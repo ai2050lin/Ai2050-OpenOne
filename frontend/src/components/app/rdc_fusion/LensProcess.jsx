@@ -1,15 +1,22 @@
-/* 过程透镜 v3：AI 自动研发工作台（M3-P1 内容层协议化，design/ui_decoupled_plan_v2.md §2）
+/* 研发透镜 v4（简化版，design/process_lens_simplify_plan_v1.md）：两栏 8 模块
    ─────────────────────────────────────────────────────────────
-   流程骨架不变（与「测什么」无关）：五证据门 + AI 模型配置 + 目标 composer + SSE 实时事件。
-   内容层 = 三个数据插槽，LIVE/DEMO 双模，只认数据键（/api/ai-rnd/queue、/workspace、
-   /api/templates、/api/results 的 schema）；demo 内容全部在 demoData.js。
-   红线（v2 §0）：本文件不出现任何具体实验字面量（Q05/F#3734/collect_ar.py 等）。 */
+   左栏 = AI 模型（折叠一行态） + 研究线队列（唯一队列；底部 = 证据链摘要 + 缺口任务链接）。
+   中栏 = Composer + GATES + 运行区（工件视图 + 实时事件 合一，常驻无 tab）。
+   右栏 = 平台运行（PlatformOps 常驻：统计/节点与租约/模板矩阵/AGG 分桶；
+     模板矩阵单元格可点击 → 在中栏「运行」展开该模板结果）。
+   v5.1：平台运行自主区 tab 移至右栏常驻（研发界面三栏：左队列 / 中运行 / 右平台）。
+   v5 去重：技术运行 tab 撤销（ResultsExplorer 结果库已含技术运行能力，见图谱透镜·结果库）；
+     分布式模板结果插槽撤销（≡平台运行模板矩阵，矩阵格改为可点击）。
+   P1/P2 删除：终端条（≡事件流重复）、右栏三卡（选中概览≡工件视图重复、跨透镜动作）、
+   运行配置硬编码（红线）、四队列子 tab（研究线/分布式/调度/缺口收敛）、技术运行 tab。
+   协议端点与启动流程不变；LIVE/DEMO 双模，demo 内容全部在 demoData.js。
+   红线（v2 §0）：本文件不出现任何具体实验字面量。 */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DEMO_QUEUE, DEMO_WORKSPACE, DEMO_ARTIFACTS, DEMO_TERMINAL } from './demoData.js';
+import { DEMO_QUEUE } from './demoData.js';
 import { TEMPLATES, DEMO_RESULTS, DEMO_SCHED, TECH_CATEGORIES, DEMO_COVERAGE, ANALYSES, LANG_TEMPLATES } from './distributedData.js';
+import PlatformOps from './PlatformOps.jsx';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
-const DEFAULT_WS_PATH = 'tests/deepseek';   // 工作区默认根（顶栏特征源选择器未来接管）
 
 const GATES=[
   {id:'gap',label:'证据缺口',phases:['analyze']},
@@ -64,7 +71,6 @@ function gapRows(catFilter){
       nTech:ANALYSES.filter(a=>a.category===c.cat).length,
     };});
 }
-function fmtSize(n){ return n>1048576?(n/1048576).toFixed(1)+' MB':(n/1024).toFixed(1)+' KB'; }
 function fmtTime(v){
   if(!v) return '—';
   const d=new Date(v);
@@ -136,7 +142,7 @@ export default function LensProcess({on,onGo}){
   const [status,setStatus]=useState({status:'idle',mode:'auto',round:0});
   const [agent,setAgent]=useState({});
   const [events,setEvents]=useState([]);
-  const [tab,setTab]=useState(0);
+  const [tab,setTab]=useState('run');   // 主区 tab 按 key（run | plat）
   const [offline,setOffline]=useState(false);
   const [busy,setBusy]=useState(false);
   const [saving,setSaving]=useState(false);
@@ -147,13 +153,6 @@ export default function LensProcess({on,onGo}){
   const [rnd,setRnd]=useState(null);            // /api/ai-rnd/queue 原样
   const [dist,setDist]=useState(null);          // [{tm_id,name,dim,results}]
   const [sched,setSched]=useState(null);        // M6-P2 /api/tasks 原样（S8 调度队列只读视图）
-  const [qTab,setQTab]=useState('rnd');
-  const [gapCat,setGapCat]=useState('all');   // M7-P1 缺口任务的技术类别过滤器
-  const [qSel,setQSel]=useState(null);          // {src:'rnd'|'dist', item}
-  const [ws,setWs]=useState(null);              // /workspace 原样
-  const [wsLive,setWsLive]=useState(false);
-  const [wsPath,setWsPath]=useState(DEFAULT_WS_PATH);
-  const [wsErr,setWsErr]=useState('');
   const [art,setArt]=useState(null);            // {type,label,loading,err,item,rows,file}
 
   const api=useCallback(async(path,opts)=>{
@@ -165,16 +164,7 @@ export default function LensProcess({on,onGo}){
     return p;
   },[]);
 
-  /* 内容层：队列 + 分布式模板 + 工作区（失败一律静默降级 DEMO） */
-  const loadWs=useCallback(async(p)=>{
-    setWsErr('');
-    try{
-      const r=await fetch(`${API_BASE}/api/ai-rnd/workspace?path=${encodeURIComponent(p)}`);
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const payload=await r.json();
-      setWs(payload); setWsLive(true); setWsPath(payload.path||p);
-    }catch{ setWs(null); setWsLive(false); setWsPath(p); }
-  },[]);
+  /* 内容层：队列 + 分布式模板（失败一律静默降级 DEMO） */
   useEffect(()=>{
     (async()=>{
       try{
@@ -197,7 +187,6 @@ export default function LensProcess({on,onGo}){
         const p=r.ok?await r.json():null;
         setSched(p&&p.stats?p:null);
       }catch{ setSched(null); }
-      loadWs(DEFAULT_WS_PATH);
     })();
   },[]); // eslint-disable-line
 
@@ -253,7 +242,7 @@ export default function LensProcess({on,onGo}){
         await api('/project-agent/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_goal:form.project_goal.trim(),max_tasks:Number(form.max_loops)||3})});
       }else if(type==='start'){
         await api('/project-agent/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,project_goal:form.project_goal.trim(),max_loops:Number(form.max_loops)||3})});
-        setTab(1);
+        setTab('run');
       }else if(type==='stop'){
         await api('/project-agent/stop',{method:'POST'});
       }
@@ -295,8 +284,7 @@ export default function LensProcess({on,onGo}){
   const rndNext=nextIdOf(rndItems);
   const rndSorted=queueRows(rndItems,8);
   const distSorted=[...distRows].sort((a,b)=>(b.results||0)-(a.results||0)).slice(0,8);
-  const gapItems=gapRows(gapCat);   // M7-P1 缺口任务（覆盖矩阵空格）
-  const wsView=wsLive?ws:DEMO_WORKSPACE;
+  const gapCount=gapRows('all').length;   // M7-P1 缺口任务计数（覆盖矩阵空格，P2 真源 /api/coverage）
   /* M6-P2 调度队列派生：LIVE 从 /api/tasks 现算剩余租约；DEMO 用快照自带 remain_h */
   const schedSrc=schedLive?sched:DEMO_SCHED;
   const schedStats=schedLive?(sched.stats||{}):DEMO_SCHED.stats;
@@ -306,19 +294,11 @@ export default function LensProcess({on,onGo}){
     :a);
   const chain=evidenceChain(rndItems,rndSealed,rndCount);
 
-  /* 默认选中：研发线最高优先待办（无则首条）；渲染与 live/demo 共用 */
-  useEffect(()=>{
-    if(qSel) return;
-    const it=rndItems.find(x=>x.status==='pending')||rndItems[0];
-    if(it) setQSel({src:'rnd',item:it});
-  },[rndItems]); // eslint-disable-line
-
   /* 选中动作：队列条目 / 工作区文件 / 分布式结果明细 */
-  const selectRnd=(item)=>{ setQSel({src:'rnd',item}); setArt({type:'queue',label:item.id+' · '+item.title,item}); setTab(0); };
+  const selectRnd=(item)=>{ setArt({type:'queue',label:item.id+' · '+item.title,item}); setTab('run'); };
   const selectDist=(row)=>{
-    setQSel({src:'dist',item:row});
     setArt({type:'dist',label:row.tm_id+' · '+(row.name||''),loading:true,row});
-    setTab(0);
+    setTab('run');
     (async()=>{
       try{
         const r=await fetch(`${API_BASE}/api/results?tm_id=${encodeURIComponent(row.tm_id)}&limit=20`);
@@ -327,33 +307,25 @@ export default function LensProcess({on,onGo}){
       }catch{ setArt(a=>(a&&a.type==='dist')?{...a,loading:false,err:'结果列表拉取失败'}:a); }
     })();
   };
-  const openFile=async(f)=>{
-    if(f.demo){
-      const d=DEMO_ARTIFACTS[f.demo];
-      setArt(d?{type:'file',label:f.name+'（demo）',file:{name:f.name,content:d.text}}:{type:'file',label:f.name,err:'demo 工件缺失'});
-      setTab(0); return;
-    }
-    setArt({type:'file',label:f.name,loading:true}); setTab(0);
-    try{
-      const r=await fetch(`${API_BASE}/api/ai-rnd/workspace/file?path=${encodeURIComponent(f.path)}`);
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const p=await r.json();
-      setArt(a=>(a&&a.type==='file')?{...a,loading:false,file:p}:a);
-    }catch(e){ setArt(a=>(a&&a.type==='file')?{...a,loading:false,err:'文件读取失败（'+e.message+'）'}:a); }
-  };
-  const wsUp=()=>{
-    const parts=wsView.path.split('/').filter(Boolean);
-    if(parts.length>1){ const up=parts.slice(0,-1).join('/'); if(loadWs) loadWs(up); }
-  };
-
+  /* 平台运行插槽（调度队列；状态在本组件，渲染归右栏 PlatformOps 节点卡内） */
+  const schedSlot=(<>
+    {schedRows.map(a=>{
+      const remain=a.remain_h;
+      return (
+        <div key={a.task_id} className="fw-q-row" style={{cursor:'default'}} title={'task '+a.task_id+' · 模板 '+a.tm_id+' · node '+(a.node_name||'?')}>
+          <span className="id">{a.tm_id}</span>{a.node_name||'?'} · {a.model||'?'}<span className={'fw-pill '+(remain<1?'':'fw-pill-run')}>{'租约 '+remain.toFixed(1)+'h'}</span>
+        </div>
+      );
+    })}
+    <div className="fw-m3-more">活跃 {schedStats.claimed||0} · 完成 {schedStats.done||0} · 失败 {schedStats.failed||0} · 过期 {schedStats.expired||0} · 单租约 {schedLease}h（{schedLive?'GET /api/tasks 实时':'demo'}）</div>
+  </>);
   const active=Boolean(agent&&agent.enabled);
   const running=status.status==='running';
   const masterReady=Boolean(config.master_model.api_key&&config.master_model.api_key.trim());
   const analystReady=config.analyst_models.filter(m=>m.api_key&&m.api_key.trim()).length;
   const ready=masterReady&&analystReady>0;
   const activeGate=GATES.findIndex(g=>g.id===gateId(status.current_phase,status.status));
-  const tabs=art?[{k:'art',label:art.label},{k:'events',label:'实时事件'}]:[{k:'events',label:'实时事件'}];
-  const tabIdx=Math.min(tab,tabs.length-1);
+  /* 主区不再分 tab（v5.1）：运行内容常驻中栏；tab 状态保留为兼容 setTab 调用的空操作 */
 
   function gateId(phase,st){
     if(!phase) return st==='stopped'?'writeback':'gap';
@@ -363,37 +335,31 @@ export default function LensProcess({on,onGo}){
 
   return (
     <section className={'fw-view fw-process'+(on?' on':'')}>
-      {/* ===== 左栏：AI 模型配置 + 任务队列 + 工作区 ===== */}
+      {/* ===== 左栏：AI 模型（折叠） + 研究线队列（唯一队列） ===== */}
       <div className="fw-pr-left">
-        <div className="fw-pr-sec">AI 模型 {offline?<span className="fw-ai-off">后端离线</span>:<span className={'fw-ai-dot'+(ready?' ok':'')} title={ready?'已就绪（主模型+分析模型均配 Key）':'配置主模型与至少一个分析模型的 API Key'}/>}</div>
-        <details className="fw-ai-card">
-          <summary><span className="fw-ai-role">主</span>{config.master_model.name||'主研发模型'}<small>{masterReady?'Key 已配':config.master_model.model_id}</small></summary>
-          <ModelFields master model={config.master_model} onChange={v=>setConfig({...config,master_model:{...v,model_type:'master'}})}/>
+        <details className="fw-ai-config">
+          <summary>
+            <span className="fw-ai-role">AI</span><b>模型配置</b>
+            {offline?<span className="fw-ai-off">后端离线</span>:<span className={'fw-ai-dot'+(ready?' ok':'')} title={ready?'已就绪（主模型+分析模型均配 Key）':'配置主模型与至少一个分析模型的 API Key'}/>}
+            <small>{offline?'—':(ready?'就绪':'缺 Key')+' · 辅 '+analystReady+'/'+config.analyst_models.length}</small>
+          </summary>
+          <div className="fw-ai-config-body">
+            <ModelFields master model={config.master_model} onChange={v=>setConfig({...config,master_model:{...v,model_type:'master'}})}/>
+            {config.analyst_models.map((m,i)=>(
+              <ModelFields key={i} model={m}
+                onChange={v=>setConfig({...config,analyst_models:config.analyst_models.map((x,j)=>j===i?{...v,model_type:'analyst'}:x)})}
+                onRemove={()=>setConfig({...config,analyst_models:config.analyst_models.filter((_,j)=>j!==i)})}/>
+            ))}
+            <button type="button" className="fw-ai-add" onClick={()=>setConfig({...config,analyst_models:[...config.analyst_models,{...EMPTY_ANALYST,name:'独立分析模型 '+(config.analyst_models.length+1)}]})}>＋ 添加分析模型</button>
+            <button type="button" className="fw-ai-save" disabled={saving||offline} onClick={saveConfig}>{saving?'保存中…':'保存模型与提示词'}</button>
+          </div>
         </details>
-        {config.analyst_models.map((m,i)=>(
-          <details className="fw-ai-card" key={i}>
-            <summary><span className="fw-ai-role an">辅</span>{m.name||('分析模型 '+(i+1))}<small>{(m.api_key&&m.api_key.trim())?'Key 已配':m.model_id}</small></summary>
-            <ModelFields model={m}
-              onChange={v=>setConfig({...config,analyst_models:config.analyst_models.map((x,j)=>j===i?{...v,model_type:'analyst'}:x)})}
-              onRemove={()=>setConfig({...config,analyst_models:config.analyst_models.filter((_,j)=>j!==i)})}/>
-          </details>
-        ))}
-        <button type="button" className="fw-ai-add" onClick={()=>setConfig({...config,analyst_models:[...config.analyst_models,{...EMPTY_ANALYST,name:'独立分析模型 '+(config.analyst_models.length+1)}]})}>＋ 添加分析模型</button>
-        <button type="button" className="fw-ai-save" disabled={saving||offline} onClick={saveConfig}>{saving?'保存中…':'保存模型与提示词'}</button>
 
         <div className="fw-pr-sec">
-          任务队列
-          <span className="fw-m3-qtabs">
-            <button type="button" className={'fw-m3-qtab'+(qTab==='rnd'?' on':'')} onClick={()=>setQTab('rnd')}>研究线</button>
-            <button type="button" className={'fw-m3-qtab'+(qTab==='dist'?' on':'')} onClick={()=>setQTab('dist')}>分布式</button>
-            <button type="button" className={'fw-m3-qtab'+(qTab==='sched'?' on':'')} onClick={()=>setQTab('sched')}>调度</button>
-            <button type="button" className={'fw-m3-qtab'+(qTab==='gap'?' on':'')} onClick={()=>setQTab('gap')} title="覆盖矩阵空格 → 任务建议（对象 × 语言模板 × 技术类别）">缺口</button>
-            <span className={'fw-src-chip mini '+((qTab==='gap'?false:(qTab==='rnd'?rndLive:qTab==='dist'?distLive:schedLive))?'live':'demo')}>
-              {qTab==='rnd'?(rndLive?'LIVE':'DEMO'):qTab==='gap'?(gapItems.length+' 格待做'):qTab==='dist'?(distLive?'LIVE':'DEMO'):(schedLive?'LIVE':'DEMO')}
-            </span>
-          </span>
+          研究线队列
+          <span className={'fw-src-chip mini '+(rndLive?'live':'demo')}>{rndLive?'LIVE':'DEMO'}</span>
         </div>
-        {qTab==='rnd'&&rndSorted.map(it=>{
+        {rndSorted.map(it=>{
           const [pl,cls]=it.status==='pending'?[(it.id===rndNext?'NEXT':'QUEUED'),(it.id===rndNext?'fw-pill-next':'')]:it.status==='sealed'?['SEALED','fw-pill-done']:['BUILT','fw-pill-run'];
           return (
             <button key={it.id} type="button" className={'fw-q-row'+(it.id===rndNext?' on':'')}
@@ -402,67 +368,12 @@ export default function LensProcess({on,onGo}){
             </button>
           );
         })}
-        {qTab==='rnd'&&<div className="fw-m3-more">共 {rndCount} 条 · sealed {rndSealed}（{rndLive?'phase_queue_v1':'demo'}）</div>}
-        {qTab==='dist'&&distSorted.map(row=>(
-          <button key={row.tm_id} type="button" className={'fw-q-row'+((row.results||0)>0?' has':'')} onClick={()=>selectDist(row)} title={row.name||''}>
-            <span className="id">{row.tm_id}</span>{row.name||row.dim}<span className={'fw-pill '+((row.results||0)>0?'fw-pill-run':'')}>{(row.results||0)>0?(row.results+' 结果'):'待测'}</span>
-          </button>
-        ))}
-        {qTab==='dist'&&<div className="fw-m3-more">共 {distRows.length} 模板（{distLive?'中心节点结果库':'demo'}）</div>}
-        {qTab==='sched'&&schedRows.map(a=>{
-          const remain=a.remain_h;
-          return (
-            <div key={a.task_id} className="fw-q-row" style={{cursor:'default'}} title={'task '+a.task_id+' · 模板 '+a.tm_id+' · node '+(a.node_name||'?')}>
-              <span className="id">{a.tm_id}</span>{a.node_name||'?'} · {a.model||'?'}<span className={'fw-pill '+(remain<1?'':'fw-pill-run')}>{'租约 '+remain.toFixed(1)+'h'}</span>
-            </div>
-          );
-        })}
-        {qTab==='sched'&&<div className="fw-m3-more">
-          活跃 {schedStats.claimed||0} · 完成 {schedStats.done||0} · 失败 {schedStats.failed||0} · 过期 {schedStats.expired||0} · 单租约 {schedLease}h
-          （{schedLive?'GET /api/tasks 实时':'demo'}）
-        </div>}
-        {qTab==='sched'&&<div className="fw-m3-more" title="概念消歧：调度队列=节点租约实时状态；研究线队列=phase_queue 依赖序；分布式=模板结果库">
-          ↑ 调度队列=节点租约（谁在领什么）· 研究线=phase 依赖序 · 两层不同
-        </div>}
-        {qTab==='gap'&&(<>
-          <div className="fw-gap-filter">
-            <button type="button" className={'fw-m3-qtab'+(gapCat==='all'?' on':'')} onClick={()=>setGapCat('all')}>全部</button>
-            {TECH_CATEGORIES.map(c=>(
-              <button key={c.id} type="button" className={'fw-m3-qtab'+(gapCat===c.id?' on':'')}
-                      style={gapCat===c.id?{borderColor:c.color,color:c.color}:undefined}
-                      onClick={()=>setGapCat(c.id)}>{c.short||c.name}</button>
-            ))}
-          </div>
-          {gapItems.map(g=>(
-            <button key={g.tpl+'__'+g.cat} type="button" className="fw-q-row"
-                    onClick={()=>{ setQSel({src:'gap',item:g}); setArt({type:'gap',label:g.tplName+' × '+g.catName,item:g}); }}
-                    title={g.note}>
-              <span className="id" style={{color:g.catColor}}>{g.tpl}</span>
-              {g.tplName} × {g.catName}
-              <span className={'fw-pill '+(g.status==='pending'?'fw-pill-run':'')}>{g.status==='pending'?'装置已建':'空格'}</span>
-            </button>
-          ))}
-          {gapItems.length===0&&<div className="fw-m3-more">该类别暂无缺口——全部模板已有该类结果。</div>}
-          <div className="fw-m3-more">缺口 = 覆盖矩阵中 status≠done 的格（对象 × 模板 × 技术类别）· 点击看输入契约与预计算力 · P2 由 /api/coverage 转真</div>
-        </>)}
-
-        <div className="fw-pr-sec">
-          工作区 {wsView.path&&<span className="fw-m3-wspath fw-mono" title={wsView.path}>/{wsView.path.split('/').pop()}</span>}
-          <span className={'fw-src-chip mini '+(wsLive?'live':'demo')}>{wsLive?'LIVE':'DEMO'}</span>
-        </div>
-        <button type="button" className="fw-file up" disabled={!wsLive} onClick={wsUp} title={wsLive?'上级目录':'demo 模式不可导航'}>◂ 上级</button>
-        {wsErr&&<div className="fw-ai-err">{wsErr}</div>}
-        {(wsView.dirs||[]).map(d=>(
-          <button key={d.path} type="button" className="fw-file dir" onClick={()=>{ if(wsLive) loadWs(d.path); }} title={d.path}>▸ {d.name}/</button>
-        ))}
-        {(wsView.files||[]).map(f=>(
-          <button key={f.path} type="button" className="fw-file" onClick={()=>openFile(f)} title={f.path+(f.size?(' · '+fmtSize(f.size)): '')}>{f.name}</button>
-        ))}
-        {wsView.truncated&&<div className="fw-m3-more">文件过多已截断（API limit）</div>}
-
-        <div className="fw-pr-sec">运行配置</div>
-        <div className="fw-q-row" style={{cursor:'default'}}><span className="id" style={{width:'auto'}}>4b bf16 · 14B/9B NF4</span></div>
-        <div className="fw-q-row" style={{cursor:'default'}}><span className="id" style={{width:'auto'}}>drift 断言 · 预注册冻结</span></div>
+        <div className="fw-m3-more">共 {rndCount} 条 · sealed {rndSealed}（{rndLive?'phase_queue_v1':'demo'}）</div>
+        {chain.map((l,i)=><div key={i} className="fw-m3-more">{l}</div>)}
+        <button type="button" className="fw-q-row" onClick={()=>onGo&&onGo('atlas','results')}
+                title="覆盖矩阵空格 → 任务建议（对象 × 语言模板 × 技术类别）· 在图谱透镜·结果库对照已覆盖格">
+          <span className="id" style={{color:'#BA7517'}}>GAP</span>缺口任务 · {gapCount} 格待做<span className="fw-pill">→ 结果库</span>
+        </button>
       </div>
 
       {/* ===== 中栏：目标 composer + 证据门 + 工件/事件 ===== */}
@@ -503,13 +414,8 @@ export default function LensProcess({on,onGo}){
           ))}
         </div>
 
-        <div className="fw-ed-tabs">
-          {tabs.map((t,i)=>(
-            <button key={t.k} type="button" className={'fw-ed-tab'+(tabIdx===i?' on':'')} onClick={()=>setTab(i)}>{t.label}</button>
-          ))}
-        </div>
         <div className="fw-ed-body">
-          {tabIdx===0&&art&&(
+          {art&&(
             <div className="fw-m3-art">
               {art.loading&&<div className="fw-pc-empty">拉取工件…</div>}
               {art.err&&<div className="fw-ai-err">{art.err}</div>}
@@ -567,7 +473,7 @@ export default function LensProcess({on,onGo}){
               )}
             </div>
           )}
-          {tabIdx===tabs.length-1&&(
+          {(
             <div className="fw-ai-events">
               {offline&&<div className="fw-ai-empty">后端 :5001 离线——启动 server.py 后，此处接入 /api/ai-rnd/session/events 实时事件流。</div>}
               {!offline&&!events.length&&<div className="fw-ai-empty">启动研发后，结构化事件（目标 / 计划 / 代码生成 / 执行 / 复核 / 回写）将在此实时滚动。</div>}
@@ -582,43 +488,13 @@ export default function LensProcess({on,onGo}){
             </div>
           )}
         </div>
-        <div className="fw-term">
-          {(events.length?events.slice(-14).reverse().map(ev=>`[${ev.type||'event'}] ${eventText(ev)}`):DEMO_TERMINAL).map((line,i)=>(
-            <div key={i} className={events.length?'fw-m3-tl':''}>{line}</div>
-          ))}
-        </div>
       </div>
 
-      {/* ===== 右栏：选中概览 + 证据链 + 跨透镜动作（全部数据驱动） ===== */}
+      {/* ===== 右栏：平台运行（基础设施监控常驻） ===== */}
       <div className="fw-pr-right">
-        <div className="fw-res-card">
-          <h5>选中概览 <span className={'fw-src-chip mini '+(rndLive?'live':'demo')}>{rndLive?'LIVE':'DEMO'}</span></h5>
-          {qSel&&qSel.src==='rnd'&&(
-            <KVList pairs={[
-              ['ID',qSel.item.id,true],['标题',qSel.item.title],['状态',qSel.item.status],
-              ['KPI',qSel.item.kpi,true],['交付物',qSel.item.deliverable],
-              ['seal 记录',qSel.item.seal_record,true],['结果 SHA8',qSel.item.res_sha8,true],
-            ]}/>
-          )}
-          {qSel&&qSel.src==='dist'&&(
-            <KVList pairs={[['模板',qSel.item.tm_id,true],['名称',qSel.item.name],['维度',qSel.item.dim],['结果数',qSel.item.results]]}/>
-          )}
-          {qSel&&qSel.src==='gap'&&(
-            <KVList pairs={[['缺口',qSel.item.tplName+' × '+qSel.item.catName],['状态',qSel.item.status==='pending'?'装置已建':'空格'],['契约',qSel.item.input,true]]}/>
-          )}
-        </div>
-        <div className="fw-res-card">
-          <h5>证据链</h5>
-          <div className="meta">{chain.map((l,i)=><span key={i}>{l}<br/></span>)}</div>
-        </div>
-        <div className="fw-res-card">
-          <h5>跨透镜动作</h5>
-          <div className="fw-xact">
-            <button className="fw-tbtn" onClick={()=>onGo('spatial')}>在 3D 中查看</button>
-            <button className="fw-tbtn" onClick={()=>onGo('data')}>到分析技术运行</button>
-          </div>
-        </div>
+        <PlatformOps schedSlot={schedSlot} onOpenDist={selectDist}/>
       </div>
     </section>
+
   );
 }

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语言模板 · 3D 关系空间 — 设计原型 v1</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --line:#e2e5ea; --line2:#eef0f3;
+    --t1:#1c2024; --t2:#5b6470; --t3:#9aa3ad;
+    --kn:#0ea5e9; --ar:#d85a30; --gr:#059669;
+    --e2:#10b981; --e3:#f59e0b; --e1:#3b82f6; --gap:#dc2626;
+    --chip:#f1f3f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--t1);font:13px/1.55 "Segoe UI","Microsoft YaHei",sans-serif;padding:18px 22px}
+  .mono{font-family:Consolas,"JetBrains Mono",monospace}
+
+  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#334155,#0f172a);color:#fff;display:grid;place-items:center;font-size:11px}
+  .brand small{color:var(--t3);font-weight:400}
+  .crumb{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--t2);font-size:12px}
+  .src-chip{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid #a7f3d0;background:#ecfdf5;color:#047857}
+
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .toolbar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+  .tbtn{font-size:11px;padding:3px 11px;border:1px solid var(--line);border-radius:99px;background:#fff;color:var(--t2);cursor:pointer}
+  .tbtn:hover{border-color:#c9d2dc}
+  .tbtn.on{background:#0f172a;color:#fff;border-color:#0f172a}
+  .tsep{width:1px;height:16px;background:var(--line)}
+  .mchip{font-size:11px;padding:3px 11px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--t2)}
+  .mchip i{width:8px;height:8px;border-radius:50%}
+  .mchip.off{opacity:.35}
+  .thint{margin-left:auto;font-size:10px;color:var(--t3)}
+  #cv{display:block;width:100%;height:540px;cursor:grab;background:
+    radial-gradient(ellipse at 50% 120%, #f0f4f8 0%, #ffffff 60%)}
+  #cv.drag{cursor:grabbing}
+
+  /* 详情面板 */
+  .detail{border-top:1px solid var(--line);padding:14px 18px;display:none;background:#fcfcfd}
+  .detail.on{display:block}
+  .d-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .d-head h3{font-size:15px}
+  .d-head .pat{font-size:12px;color:var(--mc,#0ea5e9)}
+  .d-head .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .st{font-size:10px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--t2)}
+  .st.measured{color:#047857;border-color:#a7f3d0;background:#ecfdf5}
+  .st.collecting{color:#0369a1;border-color:#bae6fd;background:#f0f9ff}
+  .st.demo{color:#92400e;border-color:#fde68a;background:#fffbeb}
+  .st.pending{color:var(--t3)}
+  .st.done{color:#047857;border-color:#a7f3d0;background:#ecfdf5}
+  .st.gap{color:var(--gap);border-color:#fecaca;background:#fef2f2}
+  .d-grid{display:grid;grid-template-columns:1.15fr .85fr 1.1fr;gap:14px}
+  .d-sec{border:1px solid var(--line2);border-radius:10px;padding:10px 12px;background:#fff}
+  .d-sec h6{font-size:10px;letter-spacing:1px;color:var(--t3);margin-bottom:7px}
+  .kv{display:flex;font-size:11.5px;padding:2.5px 0;color:var(--t2)}
+  .kv span:first-child{width:76px;flex:none;color:var(--t3)}
+  .kv b{color:var(--t1);font-weight:600}
+  .tokline{margin:4px 0 2px;font-size:12.5px;line-height:1.9}
+  .tok{padding:1px 3px;border-radius:4px}
+  .toknote{font-size:10px;color:var(--t3);margin-bottom:4px}
+  .ftr-row{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px dashed var(--line2);font-size:11px}
+  .ftr-row:last-child{border-bottom:none}
+  .ftr-row .dot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:4px}
+  .ftr-row .fid{width:50px;flex:none}
+  .ftr-row .fst{color:var(--t2)}
+  .eb{font-size:9px;padding:0 6px;border-radius:99px;color:#fff;flex:none;margin-top:2px}
+  .gapbox{font-size:11px;color:var(--gap);background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:7px 10px}
+  .d-empty{color:var(--t3);font-size:11px;padding:6px 0}
+
+  .legend{display:flex;gap:16px;align-items:center;padding:9px 14px;border-top:1px solid var(--line2);font-size:11px;color:var(--t2);flex-wrap:wrap}
+  .legend .li{display:flex;align-items:center;gap:5px}
+  .legend .sw{width:22px;height:0;border-top:2px solid #94a3b8}
+  .legend .sw.fam{border-top-color:#c084fc}
+  .legend .sw.x{border-top-style:dashed}
+  .legend .note{margin-left:auto;font-size:10px;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><div class="mark">A2</div>Ai2050 Atlas <small>路线 · 图谱 — 语言模板 3D 关系空间（设计原型 v1）</small></div>
+  <div class="crumb">
+    <span class="mono">12 模板 · 3 模块 · 关系边 = 共享机制 / 同族 / 跨模块桥</span>
+    <span class="src-chip">● 数据 = LANG_TEMPLATES + registry v1.30 摘录</span>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="toolbar">
+    <button class="tbtn on" id="btnRot">⟳ 自动旋转</button>
+    <button class="tbtn" id="btnReset">复位视角</button>
+    <span class="tsep"></span>
+    <button class="mchip" data-mod="KN"><i style="background:var(--kn)"></i>知识网络</button>
+    <button class="mchip" data-mod="AR"><i style="background:var(--ar)"></i>推理功能</button>
+    <button class="mchip" data-mod="GR"><i style="background:var(--gr)"></i>语法机制</button>
+    <span class="tsep"></span>
+    <button class="tbtn on" id="btnLbl">边标签</button>
+    <span class="thint">拖拽旋转 · 滚轮缩放 · 点击节点看测试详情</span>
+  </div>
+  <canvas id="cv"></canvas>
+  <div class="legend">
+    <span class="li"><span class="sw"></span>共享编码机制（边标签 = 共享 FTR）</span>
+    <span class="li"><span class="sw fam"></span>同模板家族（关系族 / 最小对 / 探针）</span>
+    <span class="li"><span class="sw x"></span>跨模块桥（经交叉特征 FTR-05/07/08）</span>
+    <span class="li"><i style="width:9px;height:9px;border-radius:50%;background:var(--gap);display:inline-block"></i>缺口模板（无机制对应）</span>
+    <span class="note">示意布局：模块聚簇 + 确定性布点（黄金角），非模型真实几何</span>
+  </div>
+  <div class="detail" id="detail"></div>
+</div>
+
+<script>
+/* ═══════════ 数据（真实 LANG_TEMPLATES / TM-xx / registry v1.30 摘录） ═══════════ */
+const MOD_COLOR={KN:'#0ea5e9',AR:'#d85a30',GR:'#059669'};
+const MOD_NAME={KN:'知识网络',AR:'推理功能',GR:'语法机制'};
+const MOD_CENTER={KN:[-2.6,0,-1.15],AR:[2.6,0,-1.15],GR:[0,0.15,2.45]};
+const E_COLOR={E2_predictive:'#10b981',E2_held_out:'#10b981',E2_behavioral:'#10b981',E3_causal_scoped:'#f59e0b',E1_repeatable:'#3b82f6'};
+const E_SHORT={E2_predictive:'E2',E2_held_out:'E2h',E2_behavioral:'E2b',E3_causal_scoped:'E3',E1_repeatable:'E1'};
+
+const FTRS={
+ 'FTR-01':{lv:'E2_predictive',st:'KOUT 残差流读出由 content 主导：C=57.6% / S=19.4% / R=15.9%'},
+ 'FTR-02':{lv:'E2_predictive',st:'K2 条件门近似可分离：交互份额 15–18% 远低于 50% 死线'},
+ 'FTR-03':{lv:'E2_predictive',st:'逻辑（真/假）信号中层稳定存在且可泛化：回归三模型全显著 + held-out 全过'},
+ 'FTR-04':{lv:'E1_repeatable',st:'类词方向配方跨模型重建成功（J4 质心差分 float32 链）'},
+ 'FTR-05':{lv:'E2_predictive',st:'类词×知识读出子空间几何可分且跨模型（67.0/71.9/74.0°）',cross:'X1 · SxK'},
+ 'FTR-06':{lv:'E2_predictive',st:'属性/语法词方向子空间与知识读出、逻辑方向几何可分（68.1°）'},
+ 'FTR-07':{lv:'E2_predictive',st:'逻辑方向不是类词方向的混淆（73.7/81.4/80.8° separable×3）',cross:'X2 · RxS'},
+ 'FTR-08':{lv:'E2_predictive',st:'逻辑方向与实体子空间弱混合且模型特异（45.8/26.6/46.0°）',cross:'X3 · RxK'},
+ 'FTR-12':{lv:'E2_predictive',st:'上下文二元门控：单 token 前缀即塌缩 massive activation 11072→428'},
+ 'FTR-13':{lv:'E2_predictive',st:'RoPE 纯相对性（输出级）：位置平移族输出近似不变'},
+ 'FTR-14':{lv:'E1_repeatable',st:'T_C 几何：共享分量关系无关（cos≈0.56）+ 内容特异并存'},
+ 'FTR-17':{lv:'E2_predictive',st:'E_read 未见组合读出误差基线：池化 0.3734，5% 门 0/3'},
+ 'FTR-18':{lv:'E2_predictive',st:'E_ar(k) 装置与精度桥：四臂 738×K16，max|Δrel|=0.0489'},
+ 'FTR-20':{lv:'E2_predictive',st:'谱外崩塌两线独立确认：未见类别读出误差全类最差'},
+ 'FTR-21':{lv:'E2_predictive',st:'谱外崩塌量化：E_oov=0.9479 vs 谱内基线'},
+ 'FTR-22':{lv:'E2_predictive',st:'谱外端口校准恢复曲线（3172 协议内干预）'},
+ 'FTR-23':{lv:'E2_held_out',st:'T_C 共享分量携带关系特异残差（3178 归因定判）'},
+ 'FTR-24':{lv:'E1_repeatable',st:'跨关系偏移向量低秩（关系方向不承载谱外可预测性）'},
+ 'FTR-25':{lv:'E2_behavioral',st:'谱外崩塌共享方向：SVD top1 能量 0.30，类间>类内 ×3'},
+ 'FTR-26':{lv:'E2_behavioral',st:'u* 是相对编码几何中的新成分（OOV 特异 KS≈0.98）'},
+};
+
+/* links: [FTR, kind]  a=实测锚定 c=采集中 x=跨模块桥 */
+const TEMPLATES=[
+ {id:'is_a',mod:'KN',name:'is-a 上位/下位',pat:'{X} 是一种 {Y}',tm:'TM-07',st:'measured',metric:'E_read=0.3316',family:'关系族',
+  prod:{nodes:5,cells:312,agg:'collecting'},peaks:{mlp:3,res:4,attn:3},lookback:'from 一种 → to 苹果：完成关系绑定',
+  links:[['FTR-01','a'],['FTR-02','a'],['FTR-17','a'],['FTR-18','a'],['FTR-04','a'],['FTR-20','a'],['FTR-21','a'],['FTR-22','a'],['FTR-25','a'],['FTR-26','a']],
+  toks:[['苹果',0],['是',0],['一种',0],['水果',0.95],['，',0],['富含',0.45],['维生素',0]],
+  toks2:[['香蕉',0],['、',0],['菠萝',0],['都',0],['属于',0],['水果',0.95]]},
+ {id:'attr',mod:'KN',name:'属性关系',pat:'{X} 是 {ADJ} 的',tm:'TM-08',st:'demo',metric:'—',family:'关系族',
+  prod:{nodes:4,cells:388,agg:'collecting'},peaks:{mlp:2,res:3,attn:2},lookback:'from 坚硬 → to 石头：完成属性主体绑定',
+  links:[['FTR-06','c']],
+  toks:[['石头',0],['很',0],['坚硬',0.9],['，',0],['海绵',0.1],['却',0],['柔软',0.7]]},
+ {id:'part_of',mod:'KN',name:'部分-整体',pat:'{X} 的 {Y}',tm:'—',st:'demo',metric:'—',family:'关系族',gap:'meronymy 读出未立项——无任何特征锚定',
+  prod:{nodes:0,cells:0,agg:'pending'},peaks:{mlp:2,res:4,attn:2},lookback:'from 部件 → to 汽车：回看整体词完成绑定',
+  links:[],
+  toks:[['车轮',0],['是',0],['汽车',0],['的',0],['部件',0.85],['，',0],['可',0],['更换',0.3]]},
+ {id:'tm06',mod:'KN',name:'数字与计数',pat:'{N} 个 {X}',tm:'TM-06',st:'pending',metric:'—',family:'内容探针',gap:'数词/计数机制未立项',
+  prod:{nodes:3,cells:214,agg:'pending'},links:[],toks:[['三个',0.6],['苹果',0.9],['和',0],['五',0.5],['颗',0],['葡萄',0.85]]},
+ {id:'tm05',mod:'KN',name:'实体×位置 等变网格',pat:'内容寻址解引用',tm:'TM-05',st:'collecting',metric:'—',family:'结构探针',
+  prod:{nodes:1,cells:6,agg:'collecting'},links:[['FTR-12','c']],toks:[['把',0],['苹果',0.9],['放到',0.3],['桌子',0.7],['上',0.4]]},
+ {id:'tm04',mod:'KN',name:'句式×知识 因子网格',pat:'反词嵌入指纹',tm:'TM-04',st:'collecting',metric:'—',family:'结构探针',
+  prod:{nodes:1,cells:16,agg:'collecting'},links:[['FTR-01','c']],toks:[['同义改写',0.5],['×',0],['实体替换',0.8],['网格',0.4]]},
+ {id:'tm03',mod:'AR',name:'逻辑连接词',pat:'因为 / 但是 / 而且',tm:'TM-03',st:'collecting',metric:'—',family:'逻辑族',
+  prod:{nodes:4,cells:1204,agg:'collecting'},links:[['FTR-03','c']],toks:[['因为',0.8],['下雨',0.5],['，',0],['所以',0.85],['比赛',0.4],['取消',0.6]]},
+ {id:'tm12',mod:'AR',name:'否定与转折',pat:'不是 / 然而 / 反而',tm:'TM-12',st:'collecting',metric:'—',family:'逻辑族',
+  prod:{nodes:3,cells:305,agg:'collecting'},links:[['FTR-03','c'],['FTR-08','x']],toks:[['这',0],['不是',0.9],['苹果',0.7],['，',0],['而是',0.85],['梨',0.75]]},
+ {id:'logic_tf',mod:'AR',name:'真/假命题判别',pat:'{P} 是对的 / 错的',tm:'3154/3166 实测',st:'measured',metric:'held-out 全过 ×3 模型',family:'逻辑族',
+  prod:{nodes:0,cells:0,agg:'done'},links:[['FTR-03','a'],['FTR-07','x']],toks:[['「香蕉是水果」',0.6],['是',0.2],['对的',0.95]]},
+ {id:'syntax',mod:'GR',name:'句法角色',pat:'{X} {V} {Y}（语序消融）',tm:'TM-09',st:'demo',metric:'—',family:'句法族',
+  prod:{nodes:4,cells:96,agg:'pending'},peaks:{mlp:2,res:3,attn:1},lookback:'from 追 → to 猫：完成施事角色指派',
+  links:[['FTR-06','c'],['FTR-23','c']],toks:[['猫',0.85],['追',0.3],['狗',0.1],['，',0],['狗',0.85],['却',0],['躲开',0.4]]},
+ {id:'tm10',mod:'GR',name:'重复填充句',pat:'纯位置响应 p_ℓ(pos)',tm:'TM-10',st:'done',metric:'738 cells done',family:'位置探针',
+  prod:{nodes:2,cells:738,agg:'done'},links:[['FTR-13','a']],toks:[['的',0.3],['的',0.5],['的',0.7],['的',0.9],['的',0.6]]},
+ {id:'tm01',mod:'GR',name:'语言最小对（中↔英）',pat:'同一语义 × 两种语言',tm:'TM-01',st:'collecting',metric:'812 cells',family:'最小对',
+  prod:{nodes:6,cells:812,agg:'collecting'},links:[['FTR-14','c']],toks:[['苹果',0.8],['是',0.2],['水果',0.9],['/',0],['Apple',0.75],['is',0.2],['fruit',0.9]]},
+ {id:'tm11',mod:'GR',name:'多语言混合句',pat:'中英混排 · 语码转换',tm:'TM-11',st:'collecting',metric:'261 cells',family:'最小对',
+  prod:{nodes:3,cells:261,agg:'collecting'},links:[['FTR-24','c']],toks:[['我',0.4],['like',0.7],['吃',0.5],['apple',0.9]]},
+ {id:'tm02',mod:'GR',name:'风格最小对（论文↔聊天）',pat:'同一内容 × 两种语体',tm:'TM-02',st:'collecting',metric:'533 cells',family:'最小对',
+  prod:{nodes:5,cells:533,agg:'collecting'},links:[['FTR-12','c']],toks:[['本文论证',0.7],['/',0],['说白了',0.8]]},
+];
+
+/* ═══════════ 3D 布点（确定性：黄金角螺旋，零随机） ═══════════ */
+const GOLD=2.399963229728653;
+const byMod={}; TEMPLATES.forEach(t=>{(byMod[t.mod]=byMod[t.mod]||[]).push(t);});
+Object.entries(byMod).forEach(([m,arr])=>{
+  arr.forEach((t,i)=>{
+    const r=0.62+0.30*i, a=i*GOLD, c=MOD_CENTER[m];
+    t.pos=[c[0]+r*Math.cos(a), c[1]+0.30*Math.sin(i*1.7)+0.15*i/arr.length, c[2]+r*Math.sin(a)];
+  });
+});
+
+/* 关系边：shared=共享 FTR（去掉 x 桥，x 单独算）/ family=同族 / xbridge=跨模块桥 */
+const EDGES=[];
+for(let i=0;i<TEMPLATES.length;i++)for(let j=i+1;j<TEMPLATES.length;j++){
+  const a=TEMPLATES[i],b=TEMPLATES[j];
+  const af=a.links.filter(l=>l[1]!=='x').map(l=>l[0]), bf=b.links.filter(l=>l[1]!=='x').map(l=>l[0]);
+  const shared=af.filter(f=>bf.includes(f));
+  if(shared.length) EDGES.push({a:a.id,b:b.id,type:'shared',label:shared.join(' ')});
+  if(a.family===b.family&&a.family) EDGES.push({a:a.id,b:b.id,type:'family',label:a.family});
+  const ax=a.links.filter(l=>l[1]==='x').map(l=>l[0]), bx=b.links.filter(l=>l[1]==='x').map(l=>l[0]);
+  const xs=ax.filter(f=>bx.includes(f));
+  if(xs.length) EDGES.push({a:a.id,b:b.id,type:'xbridge',label:xs.join(' ')});
+}
+
+/* ═══════════ Canvas 3D 渲染 ═══════════ */
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1;
+let yaw=0.65, pitch=0.42, zoom=1, autoRot=true, showLbl=true;
+let sel=null, hover=null, modOff={};
+const tp={}; // id → 投影后 {x,y,z,r}
+
+function resize(){
+  DPR=window.devicePixelRatio||1;
+  W=cv.clientWidth; H=cv.clientHeight;
+  cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize',()=>{resize();draw();});
+
+function project(p){
+  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  let x=p[0]*cy-p[2]*sy, z=p[0]*sy+p[2]*cy, y=p[1];
+  let y2=y*cp-z*sp, z2=y*sp+z*cp;
+  const f=4.6, s=(f/(f+z2))*Math.min(W,H)*0.148*zoom;
+  return {x:W/2+x*s, y:H/2-y2*s+22, z:z2, s};
+}
+
+function nodeVisible(t){return !modOff[t.mod];}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  /* 地面网格（y=-0.95 平面） */
+  ctx.lineWidth=1;
+  for(let g=-4;g<=4;g++){
+    const p1=project([g,-0.95,-4]),p2=project([g,-0.95,4]),p3=project([-4,-0.95,g]),p4=project([4,-0.95,g]);
+    ctx.strokeStyle=g===0?'#dfe4ea':'#eef1f4';
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(p3.x,p3.y);ctx.lineTo(p4.x,p4.y);ctx.stroke();
+  }
+  /* 模块区域环 + 标签 */
+  Object.entries(MOD_CENTER).forEach(([m,c])=>{
+    if(modOff[m])return;
+    ctx.beginPath();
+    for(let k=0;k<=48;k++){
+      const a=k/48*Math.PI*2, p=project([c[0]+1.75*Math.cos(a),-0.9,c[2]+1.75*Math.sin(a)]);
+      k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);
+    }
+    ctx.strokeStyle=MOD_COLOR[m]+'55';ctx.lineWidth=1.2;ctx.stroke();
+    ctx.fillStyle=MOD_COLOR[m]+'0d';ctx.fill();
+    const lp=project([c[0],-0.9,c[2]+1.95]);
+    ctx.font='700 12px "Segoe UI","Microsoft YaHei"';ctx.textAlign='center';
+    ctx.fillStyle=MOD_COLOR[m];ctx.fillText(MOD_NAME[m],lp.x,lp.y);
+  });
+  /* 边 */
+  EDGES.forEach(e=>{
+    const a=TEMPLATES.find(t=>t.id===e.a),b=TEMPLATES.find(t=>t.id===e.b);
+    if(!nodeVisible(a)||!nodeVisible(b))return;
+    const pa=tp[e.a],pb=tp[e.b]; if(!pa||!pb)return;
+    const hl=sel&&(sel===e.a||sel===e.b);
+    const dim=sel&&!hl;
+    let col=e.type==='shared'?'#64748b':e.type==='family'?'#c084fc':'#d85a30';
+    ctx.strokeStyle=col; ctx.globalAlpha=dim?0.06:hl?0.95:(e.type==='shared'?0.45:e.type==='family'?0.4:0.6);
+    ctx.lineWidth=hl?2:e.type==='xbridge'?1.4:1.1;
+    ctx.setLineDash(e.type==='xbridge'?[5,4]:[]);
+    ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();
+    ctx.setLineDash([]);ctx.globalAlpha=1;
+    if(showLbl&&(hl||(!sel&&e.type!=='family'))){
+      const mx=(pa.x+pb.x)/2,my=(pa.y+pb.y)/2;
+      ctx.font='9.5px Consolas,monospace';ctx.textAlign='center';
+      ctx.fillStyle=dim?'#cbd2da':col;
+      ctx.fillText(e.label,mx,my-3);
+    }
+  });
+  /* 节点（深度排序，远的先画） */
+  const nodes=TEMPLATES.filter(nodeVisible).map(t=>({t,p:tp[t.id]})).sort((a,b)=>b.p.z-a.p.z);
+  nodes.forEach(({t,p})=>{
+    const hlSel=sel===t.id, dim=sel&&!hlSel&&!EDGES.some(e=>(e.a===sel&&e.b===t.id)||(e.b===sel&&e.a===t.id));
+    const r=(hlSel?9:hover===t.id?8:6.5)*(0.75+p.s/(Math.min(W,H)*0.12));
+    ctx.globalAlpha=dim?0.18:1;
+    /* 光晕 */
+    if(hlSel){ctx.beginPath();ctx.arc(p.x,p.y,r+7,0,7);ctx.fillStyle=MOD_COLOR[t.mod]+'33';ctx.fill();}
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);
+    ctx.fillStyle=t.gap?'#fef2f2':MOD_COLOR[t.mod];
+    ctx.fill();
+    ctx.lineWidth=t.gap?1.6:1.2;
+    ctx.strokeStyle=t.gap?'#dc2626':'#ffffff';ctx.stroke();
+    if(t.gap){ctx.beginPath();ctx.arc(p.x,p.y,2.4,0,7);ctx.fillStyle='#dc2626';ctx.fill();}
+    /* 标签 */
+    ctx.font=(hlSel?'700 ':'')+'11px "Segoe UI","Microsoft YaHei"';ctx.textAlign='center';
+    ctx.fillStyle=dim?'#c4ccd4':'#1c2024';
+    ctx.fillText(t.name,p.x,p.y-r-5);
+    ctx.globalAlpha=1;
+  });
+  /* hover 提示 */
+  if(hover&&!sel){
+    const t=TEMPLATES.find(x=>x.id===hover),p=tp[hover];
+    ctx.font='10px "Segoe UI"';ctx.textAlign='center';ctx.fillStyle='#5b6470';
+    ctx.fillText(t.pat+' · '+t.tm,p.x,p.y+ (tp[hover].s? 20:20));
+  }
+}
+
+function tick(){
+  TEMPLATES.forEach(t=>{tp[t.id]=project(t.pos);});
+  draw();
+  if(autoRot&&!dragging){yaw+=0.0028;}
+  requestAnimationFrame(tick);
+}
+
+/* ═══════════ 交互 ═══════════ */
+let dragging=false,moved=0,lx=0,ly=0;
+cv.addEventListener('mousedown',e=>{dragging=true;moved=0;lx=e.clientX;ly=e.clientY;cv.classList.add('drag');});
+window.addEventListener('mousemove',e=>{
+  if(dragging){
+    yaw+=(e.clientX-lx)*0.006; pitch+=(e.clientY-ly)*0.006;
+    pitch=Math.max(-1.2,Math.min(1.35,pitch));
+    moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly); lx=e.clientX;ly=e.clientY;
+  }else{
+    const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    hover=null;
+    TEMPLATES.filter(nodeVisible).forEach(t=>{const p=tp[t.id];if(p&&Math.hypot(p.x-mx,p.y-my)<11)hover=t.id;});
+    cv.style.cursor=hover?'pointer':'grab';
+  }
+});
+window.addEventListener('mouseup',e=>{
+  if(dragging&&moved<5){
+    const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    let best=null,bd=16;
+    TEMPLATES.filter(nodeVisible).forEach(t=>{const p=tp[t.id];if(!p)return;const d=Math.hypot(p.x-mx,p.y-my);if(d<bd){bd=d;best=t.id;}});
+    sel=best; showDetail();
+  }
+  dragging=false;cv.classList.remove('drag');
+});
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.45,Math.min(2.6,zoom*(e.deltaY>0?0.92:1.09)));},{passive:false});
+
+document.getElementById('btnRot').onclick=e=>{autoRot=!autoRot;e.target.classList.toggle('on',autoRot);};
+document.getElementById('btnLbl').onclick=e=>{showLbl=!showLbl;e.target.classList.toggle('on',showLbl);};
+document.getElementById('btnReset').onclick=()=>{yaw=0.65;pitch=0.42;zoom=1;};
+document.querySelectorAll('.mchip').forEach(ch=>ch.onclick=()=>{
+  const m=ch.dataset.mod; modOff[m]=!modOff[m]; ch.classList.toggle('off',modOff[m]);
+  if(sel&&modOff[TEMPLATES.find(t=>t.id===sel).mod]){sel=null;showDetail();}
+});
+
+/* ═══════════ 详情面板 ═══════════ */
+const ST_NAME={measured:'已实测',collecting:'采集中',demo:'DEMO',pending:'待启动',done:'已完成'};
+function tokHTML(toks){
+  return '<div class="tokline">'+toks.map(([tx,v])=>{
+    const bg=v>0?`background:rgba(52,211,153,${v});color:${v>0.6?'#022c22':'#064e3b'}`:'';
+    return `<span class="tok" style="${bg}">${tx}</span>`;
+  }).join(' ')+'</div>';
+}
+function showDetail(){
+  const d=document.getElementById('detail');
+  if(!sel){d.className='detail';return;}
+  const t=TEMPLATES.find(x=>x.id===sel);
+  const rel=EDGES.filter(e=>e.a===sel||e.b===sel);
+  d.innerHTML=`
+   <div class="d-head" style="--mc:${MOD_COLOR[t.mod]}">
+     <span style="width:11px;height:11px;border-radius:50%;background:${MOD_COLOR[t.mod]}"></span>
+     <h3>${t.name}</h3><span class="pat mono">${t.pat}</span>
+     <span class="d-right">
+       <span class="st ${t.st}">${ST_NAME[t.st]}</span>
+       <span class="st">${t.tm}</span>
+       <span class="st mono">${t.metric}</span>
+       ${t.gap?`<span class="st gap">缺口</span>`:''}
+     </span>
+   </div>
+   <div class="d-grid">
+     <div class="d-sec"><h6>测试输入 · 最大激活示例</h6>
+       ${t.toks?`<div class="toknote">token 着色 = 激活强度（0–1，绿底）</div>${tokHTML(t.toks)}`:'<div class="d-empty">无激活样例</div>'}
+       ${t.toks2?tokHTML(t.toks2):''}
+       ${t.lookback?`<div class="kv"><span>attention 回看</span><b>${t.lookback}</b></div>`:''}
+     </div>
+     <div class="d-sec"><h6>生产与采集（${t.tm}）</h6>
+       <div class="kv"><span>归属模块</span><b style="color:${MOD_COLOR[t.mod]}">${MOD_NAME[t.mod]}</b> ｜ 家族 <b>${t.family||'—'}</b></div>
+       <div class="kv"><span>节点 / cells</span><b class="mono">${t.prod.nodes} 节点 · ${t.prod.cells} cells</b></div>
+       <div class="kv"><span>聚合状态</span><b class="mono">${t.prod.agg}</b></div>
+       ${t.peaks?`<div class="kv"><span>峰位</span><b class="mono">MLP L${t.peaks.mlp} · Res L${t.peaks.res} · Attn L${t.peaks.attn}</b></div>`:''}
+       <div class="kv"><span>关联模板</span><b>${rel.length?rel.map(e=>{const o=e.a===sel?e.b:e.a;return TEMPLATES.find(x=>x.id===o).name;}).join(' · '):'无（孤立节点）'}</b></div>
+       ${t.gap?`<div class="gapbox" style="margin-top:6px">⚠ ${t.gap}——建议立项补测</div>`:''}
+     </div>
+     <div class="d-sec"><h6>对应 LLM 编码机制（模板 → 特征关联）</h6>
+       ${t.links.length?t.links.map(([fid,kind])=>{const f=FTRS[fid];return `
+         <div class="ftr-row">
+           <span class="dot" style="background:${E_COLOR[f.lv]}"></span>
+           <span class="fid mono">${fid}</span>
+           <span class="eb" style="background:${E_COLOR[f.lv]}">${E_SHORT[f.lv]}</span>
+           <span class="fst">${f.st}${f.cross?` <span class="mono" style="color:#d85a30">[${f.cross} 交叉边]</span>`:''}
+             <span style="color:#9aa3ad">（${kind==='a'?'实测锚定':kind==='c'?'采集中':'跨模块桥'}）</span></span>
+         </div>`;}).join(''):'<div class="d-empty">无特征锚定——列入缺口清单</div>'}
+     </div>
+   </div>`;
+  d.className='detail on';
+}
+
+resize();tick();
+</script>
+</body>
+</html>

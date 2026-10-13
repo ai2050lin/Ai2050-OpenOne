@@ -1,11 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-// 3D可视化主界面（炫酷风格）
+// 旧版 3D 主界面 —— 归档为 /legacy（原样保留、无入口链接）
 import App from './App.jsx'
-// 新工作台架构备份: import App from './AppNew.jsx'
 import './index.css'
 import './css/DNNAnalysisControlPanel.css'
 import ErrorBoundary from './ErrorBoundary.jsx'
+// v5 工作台（唯一主入口，/ 与 /rdc-fusion 等价；URL 即状态 ?lens ?obj ?atlasTab）
+import RdcFusionWorkspace from './components/app/RdcFusionWorkspace.jsx'
+// rdc-* 专项页统一壳（P2 收敛：页头含返回工作台；目录见图谱透镜「专项视图」tab）
+import RdcPageShell from './components/app/RdcPageShell.jsx'
 import RdcFeatureAtlas from './components/app/RdcFeatureAtlas.jsx'
 import RdcPrefixAtlas from './components/app/RdcPrefixAtlas.jsx'
 import RdcRelationStudy from './components/app/RdcRelationStudy.jsx'
@@ -16,14 +19,34 @@ import RdcBindingAtlas from './components/app/RdcBindingAtlas.jsx'
 import RdcUpdateAtlas from './components/app/RdcUpdateAtlas.jsx'
 import RdcQueryAtlas from './components/app/RdcQueryAtlas.jsx'
 import RdcConstructionAtlas from './components/app/RdcConstructionAtlas.jsx'
-// v5 三透镜融合驾驶舱（3D / AI 研发 / 行业进展 同一对象路由），新增页面，不影响其他入口
-import RdcFusionWorkspace from './components/app/RdcFusionWorkspace.jsx'
+
+/* 路由表：[路径, 页面组件, 标题]。逐页协议化并入图谱透镜后，从此表删除对应行即可。 */
+const RDC_ROUTES = [
+  ['/rdc', RdcFeatureAtlas, '语言结构 · 原生坐标 · 提取算法'],
+  ['/rdc-prefix', RdcPrefixAtlas, '共同前缀库 · 全坐标图谱'],
+  ['/rdc-relation', RdcRelationStudy, '自然前缀 · 关系与状态更新'],
+  ['/rdc-joint', RdcJointAtlas, '自然语言 · 条件坐标联合图谱'],
+  ['/rdc-operator', RdcOperatorAtlas, '普通语言位置 · 完整坐标 · 真实输出'],
+  ['/rdc-law', RdcLawAtlas, '条件规律与训练形成图谱'],
+  ['/rdc-binding', RdcBindingAtlas, '来源绑定与训练形成图谱'],
+  ['/rdc-update', RdcUpdateAtlas, '关系、学习与自回归接续图谱'],
+  ['/rdc-query', RdcQueryAtlas, '条件查询与有序来源图谱'],
+  ['/rdc-construction', RdcConstructionAtlas, '语境怎样构造查询'],
+];
+
+const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+const hit = RDC_ROUTES.find(([p]) => p === path);
+const LegacyPage = hit ? hit[1] : null;
+const legacyTitle = hit ? hit[2] : '';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      {/* 默认首页 = 融合驾驶舱（/ 与 /rdc-fusion 等价）；旧版首页隐藏到 /legacy（原样保留、无入口链接），其余 rdc-* 子页路径不变 */}
-      {window.location.pathname === '/rdc-fusion' || window.location.pathname === '/' ? <RdcFusionWorkspace /> : window.location.pathname === '/legacy' ? <><App /><a href="/rdc-query" style={{position:'fixed',right:18,bottom:18,zIndex:10000,background:'#173347',color:'#b8e5ee',border:'1px solid #4b718a',borderRadius:7,padding:'10px 16px',fontSize:12}}>RDC 条件查询与有序来源图谱 ↗</a></> : window.location.pathname === '/rdc-construction' ? <RdcConstructionAtlas /> : window.location.pathname === '/rdc-query' ? <RdcQueryAtlas /> : window.location.pathname === '/rdc-update' ? <RdcUpdateAtlas /> : window.location.pathname === '/rdc-binding' ? <RdcBindingAtlas /> : window.location.pathname === '/rdc-law' ? <RdcLawAtlas /> : window.location.pathname === '/rdc-operator' ? <RdcOperatorAtlas /> : window.location.pathname === '/rdc-joint' ? <RdcJointAtlas /> : window.location.pathname === '/rdc-relation' ? <RdcRelationStudy /> : window.location.pathname === '/rdc-prefix' ? <RdcPrefixAtlas /> : window.location.pathname === '/rdc' ? <RdcFeatureAtlas /> : <RdcFusionWorkspace />}
+      {path === '/legacy'
+        ? <><App /><a href="/" style={{position:'fixed',right:18,bottom:18,zIndex:10000,background:'#173347',color:'#b8e5ee',border:'1px solid #4b718a',borderRadius:7,padding:'10px 16px',fontSize:12}}>返回工作台 ↗</a></>
+        : hit
+          ? <RdcPageShell title={legacyTitle}><LegacyPage /></RdcPageShell>
+          : <RdcFusionWorkspace />}
     </ErrorBoundary>
   </StrictMode>,
 )

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图谱 · 三模块视图 — 设计原型 v1</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --line:#e2e5ea; --line2:#eef0f3;
+    --t1:#1c2024; --t2:#5b6470; --t3:#9aa3ad;
+    --kn:#0ea5e9; --ar:#d85a30; --gr:#059669;
+    --e2:#10b981; --e3:#f59e0b; --e1:#3b82f6; --gap:#dc2626;
+    --chip:#f1f3f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--t1);font:13px/1.55 "Segoe UI","Microsoft YaHei",sans-serif;padding:18px 22px}
+  .mono{font-family:Consolas,"JetBrains Mono",monospace}
+
+  /* ── 顶栏 ── */
+  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#334155,#0f172a);color:#fff;display:grid;place-items:center;font-size:11px}
+  .brand small{color:var(--t3);font-weight:400}
+  .crumb{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--t2);font-size:12px}
+  .src-chip{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--line)}
+  .src-chip.live{color:#047857;border-color:#a7f3d0;background:#ecfdf5}
+
+  /* ── 模块选择条 ── */
+  .mods{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+  .mod{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;position:relative;transition:.15s;border-top:3px solid transparent}
+  .mod:hover{box-shadow:0 2px 10px rgba(15,23,42,.06)}
+  .mod.on{border-top-color:var(--mc);box-shadow:0 4px 16px rgba(15,23,42,.08)}
+  .mod .mh{display:flex;align-items:baseline;gap:8px}
+  .mod .mh b{font-size:15px}
+  .mod .mh .en{color:var(--t3);font-size:10px;letter-spacing:.5px}
+  .mod .mh .cov{margin-left:auto;font-size:11px;color:var(--t2)}
+  .mod .md{color:var(--t2);font-size:11px;margin-top:3px}
+  .mod .stats{display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--t2)}
+  .mod .stats b{color:var(--t1)}
+  .mod .bar{height:6px;border-radius:3px;background:var(--line2);margin-top:8px;display:flex;overflow:hidden}
+  .mod .bar i{display:block;height:100%}
+
+  /* ── 主区：三栏对照 ── */
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
+  .cols{display:grid;grid-template-columns:minmax(240px,300px) 1fr minmax(300px,1.35fr);gap:0;position:relative}
+  .col-h{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--t2);padding:4px 2px 10px}
+  .col-h small{font-weight:400;color:var(--t3);letter-spacing:0;margin-left:6px}
+  #edges{position:absolute;inset:0;pointer-events:none;z-index:1}
+  .col{position:relative;z-index:2}
+  .col.mid{pointer-events:none}
+
+  /* 模板卡 */
+  .tpl{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:9px;background:#fcfcfd;cursor:pointer;transition:.12s;position:relative}
+  .tpl:hover{border-color:#c9d2dc}
+  .tpl.sel{border-color:var(--mc);box-shadow:0 0 0 2px color-mix(in srgb,var(--mc) 25%,transparent)}
+  .tpl.dim{opacity:.35}
+  .tpl .th{display:flex;align-items:center;gap:6px}
+  .tpl .th b{font-size:12.5px}
+  .tpl .tm{margin-left:auto;font-size:10px;color:var(--t3)}
+  .tpl .pat{font-size:11px;color:var(--mc);margin-top:2px}
+  .tpl .ex{font-size:11px;color:var(--t2);margin-top:3px;background:var(--chip);border-radius:6px;padding:3px 7px}
+  .tpl .meta{display:flex;gap:6px;margin-top:6px;align-items:center;font-size:10px}
+  .st{font-size:10px;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--t2)}
+  .st.measured{color:#047857;border-color:#a7f3d0;background:#ecfdf5}
+  .st.collecting{color:#0369a1;border-color:#bae6fd;background:#f0f9ff}
+  .st.demo{color:#92400e;border-color:#fde68a;background:#fffbeb}
+  .st.pending{color:var(--t3)}
+  .gapdot{position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:var(--gap);border:2px solid #fff}
+  .gapdot[title]{cursor:help}
+
+  /* 特征节点 */
+  .famh{font-size:11px;font-weight:700;color:var(--t2);margin:10px 2px 6px;display:flex;align-items:center;gap:6px}
+  .famh::after{content:"";flex:1;height:1px;background:var(--line2)}
+  .famh:first-child{margin-top:0}
+  .ftr{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;border:1px solid transparent;cursor:pointer;margin-bottom:5px;background:#fcfcfd;border-color:var(--line2)}
+  .ftr:hover{border-color:#c9d2dc}
+  .ftr.sel{border-color:var(--mc);box-shadow:0 0 0 2px color-mix(in srgb,var(--mc) 25%,transparent)}
+  .ftr.dim{opacity:.3}
+  .ftr .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .ftr .fid{font-size:11px;width:52px;flex:none}
+  .ftr .fst{font-size:11px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .eb{font-size:9px;padding:1px 6px;border-radius:99px;color:#fff;flex:none;margin-left:auto}
+  .xchip{font-size:10px;color:var(--gr);border:1px dashed var(--gr);border-radius:6px;padding:0 6px;margin-left:4px;flex:none}
+
+  /* ── 详情面板 ── */
+  .detail{margin-top:12px;border:1px solid var(--line);border-radius:10px;background:#fcfcfd;padding:11px 14px;display:none}
+  .detail.on{display:block}
+  .detail .dh{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+  .detail .ds{font-size:12px;color:var(--t1)}
+  .detail .dm{font-size:11px;color:var(--t2);margin-top:5px}
+  .detail .dclose{margin-left:auto;cursor:pointer;color:var(--t3);border:none;background:none;font-size:14px}
+
+  /* ── 底部 strip ── */
+  .strips{display:grid;grid-template-columns:1.2fr 1fr .9fr;gap:12px;margin-top:14px}
+  .strip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+  .strip h5{font-size:11px;letter-spacing:1px;color:var(--t2);margin-bottom:8px}
+  .xrow{display:flex;align-items:center;gap:8px;font-size:11px;padding:5px 0;border-bottom:1px dashed var(--line2)}
+  .xrow:last-child{border-bottom:none}
+  .xrow .xid{font-size:10px;width:26px;color:var(--t3)}
+  .xrow .dot{width:9px;height:9px;border-radius:50%}
+  .xrow .xt{color:var(--t2)}
+  .xrow .xdom{margin-left:auto;font-size:10px;color:var(--t3)}
+  .mecchip{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:99px;padding:2px 9px;margin:0 5px 6px 0;cursor:pointer;color:var(--t2)}
+  .mecchip:hover{border-color:#c9d2dc}
+  .mecchip b{color:var(--t1)}
+  .gapitem{font-size:11px;color:var(--t2);padding:3px 0;display:flex;gap:6px;align-items:center}
+  .gapitem i{width:7px;height:7px;border-radius:50%;background:var(--gap);flex:none}
+
+  /* ── 图例 ── */
+  .legend{display:flex;gap:16px;align-items:center;margin-top:12px;font-size:11px;color:var(--t2);flex-wrap:wrap}
+  .legend .li{display:flex;align-items:center;gap:5px}
+  .legend .sw{width:22px;height:0;border-top:2px solid var(--t2)}
+  .legend .sw.dash{border-top-style:dashed}
+  .legend .sw.gap{border-top:2px dotted var(--gap)}
+  .legend .dot{width:9px;height:9px;border-radius:50%}
+  .note{margin-left:auto;font-size:10px;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><div class="mark">A2</div>Ai2050 Atlas <small>路线 · 图谱 — 三模块视图（设计原型 v1）</small></div>
+  <div class="crumb">
+    <span class="mono">registry v1.30 · tree v2（提案）</span>
+    <span class="src-chip live">● 数据 = 真实 registry 摘录 + 模板注册表</span>
+  </div>
+</div>
+
+<!-- 模块选择条 -->
+<div class="mods" id="mods"></div>
+
+<!-- 主区 -->
+<div class="stage" id="stage">
+  <div class="cols" id="cols">
+    <div class="col" id="colTpl"></div>
+    <div class="col mid"></div>
+    <div class="col" id="colFtr"></div>
+    <svg id="edges"></svg>
+  </div>
+  <div class="detail" id="detail"></div>
+  <div class="legend">
+    <span class="li"><span class="sw" style="border-color:#94a3b8"></span>实测锚定（anchor 可回查）</span>
+    <span class="li"><span class="sw dash" style="border-color:#94a3b8"></span>采集中 / 计划口径</span>
+    <span class="li"><span class="sw gap"></span>缺口（无机制对应）</span>
+    <span class="li"><span class="dot" style="background:var(--e2)"></span>E2 可预测</span>
+    <span class="li"><span class="dot" style="background:var(--e3)"></span>E3 协议内因果</span>
+    <span class="li"><span class="dot" style="background:var(--e1)"></span>E1 可重复</span>
+    <span class="note">示意布局：模块→模板/特征确定性排布，非模型真实几何 · 点击节点看关联</span>
+  </div>
+</div>
+
+<!-- 底部 strip -->
+<div class="strips">
+  <div class="strip"><h5>跨模块交叉边（cross_link 一等边）</h5><div id="cross"></div></div>
+  <div class="strip"><h5>共享机制（MEC 横切 · 一机制服务多模块）</h5><div id="mecs"></div></div>
+  <div class="strip"><h5>缺口清单</h5><div id="gaps"></div></div>
+</div>
+
+<script>
+/* ══════════ 数据（真实 registry v1.30 / atlas_tree_v1.json / LANG_TEMPLATES 摘录） ══════════ */
+const E_COLOR={E2_predictive:'var(--e2)',E2_held_out:'var(--e2)',E2_behavioral:'var(--e2)',E3_causal_scoped:'var(--e3)',E1_repeatable:'var(--e1)'};
+const E_SHORT={E2_predictive:'E2',E2_held_out:'E2h',E2_behavioral:'E2b',E3_causal_scoped:'E3',E1_repeatable:'E1'};
+
+const MODULES={
+ KN:{name:'知识网络',en:'KNOWLEDGE NETWORK',color:'var(--kn)',desc:'实体/类/属性/关系的表征、读出与泛化边界',
+  coverage:{e2:9,e1:3,n:12},
+  templates:[
+   {id:'is_a',name:'is-a 上位/下位',pat:'{X} 是一种 {Y}',tm:'TM-07',st:'measured',metric:'E_read=0.3316',ex:'苹果 是 一种 水果 ，富含 维生素',links:[['FTR-01','a'],['FTR-02','a'],['FTR-17','a'],['FTR-18','a'],['FTR-04','a'],['FTR-20','a'],['FTR-21','a'],['FTR-22','a'],['FTR-25','a'],['FTR-26','a']]},
+   {id:'attr',name:'属性关系',pat:'{X} 是 {ADJ} 的',tm:'TM-08',st:'demo',metric:'—',ex:'石头 很 坚硬 ，海绵 却 柔软',links:[['FTR-06','c','GR']]},
+   {id:'part_of',name:'部分-整体',pat:'{X} 的 {Y}',tm:'—',st:'demo',metric:'—',ex:'车轮 是 汽车 的 部件',links:[],gap:'无对应特征——meronymy 读出未立项'},
+   {id:'tm06',name:'数字与计数',pat:'{N} 个 {X}',tm:'TM-06',st:'pending',metric:'—',ex:'三个 苹果 和 五 颗 葡萄',links:[],gap:'无对应特征——数词/计数机制未立项'},
+   {id:'tm05',name:'实体×位置 等变网格',pat:'内容寻址解引用',tm:'TM-05',st:'collecting',metric:'—',ex:'把 苹果 放到 桌子 上',links:[['FTR-12','c']]},
+   {id:'tm04',name:'句式×知识 因子网格',pat:'反词嵌入指纹',tm:'TM-04',st:'collecting',metric:'—',ex:'同义改写 × 实体替换 网格',links:[['FTR-01','c']]},
+  ],
+  fams:[
+   {name:'读出几何',items:[
+     {id:'FTR-01',lv:'E2_predictive',st:'KOUT 残差流读出由 content 主导：C=57.6% / S=19.4% / R=15.9%'},
+     {id:'FTR-02',lv:'E2_predictive',st:'K2 条件门近似可分离：交互份额 15–18% 远低于 50% 死线'},
+     {id:'FTR-17',lv:'E2_predictive',st:'E_read 未见组合读出误差基线：池化 0.3734，5% 门 0/3'},
+     {id:'FTR-18',lv:'E2_predictive',st:'E_ar(k) 装置与精度桥：四臂 738×K16，max|Δrel|=0.0489'}]},
+   {name:'类轴方向',items:[
+     {id:'FTR-04',lv:'E1_repeatable',st:'类词方向配方跨模型重建成功（J4 质心差分 float32 链）'}]},
+   {name:'谱外边界',items:[
+     {id:'FTR-20',lv:'E2_predictive',st:'谱外崩塌两线独立确认：未见类别读出误差全类最差'},
+     {id:'FTR-21',lv:'E2_predictive',st:'谱外崩塌量化：E_oov=0.9479 vs 谱内基线'},
+     {id:'FTR-22',lv:'E2_predictive',st:'谱外端口校准恢复曲线（3172 协议内干预）'},
+     {id:'FTR-25',lv:'E2_behavioral',st:'谱外崩塌共享方向：SVD top1 能量 0.30，类间>类内 ×3'},
+     {id:'FTR-26',lv:'E2_behavioral',st:'u* 是相对编码几何中的新成分（OOV 特异 KS≈0.98）'}]},
+  ]},
+ AR:{name:'推理功能',en:'ANALYTICAL REASONING',color:'var(--ar)',desc:'逻辑/真值/推理方向的表征、可分性与行为杠杆',
+  coverage:{e2:3,e1:0,n:3},
+  templates:[
+   {id:'tm03',name:'逻辑连接词',pat:'因为 / 但是 / 而且',tm:'TM-03',st:'collecting',metric:'—',ex:'因为 下雨 ，所以 比赛 取消',links:[['FTR-03','c']]},
+   {id:'tm12',name:'否定与转折',pat:'不是 / 然而 / 反而',tm:'TM-12',st:'collecting',metric:'—',ex:'这 不是 苹果 ，而是 梨',links:[['FTR-03','c'],['FTR-08','x']]},
+   {id:'logic_tf',name:'真/假命题判别',pat:'{P} 是对的 / 错的',tm:'3154/3166 实测',st:'measured',metric:'held-out 全过 ×3 模型',ex:'「香蕉是水果」是对的',links:[['FTR-03','a'],['FTR-07','x']]},
+  ],
+  fams:[
+   {name:'逻辑方向',items:[
+     {id:'FTR-03',lv:'E2_predictive',st:'逻辑（真/假）信号中层稳定存在且可泛化：回归三模型全显著 + held-out 全过'}]},
+   {name:'行为杠杆（缺口注记）',items:[
+     {id:'FTR-16',lv:'E3_causal_scoped',st:'读得出≠控得住：C_steer=0（跨模型），读出几何≠行为控制',xref:'MEC-05'}]},
+  ]},
+ GR:{name:'语法机制',en:'GRAMMAR MECHANISM',color:'var(--gr)',desc:'句式/位置/上下文的编码几何与门控机制',
+  coverage:{e2:6,e1:2,n:8},
+  templates:[
+   {id:'syntax',name:'句法角色',pat:'{X} {V} {Y}（语序消融）',tm:'TM-09',st:'demo',metric:'—',ex:'猫 追 狗 / 狗 被 猫 追',links:[['FTR-06','c'],['FTR-23','c']]},
+   {id:'tm10',name:'重复填充句',pat:'纯位置响应 p_ℓ(pos)',tm:'TM-10',st:'measured',metric:'738 cells done',ex:'的的的的的…（位置探针）',links:[['FTR-13','a']]},
+   {id:'tm01',name:'语言最小对（中↔英）',pat:'同一语义 × 两种语言',tm:'TM-01',st:'collecting',metric:'—',ex:'苹果 是 水果 / Apple is a fruit',links:[['FTR-14','c']]},
+   {id:'tm11',name:'多语言混合句',pat:'中英混排 语码转换',tm:'TM-11',st:'collecting',metric:'—',ex:'我 like 吃 apple',links:[['FTR-24','c']]},
+   {id:'tm02',name:'风格最小对（论文↔聊天）',pat:'同一内容 × 两种语体',tm:'TM-02',st:'collecting',metric:'—',ex:'本文论证… / 说白了…',links:[['FTR-12','c']]},
+  ],
+  fams:[
+   {name:'属性·语法子空间',items:[
+     {id:'FTR-06',lv:'E2_predictive',st:'属性/语法词方向子空间与知识读出、逻辑方向几何可分（68.1°）'}]},
+   {name:'上下文与位置',items:[
+     {id:'FTR-12',lv:'E2_predictive',st:'上下文二元门控：单 token 前缀即塌缩 massive activation 11072→428'},
+     {id:'FTR-13',lv:'E2_predictive',st:'RoPE 纯相对性（输出级）：位置平移族输出近似不变'},
+     {id:'FTR-14',lv:'E1_repeatable',st:'T_C 几何：共享分量关系无关（cos≈0.56）+ 内容特异并存'},
+     {id:'FTR-23',lv:'E2_held_out',st:'T_C 共享分量携带关系特异残差（3178 归因定判）'},
+     {id:'FTR-24',lv:'E1_repeatable',st:'跨关系偏移向量低秩（LOO-min 门过，关系方向不承载谱外可预测性）'}]},
+  ]},
+};
+
+const CROSS=[
+ {id:'X1',type:'SxK',fid:'FTR-05',lv:'E2_predictive',st:'类词子空间×知识读出子空间几何可分且跨模型（67.0/71.9/74.0°）',dom:'语法机制 ↔ 知识网络'},
+ {id:'X2',type:'RxS',fid:'FTR-07',lv:'E2_predictive',st:'逻辑方向不是类词方向的混淆（73.7/81.4/80.8° separable×3）',dom:'推理功能 ↔ 语法机制'},
+ {id:'X3',type:'RxK',fid:'FTR-08',lv:'E2_predictive',st:'逻辑方向与实体子空间弱混合且模型特异（45.8/26.6/46.0° mixed）',dom:'推理功能 ↔ 知识网络'},
+];
+const MECS=[
+ {id:'MEC-01',n:'attention 再分配执行消耗',fs:'FTR-09/10/11',lv:'E3'},
+ {id:'MEC-02',n:'上下文二元门控',fs:'FTR-12',lv:'E2'},
+ {id:'MEC-03',n:'RoPE 纯相对编码（输出级）',fs:'FTR-13',lv:'E2'},
+ {id:'MEC-04',n:'残差流全流分布式读出',fs:'FTR-01',lv:'E2'},
+ {id:'MEC-05',n:'读出-控制解耦（C_steer=0）',fs:'FTR-16',lv:'E3'},
+ {id:'MEC-06',n:'k*/读出双轨判定',fs:'FTR-19',lv:'E2'},
+ {id:'MEC-07',n:'局部薄邻域等价边界',fs:'FTR-15',lv:'E2'},
+];
+
+/* ══════════ 渲染 ══════════ */
+let curMod='KN', sel=null;
+const $=s=>document.querySelector(s);
+
+function renderMods(){
+  $('#mods').innerHTML=Object.entries(MODULES).map(([k,m])=>{
+    const pctE2=Math.round(100*m.coverage.e2/m.coverage.n), pctE1=Math.round(100*m.coverage.e1/m.coverage.n);
+    const nf=m.fams.reduce((a,f)=>a+f.items.length,0);
+    return `<div class="mod ${k===curMod?'on':''}" style="--mc:${m.color}" data-mod="${k}">
+      <div class="mh"><b>${m.name}</b><span class="en">${m.en}</span>
+        <span class="cov">E2+ ${m.coverage.e2} · E1 ${m.coverage.e1} / n ${m.coverage.n}</span></div>
+      <div class="md">${m.desc}</div>
+      <div class="stats"><span>语言模板 <b>${m.templates.length}</b></span><span>在册特征 <b>${nf}</b></span>
+        <span>缺口 <b style="color:var(--gap)">${m.templates.filter(t=>t.gap).length}</b></span></div>
+      <div class="bar"><i style="width:${pctE2}%;background:var(--e2)"></i><i style="width:${pctE1}%;background:var(--e1)"></i></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.mod').forEach(el=>el.onclick=()=>{curMod=el.dataset.mod;sel=null;renderAll();});
+}
+
+function renderCols(){
+  const m=MODULES[curMod];
+  $('#colTpl').innerHTML=`<div class="col-h">外部语言模板<small>外部语言族图谱 · 句式/状态/指标</small></div>`+
+    m.templates.map(t=>`
+    <div class="tpl ${sel&&sel!==t.id&&!t.links.some(l=>l[0]===sel)?'dim':''} ${sel===t.id?'sel':''}" data-nid="${t.id}" style="--mc:${m.color}">
+      ${t.gap?`<span class="gapdot" title="缺口：${t.gap}"></span>`:''}
+      <div class="th"><b>${t.name}</b><span class="tm mono">${t.tm}</span></div>
+      <div class="pat mono">${t.pat}</div>
+      <div class="ex">${t.ex}</div>
+      <div class="meta"><span class="st ${t.st}">${{measured:'已实测',collecting:'采集中',demo:'DEMO',pending:'待启动'}[t.st]}</span>
+        <span class="mono" style="color:var(--t3)">${t.metric}</span></div>
+    </div>`).join('');
+
+  const linkedFrom=new Set();
+  m.templates.forEach(t=>t.links.forEach(l=>{if(sel===t.id)linkedFrom.add(l[0]);}));
+  $('#colFtr').innerHTML=`<div class="col-h">内部编码机制<small>内部响应图谱 · 特征（E 级）/ 族</small></div>`+
+    m.fams.map(f=>`<div class="famh">${f.name}</div>`+f.items.map(ftr=>{
+      const inMod=true;
+      const dim=sel&&sel!==ftr.id&&!m.templates.some(t=>t.id===sel&&t.links.some(l=>l[0]===ftr.id))&&!linkedFrom.has(ftr.id);
+      return `<div class="ftr ${sel===ftr.id?'sel':''} ${dim?'dim':''}" data-nid="${ftr.id}" data-st="${ftr.st}" data-lv="${ftr.lv}" style="--mc:${m.color}">
+        <span class="dot" style="background:${E_COLOR[ftr.lv]}"></span>
+        <span class="fid mono">${ftr.id}</span>
+        <span class="fst" title="${ftr.st}">${ftr.st}</span>
+        ${ftr.xref?`<span class="xchip" title="机制层横切引用">${ftr.xref}</span>`:''}
+        <span class="eb" style="background:${E_COLOR[ftr.lv]}">${E_SHORT[ftr.lv]}</span>
+      </div>`;
+    }).join('')).join('');
+
+  document.querySelectorAll('[data-nid]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.nid; sel=(sel===id?null:id); renderAll(); showDetail(id);
+  });
+}
+
+function drawEdges(){
+  const svg=$('#edges'), stage=$('#cols');
+  const sr=stage.getBoundingClientRect();
+  svg.setAttribute('width',sr.width); svg.setAttribute('height',sr.height);
+  const m=MODULES[curMod];
+  let paths='';
+  m.templates.forEach(t=>{
+    const a=document.querySelector(`[data-nid="${t.id}"]`);
+    if(!a)return;
+    const ra=a.getBoundingClientRect();
+    const x1=ra.right-sr.left, y1=ra.top+ra.height/2-sr.top;
+    t.links.forEach(([fid,kind,xmod])=>{
+      const b=document.querySelector(`[data-nid="${fid}"]`);
+      if(!b)return; // 跨模块引用不画线（xchip 已标注）
+      const rb=b.getBoundingClientRect();
+      const x2=rb.left-sr.left, y2=rb.top+rb.height/2-sr.top;
+      const mx=(x1+x2)/2;
+      const hl=sel&&(sel===t.id||sel===fid);
+      const dim=sel&&!hl;
+      const stroke=kind==='a'?'#64748b':'#94a3b8';
+      const dash=kind==='a'?'':'stroke-dasharray="5 4"';
+      paths+=`<path d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}" fill="none"
+        stroke="${hl?m.color.replace('var(--kn)','#0ea5e9').replace('var(--ar)','#d85a30').replace('var(--gr)','#059669'):stroke}"
+        stroke-width="${hl?2.2:1.2}" ${hl?'':dash} opacity="${dim?0.12:hl?0.95:0.55}"/>`;
+    });
+    if(t.gap){
+      const x2=x1+ (sr.width*0.30), y2=y1;
+      paths+=`<path d="M ${x1} ${y1} C ${x1+40} ${y1}, ${x2-40} ${y2}, ${x2} ${y2}" fill="none" stroke="var(--gap)" stroke-width="1.4" stroke-dasharray="2 4" opacity="${sel&&sel!==t.id?0.1:0.7}"/>
+              <text x="${x2+6}" y="${y2+3}" font-size="10" fill="var(--gap)" opacity="${sel&&sel!==t.id?0.15:0.9}">缺口</text>`;
+    }
+  });
+  svg.innerHTML=paths;
+}
+
+function showDetail(id){
+  const d=$('#detail'); if(!sel){d.className='detail';return;}
+  const m=MODULES[curMod];
+  const t=m.templates.find(x=>x.id===id);
+  let html='';
+  if(t){
+    html=`<div class="dh"><b>${t.name}</b><span class="st ${t.st}">${t.tm}</span>
+      ${t.gap?`<span class="st" style="color:var(--gap);border-color:var(--gap)">缺口：${t.gap}</span>`:''}
+      <button class="dclose" onclick="sel=null;renderAll()">×</button></div>
+      <div class="ds">句式 <span class="mono" style="color:${m.color}">${t.pat}</span> ｜ 示例：${t.ex}</div>
+      <div class="dm">关联机制：${t.links.length?t.links.map(l=>`<span class="mono">${l[0]}</span>${l[1]==='a'?'（实测锚定）':l[2]?'（跨模块 → 语法机制）':'（采集中）'}`).join(' · '):'无——列入缺口清单，建议立项'}</div>`;
+  }else{
+    const f=m.fams.flatMap(x=>x.items).find(x=>x.id===id);
+    if(f){
+      const srcs=m.templates.filter(t=>t.links.some(l=>l[0]===id)).map(t=>t.name);
+      html=`<div class="dh"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:${E_COLOR[f.lv]}"></span>
+        <b class="mono">${f.id}</b><span class="eb" style="background:${E_COLOR[f.lv]}">${E_SHORT[f.lv]}</span>
+        <button class="dclose" onclick="sel=null;renderAll()">×</button></div>
+        <div class="ds">${f.st}</div>
+        <div class="dm">证据来源模板：${srcs.length?srcs.join(' · '):'（无模板覆盖——证据链来源待登记）'} ｜ anchors res/seal sha8 在正式实施时由 FeatureDetail 抽屉承载</div>`;
+    }
+  }
+  d.innerHTML=html; d.className='detail on';
+}
+
+function renderStrips(){
+  $('#cross').innerHTML=CROSS.map(c=>`
+    <div class="xrow"><span class="xid mono">${c.id}</span>
+      <span class="dot" style="background:${E_COLOR[c.lv]}"></span>
+      <span class="mono">${c.fid}</span><span class="xt">${c.st}</span>
+      <span class="xdom">${c.type} · ${c.dom}</span></div>`).join('');
+  $('#mecs').innerHTML=MECS.map(x=>`<span class="mecchip" title="成员 ${x.fs} · 底座 ${x.lv}"><b>${x.id}</b> ${x.n}</span>`).join('');
+  const gaps=Object.entries(MODULES).flatMap(([k,m])=>m.templates.filter(t=>t.gap).map(t=>[m,t]));
+  const noTpl=Object.entries(MODULES).flatMap(([k,m])=>m.fams.flatMap(f=>f.items).filter(f=>!m.templates.some(t=>t.links.some(l=>l[0]===f.id))).map(f=>[m,f]));
+  $('#gaps').innerHTML=
+    gaps.map(([m,t])=>`<div class="gapitem"><i></i>${m.name} · ${t.name}：${t.gap.split('——')[1]||t.gap}</div>`).join('')+
+    noTpl.map(([m,f])=>`<div class="gapitem"><i style="background:var(--e3)"></i>${m.name} · <span class="mono">${f.id}</span>：特征无模板覆盖（证据来源待登记）</div>`).join('');
+}
+
+function renderAll(){renderMods();renderCols();requestAnimationFrame(drawEdges);}
+window.addEventListener('resize',drawEdges);
+renderAll();renderStrips();
+</script>
+</body>
+</html>

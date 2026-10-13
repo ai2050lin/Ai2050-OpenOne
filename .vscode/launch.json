@@ -2,6 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Frontend",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ${workspaceFolder}/scripts/start_visualization.ps1",
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "http://localhost:(\\d+)",
+        "uriFormat": "http://localhost:%s/"
+      }
+    },
+    {
       "name": "Backend",
       "type": "python",
       "request": "launch",
@@ -10,19 +22,9 @@
       "console": "integratedTerminal",
       "justMyCode": true,
       "env": {
-        "PYTHONIOENCODING": "utf-8"
-      }
-    },
-    {
-      "name": "Frontend",
-      "type": "node-terminal",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\scripts\\start_visualization.ps1\"",
-      "serverReadyAction": {
-        "action": "openExternally",
-        "pattern": "Local:\\s+(http://localhost:\\d+/?)",
-        "uriFormat": "%s"
+        "PYTHONIOENCODING": "utf-8",
+        "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+        "AI2050_SKIP_MODEL_LOAD": "1"
       }
     }
   ],

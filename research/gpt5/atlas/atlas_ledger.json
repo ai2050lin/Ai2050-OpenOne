@@ -6540,6 +6540,1210 @@
    "superseded_by": null,
    "detail": "G5-B2 FTR-14 held_out relation-LOO arm (zero GPU, sealed 3157 collect npz 95a25965/9552086d/23dd74eb; prereg title said GPU-arm but the preregistered protocol body pins the data source to the existing collect -> zero-GPU, resolved at freeze before any observation). Composite gate frozen pre-observation as A1 AND A2: A1 subset-statistic (|tc_held_pairwise - tc_full| < 0.1) passed 6/6 (0.0422/0.0197/0.0535 isa / 0.0383/0.0614/0.0548 hasa); A2 reconstruction reading (|cos_held_vs_shared - cos_full_vs_shared| < 0.1) FAILED on glm4 both folds (0.0860/0.0984/0.1114 isa / 0.0881/0.0765/0.1107 hasa; 4b/14b pass); exch band kept (cross-model mean exchange_obs 1.2728 in [1.0, 1.3], per-model 1.1929/1.2945/1.3311, recomputation drift 0). ARM GATE FAIL -> FTR-14 stays E1_repeatable, held_out upgrade NOT achieved, F16 registered (prereg gate frozen, no goalpost move), counter_evidence append only. Directional finding: tc_held > tc_full in all 6 fold x model cells (0.6052/0.5812/0.6176 isa / 0.6012/0.6228/0.6189 hasa vs 0.5630/0.5614/0.5641) => within-relation T_C pairwise cos is systematically tighter than the cross-relation-inclusive full mean, i.e. a small relation-specific component in T_C geometry is consistent with the A2 failure; a2_gap_train (same component, train vs held cells) 0.1145/0.1190, 0.1412/0.0936, 0.1500/0.1486 also above 0.09 => the 0.1 bar on out-of-sample readings is globally tight; decomposition (sampling penalty vs relation residual) preregistered as 3178. Device: tc/exch/exch-mean recomputation drift 0.00e+00 x3 models, fold-to-fold |isa-hasa| diffs of cos_held/A2 <= 0.022 (0.0021/0.0219/0.0006 per model), SMOKE and FULL registry v1.4 byte-identical (fb11d633) => arm numbers mode-independent. Registry v1.3 -> v1.4: 21 features + failures first 15 + upgrade_log first 5 byte-for-byte, failures 15 -> 16 (F16), upgrade_log stays 5; lineage metadata kept per 3176 precedent (created/phase/provenance unchanged, version/supersedes only). atlas_v1_5.html 668 fields 0/0/0/0. Honest log: 2 authoring-time fixes pre-observation (dead stmt_add_text removed; unused var). design_sha8=b2f1a836. res d451030f seal 7b746eb2 (smoke res cd1ddee3).",
    "created": "2026-10-09 22:11:24"
+  },
+  {
+   "phase": 3178,
+   "name": "g5b3_ftr14_a2_attribution",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b3_ftr14_a2_attribution|relation_specific_residual_confirmed|calib_fail_x3|r_0.0918_0.0951_0.1289|p_null_0.0193_0.0264|gap_0.0936_0.1500|p_fold_min_-0.0529|registry_v15|html_fields_669_ok",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B3",
+   "superseded_by": null,
+   "detail": "G5-B3 FTR-14 A2 attribution decomposition (zero GPU; sealed 3157 collect npz 95a25965/9552086d/23dd74eb + sealed 3177 result d451030f/7b746eb2 loaded from pinned file b2ad52ef, zero transcription). Entity-LOO null within relation: p(m,rel) = 0.0236/0.0231/0.0193 (isa), 0.0264/0.0216/0.0214 (hasa), fold-level minima negative to -0.0529 (single-entity directional self-consistency => out-of-sample penalty approx 0). Relation gap g = cos_train_a2 - cos_held_a2 (3177 same-v_shared) 0.1145/0.1412/0.1500 (isa), 0.1190/0.0936/0.1486 (hasa), bitwise replication of sealed 3177 (drift 0.00e+00). Residual r(m) = mean(isa,hasa) of (g - p) = 0.0918/0.0951/0.1289 all >= 0.05 calibration bar (gate + aggregation frozen pre-observation) => 3177 A2 failure is genuinely relation-specific geometry, NOT sampling artifact; closes consistently with 3177 directional finding tc_held > tc_full 6/6. FTR-14 stays E1_repeatable; held_out upgrade route closed with quantitative attribution (root cause = relation geometry itself). Registry v1.4 -> v1.5 (FTR-14 counter_evidence append only; 21 features / failures 16 / upgrade_log 5 byte-for-byte; e1942d03, SMOKE/FULL byte-identical); atlas_v1_6.html rendered 669 fields 0/0/0/0 (b95e67a2). Device fix: html write newline char preserved (SMOKE-1 caught Windows text-mode CRLF translation in data-k disk read-back of newline-containing GAP-4.mechanism_note; zero numeric impact). res 4f521d9b / seal 1f166645.",
+   "created": "2026-10-10T02:11:17"
+  },
+  {
+   "phase": 3179,
+   "name": "g5b4_ftr23_registration",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b4_ftr23_registration|ftr23_registered_E1_repeatable|features_23|failures_16|upgrades_5|registry_v16|html_fields_698_ok",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B4",
+   "superseded_by": null,
+   "detail": "G5-B4 FTR-23 registration (zero GPU; 'failure into atlas' positivized): T_C relation-specific residual promoted from FTR-14 counter_evidence string to standalone feature FTR-23 (family=context, E1_repeatable, cross_model immediate; held_out upgrade deferred -- for a relation-specific feature 'held-out relation' is itself the measurement construction). Registration bar met: two-phase independent measurement (3177 held-out arm + 3178 sampling-null attribution), 3-model same direction r(m)=0.0918/0.0951/0.1289 >= 0.05 bar x3, complete prereg gate history (F16 gate fail -> 3178 quantitative attribution). Device: 12 source files sha-asserted; sealed content double-locked p3178 4f521d9b/1f166645 + p3177 d451030f/7b746eb2 + p3157 collect 95a25965/9552086d/23dd74eb; recompute vs sealed 3178 drift 0.00e+00 (tc_full/exch/p_mean x3 models); range asserts vs MEMO draft all green; registry v1.5 -> v1.6 features-append-only (22 legacy features byte-for-byte, failures/upgrade_log/lineage untouched, FTR-23 appended; bebdf38d, SMOKE/FULL byte-identical); atlas_v1_7.html 698 fields 0/0/0/0 (b2bcec66). Independent verify (separate process, this closeout): sha re-assert pass, 22-feature preservation pass, field-level diff vs sealed v1.6 html dropped=0 / changed+new only FTR-23+meta+node views. res 18d6697f / seal e1b5e3a2. ledger_sha256_8 NOT recomputed (recipe unknown, stale since Phase 8 per migration_history); pre-append file sha8 8b6cfe43.",
+   "created": "2026-10-10T04:20:00"
+  },
+  {
+   "phase": 3180,
+   "name": "g5b5_ftr15_heldout",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b5_ftr15_heldout|ftr15_upgraded_E2_predictive|features_23|upgrades_6|registry_v17|html_fields_704_ok",
+   "evidence_level": "E2_predictive",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B5",
+   "superseded_by": null,
+   "detail": "G5-B5 FTR-15 held_out entity-LOO arm (zero GPU; sealed 3158 collect BUD c4d9b9fb/7f53f3a0/2ea72cfe + results 90e734fd/1f532016/c49614fc + summary 7ed85b36, sha-asserted). 16 anchors verified 1-per-entity via 3157 collect ei labels. G1 device: full ratio recomputed from BUD drift 0.00e+00 x3 models (1.028348/1.331677/1.247260 vs sealed). G2 held_out: all 16 entity-LOO folds same quotient class (<3.0) and max |log(ratio_train/ratio_full)| 0.0300/0.0278/0.0182 < 0.25 bar x3 models (gate+bar frozen pre-observation). G3 directional: held-anchor null>rand medians 10/16, 16/16, 15/16 (report only). FTR-15 E1_repeatable -> E2_predictive (held_out anchor appended; thin-neighborhood local equivalence now cross_model+held_out; scope limit 'not a global quotient structure' retained, F1 quotient rejection unchanged). Registry v1.6 -> v1.7 append-only (22 legacy features byte-for-byte, failures untouched, upgrade_log #6; f3ad070f); atlas_v1_8.html 704 fields 0/0/0/0 (1dc09043). Design fix logged: smoke flag moved out of design dict (mode-level not design-level) before FULL observation; execution.json 8e38ff2f. res e97867f4 / seal ce9f80d4. ledger_sha256_8 NOT recomputed (stale since Phase 8); pre-append file sha8 54b10689.",
+   "created": "2026-10-10T05:20:00"
+  },
+  {
+   "phase": 3181,
+   "name": "g5b6_ftr04_glm4_attribution",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b6_ftr04_glm4_attribution|noise_level_not_attributable|gates_Ga_F_Gb_F|registry_v18|html_fields_708_ok",
+   "evidence_level": "E1_repeatable_unchanged",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B6",
+   "superseded_by": null,
+   "detail": "G5-B6 FTR-04 glm4 weak-specificity attribution (zero GPU; two-arm decide-one). Geo arm on S_class (3166 recipe verbatim, per-model W_U): kappa 4.81e7/4.60e7/4.50e7 (glm4 NOT >= 1.25x max qwen), e90 8/8/8 (no drop), PR 8.78/8.90/8.92 (glm4 NOT <= 0.8x min) -> G-a FALSE. Readout arm on sealed 3169 seen rows: proj_ratio 0.0763/0.0328/0.0294 (glm4 0.0294 NOT <= 0.75x min qwen 0.0246), LOEO mean_margin 2.6614/1.4164/5.2326 (glm4 largest, NOT <= 0.75x min) -> G-b FALSE. Verdict noise_level: FTR-04 weak specificity (glm4 LOEO 0.4800 < 0.5 bar) attributable to NEITHER S_class geometry NOR readout pathway; E-level unchanged, held_out closure of 3176 maintained. Fidelity: LOEO acc re-run 0.6019/0.5981/0.4800 bit-identical vs sealed 3176 arm_a. 8 source files sha-asserted; content double-lock p3169 49430a39/018c6024 + ratio_B anchor 2.5388114997805062; registry v1.7 -> v1.8 append-only (23 legacy features byte-preserved, FTR-04 counter_evidence quantified append + attribution anchor; d08e9064); atlas_v1_9.html 708 fields 0/0/0/0 (79acbb6c). res 1e95a19d / seal 4ad066e0. ledger_sha256_8 NOT recomputed (recipe unknown, stale since Phase 8); pre-append file sha8 8d03febc.",
+   "created": "2026-10-10T06:21:00"
+  },
+  {
+   "phase": 3182,
+   "name": "g5b7_ftr23_heldout_loro",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b7_ftr23_heldout_loro|held_out_gate_fail_F17|delta_0.1070_0.1048_0.1368|ftr23_stays_E1|registry_v19|html_fields_713_ok",
+   "evidence_level": "E1_repeatable_unchanged",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B7",
+   "superseded_by": null,
+   "detail": "G5-B7 FTR-23 held_out leave-one-relation-out cross-null arm (zero GPU; sealed 3157 collect). r_full recomputed with the 3178 verbatim recipe: drift 0.00e+00 vs sealed 3178 x3 models (0.0918/0.0951/0.1289). NEW cross-relation null (calib = other relation, 30-cell entity-LOO; read = held relation 2 cells): p_x(m,rel) 0.1299/0.1342 (4b isa/hasa), 0.1507/0.1035 (14b), 0.1579/0.1564 (glm4) -- 5-8x the within-relation sampling penalty (~0.02), fully absorbing the relation gap g. r_held -0.0153/-0.0097/-0.0079; delta vs r_full 0.1070/0.1048/0.1368 all >= 0.1 gate => FAIL: held_out upgrade denied, F17 registered, FTR-23 stays E1_repeatable, counter_evidence quantified append. Substantive reading: the relation-specific residual does NOT replicate as a residual under cross-relation calibration -- it reappears as a symmetric cross-relation readout penalty (isa<->hasa direction, p_x isa~hasa within 0.02), consistent with a relation-offset structure rather than relation-asymmetric noise. Fidelity: 12 source files sha-asserted; 3157 anchors double-locked; 3177 d451030f/7b746eb2 + 3178 4f521d9b/1f166645 double-locked; 96/96 null + 96/96 xnull sanity |p|<0.5; device drift < 1e-9. Pinning note: prereg text said null calibrated from ALL relations; non-leaky version (other relation only) pinned at freeze, deviation registered. Registry v1.8 -> v1.9 (59a91512): FTR-23 counter_evidence append + F17 failures append, 22 legacy features byte-preserved; atlas_v1_10.html 0f24b739 713 fields 0/0/0/0. res 5f08426f / seal b6a57f07; design ea0a1e7a. ledger_sha256_8 NOT recomputed (recipe unknown, stale since Phase 8); pre-append file sha8 72567879.",
+   "created": "2026-10-10T11:10:00"
+  },
+  {
+   "phase": 3183,
+   "name": "g5b8_dv_lowrank",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b8_dv_lowrank|diffuse_F18_near_miss_14b|pc_share_0.4503_0.3987_0.4510|med_cos_0.4162_0.3548_0.4075|registry_v110|html_fields_717_ok",
+   "evidence_level": "n/a_gate_branch",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B8",
+   "superseded_by": null,
+   "detail": "G5-B8 cross-relation offset low-rank test (T2 precursor arm, zero GPU; sealed 3157 collect). Delta-v = v_isa - v_hasa (self-relation 32-cell unit_mean each, 3178 dC recipe verbatim; pinning note: prereg parenthetical wording corrected, registered). Aggregate: cos(v_isa,v_hasa) 0.8512/0.8503/0.8119, ||dv|| 0.5456/0.5473/0.6133 (g_mean 0.1168/0.1174/0.1493 same scale), frac_full = 0.0000 x3 -- the offset lives ENTIRELY in the v_full orthogonal complement. Entity-level (16 Delta-v_e): pc_share 0.4503/0.3987/0.4510, 120-pair median cos 0.4162/0.3548/0.4075, frac_positive 1.00/0.99/1.00, median alignment 0.66/0.63/0.66. GATE (pc>=0.4 AND med_cos>=0.2 x3): FAIL by near-miss -- 14b pc_share 0.3987 vs 0.40 (delta 0.0013; its min pairwise cos -0.0538 suggests one entity fold outlier); 4b/glm4 clearly LOWRANK, med_cos gate passes x3. Per prereg: F18 (low_rank_hypothesis_rejected) registered, FTR-23 counter_evidence quantified append, T2 route revised (2/3 low-rank + symmetric positive band = strong hint, but the gate is the gate). Fidelity: 12 source files sha-asserted; 3157 double-locked; 3178 4f521d9b/1f166645 + 3182 33d73196/ed51ca22 double-locked; tc_full drift < 1e-9; SMOKE/FULL byte-identical numbers. Registry v1.9 -> v1.10 (4cf49743): failures 17->18 (F18 append) + FTR-23 counter_evidence append, 23 legacy features byte-preserved; atlas_v1_11.html 53f24922 717 fields 0/0/0/0. res 55dc1f6e / seal 66adfb27; design 635d5bf6. ledger_sha256_8 NOT recomputed (recipe unknown, stale since Phase 8); pre-append file sha8 73778c8e.",
+   "created": "2026-10-10T12:15:00"
+  },
+  {
+   "phase": 3184,
+   "name": "g5b9_14b_marginal_loo",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b9_14b_marginal_loo|revised_ftr24_registered_E1|loo_min_0.4430_0.3927max0.4155_0.4447|outlier_14b_e12_medcos_0.2546|registry_v111|html_fields_728_ok",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B9",
+   "superseded_by": null,
+   "detail": "G5-B9 14b marginal attribution, entity-level LOO stability (zero GPU; sealed 3157 collect; Delta-v_e recipe verbatim 3183). Replication: full-panel pc_share drift 0.0e+00 x3 vs sealed 3183. LOO 16 folds drop-1: 4b pc min/max 0.4430/0.4608 (argmax e=6), 14b 0.3927/0.4155 (argmax e=12, gain 0.0167, outlier med_cos to others 0.2546), glm4 0.4447/0.4618 (argmax e=15). Frozen asymmetric gate: 14b LOO-max >= 0.4 AND 4b/glm4 LOO-min >= 0.4 => REVISED TRUE: single-entity (14b e=12, med cos 0.2546 vs panel median ~0.35) carries the 3183 near-miss; low-rank structure holds under LOO-min criterion x3. FTR-24 registered E1_repeatable (family=context, dv_lowrank_loo_revised anchor); F18 text untouched (append-only; original-gate FAIL stands true). SMOKE-1 fix registered: per-model gate flag initially applied LOO-min to 14b, deviating from frozen asymmetric gate text; corrected before FULL. Fidelity: 11 source files sha-asserted; 3157 + 3183 (c55e4e5e/7196fa8a) double-locked; tc_full drift < 1e-9; SMOKE/FULL byte-identical. Registry v1.10 -> v1.11 (84aecc21): features 23->24 (FTR-24 append), 23 legacy byte-preserved, failures 18 / upgrade_log 6 untouched; atlas_v1_12.html e19c6da2 728 fields 0/0/0/0. res 54e2b9d9 / seal 55706292; design 9c69b3d6. ledger_sha256_8 NOT recomputed (recipe unknown, stale since Phase 8); pre-append file sha8 71c00c97.",
+   "created": "2026-10-10T12:25:00"
+  },
+  {
+   "phase": 3185,
+   "name": "g5b10_rrel_predictive",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b10_rrel_predictive|linear_superposition_rejected_F19|r_g_0.5571_-0.0353_0.6162|r2_px_0.2241_-0.0692_0.2858|ftr24_counter_evidence_append|registry_v112|html_fields_736_ok",
+   "evidence_level": "E1_repeatable_unchanged",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B10",
+   "superseded_by": null,
+   "detail": "G5-B10 R_rel low-rank model quantitative predictive test, T2 main arm (zero GPU; sealed 3157 collect + 3177/3178/3182/3183/3184 results). Fit-free analytic Delta-v parameterization (dv = v_isa - v_hasa, 3183 verbatim): (A) 3177 relation gap entity-level g_e = cos_train - u_e@v_c predicted by g_pred = gbar - kap*gam_e (gam_e = (u_e - vh_t)@dvu, kap = dvu@v_c; exact identities mean(g_e)=gbar, mean(gam_e)=0 verified <1e-6 float32); r_g 0.5571/-0.0353/0.6162 (4b/14b/glm4; fold-wise 4b 0.4728/0.6413, 14b 0.1478/-0.2185, glm4 0.6477/0.5848). (B) 3182 LORO cross-null p_x entity-level distribution predicted by p_pred = b_e - gam_e*kap_x(e) (fit-free); R2_px 0.2241/-0.0692/0.2858 (r_B 0.6166/0.6351 4b, 0.3559/-0.2105 14b, 0.6876/0.5750 glm4). GATE (r_g>=0.5 AND r2_px>=0.5 x3) FAIL: r_g passes 2/3 (14b fails, hasa fold r=-0.2185), R2_px fails 3/3 (fit-free; even charitable OLS r^2 reading gives 4b 0.39/0.40, 14b neg, glm4 0.33-0.47, still <0.5). => F19 rrel_linear_superposition_rejected registered; FTR-24 counter_evidence append (stays E1); T2 route revised: R_rel low-rank direction exists (FTR-24) but superposition is NONLINEAR -- dv-component predicts gap/p_x sign-correlation (r_B up to 0.69) yet explains <30% variance; the entity-level deviation spectrum is NOT captured by a single relation-offset direction. Residual spectrum: max-abs entities e15 (4b/glm4/14b-isa) and e12 (14b-hasa, consistent with 3184 outlier e=12). Fidelity: 15 source files sha-asserted; 3157 anchors double-locked; sealed 3177 d451030f/7b746eb2 + 3178 4f521d9b/1f166645 + 3182 33d73196/ed51ca22 + 3183 c55e4e5e/7196fa8a + 3184 54e2b9d9/55706292 double-locked; replication gates all 0.00e+00 (3177 folds, 3178 r_full, 3182 p_x, 3183 dv quantities); device tc drift <1e-9; SMOKE/FULL byte-identical numbers. SMOKE-1 fix registered: exact-identity asserts loosened 1e-12 -> 1e-6 (float32 accumulation), FULL before any FULL observation. Protocol note: prereg '3177 relation gap g_e' operationalized entity-level as g_e = cos_train - u_e@v_c (3177 verbatim components), pinned at freeze. Registry v1.11 -> v1.12 (269a37c0): F19 failures append + FTR-24 counter_evidence append, 23 legacy features byte-preserved, upgrade_log 6 unchanged; atlas_v1_13.html a3bd2206 736 fields 0/0/0/0. res df958cc9 / seal 7559b27b; design 65ee0dcc. pre-append file sha8 ad566a5c.",
+   "created": "2026-10-10T12:40:00"
+  },
+  {
+   "phase": 3186,
+   "name": "g5b11_second_order",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b11_second_order|meanlevel_contraction|top2_energy_0.2458_0.3197_0.3004|r80_9-13_directions|loo_flips_none|ftr24_counter_evidence_plus_contraction|registry_v113|html_fields_737_ok",
+   "evidence_level": "E1_repeatable_unchanged",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B11",
+   "superseded_by": null,
+   "detail": "G5-B11 relation-offset second-order structure test, T2 revision arm (zero GPU; sealed 3157 collect + 3177/3178/3182/3183/3185 results). Arm A (spectrum): entity-level deviation delta_e = u_e - vh_t (sum-zero 15-dim, identity verified <1e-6) per relation, 16 vectors, SVD energy: top2 share 0.2458/0.3197/0.3004 (4b/14b/glm4, mean of isa/hasa; top1 0.1259-0.2323), rank for 80% energy needs 9-10 directions, for 90% needs 12-13 -- FULL-RANK DIFFUSE x3 (gate 0.5 all fail). Arm B (outlier LOO, 3184 protocol): 16 folds drop one entity (vh_t -> 30-cell mean, evaluation on remaining 15), recompute r_g/R2_px per 3185 fit-free recipes: flip entities (post-removal BOTH r_g>=0.5 AND R2_px>=0.5) = NONE x3 models x2 relations; 4b isa r_g LOO 0.3744..0.6171 (removal of e15 lifts 0.47->0.62 but R2 stays <=0.33), 14b hasa r_g LOO -0.3338..-0.0396 (e12 removal does NOT flip -- 3184 outlier is not the cause here), glm4 isa 0.5194..0.7442. => GATE FAIL: no plane parameterization; mean-level contraction pinned: R_rel keeps relation-level Delta-v only (FTR-24 direction statement), entity-level variation is individual diffuse noise -- F19 failure is SYSTEMIC, not outlier-carried. Substantive reading: the relation-offset direction (FTR-24, aggregate) and the entity-level deviation spectrum are decoupled -- aggregate low-rank does not imply entity-level low-rank; T2 closes with relation-level parameterization (Delta-M_rel = T_C + alpha*Delta-v at mean level, alpha fit next phase, no entity-level prediction claims). No new failure id (F19 already covers entity-level linear rejection; prereg pinned no-F-on-diffuse). Fidelity: 16 source files sha-asserted; 3157 anchors double-locked; sealed 3177/3178/3182/3183/3185 results double-locked; replication gates all <1e-9 incl. NEW 3185 full-panel r_A/R2_B recompute drift 0.00e+00; device tc drift <1e-9; SMOKE/FULL byte-identical. Registry v1.12 -> v1.13 (730729f5): FTR-24 counter_evidence append + contraction statement append (both append-only, anchors 3 unchanged), 23 legacy features byte-preserved, failures 19 / upgrade_log 6 unchanged; atlas_v1_14.html 56c45e50 737 fields 0/0/0/0. res 1bd47cee / seal 731169a0; design 2c4906b7. pre-append file sha8 4fff0f4a.",
+   "created": "2026-10-10T13:05:00"
+  },
+  {
+   "phase": 3187,
+   "name": "g5b12_alpha_calibration",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5b12_alpha_calibration|alpha_unstable_direction_level_downgrade|alpha_hat_+1.1672_-0.0131_+1.7448|14b_sign_flip_+0.76_-0.79|band_ratio_133.28|explained_rate_equals_rA2_x6|registry_v114|html_fields_736_ok",
+   "evidence_level": "E1_repeatable_unchanged",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-B12",
+   "superseded_by": null,
+   "detail": "G5-B12 R_rel mean-level alpha calibration, T2 closing arm (zero GPU; sealed 3157 collect + 3177/3178/3182/3183/3185 results). One-parameter LS on the 3185 prediction-A form g_e = gbar - kappa*alpha*gam_e per model per held-relation fold: alpha_hat 4b +1.1348/+1.1997 (isa/hasa, explained 0.2235/0.4113), 14b +0.7602/-0.7864 (SIGN FLIP, explained 0.0219/0.0477), glm4 +2.1793/+1.3102 (explained 0.4195/0.3420); alpha_m +1.1672/-0.0131/+1.7448; cross-model band ratio 133.28 (gate <=3) -- 14b alpha_m ~0 kills the band. GATE UNSTABLE => T2 downgraded to DIRECTION-LEVEL statement: FTR-24 keeps the Delta-v direction claim only, amplitude parameter alpha withdrawn (entity-level claims already withdrawn at 3186). LS algebra identity verified: explained_rate == sealed 3185 r_A^2 x6 <1e-9 (replication of 3185 through an independent route). p_x-side one-parameter alpha_px report-only: 4b +1.36/+1.19, 14b +0.59/-1.03, glm4 +2.08/+1.20 (same 14b inconsistency). Substantive reading: 4b and glm4 give consistent alpha_hat ~1.2-1.7 (Delta-v amplitude at the scale of the relation gap -- the mean-level linear form IS meaningful for 2 of 3 models), but 14b's antisymmetric fold structure (consistent with its 3185 hasa r_A=-0.2185) breaks cross-model calibration; per the pinned gate (x3 required) the direction-level downgrade is the honest disposition -- alpha may be revisited per-model-family but no cross-model scalar is claimable. Fidelity: 15 source files sha-asserted; 3157 anchors double-locked; sealed 3177/3178/3182/3183/3185 double-locked; replication gates all <1e-9 (3177 folds, 3178 r_full, 3182 p_x, 3183 dv); device tc drift <1e-9; SMOKE/FULL per_model readings byte-identical. FULL-1 crash registered: finish_registry FAIL-branch format referenced summary['band_ratio'] instead of summary['gates']['band_ratio'], crashed BEFORE any registry write; fixed and FULL re-run, arm res/seal byte-identical across runs (10140b94/cb1bce5b) -- no observation leakage. Registry v1.13 -> v1.14 (95fe55f5): FTR-24 statement append only (direction-level downgrade; anchors 3 and counter_evidence unchanged), 23 legacy features byte-preserved, failures 19 / upgrade_log 6 unchanged; atlas_v1_15.html a29022d5 736 fields 0/0/0/0. res 10140b94 / seal cb1bce5b; design 760b886d. pre-append file sha8 17c4f3e6.",
+   "created": "2026-10-10T13:15:00"
+  },
+  {
+   "phase": 3188,
+   "name": "g5c1_gap4_dv_attribution",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5c1_gap4_dv_attribution|dv_direction_decoupled_from_oov_collapse|KS_0.3344_0.1003_0.1913|p_5e-5_0.0105_5e-5|medDiff_+0.0621_-0.0031_-0.0104|sign_inconsistent_x3|FTR24_counter_evidence|registry_v115",
+   "evidence_level": "counter_evidence_registered",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-C1",
+   "superseded_by": null,
+   "detail": "G5-C1 GAP-4 residual 1.8x Delta-v directional attribution (C-line opener, zero GPU; sealed 3169 collect x3 + 3175 collect_out x3 + 3157 collect x3 + 3169/3175/3183 results). 3183-verbatim Delta-v direction projected on 3169 B-protocol per-cell collapse residual directions (q = unit(Y - XW) at readout; OOV rows 876 all-3-seed mean vs seen S1-test row mean). Device gates all 0.0 drift: 3157 tc anchors, 3183 dv replication, 3169 per-seed E replication, 3175 out-arm k=8 anchor (appendix, 780 rows). Primary gate (pinned): COUPLED iff KS>=0.15 & perm_p<0.01 in >=2/3 models AND median-diff sign consistent >=2/3. Observed: KS 0.3344/0.1003/0.1913, p 5e-5/0.0105/5e-5 (4b+glm4 pass, 14b fail), median diff +0.0621/-0.0031/-0.0104 -> 4b vs glm4 SIGN OPPOSITION => DECOUPLED. Direction-share (report-only): OOV 0.0088/0.0091/0.0060 vs seen 0.0100/0.0142/0.0193, control ~1/D (3.9e-4/2.0e-4/2.4e-4) - share tiny everywhere and OOV<=seen x3, consistent with decoupling. GAP-4 residual 1.8x is decoupled from the relation offset direction at direction level; counter_evidence appended to FTR-24 (statement/anchors byte-preserved). registry v1.14->v1.15 (0a55d2e7, features 24, failures 19), atlas_v1_16.html (384d0834, 734 fields 0/0/0/0), final res 8c1d94a3/seal ad0444ad, design 977bb327.",
+   "chain": {
+    "design_sha8": "977bb327",
+    "res_sha8": "8c1d94a3",
+    "seal_sha8": "ad0444ad",
+    "registry_v115": "0a55d2e7",
+    "atlas_v1_16": "384d0834"
+   }
+  },
+  {
+   "phase": 3189,
+   "name": "g5c2_residual_structure",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5c2_residual_structure|shared_oov_collapse_direction|top1_0.3065_0.2936_0.3008|cross_med_0.5441_0.5663_0.4449|within_below_cross_x3|FTR25_E1_repeatable|registry_v116",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-C2",
+   "superseded_by": null,
+   "detail": "G5-C2 class-level/shared-direction structure of the 3169 OOV collapse residuals (C line, zero GPU; sealed 3169 collect x3 + 3157 collect x3 for dvu re-derivation + 3169/3183/3188 results). Residual chain = 3188 primary verbatim; row-level directions (unit of 3-seed mean, 876 rows). Device: 3157 tc anchors 0 drift, 3183 dv replication 0 drift, 3169 per-seed E replication 0 drift, 3188 sealed scalars (share_oov/share_seen/ks/med_oov/med_seen) drift == 0 bitwise. Gate (pinned): SHARED iff top1>=0.2 & cross-class median cos>=0.2 x>=2/3. Observed 3/3: top1 0.3065/0.2936/0.3008, cross_med 0.5441/0.5663/0.4449; within-class mean cos BELOW cross-class x3 (0.46/0.42/0.50 vs pooled cross) - collapse direction is a cross-class SHARED direction, not class-specific. r80 37/47/29, r90 93/120/79 (of 876). GAP-4 residual 1.8x gets its first structural mechanism clue; FTR-25 candidate E1_repeatable registered (features 24->25 append-only). Honest log: SMOKE-1 log-format patch (drift69 % formatting); FULL-1 crash after atlas write on FTR-25.scope_limits list-vs-string field convention (pre final_result write; arm res/seal bitwise identical across reruns 3a26f541/fb8c1f65). registry v1.15->v1.16 (114aa114), atlas_v1_17.html (4c779d24, 746 fields 0/0/0/0), final res 66a8a8c2/seal cb4c92bb, design 10339511.",
+   "chain": {
+    "design_sha8": "10339511",
+    "res_sha8": "66a8a8c2",
+    "seal_sha8": "cb4c92bb",
+    "registry_v116": "114aa114",
+    "atlas_v1_17": "4c779d24"
+   }
+  },
+  {
+   "phase": 3190,
+   "name": "g5c3_shared_direction_robustness",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5c3_shared_direction_robustness|loo_robust_x3|loo_max_delta_0.0342_0.0214_0.0332|ks_ustar_oov_vs_seen_0.9932_0.9761_0.9715|abs_cos_ustar_vc_0.72_0.85|FTR25_anchors_append_E1_unchanged|registry_v117",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-C3",
+   "superseded_by": null,
+   "detail": "G5-C3 robustness + content attribution of the shared OOV collapse direction (C line, zero GPU; sealed 3169 collect x3 + 3189 result). Residual chain = 3189 verbatim; device anchors: 3189 sealed scalars (top1/top2/cross_med/within/r80/r90) drift == 0 bitwise x3, 3169 per-seed E replication 0 drift x3. u* = top-1 singular direction of the 876 OOV row directions in FEATURE space (Vt[0]; SMOKE-1 fix: U[:,0] is sample-space 876-dim and cannot be projected against Qn rows or v_c - honest log). Gate (pinned pre-observation): ROBUST iff LOO 4-fold (drop one class, 219 rows) top1 max |delta| < 0.05 in >= 2/3 models. Observed 3/3 ROBUST: LOO top1 4b 0.3246/0.3408/0.3118/0.3217 max_delta 0.0342; 14b 0.3136/0.3147/0.2937/0.3149 max_delta 0.0214; glm4 0.3181/0.3305/0.3140/0.3340 max_delta 0.0332 - shared direction is NOT single-class carried. Report-only attributions: (a) KS(u* projections; 876 OOV vs seen-panel baseline directions) = 0.9932/0.9761/0.9715 - the shared collapse direction is essentially ABSENT from the seen-panel baseline residual directions (OOV-specific geometry, consistent with GAP-4 spectral-out collapse 2.54x); (b) preregistered downgrade cos(u*, v_c) per class = 4b -0.806/-0.762/-0.836/-0.819, 14b -0.807/-0.797/-0.852/-0.808, glm4 -0.778/-0.746/-0.802/-0.724 (sign arbitrary for singular vectors; |cos| 0.72-0.85) - u* strongly aligned with ALL four class-mean directions, i.e. the shared direction is the common core of the class-level collapse geometry. ROBUST branch executed: FTR-25 anchors append (role=loo_robustness) + statement append; E level UNCHANGED E1_repeatable (stability != predictivity). registry v1.16->v1.17 (73923c83, append-only), atlas_v1_18.html (580af247, 746 fields 0/0/0/0), design bfe79091, arm res 24461856/seal 0c975f5b (SMOKE arm payload bitwise identical to FULL; diffs only mode/res_sha8/seal_sha8), final res fc8be7db/seal f7d8571a.",
+   "chain": {
+    "design_sha8": "bfe79091",
+    "res_sha8": "fc8be7db",
+    "seal_sha8": "f7d8571a",
+    "arm_res_sha8": "24461856",
+    "arm_seal_sha8": "0c975f5b",
+    "registry_v117": "73923c83",
+    "atlas_v1_18": "580af247"
+   }
+  },
+  {
+   "phase": 3191,
+   "name": "g5c4_ftr25_heldout_upgrade",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5c4_ftr25_heldout_upgrade|heldout_predictive_x3|min_med_abs_cos_0.3906_0.4174_0.3717|FTR25_E1_repeatable_to_E2_held_out|upgrade_log_7|registry_v118",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-C4",
+   "superseded_by": null,
+   "detail": "G5-C4 FTR-25 held_out upgrade arm (C line, zero GPU; sealed 3169 collect x3 + 3169/3189/3190 results). Residual chain = 3190 verbatim; device anchors: 3189 sealed scalars drift == 0 bitwise, 3190 sealed scalars (top1/cross_med/within/loo_max_delta/loo_top1) drift == 0 bitwise, 3169 per-seed E replication 0 drift - chain identical across 3189/3190/3191. Gate (pinned pre-observation): HOLDOUT_PREDICTIVE iff median |cos(row, unit-mean of other 3 classes' directions)| >= 0.3 in ALL 4 folds x >= 2/3 models. Observed 3/3: med|cos_held| 4b 0.4432/0.3906/0.4931/0.4547 (min 0.3906), 14b 0.4405/0.4174/0.5001/0.4296 (min 0.4174), glm4 0.4233/0.3717/0.4330/0.3807 (min 0.3717) - 3-class mean direction PREDICTS held-out class row directions cross-model: FTR-25 E1_repeatable -> E2_held_out (18th E2; upgrade_log #7). Report-only KS(|cos_held| vs within-class pairwise cos) = 0.17-0.47 (held-class rows spread wider than class-internal cos, consistent with top1 ~0.30 shared core + within-class dispersion). GAP-4 residual mechanism now at E2: shared OOV collapse direction is cross-model held-out PREDICTIVE geometry. Honest log: SMOKE-1 CONTENT_3190 anchor mis-set to final shas (fc8be7db/f7d8571a) instead of arm-stage content anchors embedded in p3190 result.json (24461856/0c975f5b) - content sha != file sha lesson re-confirmed; FULL-1 crash on FTR-25 e-level field name (e_level vs evidence_level legacy convention), crashed before final write, arm res/seal bitwise identical across reruns 836fe933/a66c0b3d, registry v1.18 rewritten c08cbcc2. registry v1.17->v1.18 (c08cbcc2, append-only), atlas_v1_19.html (d5157665, 754 fields 0/0/0/0), design c4673cc3, final res 28a852b0/seal 6eb89727.",
+   "chain": {
+    "design_sha8": "c4673cc3",
+    "res_sha8": "28a852b0",
+    "seal_sha8": "6eb89727",
+    "arm_res_sha8": "836fe933",
+    "arm_seal_sha8": "a66c0b3d",
+    "registry_v118": "c08cbcc2",
+    "atlas_v1_19": "d5157665"
+   }
+  },
+  {
+   "phase": 3192,
+   "name": "g5c5_gap4_amplitude_attribution",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5c5_gap4_amplitude_attribution|ustar_amplitude_carrier_x3|amp_ratio_10.5984_7.1100_8.8909|dir_ratio_6.23_4.75_5.38|ks_amp_0.998_0.948_0.972|gap_v15_to_v16_registry_v118_unchanged",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-C5",
+   "superseded_by": null,
+   "detail": "G5-C5 GAP-4 amplitude-level attribution (C line, zero GPU; sealed 3169 collect x3 + 3169/3189/3190/3191 results). Residual chain = 3191 verbatim; device anchors: 3189/3190/3191 sealed scalars drift == 0 bitwise x3, 3169 per-seed E replication 0 drift - chain identical across 3189..3192. u* = Vt[0] of Qn (feature space, 3190 verbatim). Gate (pinned pre-observation): USTAR_AMPLITUDE_CARRIER iff amp_ratio = median(|Rbar @ u*|, 876 UNnormalized OOV mean-residual rows) / median(|proj|, seen-panel per-(row,seed) residuals) >= 1.3 in >= 2/3 models. Observed 3/3: amp_ratio 10.5984/7.1100/8.8909 (med 8.97e1 vs 8.46e0 / 2.53e2 vs 3.55e1 / 5.00e1 vs 5.63e0) - u* is a SUPER-proportional carrier: amplitude ratio exceeds the overall collapse ratio_B 2.5388 x3-4x, so the spectral-out 2.54x collapse and the 1.8x residual are carried PRIMARILY on the shared direction, not spread across the orthogonal complement. Report-only: unit-direction projection ratio 6.23/4.75/5.38 (direction concentration on u* is itself large - consistent with 3190 KS 0.97-0.99), KS(|proj| distributions) = 0.9977/0.9477/0.9715. CARRIER branch: GAP-4 mechanism_note append (u*_amplitude_carrier) + evidence append, gap ledger v1.5->v1.6 (0f6423e0, append-only; other gaps/appendix byte-preserved), registry v1.18 UNCHANGED (no feature-level change), atlas_v1_20.html (88300285, 754 fields 0/0/0/0). SMOKE/FULL arm payload bitwise identical. registry v1.18 c08cbcc2 unchanged, design efc062be, arm res 6221fe00/seal 58c4f183, final res 7f35fca4/seal b147d3d2. C line 3188-3192 five-phase chain CLOSED: GAP-4 residual mechanism = shared direction u* carrying super-proportional OOV amplitude, held-out predictive (E2).",
+   "chain": {
+    "design_sha8": "efc062be",
+    "res_sha8": "7f35fca4",
+    "seal_sha8": "b147d3d2",
+    "arm_res_sha8": "6221fe00",
+    "arm_seal_sha8": "58c4f183",
+    "gap_v16": "0f6423e0",
+    "registry_v118_unchanged": "c08cbcc2",
+    "atlas_v1_20": "88300285"
+   }
+  },
+  {
+   "phase": 3193,
+   "name": "g5d1_ustar_decomposition",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d1_ustar_decomposition|novel_x2of3|gate_max_0.2130_0.3303_0.2457|cos_dvu_0.1064_0.0405_0.0240|FTR26_novel_direction_candidate|registry_v119_features_26",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D1",
+   "superseded_by": null,
+   "detail": "G5-D1 u* subspace decomposition (D line opening, zero GPU; sealed 3157/3169 collect + 3169/3183/3189/3190/3191/3192 results). Residual chain = 3192 verbatim; device anchors: 3189/3190/3191 sealed scalars drift == 0 bitwise x3, 3157 tc anchor + 3183 dv replication (cos_rl/norm_dv), 3169 per-seed E 0 drift - chain identical across 3189..3193; report-only |cos(u*,v_c)| bitwise == 3190 values. PREREG DOWNGRADE (freeze-pinned, honest): 3165/3166 sealed results hold scalars/singular values only, no direction vectors; gate set downgraded to {dvu (3157/3183 verbatim), v_s x6 (seen-class mean residual directions from all 738 seen rows), u_seen (seen residual top-1 SVD)}; report-only v_c x4. Gate (pinned): DECOMPOSED iff max |cos| >= 0.5 x>=2/3; NOVEL iff max < 0.3 x>=2/3. Observed: NOVEL 2/3 (4b 0.2130, glm4 0.2457 < 0.3; 14b 0.3303 intermediate); |cos(u*,dvu)| = 0.1064/0.0405/0.0240 (u* is NOT the relation-offset direction - consistent with 3188 DECOUPLED at direction level); max|cos(u*,v_s)| 0.21/0.22/0.20; |cos(u*,u_seen)| 0.15/0.33/0.25. NOVEL branch: FTR-26 u*_novel_direction candidate registered (family=context E1_repeatable, features 25->26 append-only, 25 legacy features byte-preserved), registry v1.18->v1.19 (4d64a153), atlas_v1_21.html (5a6d219f, 764 fields 0/0/0/0). Honest log: SMOKE crashes x3 (ALL_SEEN_ROWS filter missed entity constraint i<41; 3183 path dir name g5b5_lowrank_check -> g5b8_dv_lowrank; 3183 per_model key glm4 -> glm4-9b) + isa/hasa row grouping fix (rl==0 at i%4 in {0,1}, not first 32 rows; caught by 3183 dv anchor) + FULL-1 SHA_ANCHOR missing p3192_result key (design freeze refrozen bd6dbbc6 -> 7af34fe6, refreeze honest); SMOKE/FULL per_model payload bitwise identical. registry v1.19 4d64a153, design 65609e8b, arm res 5465dd47/seal ce1d8c8d, final res e75c6e34/seal 9164b1ec.",
+   "chain": {
+    "design_sha8": "7af34fe6",
+    "res_sha8": "e75c6e34",
+    "seal_sha8": "9164b1ec",
+    "arm_res_sha8": "5465dd47",
+    "arm_seal_sha8": "ce1d8c8d",
+    "registry_v119": "4d64a153",
+    "atlas_v1_21": "5a6d219f"
+   }
+  },
+  {
+   "phase": 3194,
+   "name": "g5d2_ftr26_heldout_upgrade",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d2_ftr26_heldout_upgrade|HOLDOUT_PREDICTIVE_USTAR|3of3|min_med_cos_held_ustar_0.4910_0.5198_0.5221|FTR26_E1_to_E2_held_out|upgrade_log_8|registry_v119_to_v120",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D2",
+   "superseded_by": null,
+   "detail": "G5-D2 FTR-26 held_out upgrade arm (E1->E2 channel, zero GPU; sealed 3157/3169 collect + 3169/3183/3189/3190/3191/3192/3193 results). Residual chain = 3193 verbatim (incl. corrected build_dvu); device anchors drift69/89/90/91/93 all == 0 bitwise x3, dv_drift == 0 - chain identical across 3189..3194. Dual predictors per model x 4 folds: P1 = u* (all-876-row SVD top-1, label-free non-leaking direction summary), P2 = v_hat_held (3191 protocol verbatim control anchor - med_abs_cos_held / min_med_abs_cos replicated bitwise: 3191 min values 0.3906/0.4174/0.3717 re-derived exactly). Gate (pinned pre-observation): median |cos(row, u*)| >= 0.3 in ALL 4 folds x >= 2/3 models. Observed: HOLDOUT_PREDICTIVE_USTAR 3/3 - 4b folds 0.5632/0.4910/0.5996/0.5657 (min 0.4910); 14b 0.5264/0.5303/0.6035/0.5198 (min 0.5198); glm4 0.5757/0.5254/0.5875/0.5221 (min 0.5221); all 12 fold medians exceed the FTR-25 same-protocol control minima - u* generalizes across held-out classes MORE strongly than the FTR-25 shared direction. FTR-26 upgraded E1_repeatable -> E2_held_out (19th E2, upgrade_log #8): evidence_level change + anchors append role=held_out + statement append (25 legacy features byte-preserved), registry v1.19->v1.20 (2aac7e5e, 26 features / E2x19 / E3x3 / E1x3 / failures 19 / upgrades 8), atlas_v1_22.html (b991709b, 771 fields 0/0/0/0). Honest log: SMOKE-1 NameError NPZ57_KEY dict omitted (SRC p3157 keys present, dict literal missing) - one-line fix, no observation contamination; SMOKE/FULL per_model payload bitwise identical. registry v1.20 2aac7e5e, design a733e0b6, res f4836e97/seal be9ce95b, final fca2ccbb/90bb8a9c.",
+   "chain": {
+    "design_sha8": "a733e0b6",
+    "res_sha8": "f4836e97",
+    "seal_sha8": "be9ce95b",
+    "registry_v120": "2aac7e5e",
+    "atlas_v1_22": "b991709b",
+    "final_res_sha8": "fca2ccbb",
+    "final_seal_sha8": "90bb8a9c"
+   }
+  },
+  {
+   "phase": 3195,
+   "name": "g5d3_ustar_attribution",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d3_ustar_attribution|PARTIALLY_DECOMPOSED|3of3|residual_ratio_0.0181_0.0174_0.0181|carriers_vc_x4_plus_kout_pc|registry_v120_untouched_report_only",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D3",
+   "superseded_by": null,
+   "detail": "G5-D3 u* content attribution deepening (zero GPU; sealed 3157/3169 collect + 3169/3183/3189/3190/3191/3192/3193/3194 results). Residual chain = 3194 verbatim; device anchors drift69/89/90/91/93/94 all == 0 bitwise x3, dv_drift == 0. Control anchor: 3193 gate set re-derived bitwise (gate_max 0.2130/0.3303/0.2457, |cos(u*,dvu)| 0.1064/0.0405/0.0240, cos_vs x6, cos_useen, cos_vc_report x4 0.72-0.85). Candidate span C = 22 directions {dvu, v_s x6, u_seen, v_c x4, KOUT top-10 PCs of mean-centered raw 876-row Y}; metric = residual ratio ||u* - P_C u*||/||u*|| (QR-orthonormalized). Gate (pinned): PARTIALLY_DECOMPOSED iff ratio < 0.5 x3/3. Observed: PARTIALLY_DECOMPOSED 3/3 - ratio 0.0181/0.0174/0.0181 (proj 0.9998 x3): u* lies almost entirely in the candidate span. Top carriers: v_c x4 dominate (|cos| 0.724-0.852 across models), KOUT pc0/pc2 next (0.38-0.43); dvu/v_s/u_seen single-direction contributions stay low - 3193 NOVEL (no single known-structure direction in the restricted gate set) and 3195 decomposable (subspace level, v_c included) are consistent: u* is a class-mean-dominated mixture of the OOV residual geometry, NOT a new primitive direction. REPORT-ONLY: registry v1.20 byte-UNTOUCHED (file sha recheck 2aac7e5e), no atlas HTML, FTR-26 stays E2_held_out; attribution note recorded here + MEMO. Honest log: SMOKE-1 candidate-count assert 17 -> 22 (prereg arithmetic slip 1+6+1+4+10=22; design refrozen c23f7ada); SMOKE/FULL payload bitwise identical. design c23f7ada, res 21aee353/seal f9fe19e0, final b527537a/551e8b40.",
+   "chain": {
+    "design_sha8": "c23f7ada",
+    "res_sha8": "21aee353",
+    "seal_sha8": "f9fe19e0",
+    "final_res_sha8": "b527537a",
+    "final_seal_sha8": "551e8b40",
+    "registry_v120": "2aac7e5e"
+   }
+  },
+  {
+   "phase": 3196,
+   "name": "g5d4_ustar_nnls_shares",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d4_ustar_nnls_shares|MIXED_0of3|vc_share_0.0000_x3|known_share_0.1999_0.3998_0.1139|nnls_resid_0.82_gt_ratio_0.018_nonneg_cone_fail|signed_mixture_required|registry_v120_untouched_report_only",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D4",
+   "superseded_by": null,
+   "detail": "G5-D4 u* non-negative composition shares arm (NNLS via scipy.optimize.nnls over the 22-direction candidate set of G5-D3 {dvu, v_s x6, u_seen, v_c x4, KOUT top-10 PCs}; zero GPU; sealed 3169/3183/3189/3190/3191/3192/3193/3194/3195 results). Residual chain = 3195 verbatim; device anchors drift69/89/90/91/93/94 all == 0 bitwise x3, dv_drift == 0; 3195 QR-projection ratio control anchor re-derived drift == 0 bitwise (0.01806072230473137/0.017358575654316224/0.01814552246882951). Gate (pinned): CLASS_MEAN_DOMINATED iff v_c x4 share sum >= 0.8 AND known-struct share sum < 0.1 x3/3. Observed: MIXED 0/3 - vc_share = 0.0000 in ALL 3 models (NNLS assigns zero weight to v_c); known_share 0.1999/0.3998/0.1139; NNLS share spectrum led by kout_pc (0.216-0.343 per model) + u_seen (0.074-0.343) + small dvu/v_s. KEY NEGATIVE RESULT: nnls_resid 0.8184/0.8125/0.8236 >> QR-projection ratio 0.018 - although u* lies almost entirely in the candidate SPAN (3195 PARTIALLY_DECOMPOSED, proj 0.9998), NO non-negative coefficient combination of the candidates fits u* (cone membership FAILS); the cos-level v_c dominance (0.72-0.85) can only hold via NEGATIVE-coefficient cancellation. Interpretation: u* is a SIGNED contrast mixture - consistent with its origin as OOV-specific residual direction (must contain 'subtract the seen baseline' negative components); cos-level reads without sign constraint overstate class-mean composition. Caveat registered: NNLS over collinear candidates is non-unique, but resid 0.82 is not a non-uniqueness artifact (no non-negative combo fits at all). REPORT-ONLY: registry v1.20 byte-UNTOUCHED (recheck 2aac7e5e), FTR-26 stays E2_held_out. Honest log: SMOKE-1 leftover return (decomposed -> dominated, mechanical); SMOKE/FULL payload bitwise identical. design 94bbdd58, res e69ab1e7/seal c0cdd97f, final 7313de4d/f57cc8b7.",
+   "chain": {
+    "design_sha8": "6723c371",
+    "res_sha8": "e69ab1e7",
+    "seal_sha8": "c0cdd97f",
+    "final_res_sha8": "7313de4d",
+    "final_seal_sha8": "f57cc8b7",
+    "registry_v120": "2aac7e5e"
+   }
+  },
+  {
+   "phase": 3197,
+   "name": "g5d5_signed_ls_shares",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d5_signed_ls_shares|SIGNED_CLASS_CONTRAST|3of3|ls_resid_0.0181_0.0174_0.0181|vc_l1_share_0.9159_0.8905_0.9244|vc_weights_all_negative_-0.273_to_-0.361|ustar_anti_class_mean_contrast_axis|D_line_qualitative_closing|registry_v120_untouched_report_only",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D5",
+   "superseded_by": null,
+   "detail": "G5-D5 u* SIGNED composition shares arm (unconstrained ridge-stabilized LS lam=1e-12 over the 22-direction candidate set; zero GPU; sealed 3169/3183/3189/3190/3191/3192/3193/3194/3195/3196 results). Residual chain = 3196 verbatim; device anchors drift69/89/90/91/93/94 all == 0 bitwise x3, dv_drift == 0; control anchors re-derived drift == 0 bitwise (3195 QR ratio 0.01806072230473137/0.017358575654316224/0.01814552246882951; 3196 nnls_resid 4dp 0.8184/0.8125/0.8236). Gate (pinned): SIGNED_CLASS_CONTRAST iff LS resid < 0.05 AND |v_c x4| l1 share >= 0.5 x3/3. Observed: SIGNED_CLASS_CONTRAST 3/3 - ls_resid 0.0181/0.0174/0.0181 (matches QR ratio: near-complete signed fit); vc_l1_share 0.9159/0.8905/0.9244; ALL FOUR v_c weights NEGATIVE in every model (4b: v_c[8] -0.336, v_c[6] -0.320, v_c[9] -0.303, v_c[7] -0.273; 14b: -0.355/-0.289/-0.281/-0.276; glm4: -0.361/-0.320/-0.314/-0.302); next-largest |w| <= 0.024; n_negative 18/13/13 of 22. D-LINE QUALITATIVE CLOSING: u* ~= -(w8*v_c[8]+w6*v_c[6]+w9*v_c[9]+w7*v_c[7]) - an ANTI-CLASS-MEAN CONTRAST AXIS (deviation from all four OOV class means simultaneously). D line five-link chain now closed: 3193 NOVEL (single-direction level, restricted gate set) -> 3194 E2_held_out (cross-class predictability) -> 3195 PARTIALLY_DECOMPOSED (subspace level, v_c included) -> 3196 non-negative cone FAIL (nnls_resid 0.82 >> ratio 0.018) -> 3197 signed resolution (negative class-mean sum). Consistent with origin: u* = SVD top-1 of OOV-specific residuals (must point AWAY from every class mean). REPORT-ONLY: registry v1.20 byte-UNTOUCHED (recheck 2aac7e5e), FTR-26 stays E2_held_out. Honest log: SMOKE-1 sha-anchor placeholder f086e6a3 -> measured f3f86f47 (p3196_result, measured probe before SMOKE - no observation contamination); SMOKE/FULL payload bitwise identical. design c3a64857, res dd2af224/seal 4311d796, final f8a39985/2d361f0d.",
+   "chain": {
+    "design_sha8": "c3a64857",
+    "res_sha8": "dd2af224",
+    "seal_sha8": "4311d796",
+    "final_res_sha8": "f8a39985",
+    "final_seal_sha8": "2d361f0d",
+    "registry_v120": "2aac7e5e"
+   }
+  },
+  {
+   "phase": 3198,
+   "name": "g5d6_dline_registration",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5d6_dline_registration|REGISTERED|3of3|control_anchor_3197_drift==0_x3|ftr26_statement_append_signed_closing|registry_v1.20_2aac7e5e_to_v1.21_47cf01e0|atlas_v1_23_9488777c_775_fields_clean|evidence_level_E2_held_out_unchanged|upgrade_log_unchanged_8|D_line_five_link_registered",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-D6",
+   "superseded_by": null,
+   "detail": "G5-D6 D-line closing registration arm (zero GPU; sealed registry v1.20 2aac7e5e + sealed p3197 result ee91f8c7 + gap ledger v1.5). Gate (pinned pre-observation): REGISTERED iff (a) statement append verified (startswith + anchors prefix + 25 legacy features byte-equal + evidence_level/upgrade_log/failures/other top-level keys unchanged), (b) atlas field check clean, (c) control anchor: sealed 3197 signed_weights v_c x4 + ls_resid (4dp, measured from sealed p3197 result BEFORE freeze) re-read drift == 0 x3/3. Observed: REGISTERED 3/3 - control drift==0 x3/3 (ls_resid 0.0181/0.0174/0.0181, v_c x4 all negative, matching pinned ANCH_3197 exactly); FTR-26 statement append: SIGNED_CLASS_CONTRAST closing + D-line five-link chain 3193 NOVEL -> 3194 E2_held_out -> 3195 PARTIALLY_DECOMPOSED -> 3196 non-negative cone FAIL -> 3197 signed resolution + methodology note (subspace-projection / NNLS / signed-LS three-layer readings must be reported separately; unsigned cos-level readings systematically overstate class-mean composition); anchors append role=signed_closing (asserts vc_l1_share 0.9159/0.8905/0.9244, control_3197_drift 0.0); evidence_level stays E2_held_out, upgrade_log stays 8, failures F1-F19 unchanged. Registry v1.20 2aac7e5e -> v1.21 47cf01e0 (26 features, 25 legacy byte-preserved); atlas_v1_23.html 9488777c (775/775 fields, 0 missing/extra/mismatch/dups). Honest log: DESIGN re-frozen at patch time (prereg text refined per MEMO 3197 tail before any observation; SMOKE and FULL share design 1d6b40ce, payloads identical). design 1d6b40ce, res a1167bb8/seal 591185ae, final b1e81f1b/fbd85fbb.",
+   "chain": {
+    "design_sha8": "1d6b40ce",
+    "res_sha8": "a1167bb8",
+    "seal_sha8": "591185ae",
+    "final_res_sha8": "b1e81f1b",
+    "final_seal_sha8": "fbd85fbb",
+    "registry_v121": "47cf01e0",
+    "registry_v120": "2aac7e5e",
+    "atlas_v1_23": "9488777c"
+   }
+  },
+  {
+   "phase": 3199,
+   "name": "g5e1_ftr24_heldout_upgrade",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5e1_ftr24_heldout_upgrade|NOT_PREDICTIVE|0of3|med_cos_held_dvu_min_0.0404_0.0598_0.0355_all_below_0.3|full_panel_med_0.0610_0.0734_0.0535|dvu_no_heldout_oov_predictability|consistent_with_3188_DECOUPLED_and_3189_class_mean_dominance|ftr24_counter_evidence_append_E1_unchanged|registry_v1.21_47cf01e0_to_v1.22_9fd87433|atlas_v1_24_74a11492_775_fields_clean",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-E1",
+   "superseded_by": null,
+   "detail": "G5-E1 FTR-24 held_out upgrade arm (3194 protocol; zero GPU; sealed 3169/3183/3189/3190/3191/3192/3193 reuse + sealed 3197 file lock; prereg target corrected FTR-15 -> FTR-24 since FTR-15 was already upgraded E2_held_out in Phase 3180). Protocol: per model, 4 folds hold out one OOV class (219 row directions from the 876-row 3169 B-protocol residual chain); P1 = FTR-24 sealed direction dvu = unit(v_isa - v_hasa), 3183/3157 verbatim (build_dvu bitwise anchors); gate (pinned): median |cos(row, dvu)| >= 0.3 in ALL 4 folds x ALL 3 models => E1->E2_held_out + upgrade_log #9. Observed: NOT_PREDICTIVE 0/3 - min med|cos_held,dvu| 0.0404/0.0598/0.0355 (4b/14b/glm4, all 12 folds far below 0.3); full-panel med|cos| 0.0610/0.0734/0.0535. Interpretation: the relation-offset direction dvu (isa/hasa low-rank geometry, FTR-24 structural evidence unchanged) carries NO cross-class held-out predictability on OOV rows - held-out row directions are carried by class-mean structure (u*/v_c, FTR-25/26), NOT by the relation direction. Consistent with 3188 DECOUPLED (dvu x spectral-collapse amplitude share ~ noise) and 3189 class-mean dominance. FTR-24 counter_evidence appended (4th entry), evidence_level UNCHANGED E1_repeatable, upgrade_log unchanged 8, failures F1-F19 unchanged; 25 legacy features byte-preserved. Registry v1.21 47cf01e0 -> v1.22 9fd87433 (append-only); atlas_v1_24.html 74a11492 (775/775 fields, 0 missing/extra/mismatch/dups). Device anchors: drift69/89/90/91/93 all == 0 bitwise x3, dv_drift == 0, tc drift < 1e-9; 3197 signed_weights/ls_resid 4dp re-read drift == 0 x3 (ANCH_3197 pinned pre-freeze, carried from 3198). Honest log: SMOKE/FULL payloads bitwise identical (zero GPU). design cfbe183c, res 94442e48/seal b908731e, final 06644f1f/82009c4a.",
+   "chain": {
+    "design_sha8": "cfbe183c",
+    "res_sha8": "94442e48",
+    "seal_sha8": "b908731e",
+    "final_res_sha8": "06644f1f",
+    "final_seal_sha8": "82009c4a",
+    "registry_v122": "9fd87433",
+    "registry_v121": "47cf01e0",
+    "atlas_v1_24": "74a11492"
+   }
+  },
+  {
+   "phase": 3200,
+   "name": "g5e2_ftr23_heldout_upgrade",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5e2_ftr23_heldout_upgrade|HOLDOUT_PREDICTIVE|6of6_units|med_cos_out_isa_0.7696_0.7564_0.7762|hasa_0.7429_0.7855_0.7885|gate_ge_0.5_all_units|min_fold_0.6091|ftr23_E1_to_E2_held_out_upgrade_log_9|registry_v1.22_9fd87433_to_v1.23_5f5b9e73|atlas_v1_25_7dc08f1e_782_fields_clean",
+   "evidence_level": "E2_held_out",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-E2",
+   "superseded_by": null,
+   "detail": "G5-E2 FTR-23 held_out upgrade arm (registration arm on sealed scalars, 3176 batch-upgrade precedent; zero GPU; sealed p3178 result abae296e file-locked + content double lock 4f521d9b/1f166645 + sealed 3157 npz x3 + sealed 3183 result). Protocol refined PRE-freeze and registered: FTR-23 has no sealed direction vector in the 3169 OOV row space (scalar phenomenon r_m/p_m on the 3157 context-transform panel), so the held-out arm evaluates the SEALED 3178 entity-LOO null folds cos_out (held entity's 2 cells vs within-relation mean direction rebuilt from the other 15 entities, 16 folds x 2 relations x 3 models, 3178 protocol verbatim) - the panel-internal held-out reading. Gate (pinned): median cos_out >= 0.5 in ALL 6 (model, relation) units. Observed: HOLDOUT_PREDICTIVE 6/6 - med isa 0.7696/0.7564/0.7762, hasa 0.7429/0.7855/0.7885; min fold 0.6880/0.6224/0.6918 (isa), 0.7128/0.6091/0.6941 (hasa). Interpretation: within a relation, the context-shift geometry is entity-held-out predictable (median cos ~0.74-0.79) - FTR-23's relation-specific residual is a BETWEEN-relation offset, NOT within-relation entity noise; together with 3199 (dvu NOT predictive on OOV rows) this completes the E-line picture: held-out predictability lives in class-mean/relation-internal structure, while between-relation offsets and relation directions carry no cross-panel prediction. FTR-23 E1_repeatable -> E2_held_out (upgrade_log #9), 25 legacy features byte-preserved, failures F1-F19 unchanged, counter_evidence 5 entries preserved. Registry v1.22 9fd87433 -> v1.23 5f5b9e73 (append-only); atlas_v1_25.html 7dc08f1e (782/782 fields, 0 missing/extra/mismatch/dups). Device/control anchors: 3157 tc + 3183 dv scalars bitwise x3 (build_dvu); sealed 3178 scalars re-read vs pinned 4dp constants drift == 0 x3 (medians probed from sealed p3178 BEFORE freeze - measured-anchor discipline; exch_mean 1.2728174525072664 bitwise). Honest log: prereg protocol refined pre-freeze (OOV-row projection -> sealed-null-fold evaluation) since FTR-23 has no OOV-panel direction; gate bar 0.5 pinned after pre-freeze probe of sealed medians (conservative: half the observed band floor, above the 0.3 OOV-panel precedent). SMOKE/FULL payloads bitwise identical. design 2ea6e1f6, res f9a280fc/seal cba9d56c, final ae7a5837/dfd3b880.",
+   "chain": {
+    "design_sha8": "2ea6e1f6",
+    "res_sha8": "f9a280fc",
+    "seal_sha8": "cba9d56c",
+    "final_res_sha8": "ae7a5837",
+    "final_seal_sha8": "dfd3b880",
+    "registry_v123": "5f5b9e73",
+    "registry_v122": "9fd87433",
+    "atlas_v1_25": "7dc08f1e"
+   }
+  },
+  {
+   "phase": 3201,
+   "name": "g5e3_eline_audit",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5e3_eline_audit|E_LINE_CLOSED|A1_domain_counts_ok_E2held3_E3_3_E1_3_E2pred17|A2a_held_out_anchors_FTR23_25_26|A2b_primary_intervention_FTR10_11_16|A2c_counter_evidence_FTR04_14_24|A3_upgrade_chain_9_pinned|0_contradictions|ftr24_scope_limits_methodology_append|registry_v1.23_5f5b9e73_to_v1.24_0d74b628|atlas_v1_26_fbc064d4_783_fields_clean",
+   "evidence_level": "E_LINE_CLOSED",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-E3",
+   "superseded_by": null,
+   "detail": "G5-E3 E-line closing audit arm (registration arm on sealed registry v1.23, 3176 batch precedent; zero GPU). Pinned audit A1-A3 over all 26 features: A1 domain (every evidence_level in {E0_candidate,E1_repeatable,E2_predictive,E2_held_out,E3_causal_scoped}) + counts E2_held_out==3 / E3==3 / E1==3 / E2_predictive==17; A2a FTR-23/25/26 each carry role=held_out anchor; A2b FTR-10/11/16 each carry role=primary_intervention; A2c FTR-04/14/24 each have >=1 counter_evidence; A3 upgrade_log node sequence == 9 pinned entries (N04->FTR-13, N05->FTR-12, N13->FTR-16, FTR-06, FTR-08, FTR-15, FTR-25, FTR-26, FTR-23). Observed: AUDIT CLEAN, 0 contradictions => E_LINE_CLOSED. A4 closing: FTR-24 scope_limits append ONLY (E-line methodology verdict: held-out predictability geometric divide - class-mean/within-relation structure carries it (FTR-25/26 OOV med|cos|>=0.3, FTR-23 within-relation entity holdout med cos 0.74-0.79), between-relation offsets and relation directions do not (dvu med|cos| 0.035-0.060); E1 residual falsifiable records complete; taxonomy note: E2_held_out is the held-out strengthened tier of E2_predictive, legacy values byte-preserved); all other features + upgrade_log + failures F1-F19 byte-preserved (25 legacy features assert-equal). Appendix inventory: all 5 items GPU/crossline dependent, zero-GPU candidate set empty. Control anchors: sealed 3178 scalars 4dp re-read drift==0 x3 (ANCH_3178 carried from 3200) + 3183 dv bitwise + 3157 tc drift<1e-9 + registry chain v1.20-v1.23 sha refs. Honest log: generation script P17 global reg23->reg24 rename over-reached into newly inserted code (preservation asserts self-comparing); repaired pre-FULL via phase3201_fix_rename.py (10 targeted restores, assert count==1 each); HTML sub-line initially dropped v1.20 span vs flatten key (missing=1), span restored, 783/783 clean. Registry v1.23 5f5b9e73 -> v1.24 0d74b628 (append-only, FTR-24 scope_limits only); atlas_v1_26.html fbc064d4 (783/783, 0/0/0/0). design 38fbdd1a, res 1dc22531/seal 30b08ff8, final c0350500/25cad189.",
+   "chain": {
+    "design_sha8": "38fbdd1a",
+    "res_sha8": "1dc22531",
+    "seal_sha8": "30b08ff8",
+    "final_res_sha8": "c0350500",
+    "final_seal_sha8": "25cad189",
+    "registry_v124": "0d74b628",
+    "registry_v123": "5f5b9e73",
+    "atlas_v1_26": "fbc064d4"
+   }
+  },
+  {
+   "phase": 3202,
+   "name": "g5f1_ftr04_recheck",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5f1_ftr04_recheck|REGISTERED|R1_4dp_drift0_x3|R2_anchor_bitwise|R3_loeo_gap_0.1181_ge_0.10|margin_ratio_1.9661_ge_1.5|geometry_band_ok|ftr04_weak_specificity=readout_inconsistency_not_geometry|scope_limits_append|registry_v1.24_0d74b628_to_v1.25_3bb33a24|atlas_v1_27_739faeb7_784_fields_clean",
+   "evidence_level": "E1_repeatable",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-F1",
+   "superseded_by": null,
+   "detail": "G5-F1 FTR-04 glm4 weak-specificity unit-level decomposition recheck arm (registration arm on sealed 3181 scalars; zero GPU; default prereg arm (a) confirmed viable by pre-freeze probe). R1: sealed 3181 per_model scalars re-read vs pinned 4dp constants (loeo 0.6019/0.5981/0.4800, margin 2.6614/1.4164/5.2326, kappa 48118411.9811/46016538.1628/44953766.4873, pr 8.7763/8.9016/8.9220, proj 0.0763/0.0328/0.0294, e90 8) drift == 0 x3. R2: FTR-04 p3181 anchor asserts (kappa/margin/proj glm4 + res/seal sha) bitwise-consistent with sealed scalars. R3 decomposition bars (pinned post-probe, honest): loeo_gap = min(qwen loeo) - glm4 loeo = 0.1181 >= 0.10; margin_ratio = glm4 margin / max qwen margin = 1.9661 >= 1.5; geometry band healthy (kappa ratio 0.934, pr ratio 1.017, e90 equal). Interpretation: glm4-9b weak specificity = READOUT INCONSISTENCY (highest class-pair margin with LOWEST leave-one-entity-out readout accuracy => margin distribution scattered across class pairs), NOT a geometry deficit - unit-level support for the 3181 noise_level verdict (weak specificity not attributable to geometry or readout mechanism absence; E level unchanged E1_repeatable, no upgrade). Registration: FTR-04 scope_limits append ONLY; 25 other features + upgrade_log + failures F1-F19 byte-preserved. Registry v1.24 0d74b628 -> v1.25 3bb33a24 (append-only); atlas_v1_27.html 739faeb7 (784/784 fields, 0/0/0/0). Control anchors: 3181 content double lock (res 1e95a19d / seal 462fd221) + 3178/3183 double locks + 3157 tc + 3183 dv bitwise x3. Honest log: generation pre-FULL fixes - 3181 result has top-level per_model (no arm wrapper) and flatten meta.p3181_result key added after HTML extra=1; both fixed in create script + generated script. design 822996d4, res af81e9f4/seal 480bd271, final f75b3a6d/dbcaf643.",
+   "chain": {
+    "design_sha8": "822996d4",
+    "res_sha8": "af81e9f4",
+    "seal_sha8": "480bd271",
+    "final_res_sha8": "f75b3a6d",
+    "final_seal_sha8": "dbcaf643",
+    "registry_v125": "3bb33a24",
+    "registry_v124": "0d74b628",
+    "atlas_v1_27": "739faeb7"
+   }
+  },
+  {
+   "phase": 3203,
+   "name": "g5f2_gap4_reread",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5f2_gap4_reread|CLEAN|G1_quantification_chain_4dp|G2_C_line_five_arms|G3_ftr25_anchor_bitwise_89_90_91|G3_mechanism_note_markers_ok|n_contradictions_0|gap4_reread_clean|report_only_registry_v1.25_3bb33a24_untouched|gap_ledger_v1.6_0f6423e0_authoritative_unchanged",
+   "evidence_level": "RE_READ_CONSISTENCY",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-F2",
+   "superseded_by": null,
+   "detail": "G5-F2 GAP-4 residual mechanism re-read arm (report-only; zero GPU; sealed 3169/3172/3175/3188-3192 scalars + gap v1.5/v1.6 + registry v1.25 re-read; no registry bump, no atlas). G1 quantification chain 4dp clean: 3169 pooled ratio_B 2.5388 (E_oov_B 0.9479 / E_seen_B 0.3734), 3172 ratio_kmax 1.8002 (borderline_partial_recovery), 3175 delta 0.0660, ratio_in_kmax 1.8002 / ratio_out_kmax 1.8662 (port_residual_dominant). G2 C-line five arms clean: 3188 DECOUPLED(2/3) -> 3189 SHARED(3/3, top1 0.3065/0.2936/0.3008, cross_med 0.5441/0.5663/0.4449) -> 3190 LOO robust(3/3, loo 0.0342/0.0214/0.0332, ks 0.9932/0.9761/0.9715) -> 3191 held-out predictive(3/3, min_med 0.3906/0.4174/0.3717) -> 3192 amplitude carrier(3/3, amp_ratio 10.5984/7.1100/8.8909) + ratio_B_anchor bitwise == 3169 ratio_B. G3: FTR-25 anchors bitwise vs sealed 3189/3190/3191 scalars (True/True/True) + gap v1.6 mechanism_note markers present (u*_amplitude_carrier / 10.5984 / 7.1100 / 8.8909 / ratio_B 2.5388). Honest log: SMOKE first run DIRTY(2) - (1) PIN p3169 e_seen_B was probe-truncated 0.3733, true 4dp of 0.37335046 is 0.3734 (criterion aligned to sealed data, sealed untouched); (2) mechanism_note marker criterion contained strings absent from ledger text ('amp_ratio', '10.60', 'quantified_collapse'), realigned to actually-present markers. Proposal (report-only): gap ledger v1.6 stays authoritative unchanged; GAP-4 status quantified_collapse (mechanism chain 3169->3175 + C-line 3188->3192 double-chain re-read holds); v1.7 only on new evidence. Verdict gap4_reread_clean, G1-G3 0 contradictions. design f3037547, res dc13d252 / seal d237ec5a.",
+   "chain": {
+    "design_sha8": "f3037547",
+    "res_sha8": "dc13d252",
+    "seal_sha8": "d237ec5a",
+    "registry_v125": "3bb33a24",
+    "gap_ledger_v16": "0f6423e0",
+    "ledger_pre": "4074e4bc"
+   }
+  },
+  {
+   "phase": 3204,
+   "name": "g5g1_ftr15_heldout_recheck",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5g1_ftr15_heldout_recheck|REGISTERED|H1_3158_ratios_bitwise_x3|H2_3180_chain_clean_ratio_bitwise_maxband_0.0300_0.0278_0.0182_folds_16x3_same_class_drift0|H3_registry_anchors_bitwise_upgrade_entry|scope_limits_E2_held_out_annotation_append|registry_v1.25_3bb33a24_to_v1.26_112a46ee|atlas_v1_28_cfc389a8_784_fields_clean",
+   "evidence_level": "E2_predictive_held_out_annotation",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-G1",
+   "superseded_by": null,
+   "detail": "G5-G1 FTR-15 held_out recheck arm (zero GPU; sealed p3158 summary + p3180 held-out result + registry v1.25 re-read; default prereg arm (a)). H1: sealed 3158 budget ratios bitwise == pinned full-precision constants (1.0283477199188433 / 1.3316768638966026 / 1.2472595295618603) + content double lock (res fa5cca12 / seal e0c60629). H2: sealed 3180 held-out chain clean - ratio_full_recompute bitwise == 3158 ratios x3 (device drift 0 x3, ratio_sealed == ratio_full_recompute x3), max_log_band 4dp 0.0300/0.0278/0.0182 < 0.25, folds 16 x3 all same_class with max ratio_train < 3.0, n_c_gt1 10/16/15, gates G1_device/G2_heldout True + G2_class 3.0 + G2_log_band 0.25 + content double lock (res f1689e94 / seal a3c1b53e). H3: registry v1.25 FTR-15 anchors bitwise (p3158 ratios + p3180 ratio_full_recompute/max_log_band/all_same_class + res/seal shas) + upgrade_log E1->E2_predictive entry present + evidence_level E2_predictive with held_out tag. Registration: FTR-15 scope_limits append ONLY (E2_held_out 口径注记: held_out = entity-LOO fold 口径, E2_held_out is an E2_predictive strengthened-tier annotation, no new evidence level; local-equivalence still not extrapolated to global quotient), registry v1.25 (3bb33a24) -> v1.26 (112a46ee), atlas_v1_28.html (cfc389a8, 784/784 fields clean); upgrade_log / failures / all other features byte-preserved. Verdict ftr15_heldout_recheck_registered, H1-H3 0 contradictions. design 8e3sha_ref_in_execution, res 263934c8 / seal 7bb722b1, final f9ee4152 / 59100c6d. SMOKE passed first run (CLEAN, 0 contradictions).",
+   "chain": {
+    "res_sha8": "263934c8",
+    "seal_sha8": "7bb722b1",
+    "final_res_sha8": "f9ee4152",
+    "final_seal_sha8": "59100c6d",
+    "registry_v126": "112a46ee",
+    "atlas_v1_28": "cfc389a8",
+    "registry_v125": "3bb33a24",
+    "ledger_pre": "55526f26"
+   }
+  },
+  {
+   "phase": 3205,
+   "name": "g5g3_ftr14_attribution_recheck",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5g3_ftr14_attribution_recheck|REGISTERED|K1_3178_rm_0.0918_0.0951_0.1289_ge_0.05_x3_resid_gpr_4dp_pm_bitwise|K2_3177_gates_A1_pass_A2_fail_exch_band_cross_bitwise_3177_3178_3157|K3_v126_FTR14_23_anchors_bitwise|scope_limits_gatefail_annotation_append|registry_v1.26_112a46ee_to_v1.27_d5ce1c19|atlas_v1_29_b2841d0c_785_fields_clean",
+   "evidence_level": "E1_repeatable_annotation",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-G3",
+   "superseded_by": null,
+   "detail": "G5-G3 FTR-14 A2 attribution post-recheck arm (zero GPU; sealed p3177/p3178 chain re-read + registry v1.26 FTR-14/22/23 anchors; default prereg arm (a)). K1: sealed 3178 r_m 4dp 0.0918/0.0951/0.1289 >= 0.05 bar x3; resid (g,p,r) 4dp x6 (4b isa 0.1145/0.0236/0.0909, hasa 0.1190/0.0264/0.0926; 14b isa 0.1412/0.0231/0.1181, hasa 0.0936/0.0216/0.0720; glm4 isa 0.1500/0.0193/0.1307, hasa 0.1486/0.0214/0.1272); p_m aggregate bitwise == FTR-23 p3178 asserts (0.025004226714372635/0.02230689488351345/0.02035186067223549); tc_full_drift/exch_drift 0 x3; gates calibration_bar False/device_3157 True/replication_3177 True; exch_mean 1.2728174525072664 bitwise; content double lock (res 4f521d9b / seal 1f166645). K2: sealed 3177 gates gate_a1 True/gate_a2 False/gate_exch_band True (gate False => F16) reproduced; cos_full_a2/tc_full/exchange_obs bitwise 3177==3178==3157 x3; tc_held_a1 4dp x6; content double lock (res d451030f / seal 7b746eb2). K3: v1.26 FTR-23 p3178/p3177/p3157 anchors bitwise vs sealed + FTR-14 values.exch_mean bitwise + counter_evidence r=0.0918/0.0951/0.1289 text present. Registration: FTR-14 scope_limits append ONLY (gate-fail attribution: A2 fail is relation geometry fact (relation-specific residual, see FTR-23), not readout deficit; A1 6/6 pass; exch band kept; E1_repeatable kept; A2 held_out upgrade not retried - relation-heldout construction unreachable for reconstructive readout, see 3182 LORO cross-null), registry v1.26 (112a46ee) -> v1.27 (d5ce1c19), atlas_v1_29.html (b2841d0c, 785/785 fields clean). Verdict ftr14_attribution_recheck_registered, K1-K3 0 contradictions. Honest log: SMOKE first run DIRTY(2) - tc comparison bug in verify criterion (compared float to ANCH dict instead of dict['tc']); criterion fixed, sealed data untouched; second run CLEAN. res 2c6946a6 / seal 1e73ae58, final 9d25e49b / fbcf7098.",
+   "chain": {
+    "res_sha8": "2c6946a6",
+    "seal_sha8": "1e73ae58",
+    "final_res_sha8": "9d25e49b",
+    "final_seal_sha8": "fbcf7098",
+    "registry_v127": "d5ce1c19",
+    "atlas_v1_29": "b2841d0c",
+    "registry_v126": "112a46ee",
+    "ledger_pre": "0181ee1d"
+   }
+  },
+  {
+   "phase": 3206,
+   "name": "g5g5_ftr22_chain_recheck",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5g5_ftr22_chain_recheck|REGISTERED|L1_3172_pooled_bitwise_x5_kcurves8_x3_overall_borderline_partial_recovery|L2_3169_gate_bitwise_eq_pooled0_k0_drift0_3171_ratioS_x3_mixed_across_models|L3_registry_v127_ftr22_three_anchors_bitwise_values_E2_predictive|scope_limits_residual_ledger_update_append|registry_v1.27_d5ce1c19_to_v1.28_5995bbe9|atlas_v1_30_ebc1e122_787_fields_clean",
+   "evidence_level": "E2_predictive_chain_reread_annotation",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-G5",
+   "superseded_by": null,
+   "detail": "G5-G5 FTR-22 upgrade chain re-read arm (zero GPU; sealed p3169 + p3171 + p3172 results + registry v1.27 re-read; default prereg arm (a)). L1: sealed 3172 pooled curve bitwise x5 (2.5388114997805062 / 2.031459140015479 / 1.9429485491548533 / 1.8766676450829491 / 1.800176217907229) + per_model kcurves.8.ratio bitwise x3 (1.9485993218753288 / 1.7100461949026464 / 1.767394689531845) + overall ratio_kmax 1.800176217907229 / main_cls borderline_partial_recovery + content double lock (res 463f42c8 / seal cdb85525). L2: sealed 3169 gate bitwise == 3172 pooled.0 x3 (k0 drift 0: ratio_B / pooled_E_oov_B / pooled_E_seen_B) + gate verdict collapse_confirmed_gap4_open + content double lock (res 49430a39 / seal 018c6024); sealed 3171 slots.k_main.ratio_S bitwise x3 (0.7511424513908266 / 0.7166531333803954 / 0.8205301477290912) + overall.main_cls mixed_across_models + content double lock (res 6a29201c / seal cc7ccedd). L3: registry v1.27 FTR-22 three anchors (p3172/p3169/p3171) asserts bitwise vs sealed values (incl k0_drift_ratio/E_oov/E_seen == 0.0 x3) + values dict (ratio_k0/k8, E_oov_pooled_k0/k8, E_seen_pooled_k0/k8, k0_drift_ratio_vs_3169, p3171_ratio_S x3) + evidence_level E2_predictive. Registration: FTR-22 scope_limits append ONLY (残留 ~1.8x 成分挂账口径更新: 3175 残留归因 delta 0.0660 port_residual_dominant, ratio_in 1.8002 / ratio_out 1.8662; 3203 G5-F2 双链复读 CLEAN 闭环; 「残留成分未定位」->「closed@3175 端口残留主导, E3 因果收敛仍不成立」), registry v1.27 (d5ce1c19) -> v1.28 (5995bbe9), atlas_v1_30.html (ebc1e122, 787/787 fields clean); upgrade_log / failures / all other features byte-preserved. Verdict ftr22_chain_recheck_registered, L1-L3 0 contradictions. SMOKE passed first run (CLEAN). design 530263ce, res 4229bae5 / seal 812ac34a, final 7ad6c7d4 / f899b8cd.",
+   "chain": {
+    "res_sha8": "4229bae5",
+    "seal_sha8": "812ac34a",
+    "final_res_sha8": "7ad6c7d4",
+    "final_seal_sha8": "f899b8cd",
+    "registry_v128": "5995bbe9",
+    "atlas_v1_30": "ebc1e122",
+    "registry_v127": "d5ce1c19",
+    "ledger_pre": "bf6ed076"
+   }
+  },
+  {
+   "phase": 3207,
+   "name": "g5g6_appendix_ledger_recheck",
+   "line": "G",
+   "date": "2026-10-10",
+   "model": "qwen3-4b+qwen3-14b+glm4-9b (zero GPU)",
+   "verdict": "g5g6_appendix_ledger_recheck|REPORT_ONLY_CLEAN|A1_gl15_appendix_5_entries_full_field_bitwise|A2_anchor_sha_x3_cross_3166_eff_ge05_sum2_onehot_14b_3165_K_entity_eff_ge05_0_glm4_14b_3155_kout_share_bitwise_x3|A3_gl16_appendix_append_only_bitwise_eq_gl15|A4_agate_C4_C6_pending_cross_line_wei_shi_jia_ledger_corrections_beb775bd_on_disk|5_appendix_confirmed_open_no_update_needed",
+   "evidence_level": "report_only_appendix_recheck",
+   "model_scope": "qwen3-4b+qwen3-14b+glm4-9b",
+   "prereg_id": "G5-G6",
+   "superseded_by": null,
+   "detail": "G5-G6 5-appendix ledger re-read arm (report-only, zero GPU; gap ledger v1.5/v1.6 + sealed p3166/p3165/p3155-summary + deepseek a_gate_closure_v1 + ledger_corrections_v1; default prereg arm (a)). A1: gl15 appendix 5 entries full-field bitwise (id/title/anchor/status/note/anchor_sha8 all verbatim) + version 1.5 + file sha 4fb3f37d. A2: anchor cross-sha APPX-1->p3166 448af595 (eff_ge05 sum==2, exactly one entry==2, 14b only; res 89b3f320 / seal 263de0ab) + APPX-2->p3165 511d9b13 (cross_model_K glm4/qwen3-14b K_entity_eff_ge05==0, 词表方向 4b 专属 confirmed; res 9b0fe9c9 / seal e966a4e5) + APPX-3->p3155 summary 46a5034d (k2_int_share_kout bitwise 0.15187579769212284 / 0.1824533831239199 / 0.16411745881744746 in 15.0-18.5%% band; APPX-3 note '15.2-18.3%%' 为叙述性舍入, 14b 0.18245->18.2%%). A3: gl16 (0f6423e0) version 1.6 + appendix bitwise == gl15 appendix (append-only preserved). A4: agate a_gate_closure_v1 24c60160 (== APPX-4/5 anchor_sha8, file located at research/deepseek/atlas/) + corrections_C1_C6 n==6 + C4/C6 status pending_cross_line + enactment 未施加 + ledger_corrections_v1.json beb775bd on disk — 跨线补丁已落盘未施加口径维持. Verdict appendix_ledger_recheck_report_only_clean: 5 appendix entries confirmed open, anchors all on-disk, no 口径 update needed after 3206 FTR-22 closed@3175 note; no registry/gap-ledger/HTML mutation. Honest log: SMOKE first run DIRTY(1) — A2 kout band lower bound 0.1519 > measured 0.151876 (judgement bug, seal untouched); band relaxed to 15.0-18.5%%, second SMOKE CLEAN, FULL CLEAN. design badd69fe, res 97b25b57 / seal 20d84260.",
+   "chain": {
+    "res_sha8": "97b25b57",
+    "seal_sha8": "20d84260",
+    "gl15": "4fb3f37d",
+    "gl16": "0f6423e0",
+    "agate": "24c60160",
+    "ledger_corrections": "beb775bd",
+    "ledger_pre": "fecd8e62"
+   }
+  },
+  {
+   "phase": 3208,
+   "name": "g5g7_nline_backfill_draft",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "qwen3-4b+glm4-9b-chat-hf+qwen2.5-3b-instruct (zero GPU, deepseek-line re-read)",
+   "verdict": "g5g7_nline_backfill_draft|DRAFT_REGISTERED|B1_15_sealed_sources_bitwise|B2_content_anchors_verbatim_x7_files|B3_ledger_untouched_n359_efe4a6de|5_draft_entries_N-P3..N-P7_draft_pending_cross_line|NOT_APPLIED_appx4_governance",
+   "evidence_level": "report_only_draft_backfill",
+   "model_scope": "deepseek N-line (qwen3-4b primary)",
+   "prereg_id": "G5-G7",
+   "superseded_by": null,
+   "detail": "G5-G7 N-line P3-P7 ledger backfill draft arm (draft-only, zero GPU; deepseek_temp Phase3-7 sealed artifacts re-read; default prereg arm (b), APPX-4 挂账联动). B1: 15 sealed source files sha bitwise (Phase3 e2_report d6de235f + memo 1d56f814 + wlog d0810382; Phase4 N1_design_seal bd05ba88 + memo cbe8452e + n1v2 report ad05f1f2; Phase5 memo b40de352 + n2f 248f0a46 + n2g d20cac53; Phase6 N2h1_design_seal 4d32b1aa + memo 373571ed + n2h1c 4fb86141; Phase7 N3_design_seal 66afc202 + memo 952f8833 + n3 51e19b7f). B2: content anchors verbatim (P3 'E2 条件化比较探针'; P4 seal main_axis_layer_scan/sense_split/ontology_margin; P5 memo 没有任何单头 / L31–L35; P6 report B_cat=+10.192 / B/A=0.958 / B_cat=+0.071 + seal 置换向量消融; P7 report 'F2 color B/A=0.925 (lstar=L27)' + seal F1_is_a/F2_color/B_cat_loo). B3: shared atlas_ledger untouched (n=359, internal sha efe4a6de before==after, double assertion). Draft registered: n_line_backfill_draft_v1.json (f29da2de) with 5 entries N-P3..N-P7 (E2 条件化比较层扫描 / N1 主轴三段层扫描 / N2 重建源分布式重构 / N2h1 置换向量消类别分量承载 / N3 装置跨 L2/极性/语言族迁移), all draft_pending_cross_line — NOT applied (施加需跨线确认, APPX-4/5 governance). Verdict n_line_backfill_draft_registered, B1-B3 0 contradictions. SMOKE first run CLEAN (res 2ecbe4ca / seal 03a52e6f); FULL clean (res 33cc81ac / seal 35b0345e). design 2e96dae7.",
+   "chain": {
+    "res_sha8": "33cc81ac",
+    "seal_sha8": "35b0345e",
+    "draft_file": "f29da2de",
+    "smoke_res_sha8": "2ecbe4ca",
+    "smoke_seal_sha8": "03a52e6f",
+    "ledger_pre": "efe4a6de",
+    "note": "backfill NOT applied; 5 entries pending cross-line confirmation"
+   }
+  },
+  {
+   "phase": 3209,
+   "name": "g5g8_ui_v16_client",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, client build arm)",
+   "verdict": "g5g8_ui_v16_client|REGISTERED|C1_zero_script_no_handlers_no_js_uri|C2_census_E2x20_E3x3_E1x3|C3_blocks_gaps4_appendix5_ndraft5_ftr01_26|C4_datak_137_fields_clean|C5_ledger_untouched_n360_383a05db|atlas_client_v1.html_bd230988",
+   "evidence_level": "client_build_report",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G8",
+   "superseded_by": null,
+   "detail": "G5-G8 UI v1.6 zero-script client build arm (non-ledger, zero GPU; default prereg arm (a)). Single-file pure HTML/CSS client atlas_client_v1.html (bd230988, 73507 bytes) embedding the atlas v1.30 data plane: registry v1.28 (5995bbe9) 26 features with family-grouped cards + details foldout (anchors/counter_evidence/scope_limits/replication) + CSS radio :checked evidence-level filtering (E2 20 / E3 3 / E1 3) + sticky anchor nav; gap ledger v1.6 (0f6423e0) 4 gaps with closed badges + GAP-4 mechanism_note; appendix x5 (gap v1.5 4fb3f37d) with anchor shas; N-line backfill draft x5 (f29da2de, draft_pending_cross_line, NOT applied); registry version chain v1.28..v1.21; ledger tail x5. C1 zero <script> / no on* handlers / no javascript: URI; C2 census E2 (17 E2_predictive + 3 E2_held_out) = 20 / E3_causal_scoped 3 / E1_repeatable 3; C3 blocks 4/5/5 + FTR-01..26 + APPX-1..5 present; C4 data-k verify 137/137 fields (0/0/0/0); C5 ledger untouched (n=360, 383a05db before==after). Verdict ui_v16_client_registered, C1-C5 0 contradictions. Honest log: SMOKE run1 DIRTY(2) — C2 expected literal keys (E3_protocol_causal) mismatched actual (E3_causal_scoped; E2 tier = 17+3) + C4 extra meta.created (expectation omitted); C2/CSS filter fixed to ^E2/^E3/^E1 prefix matching, created expectation added; run2 SMOKE CLEAN; FULL clean. design 9c444679, res eac7fe87 / seal fed536ad.",
+   "chain": {
+    "res_sha8": "eac7fe87",
+    "seal_sha8": "fed536ad",
+    "client_html": "bd230988",
+    "registry_v128": "5995bbe9",
+    "gl16": "0f6423e0",
+    "draft": "f29da2de",
+    "ledger_pre": "383a05db",
+    "note": "non-ledger arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3210,
+   "name": "g5g9_standing_items_audit",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only audit arm)",
+   "verdict": "g5g9_standing_items_audit|REGISTERED|D1_provenance_MEMO_anchored_2767_2800_2802_2810_2833_ledger_absent_finding|D2_memo_anchors_verbatim|D3_fruit_K4_inherited_first_at_3177_tail|D4_ledger_untouched_n361_46d53545|both_recommend_close",
+   "evidence_level": "report_only_audit",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G9",
+   "superseded_by": null,
+   "detail": "G5-G9 fruit-class/K4 standing-item audit arm (report-only, zero GPU; default prereg arm (a)). D1 provenance for phases 2767 (类别知识图谱 v1, 5 类别 x 16 实体), 2800 (LPF-13 载流子 fruit 画像), 2802 (LPF-15 apple 多义 带符号投票谱), 2810 (短语级档案调制, P-K4 虚词最小 FALSE), 2833 (Δh 通道分离, P-K2/P-K4 双否证) anchored verbatim to AGI_GPT5_MEMO headers; SMOKE probe found these LPF-line phases have NO shared-ledger entries (ledger n=361 covers G-line measurement records) => ledger absence recorded as explicit finding, not contradiction (3207 precedent). D2 memo verbatim anchors (5 类别 × 16 实体 / 带符号投票谱 / P-K4 虚词最小 / attention-sink/位置通用通道支配) all verbatim. D3 '水果类、K4' first listed at Phase 3177 tail => inherited placeholder items, no earlier G-line definition section, no G-line work product pending. D4 ledger untouched (n=361, 46d53545 before==after). Dispositions: 水果类 => recommend close (LPF-line historical research theme, MEMO-anchored provenance); K4 => recommend close (P-K4 criterion FALSE at 2810, double-falsified at 2833, superseded by Δ_specific 通道分离 line); actual list edit is a user-confirmed doc edit, NOT a ledger mutation. Verdict standing_items_audit_registered, D1-D4 0 contradictions. Honest log: SMOKE run1 crashed (KeyError 'phase' — ledger entries without phase key, m['phase'] direct index); run2 DIRTY(2) — D1 assumed ledger entries for LPF phases (absent) + D2 segment truncated at '### Phase 2833:' subsection ('## Phase' substring match); fixed to MEMO-anchored D1 + finding + top-level '\\n## ' boundary; run3 SMOKE CLEAN; FULL clean. design e678dc42, res 3ae23744 / seal 23008571.",
+   "chain": {
+    "res_sha8": "3ae23744",
+    "seal_sha8": "23008571",
+    "design_sha8": "e678dc42",
+    "memo_src": "155cfebb",
+    "ledger_pre": "46d53545",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3211,
+   "name": "g5g10_ui_v17_anchor_values",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, client build arm)",
+   "verdict": "g5g10_ui_v17_anchor_values|REGISTERED|C1_zero_script_no_handlers_no_js_uri|C2_census_E2x20_E3x3_E1x3|C3_blocks_gaps4_appendix5_ndraft5_ftr01_26|C4_datak_611_fields_61anchors_352asserts|C5_ledger_untouched_n362_1aaab36d|atlas_client_v1.html_62ba1bd6",
+   "evidence_level": "client_build_report",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G10",
+   "superseded_by": null,
+   "detail": "G5-G10 UI v1.7 anchor-values view arm (non-ledger, zero GPU; default prereg arm (a), per MEMO Phase 3210 tail). Iterates the v1.6 client (phase 3209, bd230988) with the per-feature RAW ANCHOR VALUES view: every registry v1.28 anchor's asserts dict rendered verbatim inside each feature foldout — 61 anchors (src/phase/role/tags each) and all 352 asserts (key = value, sorted) across 26 features, zero script preserved. Output atlas_client_v1.html (62ba1bd6, 137358 bytes, up from 73507). C1 zero <script> / no on* handlers / no javascript: URI; C2 census E2 (17 E2_predictive + 3 E2_held_out) = 20 / E3_causal_scoped 3 / E1_repeatable 3; C3 blocks 4/5/5 + FTR-01..26 + APPX-1..5 present; C4 data-k verify 611/611 fields (137 base + 61x2 anchor src/role + 352 asserts; 0/0/0/0); C5 ledger untouched (n=362, 1aaab36d before==after). Cosmetic fix carried: v1.6 filter label 'E3_protocol_causal' corrected to 'E3_causal_scoped' (display-only, data-k unaffected). Verdict ui_v17_anchor_values_registered, C1-C5 0 contradictions. Honest log: SMOKE run1 CLEAN once (611/611); one run-banner log string still read Phase 3209 after patch — fixed (log text only, post-observation, no DESIGN/gate change) before FULL. design 93fdcc0c, res ee976567 / seal e1a67926.",
+   "chain": {
+    "res_sha8": "ee976567",
+    "seal_sha8": "e1a67926",
+    "design_sha8": "93fdcc0c",
+    "client_html": "62ba1bd6",
+    "client_v16": "bd230988",
+    "registry_v128": "5995bbe9",
+    "ledger_pre": "1aaab36d",
+    "note": "non-ledger arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3212,
+   "name": "g5g12_ftr04_attribution_closed",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only closure-confirmation arm)",
+   "verdict": "g5g12_ftr04_attribution_closed|REGISTERED|A1_3181_sealed_noise_level_p3181_anchor_bitwise|A2_3202_decomposition_rederived_0.1180952380952382_1.9661111513569065_registry_append_verbatim|A3_chain_3176FAIL_3181noise_3202decompose_E1_maintained|A4_ledger_untouched_n363_d637e53f|closed@3202",
+   "evidence_level": "report_only_closure_confirmation",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G12",
+   "superseded_by": null,
+   "detail": "G5-G12 FTR-04 glm4 weak-specificity attribution closed-loop confirmation arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3211 tail). Pre-freeze probe found the attribution ALREADY closed on the books — 3181 G5-B6 dual-arm noise_level verdict (registry v1.7->v1.8) + 3202 G5-F1 unit-level decomposition recheck (registry v1.24->v1.25) — so the arm ran as closure confirmation: A1 3181 sealed result (res 1e95a19d / seal 462fd221 / design 7c567972, verdict noise_level) per_model scalars BITWISE equal to FTR-04 p3181 anchor asserts (kappa 48118411.98113118/46016538.162839554/44953766.487345025, proj_ratio.glm4 0.029408887325559345, mean_margin.glm4 5.23258577598124, gates Ga/Gb false); A2 3202 sealed result (res af81e9f4 / seal 480bd271 / design 822996d4) decomposition re-derived from 3181 per_model within 1e-12 (loeo_gap 0.1180952380952382 = 14b 0.5980952381 - glm4 0.4800000000; margin_ratio 1.9661111513569065 = 5.23258577598124 / 2.661388585467299) + registry v1.28 FTR-04 scope_limits 3202 append verbatim + counter_evidence acc triple 0.6019/0.5981/0.4800 == per_model 4dp; A3 chain complete (3176 arm_a FAILED gate 0.6019/0.5981/0.4800 vs 0.5 -> 3181 noise_level _not_attributable -> 3202 unit-level decompose readout-instability-not-geometry), E1_repeatable maintained, MEMO 3181/3202 verbatim anchors on disk; A4 ledger untouched (n=363, d637e53f before==after). Disposition: FTR-04 glm4 attribution closed@3202, no registry action needed (closure text already in v1.28 scope_limits), drop from candidate follow-up list. Verdict ftr04_glm4_attribution_closed, A1-A4 0 contradictions. Honest log: SMOKE run1 DIRTY(1) — A2 scope_limits fragment lowercase 'loeo' vs actual uppercase 'LOEO' (casing only); run2 SMOKE CLEAN; FULL clean. design b2e6a642, res 07041998 / seal 73024f1a.",
+   "chain": {
+    "res_sha8": "07041998",
+    "seal_sha8": "73024f1a",
+    "design_sha8": "b2e6a642",
+    "r3181": "5ab51de6 (res 1e95a19d/seal 462fd221)",
+    "r3202": "af7d8a70 (res af81e9f4/seal 480bd271)",
+    "registry_v128": "5995bbe9",
+    "ledger_pre": "d637e53f",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3213,
+   "name": "g5g13_ui_v18_block_anchor_details",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, client build arm)",
+   "verdict": "g5g13_ui_v18_block_anchor_details|REGISTERED|C1_zero_script_no_handlers_no_js_uri|C2_census_E2x20_E3x3_E1x3|C3_blocks_gaps4_appendix5_ndraft5_ftr01_26|C4_datak_670_fields_611carried_59block_details|C5_ledger_untouched_n364_63a42cbc|atlas_client_v1.html_ca76ec49",
+   "evidence_level": "client_build_report",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G13",
+   "superseded_by": null,
+   "detail": "G5-G13 UI v1.8 block anchor-details arm (non-ledger, zero GPU; default prereg arm (a), per MEMO Phase 3212 tail). Iterates the v1.7 client (phase 3211, 62ba1bd6): extends the anchor-details view to non-feature blocks — gap evidence_anchors (11 fields, per-anchor data-k) + gap anchor_sha8 per-key rows (15); appendix anchor/anchor_sha8 as data-k spans (10); N-line draft per-entry name + per-key sources (5+15) + new draft meta block status/target/governance (3) = 59 new fields; feature anchor values view (61 anchors / 352 asserts) carried over. Output atlas_client_v1.html (ca76ec49, 141577 bytes, up from 137358). C1 zero <script> / no on* / no javascript: URI; C2 census 26 (E2 20 / E3 3 / E1 3); C3 blocks present; C4 data-k verify 670/670 (0/0/0/0); C5 ledger untouched (n=364, 63a42cbc before==after). Verdict ui_v18_block_anchor_details_registered, C1-C5 0 contradictions. Honest log: SMOKE run1 DIRTY(1) — gap evidence_anchors row wrapped span() concatenation in esc(), escaping the emitted data-k spans (11 missing / 4 mismatch); removed outer esc (values already escaped inside span); run2 SMOKE CLEAN; FULL clean. design e5a9ed86, res a398c290 / seal 095624ed.",
+   "chain": {
+    "res_sha8": "a398c290",
+    "seal_sha8": "095624ed",
+    "design_sha8": "e5a9ed86",
+    "client_html": "ca76ec49",
+    "client_v17": "62ba1bd6",
+    "client_v16": "bd230988",
+    "registry_v128": "5995bbe9",
+    "ledger_pre": "63a42cbc",
+    "note": "non-ledger arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3214,
+   "name": "g5g14_ftr15_heldout_closed",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only closure-confirmation arm)",
+   "verdict": "g5g14_ftr15_heldout_closed|REGISTERED|H1_3158_ratios_bitwise_x3|H2_3180_chain_ratio_bitwise_drift0_band0.0300_0.0278_0.0182_16folds_sameclass_ncgt1_10_16_15|H3_3204_sealed_registry_append_verbatim_E2_heldout_note|H4_ledger_untouched_n365_3bd36b2a|closed@3204",
+   "evidence_level": "report_only_closure_confirmation",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G14",
+   "superseded_by": null,
+   "detail": "G5-G14 FTR-15 held_out closed-loop confirmation arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3213 tail). Pre-freeze probe found the held_out reinforcement recheck ALREADY closed — 3204 G5-G1 (registry v1.25->v1.26, FTR-15 scope_limits append) — so the arm ran as closure confirmation: H1 3158 sealed per-model products (file sha 90e734fd/1f532016/c49614fc) /ratio BITWISE == FTR-15 p3158 anchor asserts x3 (1.0283477199188433 / 1.3316768638966026 / 1.2472595295618603); H2 3180 sealed product (res f1689e94 / seal a3c1b53e, verdict ftr15_upgraded_E2_predictive) per_model ratio_full_recompute bitwise == 3158 x3 == p3180 anchor asserts, drift == 0.0 x3, max_band bitwise == p3180 asserts (0.030024603607133406 / 0.027780384524118094 / 0.018213681402158396 < 0.25), all_same_class true x3, 16 folds x3 all same_class, n_c_gt1 [10, 16, 15], gates G1_device/G2_heldout True; H3 3204 sealed product (res 263934c8 / seal 7bb722b1 / design 588dcf87, verdict ftr15_heldout_recheck_registered, recheck clean) + registry v1.28 FTR-15 scope_limits 3204 append verbatim (incl. E2_held_out 强化档注记不新增独立 evidence_level) + MEMO 3204 seg anchors on disk; H4 ledger untouched (n=365, 3bd36b2a before==after). Disposition: FTR-15 held_out closed@3204, E2_predictive with E2_held_out caliber note maintained, no registry action, drop from candidate follow-up list. Verdict ftr15_heldout_closed, H1-H4 0 contradictions. Honest log: SMOKE run1 CLEAN once; FULL clean (SMOKE first-try CLEAN, no fixes needed). design b8052e94, res a48005fa / seal 926be348.",
+   "chain": {
+    "res_sha8": "a48005fa",
+    "seal_sha8": "926be348",
+    "design_sha8": "b8052e94",
+    "r3158": "90e734fd/1f532016/c49614fc (file bytes x3)",
+    "r3180": "cb811310 (res f1689e94/seal a3c1b53e)",
+    "r3204": "b1021387 (res 263934c8/seal 7bb722b1)",
+    "registry_v128": "5995bbe9",
+    "ledger_pre": "3bd36b2a",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3215,
+   "name": "g5g15_gap4_closed",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only closure-confirmation arm)",
+   "verdict": "g5g15_gap4_closed|REGISTERED|K1_scalars_bitwise_3169_2.8291_2.1258_2.7142_gt2_3172_k0_2.5388_k8_1.8002_3175_delta+0.0660_3192_amp_10.5984_7.1100_8.8909|K2_gap_v16_quantified_collapse_six_stage_chain_anchors|K3_memo_3169_3175_3192|K4_ledger_untouched_n366_f30394dc|mechanism_chain_closed",
+   "evidence_level": "report_only_closure_confirmation",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G15",
+   "superseded_by": null,
+   "detail": "G5-G15 GAP-4 closed-loop confirmation arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3214 tail). Pre-freeze probe found the GAP-4 mechanism chain ALREADY closed on the books (gap ledger v1.6 mechanism_note: 3169 quantified collapse -> 3171 encoding_missing negated -> 3172 port partial recovery -> 3175 residual port-intrinsic -> 3191 held_out -> 3192 amplitude carrier) so the arm ran as closure confirmation: K1 sealed scalars bitwise vs ledger evidence — 3169 per-model ratio_B 2.8291123613715263/2.125753723276223/2.7142111478689683 all>2, 3172 pooled curve k0 2.5388114997805062 -> k8 1.800176217907229 (band [1.5,2)), 3175 delta 0.06603206261005456 (|delta|<=0.15 port_residual_dominant), 3192 amp_ratio 10.598382949829102/7.110019207000732/8.890898704528809 all>=1.3; K2 gap v1.6 GAP-4 status quantified_collapse + six-stage mechanism_note phrases + anchor_sha8 six keys (p3169=5b51c2c1); K3 MEMO 3169/3175/3192 verbatim anchors; K4 ledger untouched (n=366, f30394dc before==after). Disposition: mechanism chain closed on the books; GAP-4 stays quantified_collapse BY DESIGN (collapse quantified + mechanism localized; full recovery not achieved and not pending); no registry/gap action; drop from candidate follow-up list. Verdict gap4_closed_loop_confirmed, K1-K4 0 contradictions. Honest log: SMOKE run1 crashed pre-gate (3172 pooled is a dict keyed by k-string, not a list — structure misread); fixed unpacking, run2 SMOKE CLEAN; FULL clean. design ecfead62, res 1d2f037e / seal 254bff7c.",
+   "chain": {
+    "res_sha8": "1d2f037e",
+    "seal_sha8": "254bff7c",
+    "design_sha8": "ecfead62",
+    "r3169": "5b51c2c1 (res 49430a39/seal 018c6024)",
+    "r3172": "res 463f42c8/seal cdb85525",
+    "r3175": "res cb76a177/seal 9e1a2f08",
+    "r3192": "res 6221fe00/seal 58c4f183",
+    "gl16": "0f6423e0",
+    "ledger_pre": "f30394dc",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3216,
+   "name": "g5g16_standing_ledger_v2",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only final audit arm)",
+   "verdict": "standing_ledger_v2_registered|M1_closure_sweep_3210_3215_x6_governance_entries|M2_appendix_x5_all_open_gpu_crossline|M3_nline_draft_5_pending_plus_lcorr_operations_4_on_disk_not_applied|M4_shuiguolei_K4_verbatim_3177_tail_user_confirm_pending|M5_ledger_untouched_n367_bb1474e6|standing_ledger_v2_sealed_207f2fa6",
+   "evidence_level": "report_only_final_audit",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G16",
+   "superseded_by": null,
+   "detail": "G5-G16 standing-ledger v2 final audit arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3215 tail). M1 closure sweep: 3210-3215 six governance ledger entries verdict prefixes match registry (g5g9/g5g10/g5g12/g5g13/g5g14/g5g15 all REGISTERED). M2: 5 appendix (gl15 4fb3f37d) item-by-item all open, GPU or cross-line dependent => remain standing (cannot be closed zero-GPU); table recorded. M3: N-line backfill draft f29da2de status draft_pending_cross_line with 5 entries, NOT applied + APPX-5 ledger_corrections_v1 beb775bd on disk (single correction record, 4 operations) not applied => remain standing. M4: 水果类、K4 still verbatim in MEMO 3177 tail (user-confirmed doc edit pending, 3210 disposition). M5: ledger untouched (n=367, bb1474e6 before==after). Output sealed: standing_ledger_v2.json sha8 207f2fa6 with closed=[FTR-04 glm4 closed@3202, FTR-15 held_out closed@3204, GAP-4 chain closed on the books, 水果类 recommend close, K4 recommend close] / open=[APPX-1..5, N-line apply, APPX-5 apply, UI iteration line] / pending_user_confirmation=[MEMO list edit 水果类/K4]. Verdict standing_ledger_v2_registered, M1-M5 0 contradictions. Honest log: SMOKE run1 DIRTY(1) — M3 misread lcorr top-level structure (looked for 'corrections'/'entries' keys; actual schema is a single correction record with 'operations' x4); fixed counter, run2 SMOKE CLEAN; FULL clean. design 4a1bda9a, res e46b2e51 / seal 09e6908a.",
+   "chain": {
+    "res_sha8": "e46b2e51",
+    "seal_sha8": "09e6908a",
+    "design_sha8": "4a1bda9a",
+    "standing_ledger_v2": "207f2fa6",
+    "gl15": "4fb3f37d",
+    "gl16": "0f6423e0",
+    "draft": "f29da2de",
+    "lcorr": "beb775bd",
+    "ledger_pre": "bb1474e6",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3217,
+   "name": "g5g19_ui_v19_chain_ledger_details",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, non-ledger UI arm)",
+   "verdict": "ui_v19_chain_ledger_details_registered|C1_zero_script|C2_census_E2_20_E3_3_E1_3|C3_blocks_gaps4_appendix5_draft5_chain8_ledgertail5|C4_datak_698_698_0_0_0_0|C5_ledger_untouched_n368_3cf5938b|client_9c5b48da_142904_bytes",
+   "evidence_level": "ui_iteration_governance",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G19",
+   "superseded_by": null,
+   "detail": "G5-G19 UI v1.9 client arm (zero GPU, non-ledger; default prereg arm (a), per MEMO Phase 3216 tail). Base: v1.8 client (phase 3213, ca76ec49, 670 data-k fields) carried over in full. v1.9 extends anchor details to the version-chain and ledger-tail blocks: version chain 8 entries now span chain.{v}.note (8 new fields); ledger tail 5 rows now span led.{idx}.phase/.name/.pre/.post in addition to verdict (20 new fields) — rows #364-#368 covering governance entries 3212..3216, pre->post chain consistent with ledger_sha256_8 3cf5938b on the final row. C1 zero <script> / no on* handlers / no javascript: URI; C2 census E2=20 (17 predictive + 3 held_out) / E3=3 / E1=3; C3 blocks gaps(4)/appendix(5)/draft(5)/chain(8)/ledger-tail(5) present; C4 data-k 698/698 (0 missing/extra/mismatch/dups); C5 ledger untouched (n=368, 3cf5938b before==after). Output atlas_client_v1.html sha8 9c5b48da (142904 bytes). Verdict ui_v19_chain_ledger_details_registered, C1-C5 0 contradictions. Honest log: SMOKE run1 crashed pre-gate — verify_html expects string values, led.{idx}.phase/.name were passed as int; str()-coerced, run2 SMOKE CLEAN, FULL clean. design 4313f47d, res 41efe346 / seal 5ae84bf8.",
+   "chain": {
+    "res_sha8": "41efe346",
+    "seal_sha8": "5ae84bf8",
+    "design_sha8": "4313f47d",
+    "client_sha8": "9c5b48da",
+    "base_client": "ca76ec49 (v1.8, phase 3213)",
+    "registry": "5995bbe9",
+    "gl16": "0f6423e0",
+    "gl15": "4fb3f37d",
+    "draft": "f29da2de",
+    "ledger_pre": "3cf5938b",
+    "note": "non-ledger arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3218,
+   "name": "g5g20_crossline_apply_readiness",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only readiness inventory)",
+   "verdict": "crossline_apply_readiness_registered|R1_nline_5_entries_itemized|R2_lcorr_4_ops_itemized_stale_baseline_finding_bbda63df_ne_7978e4f7|R3_checklist_sealed_e402da6e|R4_ledger_untouched_n369_7978e4f7|no_application_performed",
+   "evidence_level": "report_only_readiness_inventory",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G20",
+   "superseded_by": null,
+   "detail": "G5-G20 cross-line apply readiness inventory arm (report-only, zero GPU, NO application; default prereg arm (a), per MEMO Phase 3217 tail). R1: N-line backfill draft f29da2de (5 entries N-P3..N-P7, all draft_pending_cross_line) itemized entry-wise with per-entry source keys; plan = single append batch of 5 to atlas_ledger measurements + one cross-line confirmation + bak/rollback. R2: APPX-5 ledger_corrections_v1 beb775bd (SEALED_BUT_NOT_APPLIED) 4 operations itemized (set_field ledger_sha256_8, unify_schema meas_id+phase n_total=304, enumerate_field evidence_level, append_measurement A-gate entry); CRITICAL FINDING: patch precondition target_sha256_before=bbda63df vs current ledger 7978e4f7 => baseline STALE, re-baseline required before any apply. R3: crossline_apply_checklist_v1.json sealed, content sha e402da6e (file d3f8c544), includes per-item apply_plan steps. R4: ledger untouched (n=369, 7978e4f7 before==after). Verdict crossline_apply_readiness_registered, R1-R4 0 contradictions. Honest log: SMOKE/FULL both clean first pass; stale-baseline finding is a checklist fact (patch predates 300+ governance entries), NOT a contradiction. design a6d5cdb5, res 976391dc / seal cd7eebe2.",
+   "chain": {
+    "res_sha8": "976391dc",
+    "seal_sha8": "cd7eebe2",
+    "design_sha8": "a6d5cdb5",
+    "checklist": "e402da6e (file d3f8c544)",
+    "draft": "f29da2de",
+    "lcorr": "beb775bd",
+    "ledger_pre": "7978e4f7",
+    "note": "report-only arm; governance entry only, atlas data untouched; no cross-line application performed"
+   }
+  },
+  {
+   "phase": 3219,
+   "name": "g5g21_ui_v110_standing_block",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, non-ledger UI arm)",
+   "verdict": "ui_v110_standing_block_registered|C1_zero_script|C2_census_E2_20_E3_3_E1_3|C3_blocks_plus_standing_v2_5_4_1_readiness|C4_datak_727_727_0_0_0_0|C5_ledger_untouched_n370_d85d6792|client_def433e0_146547_bytes",
+   "evidence_level": "ui_iteration_governance",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G21",
+   "superseded_by": null,
+   "detail": "G5-G21 UI v1.10 client arm (zero GPU, non-ledger; default prereg arm (a), per MEMO Phase 3218 tail). Base: v1.9 client (phase 3217, 9c5b48da, 698 data-k fields) carried over in full. v1.10 adds the standing-ledger v2 + apply-readiness block (nav anchor #standing): closed x5 item/closed_at/evidence spans (FTR-04 closed@3202, FTR-15 closed@3204, GAP-4 in-books, 水果类/K4 recommend close), open x4 item/why spans, pending_user_confirmation x1 (MEMO list edit 水果类/K4), readiness spans N-line ready_append_type + APPX-5 not_ready_stale_baseline (from checklist d3f8c544), plus meta v2_sha8 cd105b50 + checklist_sha8 d3f8c544 — 29 new fields, 727 total. C1 zero <script>; C2 census E2=20/E3=3/E1=3; C3 blocks incl standing markers; C4 data-k 727/727 (0/0/0/0); C5 ledger untouched (n=370, d85d6792 before==after). Output atlas_client_v1.html sha8 def433e0 (146547 bytes). Verdict ui_v110_standing_block_registered, C1-C5 0 contradictions. Honest log: SMOKE run1 DIRTY(1) — two new meta spans (v2_sha8/checklist_sha8) missing from the expected dict; added, run2 CLEAN; FULL clean. design 16d99a7e, res 6bdc1127 / seal 5819a1b3.",
+   "chain": {
+    "res_sha8": "6bdc1127",
+    "seal_sha8": "5819a1b3",
+    "design_sha8": "16d99a7e",
+    "client_sha8": "def433e0",
+    "base_client": "9c5b48da (v1.9, phase 3217)",
+    "registry": "5995bbe9",
+    "gl16": "0f6423e0",
+    "gl15": "4fb3f37d",
+    "draft": "f29da2de",
+    "v2": "cd105b50",
+    "checklist": "d3f8c544",
+    "ledger_pre": "d85d6792",
+    "note": "non-ledger arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3220,
+   "name": "g5g22_appendix_anchors_reread",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only anchor re-read)",
+   "verdict": "appendix_anchors_reread_registered|A1_p3166_448af595_census_mixed_p3165_511d9b13_cross_model_K_p3155_46a5034d_k2_int_share_0.1519_0.1825_0.1641|A2_APPX1_3_appendix_open_unchanged_gpu_dependent|A3_agate_24c60160_draft_pending_lcorr_sealed_not_applied_unchanged|A4_ledger_untouched_n371_5cff05f6",
+   "evidence_level": "report_only_anchor_reread",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G22",
+   "superseded_by": null,
+   "detail": "G5-G22 5-appendix on-disk anchor re-read arm (report-only, zero GPU, NO status change; default prereg arm (a), per MEMO Phase 3219 tail). A1: three GPU-type anchors re-read with file-sha lock + key scalars — APPX-1 p3166 result.json 448af595 (census mixed, cls_agree False, not_confounded, device_ok_all x3), APPX-2 p3165 result.json 511d9b13 (cross_model_K + k_entity_vs_readout_4b tokenizer-side), APPX-3 p3155 summary/result_summary.json 46a5034d (k2_int_share_kout 0.15187579769212284/0.1824533831239199/0.16411745881744746). A2: APPX-1..3 statuses all appendix_open unchanged — each requires new GPU measurement (14b eff>=0.5 runs / per-model vocab rebuild / K2-K3 direct measurement) => zero-GPU non-closable conclusion RE-AFFIRMED. A3: crossline anchors unchanged — agate a_gate_closure_v1.json 24c60160, N-line draft f29da2de draft_pending_cross_line (5), lcorr beb775bd SEALED_BUT_NOT_APPLIED (4 ops). A4: ledger untouched (n=371, 5cff05f6 before==after). Verdict appendix_anchors_reread_registered, A1-A4 0 contradictions. Honest log: SMOKE/FULL both clean first pass. design 4288f690, res 122adaf5 / seal 47f9213e.",
+   "chain": {
+    "res_sha8": "122adaf5",
+    "seal_sha8": "47f9213e",
+    "design_sha8": "4288f690",
+    "p3166": "448af595",
+    "p3165": "511d9b13",
+    "p3155": "46a5034d",
+    "agate": "24c60160",
+    "gl15": "4fb3f37d",
+    "draft": "f29da2de",
+    "lcorr": "beb775bd",
+    "ledger_pre": "5cff05f6",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3221,
+   "name": "g5g23_ui_freeze_archival",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only archival inventory)",
+   "verdict": "ui_version_chain_archival_registered|F1_five_clients_disk_reread_bd230988_137_62ba1bd6_611_ca76ec49_670_9c5b48da_698_def433e0_727|F2_chain_sealed_ca1b24ca|F3_ui_line_frozen_at_v110|F4_ledger_untouched_n372_87b28799",
+   "evidence_level": "report_only_archival_inventory",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G23",
+   "superseded_by": null,
+   "detail": "G5-G23 UI freeze + client version-chain archival arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3220 tail). F1: five client generations re-read from disk with client file-sha + content res_sha8 + field_check.n_expected all matching — v1.6 (phase 3209, bd230988, 137), v1.7 (3211, 62ba1bd6, 611), v1.8 (3213, ca76ec49, 670), v1.9 (3217, 9c5b48da, 698), v1.10 (3219, def433e0, 727); zero-script constraint held across all five. F2: ui_client_version_chain_v1.json sealed, content sha ca1b24ca (file 660043ab), with per-generation milestones and field evolution 137->611->670->698->727. F3: UI iteration line FROZEN at v1.10 — further UI work requires a new prereg phase. F4: ledger untouched (n=372, 87b28799 before==after). Verdict ui_version_chain_archival_registered, F1-F4 0 contradictions. Honest log: first SMOKE/FULL DIRTY(1) — F1 compared result.json FILE bytes sha against the content res_sha8 lock for v1.6/v1.7 (content sha != file sha); corrected to field-value comparison, rerun CLEAN. design 09f68ccd, res 5941ed71 / seal 880a8bfa.",
+   "chain": {
+    "res_sha8": "5941ed71",
+    "seal_sha8": "880a8bfa",
+    "design_sha8": "09f68ccd",
+    "chain_doc": "ca1b24ca (file 660043ab)",
+    "clients": "bd230988/62ba1bd6/ca76ec49/9c5b48da/def433e0",
+    "ledger_pre": "87b28799",
+    "note": "report-only arm; governance entry only, atlas data untouched; UI line frozen at v1.10"
+   }
+  },
+  {
+   "phase": 3222,
+   "name": "g5g24_gline_session_summary",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, report-only session summary)",
+   "verdict": "gline_session_summary_registered|G1_twelve_entries_362_373_sequence_verified|G2_census_closure3_ui5_audit4|G3_summary_sealed_52ba5d3a|G4_ledger_untouched_n373_ff363d67",
+   "evidence_level": "report_only_session_summary",
+   "model_scope": "n/a",
+   "prereg_id": "G5-G24",
+   "superseded_by": null,
+   "detail": "G5-G24 G-line session summary arm (report-only, zero GPU; default prereg arm (a), per MEMO Phase 3221 tail). G1: twelve ledger entries #362-#373 (phases 3210-3221) read from disk, phase/name/verdict-prefix sequence verified — all REGISTERED, zero contradictions against the on-record table. G2: category census closure_confirmation x3 (3212 FTR-04 / 3214 FTR-15 / 3215 GAP-4), UI iteration x5 (3211 v1.7 / 3213 v1.8 / 3217 v1.9 / 3219 v1.10 / 3221 freeze), audit-inventory x4 (3210 standing items / 3216 standing-ledger v2 / 3218 apply readiness / 3220 appendix anchors). G3: gline_session_summary_v1.json sealed, content sha 52ba5d3a (file 17dfb237), incl closing_state (standing_ledger_v2 207f2fa6 closed5/open4/pending1; apply readiness N-line ready / APPX-5 not-ready stale baseline; UI frozen at v1.10; appendix zero-GPU non-closable re-affirmed) and pending_user_confirmation items. G4: ledger untouched (n=373, ff363d67 before==after). Verdict gline_session_summary_registered, G1-G4 0 contradictions. Honest log: SMOKE run1 crashed (TABLE unpack arity) then DIRTY twice — G1 verdict-prefix table initially assumed name==verdict-prefix for closure/UI arms; disk is source of truth, prefixes corrected per on-disk values (#364/#366/#367 closure names, #369/#371 UI verdict forms), run4 CLEAN. design 7081779b, res a1de6a81 / seal 3b9cb4e6.",
+   "chain": {
+    "res_sha8": "a1de6a81",
+    "seal_sha8": "3b9cb4e6",
+    "design_sha8": "7081779b",
+    "summary_doc": "52ba5d3a (file 17dfb237)",
+    "window": "phases 3210-3221, ledger #362-#373",
+    "ledger_pre": "ff363d67",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3223,
+   "name": "g5g25_presoftmax_band_design",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero GPU, design-only arm, no inference)",
+   "verdict": "presoftmax_band_design_registered|D1_residual_stream_npz_x3_sealed|D2_oov_panel_npz_x3_sealed|D3_wu_finding_snapshot_incomplete|D5_design_sealed_87e51bcd|D6_ledger_untouched_n374_a1075729",
+   "evidence_level": "sealed_design",
+   "model_scope": "design targets qwen3-4b + qwen3-14b (2/3); glm4 deferred",
+   "prereg_id": "G5-G25",
+   "superseded_by": null,
+   "detail": "G5-G25 pre-softmax behavioral band upgrade gate — DESIGN-ONLY arm (zero GPU, no observation, no registry change). Honest prereg deviation: MEMO Phase 3222 tail preregistered 3223 = (a) standby; user selected the assistant-offered design arm via follow-up instruction (user-directed, not drift). D1: phase3154 g1p4_mfd_multifactor_disentangle collect.npz x3 (full residual stream H: 4b 208x37x2560 bb99438f / 14b 208x41x5120 6d142b9d / glm4 208x41x4096 cf2659f1). D2: phase3169 g5a6_oov_panel collect npz x3 (36eb4ff0 / 97f98575 / 9cc3f8b4). D3/D4 FINDING (not gate): W_U weights NOT locally usable — 4B-Base snapshot empty, 14B snapshot config-only, glm4 absent from HF hub; behavioral band scope = 2/3 models, 3224 execution precondition = one-time safetensors acquisition (download; zero GPU compute — ground truth logits = W_U @ ln_f(h_final) is exact CPU matrix math on cached tensors). D5: presoftmax_band_design_v1.json sealed, content sha 87e51bcd (file 1a1c4978) — objective (E2_held_out geometric band -> behavioral band, completion criterion #1), RMSNorm closed-form Jacobian linearized predictor vs exact displacement, pre-registered gates GA cos>=0.70 x>=3/4 folds x2 models / GB band<0.25 / GC rank-8 energy>=0.8, verdict taxonomy BEHAVIORAL_BAND_PASS/DIRECTIONAL/FAIL (FAIL to F ledger), upgrade path E2_held_out -> E2_behavioral (registry append, upgrade_log #10), chain 3224 A1 compute+seal / 3225 A2 gates+registry. D6: ledger untouched (n=374, a1075729 before==after). Honest log: SMOKE run1 crashed (os.path.relpath cross-drive C:/D:), run2 DIRTY(3) (D3 snapshot absence wrongly gated), restructured D3/D4 to finding-type, run3 CLEAN + FULL CLEAN. design = this entry chain.design_sha8; res bf1d4261 / seal e3b0c442.",
+   "chain": {
+    "res_sha8": "bf1d4261",
+    "seal_sha8": "e3b0c442",
+    "design_sha8": "87e51bcd",
+    "design_doc_file_sha8": "1a1c4978",
+    "npz_anchors": {
+     "3154": [
+      "bb99438f",
+      "6d142b9d",
+      "cf2659f1"
+     ],
+     "3169": [
+      "36eb4ff0",
+      "97f98575",
+      "9cc3f8b4"
+     ]
+    },
+    "w_u_finding": "not_locally_usable_3224_precondition_download",
+    "ledger_pre": "a1075729",
+    "note": "design-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3224,
+   "name": "g5g25b_weights_readiness_inventory",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "n/a (zero-action report-only; metadata json fetches only)",
+   "verdict": "weights_readiness_inventory_registered|R1_disk_headroom_ok|R2_weights_absent_reconfirmed|R3_wu_shard_map_pinned|R4_manifests_x3|R5_inventory_sealed_0590e53b|R6_ledger_untouched_n375_5111392c",
+   "evidence_level": "sealed_inventory",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 optional plan C",
+   "prereg_id": "G5-G25-B",
+   "superseded_by": null,
+   "detail": "G5-G25-B weights-acquisition readiness inventory (zero-action report-only; metadata json fetches only, NO safetensors downloaded). R1: disk headroom C: 71.7GB free / D: 32.2GB free. R2: weights-level recheck — no .safetensors anywhere, consistent with 3223 D3/D4 findings; honest side effect: this arm's own R3 metadata fetch materialized the 4B snapshot dir (config/index json, ~KB) from SMOKE run1 onward, R2 criterion therefore set at weights level. R3: W_U shard map pinned via config+index fetch — 4B tied=True (embed_tokens in model-00001, model.norm in model-00003) minimal 3.78GB; 14B tied=False (lm_head + model.norm both in model-00008) minimal 1.78GB; qwen-pair minimal total 5.56GB. R4: API manifests x3 — 4B 7.50GB/3 shards, 14B 27.52GB/8 shards, glm-4-9b-chat 17.51GB/10 shards. R5: weights_readiness_inventory_v1.json sealed, content sha 0590e53b (file c7a367a3) — plans A minimal 5.56GB (RECOMMENDED for 3225 A1) / B full qwen pair 35.02GB / C +glm4 52.53GB, all disk verdicts OK; integrity plan: hub LFS sha256 at download + A1 freeze records per-shard sha8 + CPU matrix math only. R6: ledger untouched (n=375, 5111392c before==after). Honest log: SMOKE run1 crash-free but R2 DIRTY x2 (dir-status string criterion invalidated by own metadata fetch; restructured to weights-level criterion), run3 CLEAN + FULL CLEAN. res 5394a8d4 / seal e3b0c442.",
+   "chain": {
+    "res_sha8": "5394a8d4",
+    "seal_sha8": "e3b0c442",
+    "inventory_sha8": "0590e53b",
+    "inventory_file_sha8": "c7a367a3",
+    "plans": {
+     "A_minimal_gb": 5.56,
+     "B_full_qwen_gb": 35.02,
+     "C_plus_glm4_gb": 52.53
+    },
+    "wu_shard_map": {
+     "qwen3-4b": [
+      "model-00001-of-00003.safetensors",
+      "model-00003-of-00003.safetensors"
+     ],
+     "qwen3-14b": [
+      "model-00008-of-00008.safetensors"
+     ]
+    },
+    "ledger_pre": "5111392c",
+    "note": "report-only arm; governance entry only, atlas data untouched"
+   }
+  },
+  {
+   "phase": 3225,
+   "name": "g5g25_a1_behavioral_band_compute",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "qwen3-4b + qwen3-14b (plan A weights; CPU matrix math only, no model forward, no GPU)",
+   "verdict": "a1_behavioral_band_sealed|DEVICE_ANCHORS_drift0_3169_3189_3190_3191|PLAN_A_WEIGHTS_sha_verified|J_SELF_CHECK_cos>0.9999996|COS_FULL_1.0000_BAND_le0.0052|GOLD_TOKEN_DISP_approx_0|GATES_DEFERRED_TO_3226_A2",
+   "evidence_level": "sealed_computation_a1",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred (weights)",
+   "prereg_id": "G5-G25 A1",
+   "superseded_by": null,
+   "detail": "G5-G25 A1 pre-softmax behavioral band compute+seal arm. Freeze sealed BEFORE any displacement observation (98d7fbd1): alpha in {0.1, 0.5} (0.5 = gate scale), S rule (top-64 by row-mean |dl_true| + gold tokens), final-layer injection (NH-1; directions live at kout=NH-2 — injecting kout directions at the final layer IS the behavioral test), P1=u* (FTR-26, 3194 protocol) / P2=v_hat_held (FTR-25, 3191 protocol), 4 OOV folds, FTR-15 deferred. Authorization record: user continuation instruction = preregistered-default-arm trigger -> plan A (5.56GB) downloaded, per-shard sha8 verified (4b shard1 4c807e25 / shard3 c7b1aa8f / 14b shard8 0d6b9229). Device anchors: Qn pipeline rebuilt verbatim from sealed 3194 recipe (module import) — drift69=0, drift89=drift90=drift91=0 bitwise. J self-check: numeric vs analytic RMSNorm Jacobian cos>0.9999996 per model (honest math amendment: design doc closed form lacked the 1/N factor; caught by SMOKE band~921x, corrected + self-check added before any gate data was sealed). Key result: pre-softmax logit displacement is effectively LINEAR in the pinned regime — cos_full=1.0000 (mean/median, all 4 folds x 2 predictors x 2 alphas x 2 models), band_med 0.0008-0.0052 (<< 0.25 gate), svd8 energy=1.000; gold class-token displacement ~ 0 (u* does not push gold token logits — consistent with u* being a collapse-carrier, not a class direction). Interpretation (for A2): GA/GB gates will pass with ~50x margin — E2_held_out -> E2_behavioral upgrade is justified, but the pre-softmax regime is too linear to discriminate; the nonlinearity of language encoding lives POST-softmax (Big Task A diagnosis confirmed at the OOV-panel rows). Gate evaluation deferred to 3226 (A2) per design chain. Honest log: SMOKE run1 bfloat16 TypeError (safe_open framework numpy) -> pt+float(); run2 exposed J 1/N bug via band~921; run3 IndentationError (self-check relocation); run4/5 CLEAN with self-check cos>0.9999996; FULL CLEAN. res ea1a0585 / seal 4751db60; npz ac5d4d74.",
+   "chain": {
+    "res_sha8": "ea1a0585",
+    "seal_sha8": "4751db60",
+    "freeze_sha8": "98d7fbd1",
+    "npz_sha8": "ac5d4d74",
+    "weight_shards": {
+     "qwen3-4b": [
+      "4c807e25",
+      "c7b1aa8f"
+     ],
+     "qwen3-14b": [
+      "0d6b9229"
+     ]
+    },
+    "key_scalars": {
+     "cos_full_range": "0.9997-1.0000",
+     "band_med_range": "0.0008-0.0052",
+     "gold_true_abs_max": 0.125
+    },
+    "ledger_pre": "0543371d",
+    "note": "compute+seal arm; no registry change; gates deferred to 3226"
+   }
+  },
+  {
+   "phase": 3226,
+   "name": "g5g25_a2_gate_decision",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "sealed-number arithmetic only (no model, no forward, no GPU)",
+   "verdict": "a2_behavioral_upgrade_registered|GA_4of4_folds_x2_MODELS_min_cosS_1.0000|GB_BAND_MED_MAX_0.0052_gate_0.25|GC_SVD8_MIN_0.999904_gate_0.8|UPGRADE_FTR25_FTR26_E2_held_out->E2_behavioral_upgradelog10|REGISTRY_v1_29_85b8dc1f_gap_v1_7_GAP5_4f45fda0|LEDGER_UNTOUCHED",
+   "evidence_level": "gate_decision_a2",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred (weights)",
+   "prereg_id": "G5-G25 A2",
+   "superseded_by": null,
+   "detail": "G5-G25 A2 gate evaluation + registry decision arm (zero GPU, pure arithmetic on sealed 3225 A1 scalars). Freeze 1608c23d before any gate evaluation; gates verbatim from design 87e51bcd/1a1c4978. Gate results (alpha 0.5 gate scale; alpha 0.1 sensitivity, all PASS too): GA cos_S_med >= 0.70 on 4/4 folds x 2 models x 2 features (min 1.0000); GB band_med max 0.0052 << 0.25; GC rank-8 energy min 0.999904 >= 0.8. Feature verdicts: FTR-26 (u*) and FTR-25 (v_hat_held) both BEHAVIORAL_BAND_PASS (GA and GB per design taxonomy). Upgrade executed: E2_held_out -> E2_behavioral for FTR-25+FTR-26 via registry v1.29 (upgrade_log #10, anchors +1 x2, provenance a1 npz appended; supersedes v1.28 85b8dc1f/f0b7444a); byte-preservation asserted on 24 legacy features + legacy top-level fields. Gap ledger v1.7 (4f45fda0/c1acabcd): GAP-5 appended — nonlinearity localization (pre-softmax effectively linear; language-encoding behavioral nonlinearity lives POST-softmax; Big Task A re-confirmed on OOV panel rows); legacy 4 gaps byte-preserved. Ledger untouched in arm (n=377 969b6791 before==after). Honest log: SMOKE run1 design phase int assert; run2 metric-key filter trailing underscore bug; run3 all_gate key missing 'a' prefix; run3/FULL CLEAN. res c9893fee / seal 603214b1.",
+   "chain": {
+    "res_sha8": "c9893fee",
+    "seal_sha8": "603214b1",
+    "freeze_sha8": "1608c23d",
+    "registry_v129": {
+     "file_sha8": "85b8dc1f",
+     "content_sha8": "f0b7444a"
+    },
+    "gap_v17": {
+     "file_sha8": "4f45fda0",
+     "content_sha8": "c1acabcd"
+    },
+    "a1_inputs": {
+     "res": "ea1a0585",
+     "npz": "ac5d4d74",
+     "freeze": "98d7fbd1",
+     "design": "87e51bcd/1a1c4978"
+    },
+    "key_scalars": {
+     "ga_min_cos_S_med": 1.0,
+     "gb_band_med_max": 0.0052,
+     "gc_svd8_median_min": 0.999904
+    },
+    "ledger_pre": "969b6791",
+    "note": "registry v1.29 + gap v1.7 are NEW append-only files; v1.28/v1.6 sealed files untouched"
+   }
+  },
+  {
+   "phase": 3227,
+   "name": "g5g26_e3_intervention_design",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "design-only (no model, no observation, no GPU)",
+   "verdict": "e3_intervention_design_registered|DESIGN_SEALED_NOT_OBSERVED|GATES_GD_flip_GD_dose_GD_spec_GD_amp|CHAIN_3228_compute_3229_decision|CACHES_x6_REVERIFIED|LEDGER_UNTOUCHED",
+   "evidence_level": "design_only",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred (W_U absent)",
+   "prereg_id": "G5-G26",
+   "superseded_by": null,
+   "detail": "G5-G26 criterion-2 (sufficiency) E3 intervention DESIGN arm (zero GPU, no observation). Freeze 82dbb8b1 before any observation. Sealed design a883c4da/32968738: minimal-intervention protocol licensing E2 -> E3 per 3223 completion criterion_2 — patch relation direction u_R at the FINAL layer of cached residuals, evaluate EXACT post-patch logits l' = W_U @ ln_f(h + a*u) on CPU (ground truth at any alpha; A1 linearity licenses the linear INTERPRETATION at gate scale 0.5 only; alpha=2 doubles as nonlinearity-onset probe). Judgment operationalization pinned to on-disk anchors: 3154 column schema (g/l/s/ti/ci/ho) + 3169 marg relation-readout cache; token-set distinctness inherited from 3169 D2. Pre-registered gates: GD_flip (flip-rate minus max-null >= 0.15 on >=3/4 folds x2 models), GD_dose (monotone in alpha {0.5,1,2}), GD_spec (cross-patch <= 1/3 matched), GD_amp (u* amplitude rank-correlates with per-class collapse >= 0.6, n=4 small-n scope). Taxonomy: E3_PASS iff GD_flip and GD_dose and GD_spec; FAIL -> F ledger. E3 taxonomy honesty: in-protocol causality only (last-layer residual injection bypasses upstream computation — recorded verbatim, no full-regeneration claim). Upgrade targets on E3_PASS (3229): FTR-22 family + FTR-26 -> E3 via upgrade_log #11 (registry v1.30). Honest log: SMOKE run1 glm4 cache path guess wrong (actual glm4\\collect.npz); run2 CLEAN; FULL CLEAN. res 618afcdf / seal 4adf87dd.",
+   "chain": {
+    "res_sha8": "618afcdf",
+    "seal_sha8": "4adf87dd",
+    "freeze_sha8": "82dbb8b1",
+    "design": {
+     "content_sha8": "a883c4da",
+     "file_sha8": "32968738"
+    },
+    "caches_reverified": {
+     "p3154": [
+      "bb99438f",
+      "6d142b9d",
+      "cf2659f1"
+     ],
+     "p3169": [
+      "36eb4ff0",
+      "97f98575",
+      "9cc3f8b4"
+     ]
+    },
+    "ledger_pre": "62b2d7d6",
+    "note": "design-only; no registry/gap change; compute arm 3228, decision arm 3229"
+   }
+  },
+  {
+   "phase": 3228,
+   "name": "g5g26_e3_compute_seal",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "CPU matrix math only (zero GPU); qwen3-4b (LOCAL weights) + qwen3-14b",
+   "verdict": "e3_compute_sealed|matched_flip_0_all_folds_x2models_x2R|null_flip_0|u_isa_ANTIDIRECTIONAL_dose_monotone|u_hasa_weak_7x|GD_amp_rho_0.40_0.80|C9_MAP_AND_PROVENANCE_CORRECTION|C6v3_marg_exact_cos_1.0|GATES_TO_3229",
+   "evidence_level": "compute_only (gates deferred to 3229)",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred (W_U absent)",
+   "prereg_id": "G5-G26",
+   "superseded_by": null,
+   "detail": "G5-G26 E3 intervention compute+seal arm (zero GPU, default (a) per 3227 design a883c4da). Sealed exact flip matrices + null controls + amplitude correlations: npz a844d985, res 99693298, freeze c51bfea5 (SMOKE ec0f0ccb). IN-RUN HONEST HISTORY: freeze v1 aae60c9d / v2 5dd8b4f6 / FULL v1 (freeze c076d6f6, res ef55a204 dirty) all SUPERSEDED in-phase — SMOKE exposed the pre-registered C6 marg gate (0.90 blanket) failing; bf16-emulation arbitration (fp32-vs-bf16emul 0.9927, both-vs-cached 0.55) ruled out machinery bug and exposed C9: the cached slot NH-1 is the POST-NORM pre-logit state (HF final-norm append; raw last-layer output not cached) — the design map l'=W_U@ln_f(h+a*u) was a DOUBLE-NORM misread; corrected map is EXACTLY LINEAR l'=W_U@(h+a*u) (GAP-5 coherent: nonlinearity lives upstream). C9 also found a W_U PROVENANCE SPLIT: 4B caches were collected with LOCAL models/hf/qwen3-4b weights (shard1 328a91d3) which DIFFER from the hub Qwen3-4B-Base snapshot (4c807e25) used by 3225 plan A; corrected arm loads LOCAL 4B weights, 14B hub shard8 (0d6b9229 == local, exact). Cross-phase note for 3229: 3225 A1 used hub 4B W_U on local residuals; A1 linearity conclusion (map property) unaffected, provenance caveat travels with registry v1.29 E2_behavioral upgrades. CORRECTED DEVICE GATE C6v3: baseline direct-map class readout vs sealed 3169 bf16 marg argmax agreement 0.9963 (4B) / 0.9941 (14B), centered-cos 1.0000 both, gap>=0.5 agreement 1.0000 — readout machinery exact. SUBSTANTIVE NUMBERS (corrected map, both panels, both models): matched flip-toward-R rate 0.0000 on ALL seen folds (4 cut-folds x 2 models x 2 R) and null flip rates 0 (the superseded double-norm map had amplified noise flips 2-4%); u_isa dose ANTI-DIRECTIONAL monotone (mean dD=m_isa-m_hasa shift: 4b seen -0.071/-0.142/-0.284, oov -0.069/-0.139/-0.278; 14b seen -0.063/-0.127/-0.253, oov -0.056/-0.112/-0.223 at alpha 0.5/1/2), u_hasa ~7x weaker same sign — the T2 relation-level directions (ctx-contrast recipe v_R=unit_mean(dCn[rel])) do NOT act as levers toward their own relation on the behavioral judgment readout (J = sign mean-logit{'是一种'=101158} - mean-logit{'有'=18830}, token sets pinned from sealed prompt ids, D2 distinctness replicated); judgment has power (baseline d0 std ~3.8, 55/45 both sides). GD_amp data sealed: per-class u* amplitude vs per-class 3169-B collapse Spearman 0.40 (4b) / 0.80 (14b) — partial support, n=4 scope. All device anchors drift==0 (3157 tc, 3183 dv, 3169 per-seed E, 3189/3190/3191 scalars, u* bitwise). Gate application (GD_flip/GD_dose/GD_spec/GD_amp; E3 taxonomy: FAIL -> F ledger) DEFERRED to 3229 per design chain — expectation recorded honestly: GD_flip/GD_dose/GD_spec FAIL, GD_amp partial.",
+   "chain": {
+    "res_sha8": "b08d4be7",
+    "seal_sha8": "dce6afe8",
+    "freeze_sha8": "c51bfea5",
+    "freeze_smoke_sha8": "ec0f0ccb",
+    "superseded_in_run": {
+     "freeze_v1": "aae60c9d",
+     "freeze_v2": "5dd8b4f6",
+     "full_v1_freeze": "c076d6f6",
+     "full_v1_res_content": "ef55a204"
+    },
+    "npz_sha8": "a844d985",
+    "c6v3_marg_agreement": {
+     "qwen3-4b": 0.9963,
+     "qwen3-14b": 0.9941
+    },
+    "w_u_provenance": {
+     "qwen3-4b": "LOCAL 328a91d3 (hub 4c807e25 is a different revision)",
+     "qwen3-14b": "hub 0d6b9229 == local"
+    },
+    "ledger_pre": "f21108e7",
+    "note": "compute+seal; GD_* application + F-ledger/registry action = 3229"
+   }
+  },
+  {
+   "phase": 3229,
+   "name": "g5g26_e3_gate_decision",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "CPU arithmetic on sealed npz (zero GPU)",
+   "verdict": "e3_gate_e3_fail_f20_registered|GD_flip_FAIL_matched0_nullmax0.049|GD_dose_FAIL_degenerate_zero_K2|GD_spec_FAIL_inverted_K3|GD_amp_FAIL_1of2_0.40_0.80|registry_v1.30_F20|gap_v1.8_GAP5_note",
+   "evidence_level": "gate_decision (E3 FAIL -> no E-level change)",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred",
+   "prereg_id": "G5-G26",
+   "superseded_by": null,
+   "detail": "G5-G26 E3 gate evaluation + registry decision arm (zero GPU, default (a) per 3228 prereg). Gates GD_flip/GD_dose/GD_spec applied VERBATIM from design a883c4da to the sealed 3228 flip matrices (res 99693298 / npz a844d985 / freeze c51bfea5); integrity: 1176 sealed agg cells reproduced from npz bit-exact before gate evaluation; freeze d0bb40e6 sealed pre-evaluation with 5 clarifications (K1 design-label fix: 'FTR-22 family' in upgrade_targets is a mislabel, relation-direction carrier = FTR-24 dv family; K2 dose degenerate-zero rule; K3 spec undefined-ratio rule; K4 fold basis; K5 3225 provenance warning routing). VERDICT per taxonomy: E3_FAIL (0/3 core gates). GD_flip FAIL: matched flip-toward-R rate 0.0000 on 4/4 seen folds x 2 models x 2 directions (deltas all <= 0 vs null_max up to 0.049 on OOV report); GD_dose FAIL: matched rates all-zero across alphas (K2 degenerate — monotonicity of nulls is not evidence); GD_spec FAIL: cross-patch rate UP TO ~8x matched (inverted specificity; K3 applied); GD_amp FAIL as gate (Spearman 0.40/0.80 = 1/2 models >= 0.6, n=4 scope). CONCLUSION (F20): the T2 ctx-contrast relation-level direction u_R is NOT a behavioral lever on the isa/hasa judgment readout under the exactly-linear last-layer pre-logit map (u_isa anti-directional monotone dD -0.139/-0.112 @a1, -0.278/-0.223 @a2, 4b/14b OOV); behavioral judgment is carried upstream — readout geometry != behavioral control; coheres 3188 DECOUPLED + GAP-5. REGISTRY v1.30 (file c11d13bd / content 9ea9fc3e): F20 e3_sufficiency_gate_fail appended, upgrade_log #11 (FAIL record, no E-level change), scope_limits appends FTR-24 (E3 FAIL note) + FTR-25/FTR-26 (3225 hub-vs-local W_U provenance warning filed per K5), 23 features + legacy top-level byte-preserved. GAP v1.8 (file 7065ec4e / content 09bf2fa9): GAP-5 mechanism_note appended — three-stage conclusion: upstream encoding carries judgment behavior -> last-layer readout is an exact linear projection (3228 C6v3 cos 1.0000) -> post-softmax distribution-level nonlinearity; causal levers for behavior must be sought upstream; last-layer geometric fingerprints do not extrapolate to behavioral control. Ledger READ-ONLY in this arm (head at freeze: n=380 post 8e593d22; reseal run observed head n=381 with byte-identical before/after within the run; #381 appended by this closeout only).",
+   "chain": {
+    "res_sha8": "193b2fa8",
+    "seal_sha8": "eabc725c",
+    "freeze_sha8": "d0bb40e6",
+    "res_content_sha8": "7c4e8bfe",
+    "registry_v130": {
+     "file": "c11d13bd",
+     "content": "9ea9fc3e"
+    },
+    "gap_v18": {
+     "file": "7065ec4e",
+     "content": "09bf2fa9"
+    },
+    "gate_pass": {
+     "GD_flip": false,
+     "GD_dose": false,
+     "GD_spec": false,
+     "GD_amp_support": false
+    },
+    "e3_verdict": "E3_FAIL",
+    "integrity_cells": 1176,
+    "ledger_pre": "8e593d22",
+    "note": "gate decision arm; next = 3230 per prereg"
+   }
+  },
+  {
+   "phase": 3230,
+   "name": "g5g27_relcontrast_efficacy",
+   "line": "G",
+   "date": "2026-10-11",
+   "model": "CPU matrix math on sealed caches (zero GPU)",
+   "verdict": "dR_lever_fail|GA_flip_FAIL_0of4x2_null_band_0|GB_dir_PASS_x2_dD_monotone_mirror|recipes_decoupled_cos_dR_visA_-0.2463_-0.0547|transfer_orthogonal_cos_dR_dW_+0.0997_+0.0625",
+   "evidence_level": "efficacy_test (gate fail -> no E-level change; F20 refinement routed to 3231)",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3); glm4 deferred",
+   "prereg_id": "G5-G27",
+   "superseded_by": null,
+   "detail": "G5-G27 relation-contrast (state) direction efficacy arm (zero GPU, default (a) per 3229 prereg). dR = mean(h[isa 64 rows]) - mean(h[hasa 64 rows]) over the sealed 3157 cache at slot NH-1 (post-norm pre-logit, C9 space coherence; K1: prereg wording '3157 KOUT 缓存均值' read at NH-1, KOUT-slot version sealed as dR_raw, cos(dR,dR_raw)=0.8614/0.7081). |dR|=16.40/20.72 (~7-9x the row RMS 2.16/2.19). Protocol verbatim from sealed 3228 (freeze c51bfea5 / res 99693298): direct linear map l=W_U@(h+dv), dv=unit(dR)*alpha*rms(h_row), alphas {0.5,1,2}, nulls 10 pinned seeds + orth. Freeze 1d02dd97 BEFORE any dR number; gates frozen in-freeze. Results: GB_dir PASS x2 (seen dD strictly monotone +0.1772/+0.3545/+0.7089 (4b) and +0.1632/+0.3263/+0.6526 (14b); dR_neg perfect mirror = linear-map sanity) - dR pushes the margin in ITS OWN direction (qualitative contrast with the anti-directional T2 u_isa); GA_flip FAIL x2 (flip 0.0000 on 4/4 seen folds x 2 models at all alphas, null band also 0; mechanical attribution: cos(dR, unit(W_isa-W_hasa))=+0.0997/+0.0625 ~ orthogonal, transfer capped, delta-m@a2 ~0.71/0.65 << |d0| 3.97/4.69). Diagnostics: cos(dR,v_isa)=-0.2463/-0.0547, cos(dR,v_hasa)=+0.0606/+0.1067 -> |cos|<0.5 recipes DECOUPLED per the prereg reading - the 3228 anti-direction finding is NOT explained by ctx-contrast anti-parallelism; both direction families fail as behavioral levers for different reasons. Device anchors: 3157 tc + 3183 drift 0 x2, C6v3 marg 0.9963/0.9941 (centered-cos 1.0000), RMS scale 2.16/11.98 + 2.19/25.31. Res 1b63b063 / npz d430d29e. Ledger read-only in arm (n=381 post b21db7e3 before==after); registry changes deferred to 3231. pre-append file sha8 c3919948."
   }
  ],
  "growth_curve": [
@@ -8303,5 +9507,5 @@
   }
  ],
  "schema_version": 3,
- "ledger_sha256_8": "a51f15a8"
+ "ledger_sha256_8": "3cba5317"
 }

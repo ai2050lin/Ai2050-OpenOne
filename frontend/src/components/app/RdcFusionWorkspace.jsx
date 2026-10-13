@@ -14,15 +14,21 @@ import { useEffect, useRef, useState } from 'react';
 import LensSpatial from './rdc_fusion/LensSpatial.jsx';
 import LensProcess from './rdc_fusion/LensProcess.jsx';
 import LensProgress from './rdc_fusion/LensProgress.jsx';
-import LensData from './rdc_fusion/LensData.jsx';
-import { EVENTS, TICKER, CMDK_GROUPS, DEMO_OBJECT, DEMO_QUEUE } from './rdc_fusion/demoData.js';
-import { TECH_CATEGORIES, DEMO_COVERAGE, LANG_TEMPLATES, ANALYSES, MISSION } from './rdc_fusion/distributedData.js';
+import NewbieGuide from './rdc_fusion/NewbieGuide.jsx';
+import AtlasPanorama from './rdc_fusion/AtlasPanorama.jsx';
+import { TICKER, CMDK_GROUPS, DEMO_OBJECT, DEMO_QUEUE } from './rdc_fusion/demoData.js';
+import { MISSION } from './rdc_fusion/distributedData.js';
 import './rdc_fusion/rdc_fusion.css';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const DEFAULT_OBJ = 'F#3734';
 
-const LENS_NAME={spatial:'空间透镜',process:'过程透镜',progress:'脉络透镜',data:'分析技术',home:'总览'};
+/*    五轴模型（design/client_ia_refactor_plan_v1.md §3）：导航 6→5。
+   技术透镜已拆分：「按结果」面 → 图谱透镜·结果库；「按技术」面 → 研发透镜·技术运行。
+   P1+P2（design/client_mission_ia_review_v1.md）：总览改「图谱驾驶舱」——
+   主体 = AtlasPanorama 三域全景只读态（打开即图谱）；事件流（DEMO）→ 最近闭环（接 atlas ledger）；
+   通知 badge 去写死（= queue pending 数）；入口卡 ×4 撤销（使命链压缩为一行 + 快速入口三按钮）。 */
+const LENS_NAME={spatial:'空间 · 几何',process:'研发 · 生产',progress:'路线 · 时间线',atlas:'路线 · 图谱',home:'总览 · 图谱驾驶舱'};
 
 function Tok({t,dfa}){
   const [txt,v]=t;
@@ -74,104 +80,39 @@ function ObjectCard({obj,live,onDispatch}){
   );
 }
 
-/* M7-P1 技术四分类状态标签（渲染词表，非实验内容） */
-const CAT_STATUS={measured:'已测',device_built:'装置已建',planned:'装置待建'};
-
-function HomeView({onGo,home}){
+/* HomeView · 图谱驾驶舱（P2 改造，design/client_mission_ia_review_v1.md）：
+   使命主产物 = 语言机制图谱 → 总览主体 = 图谱三域全景（只读，复用 AtlasPanorama），
+   侧栏 = 生产状态（queue）/ 最近闭环（接 atlas ledger，替代原 DEMO 事件流）/ 快速入口。
+   hero 压缩为使命一行；入口卡 ×4 撤销（与导航重复，S3 命名漂移一并消除）。 */
+function HomeView({onGo,home,ledger}){
   const st=home||{sealed:DEMO_QUEUE.sealed,count:DEMO_QUEUE.count,tpls:'—',results:'—',objects:1,queue:DEMO_QUEUE.queue};
   const q=st.queue||DEMO_QUEUE.queue;
   const nx=q.find(x=>x.status==='pending');
   const pend=q.filter(x=>x.status==='pending')[1];
   const last=[...q].reverse().find(x=>x.status==='sealed');
-  /* M7-P1 技术版图：覆盖度矩阵（P2 真源 = /api/coverage；当前 DEMO_COVERAGE） */
-  const cov=home&&home.coverage?home.coverage:DEMO_COVERAGE;
-  const covOf=(tpl,cat)=>{const c=cov.find(x=>x.tpl===tpl&&x.cat===cat);return c?c.status:'empty';};
-  const coveredCats=TECH_CATEGORIES.filter(c=>cov.some(x=>x.cat===c.id&&x.status==='done')).length;
-  const nTech=cat=>ANALYSES.filter(a=>a.category===cat.id).length;
-  const cellsOf=(cat,onlyDone)=>cov.filter(x=>x.cat===cat.id&&(!onlyDone||x.status==='done')).length;
+  const rows=ledger?ledger.measurements:[];
   return (
     <div className="fw-view fw-home on">
       <div className="fw-hero">
         <div className="fw-mission">
           <h2><b className="fw-brand">{MISSION.brand}</b>{MISSION.title}</h2>
-          <div className="fw-mission-chain">
-            {MISSION.chain.map((s,i)=>(
-              <span key={s.k} className="fw-mission-step">
-                <i>{s.k}</i>
-                <span>{s.v}</span>
-              </span>
-            ))}
-          </div>
+          <div className="fw-mission-line">使命：破解 LLM 语言编码机制 —— 主产物 = 语言机制图谱（知识网络 / 分析推理 / 语法系统 → 语言族 → 特征 × E 级证据）</div>
         </div>
         <div className="fw-hero-num">
           <div className="stat"><div className="n">{st.count?`${st.sealed}/${st.count}`:'—'}</div><div className="l">队列 sealed</div></div>
           <div className="stat"><div className="n">{st.tpls}</div><div className="l">测试模板</div></div>
           <div className="stat"><div className="n">{st.results}</div><div className="l">结果条目</div></div>
-          <div className="stat"><div className="n">{coveredCats}/{TECH_CATEGORIES.length}</div><div className="l">技术覆盖</div></div>
         </div>
       </div>
-      <div className="fw-techmap">
-        <div className="fw-techmap-head">
-          <b>技术版图 · 四类分析技术</b>
-          <span>结果空间 = 对象 × 语言模板 × 分析技术 · 覆盖度矩阵：实心=已有结果 · 半透明=部分/装置已建 · 虚线=空格（点空格去研发透镜领缺口任务）</span>
+
+      <div className="fw-home-atlas">
+        <div className="fw-home-atlas-hd">
+          <b>语言机制图谱 · 三域全景</b>
+          <button className="fw-tbtn" onClick={()=>onGo('atlas')} title="路线 → 图谱：全景交互 / 特征详情 / 账本 / 结果库">打开图谱工作区 →</button>
         </div>
-        <div className="fw-techmap-cards">
-          {TECH_CATEGORIES.map(c=>(
-            <button key={c.id} type="button" className="fw-tc-card" style={{'--cat':c.color}} title={c.note} onClick={()=>onGo('data')}>
-              <div className="hd"><i style={{background:c.color}}/><b>{c.name}</b><span className="fw-tc-st">{CAT_STATUS[c.status]||c.status}</span></div>
-              <div className="ms">{c.methods.join(' · ')}</div>
-              <div className="ft"><span>{nTech(c)} 项技术</span><span>覆盖 {cellsOf(c,true)}/{cellsOf(c)} 格</span><span className="dim2">{c.cost}</span></div>
-            </button>
-          ))}
-        </div>
-        <div className="fw-cov-grid">
-          <div className="fw-cov-row head"><span>模板 \ 技术</span>{TECH_CATEGORIES.map(c=><span key={c.id} style={{color:c.color}}>{c.short||c.name}</span>)}</div>
-          {LANG_TEMPLATES.map(t=>(
-            <div key={t.id} className="fw-cov-row">
-              <span className="tpl">{t.name}</span>
-              {TECH_CATEGORIES.map(c=>{
-                const s=covOf(t.id,c.id);
-                return <button key={c.id} type="button" className={'fw-cov-cell '+s}
-                               title={t.name+' × '+c.name+' · 状态 '+s} onClick={()=>onGo('process')}/>;
-              })}
-            </div>
-          ))}
-        </div>
+        <AtlasPanorama onPick={()=>onGo('atlas')}/>
       </div>
-      <div className="fw-entry-col">
-      <button className="fw-entry" onClick={()=>onGo('spatial')}>
-        <div className="ic" style={{background:'#eff6ff',color:'#0284c7'}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/></svg>
-        </div>
-        <h3>空间透镜 · 3D</h3>
-        <p>1,024 特征点云（L6），簇=模式族；高亮特征与 top-k 邻居；E_ar 方向叠加；14B/9B 跨模型对比。</p>
-        <span className="tag">接 collect.npz · three.js→WebGPU</span>
-      </button>
-      <button className="fw-entry" onClick={()=>onGo('process')}>
-        <div className="ic" style={{background:'#f5f3ff',color:'#6d28d9'}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
-        </div>
-        <h3>过程透镜 · AI 研发</h3>
-        <p>预注册 → 冻结 → 执行 → 独立复核闭环；队列 / 工作区 / 工件查看器同屏（协议驱动，LIVE/DEMO 双模）。</p>
-        <span className="tag">接 :5001 /api/ai-rnd · 队列←phase_queue</span>
-      </button>
-      <button className="fw-entry" onClick={()=>onGo('progress')}>
-        <div className="ic" style={{background:'#fffbeb',color:'#b45309'}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>
-        </div>
-        <h3>脉络透镜 · 行业进展</h3>
-        <p>本项目证据链时间线 + 同行泳道（Anthropic / OpenAI / 开源生态）；节点挂论文与 sealed 产物，可对比登记。</p>
-        <span className="tag">接 industry.json · MEMO 索引</span>
-      </button>
-      <button className="fw-entry" onClick={()=>onGo('data')}>
-        <div className="ic" style={{background:'#ecfdf5',color:'#059669'}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
-        </div>
-        <h3>分析技术 · 结果浏览器</h3>
-        <p>分析技术注册表驱动：选技术 → 契约匹配结果 → 展开自动运行（RSA/RDM、η² 分解、CKA）；亦可按结果浏览。新模板注册即自动出现。</p>
-        <span className="tag">接 /api/templates · /api/results（summary_digest）· 技术注册表</span>
-      </button>
-      </div>
+
       <div className="fw-side-col">
         <div className="fw-mini">
           <h4>进行中 <span style={{fontSize:10,color:'var(--fw-blue)',cursor:'pointer'}} onClick={()=>onGo('process')}>全部 →</span></h4>
@@ -180,10 +121,24 @@ function HomeView({onGo,home}){
           {last&&<div className="fw-task"><span className="st fw-st-done"/><div className="t"><b>{last.id} · {last.title}</b><span>sealed {last.res_sha8||''}</span></div></div>}
         </div>
         <div className="fw-mini">
-          <h4>事件流</h4>
-          {EVENTS.map((e,i)=><div key={i} className="fw-evt"><span className="tm">{e.tm}</span><span>{e.txt}</span></div>)}
+          <h4>最近闭环 {ledger&&<span style={{fontSize:10,color:'var(--fw-blue)',cursor:'pointer'}} onClick={()=>onGo('atlas','ledger')}>全部 {ledger.total} 条 →</span>}</h4>
+          {rows.map(m=>(
+            <div key={m.phase} className="fw-ledger-row" onClick={()=>onGo('atlas','ledger')} title={(m.verdict||'')+' · 点击打开跨线账本'}>
+              <span className="mono">P{m.phase}</span><span className="t">{m.name}</span><span className="ln">{m.line}</span>
+            </div>
+          ))}
+          {!ledger&&<div className="fw-evt"><span>接 GET /api/ai-rnd/atlas/ledger 后显示实时闭环；服务未启动时空态，不伪造数据。</span></div>}
+        </div>
+        <div className="fw-mini">
+          <h4>快速入口</h4>
+          <div className="fw-home-go">
+            <button type="button" onClick={()=>onGo('spatial')}>空间 · 3D 几何与实时权重</button>
+            <button type="button" onClick={()=>onGo('process')}>研发 · 图谱生产闭环</button>
+            <button type="button" onClick={()=>onGo('progress')}>路线 · 进展与时间线</button>
+          </div>
         </div>
       </div>
+      <NewbieGuide/>
     </div>
   );
 }
@@ -192,19 +147,29 @@ export default function RdcFusionWorkspace(){
   const params=new URLSearchParams(typeof window!=='undefined'?window.location.search:'');
   const [lens,setLens]=useState(()=>params.get('lens')||'spatial');
   const [objId,setObjId]=useState(()=>params.get('obj')||DEFAULT_OBJ);
+  const [atlasTab,setAtlasTab]=useState(()=>params.get('atlasTab')||null);  // 图谱透镜子 tab（URL 即状态）
+  const [atlasSel,setAtlasSel]=useState(()=>params.get('atlasSel')||null);  // 图谱特征选中（?atlasSel=FTR-xx；P3 特征源选择器）
+  const [atlasReg,setAtlasReg]=useState(null);   // /api/ai-rnd/atlas/registry features（特征源选择器数据源，LIVE）
+  const [featOpen,setFeatOpen]=useState(false);  // 特征源下拉开合
   const [objLive,setObjLive]=useState(null);     // /api/object/{fid} → {object,related_results}
   const [objects,setObjects]=useState(null);     // /api/objects
   const [rndQueue,setRndQueue]=useState(null);   // /api/ai-rnd/queue
   const [distStats,setDistStats]=useState(null); // /api/distributed/summary
+  const [atlasLedger,setAtlasLedger]=useState(null); // /api/ai-rnd/atlas/ledger（总览·最近闭环，替代 DEMO 事件流）
   const [cmdk,setCmdk]=useState(false);
   const [about,setAbout]=useState(false);
   // const [sideOpen,setSideOpen]=useState(false);  // 对象卡已隐藏，恢复时连同右侧 aside 一起取消注释
   const queryRef=useRef(null);
 
-  const syncURL=(l,o)=>{
-    try{ window.history.replaceState(null,'',`?lens=${l}&obj=${encodeURIComponent(o)}`); }catch{ /* 隐私模式等 */ }
+  const syncURL=(l,o,t,s)=>{
+    try{
+      let url=`?lens=${l}&obj=${encodeURIComponent(o)}`;
+      if(l==='atlas'&&t) url+=`&atlasTab=${encodeURIComponent(t)}`;
+      if(s) url+=`&atlasSel=${encodeURIComponent(s)}`;   // 跨透镜贯通：图谱/空间 3D 共用同一选中态
+      window.history.replaceState(null,'',url);
+    }catch{ /* 隐私模式等 */ }
   };
-  const go=l=>{ setLens(l); setAbout(false); setCmdk(false); syncURL(l,objId); };
+  const go=(l,t,s)=>{ setLens(l); if(s!==undefined) setAtlasSel(s||null); if(l==='atlas') setAtlasTab(t||null); setAbout(false); setCmdk(false); setFeatOpen(false); syncURL(l,objId,t,s); };
   const selectObj=id=>{ setObjId(id); setCmdk(false); setAbout(false); syncURL(lens,id); };
 
   /* 对象数据：LIVE 优先，未注册/离线 → DEMO_OBJECT */
@@ -229,6 +194,10 @@ export default function RdcFusionWorkspace(){
         if(!dead&&p&&Array.isArray(p.queue)&&p.queue.length) setRndQueue(p); }catch{ /* demo */ }
       try{ const r=await fetch(`${API_BASE}/api/distributed/summary`); const p=r.ok?await r.json():null;
         if(!dead&&p&&p.templates) setDistStats(p); }catch{ /* demo */ }
+      try{ const r=await fetch(`${API_BASE}/api/ai-rnd/atlas/ledger?limit=8`); const p=r.ok?await r.json():null;
+        if(!dead&&p&&Array.isArray(p.measurements)) setAtlasLedger(p); }catch{ /* 空态 */ }
+      try{ const r=await fetch(`${API_BASE}/api/ai-rnd/atlas/registry`); const p=r.ok?await r.json():null;
+        if(!dead&&p&&Array.isArray(p.features)) setAtlasReg(p.features); }catch{ /* 空态 */ }
     })();
     return ()=>{ dead=true; };
   },[]);
@@ -236,7 +205,7 @@ export default function RdcFusionWorkspace(){
   useEffect(()=>{
     const onKey=e=>{
       if((e.metaKey||e.ctrlKey)&&String(e.key).toLowerCase()==='k'){e.preventDefault();setCmdk(v=>!v);}
-      if(e.key==='Escape'){setCmdk(false);setAbout(false);}
+      if(e.key==='Escape'){setCmdk(false);setAbout(false);setFeatOpen(false);}
     };
     window.addEventListener('keydown',onKey);
     return ()=>window.removeEventListener('keydown',onKey);
@@ -280,15 +249,39 @@ export default function RdcFusionWorkspace(){
       <header className="fw-topbar">
         <div className="fw-logo"><div className="fw-logo-mark">A2</div>Ai2050 Atlas <small>v5 · RDC</small></div>
         <button className="fw-select" title="演示选择器（模型接入后由此驱动）"><span className="dot" style={{background:'#6366f1'}}/><b>qwen3-4b</b><span className="car">▾</span></button>
-        <button className="fw-select" title="演示选择器（特征源注册后由此驱动）"><b>6-l6-teal</b><span style={{color:'var(--fw-text-3)',fontSize:10}}>RDC 特征源</span><span className="car">▾</span></button>
+        {/* 特征源选择器（P3-lite）：LIVE = atlas registry 在册特征（FTR-xx），选中 → 图谱全景打开该特征详情；
+            不可达时显示注记空态（不伪造特征列表）。对象宇宙归一挂账：FTR→点云真实坐标映射见
+            design/atlas_pointcloud_mapping_protocol_v1.md */}
+        <div className="fw-select-wrap">
+          <button className="fw-select" onClick={()=>setFeatOpen(v=>!v)}
+                  title="特征源 = 语言机制图谱在册特征（GET /api/ai-rnd/atlas/registry）；选中后打开图谱全景详情">
+            <b className="fw-mono">{atlasSel||'特征源'}</b><span style={{color:'var(--fw-text-3)',fontSize:10}}>图谱 FTR</span><span className="car">▾</span>
+          </button>
+          {featOpen&&(
+            <div className="fw-feat-menu">
+              {atlasReg ? atlasReg.map(f=>(
+                <div key={f.id} className="fw-feat-item" title={f.statement}
+                     onClick={()=>{ setFeatOpen(false); go('atlas',null,f.id); }}>
+                  <span className="k fw-mono">{f.id}</span>
+                  <span className="t">{f.statement}</span>
+                </div>
+              )) : (
+                <div className="fw-feat-item dim">接 GET /api/ai-rnd/atlas/registry 后列出在册特征（服务未启动时空态，不伪造）。</div>
+              )}
+              {atlasReg&&atlasSel&&(
+                <div className="fw-feat-item clear" onClick={()=>{ setFeatOpen(false); go('atlas',null,null); }}>清除选中（回到全景默认）</div>
+              )}
+            </div>
+          )}
+        </div>
         <div className="fw-crumb">
           <button className="obj" onClick={()=>selectObj(objId)} title={obj.label}>{objId}</button>
           <span className="lens-chip">{LENS_NAME[lens]}</span>
         </div>
         <button className="fw-cmdk" onClick={()=>setCmdk(true)}>搜索对象、任务、论文… <kbd>⌘K</kbd></button>
-        <button className="fw-bell" title="任务通知">
+        <button className="fw-bell" title="任务通知（待处理 Phase 数，实时）">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          <span className="badge">2</span>
+          {(()=>{ const n=rndQueue?rndQueue.queue.filter(x=>x.status==='pending').length:0; return n>0?<span className="badge">{n}</span>:null; })()}
         </button>
         <div className="fw-avatar">R</div>
       </header>
@@ -306,7 +299,7 @@ export default function RdcFusionWorkspace(){
           <button className={'fw-rbtn'+(lens==='process'?' on':'')} onClick={()=>go('process')} title="AI 研发">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发
           </button>
-          <button className={'fw-rbtn'+(lens==='progress'?' on':'')} onClick={()=>go('progress')} title="行业路线图">
+          <button className={'fw-rbtn'+(lens==='progress'||lens==='atlas'?' on':'')} onClick={()=>go('progress')} title="路线 · 行业进展 / 图谱 / 本地进度">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>路线
           </button>
           <div className="fw-rdiv"/>
@@ -314,9 +307,7 @@ export default function RdcFusionWorkspace(){
           {/* <button className="fw-rbtn" onClick={()=>window.alert('账本视图（registry / 队列 / 证据等级）：沿用旧版工作台入口，本页不重复实现')} title="账本">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM8 8h8M8 12h8M8 16h5"/></svg>账本
           </button> */}
-          <button className={'fw-rbtn'+(lens==='data'?' on':'')} onClick={()=>go('data')} title="分析技术 · 技术注册表 + 结果浏览器（协议驱动）">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>技术
-          </button>
+          {/* 图谱不再设独立导航：已并入路线透镜中间 tab；?lens=atlas 作为 URL 兼容键仍可达 */}
         </nav>
 
         {/* ===== 主视口 ===== */}
@@ -335,11 +326,12 @@ export default function RdcFusionWorkspace(){
           </div>
 
           <div className="fw-viewport">
-            {lens==='home'&&<HomeView onGo={go} home={{sealed:rndQueue?rndQueue.sealed:DEMO_QUEUE.sealed,count:rndQueue?rndQueue.count:DEMO_QUEUE.count,queue:rndQueue?rndQueue.queue:DEMO_QUEUE.queue,tpls:distStats?String(distStats.templates.length):'—',results:distStats?String(distStats.results_total):'—'}}/>}
+            {lens==='home'&&<HomeView onGo={go} ledger={atlasLedger} home={{sealed:rndQueue?rndQueue.sealed:DEMO_QUEUE.sealed,count:rndQueue?rndQueue.count:DEMO_QUEUE.count,queue:rndQueue?rndQueue.queue:DEMO_QUEUE.queue,tpls:distStats?String(distStats.templates.length):'—',results:distStats?String(distStats.results_total):'—'}}/>}
             {lens==='spatial'&&<LensSpatial on onGo={go}/>}
             {lens==='process'&&<LensProcess on onGo={go}/>}
-            {lens==='progress'&&<LensProgress on onGo={go}/>}
-            {lens==='data'&&<LensData on/>}
+            {lens==='progress'&&<LensProgress on onGo={go} initialAtlasSel={atlasSel}/>}
+            {/* lens=atlas：URL 兼容别名 → 路线透镜·图谱 tab（导航已并入路线） */}
+            {lens==='atlas'&&<LensProgress on onGo={go} initialView="atlas" initialAtlasTab={atlasTab} initialAtlasSel={atlasSel}/>}
             {about&&lens!=='home'&&(
               <div className="fw-about-pop">
                 <span className="t">v5 融合主张 —— 四界面如何成为「一个界面」</span>

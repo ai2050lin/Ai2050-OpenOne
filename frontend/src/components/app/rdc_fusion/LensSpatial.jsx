@@ -15,6 +15,7 @@ import NeuronMode from './NeuronMode.jsx';
 import CloudMode from './CloudMode.jsx';
 import ParamMode from './ParamMode.jsx';
 import { LANG_TEMPLATES, LIVE_MODEL_DEMO, PROJECTIONS, TECH_CATEGORIES } from './distributedData.js';
+import ModelManager from './ModelManager.jsx';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
@@ -313,7 +314,7 @@ export default function LensSpatial({ on, onGo }) {
         </div>
       )}
       <div className="fw-sp-wrap">
-        {mode === 'stack' && <StackMode live={top === 'live' ? liveInfo : null} scan={top === 'live' && conn ? scan : null} scanState={top === 'live' && conn ? scanState : null} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>}
+        {mode === 'stack' && <StackMode live={top === 'live' ? liveInfo : null} scan={top === 'live' && conn ? scan : null} scanState={top === 'live' && conn ? scanState : null} modelSlot={top === 'live' ? <ModelManager conn={conn} onConn={setConn}/> : null} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>}
         {mode === 'neuron' && <NeuronMode layer={neuronLayer} onLayer={setNeuronLayer} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onBack={() => setMode('stack')} tpl={tpl}/>}
         {mode === 'cloud' && <CloudMode tpl={tpl}/>}
         {mode === 'param' && <ParamMode layer={paramLayer} live={top === 'live' && conn ? conn : null} scan={scan}/>}

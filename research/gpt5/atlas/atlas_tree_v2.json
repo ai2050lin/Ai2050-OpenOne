@@ -1,0 +1,1112 @@
+{
+ "schema": "atlas_tree_v2",
+ "design": "design/atlas_module_view_scheme_v1.md",
+ "derived_from": {
+  "registry_version": "30",
+  "registry_file": "atlas_registry_v1_30.json",
+  "registry_file_sha8": "c11d13bd",
+  "ledger_measurements": 382,
+  "ledger_sha256_8": "3cba5317",
+  "ledger_file_sha8": "78b44910"
+ },
+ "modules": [
+  {
+   "id": "KN",
+   "name": "知识网络",
+   "en": "KNOWLEDGE NETWORK",
+   "color": "#0ea5e9",
+   "desc": "实体/类/属性/关系的表征、读出与泛化边界",
+   "coverage": {
+    "e3": 0,
+    "e2": 9,
+    "e1": 3,
+    "n": 12,
+    "e2plus": 9
+   },
+   "center": [
+    -2.6,
+    0.0,
+    -1.15
+   ],
+   "families": [
+    {
+     "id": "KN.readout",
+     "name": "读出几何",
+     "features": [
+      {
+       "id": "FTR-01",
+       "family": "K",
+       "evidence_level": "E2_predictive",
+       "statement": "KOUT 残差流读出面板由 content 分量主导：mean 份额 C=57.6%、S=19.4%、R=15.9%（L/G/D 合计约 7%），逻辑轴中层显著且 held-out 全过；跨模型 KOUT 指纹 fpmin=0.996。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3154,
+        3162
+       ]
+      },
+      {
+       "id": "FTR-02",
+       "family": "K",
+       "evidence_level": "E2_predictive",
+       "statement": "K2 条件门近似可分离：φ_ℓ(c) 与 W_ℓ 的交互份额 15.2%/18.2%/16.4% 远低于 50% 死线，k2_separable_all=True、死线未触发（held-out 加性迁移 9/9）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3155,
+        3162
+       ]
+      },
+      {
+       "id": "FTR-17",
+       "family": "readout",
+       "evidence_level": "E2_predictive",
+       "statement": "E_read 未见组合读出误差基线：池化 0.3734（三模型 0.332/0.399/0.390），5% 门 0/3（最小 6.63x 超门）——未见类别×属性组合的读出误差结构性超门；三 collect.npz 锚逐位复现 drift=0.00e+00。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        37
+       ]
+      },
+      {
+       "id": "FTR-18",
+       "family": "readout",
+       "evidence_level": "E2_predictive",
+       "statement": "E_ar(k) 装置与精度桥：四臂 738×K16 测量完成，D4 精度桥 max|delta_rel|=0.0489 小于 0.05 门 PASS；形状 4b=flat（bf16/nf4 双精度）/14b=saturating/glm4=flat；S_rel 0/4 过门（报告性，不阻塞）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        39,
+        3162
+       ]
+      }
+     ]
+    },
+    {
+     "id": "KN.class_axis",
+     "name": "类轴方向",
+     "features": [
+      {
+       "id": "FTR-04",
+       "family": "S",
+       "evidence_level": "E1_repeatable",
+       "statement": "类词方向配方（2881 联合词坐标 J4 质心差分，float32 round-trip 链）跨模型重建成功：三模型各重建 10 方向/100 词 ok(n=10 words=100)，S_class 不再是 4b 专属。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 3,
+       "anchor_phases": [
+        3165,
+        3166,
+        3181
+       ]
+      }
+     ]
+    },
+    {
+     "id": "KN.oov_limit",
+     "name": "谱外边界",
+     "features": [
+      {
+       "id": "FTR-20",
+       "family": "limit",
+       "evidence_level": "E2_predictive",
+       "statement": "谱外崩塌（两线独立确认）：未见类别（水果）B4 读出误差全类最差（3151 rev 链 b4_worst_fold=shuiguo(1.2226)，v3 confirmed），与 N 线「未见类别仍崩（水果 0.04/0.05）」限界互证——图谱只能测谱内，不可外推到未见类别。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        37,
+        3151
+       ]
+      },
+      {
+       "id": "FTR-21",
+       "family": "limit",
+       "evidence_level": "E2_predictive",
+       "statement": "谱外类别读出崩塌量化：类别级留出（口径 B，谱外类别行完全缺席训练）下 pooled E_oov=0.947866 vs pooled E_seen=0.373350，ratio_B=2.5388 >= 2 门；三模型单模型 ratio_B 2.83/2.13/2.71 全 > 2。组合留出口径（A，训练含谱外类部分组合）ratio 0.91/0.85/0.95 全 < 1——「未见组合」与「未见类别」是两个 regime（双口径结构性对照）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 3,
+       "anchor_phases": [
+        3169
+       ]
+      },
+      {
+       "id": "FTR-22",
+       "family": "limit",
+       "evidence_level": "E2_predictive",
+       "statement": "谱外类端口校准恢复曲线（协议内干预，3172）：对每谱外类加入 k 个校准实体行进口径 B 训练集（k in {0,1,2,4,8}，校准与测试实体不相交），pooled ratio_B(k) = 2.5388 -> 2.0315 -> 1.9429 -> 1.8767 -> 1.8002；k=0 逐位复现 3169 封存值（ratio drift=0.0e+00）。三模型 k=8 = 1.9486/1.7100/1.7674 全落预注册 [1.5,2) 带 => borderline_partial_recovery：one-hot 类端口缺失（类别级留出下无训练信号）为崩塌的显著但部分成分——k=8 移除约 29.1% 崩塌量，恢复集中于 k=0->1（单实体校准 -20%）；残留 ~1.8x 过量误差 = 更深成分（结构性残留，挂账定位）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 3,
+       "anchor_phases": [
+        3169,
+        3171,
+        3172
+       ]
+      },
+      {
+       "id": "FTR-25",
+       "family": "context",
+       "evidence_level": "E2_behavioral",
+       "statement": "谱外崩塌共享方向（3189 G5-C2 定判）：3169 谱外逐细胞崩塌残差方向的 SVD top1 能量占比 0.3065/0.2936/0.3008、类间中位 cos 0.5441/0.5663/0.4449（≥2/3 模型 top1≥0.2 且类间中位 cos≥0.2）——谱外崩塌由少数跨类共享方向承载，GAP-4 残留 1.8× 获得首条结构级机制线索；方向级主张，无幅度主张。；3190 G5-C3 LOO 稳健臂：剔除单一 OOV 类后 top1 最大波动 0.0342/0.0214/0.0332（门 <0.05 ×≥2/3 模型）——共享崩塌方向非单类承载，跨类共享读法稳健（E 级维持 E1_repeatable：稳定性≠预测性，held_out 升级留专用臂）。；3191 G5-C4 held_out 升格臂：留出类 219 行方向对其余 3 类均值方向的中位 |cos| 每模型 4 折最小值 0.3906/0.4174/0.3717（门 ≥0.3 全 4 折 ×≥2/3 模型）——3 类均值方向可预测留出类行方向，E1_repeatable 升 E2_held_out（升级链 #7）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 4,
+       "anchor_phases": [
+        3189,
+        3190,
+        3191,
+        3225
+       ]
+      },
+      {
+       "id": "FTR-26",
+       "family": "context",
+       "evidence_level": "E2_behavioral",
+       "statement": "谱外 OOV 崩塌共享方向 u* 是相对编码几何中的新成分：对全部已知结构方向（关系偏移 dvu、seen 类均值残差方向、seen 残差主方向）的最大 |cos| = 0.2130/0.3303/0.2457（novel 门 <0.3 ×≥2/3 模型）——u* 不可归约为任何已知机制方向，独立登记为候选特征。方向级主张，无幅度主张；E1_repeatable，held_out/因果升格留专用臂。；3194 G5-D2 held_out 升格臂：留出类 219 行方向对 u*（全 876 行 SVD top-1，label-free 汇总方向）的中位 |cos| 每模型 4 折最小值 0.4910/0.5198/0.5221（门 ≥0.3 全 4 折 ×≥2/3 模型）——u* 可跨类预测留出类行方向，E1_repeatable 升 E2_held_out（升级链 #8）；对照锚：3191 v̂_held 协议逐位复现。；3197 G5-D5 带符号组成份额定谳（D 线收官）：22 方向候选集上无约束 LS （λ=1e-12）残差 0.0181/0.0174/0.0181（≈3195 QR 投影残差比，近完全拟合），v_c×4 权重全负 −0.273~−0.361、l1 份额 0.9159/0.8905/0.9244、次大 |w| ≤0.024——u* ≈ −(w₈v_c[8]+w₆v_c[6]+w₉v_c[9]+w₇v_c[7])：反类均值对比轴（同时偏离全部 OOV 类均值）。D 线五连闭环：3193 NOVEL（单方向级，限制门集）→ 3194 E2_held_out（跨类留出可预测）→ 3195 PARTIALLY_DECOMPOSED（子空间级 proj 0.9998）→ 3196 非负锥 FAIL（nnls_resid 0.82 ≫ ratio 0.018）→ 3197 带符号定谳；方法学沉淀：子空间投影/非负份额/带符号份额三层读数必须分开报告，无符号 cos 级读数系统性夸大类均值构成。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 4,
+       "anchor_phases": [
+        3193,
+        3194,
+        3197,
+        3225
+       ]
+      }
+     ]
+    }
+   ],
+   "templates": [
+    {
+     "id": "is_a",
+     "mod": "KN",
+     "name": "is-a 上位/下位",
+     "pat": "{X} 是一种 {Y}",
+     "tm": "TM-07",
+     "st": "measured",
+     "metric": "E_read=0.3316",
+     "family": "关系族",
+     "ex": "苹果 是 一种 水果 ，富含 维生素",
+     "prod": {
+      "nodes": 5,
+      "cells": 312,
+      "agg": "collecting"
+     },
+     "pos": [
+      -1.98,
+      0.0,
+      -1.15
+     ]
+    },
+    {
+     "id": "attr",
+     "mod": "KN",
+     "name": "属性关系",
+     "pat": "{X} 是 {ADJ} 的",
+     "tm": "TM-08",
+     "st": "demo",
+     "metric": "",
+     "family": "关系族",
+     "ex": "石头 很 坚硬 ，海绵 却 柔软",
+     "prod": {
+      "nodes": 4,
+      "cells": 388,
+      "agg": "collecting"
+     },
+     "pos": [
+      -3.2784,
+      0.3225,
+      -0.5285
+     ]
+    },
+    {
+     "id": "part_of",
+     "mod": "KN",
+     "name": "部分-整体",
+     "pat": "{X} 的 {Y}",
+     "tm": "",
+     "st": "demo",
+     "metric": "",
+     "family": "关系族",
+     "ex": "车轮 是 汽车 的 部件",
+     "gap": "meronymy 读出未立项——无任何特征锚定",
+     "prod": {
+      "nodes": 0,
+      "cells": 0,
+      "agg": "pending"
+     },
+     "pos": [
+      -2.4933,
+      -0.0267,
+      -2.3653
+     ]
+    },
+    {
+     "id": "tm06",
+     "mod": "KN",
+     "name": "数字与计数",
+     "pat": "{N} 个 {X}",
+     "tm": "TM-06",
+     "st": "pending",
+     "metric": "",
+     "family": "内容探针",
+     "ex": "三个 苹果 和 五 颗 葡萄",
+     "gap": "数词/计数机制未立项",
+     "prod": {
+      "nodes": 3,
+      "cells": 214,
+      "agg": "pending"
+     },
+     "pos": [
+      -1.6752,
+      -0.2027,
+      0.0563
+     ]
+    },
+    {
+     "id": "tm05",
+     "mod": "KN",
+     "name": "实体×位置 等变网格",
+     "pat": "内容寻址解引用",
+     "tm": "TM-05",
+     "st": "collecting",
+     "metric": "",
+     "family": "结构探针",
+     "ex": "把 苹果 放到 桌子 上",
+     "prod": {
+      "nodes": 1,
+      "cells": 6,
+      "agg": "collecting"
+     },
+     "pos": [
+      -4.3922,
+      0.2482,
+      -1.467
+     ]
+    },
+    {
+     "id": "tm04",
+     "mod": "KN",
+     "name": "句式×知识 因子网格",
+     "pat": "反词嵌入指纹",
+     "tm": "TM-04",
+     "st": "collecting",
+     "metric": "",
+     "family": "结构探针",
+     "ex": "同义改写 × 实体替换 网格",
+     "prod": {
+      "nodes": 1,
+      "cells": 16,
+      "agg": "collecting"
+     },
+     "pos": [
+      -0.8112,
+      0.3645,
+      -2.2879
+     ]
+    }
+   ]
+  },
+  {
+   "id": "AR",
+   "name": "推理功能",
+   "en": "ANALYTICAL REASONING",
+   "color": "#d85a30",
+   "desc": "逻辑/真值/推理方向的表征、可分性与行为杠杆",
+   "coverage": {
+    "e3": 0,
+    "e2": 3,
+    "e1": 0,
+    "n": 3,
+    "e2plus": 3
+   },
+   "center": [
+    2.6,
+    0.0,
+    -1.15
+   ],
+   "families": [
+    {
+     "id": "AR.logic",
+     "name": "逻辑方向",
+     "features": [
+      {
+       "id": "FTR-03",
+       "family": "R",
+       "evidence_level": "E2_predictive",
+       "statement": "逻辑（真/假命题）信号在中层稳定存在且可泛化：3154 逻辑轴回归三模型全显著 + held-out 全过；3166 真/假对比方向严格 leave-one-entity-out AUC 0.856/0.863/0.781（三模型独立方法复现）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3154,
+        3166
+       ]
+      }
+     ]
+    }
+   ],
+   "templates": [
+    {
+     "id": "tm03",
+     "mod": "AR",
+     "name": "逻辑连接词",
+     "pat": "因为 / 但是 / 而且",
+     "tm": "TM-03",
+     "st": "collecting",
+     "metric": "",
+     "family": "逻辑族",
+     "ex": "因为 下雨 ，所以 比赛 取消",
+     "prod": {
+      "nodes": 4,
+      "cells": 1204,
+      "agg": "collecting"
+     },
+     "pos": [
+      3.22,
+      0.0,
+      -1.15
+     ]
+    },
+    {
+     "id": "tm12",
+     "mod": "AR",
+     "name": "否定与转折",
+     "pat": "不是 / 然而 / 反而",
+     "tm": "TM-12",
+     "st": "collecting",
+     "metric": "",
+     "family": "逻辑族",
+     "ex": "这 不是 苹果 ，而是 梨",
+     "prod": {
+      "nodes": 3,
+      "cells": 305,
+      "agg": "collecting"
+     },
+     "pos": [
+      1.9216,
+      0.3475,
+      -0.5285
+     ]
+    },
+    {
+     "id": "logic_tf",
+     "mod": "AR",
+     "name": "真/假命题判别",
+     "pat": "{P} 是对的 / 错的",
+     "tm": "3154/3166 实测",
+     "st": "measured",
+     "metric": "held-out 全过 ×3 模型",
+     "family": "逻辑族",
+     "ex": "「香蕉是水果」是对的",
+     "prod": {
+      "nodes": 0,
+      "cells": 0,
+      "agg": "done"
+     },
+     "pos": [
+      2.7067,
+      0.0233,
+      -2.3653
+     ]
+    }
+   ]
+  },
+  {
+   "id": "GR",
+   "name": "语法机制",
+   "en": "GRAMMAR MECHANISM",
+   "color": "#059669",
+   "desc": "句式/位置/上下文的编码几何与门控机制",
+   "coverage": {
+    "e3": 0,
+    "e2": 6,
+    "e1": 2,
+    "n": 8,
+    "e2plus": 6
+   },
+   "center": [
+    0.0,
+    0.15,
+    2.45
+   ],
+   "families": [
+    {
+     "id": "GR.subspace",
+     "name": "属性·语法子空间",
+     "features": [
+      {
+       "id": "FTR-06",
+       "family": "S",
+       "evidence_level": "E2_predictive",
+       "statement": "属性/语法词方向子空间（4b 构建）与知识读出、逻辑方向子空间均几何可分：K_readout×S_attr=68.1 度、×S_syntax=58.5 度（3165），R_logic×S_attr=85.6 度、×S_syntax=86.3 度（3166 独立确认）——词表方向目前仅 4b（跨模型 pending）。 3176 跨模型重建定判（零 GPU，unembed-only）：AXES 词表 verbatim（2874/2878 pairs_json），per-model W_U + single-token 重建 S_attr/S_syntax，K_readout x S_attr = 68.094/75.071/73.596 度、x S_syntax = 58.488/67.004/61.566 度（4b/14b/glm4）；4b 重建对拍 3165 锚 drift 0.0003/0.0002 度。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 3,
+       "anchor_phases": [
+        3165,
+        3166,
+        3176
+       ]
+      }
+     ]
+    },
+    {
+     "id": "GR.context",
+     "name": "上下文与位置",
+     "features": [
+      {
+       "id": "FTR-12",
+       "family": "context",
+       "evidence_level": "E2_predictive",
+       "statement": "上下文二元门控：单 token 前缀即塌缩 massive activation（11072→428）且与 k 无关——has-context 二元门而非渐进上下文积累；3164 跨模型 supported×3（massive 维度 4b d1=0 / 14b d1=731 / glm4 d1=2319）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3156,
+        3164
+       ]
+      },
+      {
+       "id": "FTR-13",
+       "family": "context",
+       "evidence_level": "E2_predictive",
+       "statement": "RoPE 纯相对性（输出级）：位置平移族输出近似不变（4b KL_B 小于等于 0.0023、top1_B 9/9），3164 跨模型 supported×3；严格内部不变量未过（max 相对位移 1.375e-2 大于 1e-3，F6）——输出稳定与内部严格不变是两个强度。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3156,
+        3164
+       ]
+      },
+      {
+       "id": "FTR-14",
+       "family": "context",
+       "evidence_level": "E1_repeatable",
+       "statement": "上下文变换 T_C 的几何：共享分量关系无关（三模型 cos 约 0.56 一致）+ 内容特异并存；变换代数对易子 partial（exch 1.0-1.3=近正交非反平行；RxN 方差 1.2-1.7% 但几何扭曲大=低能量高扭曲型）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 2,
+       "anchor_phases": [
+        3157,
+        3162
+       ]
+      },
+      {
+       "id": "FTR-23",
+       "family": "context",
+       "evidence_level": "E2_held_out",
+       "statement": "T_C 共享分量携带关系特异残差（3178 sampling-null 归因定判 + 3177 关系留出方向性发现）：实体留出 null 标定下纯采样惩罚 p 0.019-0.026，关系残差 r 0.072-0.131 ×3 模型（标定 bar 0.05，r(m) = 0.0918/0.0951/0.1289 全过 bar 判关系无关失败）；关系内两两 cos tc_held 0.581-0.623 > 全量 tc_full 0.561-0.564（6/6 fold×模型单元）——T_C 几何按关系分解，关系内自洽、跨关系系统性偏移；关系残差由 3177 F16 门失败归因定量闭合（F16 = gate fail 记录，本特征 = 残差本体的正面登记）；3200 G5-E2 held_out 升格臂：3178 实体留出 null 封存读数复用——关系内均值方向（留出实体重建）对留出实体 2 细胞 cos_out 的 16-fold 中位数 isa 0.7696/0.7564/0.7762 / hasa 0.7429/0.7855/0.7885（门 ≥0.5 全 6 单元；min fold ≥0.61）——关系内几何对实体留出可预测，E1_repeatable 升 E2_held_out（升级链 #9）；对照锚：3178 标量 4dp 逐位回读 + 3183 dv 标量逐位复现。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 4,
+       "anchor_phases": [
+        3157,
+        3177,
+        3178,
+        3200
+       ]
+      },
+      {
+       "id": "FTR-24",
+       "family": "context",
+       "evidence_level": "E1_repeatable",
+       "statement": "跨关系偏移向量低秩（3184 G5-B9 修正判据定判；3183 F18 贴线拒绝的 LOO 归因修正）：Δv = v_isa − v_hasa（自关系 32 细胞 unit_mean，dC 面板 3178 配方 verbatim）实体级 LOO（16 fold 剔除 1 实体重算）下 pc_share LOO-min 0.4430/0.3927/0.4447 全部 ≥0.4 ×3 模型（14b 由全量 0.3987 贴线升为 LOO-max 0.4155，剔除实体 e=12，其对其余 15 实体 median cos 0.2546 —— 单实体异常承载原贴线失败）；两两 cos 正方向带 3183 已证（99–100% 为正）；Δv 完全位于 v_full 正交补（frac_full=0 ×3，3183）。⇒ ΔM_rel = T_C + R_rel 低秩关系偏移登记为独立特征（E1_repeatable：3 模型同向 + LOO-min 判据 ×3 过门）；T2 参数化路线按低秩 R_rel 推进。F18 保持原文（原门下判 FAIL 为真，append-only 不改写）。；3186 G5-B11：δ_e 谱满秩扩散（top2 0.2458/0.3197/0.3004），T2 收缩为均值级参数化——FTR-24 的低秩性限于关系级方向，不支撑实体级预测。；3187 G5-B12 α 定标不稳定：α̂ = 1.1672/-0.0131/1.7448（qwen3-4b isa +1.1348 / hasa +1.1997；qwen3-14b isa +0.7602 / hasa -0.7864；glm4-9b isa +2.1793 / hasa +1.3102，跨模型带比 133.28）——T2 降级为方向级陈述：FTR-24 只保留 Δv 方向主张，幅度参数 α 撤销（实体级主张已于 3186 撤销）。",
+       "model_scope": [
+        "qwen3-4b",
+        "qwen3-14b",
+        "glm4-9b"
+       ],
+       "n_anchors": 1,
+       "anchor_phases": [
+        3184
+       ]
+      }
+     ]
+    }
+   ],
+   "templates": [
+    {
+     "id": "syntax",
+     "mod": "GR",
+     "name": "句法角色",
+     "pat": "{X} {V} {Y}（语序消融）",
+     "tm": "TM-09",
+     "st": "demo",
+     "metric": "",
+     "family": "句法族",
+     "ex": "猫 追 狗 / 狗 被 猫 追",
+     "prod": {
+      "nodes": 4,
+      "cells": 96,
+      "agg": "pending"
+     },
+     "pos": [
+      0.62,
+      0.15,
+      2.45
+     ]
+    },
+    {
+     "id": "tm10",
+     "mod": "GR",
+     "name": "重复填充句",
+     "pat": "纯位置响应 p_ℓ(pos)",
+     "tm": "TM-10",
+     "st": "done",
+     "metric": "738 cells done",
+     "family": "位置探针",
+     "ex": "的的的的…（位置探针）",
+     "prod": {
+      "nodes": 2,
+      "cells": 738,
+      "agg": "done"
+     },
+     "pos": [
+      -0.6784,
+      0.4775,
+      3.0715
+     ]
+    },
+    {
+     "id": "tm01",
+     "mod": "GR",
+     "name": "语言最小对（中↔英）",
+     "pat": "同一语义 × 两种语言",
+     "tm": "TM-01",
+     "st": "collecting",
+     "metric": "812 cells",
+     "family": "最小对",
+     "ex": "苹果 是 水果 / Apple is a fruit",
+     "prod": {
+      "nodes": 6,
+      "cells": 812,
+      "agg": "collecting"
+     },
+     "pos": [
+      0.1067,
+      0.1333,
+      1.2347
+     ]
+    },
+    {
+     "id": "tm11",
+     "mod": "GR",
+     "name": "多语言混合句",
+     "pat": "中英混排 · 语码转换",
+     "tm": "TM-11",
+     "st": "collecting",
+     "metric": "261 cells",
+     "family": "最小对",
+     "ex": "我 like 吃 apple",
+     "prod": {
+      "nodes": 3,
+      "cells": 261,
+      "agg": "collecting"
+     },
+     "pos": [
+      0.9248,
+      -0.0377,
+      3.6563
+     ]
+    },
+    {
+     "id": "tm02",
+     "mod": "GR",
+     "name": "风格最小对（论文↔聊天）",
+     "pat": "同一内容 × 两种语体",
+     "tm": "TM-02",
+     "st": "collecting",
+     "metric": "533 cells",
+     "family": "最小对",
+     "ex": "本文论证… / 说白了…",
+     "prod": {
+      "nodes": 5,
+      "cells": 533,
+      "agg": "collecting"
+     },
+     "pos": [
+      -1.7922,
+      0.4182,
+      2.133
+     ]
+    }
+   ]
+  }
+ ],
+ "links": [
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-01",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-02",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-17",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-18",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-04",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-20",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-21",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-22",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-25",
+   "kind": "a"
+  },
+  {
+   "tpl": "is_a",
+   "ftr": "FTR-26",
+   "kind": "a"
+  },
+  {
+   "tpl": "attr",
+   "ftr": "FTR-06",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm05",
+   "ftr": "FTR-12",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm04",
+   "ftr": "FTR-01",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm03",
+   "ftr": "FTR-03",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm12",
+   "ftr": "FTR-03",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm12",
+   "ftr": "FTR-08",
+   "kind": "x"
+  },
+  {
+   "tpl": "logic_tf",
+   "ftr": "FTR-03",
+   "kind": "a"
+  },
+  {
+   "tpl": "logic_tf",
+   "ftr": "FTR-07",
+   "kind": "x"
+  },
+  {
+   "tpl": "syntax",
+   "ftr": "FTR-06",
+   "kind": "c"
+  },
+  {
+   "tpl": "syntax",
+   "ftr": "FTR-23",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm10",
+   "ftr": "FTR-13",
+   "kind": "a"
+  },
+  {
+   "tpl": "tm01",
+   "ftr": "FTR-14",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm11",
+   "ftr": "FTR-24",
+   "kind": "c"
+  },
+  {
+   "tpl": "tm02",
+   "ftr": "FTR-12",
+   "kind": "c"
+  }
+ ],
+ "gaps": {
+  "templates_without_feature": [
+   "part_of",
+   "tm06"
+  ],
+  "features_without_template": [
+   "FTR-05"
+  ],
+  "note": "特征口径=域族+交叉；机制层独占特征不计"
+ },
+ "cross_links": [
+  {
+   "edge": "X1",
+   "type": "SxK",
+   "features": [
+    "FTR-05"
+   ],
+   "domains": [
+    "GR",
+    "KN"
+   ],
+   "detail": [
+    {
+     "id": "FTR-05",
+     "family": "SxK",
+     "evidence_level": "E2_predictive",
+     "statement": "类词子空间与知识读出子空间几何可分且跨模型：K_readout×S_class 主角 67.0/71.9/74.0 度（三模型全过 30 度可分门，无半能量共享方向），4b 角度在 3166 独立 phase 对拍锚逐位复现（67.000 度）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3165,
+      3166
+     ]
+    }
+   ]
+  },
+  {
+   "edge": "X2",
+   "type": "RxS",
+   "features": [
+    "FTR-07"
+   ],
+   "domains": [
+    "AR",
+    "GR"
+   ],
+   "detail": [
+    {
+     "id": "FTR-07",
+     "family": "RxS",
+     "evidence_level": "E2_predictive",
+     "statement": "逻辑方向不是类词方向的混淆：R_logic×S_class 主角 73.7/81.4/80.8 度 separable×3 且 not_confounded（对比方向对类词方向做回归后逻辑 AUC 不塌）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3165,
+      3166
+     ]
+    }
+   ]
+  },
+  {
+   "edge": "X3",
+   "type": "RxK",
+   "features": [
+    "FTR-08"
+   ],
+   "domains": [
+    "AR",
+    "KN"
+   ],
+   "detail": [
+    {
+     "id": "FTR-08",
+     "family": "RxK",
+     "evidence_level": "E2_predictive",
+     "statement": "逻辑方向与实体子空间弱混合且模型特异：R×K_entity 主角 45.8/26.6/46.0 度（mixed），14b 落弱分离带并有 2 个半能量共享方向（4b/glm4 为 0）——全表唯一族间弱混合读数。 3176 held-out 定判（零 GPU）：R_logic 留一实体 LOEO（41 fold，fold 内 40 实体重建 top8）x 固定 K_entity（3157 verbatim）：LOEO 均值角 = 45.939/26.658/46.042 度 vs 全量锚 45.845/26.641/46.005 度（|差| < 5 度门，分类带一致 separable/weakly_separated/separable）——R x K_entity 混合读数对构建集实体选择稳健，held_out 锚入表。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 3,
+     "anchor_phases": [
+      3165,
+      3166,
+      3176
+     ]
+    }
+   ]
+  }
+ ],
+ "mechanisms": [
+  {
+   "id": "MEC-01",
+   "name": "attention 再分配执行消耗",
+   "features": [
+    {
+     "id": "FTR-09",
+     "family": "mech",
+     "evidence_level": "E2_predictive",
+     "statement": "等价类动力学非继承：中层注入读出谱方向后 dynamics_destroyed×3（ratio_mid 0.92/0.82/0.94），各向同性是剩余层算出来的而非 inherited；big-drop=注入后第 1 块，top 方向被动力学消耗 91-94%。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3159,
+      3162
+     ]
+    },
+    {
+     "id": "FTR-10",
+     "family": "mech",
+     "evidence_level": "E3_causal_scoped",
+     "statement": "注入消耗的执行者第一步：GPU 层消融置零 L_mid/+1/+1+2 的 MLP 输出 recover 仅 -0.008~+0.006（远小于 0.1 门）→ MLP 无贡献，旋转由 attention 再分配执行（attention_reallocation_primary×3）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3160,
+      3162
+     ]
+    },
+    {
+     "id": "FTR-11",
+     "family": "mech",
+     "evidence_level": "E3_causal_scoped",
+     "statement": "消耗机制链收官：逐头置零 o_proj 输入无单点头贡献（T=0.056/0.030/0.007 均小于 0.1，ctrl 约等于 0）且整块恒等化不改变消耗（redundant_closing×3）→ 消耗无单点执行者=残差流冗余分布式性质（3159→3160→3161→3163 判闭）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3161,
+      3163
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  },
+  {
+   "id": "MEC-02",
+   "name": "上下文二元门控",
+   "features": [
+    {
+     "id": "FTR-12",
+     "family": "context",
+     "evidence_level": "E2_predictive",
+     "statement": "上下文二元门控：单 token 前缀即塌缩 massive activation（11072→428）且与 k 无关——has-context 二元门而非渐进上下文积累；3164 跨模型 supported×3（massive 维度 4b d1=0 / 14b d1=731 / glm4 d1=2319）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3156,
+      3164
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  },
+  {
+   "id": "MEC-03",
+   "name": "RoPE 纯相对编码（输出级）",
+   "features": [
+    {
+     "id": "FTR-13",
+     "family": "context",
+     "evidence_level": "E2_predictive",
+     "statement": "RoPE 纯相对性（输出级）：位置平移族输出近似不变（4b KL_B 小于等于 0.0023、top1_B 9/9），3164 跨模型 supported×3；严格内部不变量未过（max 相对位移 1.375e-2 大于 1e-3，F6）——输出稳定与内部严格不变是两个强度。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3156,
+      3164
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  },
+  {
+   "id": "MEC-04",
+   "name": "残差流全流分布式读出",
+   "features": [
+    {
+     "id": "FTR-01",
+     "family": "K",
+     "evidence_level": "E2_predictive",
+     "statement": "KOUT 残差流读出面板由 content 分量主导：mean 份额 C=57.6%、S=19.4%、R=15.9%（L/G/D 合计约 7%），逻辑轴中层显著且 held-out 全过；跨模型 KOUT 指纹 fpmin=0.996。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3154,
+      3162
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  },
+  {
+   "id": "MEC-05",
+   "name": "读出-控制解耦（C_steer=0）",
+   "features": [
+    {
+     "id": "FTR-16",
+     "family": "control",
+     "evidence_level": "E3_causal_scoped",
+     "statement": "读得出不等于控得住（跨模型）：C_steer=0（4b 主测量 Wilson 上界 1.01%，rand 对照同 0，collateral 干净 frac0=0.933），3164 同构移植 14b/glm4 zero_like_q06×3——承重轴=生成稳定性轴非类身份杠杆。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      40,
+      3164
+     ]
+    }
+   ],
+   "evidence_level_floor": "E3_causal_scoped"
+  },
+  {
+   "id": "MEC-06",
+   "name": "k*/读出双轨判定",
+   "features": [
+    {
+     "id": "FTR-19",
+     "family": "gate",
+     "evidence_level": "E2_predictive",
+     "statement": "K1 双轨判定层（A 闸门 seal Q08=甲）：同一死线在 k* 层与读出层判定相反——k* 层 3/3 否决、读出层池化 0.3734=门 7.5x 触发；「条件齿轮组=算子代数」降级 descriptive；k* model_specific。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 2,
+     "anchor_phases": [
+      3162
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  },
+  {
+   "id": "MEC-07",
+   "name": "局部薄邻域等价边界",
+   "features": [
+    {
+     "id": "FTR-15",
+     "family": "mech",
+     "evidence_level": "E2_predictive",
+     "statement": "输出等价的边界：局部薄邻域等价成立、子空间型商结构被拒（quotient 0/3 mixed，预算比 1.03/1.33/1.25）——商结构形式化不得再以「已确立」引用（F1）。",
+     "model_scope": [
+      "qwen3-4b",
+      "qwen3-14b",
+      "glm4-9b"
+     ],
+     "n_anchors": 3,
+     "anchor_phases": [
+      3158,
+      3162,
+      3180
+     ]
+    }
+   ],
+   "evidence_level_floor": "E2_predictive"
+  }
+ ],
+ "space3d_note": "模板 pos 为模块聚簇+黄金角派生坐标，非模型真实几何（scheme §9）",
+ "tree_sha256_8": "9d60827a"
+}

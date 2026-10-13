@@ -95,7 +95,7 @@ const LNODES=[...Array(N)].map((_,l)=>{
   return {nodes,edges};
 });
 
-export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState}){   /* live=实时模型信息包，scan=各层真实权重统计（S9b），null=demo 口径 */
+export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState,modelSlot}){   /* live=实时模型信息包，scan=各层真实权重统计（S9b），null=demo 口径；modelSlot=实时分析时「本地模型」模块（渲染在模型总览上方） */
   const cvRef=useRef(null);
   const camRef=useRef({th:0.55,ph:0.42,zoom:480,auto:true,pulse:0,panX:0,panY:0});
   const dragRef=useRef(null);
@@ -383,6 +383,7 @@ export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState}
       <aside className="fw-lp">
         {sel<0?(
           <>
+            {modelSlot}
             <div className="fw-lp-hd">模型总览 <small>{live ? live.head : 'qwen3-4b · 4.02B'}</small></div>
             {live ? (
               <>

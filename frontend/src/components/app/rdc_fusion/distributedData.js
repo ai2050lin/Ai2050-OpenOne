@@ -75,7 +75,7 @@ export const AGG_DIMS = [
   { dim: '句法', src: 'TM-09', state: 'pending', note: '待分发' },
 ];
 
-/* 结果浏览器演示行（LensData 离线回退；行=一次上传，字段=协议键 D1-3 平铺结构）
+/* 结果浏览器演示行（ResultsExplorer 离线回退；行=一次上传，字段=协议键 D1-3 平铺结构）
    覆盖三种 analysis 协议形态（factorial / oneway / heads）——演示组件的协议通用性，
    数值参考 qwen3-4b 首轮真实测量（2026-10-07，登记用） */
 export const DEMO_RESULTS = [
@@ -220,7 +220,7 @@ export const RSA_NOTE = '对比：本项目 TM 协议已逐 cell 保存 cos 方�
    每技术：id / category（四类归属）/ name / input（数据契约，决定可用性）/ output（协议渲染形态）/
    metric_version（口径登记，禁止跨量纲平均 13.1）/ evidence_level / status / source / note。
    status 与 Q04/Q06 装置状态机同构：available=可运行 · planned=装置待建 · disabled=缺输入（disabled_reason 登记）。
-   可用性由 LensData TechPanel 按 input 契约对当前选中 detail 匹配得出，不硬编码；
+   可用性由 ResultsExplorer TechPanel 按 input 契约对当前选中 detail 匹配得出，不硬编码；
    JSx 中不得出现技术字面量以外的注册信息（红线扩展到技术层）。 */
 export const ANALYSES = [
   {
@@ -266,12 +266,12 @@ export const ANALYSES = [
   },
 ];
 
-/* 平台定位（总览 hero，M8）：品牌 + 标题 + 「手段→路径→目标」三段链 */
+/* 平台定位（总览 hero，M8）：品牌 + 标题 + 「方法→路径→目标」三段链 */
 export const MISSION = {
   brand: 'AI2050',
   title: 'LLM 逆向工程平台',
   chain: [
-    { k: '手段', v: '语言模板 × 分析技术' },
+    { k: '方法', v: '语言模板 × 分析技术' },
     { k: '路径', v: '从行为反推机制' },
     { k: '目标', v: '原理 → 智能理论 → AGI' },
   ],

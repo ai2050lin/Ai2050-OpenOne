@@ -1,0 +1,16 @@
+[    0.0] freeze: execution.json written (bfe79091)
+[    0.0] == Phase 3190 g5c3_shared_direction_robustness SMOKE ==
+[    0.8] sources: 8 files sha-asserted
+[    0.8] sealed results double-locked: 3169 49430a39/018c6024 3189 3a26f541/fb8c1f65
+[    0.8] === qwen3-4b ===
+[    2.7]   device ok: drift69=0.00e+00 drift89=0 (top1/top2/cross/within/r80/r90 bitwise)
+[    4.3]   qwen3-4b: LOO top1 0.3246/0.3408/0.3118/0.3217 | max_delta=0.0342 (gate <0.05)=True | KS(u*; oov vs seen)=0.9932 | cos(u*,v_c)=-0.806/-0.762/-0.836/-0.819
+[    4.3] === qwen3-14b ===
+[    8.3]   device ok: drift69=0.00e+00 drift89=0 (top1/top2/cross/within/r80/r90 bitwise)
+[   10.6]   qwen3-14b: LOO top1 0.3136/0.3147/0.2937/0.3149 | max_delta=0.0214 (gate <0.05)=True | KS(u*; oov vs seen)=0.9761 | cos(u*,v_c)=-0.807/-0.797/-0.852/-0.808
+[   10.6] === glm4-9b ===
+[   13.7]   device ok: drift69=0.00e+00 drift89=0 (top1/top2/cross/within/r80/r90 bitwise)
+[   15.7]   glm4-9b: LOO top1 0.3181/0.3305/0.3140/0.3340 | max_delta=0.0332 (gate <0.05)=True | KS(u*; oov vs seen)=0.9715 | cos(u*,v_c)=-0.778/-0.746/-0.802/-0.724
+[   15.7] GATE: 3/3 models pass LOO => ROBUST
+[   15.7] verdict: shared_direction_loo_robust (LOO max delta 0.0342/0.0214/0.0332 < 0.05 in 3/3 models; FTR-25 anchors append role=loo_robustness, E level unchanged E1_repeatable, registry v1.16 -> v1.17)
+[   15.7] result written res=bd6090d3 seal=66136869

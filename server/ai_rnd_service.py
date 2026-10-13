@@ -1670,3 +1670,172 @@ async def workspace_file(path: str):
     text = p.read_text(encoding="utf-8", errors="replace")
     return {"path": (path or "").replace("\\", "/").strip("/"), "name": p.name,
             "size": size, "content": text}
+
+
+# ============================================================
+# Atlas 图谱接入（Phase 3179/3180 客户端阶段 A/C，协议键驱动，零实验字面量）
+# ============================================================
+_ATLAS_DIR = Path(__file__).parent.parent / "research" / "gpt5" / "atlas"
+_ATLAS_RESULT_DIR = (Path(__file__).parent.parent / "tests" / "glm5" / "result" /
+                     "rdc_query_construction_20260913")
+# registry 版本 -> 产物目录（ discoveries 顺序即版本链；新增版本在此登记路径规则即可）
+_ATLAS_REGISTRY_CANDIDATES = [
+    ("1.8", _ATLAS_RESULT_DIR / "phase3181" / "g5b6_ftr04_glm4_attribution" / "atlas_registry_v1_8.json"),
+    ("1.7", _ATLAS_RESULT_DIR / "phase3180" / "g5b5_ftr15_heldout" / "atlas_registry_v1_7.json"),
+    ("1.6", _ATLAS_RESULT_DIR / "phase3179" / "g5b4_ftr23_registration" / "atlas_registry_v1_6.json"),
+    ("1.5", _ATLAS_RESULT_DIR / "phase3178" / "g5b3_ftr14_a2_attribution" / "atlas_registry_v1_5.json"),
+]
+
+
+def _atlas_registry_path(version: Optional[str] = None) -> Optional[Path]:
+    if version:
+        for v, p in _ATLAS_REGISTRY_CANDIDATES:
+            if v == version and p.is_file():
+                return p
+        return None
+    for _, p in _ATLAS_REGISTRY_CANDIDATES:
+        if p.is_file():
+            return p
+    return None
+
+
+def _atlas_version_list() -> List[Dict[str, Any]]:
+    out = []
+    for v, p in _ATLAS_REGISTRY_CANDIDATES:
+        if p.is_file():
+            try:
+                reg = json.loads(p.read_text(encoding="utf-8"))
+                out.append({"version": v, "file": p.name,
+                            "sha8_source": reg.get("supersedes", ""),
+                            "n_features": len(reg.get("features", [])),
+                            "n_upgrades": len(reg.get("upgrade_log", [])),
+                            "n_failures": len(reg.get("failures", []))})
+            except Exception:
+                continue
+    return out
+
+
+def _feature_card(f: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": f.get("id"), "family": f.get("family"),
+        "statement": f.get("statement"), "evidence_level": f.get("evidence_level"),
+        "model_scope": f.get("model_scope", []),
+        "values": f.get("values", {}), "replication": f.get("replication"),
+        "scope_limits": f.get("scope_limits"),
+        "counter_evidence": f.get("counter_evidence", []),
+        "n_anchors": len(f.get("anchors", [])),
+        "anchors": [{"src": a.get("src"), "phase": a.get("phase"), "role": a.get("role"),
+                     "tags": a.get("tags", []),
+                     "res_sha8": (a.get("asserts") or {}).get("res_sha8"),
+                     "seal_sha8": (a.get("asserts") or {}).get("seal_sha8")}
+                    for a in f.get("anchors", [])],
+    }
+
+
+@router.get("/atlas/registry")
+async def atlas_registry(version: Optional[str] = None):
+    """图谱 registry（协议第五件数据源；versions=版本链，registry=完整 JSON）。文件缺失 404。"""
+    p = _atlas_registry_path(version)
+    if not p:
+        raise HTTPException(status_code=404, detail="atlas registry not found")
+    try:
+        reg = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="registry parse error: %s" % e)
+    return {"schema": "atlas_registry_v1", "versions": _atlas_version_list(),
+            "version": reg.get("version"), "file": p.name,
+            "features": [_feature_card(f) for f in reg.get("features", [])],
+            "upgrade_log": reg.get("upgrade_log", []),
+            "failures": reg.get("failures", []),
+            "principles": reg.get("principles", []),
+            "evidence_level_taxonomy": reg.get("evidence_level_taxonomy", {})}
+
+
+@router.get("/atlas/feature/{fid}")
+async def atlas_feature(fid: str, version: Optional[str] = None):
+    """特征卡详情（含证据链 anchors 逐条 res/seal sha8，供钻取）。"""
+    p = _atlas_registry_path(version)
+    if not p:
+        raise HTTPException(status_code=404, detail="atlas registry not found")
+    reg = json.loads(p.read_text(encoding="utf-8"))
+    for f in reg.get("features", []):
+        if f.get("id") == fid:
+            return {"schema": "atlas_feature_v1", "version": reg.get("version"),
+                    "feature": f}
+    raise HTTPException(status_code=404, detail="feature %s not found" % fid)
+
+
+@router.get("/atlas/ledger")
+async def atlas_ledger(offset: int = 0, limit: int = 30, line: Optional[str] = None):
+    """跨线账本 measurements（append-only，只读分页；line 可选过滤 G/D/N）。"""
+    lp = _ATLAS_DIR / "atlas_ledger.json"
+    if not lp.is_file():
+        raise HTTPException(status_code=404, detail="atlas ledger not found")
+    data = json.loads(lp.read_text(encoding="utf-8"))
+    ms = data.get("measurements", [])
+    if line:
+        ms = [m for m in ms if m.get("line") == line]
+    total = len(ms)
+    off = max(0, int(offset))
+    n = max(1, min(int(limit), 200))
+    page = []
+    for m in ms[-(off + n): -off or None] if off else ms[-n:]:
+        page.append({"phase": m.get("phase"), "name": m.get("name"), "line": m.get("line"),
+                     "date": m.get("date"), "model": m.get("model"),
+                     "verdict": m.get("verdict"), "evidence_level": m.get("evidence_level"),
+                     "model_scope": m.get("model_scope"), "prereg_id": m.get("prereg_id")})
+    page.reverse()
+    return {"schema": "atlas_ledger_v1", "total": total, "count": len(page),
+            "offset": off, "ledger_sha256_8": data.get("ledger_sha256_8"),
+            "schema_version": data.get("schema_version"), "measurements": page}
+
+
+@router.get("/atlas/tree")
+async def atlas_tree(schema: str = None):
+    """三域树派生视图（atlas_tree_v1：KN/AR/GR → 族 → 特征 + MEC 机制横切 + cross_link 交叉边）。
+    由 server/derive_atlas_tree.py 从 registry 最新版 + ledger 派生（只读；缺失 404，不现算）。
+    ?schema=v2 → atlas_tree_v2（三模块视图：语言模板 × 编码机制关联 + 缺口，scheme design/atlas_module_view_scheme_v1.md）。"""
+    fn = "atlas_tree_v2.json" if schema == "v2" else "atlas_tree_v1.json"
+    tp = _ATLAS_DIR / fn
+    if not tp.is_file():
+        raise HTTPException(status_code=404, detail="%s not found (run server/derive_atlas_tree.py)" % fn)
+    try:
+        data = json.loads(tp.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="atlas tree parse error: %s" % e)
+    return data
+
+
+@router.get("/queue/gline")
+async def gline_queue():
+    """G 线五段式队列：closed = atlas_ledger 尾部 phase（G 线），queued/preregistered =
+    research/gpt5/atlas/gline_queue_v1.json（缺失返回空，不炸）。"""
+    items, closed = [], []
+    lp = _ATLAS_DIR / "atlas_ledger.json"
+    if lp.is_file():
+        try:
+            data = json.loads(lp.read_text(encoding="utf-8"))
+            for m in data.get("measurements", []):
+                if m.get("line") != "G":
+                    continue
+                closed.append({"id": "p%s" % m.get("phase"), "phase": m.get("phase"),
+                               "title": m.get("name"), "status": "closed",
+                               "evidence_level": m.get("evidence_level"),
+                               "prereg_id": m.get("prereg_id"),
+                               "verdict": m.get("verdict"), "date": m.get("date")})
+        except Exception:
+            closed = []
+    qp = _ATLAS_DIR / "gline_queue_v1.json"
+    if qp.is_file():
+        try:
+            q = json.loads(qp.read_text(encoding="utf-8"))
+            for it in q.get("queue", []):
+                if isinstance(it, dict):
+                    items.append({"id": it.get("id"), "phase": it.get("phase"),
+                                  "title": it.get("title"), "status": it.get("status"),
+                                  "gpu": it.get("gpu"), "note": it.get("note"),
+                                  "prereg": it.get("prereg")})
+        except Exception:
+            pass
+    return {"schema": "gline_queue_v1", "closed_count": len(closed),
+            "closed_tail": closed[-12:], "queue": items}

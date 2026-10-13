@@ -111,10 +111,14 @@ function Test-AI2050VisualizationListener(
 ) {
     if (-not $Listener -or -not $Listener.CommandLine) { return $false }
 
-    $expectedViteScript = Join-Path $ExpectedFrontendRoot 'node_modules\vite\bin\vite.js'
-    $normalizedCommand = $Listener.CommandLine.Replace('/', '\')
-    $normalizedViteScript = $expectedViteScript.Replace('/', '\')
-    return $normalizedCommand.IndexOf($normalizedViteScript, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+        $expectedViteScript = Join-Path $ExpectedFrontendRoot 'node_modules\vite\bin\vite.js'
+        $normalizedCommand = $Listener.CommandLine.Replace('/', '\')
+        $normalizedViteScript = $expectedViteScript.Replace('/', '\')
+        # npm shim invokes vite via "node_modules\.bin\..\vite\bin\vite.js";
+        # collapse the "\..\" segment before matching, otherwise our own vite
+        # process is misdetected as a foreign listener and the script throws.
+        $collapsedCommand = (($normalizedCommand -replace '\\{2,}', '\') -replace '\\\.bin\\\.\.\\', '\')
+        return $collapsedCommand.IndexOf($normalizedViteScript, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
 }
 
 if (-not (Test-Path -LiteralPath $frontendRoot)) {
