@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>三模块 3D 关系空间 · module_space.v1 原型</title>
+<style>
+  :root{--kn:#0ea5e9;--ar:#d85a30;--gr:#059669;--e3:#b45309;--e2:#1e5c22;--e1:#24558a;
+        --x:#d97706;--line:#d9dee6;--txt:#1a1d23;--dim:#7a8494;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font:13px/1.55 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:#f2f4f8;color:var(--txt)}
+  .wrap{max-width:1180px;margin:18px auto;padding:0 14px}
+  h1{font-size:16px;margin-bottom:2px}
+  .sub{font-size:11.5px;color:var(--dim);margin-bottom:10px}
+  .stage{position:relative;background:#fbfcfe;border:1px solid var(--line);border-radius:12px;height:620px;overflow:hidden}
+  canvas{display:block;width:100%;height:100%;cursor:grab}
+  canvas:active{cursor:grabbing}
+  .cap{position:absolute;left:12px;top:10px;font-size:10.5px;color:#8a93a3;pointer-events:none}
+  .cap b{color:var(--e3);font-weight:500}
+  .toolbar{position:absolute;right:12px;top:10px;display:flex;flex-direction:column;gap:6px;background:#fffffff2;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:11px;width:170px}
+  .toolbar b{font-size:10.5px;color:var(--txt);font-weight:500}
+  .trow{display:flex;gap:4px;flex-wrap:wrap}
+  .tbtn{border:1px solid var(--line);background:#f4f6f9;border-radius:6px;padding:2px 8px;font:inherit;font-size:10.5px;cursor:pointer;color:#52616f}
+  .tbtn.on{background:#24558a;color:#fff;border-color:#24558a}
+  .tbtn.kn.on{background:var(--kn);border-color:var(--kn)}
+  .tbtn.ar.on{background:var(--ar);border-color:var(--ar)}
+  .tbtn.gr.on{background:var(--gr);border-color:var(--gr)}
+  .legend{position:absolute;left:12px;bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:10.5px;color:#52616f;background:#fffffff2;border:1px solid var(--line);border-radius:8px;padding:5px 10px;pointer-events:none}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+  .legend .ln{display:inline-block;width:16px;height:0;border-top:2px solid;margin-right:4px;vertical-align:3px}
+  .detail{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;min-height:120px}
+  .detail .none{color:var(--dim);font-size:12px}
+  .dt-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .dt-head .fid{font-family:ui-monospace,Consolas,monospace;font-weight:600;font-size:13px}
+  .badge{font-size:10px;border:1px solid;border-radius:4px;padding:0 6px;font-family:ui-monospace,monospace}
+  .badge.e3{color:var(--e3);border-color:var(--e3)}.badge.e2{color:var(--e2);border-color:var(--e2)}
+  .badge.e2h{color:var(--e2);border-color:var(--e2)}.badge.e1{color:var(--e1);border-color:var(--e1)}
+  .badge.st{color:#64748b;border-color:#64748b}
+  .dt-sec{margin-top:8px;font-size:12px}
+  .dt-sec .h{font-size:10.5px;color:var(--dim);letter-spacing:.5px;margin-bottom:2px}
+  .mono{font-family:ui-monospace,Consolas,monospace}
+  .stmt{color:#39434e;font-size:12px;line-height:1.6}
+  .chip{display:inline-block;font-size:10.5px;background:#f4f6f9;border:1px solid var(--line);border-radius:4px;padding:1px 7px;margin:2px 4px 2px 0}
+  .chip.gap{color:#b91c1c;border-color:#fecaca;background:#fef2f2}
+  .chip.x{color:#b45309;border-color:#fde68a;background:#fffbeb}
+  .ang{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+  .ang .a{text-align:center}
+  .ang .a .v{font-family:ui-monospace,monospace;font-size:15px;font-weight:700}
+  .ang .a .l{font-size:9.5px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>三模块 3D 关系空间 · AtlasModuleSpace（module_space.v1 原型）</h1>
+  <div class="sub">数据：atlas_tree_v2（registry v1.30 · ledger n=382 · sha8 9d60827a）· 三舱一塔三桥：KN 晶格舱 / AR 链舱 / GR 环形舱 + 机制竖井塔 + 可分离桥 X1–X3 · 拖拽旋转 · 右键平移 · 滚轮缩放 · 点击节点/桥/楼层盘看详情</div>
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="cap">module_space.v1 · <b>组织假说示意（派生布局）</b> — 舱体形态=工作假设非模型真实几何 · 桥线宽=分离度（细=可分 粗=弱混合）· npz 接入后仅替换节点坐标</div>
+    <div class="toolbar">
+      <b>模块显隐</b>
+      <div class="trow">
+        <button class="tbtn kn on" data-mod="KN">KN 知识</button>
+        <button class="tbtn ar on" data-mod="AR">AR 推理</button>
+        <button class="tbtn gr on" data-mod="GR">语法</button>
+      </div>
+      <b>边类型过滤</b>
+      <div class="trow" id="edgeRow">
+        <button class="tbtn on" data-ek="a">a 实测</button>
+        <button class="tbtn on" data-ek="c">c 采集</button>
+        <button class="tbtn on" data-ek="x">x 跨模块</button>
+        <button class="tbtn on" data-ek="b">桥</button>
+      </div>
+      <b>视角</b>
+      <div class="trow">
+        <button class="tbtn on" id="rotBtn">⟳ 自转</button>
+        <button class="tbtn" id="resetBtn">复位</button>
+      </div>
+      <b>着色</b>
+      <div class="trow">
+        <button class="tbtn on" data-cm="elevel">E 级+状态</button>
+        <button class="tbtn" data-cm="module">模块色</button>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="detail" id="detail"><div class="none">点击任意模板 / 特征 / 桥节点 / 机制楼层盘查看详情（协议键驱动）。</div></div>
+</div>
+<script>
+"use strict";
+/* ===== 数据（内嵌自 research/gpt5/atlas/atlas_tree_v2.json · 派生 2026-10-13） ===== */
+var MODS = {
+  KN:{name:"知识网络", color:"#0ea5e9", center:[-10,2.0,4.5], half:[3.6,2.2,3.6], desc:"实体/类/属性/关系的表征、读出与泛化边界 · E2×9 + E1×3"},
+  AR:{name:"推理功能", color:"#d85a30", center:[10,1.8,4.5],  desc:"逻辑/真值/推理方向的表征、可分性与行为杠杆 · E2×3"},
+  GR:{name:"语法机制", color:"#059669", center:[0,1.8,-9.0],  ring:3.2, desc:"句式/位置/上下文的编码几何与门控机制 · E2×6 + E1×2"}
+};
+var TPL = [
+  {id:"is_a",   mod:"KN", name:"is-a 上位/下位", tm:"TM-07", st:"measured", cells:312, metric:"E_read=0.3316", family:"关系族",   pat:"{X} 是一种 {Y}", ex:"苹果 是 一种 水果 ,富含 维生素", pos:[-12.3,2.9,3.1]},
+  {id:"attr",   mod:"KN", name:"属性关系",       tm:"TM-08", st:"demo",     cells:388, metric:"", family:"关系族",   pat:"{X} 是 {ADJ} 的", ex:"石头 很 坚硬 ,海绵 却 柔软", pos:[-8.1,3.1,5.9]},
+  {id:"part_of",mod:"KN", name:"部分-整体",      tm:"",      st:"demo",     cells:0,   metric:"", family:"关系族",   pat:"{X} 的 {Y}", ex:"车轮 是 汽车 的 部件", gap:"meronymy 读出未立项——无任何特征锚定", pos:[-10.4,0.6,2.3]},
+  {id:"tm06",   mod:"KN", name:"数字与计数",     tm:"TM-06", st:"pending",  cells:214, metric:"", family:"内容探针", pat:"{N} 个 {X}", ex:"三个 苹果 和 五 颗 葡萄", gap:"数词/计数机制未立项", pos:[-9.3,0.5,6.7]},
+  {id:"tm05",   mod:"KN", name:"实体×位置 等变网格", tm:"TM-05", st:"collecting", cells:6, metric:"", family:"结构探针", pat:"内容寻址解引用", ex:"把 苹果 放到 桌子 上", pos:[-12.8,1.6,5.9]},
+  {id:"tm04",   mod:"KN", name:"句式×知识 因子网格", tm:"TM-04", st:"collecting", cells:16, metric:"", family:"结构探针", pat:"反词嵌入指纹", ex:"同义改写 × 实体替换 网格", pos:[-7.5,1.7,3.0]},
+  {id:"tm03",   mod:"AR", name:"逻辑连接词",     tm:"TM-03", st:"collecting", cells:1204, metric:"", family:"逻辑族", pat:"因为 / 但是 / 而且", ex:"因为 下雨 ,所以 比赛 取消", pos:[6.9,1.1,6.7]},
+  {id:"tm12",   mod:"AR", name:"否定与转折",     tm:"TM-12", st:"collecting", cells:305, metric:"", family:"逻辑族", pat:"不是 / 然而 / 反而", ex:"这 不是 苹果 ,而是 梨", pos:[10.0,1.8,7.5]},
+  {id:"logic_tf",mod:"AR",name:"真/假命题判别",  tm:"3154/3166 实测", st:"measured", cells:0, metric:"held-out 全过 ×3 模型", family:"逻辑族", pat:"{P} 是对的 / 错的", ex:"「香蕉是水果」是对的", pos:[13.1,2.5,6.7]},
+  {id:"syntax", mod:"GR", name:"句法角色",       tm:"TM-09", st:"demo",     cells:96,  metric:"", family:"句法族",  pat:"{X} {V} {Y}（语序消融）", ex:"猫 追 狗 / 狗 被 猫 追", pos:[1.09,1.6,-6.0]},
+  {id:"tm10",   mod:"GR", name:"重复填充句",     tm:"TM-10", st:"done",     cells:738, metric:"738 cells done", family:"位置探针", pat:"纯位置响应 p_ℓ(pos)", ex:"的的的的…（位置探针）", pos:[-3.19,1.9,-8.8]},
+  {id:"tm01",   mod:"GR", name:"语言最小对（中↔英）", tm:"TM-01", st:"collecting", cells:812, metric:"812 cells", family:"最小对", pat:"同一语义 × 两种语言", ex:"苹果 是 水果 / Apple is a fruit", pos:[-0.83,1.6,-5.9]},
+  {id:"tm11",   mod:"GR", name:"多语言混合句",   tm:"TM-11", st:"collecting", cells:261, metric:"261 cells", family:"最小对", pat:"中英混排 · 语码转换", ex:"我 like 吃 apple", pos:[3.01,1.7,-10.1]},
+  {id:"tm02",   mod:"GR", name:"风格最小对（论文↔聊天）", tm:"TM-02", st:"collecting", cells:533, metric:"533 cells", family:"最小对", pat:"同一内容 × 两种语体", ex:"本文论证… / 说白了…", pos:[-1.84,1.9,-11.6]}
+];
+var FTR = [
+  {id:"FTR-01",mod:"KN",el:"E2", st:"KOUT 读出 content 主导：C=57.6%/S=19.4%/R=15.9%，指纹 fpmin=0.996", pos:[-11.6,2.2,6.3]},
+  {id:"FTR-02",mod:"KN",el:"E2", st:"K2 条件门近似可分离：交互份额 15–18% 远低于 50% 死线，held-out 加性迁移 9/9", pos:[-8.7,2.2,2.4]},
+  {id:"FTR-17",mod:"KN",el:"E2", st:"E_read 未见组合读出误差 0.3734，5% 门 0/3（最小 6.63× 超门）", pos:[-13.0,2.2,3.9]},
+  {id:"FTR-18",mod:"KN",el:"E2", st:"E_ar(k) 装置与精度桥：max|Δ_rel|=0.0489 < 0.05 门 PASS", pos:[-7.9,2.2,4.9]},
+  {id:"FTR-04",mod:"KN",el:"E1", st:"类词方向配方跨模型重建成功（10 方向/100 词 ×3 模型）", pos:[-12.0,1.2,4.7]},
+  {id:"FTR-20",mod:"KN",el:"E2", st:"谱外崩塌两线独立确认：图谱只能测谱内，不可外推未见类别", pos:[-10.1,2.2,6.8]},
+  {id:"FTR-21",mod:"KN",el:"E2", st:"谱外类别读出崩塌量化：ratio_B=2.5388 ≥ 2 门 ×3；未见组合与未见类别是两个 regime", pos:[-12.7,2.2,2.6]},
+  {id:"FTR-22",mod:"KN",el:"E2", st:"谱外端口校准恢复曲线：k=8 移除约 29.1% 崩塌量，残留 ~1.8× 为结构性成分", pos:[-8.4,2.2,6.6]},
+  {id:"FTR-25",mod:"KN",el:"E2h",st:"谱外崩塌共享方向 u*：top1 能量 0.29–0.31、类间中位 cos 0.44–0.57；LOO 稳健 + held-out 0.37–0.42（升级链 #7）", pos:[-11.2,2.9,1.6]},
+  {id:"FTR-26",mod:"KN",el:"E2h",st:"u* 不可归约已知方向（novel 门过）+ 留出可预测 min 0.49–0.52（升级链 #8）+ 带符号定谳：u* ≈ 反类均值对比轴", pos:[-9.6,2.9,3.8]},
+  {id:"FTR-03",mod:"AR",el:"E2", st:"逻辑（真/假）信号中层稳定可泛化：LOEO AUC 0.856/0.863/0.781 三模型独立复现", pos:[10.0,2.2,4.6]},
+  {id:"FTR-06",mod:"GR",el:"E2", st:"属性/语法子空间与知识读出、逻辑方向几何可分：58–75° ×3 模型（3176 跨模型定判）", pos:[-1.39,2.2,-8.2]},
+  {id:"FTR-12",mod:"GR",el:"E2", st:"上下文二元门控：单 token 前缀即塌缩 massive（11072→428），跨模型 ×3", pos:[-0.68,2.2,-10.4]},
+  {id:"FTR-13",mod:"GR",el:"E2", st:"RoPE 纯相对性（输出级）：平移族输出近似不变，严格内部不变量未过（F6）", pos:[0.85,2.2,-7.5]},
+  {id:"FTR-14",mod:"GR",el:"E1", st:"T_C 共享分量关系无关（cos≈0.56 ×3）+ 内容特异并存；对易子 partial", pos:[-1.54,1.2,-7.2]},
+  {id:"FTR-23",mod:"GR",el:"E2h",st:"T_C 共享分量携带关系特异残差；关系内几何对实体留出可预测（升级链 #9）", pos:[1.20,2.9,-10.2]},
+  {id:"FTR-24",mod:"GR",el:"E1", st:"跨关系偏移 Δv 低秩（LOO-min pc≥0.4 ×3）；幅度参数 α 已撤销（3187）", pos:[0,1.2,-6.4]},
+  {id:"FTR-05",mod:"X1",el:"E2", st:"类词子空间 × 知识读出子空间几何可分且跨模型：67.0/71.9/74.0°（全过 30° 门）", pos:null},
+  {id:"FTR-07",mod:"X2",el:"E2", st:"逻辑方向不是类词方向混淆：73.7/81.4/80.8° separable×3 且 not_confounded", pos:null},
+  {id:"FTR-08",mod:"X3",el:"E2", st:"逻辑方向 × 实体子空间弱混合（全表唯一）：45.8/26.6/46.0° mixed，14b 有 2 个半能量共享方向；LOEO 稳健", pos:null}
+];
+var BRIDGES = [
+  {edge:"X1", type:"SxK", a:"GR", b:"KN", ftr:"FTR-05", angles:[67.0,71.9,74.0], band:"separable", p1:[-2.2,3.4,-6.4], p2:[-6.9,3.4,3.4], note:"GR↔KN：类词子空间与知识读出可分（细线=可分）"},
+  {edge:"X2", type:"RxS", a:"AR", b:"GR", ftr:"FTR-07", angles:[73.7,81.4,80.8], band:"separable", p1:[2.2,3.4,-6.4],  p2:[6.9,3.4,3.4],  note:"AR↔GR：逻辑方向与属性/语法子空间可分"},
+  {edge:"X3", type:"RxK", a:"AR", b:"KN", ftr:"FTR-08", angles:[45.8,26.6,46.0], band:"mixed",      p1:[6.6,3.4,4.9],  p2:[-6.6,3.4,4.9], note:"AR↔KN：全表唯一弱混合（26.6°）——唯一强耦合对（粗线）"}
+];
+var TRUNKS = [
+  {from:"KN", label:"内容轴（提供什么知识）", p1:[-6.6,1.0,4.5]},
+  {from:"AR", label:"真值轴（判断与转换）",   p1:[6.6,1.0,4.5]},
+  {from:"GR", label:"形式轴（如何组织）",     p1:[0,1.0,-5.9]}
+];
+var MECS = [
+  {id:"MEC-01", name:"attention 再分配执行消耗", floor:"E2", ftrs:["FTR-09","FTR-10","FTR-11"], note:"等价类动力学非继承；消耗无单点执行者=残差流冗余分布式（3159→3163 判闭）"},
+  {id:"MEC-02", name:"上下文二元门控",           floor:"E2", ftrs:["FTR-12"], beams:["KN","GR"], note:"跨模块服务：tm05（KN 实体×位置）+ tm02（GR 风格最小对）共用同一门控"},
+  {id:"MEC-03", name:"RoPE 纯相对编码（输出级）", floor:"E2", ftrs:["FTR-13"], note:"位置平移族输出不变；严格内部不变量未过"},
+  {id:"MEC-04", name:"残差流全流分布式读出",     floor:"E2", ftrs:["FTR-01"], note:"KOUT 读出 content 主导，逻辑轴中层显著"},
+  {id:"MEC-05", name:"读出-控制解耦（C_steer=0）", floor:"E3", ftrs:["FTR-16"], note:"读得出≠控得住：承重轴=生成稳定性轴非类身份杠杆"},
+  {id:"MEC-06", name:"k*/读出双轨判定",          floor:"E2", ftrs:["FTR-19"], note:"同一死线在 k* 层与读出层判定相反；k* model_specific"},
+  {id:"MEC-07", name:"局部薄邻域等价边界",       floor:"E2", ftrs:["FTR-15"], note:"商结构形式化不得再以「已确立」引用（F1）"}
+];
+var LINKS = [
+  ["is_a","FTR-01","a"],["is_a","FTR-02","a"],["is_a","FTR-17","a"],["is_a","FTR-18","a"],["is_a","FTR-04","a"],
+  ["is_a","FTR-20","a"],["is_a","FTR-21","a"],["is_a","FTR-22","a"],["is_a","FTR-25","a"],["is_a","FTR-26","a"],
+  ["attr","FTR-06","c"],["tm05","FTR-12","c"],["tm04","FTR-01","c"],["tm03","FTR-03","c"],["tm12","FTR-03","c"],
+  ["tm12","FTR-08","x"],["logic_tf","FTR-03","a"],["logic_tf","FTR-07","x"],["syntax","FTR-06","c"],
+  ["syntax","FTR-23","c"],["tm10","FTR-13","a"],["tm01","FTR-14","c"],["tm11","FTR-24","c"],["tm02","FTR-12","c"]
+];
+var GAPS = {templates:["part_of","tm06"], features:["FTR-05"], note:"特征口径=域族+交叉；机制层独占特征不计"};
+
+/* ===== 派生：桥上特征位置（贝塞尔 t=0.5）、节点索引 ===== */
+function bez(p1,p2,t){var mx=(p1[0]+p2[0])/2,my=Math.min(p1[1],p2[1])+1.6,mz=(p1[2]+p2[2])/2;
+  var u=1-t;return [u*u*p1[0]+2*u*t*mx+t*t*p2[0], u*u*p1[1]+2*u*t*my+t*t*p2[1], u*u*p1[2]+2*u*t*mz+t*t*p2[2]];}
+BRIDGES.forEach(function(b){ b.ctrl=[(b.p1[0]+b.p2[0])/2, Math.min(b.p1[1],b.p2[1])+1.6, (b.p1[2]+b.p2[2])/2];
+  var f=FTR.find(function(x){return x.id===b.ftr;}); f.pos=bez(b.p1,b.p2,0.5); b.fpos=f.pos; });
+var tplById={}, ftrById={};
+TPL.forEach(function(t){tplById[t.id]=t;}); FTR.forEach(function(f){ftrById[f.id]=f;});
+
+/* ===== 相机与投影 ===== */
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+var cam={yaw:0.55,pitch:0.36,dist:37,tgt:[0,2.4,0]}, camGoal=null, drag=null, lastAct=0, autoRot=true;
+var W=0,H=0;
+function resize(){var dpr=window.devicePixelRatio||1;W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
+window.addEventListener("resize",resize);
+function project(p){var dx=p[0]-cam.tgt[0],dy=p[1]-cam.tgt[1],dz=p[2]-cam.tgt[2];
+  var cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);var x1=dx*cy-dz*sy,z1=dx*sy+dz*cy;
+  var cp=Math.cos(cam.pitch),sp=Math.sin(cam.pitch);var y2=dy*cp-z1*sp,z2=dy*sp+z1*cp;
+  var per=26/(26+z2+cam.dist);return [W/2+x1*per*14, H/2-y2*per*14, per];}
+function seg(a,b,style,w,dash){var p1=project(a),p2=project(b);ctx.strokeStyle=style;ctx.lineWidth=w;
+  ctx.setLineDash(dash||[]);ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();ctx.setLineDash([]);}
+function ell(c,yz,r,fill,stroke,lw){var p=project([c[0],yz,c[2]]);
+  ctx.beginPath();ctx.ellipse(p[0],p[1],r*p[2]*14,r*p[2]*14*0.32,0,0,Math.PI*2);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke();}}
+function label(p,txt,font,col,align){ctx.fillStyle=col;ctx.font=font||"10px ui-monospace,Consolas,monospace";
+  ctx.textAlign=align||"left";ctx.fillText(txt,p[0],p[1]);ctx.textAlign="left";}
+
+/* ===== UI 状态 ===== */
+var modOn={KN:true,AR:true,GR:true}, edgeOn={a:true,c:true,x:true,b:true}, colorMode="elevel";
+document.querySelectorAll("[data-mod]").forEach(function(btn){
+  btn.onclick=function(){var m=btn.dataset.mod;modOn[m]=!modOn[m];btn.classList.toggle("on",modOn[m]);};});
+document.querySelectorAll("#edgeRow [data-ek]").forEach(function(btn){
+  btn.onclick=function(){var k=btn.dataset.ek;edgeOn[k]=!edgeOn[k];btn.classList.toggle("on",edgeOn[k]);};});
+document.querySelectorAll("[data-cm]").forEach(function(btn){
+  btn.onclick=function(){colorMode=btn.dataset.cm;document.querySelectorAll("[data-cm]").forEach(function(b){b.classList.toggle("on",b===btn);});};});
+var rotBtn=document.getElementById("rotBtn");
+rotBtn.onclick=function(){autoRot=!autoRot;rotBtn.classList.toggle("on",autoRot);};
+document.getElementById("resetBtn").onclick=function(){camGoal={yaw:0.55,pitch:0.36,dist:37,tgt:[0,2.4,0]};};
+
+var ECOL={E3:"#b45309",E2:"#1e5c22",E2h:"#177a53",E1:"#24558a"};
+var STCOL={measured:"#1e5c22",done:"#1e5c22",collecting:"#24558a",demo:"#64748b",pending:"#9aa4b1"};
+var ELBL={E3:"E3 因果",E2:"E2 可预测",E2h:"E2h 行为/留出",E1:"E1 可重复"};
+var STLBL={measured:"实测",done:"完成",collecting:"采集中",demo:"演示",pending:"待立项"};
+
+/* ===== 绘制 ===== */
+var picks=[];
+function nodeColor(n){
+  if(colorMode==="module"){var m=n.mod&&MODS[n.mod];return m?m.color:"#8a93a3";}
+  return n.kind==="tpl"?(STCOL[n.st]||"#8a93a3"):(ECOL[n.el]||"#8a93a3");
+}
+function draw(){
+  var i;
+  if(camGoal){var g=camGoal,L=function(a,b){return a+(b-a)*0.09;};
+    cam.yaw=L(cam.yaw,g.yaw);cam.pitch=L(cam.pitch,g.pitch);cam.dist=L(cam.dist,g.dist);
+    cam.tgt=cam.tgt.map(function(v,j){return L(v,g.tgt[j]);});
+    if(Math.abs(cam.yaw-g.yaw)<0.002&&Math.abs(cam.dist-g.dist)<0.05)camGoal=null;
+  } else if(!drag&&autoRot&&performance.now()-lastAct>2000){cam.yaw+=0.0022;}
+  ctx.clearRect(0,0,W,H);
+  picks=[];
+  /* 地面参考网格 */
+  for(i=-16;i<=16;i+=4){seg([i,0,-16],[i,0,16],"#e8edf3",1);seg([-16,0,i],[16,0,i],"#e8edf3",1);}
+  /* 三主干汇入 */
+  TRUNKS.forEach(function(t){
+    if(!modOn[t.from])return;
+    var c=MODS[t.from].color;
+    var p1=project(t.p1),p2=project([0,1.0,0]);
+    ctx.strokeStyle=c+"88";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();
+    var pm=project([(t.p1[0])*0.5,(t.p1[1]+1.0)/2+0.3,(t.p1[2])*0.5]);
+    label(pm,t.label,"10px system-ui","#52616f","center");
+  });
+  /* 机制竖井塔 */
+  ctx.strokeStyle="rgba(124,58,237,0.5)";ctx.lineWidth=2;
+  var b0=project([-1.3,0.4,0]),b1=project([1.3,0.4,0]),t0=project([-1.3,5.7,0]),t1=project([1.3,5.7,0]);
+  ctx.beginPath();ctx.moveTo(b0[0],b0[1]);ctx.lineTo(t0[0],t0[1]);ctx.moveTo(b1[0],b1[1]);ctx.lineTo(t1[0],t1[1]);ctx.stroke();
+  MECS.forEach(function(m,j){var y=1.0+j*0.62;
+    ell([0,y,0],y,1.5,"rgba(124,58,237,"+(m.floor==="E3"?"0.22":"0.12")+")","rgba(124,58,237,0.65)",1);
+    var p=project([0,y,0]);picks.push({x:p[0],y:p[1],r:9,kind:"mec",ref:m});
+  });
+  /* 汇合核 */
+  var core=project([0,6.3,0]);
+  var grd=ctx.createRadialGradient(core[0],core[1],2,core[0],core[1],16);
+  grd.addColorStop(0,"rgba(124,58,237,0.55)");grd.addColorStop(1,"rgba(124,58,237,0.05)");
+  ctx.fillStyle=grd;ctx.beginPath();ctx.arc(core[0],core[1],16,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="rgba(124,58,237,0.6)";ctx.lineWidth=1.2;ctx.stroke();
+  label([core[0]-18,core[1]-20],"汇合核 = next-token 条件化汇合（RDC 示意）","10px system-ui","#6d28d9");
+  /* 模块舱体 */
+  Object.keys(MODS).forEach(function(mid){
+    if(!modOn[mid])return;var m=MODS[mid],c=m.center,col=m.color;
+    if(mid==="KN"){
+      var h=m.half,cs=[[c[0]-h[0],c[1]-h[1],c[2]-h[2]],[c[0]+h[0],c[1]-h[1],c[2]-h[2]],[c[0]+h[0],c[1]-h[1],c[2]+h[2]],[c[0]-h[0],c[1]-h[1],c[2]+h[2]],
+                       [c[0]-h[0],c[1]+h[1],c[2]-h[2]],[c[0]+h[0],c[1]+h[1],c[2]-h[2]],[c[0]+h[0],c[1]+h[1],c[2]+h[2]],[c[0]-h[0],c[1]+h[1],c[2]+h[2]]];
+      var ed=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+      ctx.strokeStyle=col+"55";ctx.lineWidth=1;
+      ed.forEach(function(e){seg(cs[e[0]],cs[e[1]],col+"55",1);});
+      /* 内部网格线（晶格感） */
+      [0.34,0.67].forEach(function(f){
+        seg([c[0]-h[0]+2*h[0]*f,c[1]-h[1],c[2]-h[2]],[c[0]-h[0]+2*h[0]*f,c[1]-h[1],c[2]+h[2]],col+"22",1);
+        seg([c[0]-h[0],c[1]-h[1],c[2]-h[2]+2*h[2]*f],[c[0]+h[0],c[1]-h[1],c[2]-h[2]+2*h[2]*f],col+"22",1);
+      });
+    } else if(mid==="AR"){
+      /* 链式拱：三站连线 + 站台椭圆 */
+      seg([6.9,1.1,6.7],[10.0,1.8,7.5],col+"88",2);
+      seg([10.0,1.8,7.5],[13.1,2.5,6.7],col+"88",2);
+      [[6.9,1.1,6.7],[10.0,1.8,7.5],[13.1,2.5,6.7]].forEach(function(s){ell([s[0],s[1]-0.25,s[2]],s[1]-0.25,1.1,col+"14",col+"66",1);});
+      label(project([10,0.6,8.6]),"前提 → 门控 → 结论（链式假说示意）","10px system-ui","#9a6a52","center");
+    } else {
+      /* GR 环形 */
+      ctx.strokeStyle=col+"77";ctx.lineWidth=1.4;ctx.beginPath();
+      for(i=0;i<=40;i++){var th=i/40*Math.PI*2,p=project([c[0]+m.ring*Math.cos(th),c[1],c[2]+m.ring*Math.sin(th)]);
+        if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);}
+      ctx.stroke();
+      label(project([c[0],0.4,c[2]+m.ring+1.2]),"位置/顺序环（序列假说示意）","10px system-ui","#4d8577","center");
+    }
+    label(project([c[0],m===MODS.KN?4.6:4.2,c[2]]),mid+" "+m.name,"600 11px system-ui",col,"center");
+  });
+  /* 桥（弧线 + 分离度线宽） */
+  BRIDGES.forEach(function(b){
+    if(!edgeOn.b)return;var visA=modOn[b.a],visB=modOn[b.b];if(!visA&&!visB)return;
+    var mixed=b.band==="mixed";
+    ctx.strokeStyle=mixed?"#7c3aed":"#7c3aed66";ctx.lineWidth=mixed?3.2:1.4;
+    if(mixed)ctx.setLineDash([]);else ctx.setLineDash([7,4]);
+    ctx.beginPath();
+    for(i=0;i<=28;i++){var p=project(bez(b.p1,b.p2,i/28));if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);}
+    ctx.stroke();ctx.setLineDash([]);
+    var mp=project(bez(b.p1,b.p2,0.5));
+    label([mp[0]-24,mp[1]-10],b.edge+" "+b.type+" · "+b.angles.map(function(v){return v.toFixed(1);}).join("/"), mixed?"600 10.5px ui-monospace,monospace":"10px ui-monospace,monospace", mixed?"#6d28d9":"#8a7bb5");
+  });
+  /* 舱内关联边（links） */
+  LINKS.forEach(function(l){
+    var t=tplById[l[0]],f=ftrById[l[1]],k=l[2];
+    if(!t||!f||!f.pos)return;
+    if(!modOn[t.mod])return;
+    if(f.mod.indexOf("X")===0&&!edgeOn.b)return;
+    if(!edgeOn[k])return;
+    var isX=k==="x";
+    ctx.strokeStyle=isX?"#d97706cc":(k==="a"?MODS[t.mod].color+"aa":"#94a3b888");
+    ctx.lineWidth=isX?1.8:1;if(k==="c"||isX)ctx.setLineDash([5,4]);
+    var p1=project(t.pos),p2=project(f.pos);
+    ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();ctx.setLineDash([]);
+  });
+  /* 机制横梁（MEC-02 跨模块） */
+  MECS.forEach(function(m,j){
+    if(!m.beams)return;
+    var y=1.0+j*0.62;
+    m.beams.forEach(function(mid){
+      if(!modOn[mid])return;
+      var c=MODS[mid].center;
+      seg([0,y,0],[c[0]*0.62,2.6,c[2]*0.62],"rgba(124,58,237,0.4)",1.4,[6,3]);
+    });
+  });
+  /* 节点（深度排序） */
+  var nodes=[];
+  TPL.forEach(function(t){if(modOn[t.mod])nodes.push({kind:"tpl",ref:t,pos:t.pos,r:3.4+Math.log10(t.cells+1)*1.4});});
+  FTR.forEach(function(f){if(f.pos&&modOn[f.mod])nodes.push({kind:"ftr",ref:f,pos:f.pos,r:3.2});});
+  var projd=nodes.map(function(n){return {n:n,p:project(n.pos)};});
+  projd.sort(function(a,b){return a.p[2]-b.p[2];});
+  projd.forEach(function(q){
+    var n=q.n,p=q.p,col=nodeColor(n);
+    var gap=n.kind==="tpl"&&n.ref.gap;
+    ctx.beginPath();ctx.arc(p[0],p[1],n.r*Math.max(0.55,p[2]),0,Math.PI*2);
+    if(gap){ctx.fillStyle="#ffffff";ctx.fill();ctx.strokeStyle="#b91c1c";ctx.lineWidth=1.4;ctx.setLineDash([2,2]);ctx.stroke();ctx.setLineDash([]);}
+    else{ctx.fillStyle=col;ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=1;ctx.stroke();}
+    if(n.kind==="tpl"&&n.ref.tm){label([p[0]+n.r+3,p[1]+3],n.ref.tm,"9px ui-monospace,monospace","#52616f");}
+    if(n.kind==="ftr"){label([p[0]+n.r+3,p[1]+3],n.ref.id,"9px ui-monospace,monospace","#7a8494");}
+    if(gap){label([p[0]-4,p[1]-n.r-5],"gap","600 9px system-ui","#b91c1c","right");}
+    picks.push({x:p[0],y:p[1],r:n.r*Math.max(0.55,p[2])+3,kind:n.kind,ref:n.ref});
+  });
+  /* 缺口虚位（FTR-05 无模板 → X1 桥旁红点线） */
+  if(modOn.GR&&modOn.KN&&edgeOn.b){
+    var bp=project(bez(BRIDGES[0].p1,BRIDGES[0].p2,0.72));
+    ctx.fillStyle="#b91c1c";ctx.beginPath();ctx.arc(bp[0],bp[1],3.4,0,Math.PI*2);ctx.fill();
+    label([bp[0]+6,bp[1]+3],"FTR-05 无模板锚定（缺口虚位）","9.5px system-ui","#b91c1c");
+  }
+  /* 选中高亮 */
+  if(sel){picks.forEach(function(pk){
+    var id=pk.kind==="tpl"?pk.ref.id:(pk.kind==="ftr"?pk.ref.id:(pk.kind==="mec"?pk.ref.id:null));
+    if(id===sel){var p=picks.find(function(x){return x===pk;});
+      ctx.beginPath();ctx.arc(p.x,p.y,(p.r||8)+5,0,Math.PI*2);ctx.strokeStyle="#b45309";ctx.lineWidth=2;ctx.stroke();}
+  });}
+  requestAnimationFrame(draw);
+}
+
+/* ===== 交互 ===== */
+var sel=null;
+cv.addEventListener("mousedown",function(e){drag={btn:e.button,x:e.clientX,y:e.clientY,moved:0};camGoal=null;lastAct=performance.now();});
+window.addEventListener("mousemove",function(e){
+  if(!drag)return;
+  var dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved+=Math.abs(dx)+Math.abs(dy);
+  lastAct=performance.now();
+  if(drag.btn===2||e.shiftKey){var s=cam.dist*0.0016;var cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw);
+    cam.tgt[0]-=dx*cy*s;cam.tgt[2]-=dx*sy*s;cam.tgt[1]+=dy*s;}
+  else{cam.yaw+=dx*0.0055;cam.pitch=Math.max(-1.3,Math.min(1.3,cam.pitch+dy*0.0045));}
+  drag.x=e.clientX;drag.y=e.clientY;
+});
+window.addEventListener("mouseup",function(e){
+  var d=drag;drag=null;if(!d||d.moved>=5)return;
+  var rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  var best=null,bd=14;
+  picks.forEach(function(pk){var dd=Math.hypot(pk.x-mx,pk.y-my)-(pk.r||8);if(dd<bd){bd=dd;best=pk;}});
+  if(best){sel=best.kind==="tpl"?best.ref.id:(best.kind==="ftr"?best.ref.id:(best.kind==="mec"?best.ref.id:best.ref.edge));showDetail(best);}
+});
+cv.addEventListener("wheel",function(e){e.preventDefault();cam.dist=Math.max(14,Math.min(80,cam.dist*Math.exp(e.deltaY*0.001)));lastAct=performance.now();camGoal=null;},{passive:false});
+cv.addEventListener("contextmenu",function(e){e.preventDefault();});
+
+/* ===== 详情面板 ===== */
+function chip(cls,txt){return '<span class="chip '+cls+'">'+txt+"</span>";}
+function showDetail(pk){
+  var el=document.getElementById("detail"),h="",s1="",s2="",s3="";
+  if(pk.kind==="tpl"){var t=pk.ref;
+    var links=LINKS.filter(function(l){return l[0]===t.id;});
+    h='<div class="dt-head"><span class="fid mono">'+t.id+'</span><b>'+t.name+"</b>"+chip("st",(t.tm||"未注册")+" · "+STLBL[t.st])+(t.metric?chip("",t.metric):"")+(t.gap?chip("gap","缺口："+t.gap):"")+"</div>";
+    s1='<div class="dt-sec"><div class="h">对象档案（协议键：pat / tm / st / metric / ex）</div><div class="stmt mono">'+t.pat+"</div><div class=\"stmt\">例："+t.ex+"</div><div>"+chip("",t.family+" · prod "+t.cells+" cells")+"</div></div>";
+    s2='<div class="dt-sec"><div class="h">关联机制（'+links.length+" 条）</div>"+(links.length?links.map(function(l){
+      var f=ftrById[l[1]];var kcls=l[2]==="x"?"x":"";
+      return chip(kcls,(l[2]==="a"?"a 实测":(l[2]==="c"?"c 采集":"x 跨模块"))+" → "+l[1]+"（"+(f?ELBL[f.el]:"")+"）");
+    }).join(""):"<span class='none'>无锚定特征 —— 缺口</span>")+"</div>";
+    s3=t.gap?'<div class="dt-sec"><div class="h">缺口与边界</div><div class="stmt">'+t.gap+"（立项前此节点仅作占位，不得计入覆盖度）</div></div>":"";
+  } else if(pk.kind==="ftr"){var f=pk.ref;
+    var lks=LINKS.filter(function(l){return l[1]===f.id;});
+    var bridge=BRIDGES.find(function(b){return b.ftr===f.id;});
+    h='<div class="dt-head"><span class="fid mono">'+f.id+'</span><span class="badge '+(f.el==="E2h"?"e2h":f.el.toLowerCase())+'">'+ELBL[f.el]+"</span>"+(f.mod.indexOf("X")===0?chip("x",f.mod+" 跨域桥 · "+bridge.type):chip("",MODS[f.mod]?MODS[f.mod].name:f.mod))+"</div>";
+    s1='<div class="dt-sec"><div class="h">定判读数（statement 摘要）</div><div class="stmt">'+f.st+"</div></div>";
+    s2='<div class="dt-sec"><div class="h">锚定模板</div>'+(lks.length?lks.map(function(l){return chip("",(l[2]==="a"?"a":(l[2]==="c"?"c":"x"))+" "+l[0]+"（"+tplById[l[0]].name+"）");}).join(""):"<span class='none'>无模板锚定（缺口虚位）</span>")+"</div>";
+    s3=bridge?'<div class="dt-sec"><div class="h">跨域分离度（主角角度 · 三模型）</div><div class="ang">'+bridge.angles.map(function(v,j){return '<div class="a"><div class="v">'+v.toFixed(1)+"°</div><div class=\"l\">"+["qwen3-4b","qwen3-14b","glm4-9b"][j]+"</div></div>";}).join("")+'</div><div class="stmt" style="margin-top:6px">'+bridge.band+" · "+bridge.note+"</div></div>":"";
+  } else if(pk.kind==="mec"){var m=pk.ref;
+    h='<div class="dt-head"><span class="fid mono">'+m.id+'</span><b>'+m.name+"</b>"+chip("st","底座 "+m.floor)+"</div>";
+    s1='<div class="dt-sec"><div class="h">机制档案</div><div class="stmt">'+m.note+"</div></div>";
+    s2='<div class="dt-sec"><div class="h">成员特征</div>'+m.ftrs.map(function(id){return chip("",id);}).join("")+"</div>";
+    s3=m.beams?'<div class="dt-sec"><div class="h">跨模块服务</div><div class="stmt">横梁 → '+m.beams.join(" + ")+"（图中紫色虚线梁）</div></div>":'<div class="dt-sec"><div class="h">跨模块服务</div><div class="stmt">当前为模块内机制，无横梁</div></div>';
+  }
+  el.innerHTML=h+s1+s2+s3;
+}
+
+/* ===== 图例 ===== */
+document.getElementById("legend").innerHTML=
+  '<span><i style="background:#1e5c22"></i>E2</span><span><i style="background:#177a53"></i>E2h</span><span><i style="background:#24558a"></i>E1</span>'+
+  '<span><i style="background:#b45309"></i>E3</span><span><span class="ln" style="border-color:#64748b"></span>演示/待立项</span>'+
+  '<span><span class="ln" style="border-color:#24558a"></span>a 实测</span><span><span class="ln" style="border-color:#94a3b8;border-top-style:dashed"></span>c 采集</span>'+
+  '<span><span class="ln" style="border-color:#d97706;border-top-style:dashed"></span>x 跨模块</span><span><span class="ln" style="border-color:#7c3aed"></span>桥（细=可分 粗=弱混合）</span>'+
+  '<span><span class="ln" style="border-color:rgba(124,58,237,.5)"></span>机制横梁</span><span><i style="border:1.4px dashed #b91c1c;background:#fff"></i>缺口模板</span>';
+
+resize();draw();
+</script>
+</body>
+</html>

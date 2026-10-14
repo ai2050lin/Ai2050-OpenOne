@@ -42,16 +42,17 @@
 ### D6（无重复）路线透镜「行业进展」tab
 - EraTimeline（时间轴）与 PEERS 对比卡（同行横向）叙事轴不同，非重复。
 
-## 3 删除清单（待确认）
+## 3 删除清单（已执行，2026-10-13 用户确认）
 
-| # | 对象 | 动作 | 影响 |
+| # | 对象 | 动作 | 结果 |
 |---|---|---|---|
-| 1 | AtlasPanorama.jsx + map 模式按钮 | 删除 | -200 行；泳道 CSS 段清理 |
-| 2 | AtlasGallery.jsx + gallery 模式按钮 | 删除（组件留档 git 即可） | -355 行；gallery3d 派生段保留 |
-| 3 | AtlasTree.jsx 或卡片模式 | 删除其一（建议删 AtlasTree） | -123 行 |
-| 4 | 对应 CSS 段（at-tree-*、at-gal-* 等） | 随组件清理 | 瘦身 rdc_fusion.css |
+| 1 | map 模式（AtlasLens 内） | 撤下模式按钮与渲染行 | **AtlasPanorama.jsx 保留**——执行中发现总览 home 首屏主体（RdcFusionWorkspace:113）仍引用，仅退出图谱全景 |
+| 2 | AtlasGallery.jsx + gallery 模式 | 删除 | -355 行；at-space-*/at-gal-* CSS 段随删；gallery3d 派生数据段按 append-only 保留 |
+| 3 | AtlasTree.jsx + list 模式 | 删除 | -123 行；at-tree-* CSS 随删（at-tree-mechs 机制过滤条样式恢复给 AtlasPanorama——其为该类唯一剩余使用家） |
+| 4 | 对应 CSS 段 | 已清理 | rdc_fusion.css 净 -约 90 行 |
 
-**净效果**：六模式 → 三模式（模块 / 模板空间 / 卡片），约 -680 行，且每类表达对象只剩一个家（唯一家原则）。
+**净效果**：全景六模式 → **模块 / 模板空间 / 卡片** 三模式；组件文件 -2 个（-478 行 jsx）+ CSS -约 90 行。vite build 全过（8.07s）。
+遗留挂账：总览首屏仍用旧泳道视图，后续可评估替换为模块视图只读态（未在本轮执行）。
 
 ## 4 保留理由摘要
 

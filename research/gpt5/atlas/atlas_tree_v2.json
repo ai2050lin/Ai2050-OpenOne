@@ -2,12 +2,12 @@
  "schema": "atlas_tree_v2",
  "design": "design/atlas_module_view_scheme_v1.md",
  "derived_from": {
-  "registry_version": "30",
-  "registry_file": "atlas_registry_v1_30.json",
-  "registry_file_sha8": "c11d13bd",
-  "ledger_measurements": 382,
-  "ledger_sha256_8": "3cba5317",
-  "ledger_file_sha8": "78b44910"
+  "registry_version": "31",
+  "registry_file": "atlas_registry_v1_31.json",
+  "registry_file_sha8": "ef5189e7",
+  "ledger_measurements": 383,
+  "ledger_sha256_8": "271cdbf2",
+  "ledger_file_sha8": "fa320fe3"
  },
  "modules": [
   {
@@ -1108,5 +1108,633 @@
   }
  ],
  "space3d_note": "模板 pos 为模块聚簇+黄金角派生坐标，非模型真实几何（scheme §9）",
- "tree_sha256_8": "9d60827a"
+ "module_space": {
+  "schema": "module_space.v1",
+  "design": "design/atlas_module_space3d_scheme_v1.md",
+  "modules": {
+   "KN": {
+    "shape": "lattice",
+    "half": [
+     3.6,
+     2.2,
+     3.6
+    ],
+    "layout_r": 2.8,
+    "center": [
+     -10.0,
+     2.0,
+     4.5
+    ],
+    "color": "#0ea5e9"
+   },
+   "AR": {
+    "shape": "chain",
+    "layout_r": 2.6,
+    "center": [
+     10.0,
+     1.8,
+     4.5
+    ],
+    "color": "#d85a30"
+   },
+   "GR": {
+    "shape": "ring",
+    "radius": 3.2,
+    "inner_r": 1.8,
+    "center": [
+     0.0,
+     1.8,
+     -9.0
+    ],
+    "color": "#059669"
+   }
+  },
+  "nodes": [
+   {
+    "kind": "tpl",
+    "ref": "is_a",
+    "mod": "KN",
+    "gap": false,
+    "pos": [
+     -9.02,
+     2.0,
+     4.5
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "attr",
+    "mod": "KN",
+    "gap": false,
+    "pos": [
+     -11.1768,
+     2.3967,
+     5.5781
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "part_of",
+    "mod": "KN",
+    "gap": true,
+    "pos": [
+     -9.7718,
+     1.8978,
+     1.8998
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm06",
+    "mod": "KN",
+    "gap": true,
+    "pos": [
+     -7.9696,
+     1.6297,
+     7.1483
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm05",
+    "mod": "KN",
+    "gap": false,
+    "pos": [
+     -13.3914,
+     2.1976,
+     3.9001
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm04",
+    "mod": "KN",
+    "gap": false,
+    "pos": [
+     -6.5744,
+     2.3194,
+     2.3209
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm03",
+    "mod": "AR",
+    "gap": false,
+    "pos": [
+     10.91,
+     1.8,
+     4.5
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm12",
+    "mod": "AR",
+    "gap": false,
+    "pos": [
+     8.9072,
+     2.1967,
+     5.5011
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "logic_tf",
+    "mod": "AR",
+    "gap": false,
+    "pos": [
+     10.1796,
+     1.6978,
+     2.4539
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "syntax",
+    "mod": "GR",
+    "gap": false,
+    "pos": [
+     2.8083,
+     1.8,
+     -7.4658
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm10",
+    "mod": "GR",
+    "gap": false,
+    "pos": [
+     -3.107,
+     2.0839,
+     -8.2343
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm01",
+    "mod": "GR",
+    "gap": false,
+    "pos": [
+     1.7738,
+     1.6164,
+     -11.6634
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm11",
+    "mod": "GR",
+    "gap": false,
+    "pos": [
+     0.4911,
+     1.6348,
+     -5.8379
+    ]
+   },
+   {
+    "kind": "tpl",
+    "ref": "tm02",
+    "mod": "GR",
+    "gap": false,
+    "pos": [
+     -2.4981,
+     2.0904,
+     -10.9999
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-01",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -8.0,
+     2.2,
+     4.5
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-02",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -11.6075,
+     2.2,
+     5.9726
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-17",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -9.7937,
+     2.2,
+     2.149
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-18",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -8.4546,
+     2.2,
+     6.5157
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-04",
+    "mod": "KN",
+    "gap": false,
+    "band": "E1_repeatable",
+    "pos": [
+     -12.6784,
+     1.1,
+     4.0262
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-20",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -7.5531,
+     2.2,
+     2.9435
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-21",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -10.7996,
+     2.2,
+     7.4744
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-22",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -11.4749,
+     2.2,
+     1.6602
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-25",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_behavioral",
+    "pos": [
+     -6.9942,
+     2.0,
+     5.5977
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-26",
+    "mod": "KN",
+    "gap": false,
+    "band": "E2_behavioral",
+    "pos": [
+     -12.9579,
+     2.0,
+     5.721
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-03",
+    "mod": "AR",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     10.0,
+     2.0,
+     5.7
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-06",
+    "mod": "GR",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     1.8,
+     2.0,
+     -9.0
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-12",
+    "mod": "GR",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -1.3273,
+     2.0,
+     -7.7841
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-13",
+    "mod": "GR",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     0.1574,
+     2.0,
+     -10.7931
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-14",
+    "mod": "GR",
+    "gap": false,
+    "band": "E1_repeatable",
+    "pos": [
+     1.0952,
+     0.9,
+     -7.5715
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-23",
+    "mod": "GR",
+    "gap": false,
+    "band": "E2_held_out",
+    "pos": [
+     -1.7725,
+     2.75,
+     -9.3135
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-24",
+    "mod": "GR",
+    "gap": false,
+    "band": "E1_repeatable",
+    "pos": [
+     1.5188,
+     0.9,
+     -9.9661
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-05",
+    "mod": "X1",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     -4.9405,
+     4.2,
+     -2.3304
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-07",
+    "mod": "X2",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     5.0595,
+     4.2,
+     -2.1696
+    ]
+   },
+   {
+    "kind": "ftr",
+    "ref": "FTR-08",
+    "mod": "X3",
+    "gap": false,
+    "band": "E2_predictive",
+    "pos": [
+     0.2,
+     4.2,
+     4.5
+    ]
+   }
+  ],
+  "bridges": [
+   {
+    "edge": "X1",
+    "type": "SxK",
+    "mods": [
+     "GR",
+     "KN"
+    ],
+    "ftr": "FTR-05",
+    "angles": {
+     "angle_4b_deg": 67.0,
+     "angle_14b_deg": 71.9,
+     "angle_glm4_deg": 74.014
+    },
+    "angle_min": 67.0,
+    "band": "separable",
+    "band_gate_deg": 30.0,
+    "p1": [
+     -2.3809,
+     3.4,
+     -5.7858
+    ],
+    "p2": [
+     -7.5,
+     3.4,
+     1.1251
+    ],
+    "ctrl": [
+     -4.9405,
+     5.0,
+     -2.3304
+    ],
+    "mid": [
+     -4.9405,
+     4.2,
+     -2.3304
+    ]
+   },
+   {
+    "edge": "X2",
+    "type": "RxS",
+    "mods": [
+     "AR",
+     "GR"
+    ],
+    "ftr": "FTR-07",
+    "angles": {
+     "angle_4b_deg": 73.704,
+     "angle_14b_deg": 81.381,
+     "angle_glm4_deg": 80.77
+    },
+    "angle_min": 73.704,
+    "band": "separable",
+    "band_gate_deg": 30.0,
+    "p1": [
+     7.7381,
+     3.4,
+     1.4465
+    ],
+    "p2": [
+     2.3809,
+     3.4,
+     -5.7858
+    ],
+    "ctrl": [
+     5.0595,
+     5.0,
+     -2.1696
+    ],
+    "mid": [
+     5.0595,
+     4.2,
+     -2.1696
+    ]
+   },
+   {
+    "edge": "X3",
+    "type": "RxK",
+    "mods": [
+     "AR",
+     "KN"
+    ],
+    "ftr": "FTR-08",
+    "angles": {
+     "angle_4b_deg": 45.845,
+     "angle_14b_deg": 26.641,
+     "angle_glm4_deg": 46.005
+    },
+    "angle_min": 26.641,
+    "band": "mixed",
+    "band_gate_deg": 30.0,
+    "p1": [
+     6.2,
+     3.4,
+     4.5
+    ],
+    "p2": [
+     -5.8,
+     3.4,
+     4.5
+    ],
+    "ctrl": [
+     0.2,
+     5.0,
+     4.5
+    ],
+    "mid": [
+     0.2,
+     4.2,
+     4.5
+    ]
+   }
+  ],
+  "trunks": [
+   {
+    "from": "KN",
+    "axis": "内容轴（提供什么知识）",
+    "p1": [
+     -6.6,
+     1.0,
+     4.5
+    ]
+   },
+   {
+    "from": "AR",
+    "axis": "真值轴（判断与转换）",
+    "p1": [
+     6.6,
+     1.0,
+     4.5
+    ]
+   },
+   {
+    "from": "GR",
+    "axis": "形式轴（如何组织）",
+    "p1": [
+     0.0,
+     1.0,
+     -5.9
+    ]
+   }
+  ],
+  "tower": {
+   "slabs": [
+    {
+     "id": "MEC-01",
+     "y": 1.0
+    },
+    {
+     "id": "MEC-02",
+     "y": 1.62
+    },
+    {
+     "id": "MEC-03",
+     "y": 2.24
+    },
+    {
+     "id": "MEC-04",
+     "y": 2.86
+    },
+    {
+     "id": "MEC-05",
+     "y": 3.48
+    },
+    {
+     "id": "MEC-06",
+     "y": 4.1
+    },
+    {
+     "id": "MEC-07",
+     "y": 4.72
+    }
+   ],
+   "core": [
+    0.0,
+    6.3,
+    0.0
+   ]
+  },
+  "mech_beams": [
+   {
+    "mec": "MEC-02",
+    "mods": [
+     "GR",
+     "KN"
+    ],
+    "y": 1.62
+   }
+  ],
+  "note": "三舱形态（晶格/链/环）为组织假说示意（确定性派生布局），非模型真实几何；桥 band 由 registry 角度值对预注册门 30° 判定；npz 真实坐标接入后仅替换节点 pos"
+ },
+ "tree_sha256_8": "474e5819"
 }

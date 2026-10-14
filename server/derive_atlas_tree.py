@@ -153,6 +153,160 @@ TEMPLATE_LINKS = [
     ("tm01", "FTR-14", "c"), ("tm11", "FTR-24", "c"), ("tm02", "FTR-12", "c"),
 ]
 
+# ================= 模块空间 v1（design/atlas_module_space3d_scheme_v1.md §3） =================
+# 布点/几何常量 = 布局决策（预注册；改动须走预注册）。角度/证据级等实验读数只从 registry 派生。
+MS_MOD_CENTERS = {"KN": (-10.0, 2.0, 4.5), "AR": (10.0, 1.8, 4.5), "GR": (0.0, 1.8, -9.0)}
+MS_SHAPES = {
+    "KN": {"shape": "lattice", "half": [3.6, 2.2, 3.6], "layout_r": 2.8},
+    "AR": {"shape": "chain", "layout_r": 2.6},
+    "GR": {"shape": "ring", "radius": 3.2, "inner_r": 1.8},
+}
+MS_SHELL_R = {"KN": 4.2, "AR": 3.8, "GR": 4.0}          # 桥端点到舱心距离（舱面）
+MS_BRIDGE_H = 3.4                                        # 桥面高度
+MS_BRIDGE_ARC = 1.6                                      # 桥拱控制点抬升
+MS_BAND_GATE_DEG = 30.0                                  # 可分门（预注册协议常量，registry 角度判定 band）
+MS_BAND_Y = {"E3_causal_scoped": 1.2, "E2_held_out": 0.95,
+             "E2_predictive": 0.2, "E1_repeatable": -0.9}  # E 级分带高度（相对舱心 y）
+MS_TRUNKS = [
+    {"from": "KN", "axis": "内容轴（提供什么知识）", "p1": [-6.6, 1.0, 4.5]},
+    {"from": "AR", "axis": "真值轴（判断与转换）", "p1": [6.6, 1.0, 4.5]},
+    {"from": "GR", "axis": "形式轴（如何组织）", "p1": [0.0, 1.0, -5.9]},
+]
+MS_TOWER_SLAB0 = 1.0
+MS_TOWER_SLAB_DY = 0.62
+MS_TOWER_CORE = [0.0, 6.3, 0.0]
+
+
+def _r4(v):
+    return [round(x, 4) for x in v]
+
+
+def _quad_bez(p1, ctrl, p2, t):
+    u = 1.0 - t
+    return [u * u * p1[i] + 2 * u * t * ctrl[i] + t * t * p2[i] for i in range(3)]
+
+
+def build_module_space(domains, cross, mecs, values_idx, derived_from):
+    """module_space.v1（scheme §3）：三舱一塔三桥，全部确定性派生。
+
+    - 桥 band 由 registry 角度值对预注册门 30° 判定（separable/mixed），零实验字面量；
+    - 节点只携带 ref（id），statement/模板详情由 UI 从同档 modules/cross_links/mechanisms join；
+    - 机制层独占特征不作空间节点（挂在塔楼层盘 MEC 上），与 gaps.note 口径一致。
+    """
+    tpl_ids = [t["id"] for t in TEMPLATES]
+    mod_of_tpl = {t["id"]: t["mod"] for t in TEMPLATES}
+    gap_tpls = {t["id"] for t in TEMPLATES if not any(tid == t["id"] for tid, _, _ in TEMPLATE_LINKS)}
+
+    def shell_end(a, b):
+        ax, ay, az = MS_MOD_CENTERS[a]
+        bx, _, bz = MS_MOD_CENTERS[b]
+        dx, dz = bx - ax, bz - az
+        ln = math.hypot(dx, dz)
+        return [round(ax + dx / ln * MS_SHELL_R[a], 4), MS_BRIDGE_H,
+                round(az + dz / ln * MS_SHELL_R[a], 4)]
+
+    bridges = []
+    bridge_mid = {}
+    for x in cross:
+        da, db = x["domains"]
+        fid = x["features"][0]
+        angs = {k: v for k, v in (values_idx.get(fid) or {}).items()
+                if k.startswith("angle_") and isinstance(v, (int, float))}
+        amin = min(angs.values()) if angs else None
+        band = "unknown" if amin is None else ("separable" if amin >= MS_BAND_GATE_DEG else "mixed")
+        p1, p2 = shell_end(da, db), shell_end(db, da)
+        ctrl = [(p1[0] + p2[0]) / 2, MS_BRIDGE_H + MS_BRIDGE_ARC, (p1[2] + p2[2]) / 2]
+        mid = _r4(_quad_bez(p1, ctrl, p2, 0.5))
+        bridge_mid[fid] = mid
+        bridges.append({"edge": x["edge"], "type": x["type"], "mods": [da, db], "ftr": fid,
+                        "angles": angs, "angle_min": None if amin is None else round(amin, 4),
+                        "band": band, "band_gate_deg": MS_BAND_GATE_DEG,
+                        "p1": p1, "p2": p2, "ctrl": _r4(ctrl), "mid": mid})
+
+    nodes = []
+    # 1) 模板节点（舱内确定性布点；缺口模板外推至舱缘）
+    for mod in ("KN", "AR", "GR"):
+        c = MS_MOD_CENTERS[mod]
+        arr = [t for t in TEMPLATES if t["mod"] == mod]
+        if mod == "GR":
+            rr = MS_SHAPES["GR"]["radius"]
+            for i, t in enumerate(arr):
+                a = i * GOLDEN + 0.5
+                nodes.append({"kind": "tpl", "ref": t["id"], "mod": mod, "gap": t["id"] in gap_tpls,
+                              "pos": _r4([c[0] + rr * math.cos(a), c[1] + 0.3 * math.sin(i * 1.9),
+                                          c[2] + rr * math.sin(a)])})
+        else:
+            lr = MS_SHAPES[mod]["layout_r"]
+            for i, t in enumerate(arr):
+                r = lr * (0.35 + 0.22 * i) * (1.18 if t["id"] in gap_tpls else 1.0)
+                a = i * GOLDEN
+                nodes.append({"kind": "tpl", "ref": t["id"], "mod": mod, "gap": t["id"] in gap_tpls,
+                              "pos": _r4([c[0] + r * math.cos(a), c[1] + 0.4 * math.sin(i * 1.7),
+                                          c[2] + r * math.sin(a)])})
+    # 2) 舱内特征节点（E 级分带高度）
+    for d in domains:
+        mod = d["id"]
+        c = MS_MOD_CENTERS[mod]
+        j = 0
+        for fam in d["families"]:
+            for f in fam["features"]:
+                off = MS_BAND_Y.get(f["evidence_level"], 0.0)
+                if mod == "GR":
+                    rr = MS_SHAPES["GR"]["inner_r"]
+                    pos = [c[0] + rr * math.cos(j * GOLDEN), c[1] + off,
+                           c[2] + rr * math.sin(j * GOLDEN)]
+                elif mod == "KN":
+                    rr = min(2.0 + 0.18 * j, 3.2)
+                    pos = [c[0] + rr * math.cos(j * GOLDEN), c[1] + off,
+                           c[2] + rr * math.sin(j * GOLDEN)]
+                else:
+                    pos = [c[0], c[1] + off, c[2] + 1.2]
+                nodes.append({"kind": "ftr", "ref": f["id"], "mod": mod, "gap": False,
+                              "band": f["evidence_level"], "pos": _r4(pos)})
+                j += 1
+    # 3) 桥上跨域特征节点（弧线 t=0.5）
+    for x in cross:
+        for fid in x["features"]:
+            nodes.append({"kind": "ftr", "ref": fid, "mod": x["edge"], "gap": False,
+                          "band": (x["detail"][0]["evidence_level"]
+                                   if x["detail"] else None),
+                          "pos": bridge_mid[fid]})
+
+    # 断言：模板/域特征/交叉特征恰好各一次
+    tpl_refs = [n["ref"] for n in nodes if n["kind"] == "tpl"]
+    ftr_refs = [n["ref"] for n in nodes if n["kind"] == "ftr"]
+    assert sorted(tpl_refs) == sorted(tpl_ids), "module_space tpl coverage mismatch"
+    dom_fids = [f["id"] for d in domains for fam in d["families"] for f in fam["features"]]
+    cross_fids = [fid for x in cross for fid in x["features"]]
+    assert sorted(ftr_refs) == sorted(dom_fids + cross_fids), "module_space ftr coverage mismatch"
+
+    # 机制横梁：MEC 成员特征被 ≥2 模块的模板关联时向对应舱发梁（跨模块机制）
+    ftr_mods = {}
+    for tid, fid, _k in TEMPLATE_LINKS:
+        ftr_mods.setdefault(fid, set()).add(mod_of_tpl[tid])
+    mech_beams = []
+    for i, m in enumerate(mecs):
+        mods = sorted({mm for f in m["features"] for mm in ftr_mods.get(f["id"], set())})
+        if len(mods) >= 2:
+            mech_beams.append({"mec": m["id"], "mods": mods,
+                               "y": round(MS_TOWER_SLAB0 + i * MS_TOWER_SLAB_DY, 4)})
+
+    return {
+        "schema": "module_space.v1",
+        "design": "design/atlas_module_space3d_scheme_v1.md",
+        "modules": {m: {**MS_SHAPES[m], "center": list(MS_MOD_CENTERS[m]),
+                        "color": MOD_META[m]["color"]} for m in ("KN", "AR", "GR")},
+        "nodes": nodes,
+        "bridges": bridges,
+        "trunks": MS_TRUNKS,
+        "tower": {"slabs": [{"id": m["id"], "y": round(MS_TOWER_SLAB0 + i * MS_TOWER_SLAB_DY, 4)}
+                            for i, m in enumerate(mecs)],
+                  "core": MS_TOWER_CORE},
+        "mech_beams": mech_beams,
+        "note": "三舱形态（晶格/链/环）为组织假说示意（确定性派生布局），非模型真实几何；"
+                "桥 band 由 registry 角度值对预注册门 30° 判定；npz 真实坐标接入后仅替换节点 pos",
+    }
+
 
 def sha8_bytes(b):
     return hashlib.sha256(b).hexdigest()[:8]
@@ -533,6 +687,9 @@ def build():
     tree["tree_sha256_8"] = sha8_bytes(payload)
 
     tree2 = build_v2(domains, cross, mecs, coverage, idx, tree["derived_from"])
+    # module_space.v1：角度等实验读数直接从 registry values 派生（不改动 idx，v1 输出字节不受影响）
+    values_idx = {f["id"]: f.get("values", {}) for f in reg.get("features", [])}
+    tree2["module_space"] = build_module_space(domains, cross, mecs, values_idx, tree["derived_from"])
     payload2 = json.dumps(tree2, ensure_ascii=False, indent=1, sort_keys=False).encode("utf-8")
     tree2["tree_sha256_8"] = sha8_bytes(payload2)
     return tree, tree2

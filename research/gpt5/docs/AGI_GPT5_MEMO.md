@@ -16815,3 +16815,133 @@ cos(dR,v_isa)=−0.2463/−0.0547、cos(dR,v_hasa)=+0.0606/+0.1067 → **|cos|<0
 ### 预注册 Phase 3231（两支候选）
 - (a) **G5-G28 registry 决策臂**（默认）：按 3230 verdict 路由——F20 refinement append（配方普适化定论：dR 亦非杠杆 + 传递正交机制 + 解耦诊断）+ GAP-5 mechanism_note append（三层图景第二配方确证）+ FTR-24/25/26 scope_limits 注记；registry v1.31、gap v1.9；
 - (b) **GD_amp 扩样臂**：n=4 → n=10 类（3169 全类崩塌幅度 + 3225 npz u* 逐类投影，纯算术）——裁决幅度承载假设。
+
+
+## Phase 3231: G5-G28 registry 决策臂 [2026-10-13 11:40]
+
+**执行模式**：零 GPU 纯算术装配（默认 (a)，按 3230 预注册；K1 纯入册臂——无新观测、不重开任何门，只执行 3230 verdict 路由的 registry/gap append）。freeze **`45a130ea`**（任何装配前封存，K1–K5 澄清在案）；res **`54e55c7a`**；verdict **`f20_refinement_registered`**（0 矛盾）；账本只读（n=382 post `3cba5317` before==after），本 closeout 追加 #383。
+
+### S1 完整性重算（封存 3230 npz `d430d29e`）
+d0_mean / dD(α=0.5,1,2) / GA_flip(4 seen 折，3154 掩码) / cos(dR,dR_raw) 自封存 npz **逐位复现** ×2 模型；GB 单调 ×2 True；GA flip 全 0。装配建立在已封存事实之上，无任何新数字。
+
+### S2 registry v1.30 → v1.31（file `ef5189e7` / content `4b6648c2`，源 v1.30 `c11d13bd`）
+- **F20 refinement append**（新增 append-only `refinements` 键，既有字段逐位保全）：配方普适化定论——状态对比方向 dR=mean(h[isa])−mean(h[hasa])（3157 面板，NH−1 槽，|dR|=16.40/20.72 ≈ 行态 RMS 7–9×）在末层精确线性读出图上同样**不是行为杠杆**：GA_flip 0/4 折 ×2 模型 ×全 α（null 带亦 0），尽管 GB_dir PASS（dD 严格单调 +0.3545/+0.3263 @α1，dR_neg 完美镜像）。机制归因=**传递正交** cos(dR, unit(W_isa−W_hasa))=+0.0997/+0.0625，Δm@α2 0.71/0.65 ≪ |d0| 3.97/4.69；解耦诊断 cos(dR,v_isa)=−0.2463/−0.0547 排除配方反平行解释。**两个方向族以不同方式非杠杆（u_R 反方向；dR 同方向但读出近正交）——「读出几何≠行为控制」获第二配方独立确证。**
+- **FTR-24/25/26 scope_limits append**：dR 第二配方 FAIL 是行为杠杆地位的进一步反证，不改变几何带 E 级（E2_held_out 等）与既有锚。
+- 字节保全断言：23 特征逐位不变 + failures[:19] + upgrade_log(11) 不动 + 顶层字段不变。
+
+### S3 gap v1.8 → v1.9（file `9fca29bd` / content `83dac915`，源 v1.8 `7065ec4e`）
+GAP-5 mechanism_note append（三段式三层图景第二配方确证：上游编码承载行为 → 末层精确线性投影 → post-softmax 分布级非线性；行为杠杆须在上游机制中寻找）；legacy gaps ×4 逐位不变。
+
+### 独立复核（verify.json，12/12 PASS）
+V1–V3 身份/sha 锚、V4 smoke 隔离、V5–V6 源锚未漂移、V7 npz 重算逐位、**V8 cos(dR,Δw) 自 sha-pinned W_U 切片独立重算 0.099659/0.062541**、V9 registry 字节保全、V10 F20 文本数字 vs 封存值、V11 gap 字节保全、V12 账本头未动。V10 初跑 FAIL 系 verify 探针 en-dash（`7–9`）误查 ASCII 连字符，按纪律只修 verify 不动封存产物，复跑全 PASS。
+
+### 预注册 Phase 3232（候选）
+- (a) **GD_amp 扩样臂**（默认）：n=4 → n=10 类（3169 全类崩塌幅度 + 3225 npz u* 逐类投影，纯算术）——裁决 u*_amplitude_carrier 幅度承载假设的类数稳健性；
+- (b) GAP-5 上游机制臂设计（FTR-22 残留挂账口径 closed@3175 已清，上游杠杆候选扫描需先立项设计）。
+
+
+## Phase 3232: G5-G29 GD_amp 类数稳健性扩样臂 [2026-10-13 11:57]
+
+**执行模式**：零 GPU CPU 矩阵运算（默认 (a)，按 3231 预注册）；design **`a636d023`**（任何门控观测前冻结）；res **`89fb1440`** / seal **`653933fe`**、npz **`0bbe1f42`**、gap v1.10 **`378de1cd`**、verdict **`GD_AMP_CLASS_ROBUST`**；registry v1.31 未动（`ef5189e7`）；账本只读（n=383 post `271cdbf2` before==after），closeout 追加 #384。
+
+### 问题与设计
+3192 的 u*_amplitude_carrier（amp_ratio 10.60/7.11/8.89 ≥1.3 ×3）是**池化**口径（876 OOV 行 4 类合判）。本臂把分析单元扩到 **n=10 逐类**（4 OOV + 6 seen）：同一封存残差链（3169 B 口径 verbatim，seeds 7/8/9，ridge λ=1e-3）+ 链内重算 u* ×3 模型（3225 npz ustar 外部锚：cos=0.99999988 ≥1−1e-6、med_abs drift==0）。门（冻结在先）：**G1** 逐 OOV 类 amp_ratio_c ≥1.3 于 ≥3/4 类 ×≥2/3 模型；**G2** class_ratio = med(4 OOV 类幅)/med(6 seen 类幅) ≥1.3 ×≥2/3 模型；双过 ⇒ ROBUST。
+
+### C1 修正（观测前登记，诚实记录）
+首次 SMOKE 在 3192 池化锚逐位断言处崩——med_amp 经 SVD 奇异**向量** u* 传导，跨运行 BLAS 线程抖动 ~5e-4 rad（cos(u*_run, u*_3225npz)=0.99999988）；而全部**标量锚**（3189/3190/3191，不依赖 Vt[0] 方向）保持 drift==0 逐位。崩点在任何逐类观测计算之前 ⇒ 池化锚改相对容差 1e-6（实测 1.6e-9；独立复核在本机复算 rel=0.00e+00）。
+
+### 观测（主臂，×3 模型）
+| 模型 | amp_ratio_c（4 OOV 类） | class_ratio | G1/G2 | spearman(amp,崩塌) |
+|---|---|---|---|---|
+| qwen3-4b | 10.18/9.96/12.21/10.08 | 9.6117 | PASS/PASS | 0.794 |
+| qwen3-14b | 6.65/7.06/8.50/6.57 | 7.1420 | PASS/PASS | 0.830 |
+| glm4-9b | 9.19/8.30/10.30/7.97 | 9.1832 | PASS/PASS | 0.830 |
+
+### verdict
+- **重复一**：G1 3/3 × 4/4 类、G2 3/3 全过（最低单类 6.57 仍为门 1.3 的 5 倍）——**u*_amplitude_carrier 在类级成立，非池化伪影**：每个 OOV 类独立携带 6.6–12.2 倍于 seen 类的 u* 投影幅度。
+- **重复二**：report-only 全类（10 类）Spearman(类 med 幅, 类崩塌能量) = 0.79/0.83/0.83——崩塌越强的类在 u* 上集中越多幅度，类级幅度承载与 3169 全类崩塌幅度**共变**。
+- **重复三**：C 线机制链加厚——3189 SHARED → 3190 LOO → 3191 held-out → 3192 池化 CARRIER → **3232 类级 ROBUST（n=10）**；GAP-4 mechanism_note append（gap v1.9→v1.10，append-only，legacy 逐位保全），registry 不动（无特征级变化）。
+
+### 独立复核（verify.json，8/8 PASS）
+源锚 ×11、registry 未动、逐类数独立重算（rel=0）、门逻辑复算、gap v1.10 推导（legacy x4 + GAP-4 字段保全 + append 形状）、npz==result、smoke/FULL 数字一致（仅 mode/res/seal 差）。两次初 FAIL 均 verify 探针哈希口径 bug（None 填充 vs 键剔除；mid 态多含 seal_sha8），封存产物未动。
+
+### 预注册 Phase 3233（候选）
+- (a) **GAP-5 上游机制臂设计**（默认，按 3231 预注册 (b)）：FTR-22 残留挂账已清，上游杠杆候选扫描先立项——设计文档 + 候选杠杆清单 + 门定义（零 GPU 设计臂）；
+- (b) u* 内容归因类级扩展：u* 与 10 类 first-token embedding 差分方向的逐类对齐（3190 report-only 降级方案的正式化，零 GPU）。
+
+
+## Phase 3233: G5-G30 GAP-5 上游杠杆扫描设计臂 [2026-10-13 12:05]
+
+**执行模式**：零 GPU 纯设计（默认 (a)，按 3232 预注册；无观测、无模型前向）；freeze **`7e201c78`**（任何观测前）；设计文档内容 **`d74b6484`** / 文件 **`6a53616c`**；res **`e594f31e`**，verdict **`upstream_lever_design_registered`**（0 矛盾）；registry v1.31 未动（`ef5189e7`）、gap v1.10 未动（`378de1cd`）；账本只读（n=384 post `0e47bfd9` before==after），closeout 追加 #385。
+
+### 问题与动机
+GAP-5 三段式（3229）：上游编码承载行为 → 末层精确线性读出（3228 C6v3 cos 1.0000）→ post-softmax 分布级非线性。F20（3229/3230）已证**两个方向配方（u_R、dR）在末层都不是行为杠杆**——「上游是否有单一方向杠杆」是 GAP-5 链最后一段 open 问题（gap v1.10 mechanism_note）。
+
+### 设计要点（全部冻结在先）
+- **干预**：残差流 patch `h_L ← h_L + α·u`，L ∈ {0..NL−1}，**下游全量重算**（所有层 > L + final norm + W_U）——比 3227 末层注入（绕过上游计算）更强的协议内因果；判断 = isa/hasa token-set margin 符号（3169 D2 first-token distinctness 锚定）。
+- **候选杠杆 ×6（预注册）**：C1 u_R（T2 链配方）、C2 u*（3189–3232 链公共核）、C3 dR（3230 配方）、C4 Δv=W_U 词对差、C5 k* 带秩-5 子空间投影分解（in-plane vs 正交补）、C6 头级再分配（3160/3161；**report-only 设计预留**，不进 3234 计算臂）。
+- **门（量纲体检在案）**：UL_flip 峰层 flip_rate ≥0.15（与 GD_flip 同族比值量纲，**可失败性已协议内实证**——3229/3230 GA_flip=0）；UL_dose α{0.5,1,2} 单调；UL_spec cross-patch ≤1/3；UL_amp u* 通道逐类 margin 偏移与 3169 崩塌能量 rank-corr ≥0.6（n=4 small-n scope）；**UL_loc 为 report-only 位置预测**：峰层带应与 [k*−2, k*+2]=[1,5] 重叠（3152 实测锚：k*=3 ×3 模型，深度 0.075–0.083，NL=36/40/40）——预测可被记录为不符而不改 verdict（防事后调门）。
+- **verdict taxonomy**：UPSTREAM_LEVER_FOUND（flip+dose+spec 全过 ×2 模型）→ 3235 registry 升级；UPSTREAM_PARTIAL（方向性记录 + F 账本注记）；**UPSTREAM_ABSENT（全网格 FAIL ×2 模型 ⇒ 分布式承载确证，F20-family F 账本扩展，不隐藏）**。
+- **对照**：逐层 norm-matched random（10 pinned seeds）+ 正交化（u 投影出行态）——正阳性不能归因于范数膨胀。
+- **预算（预注册，防中途改设计）**：粗扫 NL×2 方向×208 行×2 模型 ≈3.2e4 前向 + 峰带细扫 3 层×3α×2 方向×730 行×2 模型 ≈2.6e4 + 峰层对照 ×11 ⇒ ~1.5–2 h GPU 串行。
+
+### 链
+- **3234** = G5-G30 compute+seal 臂（GPU：粗扫 + 峰带剂量细扫 + 对照，qwen pair，freeze-before-observation seed pinning）；
+- **3235** = G5-G30 门评估 + registry/gap 决策臂（UL_* 门施加；FOUND → upgrade_log；ABSENT → F 账本 + GAP-5 mechanism_note append）。
+
+### 独立复核（verify.json，39/39 PASS）
+结果/设计/冻结三层身份哈希复算（自键剔除口径）、数据锚 ×6 重验、k* 锚独立重读（k*=3 ×3 模型 + NL 36/40/40）、UL_loc 带 [1,5] 文本、账本 n=384 post `0e47bfd9` 复算、registry/gap sha、SMOKE/FULL 冻结内容一致、无观测键泄漏。3 个初 FAIL 均 verify 探针哈希域 bug（把已赋值的自身 sha 键带进哈希域），封存产物未动。
+
+### 预注册 Phase 3234（候选）
+- (a) **G5-G30 compute+seal 臂**（默认，按本设计执行）：逐层 patch 全重算粗扫 + 峰带剂量细扫 + 双对照，qwen pair，GPU ~1.5–2 h，封存 npz + freeze-before-observation；
+- (b) u* 内容归因类级扩展（3232 预注册 (b) 顺延，零 GPU）。
+
+
+## Phase 3234: G5-G30 GAP-5 上游杠杆扫描 compute+seal 臂 [2026-10-13 14:28]
+
+**执行模式**：GPU 计算+封存（默认 (a)，按 3233 预注册；无门控决策——门施加按 3233 链 DEFERRED 到 3235）；freeze **`dde04645`**（任何观测前）；res **`71050e5c`**，verdict **`upstream_lever_scan_sealed`**（矛盾 0 项）；npz **`48034bd9`**；registry v1.31 未动（`ef5189e7`）、gap v1.10 未动（`378de1cd`）；closeout 追加 #386。
+
+### 装置锚（最强锚级，全过）
+- **A1 逐位锚**：4b bf16 baseline 前向 hidden_states（fp16 化）与封存缓存**全槽逐位相等**——3154 全 208 行 × 全槽 + 3169 t=0 全 730 行 × 全槽 ⇒ 扫描装置与收集器完全同一；
+- **A2 逐位锚**：baseline margin 与 3230 封存 seen_m0 **bitwise 相等**（drift 0.00e+00，两模型）；C6v3 直接类读出 argmax 一致率 **1.0000**（门 0.98）；
+- **3154 prompt 重建验证**：MAT 表 + tags 六因子 + d 列（token 计数）0/208 错配 ×2 模型。
+
+### 封存矩阵（npz）
+- 粗扫：L ∈ {0..NL−1} × {u_isa, u_hasa} × 208 行（3154 面板）flip J1 逐层逐模型；
+- 峰带细扫：band {L*−1, L*, L*+1} × α {0.5, 1, 2} × 两方向 × 730 行（3169 t=0）J1+marg；
+- **u* 通道（UL_amp 数据）**：band 层逐类 median margin 偏移 ×10 类，4 OOV spearman vs 3228 E_cls + 10 类 report-only vs 3232 崩塌能量；
+- dR/dW 峰层描述性 flip；峰层对照 10 随机 norm-matched（pinned seeds）+ 2 正交化（两面板）；
+- **4B nf4 bridge**：4b 以 nf4 重跑峰层，量化扰动定量记录（bf16 常驻不可用先例）。
+
+### 独立复核（verify.json，26/0 PASS）
+结果/冻结身份哈希（域口径分立：res 含 res_sha8=None、execution.json 不含自身键）、npz 文件 sha、J0 三锚逐位复算（cache-m0==3230 seen_m0、coarse_J0、fine_J0）、coarse flip_stats ×全部键自 J1 重算、pooled+Lstar 重算、fine flip/dD 自 J1+marg 重算、nulls 重算、UL_amp 双 spearman 重算（自封存 amps + 3228 E_cls + 3232 崩塌）、u* 逐类 med shift 重算、bridge 一致性、verdict/矛盾一致性、账本只读断言。
+
+### 预注册 Phase 3235（候选）
+- (a) **G5-G30 门评估 + registry/gap 决策臂**（默认，零/低 GPU，基于 3234 封存矩阵）：施加 UL_flip（峰层 flip_rate ≥0.15 ×≥3/4 折 ×2 模型，对照 null 分布）/UL_dose 单调/UL_spec ≤1/3/UL_amp rank-corr ≥0.6 + UL_loc report-only 记录（k* 带 [1,5]）；FOUND ⇒ registry upgrade_log；ABSENT ⇒ F 账本 append + GAP-5 mechanism_note（分布式承载定谳）；
+- (b) u* 内容归因类级扩展（零 GPU，顺延）。
+
+
+## Phase 3235: G5-G31 GAP-5 上游杠杆门评估决策臂 [2026-10-13 14:33]
+
+**执行模式**：零 GPU 门控算术（默认 (a)，按 3234 预注册；全部输入取自 3234 封存 npz `48034bd9`）；freeze **`99b944fb`**（任何门控算术前）；res **`5bab6419`**，verdict **`UPSTREAM_ABSENT`**（矛盾 2 项）；registry v1.31 未动（`ef5189e7`）、gap v1.10 未动（`378de1cd`）；closeout 追加 #387。
+
+### 门评估结果（3233 设计门 verbatim 操作化，双模型）
+
+| 门 | qwen3-4b | qwen3-14b | 结论 |
+|---|---|---|---|
+| UL_flip（≥0.15 ×≥3/4 折，vs null max） | 0/4 折 ×2 方向（delta 全 0.0000） | 0/4 折 ×2 方向 | **FAIL** |
+| UL_dose（α 单调） | u_isa 非单调 | u_isa 非单调 | **FAIL** |
+| UL_spec（cross ≤ 1/3 matched） | 平凡 PASS（无 flip 可 cross） | 同 | PASS（无信息） |
+| UL_amp（spearman ≥0.6） | best 0.2 | best 0.4 | **FAIL** |
+| UL_loc（峰带 ⊆ [1,5]，report-only） | 峰在 L0，不重叠 | 同 | 记录 |
+
+**⇒ verdict `UPSTREAM_ABSENT`（按 3233 taxonomy：全网格 FAIL ⇒ 上游分布式承载确证）**——残差流任意层、任意方向（u_R/u*/dR/ΔW）norm-matched patch 均无法翻转 isa/hasa 判断（粗扫全 L 网格 ×4 折 delta 对 null 全为 0.0000），上游不存在单一方向行为杠杆；GAP-5 第三段（上游承载）定谳为**分布式**，与 F20（末层读出几何非杠杆）、3161/3163（写入端无单点头、全流分布式）构成三重互证。
+
+**C11 诚实记录**：臂内冗余 `rates_j1` 重算存在 mode 变量泄漏（u_isa 迭代误用 UL_flip 循环残留的 mode='hasa'）；数值上与总 flip 率巧合相等（u_isa patch 的全部翻转恰为 hasa 向），门控主值 = 封存总 flip 率（与 UL_flip 语义一致，4/4 独立重算逐位匹配），**verdict 不受影响**。
+
+### 独立复核（verify.json，21/0 PASS）
+身份哈希、3234 npz sha、UL_flip primary+sensitivity 自 J1 重算、UL_dose 总 flip 口径重算、UL_spec matched/cross 重算、UL_amp best-layer+spearman 重算（自 3234 result + 3228 E_cls + 3232 崩塌）、UL_loc 重叠重算、verdict 推导复算、gates 表一致性、registry/gap 未动断言。V5/V7 初跑 FAIL 均为探针口径问题（V5 子串误报 gate 定义文本、V7 即 C11 泄漏的暴露），封存产物未动。
+
+### 预注册 Phase 3236（候选）
+- (a) **G5-G31 落账臂**（默认，零 GPU，照 3231 模板）：F21（F20 族扩展：上游亦无杠杆）append → registry v1.32 + GAP-5 mechanism_note 终版（三段式收官：上游分布式承载→末层线性读出→post-softmax 非线性）→ gap v1.11；
+- (b) u* 内容归因类级扩展（零 GPU，顺延）。

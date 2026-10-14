@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>路线·图谱界面优化方案 v2 —— 分布式 LLM 逆向研发平台</title>
+<style>
+:root{
+  --bg:#0b1220; --bg2:#0f1829; --panel:#131e30; --panel2:#182540;
+  --line:#22314d; --line2:#2b3d5c;
+  --tx:#e6edf7; --tx2:#9fb0c8; --tx3:#6b7c98;
+  --em:#34d399; --em2:#10b981; --blue:#6366f1; --blue2:#818cf8;
+  --amber:#f59e0b; --red:#ef4444; --cyan:#22d3ee;
+  --mono:'SF Mono','Cascadia Code',Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.65 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:0 0 80px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono)}
+
+/* hero */
+.hero{padding:52px 0 8px;border-bottom:1px solid var(--line)}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--em);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);padding:4px 12px;border-radius:99px;margin-bottom:18px}
+.tag b{font-family:var(--mono);font-weight:600}
+.hero h1{font-size:32px;font-weight:700;letter-spacing:.2px;margin-bottom:14px}
+.hero h1 span{color:var(--em)}
+.hero p{color:var(--tx2);max-width:860px;font-size:15px}
+.hero .meta{margin-top:18px;font-size:12px;color:var(--tx3);font-family:var(--mono)}
+
+h2{font-size:22px;margin:52px 0 6px;display:flex;align-items:center;gap:12px}
+h2 .no{font-family:var(--mono);font-size:13px;color:var(--em);border:1px solid var(--line2);padding:2px 10px;border-radius:6px;background:var(--bg2)}
+h2 .sub{font-size:13px;color:var(--tx3);font-weight:400}
+.lead{color:var(--tx2);margin-bottom:22px;max-width:900px}
+
+/* diagnosis cards */
+.diag{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+.dcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.dcard h4{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.dcard h4 .ic{color:var(--red)}
+.dcard p{color:var(--tx2);font-size:13px}
+.dcard .eg{margin-top:8px;font-size:12px;color:var(--tx3);font-family:var(--mono);background:var(--bg2);padding:6px 10px;border-radius:6px}
+
+/* principle */
+.principle{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.pcard{background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:12px;padding:20px}
+.pcard .num{font-family:var(--mono);color:var(--em);font-size:13px}
+.pcard h4{font-size:16px;margin:8px 0 8px}
+.pcard p{color:var(--tx2);font-size:13px}
+
+/* IA structure */
+.ia{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:20px;overflow:hidden}
+.ia-hd{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--bg2)}
+.ia-hd .lbl{font-family:var(--mono);font-size:12px;color:var(--em)}
+.ia-hd .t{font-weight:600}
+.ia-hd .note{margin-left:auto;font-size:12px;color:var(--tx3)}
+.ia-body{padding:20px}
+.lv{display:flex;align-items:flex-start;gap:12px}
+.lv .bar{width:26px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--em);writing-mode:vertical-lr;letter-spacing:2px;padding:6px 0;border-radius:6px;background:rgba(52,211,153,.08)}
+.lv .items{flex:1;display:grid;gap:8px}
+.node{border:1px solid var(--line2);border-radius:10px;padding:12px 16px;background:var(--bg2)}
+.node.dom{border-color:rgba(99,102,241,.5)}
+.node .nh{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.node .nh .k{font-family:var(--mono);font-size:11px;color:var(--blue2);background:rgba(99,102,241,.12);padding:1px 7px;border-radius:5px}
+.node .nh .k.em{color:var(--em);background:rgba(52,211,153,.1)}
+.node .nd{color:var(--tx3);font-size:12px;margin-top:3px}
+.node .views{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.vchip{font-size:11px;font-family:var(--mono);padding:3px 9px;border-radius:6px;border:1px solid var(--line2);color:var(--tx2)}
+.vchip.hot{border-color:rgba(52,211,153,.4);color:var(--em);background:rgba(52,211,153,.06)}
+.vchip.del{color:var(--tx3);text-decoration:line-through;border-style:dashed}
+.arrow{color:var(--tx3);font-size:12px;padding:2px 0 2px 6px}
+
+/* before after */
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.ba{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.ba h4{font-size:14px;margin-bottom:10px}
+.ba.before h4{color:var(--red)}
+.ba.after h4{color:var(--em)}
+.ba ol{margin-left:18px;color:var(--tx2);font-size:13px}
+.ba li{margin-bottom:6px}
+.ba li b{color:var(--tx)}
+
+/* before structure mock */
+.tabmock{margin-top:12px}
+.tabmock .row{font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:4px}
+.tabmock .l1{background:var(--bg2);color:var(--tx2);border:1px solid var(--line)}
+.tabmock .l2{margin-left:18px;background:rgba(239,68,68,.06);color:var(--red);border:1px dashed rgba(239,68,68,.4)}
+.tabmock .l3{margin-left:36px;background:rgba(245,158,11,.06);color:var(--amber);border:1px dashed rgba(245,158,11,.4)}
+
+/* new structure mock */
+.newmock{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.nm-dom{display:flex;align-items:center;gap:8px}
+.nm-chip{font-family:var(--mono);font-size:12px;padding:7px 13px;border-radius:8px;border:1px solid var(--line2);color:var(--tx2);background:var(--bg2)}
+.nm-chip.hot{color:var(--em);border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.07);font-weight:600}
+.nm-chip.blue{color:var(--blue2);border-color:rgba(99,102,241,.5)}
+.nm-view{font-size:11px;font-family:var(--mono);padding:4px 8px;border-radius:5px;border:1px solid var(--line2);color:var(--tx3)}
+.nm-view.hot{color:var(--em);border-color:rgba(52,211,153,.4)}
+
+/* map table */
+table.map{width:100%;border-collapse:collapse;margin-top:18px;font-size:13px}
+table.map th{background:var(--bg2);color:var(--tx2);text-align:left;padding:10px 12px;border:1px solid var(--line);font-weight:600}
+table.map td{padding:10px 12px;border:1px solid var(--line);vertical-align:top;color:var(--tx2)}
+table.map td b{color:var(--tx)}
+table.map .old{color:var(--tx3)}
+table.map .newc{color:var(--em)}
+table.map .ok{color:var(--em);font-weight:600}
+table.map .del{text-decoration:line-through;color:var(--tx3)}
+table.map .keep{color:var(--blue2)}
+
+/* roadmap */
+.road{display:flex;flex-direction:column;gap:0;margin-top:18px;border-left:2px solid var(--line2);padding-left:24px}
+.step{position:relative;padding:0 0 26px 0}
+.step:before{content:'';position:absolute;left:-31px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--em);border:3px solid var(--bg)}
+.step.later:before{background:var(--bg);border-color:var(--line2)}
+.step h4{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.step .tag2{font-family:var(--mono);font-size:11px;color:var(--em);background:rgba(52,211,153,.08);padding:1px 7px;border-radius:5px}
+.step.later .tag2{color:var(--tx3);background:var(--bg2)}
+.step p{color:var(--tx2);font-size:13px;max-width:820px}
+.step .what{font-size:12px;color:var(--tx3);margin-top:4px}
+
+/* footer */
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--tx3);font-size:12px;font-family:var(--mono)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);color:var(--tx2);margin:2px 4px 2px 0}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--em)}
+.pill.warn .dot{background:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="tag"><b>DESIGN · atlas_lens_redesign_v2</b> 路线 → 图谱界面 信息架构重构方案</div>
+    <h1>图谱界面整体优化方案<br><span>围绕「分布式 LLM 逆向研发平台」重新组织信息架构</span></h1>
+    <p>把当前分散、交叉、命名漂移的「图谱全景 / 跨线账本 / 结果库 / 模板与技术 / 模块 / 模块空间 / 模板空间 / 卡片」等界面，收敛为一条可导航、可解释、可扩展的主线：<b>从「平台要逆向什么」出发，按“发现(图谱) → 验证(账本) → 生产(资产) → 运行(平台)”四条主线组织。</b></p>
+    <div class="meta">依据：RdcFusionWorkspace.jsx / LensProgress.jsx / AtlasLens.jsx / AtlasPanorama.jsx / RegistryPanel.jsx / ResultsExplorer.jsx / AtlasModuleSpace.jsx / AtlasTemplateSpace.jsx 实读 · 2026-10-13 21:20</div>
+  </div>
+
+  <!-- 01 现状诊断 -->
+  <h2><span class="no">01</span>现状诊断：为什么“混乱”</h2>
+  <p class="lead">混乱的根源不是界面数量多，而是<b>没有统一的组织轴</b>——同一批“图谱对象”被按“技术视角”“知识视角”“资产视角”切了三刀，每一刀都起了新名字，用户无法回答“我现在看的是哪一层、哪一维”。</p>
+  <div class="diag">
+    <div class="dcard">
+      <h4><span class="ic">✕</span>二级 Tab 嵌套</h4>
+      <p>「路线」下有「行业进展/图谱」两个 tab，进入图谱后又出现「图谱全景/跨线账本/结果库/模板与技术」四个 tab，两层 tab 叠加，导航深度过深。</p>
+      <div class="eg">路线 → [行业进展 | 图谱] → [图谱全景 | 账本 | 结果库 | 模板与技术] → 全景内再 [模块|模块空间|模板空间|卡片]</div>
+    </div>
+    <div class="dcard">
+      <h4><span class="ic">✕</span>“模块 / 模块空间 / 模板空间”三概念混淆</h4>
+      <p>「模块」（2D 双栏对照）与「模块空间」（3D 三舱一塔三桥）本质是<b>同一对象的两种视图</b>，却各占一个模式位；加上「模板空间」又是另一粒度，三个“空间”并列让用户分不清谁包含谁。</p>
+      <div class="eg">模块(2D 双栏) vs 模块空间(3D 三舱) = 同对象不同视图；模板空间 = 更细粒度</div>
+    </div>
+    <div class="dcard">
+      <h4><span class="ic">✕</span>知识轴与资产轴混排</h4>
+      <p>「结果库」「模板与技术」是<b>数据产线资产 / 证据档案</b>（生产轴），而「图谱全景」「跨线账本」是<b>机制知识</b>（知识轴），四者平铺在同一 tab 行，认知负荷大。</p>
+      <div class="eg">[知识] 全景 + 账本　⟷　[资产] 结果库 + 模板技术  ← 两类目标混在一行</div>
+    </div>
+    <div class="dcard">
+      <h4><span class="ic">✕</span>命名漂移 &amp; 死件残留</h4>
+      <p>「模板与技术」曾叫「注册表」；「图谱」既作 tab 名又作全景内部标题；`lens=atlas` 是 URL 兼容别名，与「路线」导航重复。多处历史命名随版本迭代漂移，新老概念并存。</p>
+      <div class="eg">注册表→模板与技术 / 图谱(tab) ≡ 图谱全景(内部) / ?lens=atlas 别名路由</div>
+    </div>
+  </div>
+
+  <!-- 02 设计原则 -->
+  <h2><span class="no">02</span>重构的三条设计原则</h2>
+  <div class="principle">
+    <div class="pcard">
+      <div class="num">PRINCIPLE 1</div>
+      <h4>一条主线：逆向研发流水线</h4>
+      <p>界面顺序应还原平台的真实工作流——<b>先看图谱里发现了什么，再看这些发现如何被账本验证，接着看用什么模板/技术生产证据，最后看分布式平台如何运行</b>。导航即流程。</p>
+    </div>
+    <div class="pcard">
+      <div class="num">PRINCIPLE 2</div>
+      <h4>对象 / 视图分离</h4>
+      <p>“模块”“模板”是<b>对象（研究对象）</b>，“2D 双栏”“3D 空间”“卡片”是<b>视图（看的方式）</b>。二者不能并列——视图应作为对象的子级切换，而不是平级 tab。</p>
+    </div>
+    <div class="pcard">
+      <div class="num">PRINCIPLE 3</div>
+      <h4>知识 / 资产 / 运行 分域</h4>
+      <p>区分三类信息：<b>机制知识</b>（特征/账本）、<b>生产资产</b>（模板/技术/研究包）、<b>平台运行</b>（节点/队列/租约）。同一屏最多呈现一类主线，避免混杂。</p>
+    </div>
+  </div>
+
+  <!-- 03 目标信息架构 -->
+  <h2><span class="no">03</span>目标信息架构（四域一图）</h2>
+  <p class="lead">把分散的界面收敛为<b>「图谱」一个主入口 + 四个视角域</b>，每个域内部再按“对象 → 视图”两层组织。所有旧入口都映射到新架构的一个明确位置，不再有多套并列命名。</p>
+
+  <div class="ia">
+    <div class="ia-hd"><span class="lbl">IA TARGET</span><span class="t">路线 → 图谱（单一主入口，取代二级 tab 嵌套）</span><span class="note">四域 = 发现 / 验证 / 生产 / 运行</span></div>
+    <div class="ia-body">
+      <div class="lv">
+        <div class="bar">域 L0</div>
+        <div class="items">
+          <div class="node dom">
+            <div class="nh"><span class="k em">图谱全景</span>机制发现 · 三域一图（默认首屏）</div>
+            <div class="nd">核心：知识网络 / 分析推理 / 语法系统 → 语言族 → 特征（E 级着色 + 机制横切 + 交叉边）。<b>这是平台要逆向的“目标对象”总图。</b></div>
+            <div class="views">
+              <span class="vchip hot">对象：特征 FTR-xx</span>
+              <span class="vchip hot">视图：全景图（域树泳道）</span>
+              <span class="vchip">视图：模块 2D 双栏</span>
+              <span class="vchip">视图：模块空间 3D</span>
+              <span class="vchip">视图：模板空间 3D</span>
+              <span class="vchip">视图：卡片</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼ 视图不再并列——统一收为「视图切换器」，同一选中态贯穿</div>
+      <div class="lv">
+        <div class="bar">域 L1</div>
+        <div class="items">
+          <div class="node">
+            <div class="nh"><span class="k">跨线账本</span>验证 · 唯一 Phase 时间线</div>
+            <div class="nd">append-only 只读 · 跨线交错 · measurements / verdict / res·seal sha8 证据链回查。</div>
+          </div>
+        </div>
+      </div>
+      <div class="lv">
+        <div class="bar">域 L2</div>
+        <div class="items">
+          <div class="node">
+            <div class="nh"><span class="k">生产资产</span>结果库 + 模板与技术（原两 tab 合并为一域的两个面板）</div>
+            <div class="nd">语言模板 × 分析技术 × 研究包（数据产线资产）+ 结果库（证据档案）。同为“生产轴”，合并减少一级导航。</div>
+            <div class="views">
+              <span class="vchip">结果库（证据档案）</span>
+              <span class="vchip">语言模板注册</span>
+              <span class="vchip">分析技术注册</span>
+              <span class="vchip">研究包组合</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lv">
+        <div class="bar">域 L3</div>
+        <div class="items">
+          <div class="node">
+            <div class="nh"><span class="k">平台运行</span>节点 / 队列 / 租约（迁自研发透镜，跨域引用）</div>
+            <div class="nd">分布式节点状态、调度队列、GPU 租约——<b>不是本图内重复实现</b>，仅作为入口卡链接到研发透镜，保持“唯一事实源”。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 前后对比 -->
+  <h2><span class="no">04</span>前后结构对比</h2>
+  <div class="before-after">
+    <div class="ba before">
+      <h4>优化前（现状）—— 二级 Tab + 四级并列</h4>
+      <div class="tabmock">
+        <div class="row l1">路线 lens</div>
+        <div class="row l2">├ 行业进展　└ 图谱</div>
+        <div class="row l3">　图谱内四 tab：图谱全景 / 跨线账本 / 结果库 / 模板与技术</div>
+        <div class="row l3">　图谱全景内四模：模块 / 模块空间 / 模板空间 / 卡片</div>
+        <div class="row l3">　＋ 折叠区：专项视图 10 个 /rdc-* 独立页</div>
+      </div>
+      <ol>
+        <li>「模块」与「模块空间」同对象两视图却并列</li>
+        <li>知识（全景/账本）与资产（结果/模板）混排</li>
+        <li>「图谱」tab 名与内部「图谱全景」语义重叠</li>
+      </ol>
+    </div>
+    <div class="ba after">
+      <h4>优化后 —— 单入口 + 四域 + 视图切换器</h4>
+      <div class="newmock">
+        <div class="nm-dom"><span class="nm-chip hot">① 图谱全景</span><span class="nm-chip">② 跨线账本</span><span class="nm-chip">③ 生产资产</span><span class="nm-chip">④ 平台运行→</span></div>
+        <div style="font-size:12px;color:var(--tx3)">↓ 图谱全景内：对象(特征)固定，仅切换“看的方式”</div>
+        <div class="nm-dom">
+          <span class="nm-view hot">全景图</span><span class="nm-view">模块 2D</span><span class="nm-view">模块 3D</span><span class="nm-view">模板 3D</span><span class="nm-view">卡片</span>
+        </div>
+      </div>
+      <ol>
+        <li><b>四域一条主线</b>：发现→验证→生产→运行</li>
+        <li><b>对象/视图分离</b>：模块、模板是对象；2D/3D/卡片是视图</li>
+        <li><b>知识/资产分域</b>：结果库+模板技术并入“生产资产”</li>
+        <li><b>单一事实源</b>：平台运行只作入口，不重复实现</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 05 界面映射表 -->
+  <h2><span class="no">05</span>界面映射表（旧 → 新）</h2>
+  <p class="lead">八个现有界面，逐一给出归宿：<span class="ok">保留并归位</span> / <span class="keep">保留但改层级</span> / <span class="del">合并或降级</span>。</p>
+  <table class="map">
+    <thead><tr><th style="width:150px">现有界面</th><th style="width:90px">现状位置</th><th style="width:220px">优化后归宿</th><th>处理理由</th></tr></thead>
+    <tbody>
+      <tr><td><b>图谱全景</b></td><td class="old">LensProgress 图谱 tab → AtlasLens tab</td><td class="newc">四域 · ① 图谱全景（默认首屏）</td><td>作为唯一主入口首屏，承载机制发现主线</td></tr>
+      <tr><td><b>跨线账本</b></td><td class="old">AtlasLens tab</td><td class="newc">四域 · ② 跨线账本</td><td>位置不变，仅从“tab”改“域”语义，取消二级嵌套</td></tr>
+      <tr><td><b>结果库</b></td><td class="old">AtlasLens tab</td><td class="newc">四域 · ③ 生产资产（面板A）</td><td>证据档案，与模板/技术同为生产轴，合并归域</td></tr>
+      <tr><td><b>模板与技术</b></td><td class="old">AtlasLens tab（原注册表）</td><td class="newc">四域 · ③ 生产资产（面板B）</td><td>数据产线资产，与结果库合并，消除撞名历史</td></tr>
+      <tr><td><b>模块</b></td><td class="old">全景内模式1（2D 双栏）</td><td class="newc">① 图谱全景 → 视图：模块 2D</td><td>降级为“视图”，不再与 3D 并列</td></tr>
+      <tr><td><b>模块空间</b></td><td class="old">全景内模式2（3D 三舱）</td><td class="newc">① 图谱全景 → 视图：模块 3D</td><td>与“模块”合并为同一对象的两种视图</td></tr>
+      <tr><td><b>模板空间</b></td><td class="old">全景内模式3（3D 模板）</td><td class="newc">① 图谱全景 → 视图：模板 3D</td><td>保留为视图，明确“模板粒度”区别于模块</td></tr>
+      <tr><td><b>卡片</b></td><td class="old">全景内模式4</td><td class="newc">① 图谱全景 → 视图：卡片</td><td>保留，作为特征扫读视图</td></tr>
+      <tr><td><b>行业进展</b></td><td class="old">LensProgress 顶层 tab</td><td class="del">保持独立，但移出“图谱”语义</td><td>是“领域动态”，非图谱对象，与图谱解耦</td></tr>
+      <tr><td><b>专项视图(10 个 /rdc-*)</b></td><td class="old">全景折叠区</td><td class="del">逐步协议化并入，期间保留折叠入口</td><td>已是降级态，最终并入四域，删独立路由</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 06 落地路线 -->
+  <h2><span class="no">06</span>落地路线（分三阶段，每阶段可独立验收）</h2>
+  <div class="road">
+    <div class="step">
+      <h4><span class="tag2">P1 · 低风险</span>取消二级 tab，改四域切换器</h4>
+      <p>在 <span class="mono">AtlasLens</span> 内把「图谱全景/跨线账本/结果库/模板与技术」四个 tab 重新组织为「图谱全景 / 跨线账本 / 生产资产（合并结果库+模板技术）/ 平台运行（入口卡）」四个域；将「模块/模块空间/模板空间/卡片」从模式位降为「视图切换器」。</p>
+      <div class="what">改动面：AtlasLens.jsx 主框架 + CSS；零后端改动；无数据迁移。</div>
+    </div>
+    <div class="step">
+      <h4><span class="tag2">P2 · 语义归一</span>对象/视图分离 + 命名收敛</h4>
+      <p>确立“对象=特征/模块/模板，视图=全景图/2D/3D/卡片”的统一词汇表；消除「注册表→模板与技术」等历史命名；<span class="mono">?lens=atlas</span> 别名路由与「路线→图谱」导航语义统一（保留 URL 兼容，不再暴露为第二入口）。</p>
+      <div class="what">改动面：LensProgress.jsx + 各视图组件标题/提示文案；同步更新设计文档词汇表。</div>
+    </div>
+    <div class="step later">
+      <h4><span class="tag2">P3 · 长期</span>专项视图协议化收敛 + 平台运行深度联动</h4>
+      <p>10 个 /rdc-* 独立页逐页协议化并入四域，删除独立路由；“平台运行”域从“入口卡”升级为与研发透镜共享同一状态源的实时视图（节点/队列/租约），实现分布式平台“一屏看全流程”。</p>
+      <div class="what">改动面：涉及后端协议与多组件；需逐页回归，风险较高，独立排期。</div>
+    </div>
+  </div>
+
+  <!-- 07 核心洞察 -->
+  <h2><span class="no">07</span>关键洞察：这不是“排版问题”，是“研究平台心智模型”问题</h2>
+  <div class="grid2">
+    <div class="pcard">
+      <h4>图谱界面的本质角色</h4>
+      <p>在「分布式 LLM 逆向研发平台」里，图谱界面不是“一个功能页”，而是<b>平台的知识中枢</b>——它要回答三个问题：<b>我们逆向出了什么（发现）？这些发现是否站得住（验证）？用什么资产持续生产证据（生产）？</b>当前界面把这三个问题混在四个平级 tab 里，用户的心智模型被迫自己拼装。</p>
+    </div>
+    <div class="pcard">
+      <h4>“视图”是最大冗余来源</h4>
+      <p>模块/模块空间/模板空间/卡片，本质是<b>同一批研究对象的不同可视化方式</b>。把它们并列，等于把“放大镜/显微镜/望远镜”当成了三种“研究对象”。正确做法是：<b>对象固定，视图切换</b>——这也是 v5 四透镜“对象路由即状态”原则在图形内部的自然延伸。</p>
+    </div>
+  </div>
+
+  <div class="foot">atlas_lens_redesign_proposal_v2 · 基于 RdcFusionWorkspace / AtlasLens / LensProgress 实读 · 生成于 2026-10-13 21:20 · 演示原型，非生产代码</div>
+</div>
+</body>
+</html>

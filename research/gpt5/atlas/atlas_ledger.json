@@ -7744,6 +7744,71 @@
    "prereg_id": "G5-G27",
    "superseded_by": null,
    "detail": "G5-G27 relation-contrast (state) direction efficacy arm (zero GPU, default (a) per 3229 prereg). dR = mean(h[isa 64 rows]) - mean(h[hasa 64 rows]) over the sealed 3157 cache at slot NH-1 (post-norm pre-logit, C9 space coherence; K1: prereg wording '3157 KOUT 缓存均值' read at NH-1, KOUT-slot version sealed as dR_raw, cos(dR,dR_raw)=0.8614/0.7081). |dR|=16.40/20.72 (~7-9x the row RMS 2.16/2.19). Protocol verbatim from sealed 3228 (freeze c51bfea5 / res 99693298): direct linear map l=W_U@(h+dv), dv=unit(dR)*alpha*rms(h_row), alphas {0.5,1,2}, nulls 10 pinned seeds + orth. Freeze 1d02dd97 BEFORE any dR number; gates frozen in-freeze. Results: GB_dir PASS x2 (seen dD strictly monotone +0.1772/+0.3545/+0.7089 (4b) and +0.1632/+0.3263/+0.6526 (14b); dR_neg perfect mirror = linear-map sanity) - dR pushes the margin in ITS OWN direction (qualitative contrast with the anti-directional T2 u_isa); GA_flip FAIL x2 (flip 0.0000 on 4/4 seen folds x 2 models at all alphas, null band also 0; mechanical attribution: cos(dR, unit(W_isa-W_hasa))=+0.0997/+0.0625 ~ orthogonal, transfer capped, delta-m@a2 ~0.71/0.65 << |d0| 3.97/4.69). Diagnostics: cos(dR,v_isa)=-0.2463/-0.0547, cos(dR,v_hasa)=+0.0606/+0.1067 -> |cos|<0.5 recipes DECOUPLED per the prereg reading - the 3228 anti-direction finding is NOT explained by ctx-contrast anti-parallelism; both direction families fail as behavioral levers for different reasons. Device anchors: 3157 tc + 3183 drift 0 x2, C6v3 marg 0.9963/0.9941 (centered-cos 1.0000), RMS scale 2.16/11.98 + 2.19/25.31. Res 1b63b063 / npz d430d29e. Ledger read-only in arm (n=381 post b21db7e3 before==after); registry changes deferred to 3231. pre-append file sha8 c3919948."
+  },
+  {
+   "phase": 3231,
+   "name": "g5g28_registry_decision",
+   "line": "G",
+   "date": "2026-10-13",
+   "model": "CPU JSON assembly on sealed artifacts (zero GPU)",
+   "verdict": "f20_refinement_registered|registry_v1.31|gap_v1.9|byte_preservation_OK|verify_12of12_PASS",
+   "evidence_level": "registration arm (no new observation -> no E-level change; F20 refinement appended, upgrade_log untouched at 11)",
+   "model_scope": "qwen3-4b + qwen3-14b (2/3, inherited); glm4 deferred",
+   "prereg_id": "G5-G28",
+   "superseded_by": null,
+   "detail": "G5-G28 registry decision arm (zero GPU, default (a) per 3230 prereg; K1 pure registration - no new observation, no gate re-opened). Freeze 45a130ea BEFORE any assembly (K1-K5 clarifications in-freeze). S1 integrity: d0_mean/dD(a=0.5,1,2)/GA_flip(4 seen folds via 3154 masks)/cos(dR,dR_raw) recomputed bit-exact from sealed 3230 npz d430d29e x2 models; GB monotone both True; GA flips all 0. S2 registry v1.31 (file ef5189e7 / content 4b6648c2, from v1.30 c11d13bd): F20 gains append-only 'refinements' key (recipe-generalization second recipe: state-contrast dR also NOT a behavioral lever, GA_flip 0 x2 models x all alphas though GB_dir PASS; transfer-orthogonality cos(dR,unit(W_isa-W_hasa))=+0.0997/+0.0625; decoupling cos(dR,v_isa)=-0.2463/-0.0547); FTR-24/25/26 scope_limits appends; 23 other features + failures[:19] + F20 pre-existing fields + upgrade_log(11) byte-exact. S3 gap v1.9 (file 9fca29bd / content 83dac915, from v1.8 7065ec4e): GAP-5 mechanism_note appended (three-stage picture second-recipe confirmation), legacy gaps x4 byte-exact. Independent verify 12/12 PASS (incl. cos(dR,dw) recomputed from sha-pinned W_U slices: 0.099659/0.062541). Res 54e55c7a. Ledger read-only in arm (n=382 post 3cba5317 before==after); this entry #383 appended in closeout. pre-append file sha8 78b44910."
+  },
+  {
+   "phase": 3232,
+   "name": "g5g29_gd_amp_class_robustness",
+   "line": "G",
+   "date": "2026-10-13",
+   "model": "CPU matrix math on sealed caches (zero GPU)",
+   "verdict": "GD_AMP_CLASS_ROBUST|G1_3of3_models_x4of4_oov_classes|G2_3of3_class_ratio_7.14_9.61_9.18|amp_ratio_c_6.57_12.21|spearman_amp_collapse_0.79_0.83|registry_v1.31_UNCHANGED|gap_v1.9_to_v1.10",
+   "evidence_level": "robustness arm (no new feature -> no E-level change; GAP-4 mechanism_note append class-level robustness)",
+   "model_scope": "3/3 (qwen3-4b + qwen3-14b + glm4-9b; glm4 via chain-recomputed u*, 3225 ustar anchor 4b/14b)",
+   "prereg_id": "G5-G29",
+   "superseded_by": null,
+   "detail": "G5-G29 GD_amp class-count robustness arm (zero GPU, default (a) per 3231 prereg). 3192 u*_amplitude_carrier was pooled over n=4 OOV classes; this arm expands the unit of analysis to n=10 per-class measurements (4 OOV + 6 seen) on the SAME sealed residual chain (3169 B-protocol verbatim, seeds 7/8/9, ridge lam 1e-3) with chain-recomputed u* for all 3 models (3225 npz ustar external anchor for 4b/14b: cos=0.99999988 >= 1-1e-6; 3225 med_abs drift == 0). Device anchors: 3169 per-seed E drift 0, 3189/3190/3191 scalars drift == 0 bitwise x3. C1 correction registered pre-observation: 3192 pooled med anchors propagate through the SVD vector u* (BLAS run-to-run wobble ~5e-4 rad; first smoke crashed at the bitwise assert BEFORE any per-class observation) -> relaxed to rel tol 1e-6 (observed 1.6e-9); independent verify later showed 0.00e+00 rel on this machine. Gates (frozen pre-observation): G1 per-OOV-class amp_ratio_c >= 1.3 in >= 3/4 classes, G2 class_ratio = med(4 OOV class meds)/med(6 seen class meds) >= 1.3, each x >= 2/3 models. Results: G1 PASS 3/3 models (4b amp_ratio_c 10.18/9.96/12.21/10.08; 14b 6.65/7.06/8.50/6.57; glm4 9.19/8.30/10.30/7.97); G2 PASS 3/3 (class_ratio 9.6117/7.1420/9.1832) => GD_AMP_CLASS_ROBUST: the carrier verdict is NOT a pooling artifact - every OOV class individually carries 6.6-12.2x the seen-class u* amplitude. Report-only: per-class u* energy share, per-class collapse amplitude, Spearman(med_amp_c, collapse_c) = 0.794/0.830/0.830 over 10 classes (bigger-collapse classes concentrate more u* amplitude). Res 89fb1440 / seal 653933fe / npz 0bbe1f42 / gap v1.10 378de1cd. Independent verify 8/8 PASS (two initial FAILs were verify-probe hash-convention bugs, sealed artifacts untouched). Registry v1.31 UNTOUCHED (ef5189e7). pre-append ledger file sha8 fa320fe3."
+  },
+  {
+   "phase": 3233,
+   "name": "g5g30_gap5_upstream_lever_design",
+   "line": "G",
+   "date": "2026-10-13",
+   "model": "design-only (zero GPU, no observation)",
+   "verdict": "UPSTREAM_LEVER_DESIGN_REGISTERED|candidates_6_C1_u_R_C2_u_star_C3_dR_C4_dv_C5_kstar_proj_C6_head_redist|gates_UL_flip_0.15_UL_dose_UL_spec_1of3_UL_amp_0.6_UL_loc_report_only_kstar_band_1_5|k1_anchor_kstar3_x3models_NL36_40_40|registry_v1.31_UNTOUCHED_gap_v1.10_UNTOUCHED|chain_3234_compute_3235_decision",
+   "evidence_level": "design arm (no observation -> no E-level change; freezes GAP-5 stage-1 upstream-lever scan protocol with full downstream recomputation)",
+   "model_scope": "qwen pair (3234 compute arm); glm4 deferred (W_U absent from local hub)",
+   "prereg_id": "G5-G30",
+   "superseded_by": null,
+   "detail": "G5-G30 GAP-5 upstream-lever scan DESIGN arm (zero GPU, default (a) per 3232 prereg). GAP-5 stage-1 (upstream encoding carries behavior) is the last open stage: F20 (3229/3230) proved both direction recipes (u_R, dR) are non-levers AT the final layer. This arm freezes the upstream scan protocol: residual patch h_L += alpha*u at L in {0..NL-1} with FULL downstream recomputation (stronger in-protocol causality than 3227 last-layer injection), judgment = isa/hasa token-set margin sign, per-layer norm-matched + orthogonalized nulls. Six pre-registered candidate levers (u_R / u* / dR / dW / kstar-projection / head-redistribution report-only reservation). Gates: UL_flip >= 0.15 over nulls x >= 3/4 folds x 2 models (same ratio family that genuinely failed in-protocol at 3229/3230 GA_flip=0), UL_dose monotone, UL_spec cross-patch <= 1/3, UL_amp rank-corr >= 0.6 (n=4 small-n scope), UL_loc REPORT-ONLY position prediction (argmax band overlap [kstar-2, kstar+2] = [1, 5]; 3152 k*=3 three models, depth 0.075-0.083). Verdict taxonomy: UPSTREAM_LEVER_FOUND / UPSTREAM_PARTIAL / UPSTREAM_ABSENT (absent => distributed-carrier confirmation, F20-family F ledger extension). Budget ~1.5-2 h GPU serial (coarse 3.2e4 + fine 2.6e4 forwards). Design doc d74b6484 / file 6a53616c, freeze 7e201c78, res e594f31e. Independent verify 39/39 PASS (three initial FAILs were verify-probe hash-domain bugs: self keys included; sealed artifacts untouched). Registry v1.31 UNTOUCHED (ef5189e7), gap v1.10 UNTOUCHED (378de1cd). pre-append ledger file sha8 a6d93e1f."
+  },
+  {
+   "phase": 3234,
+   "name": "g5g30_gap5_upstream_lever_scan",
+   "line": "G",
+   "date": "2026-10-13",
+   "model": "qwen3-4b (bf16 bitwise path) + qwen3-14b (nf4, recorded)",
+   "verdict": "UPSTREAM_LEVER_SCAN_SEALED|coarse_L0_35_x2dirs_fine_band_x3alpha|nulls_10rand_2orth|UL_amp_u*_channel|nf4_bridge_4b|gate_application_DEFERRED_3235|contradictions_0",
+   "evidence_level": "compute+seal arm (matrices + nulls + amplitude data sealed; gate evaluation per 3233 chain deferred to 3235 -> no E-level change yet)",
+   "model_scope": "qwen pair; glm4 deferred (W_U absent from local hub)",
+   "prereg_id": "G5-G30",
+   "superseded_by": null,
+   "detail": "G5-G30 GAP-5 upstream-lever scan compute+seal arm (default (a) per 3233 prereg, GPU). Device anchors: A1 4b bf16 baseline hidden_states fp16 == sealed cache H bitwise (3154 all 208 rows x all slots + 3169 t=0 all 730 rows x all slots), A2 baseline margins == 3230 seen_m0 bitwise, C6v3 direct class readout argmax agreement 1.0000. 3154 prompt reconstruction verified (tags + d column, 0/208 mismatch both models). Sealed: coarse L-grid x {u_isa, u_hasa} flip matrices (J1 per layer per model), fine band x alpha {0.5,1,2} J1+marg, u* channel per-class med margin-shift (UL_amp data, 4 OOV spearman + 10cls report-only vs 3232 collapse), dR/dW peak flips, nulls 10 random norm-matched seeds + 2 orthogonalized at peak layers, 4B nf4 bridge at peak layers (quantization perturbation quantified). Freeze dde04645 (before any observation), res 71050e5c, npz 48034bd9. Gate application DEFERRED to 3235 per 3233 chain. Independent verify 26/0 PASS. Registry v1.31 UNTOUCHED (ef5189e7), gap v1.10 UNTOUCHED (378de1cd). pre-append ledger file sha8 9b41079f."
+  },
+  {
+   "phase": 3235,
+   "name": "g5g31_gap5_gate_decision",
+   "line": "G",
+   "date": "2026-10-13",
+   "model": "zero-GPU gate arithmetic on 3234 sealed matrices (qwen pair)",
+   "verdict": "UPSTREAM_ABSENT|UL_flip_0_all_L_folds_dirs_x2models|UL_dose_nonmono|UL_amp_below|UL_spec_trivial_pass|UL_loc_band[1,5]_report_only|contradictions_2",
+   "evidence_level": "gate decision arm (per 3233 prereg taxonomy: ABSENT => upstream distributed-carrying confirmed; F-ledger/registry + GAP-5 note landing deferred to 3236 landing arm -> no E-level change yet)",
+   "model_scope": "qwen pair (3234 sealed matrices)",
+   "prereg_id": "G5-G31",
+   "superseded_by": null,
+   "detail": "G5-G31 GAP-5 upstream-lever gate decision arm (default (a) per 3234 prereg, zero GPU). Gates from 3234 sealed npz (48034bd9), freeze 99b944fb before any gate arithmetic: UL_flip primary 0/4 folds x2 dirs x2 models (max-over-L delta vs null max = 0.0000 everywhere; sensitivity pooled-L* variant same), UL_dose non-monotone (u_isa both models; u_hasa mono but flip levels ~0), UL_amp best rho 0.2/0.4 < 0.6, UL_spec trivial pass (no flips to cross), UL_loc band [1,5] report-only no overlap (peaks at L0). C11 honest record: arm's redundant rates_j1 recompute had a mode-variable leak (u_isa iterated with leftover mode='hasa'); numerically coincided with total flips (all u_isa flips hasa-directed); gate basis = sealed total-flip rates, 4/4 recompute match, verdict unaffected. res 5bab6419. Independent verify 21/0 PASS (V5/V7 initial FAILs = probe bugs: V5 substring false-positive on gate-definition prose, V7 = the C11 leak). Registry v1.31 UNTOUCHED (ef5189e7), gap v1.10 UNTOUCHED (378de1cd); F-ledger F21 + GAP-5 mechanism_note landing preregistered as 3236. pre-append ledger file sha8 8c54a801."
   }
  ],
  "growth_curve": [
@@ -9507,5 +9572,5 @@
   }
  ],
  "schema_version": 3,
- "ledger_sha256_8": "3cba5317"
+ "ledger_sha256_8": "26a9fa05"
 }

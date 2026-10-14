@@ -1,10 +1,10 @@
-/* AtlasLens 图谱透镜 v1.8（tab 收敛 6→4；design/atlas_lens_tabs_consolidation_plan_v1.md）：
-   - 图谱全景（默认 · 特征唯一家）：指标条 + E 级分布条 + 四模式切换（图形=三域泳道 AtlasPanorama /
-     3D=立体馆 AtlasGallery / 列表=域树 AtlasTree / 卡片=特征卡网格），四模共享同一选中态与
-     FeatureDetail 详情抽屉；registry 版本链 select 移入全景头；底部「专项视图」折叠区（10 个 /rdc-* 页三组链接）
-   - v1.8 变更（design/atlas_gallery3d_scheme_v1.md，用户确认方案 A）：全景「3D」模式由散点空间
-     （AtlasSpace/space3d，退役留档）升级为立体馆 AtlasGallery/gallery3d——三域塔×族楼层×证据节点×
-     机制竖井×交叉天桥×模型轨道环×建馆回放；结构建筑化=把泳道骨架立起来，sel 协议键不变
+/* AtlasLens 图谱透镜 v1.11（tab 收敛 4 + 全景四模；design/atlas_module_space3d_scheme_v1.md）：
+   - 图谱全景（默认 · 特征唯一家）：指标条 + E 级分布条 + 四模式切换（模块=2D 双栏对照 AtlasModuleView /
+     模块空间=三舱一塔三桥 3D AtlasModuleSpace / 模板空间=模板 3D AtlasTemplateSpace / 卡片=特征卡网格），
+     四模共享同一选中态与 FeatureDetail 详情抽屉；registry 版本链 select 移入全景头；底部「专项视图」折叠区
+   - v1.10 去重（用户确认执行）：退役 map/gallery/list 三模式；AtlasGallery/AtlasTree 组件已删（留档 git 历史），
+     AtlasPanorama 保留（总览 home 首屏仍引用）但不再进入图谱全景；
+     gallery3d 派生数据段保留不删
    - 跨线账本：GET /api/ai-rnd/atlas/ledger 分页时间线（append-only 只读；唯一 Phase 时间线，
      全景指标条两卡可点击直达）
    - 结果库：ResultsExplorer mode="results"（原技术透镜「按结果」面，知识轴归图谱）
@@ -19,10 +19,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import ResultsExplorer from './ResultsExplorer.jsx';
 import RegistryPanel from './RegistryPanel.jsx';
-import AtlasPanorama from './AtlasPanorama.jsx';
-import AtlasGallery from './AtlasGallery.jsx';
-import AtlasTree from './AtlasTree.jsx';
 import AtlasModuleView from './AtlasModuleView.jsx';
+import AtlasModuleSpace from './AtlasModuleSpace.jsx';
 import AtlasTemplateSpace from './AtlasTemplateSpace.jsx';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
@@ -115,10 +113,13 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
   /* v1.6：tab 收敛为 4；旧 ?atlasTab=tree|map|features|special 兼容归一到全景（features 归一到卡片模式） */
   const normTab = t => ({ tree: 'overview', map: 'overview', features: 'overview', special: 'overview' }[t] || t || 'overview');
   const [tab, setTab] = useState(normTab(initialTab));        // overview | ledger | results | registry
-  /* v1.9（scheme design/atlas_module_view_scheme_v1.md，用户 2026-10-13 确认落地）：
-     全景默认 = 模块视图（三模块模板↔机制双栏对照）；新增「模板空间」模式（Canvas 3D）。
-     旧 map（三域泳道）保留为「图形」模式，四模共享选中态与 FeatureDetail 抽屉协议不变。 */
-  const [panMode, setPanMode] = useState(initialTab === 'features' ? 'cards' : 'modules');  // modules/map/gallery/list/cards/tplspace
+  /* v1.10 去重（design/atlas_lens_dedup_audit_v1.md）：退役 map/gallery/list 三模式
+     （AtlasGallery/AtlasTree 已删，AtlasPanorama 保留供总览首屏）。
+     v1.11（scheme design/atlas_module_space3d_scheme_v1.md，用户确认落地 module_space.v1）：
+     全景默认 = 模块视图（2D 双栏查询工具）；新增「模块空间」模式（module_space.v1，三舱一塔三桥
+     3D 关系发现工具，数据 = atlas_tree_v2.module_space 派生段）。「模板空间」保留（模板粒度），
+     「卡片」保留（特征扫读）。特征选中态共用 FeatureDetail 抽屉协议，不引入第二事实源。 */
+  const [panMode, setPanMode] = useState(initialTab === 'features' ? 'cards' : 'modules');  // modules/modspace/tplspace/cards
   const [data, setData] = useState(null);                // registry payload
   const [versions, setVersions] = useState([]);
   const [version, setVersion] = useState(null);
@@ -211,20 +212,16 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
             <span className="at-pan-toggle">
               <button type="button" className={'at-tab' + (panMode === 'modules' ? ' on' : '')} onClick={() => setPanMode('modules')}
                 title="三模块视图（atlas_tree_v2）：知识网络/推理功能/语法机制 × 语言模板↔编码机制双栏对照 + 关联边三态 + 缺口清单">模块</button>
+              <button type="button" className={'at-tab' + (panMode === 'modspace' ? ' on' : '')} onClick={() => setPanMode('modspace')}
+                title="三模块 3D 关系空间（module_space.v1）：三舱一塔三桥——KN 晶格舱/AR 链舱/GR 环形舱 + 机制竖井塔 + 汇合核；桥线宽编码分离度（registry 角度派生）">模块空间</button>
               <button type="button" className={'at-tab' + (panMode === 'tplspace' ? ' on' : '')} onClick={() => setPanMode('tplspace')}
                 title="语言模板 3D 关系空间：模块聚簇 + 共享机制/同族/跨模块桥边；点击节点看测试详情">模板空间</button>
-              <button type="button" className={'at-tab' + (panMode === 'map' ? ' on' : '')} onClick={() => setPanMode('map')}>图形</button>
-              <button type="button" className={'at-tab' + (panMode === 'gallery' ? ' on' : '')}
-                onClick={() => setPanMode('gallery')} title="3D 立体馆（gallery3d.v1）：三域塔 × 族楼层 × 证据节点 × 机制竖井 × 交叉天桥 × 模型轨道 × 建馆回放">3D</button>
-              <button type="button" className={'at-tab' + (panMode === 'list' ? ' on' : '')} onClick={() => setPanMode('list')}>列表</button>
               <button type="button" className={'at-tab' + (panMode === 'cards' ? ' on' : '')} onClick={() => setPanMode('cards')}>卡片</button>
             </span>
           </div>
           {panMode === 'modules' && <AtlasModuleView sel={sel} onPickFeature={fid => setSel(cur => (cur === fid ? null : fid))}/>}
+          {panMode === 'modspace' && <AtlasModuleSpace sel={sel} onPickFeature={fid => setSel(cur => (cur === fid ? null : fid))}/>}
           {panMode === 'tplspace' && <AtlasTemplateSpace onPickFeature={fid => setSel(cur => (cur === fid ? null : fid))}/>}
-          {panMode === 'map' && <AtlasPanorama sel={sel} onPick={fid => setSel(cur => (cur === fid ? null : fid))}/>}
-          {panMode === 'gallery' && <AtlasGallery sel={sel} onPick={fid => setSel(cur => (cur === fid ? null : fid))} onGo={onGo}/>}
-          {panMode === 'list' && <AtlasTree onPick={fid => setSel(cur => (cur === fid ? null : fid))}/>}
           {panMode === 'cards' && (
             <div className="at-grid">
               {data.features.map(f => (

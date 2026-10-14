@@ -806,36 +806,13 @@
 .at-ov-seg.at-e2{background:#1e5c22}.at-ov-seg.at-e3{background:#8a4b16}.at-ov-seg.at-e1{background:#24558a}
 
 
-/* ---- 域树视图（AtlasTree，AtlasLens v1.4；design/atlas_domain_tree_scheme_v1.md §3.1） ---- */
-.at-tree{display:flex;flex-direction:column;gap:10px;min-width:0}
-.at-tree-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.at-tree-head .dim2{font-size:11px;color:#7a8494}
-.at-tree-cov{display:flex;flex-direction:column;gap:5px;border:1px solid var(--line,#d9dee6);border-radius:8px;padding:8px 12px;background:#fbfcfe}
-.at-tree-cov-row{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;font-size:11.5px;color:#39434e}
-.at-tree-cov-row .bar{display:flex;height:10px;border-radius:4px;overflow:hidden;background:#eef1f5}
-.at-tree-cov-row .seg{height:100%}
-.at-tree-cov-row .seg.e2{background:#1e5c22}
-.at-tree-cov-row .seg.e1{background:#24558a}
-.at-tree-cov-row .ct{color:#52616f}
+/* ---- 图谱全景（AtlasPanorama，总览 home 首屏主体 + AtlasLens 全景头/切换条共用；三域泳道可视化） ---- */
+.at-pan{display:flex;flex-direction:column;gap:8px;min-width:0}
+/* 机制横切过滤条（原域树段样式，AtlasPanorama 仍在用——v1.10 去重后唯一使用家） */
 .at-tree-mechs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .at-tree-mechs .lbl{font-size:11px;color:#7a8494}
-.at-tree-mechs .at-chip{cursor:pointer;font-size:11px;font-family:var(--fw-mono,monospace);padding:2px 8px;background:#f4f6f9}
+.at-tree-mechs .at-chip{cursor:pointer;padding:2px 8px;background:#f4f6f9}
 .at-tree-mechs .at-chip.on{background:#24558a;color:#fff}
-.at-tree-domain{border:1px solid var(--line,#d9dee6);border-radius:10px;background:#fff;overflow:hidden}
-.at-tree-domain h6{margin:0;padding:8px 12px;font-size:12.5px;color:#1a1d23;border-bottom:1px solid var(--line,#d9dee6);background:#f4f6f9;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.at-tree-domain h6 span{font:400 10.5px var(--fw-mono,monospace);color:#7a8494}
-.at-tree-fam{padding:4px 0}
-.at-tree-fam + .at-tree-fam{border-top:1px dashed var(--line,#d9dee6)}
-.at-tree-fam-h{display:flex;align-items:baseline;gap:8px;padding:4px 12px;font-size:11.5px;font-weight:500;color:#39434e}
-.at-tree-fam-h .dim2{font-size:9.5px;color:#9aa4b1}
-.at-tree-ft{display:grid;grid-template-columns:34px 62px 1fr;gap:8px;align-items:center;width:100%;padding:5px 12px;border:0;border-top:1px solid #eef1f5;background:none;text-align:left;font:inherit;cursor:pointer}
-.at-tree-ft:hover{background:#f4f8fd}
-.at-tree-ft.dim{opacity:.35}
-.at-tree-ft .st{font-size:11px;color:#52616f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.at-badge-lv{display:inline-block;font-size:10px;border:1px solid;border-radius:4px;padding:0 4px;text-align:center}
-
-/* ---- 图谱全景（AtlasPanorama，AtlasLens v1.5 首屏；三域泳道可视化） ---- */
-.at-pan{display:flex;flex-direction:column;gap:8px;min-width:0}
 .at-pan-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0}
 .at-pan-head b{font-size:13px;color:#1a1d23}
 .at-pan-head .dim2{font-size:11px;color:#7a8494}
@@ -1004,47 +981,11 @@
 .fw-domain .fw-rg-note{font-size:12px;padding:4px 0 4px 14px;margin-top:14px}
 
 
-/* ---- 图谱 3D 立体馆（AtlasGallery，gallery3d.v1；design/atlas_gallery3d_scheme_v1.md；容器样式沿用 at-space 系） ---- */
-.at-space{position:relative;height:100%;min-height:420px;overflow:hidden;background:#fbfcfe;border:1px solid var(--line,#d9dee6);border-radius:10px}
-.at-space-cv{display:block;width:100%;height:100%;cursor:grab}
-.at-space-cv:active{cursor:grabbing}
-.at-space-empty{display:flex;align-items:center;justify-content:center;padding:24px;font-size:12px;color:#7a8494;text-align:center}
-.at-space-cap{position:absolute;left:10px;top:8px;font-size:10.5px;color:#8a93a3;pointer-events:none}
-.at-space-cap b{color:#b45309;font-weight:500}
-.at-space-legend{position:absolute;left:10px;bottom:40px;display:flex;gap:10px;font-size:10.5px;color:#52616f;pointer-events:none}
-.at-space-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.at-space-panel{position:absolute;right:10px;top:8px;width:148px;background:#fff;border:1px solid var(--line,#d9dee6);border-radius:8px;padding:8px 10px;font-size:11px;color:#39434e}
-.at-space-panel b{display:block;font-size:10.5px;color:#1a1d23;font-weight:500;margin-bottom:3px}
-.at-space-panel label{display:flex;align-items:center;gap:5px;padding:1.5px 0;cursor:pointer}
-.at-space-seg{display:flex;gap:0;border:1px solid var(--line,#d9dee6);border-radius:6px;overflow:hidden;margin-bottom:4px}
-.at-space-seg button{flex:1;border:0;background:#f4f6f9;font:inherit;font-size:10.5px;padding:2.5px 0;cursor:pointer;color:#52616f}
-.at-space-seg button.on{background:#24558a;color:#fff}
-.at-space-panel select{width:100%;font-size:10.5px;padding:2px}
-.at-gal-presets{display:flex;gap:3px;margin-bottom:4px}
-.at-gal-presets button{flex:1;border:1px solid var(--line,#d9dee6);background:#f4f6f9;border-radius:5px;font:inherit;font-size:10px;padding:2px 0;cursor:pointer;color:#52616f}
-.at-gal-presets button.on{background:#24558a;color:#fff;border-color:#24558a}
-.at-space-card{position:absolute;right:10px;top:196px;width:210px;background:#fff;border:1px solid var(--line,#d9dee6);border-radius:8px;padding:8px 10px;font-size:11px;box-shadow:0 6px 18px rgba(15,23,42,.08)}
-.at-space-card .hd{display:flex;align-items:baseline;gap:6px}
-.at-space-card .hd .mono{font-family:ui-monospace,Consolas,monospace;font-weight:500;color:#1a1d23}
-.at-space-card .hd .lv{font-size:10px;border:1px solid;border-radius:4px;padding:0 5px}
-.at-space-card .hd .x{margin-left:auto;border:0;background:none;font-size:14px;cursor:pointer;color:#8a93a3;padding:0 2px}
-.at-space-card p{margin:5px 0;font-size:10.5px;color:#39434e;line-height:1.5}
-.at-space-card .mono{font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#8a93a3}
-.at-space-card button{margin-top:5px;border:1px solid var(--line,#d9dee6);background:#f4f6f9;border-radius:6px;padding:2px 8px;font:inherit;font-size:10.5px;cursor:pointer;color:#185fa5}
-.at-space-time{position:absolute;left:10px;right:10px;bottom:8px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line,#d9dee6);border-radius:8px;padding:5px 12px;font-size:10.5px;color:#39434e}
-.at-space-time b{font-weight:500;color:#1a1d23}
-.at-space-time input[type=range]{flex:1;accent-color:#24558a}
-.at-space-time .mono{font-family:ui-monospace,Consolas,monospace}
-.at-space-time .dim{color:#8a93a3}
-.at-space-famclear{border:1px solid var(--line,#d9dee6);background:#f4f6f9;border-radius:5px;padding:1px 7px;font:inherit;font-size:10px;cursor:pointer;color:#52616f}
-.at-space-selhint{position:absolute;left:10px;bottom:64px;background:#fff;border:1px solid var(--line,#d9dee6);border-radius:8px;padding:4px 10px;font-size:10.5px;color:#39434e;box-shadow:0 4px 14px rgba(15,23,42,.07)}
+/* （v1.10 去重：图谱 3D 立体馆 AtlasGallery 已退役——at-space-*/at-gal-* 样式段随组件删除，
+   gallery3d 派生数据段按 append-only 纪律保留；模板 3D 关系空间使用独立 ats-* 前缀，见文末） */
 
 /* ===== 行业进展 v5：阶段目标 / 关键成果 改为上下两行 ===== */
 .fw-domain .fw-era-body{grid-template-columns:1fr;gap:12px}
-
-.at-space-tip{position:absolute;pointer-events:none;background:#1a1d23;color:#fff;border-radius:6px;padding:4px 8px;font-size:10.5px;max-width:240px;z-index:20}
-.at-space-tip b{display:block;font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#9fd0ff;margin-bottom:1px}
-.at-space-tip span{line-height:1.4}
 /* ===== 行业进展 v6：对比卡默认隐藏，点击展开（箭头旋转指示） ===== */
 .fw-peers-sec{margin-top:4px}
 .fw-peers-btn{display:inline-flex;align-items:baseline;gap:8px;border:0;background:none;padding:5px 2px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--fw-text);cursor:pointer;text-align:left}
@@ -1191,3 +1132,39 @@
 .ats-legend .gd{width:9px;height:9px;border-radius:50%;background:#dc2626;display:inline-block}
 .ats-legend .note{margin-left:auto;font-size:10px;color:#9aa3ad}
 .ats-detail{border-top:1px solid #e2e5ea}
+
+/* ============================================================
+   AtlasModuleSpace · 三模块 3D 关系空间（module_space.v1；atms-* 前缀）
+   design/atlas_module_space3d_scheme_v1.md —— 三舱一塔三桥
+   ============================================================ */
+.atms-root{display:flex;flex-direction:column;gap:8px;min-width:0}
+.atms-stage{position:relative;height:540px;overflow:hidden;background:#fbfcfe;border:1px solid var(--line,#d9dee6);border-radius:10px}
+.atms-cv{display:block;width:100%;height:100%;cursor:grab}
+.atms-cv:active{cursor:grabbing}
+.atms-cap{position:absolute;left:10px;top:8px;font-size:10.5px;color:#8a93a3;pointer-events:none}
+.atms-cap b{color:#b45309;font-weight:500}
+.atms-toolbar{position:absolute;right:10px;top:8px;width:168px;display:flex;flex-direction:column;gap:5px;background:#fffffff2;border:1px solid #d9dee6;border-radius:10px;padding:8px 10px;font-size:11px;color:#39434e}
+.atms-toolbar>b{font-size:10.5px;color:#1a1d23;font-weight:500}
+.atms-row{display:flex;gap:4px;flex-wrap:wrap}
+.atms-row .fw-tbtn{padding:2px 8px;font-size:10.5px}
+.atms-row .fw-tbtn.on{background:#24558a;color:#fff;border-color:#24558a}
+.atms-row .fw-tbtn.atms-kn.on{background:#0ea5e9;border-color:#0ea5e9}
+.atms-row .fw-tbtn.atms-ar.on{background:#d85a30;border-color:#d85a30}
+.atms-row .fw-tbtn.atms-gr.on{background:#059669;border-color:#059669}
+.atms-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:#52616f}
+.atms-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:-1px}
+.atms-ln{display:inline-block;width:14px;margin-right:3px;vertical-align:3px}
+.atms-detail{border:1px solid #d9dee6;border-radius:10px;background:#fff;padding:10px 14px;min-height:64px;font-size:12px;color:#39434e}
+.atms-dh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.atms-dh b{font-size:12.5px;color:#1a1d23}
+.atms-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+@media (max-width:900px){.atms-dgrid{grid-template-columns:1fr}}
+.atms-chips{margin-top:3px}
+.atms-chips .chip{display:inline-block;font-size:10.5px;background:#f4f6f9;border:1px solid #d9dee6;border-radius:4px;padding:1px 7px;margin:2px 4px 2px 0}
+.atms-chips .atms-chip-x{color:#b45309;border-color:#fde68a;background:#fffbeb}
+.atms-chips .chip.gap{color:#b91c1c;border-color:#fecaca;background:#fef2f2}
+.atms-stmt{font-size:11.5px;line-height:1.6;color:#52616f}
+.atms-angles{display:flex;gap:16px;margin:3px 0}
+.atms-angle{text-align:center}
+.atms-angle b{display:block;font-size:15px;font-weight:700;color:#1a1d23}
+.atms-angle span{font-size:9.5px;color:#7a8494}
