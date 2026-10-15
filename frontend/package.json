@@ -3,7 +3,8 @@
   "productName": "AI2050 语言机制研究平台",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "description": "AI2050 语言机制研究平台客户端 — 图谱 / 模板 / 机制查询与可视化",
+  "author": "AI2050 Research Platform",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -19,31 +20,30 @@
     "dist": "npm run build && electron-builder --win --x64",
     "dist:dir": "npm run build && electron-builder --dir"
   },
-  "dependencies": {
+  "//": "前端依赖全部列在 devDependencies：Electron 主进程只用 Node 内置模块（http/https/fs/path/child_process），运行期不需要 react/three 等——它们已由 vite 打进 dist/。这同时让 electron-builder 不把 300MB node_modules 打进 asar。",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
     "@types/three": "^0.182.0",
+    "@vitejs/plugin-react": "^5.1.1",
     "axios": "^1.13.3",
+    "electron": "^44.7.2",
+    "electron-builder": "^26.15.3",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "framer-motion": "^12.29.0",
+    "globals": "^16.5.0",
     "lucide-react": "^0.563.0",
     "plotly.js": "^2.35.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-plotly.js": "^2.6.0",
     "recharts": "^3.7.0",
-    "three": "^0.182.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^44.7.2",
-    "electron-builder": "^26.15.3",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
+    "three": "^0.182.0",
     "vite": "^7.2.4"
   },
   "build": {
@@ -51,7 +51,7 @@
     "productName": "AI2050 语言机制研究平台",
     "copyright": "AI2050 Research Platform",
     "directories": {
-      "output": "release",
+      "output": "dist-electron",
       "buildResources": "electron"
     },
     "files": [
@@ -76,9 +76,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "AI2050 语言机制研究平台",
-      "installerIcon": "electron/icon.ico",
-      "uninstallerIcon": "electron/icon.ico",
-      "installerHeaderIcon": "electron/icon.ico",
       "deleteAppDataOnUninstall": false
     },
     "linux": {
