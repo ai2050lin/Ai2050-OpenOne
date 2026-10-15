@@ -1,6 +1,7 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
-const API=(import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction')+'/questions';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}/questions`;
 const fmt=x=>x==null?'未定义':Number(x).toPrecision(6);
 const columns=[['passage_mass_fraction','篇章注意力比例'],['question_mass_fraction','问题比例'],['other_mass_fraction','其余提示比例'],
   ['passage_conditional_effective_source_fraction','篇章有效来源 / token数'],['passage_coupling_L2','篇章配对项 L2'],['passage_permutation_delta_L2','置换读取变化 L2'],

@@ -1,0 +1,26 @@
+# AI2050 中心服务（:5001）运行依赖 —— CentOS / CPU 版
+#
+# 版本取自 2026-10-14 本机实测环境（.venv），保证与已验证行为一致。
+# 安装：/opt/ai2050/venv/bin/pip install -r requirements-server.txt
+#
+# ⚠️ torch 走 **CPU wheel 索引**（服务器无 GPU 时），否则会拉 2GB+ CUDA 包：
+#    /opt/ai2050/venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
+#    若服务器有 NVIDIA 卡 + 驱动，改为对应 CUDA 版本索引即可。
+#
+# ⚠️ transformer-lens **不在此列表**：仓库自带 transformer_lens/ 源码目录，
+#    server.py 从仓库根导入即可（2026-10-14 实测未安装 pip 包也能成功导入）。
+#    → 必须在仓库根目录启动，否则 import transformer_lens 失败。
+
+# ── Web 层 ───────────────────────────────────────────────────
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
+pydantic==2.13.4
+
+# ── 数值层 ───────────────────────────────────────────────────
+numpy==2.5.1
+scipy==1.18.0
+
+# ── 模型工具层（SKIP_MODEL_LOAD=1 时不加载权重，但 import 链需要）──
+torch==2.13.0
+transformers==5.14.1
+safetensors==0.8.0

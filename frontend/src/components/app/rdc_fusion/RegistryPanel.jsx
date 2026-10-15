@@ -3,10 +3,10 @@
    - RegistryCards：语言模板注册表 × 分析技术注册表 + 研究包组合（LIVE=GET /api/kits，available 行可下载整包）
    - MaturityCards：四类分析技术 × 平台状态机（与 Q04/Q06「装置建成→正式测量」同构）
    注：节点 / 模板矩阵 / AGG 管线（运行时）不在本面板——已迁研发透镜「平台运行」tab。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import { LANG_TEMPLATES, ANALYSES, RESEARCH_KITS, TECH_CATEGORIES, DEMO_COVERAGE } from './distributedData.js';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 /* M7-P1 技术类别查找（PROJECTIONS/era cat → 名称/颜色/短名，数据 ← TECH_CATEGORIES） */
 const catOf=id=>TECH_CATEGORIES.find(c=>c.id===id)||{};

@@ -1,0 +1,27 @@
+{
+ "tm_id": "TM-ISA-DEMO",
+ "version": 1,
+ "name": "G-line 3236 isa demo pipeline (bundle protocol example)",
+ "design_sha": "2ecf0e9ea50a360e2c30d033c238ed61be97b81f1d99d3af917036563c91d7a5",
+ "preregistered": true,
+ "status": "protocol_example_NOT_registered",
+ "metric_pin": "margin (corpus.margin_def), bf16 final-slot logits",
+ "model_pin": "qwen3-4b bf16 (3236 arm); shards via AI2050_SHARD",
+ "gates": {
+  "G1_sep_pos": "mean margin separation > 0 in all 5 templates",
+  "G2_stitch": "mean cross-template spearman >= 0.6",
+  "G3_xlang_behavior": "mean ZH-EN spearman >= 0.5",
+  "G4_layer_report": "layer curve recorded, report-only"
+ },
+ "verdict_rule": "DEMO_PIPELINE_COMPLETE if G1-G3 all pass else DEMO_PIPELINE_PARTIAL (demo-level gates, no E-level claim)",
+ "provenance": {
+  "source_phase": 3236,
+  "source_freeze_sha8": "b1fa889f",
+  "source_res_sha8": "8b79ed5e",
+  "registry_at_export": "v1.32 (file 3c3f0484)",
+  "gap_at_export": "v1.11 (file 5934631b)",
+  "ledger_at_export": "n=389 post d37ca65f",
+  "alignment_doc": "research/gpt5/docs/CLIENT_SERVER_ALIGNMENT_v1.md"
+ },
+ "registration": "to register on the hub: deploy/distributed_service.py S2 template-register with this corpus/runner pair; design_sha must reproduce byte-exact (canonical json sort_keys separators(\",\",\":\"))"
+}

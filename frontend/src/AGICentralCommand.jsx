@@ -1,3 +1,4 @@
+import { API_BASE } from './config.js';
 import {
     Brain,
     CheckCircle2,
@@ -19,7 +20,7 @@ const AGICentralCommand = ({ onClose }) => {
   const [selectedPhaseId, setSelectedPhaseId] = useState('theory'); // Default to top-level Theory
 
   useEffect(() => {
-    fetch('http://localhost:5001/agi/progress')
+    fetch(`${API_BASE}/agi/progress`)
       .then(res => res.json())
       .then(d => {
         if (d.status === 'success') {

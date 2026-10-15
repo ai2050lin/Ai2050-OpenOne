@@ -1,9 +1,10 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import FormationProgramEvidence from './RdcFormationProgramEvidence.jsx';
 import './RdcFormationEvidence.css';
 
-const API=import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}`;
 async function get(path,params={}){const r=await fetch(API+path+'?'+new URLSearchParams(params));if(!r.ok)throw new Error((await r.json()).detail||r.statusText);return r.json();}
 
 export default function FormationEvidence({data,refresh}){

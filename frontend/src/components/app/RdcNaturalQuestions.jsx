@@ -1,9 +1,10 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect, useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import NaturalAnalyses from './RdcNaturalAnalyses.jsx';
 import SourceCoupling from './RdcSourceCoupling.jsx';
 
-const API=(import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction')+'/questions';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}/questions`;
 const MODELS=['qwen4','qwen14','glm4'];
 const fmt=x=>x==null?'未提交':Number(x).toPrecision(6);
 async function get(path,params={}){

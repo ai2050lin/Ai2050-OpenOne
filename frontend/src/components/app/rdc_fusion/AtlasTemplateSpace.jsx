@@ -3,10 +3,10 @@
    边三类（由 links 派生，非手工维护）：共享 FTR（灰）/ 同模板家族（紫）/ 跨模块桥（橙虚线）；
    交互：拖拽旋转 / 滚轮缩放 / 自动旋转 / 模块显隐 / 边标签开关；点击节点 → 下方三段详情面板。
    点击特征 → onPickFeature(fid) 联动 FeatureDetail 抽屉。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LANG_TEMPLATES } from './distributedData.js';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const ECLASS = { E2_predictive: 'at-e2', E2_held_out: 'at-e2', E2_behavioral: 'at-e2', E3_causal_scoped: 'at-e3', E1_repeatable: 'at-e1' };
 const ELABEL = { E2_predictive: 'E2', E2_held_out: 'E2h', E2_behavioral: 'E2b', E3_causal_scoped: 'E3', E1_repeatable: 'E1' };
 const ST_NAME = { measured: '已实测', collecting: '采集中', demo: 'DEMO', pending: '待启动', done: '已完成' };

@@ -1,9 +1,9 @@
+import { API_BASE } from '../config.js';
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, Save, ChevronDown, ChevronRight, Eye, EyeOff, Brain, Search } from 'lucide-react';
 import { DEFAULT_MASTER_MODEL, DEFAULT_ANALYST_MODELS, API_TYPES } from './aiRnDConfig';
 import { beginBackendRequest, clearBackendUnavailable, isFetchNetworkError, markBackendUnavailable } from '../utils/backendAvailability';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 export const AIRnDConfigTab = () => {
   const [masterModel, setMasterModel] = useState(DEFAULT_MASTER_MODEL);

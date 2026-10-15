@@ -1,0 +1,946 @@
+{
+ "schema_version": "template_grammar.v1",
+ "family_id": "KN-ISA",
+ "module": "KN",
+ "name": "知识网络 · 上下位（is-a）",
+ "description": "6 个类别 × 14 个成员 × 5 种句式；目标位置为成员词。检验类别因子方向是否跨句式稳定、能否推广到未见成员（lockbox）与未见句式（lockbox_frame）。",
+ "factors": [
+  "category",
+  "frame"
+ ],
+ "concepts": {
+  "frame=interrog": "疑问",
+  "frame=decl": "陈述"
+ },
+ "layers": [
+  "first",
+  "mid",
+  "last"
+ ],
+ "frames": [
+  {
+   "id": "decl",
+   "levels": {
+    "frame": "decl"
+   },
+   "text": "{X}是一种{Y}。",
+   "target": "X",
+   "probe": {
+    "prompt": "{X}是一种",
+    "answer": "{Y}"
+   }
+  },
+  {
+   "id": "interrog",
+   "levels": {
+    "frame": "interrog"
+   },
+   "text": "{X}是不是一种{Y}？",
+   "target": "X",
+   "probe": {
+    "prompt": "问：{X}属于哪一类？答：{X}属于",
+    "answer": "{Y}"
+   }
+  },
+  {
+   "id": "scene",
+   "levels": {
+    "frame": "scene"
+   },
+   "text": "昨天我在书上看到了{X}，它属于{Y}。",
+   "target": "X",
+   "probe": {
+    "prompt": "昨天我在书上看到了{X}，它属于",
+    "answer": "{Y}"
+   }
+  },
+  {
+   "id": "concess",
+   "levels": {
+    "frame": "concess"
+   },
+   "text": "虽然{X}很常见，但它确实是一种{Y}。",
+   "target": "X",
+   "probe": {
+    "prompt": "虽然{X}很常见，但它确实是一种",
+    "answer": "{Y}"
+   }
+  },
+  {
+   "id": "topic",
+   "levels": {
+    "frame": "topic"
+   },
+   "text": "说到{Y}，{X}就是其中之一。",
+   "target": "X",
+   "probe": {
+    "prompt": "{X}通常被归为",
+    "answer": "{Y}"
+   }
+  }
+ ],
+ "fillers": [
+  {
+   "id": "fruit-00",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "苹果",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-01",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "香蕉",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-02",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "葡萄",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-03",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "西瓜",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-04",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "橙子",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-05",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "草莓",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-06",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "芒果",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-07",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "桃子",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-08",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "梨",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-09",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "樱桃",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-10",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "菠萝",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-11",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "柠檬",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-12",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "荔枝",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "fruit-13",
+   "levels": {
+    "category": "fruit"
+   },
+   "slots": {
+    "X": "石榴",
+    "Y": "水果"
+   }
+  },
+  {
+   "id": "animal-00",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "老虎",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-01",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "大象",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-02",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "狮子",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-03",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "长颈鹿",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-04",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "熊猫",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-05",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "狐狸",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-06",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "猴子",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-07",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "斑马",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-08",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "袋鼠",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-09",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "骆驼",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-10",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "狼",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-11",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "兔子",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-12",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "松鼠",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "animal-13",
+   "levels": {
+    "category": "animal"
+   },
+   "slots": {
+    "X": "刺猬",
+    "Y": "动物"
+   }
+  },
+  {
+   "id": "metal-00",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "铁",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-01",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "铜",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-02",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "铝",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-03",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "金",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-04",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "银",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-05",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "锌",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-06",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "锡",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-07",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "铅",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-08",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "镍",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-09",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "钛",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-10",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "钨",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-11",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "镁",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-12",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "铂",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "metal-13",
+   "levels": {
+    "category": "metal"
+   },
+   "slots": {
+    "X": "钴",
+    "Y": "金属"
+   }
+  },
+  {
+   "id": "tool-00",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "锤子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-01",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "螺丝刀",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-02",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "扳手",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-03",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "钳子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-04",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "锯子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-05",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "剪刀",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-06",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "斧头",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-07",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "铲子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-08",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "凿子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-09",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "锉刀",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-10",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "卷尺",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-11",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "电钻",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-12",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "撬棍",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "tool-13",
+   "levels": {
+    "category": "tool"
+   },
+   "slots": {
+    "X": "镊子",
+    "Y": "工具"
+   }
+  },
+  {
+   "id": "vehicle-00",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "汽车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-01",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "火车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-02",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "飞机",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-03",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "轮船",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-04",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "自行车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-05",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "摩托车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-06",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "公交车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-07",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "地铁",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-08",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "卡车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-09",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "出租车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-10",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "轮渡",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-11",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "直升机",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-12",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "电车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "vehicle-13",
+   "levels": {
+    "category": "vehicle"
+   },
+   "slots": {
+    "X": "马车",
+    "Y": "交通工具"
+   }
+  },
+  {
+   "id": "instrument-00",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "钢琴",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-01",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "小提琴",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-02",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "吉他",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-03",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "二胡",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-04",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "笛子",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-05",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "鼓",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-06",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "琵琶",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-07",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "古筝",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-08",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "萨克斯",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-09",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "长笛",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-10",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "大提琴",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-11",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "竖琴",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-12",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "手风琴",
+    "Y": "乐器"
+   }
+  },
+  {
+   "id": "instrument-13",
+   "levels": {
+    "category": "instrument"
+   },
+   "slots": {
+    "X": "唢呐",
+    "Y": "乐器"
+   }
+  }
+ ],
+ "splits": {
+  "unit": "filler",
+  "fractions": {
+   "discovery": 0.6,
+   "confirm": 0.2,
+   "lockbox": 0.2
+  },
+  "salt": "v1",
+  "heldout_frames": [
+   "topic"
+  ]
+ },
+ "prereg": {
+  "min_behavior_acc": 0.8,
+  "min_probe_n": 3,
+  "min_cell_n": 6,
+  "min_lockbox_cos": 0.5
+ },
+ "shards": 4,
+ "language_graph_target_ids": [
+  "LG-TAXONOMY"
+ ]
+}

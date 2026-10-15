@@ -1,3 +1,4 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect, useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import {RuntimeFields,HistoryFindings,SelfHistory} from './RdcRuntimeAtlas.jsx';
@@ -7,7 +8,7 @@ import './RdcPrefixAtlas.css';
 import './RdcJointAtlas.css';
 import './RdcConstructionAtlas.css';
 
-const API=import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}`;
 const MODELS=['qwen4','qwen14','glm4'];
 const number=x=>x==null?'未提交':Number(x).toLocaleString('zh-CN');
 const precise=x=>x==null?'未提交':x!==0&&Math.abs(x)<1e-5?x.toExponential(4):x.toFixed(6);

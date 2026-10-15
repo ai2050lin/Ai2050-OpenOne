@@ -4,9 +4,9 @@
    域间交叉 strip（X1–X3 一等边，虚线连回所属域头），点击特征节点 → onPick(fid) 打开详情抽屉。
    布局确定性（无随机）：泳道 x 固定，族纵向堆叠，节点行内排列；非度量几何，图内已标注。
    数据源：GET /api/ai-rnd/atlas/tree（server/derive_atlas_tree.py 派生，零实验字面量）。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const ECLASS = { E2_predictive: 'at-e2', E2_held_out: 'at-e2', E3_causal_scoped: 'at-e3', E1_repeatable: 'at-e1' };
 const ELABEL = { E2_predictive: 'E2', E2_held_out: 'E2h', E3_causal_scoped: 'E3', E1_repeatable: 'E1' };
 const ELEGEND = { E2_predictive: 'E2 可预测', E2_held_out: 'E2h 留出', E3_causal_scoped: 'E3 协议内因果', E1_repeatable: 'E1 可重复' };

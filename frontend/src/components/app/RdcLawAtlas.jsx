@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config.js';
 import {useEffect, useMemo, useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import './RdcPrefixAtlas.css';
@@ -5,7 +6,7 @@ import './RdcJointAtlas.css';
 import './RdcOperatorAtlas.css';
 import './RdcLawAtlas.css';
 
-const API='http://127.0.0.1:5001/api/rdc-law';
+const API = `${API_BASE}/api/rdc-law`;
 const fmt=x=>x==null?'—':Number(x).toPrecision(5);
 async function get(path,params){const r=await fetch(API+path+(params?'?'+new URLSearchParams(params):''));if(!r.ok)throw new Error((await r.json().catch(()=>({}))).detail||r.statusText);return r.json();}
 function ErrorLine({error}){return error?<p role="alert">{error}</p>:null;}

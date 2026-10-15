@@ -9,6 +9,7 @@
       不加载权重、秒级完成）。3D 舞台与数据分析共用（middle 插槽：连接栏/统计 → 3D → 参数浏览器）；
       激活级实时 forward 流属 P2。离线回退 LIVE_MODEL_DEMO（协议结构 demo，显式标注）。
    零依赖 canvas 伪 3D；接入点在各模式组件内注释 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import StackMode from './StackMode.jsx';
 import NeuronMode from './NeuronMode.jsx';
@@ -17,7 +18,6 @@ import ParamMode from './ParamMode.jsx';
 import { LANG_TEMPLATES, LIVE_MODEL_DEMO, PROJECTIONS, TECH_CATEGORIES } from './distributedData.js';
 import ModelManager from './ModelManager.jsx';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 /* M7-P1 投影层（PROJECTIONS 注册表驱动）：特征点云按技术产物切换投影。
    available 且 render=cloud-cos → 当前视图；render=panel → 显示说明面板（含契约缺口与跳转）；

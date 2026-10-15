@@ -1,9 +1,10 @@
+import { TRAINING_API_BASE } from '../config.js';
 import React, { useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
 import axios from 'axios';
 import LCSVisualization from './LCSVisualization';
 
-const API_BASE_URL = 'http://localhost:8000';
+
 
 const MainVisualizationArea = ({
   searchQuery,
@@ -42,19 +43,19 @@ const MainVisualizationArea = ({
 
       // 根据选择的类别加载不同的可视化数据
       if (selectedCategory === 'shared_bearing') {
-        endpoint = `${API_BASE_URL}/api/visualization/shared-bearing/heatmap`;
+        endpoint = `${TRAINING_API_BASE}/api/visualization/shared-bearing/heatmap`;
         payload = {
           family_type: selectedSubcategory || 'cross_family',
           model: 'deepseek7b'
         };
       } else if (selectedCategory === 'cross_model_validation') {
-        endpoint = `${API_BASE_URL}/api/visualization/cross-model/comparison`;
+        endpoint = `${TRAINING_API_BASE}/api/visualization/cross-model/comparison`;
         payload = {
           concept_ids: ['apple', 'banana', 'orange', 'grape', 'pear'],
           models: ['gpt2', 'qwen3', 'deepseek7b']
         };
       } else if (selectedCategory === 'bias_deflection') {
-        endpoint = `${API_BASE_URL}/api/visualization/shared-bearing/scatter`;
+        endpoint = `${TRAINING_API_BASE}/api/visualization/shared-bearing/scatter`;
         payload = {
           family_type: 'cross_family',
           model: 'deepseek7b'
@@ -76,7 +77,7 @@ const MainVisualizationArea = ({
   const generateDemoData = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/visualization/demo-data`);
+      await axios.post(`${TRAINING_API_BASE}/api/visualization/demo-data`);
       alert('示例数据已生成！');
       loadVisualizationData();
     } catch (error) {
@@ -99,7 +100,7 @@ const MainVisualizationArea = ({
       }
 
       // 否则执行搜索
-      const endpoint = `${API_BASE_URL}/api/search`;
+      const endpoint = `${TRAINING_API_BASE}/api/search`;
       const response = await axios.post(endpoint, {
         term: query.term,
         type: query.type || 'all',

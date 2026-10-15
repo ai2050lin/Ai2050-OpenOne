@@ -1,8 +1,6 @@
 import { API_CONFIG } from './api';
 
-
 const ASSET_API_BASE = `${API_CONFIG.main.replace(/\/$/, '')}/api/research-assets/file`;
-
 
 export function researchAssetUrl(path = '') {
   const value = String(path || '').trim();
@@ -22,6 +20,5 @@ export function researchAssetUrl(path = '') {
     .join('/');
   return encoded ? `${ASSET_API_BASE}/${encoded}` : ASSET_API_BASE;
 }
-
 
 export const RESEARCH_ASSET_API_BASE = ASSET_API_BASE;

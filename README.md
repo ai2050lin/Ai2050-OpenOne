@@ -235,17 +235,85 @@ G_f^{int}(\Psi_\theta(x);x,r,l,c)
 → 跨模型功能复现
 ```
 
-### 4. 三个工程工作区
+### 4. 分布式测试闭环（dist_protocol v3）
 
-#### 研究积累
+大量测试只有在「可合并、可复核、可做留出预测」时才会累积成机制证据。分布式测试按下面的闭环组织，实现在 `shared/dist_protocol/`，中心节点服务在 `deploy/distributed_service.py`：
 
-保存语言节点、超图关系、构式、Case/Pair、完整场、干预、证据、理论主张、关键拼图和闭合申请。
+```text
+生成式模板（句式框架 × 填充词表 × 因子水平）
+→ 按填充切分 discovery / confirm / lockbox，留出句式进 lockbox_frame
+→ 试跑行为门（模型答不对的条件格不进入内部分析）
+→ 冻结（design_sha 固定语料、runner 与预注册阈值）
+→ 分片派发到 GPU 节点
+→ 节点回传充分统计量 + 行为结果 + 金丝雀摘要
+→ 中心按「模型快照 × 精度」精确合并（金丝雀漂移、审计驳回的结果不进入）
+→ η² 分解 / 因子方向 / 格均值结构
+→ 留出预测：discovery 方向在未见词表、未见句式上是否达到预注册阈值
+→ 逐样本规律分析（analysis.v1）：置换检验、句式不变性、可加性、词身份与长度混杂 → 3D 响应空间与规律陈述
+→ 证据门链判定；证据等级仍在 Research OS 人工登记
+```
 
-#### 3D 机制显微镜
+关键设计：
 
-观察真实模型结构、实时前向事件、Embedding 完整场、当前 Layer HiddenState、条件差分、响应边和输出贡献。3D 是研究仪器，不是结论生成器。
+- **生成式模板**（`template_grammar.v1`）：一个模板族 = 若干句式框架 × 若干填充；每个组合生成一条样本，条件 = 框架水平 ∪ 填充水平。内置模板族见 `shared/dist_protocol/grammars/`（知识上下位、属性绑定、施事/受事 × 构式、否定 × 语气），在客户端「研发 · 模板工作室」编辑和预览。
+- **切分防泄漏**：按填充词确定性切分，同一填充的全部句式落在同一划分；lockbox 的词汇从未参与发现。
+- **可合并统计量**：节点不回传摘要，而是回传每个 (划分, 条件格, 层, 维) 的 n、Σx、Σx²。这些量可以相加，所以多节点合并后的 η² 与单机在全部样本上计算的结果一致。
+- **金丝雀**：每个模板包附带固定输入；同一模型快照和精度下，各节点的金丝雀向量摘要必须在容差内一致，否则该结果标为漂移并排除。
+- **证据门链**：行为 → 仪器 → 重复 → 留出复现 → 未见词表预测 → 未见句式预测 → 跨模型 → 选择性/充分性 → 必要性与负控制 → 自然生成。前 7 道由分布式协议自动判定，后 3 道需要干预或生成实验，当前显示「未运行」。门按顺序判定。
+- **验收指标**：预测记分板中 discovery 方向在 lockbox / lockbox_frame 上的复现分数（与冻结阈值比较），以及跨模型的功能结构一致性。它衡量「对未见材料的预测能力」，不等于机制闭合。
+- **逐样本向量（items.npz，`items.v1`）**：runner 默认同时保存每条样本在各采样层的向量（float16；超过 48MB 时用以语料种子固定的 JL 随机投影降维，同一模板族各分片投影一致）及条件、划分、填充、句式、token 数、作答对错。中心按 `results.sha` 去重拼接各分片。
+- **模式族规律分析（`shared/dist_protocol/analysis.py`，`analysis.v1`）**：只在 discovery 上拟合，在 confirm / lockbox / lockbox_frame 上检验。每层计算校正迹 η²（ε²，因子与词身份）、白化空间中的因子方向复现 cos 与最近质心探针准确率、按单位（填充词 / 句式 / 样本）整体打乱标签的置换零分布、句式不变性矩阵、split-half 可靠交互（可加性）、词身份超额方差、格内长度偏相关；再按代码中固定的判据（`CRITERIA`，随结果返回）生成「支持 / 未支持 / 注意 / 描述」规律陈述。3D 坐标为 discovery 拟合的 LDA（按因子）与 PCA，层堆叠视图用 Procrustes 对齐相邻层。接口：`GET /api/analysis/{tm_id}?bucket=&gate=1`。
+- **方法验证与负对照**：`tests/dist_protocol/test_analysis.py` 用合成模式植入已知规律（早层句式与词身份主导、中层类别可读且跨句式不变、组合可加），检查分析能否找回；再打乱类别标签，检查不会报告「支持」。
 
-#### AI 自动研发
+#### 一个模式族的完整流程
+
+`scripts/run_language_family.py` 用中心 HTTP 接口和 `deploy/node_agent.py` 把一个模式族从头跑到报告，数据与客户端看到的是同一份：
+
+```text
+① 文法预览 → ② 冻结试跑版 → ③ 节点跑试跑分片（行为门；达标格比例低于 --min-pilot-pass 时停止）
+→ ④ 冻结正式模板 → ⑤ 逐分片采集（node_agent --tm-id）→ ⑥ 中心合并 + 规律分析 → ⑦ 写报告（research/family_runs/）
+```
+
+```powershell
+# 真实模型（先启动后端 server.server，:5001 已挂载中心路由）
+python scripts/run_language_family.py --family KN-ISA --center http://127.0.0.1:5001 `
+  --model-path D:\AI2050\Ai2050-OpenOne\models\hf\qwen3-4b --model-id qwen3-4b --dtype bf16
+```
+
+完成后在客户端「空间 · 实验响应」选择该模板与模型桶，查看 **3D 响应空间** 与 **规律分析**。
+
+#### 在客户端一键运行：研发 · 自动测试
+
+「研发」的默认工位是 **自动测试**，用来对多个模型批量跑模式族测试，不需要敲命令：
+
+1. **登记被测模型**：「＋ 添加模型」→ 从本机模型库（`/api/models/local`，即 `models/` 与 HF 缓存）选择或填写权重目录 →「检查」读取 config.json（架构、层数、隐藏维、权重大小，不加载权重）→ 填 model_id（进入模型桶名）与精度。被测模型必须是本机权重：只有 API 的模型拿不到内部状态，不能作为被测对象。
+2. **勾选模式族**：列表来自文法库 `shared/dist_protocol/grammars/`。
+3. **运行**：填管理令牌，点「▶ 运行 N 个测试」。中心为每个「模型 × 模式族」组合建一个作业，在中心所在机器上**逐个**执行（同一模型的作业连续执行，一张 GPU 同时只跑一个模型），每个作业调用 `run_language_family.py --progress` 走完 7 步。
+4. **看进度与结果**：运行队列显示 7 段进度条、当前步骤、日志（可展开）、规律摘要；可取消、重跑。结果矩阵（模型 × 模式族）点击「完成」格直接进入「空间 · 实验响应」，并预选该模板与模型桶。
+
+试跑行为门达标比例低于设置值时，该组合停在「行为门停止」，不冻结正式模板。多个模型共用同一个冻结模板（同一文法与 runner 只冻结一次），中心按模型补齐各自缺的分片，每个模型一个模型桶。作业与日志保存在 `<AI2050_DIST_DIR>/autotest/`；后端重启时运行中的作业记为「中断」，需手动重跑。
+
+作业通过 `AI2050_AUTOTEST_CENTER`（缺省 `http://127.0.0.1:5001`；独立中心服务为其自身端口）回连中心。被测模型在子进程中加载：如果后端已通过「空间 · 实时分析」连接了一个大模型，先断开，避免显存不足。接口：`GET /api/autotest/state`、`POST /api/autotest/models|probe|batches|clear`、`DELETE /api/autotest/models/{id}`、`POST /api/autotest/jobs/{id}/cancel|retry`、`GET /api/autotest/jobs/{id}/log`。
+
+**沙盒合成模式（只验证流程）**：中心以 `AI2050_DIST_ALLOW_SYNTHETIC=1` 并配独立的 `AI2050_DIST_DIR` 启动时，才接受 `kind=synthetic` 结果并参与合并；模型桶名带「合成·」前缀，客户端总览和实验响应显示合成横幅，报告写入 `research/family_runs_synthetic/` 并标注 SYNTHETIC。正式中心默认拒绝合成结果。驱动加 `--synthetic` 即可在无 GPU 环境走完整流程。合成结果不代表任何真实模型，不能写入研究记录。
+
+#### 题库、研究包与语言谱图（开放参与）
+
+任何用户都可以通过客户端连接中心：读**题库**（`GET /api/catalog`：类别 → 模式族 → 冻结版本、各模型的测试状态、领题命令、贡献者），领取分片在本地 GPU 测试并回传；下载**研究包**（`GET /api/export/{tm}?bucket=`，respack.v1 zip：corpus / agg / analysis 含 3D 坐标 / suffstats / 逐条向量）到本地观察与复算；读**语言谱图**（`GET /api/atlas`，atlas.v1）。
+
+语言谱图（`shared/dist_protocol/atlas.py`）把各模式族的稳定特征连成跨族结构。
+- **特征**：每个因子水平在各层的对比方向，在原生坐标中比较，只在同一模型内比较方向。
+- **基线**：族基线与共享轴交替估计，避免共享成分经由本族平均泄漏。
+- **成边**：要求两组互不重叠的词各自复现，并超过该层跨族 cos 的经验零分布。
+- **共享编码轴**：用贪心生长，以留一族迁移检验。
+- **概念假设**：文法 `concepts` 预注册的跨族概念（如「疑问」），留出句式的水平作为未见句式预测。
+- **跨模型**：检验同一结构是否在其他模型复现。
+
+AI 解读（`POST /api/atlas/interpret`）用 Agent 工作流的主模型读谱图摘要，输出可检验假设，一律标为「未检验」，必须写成新模式族运行后才有结论。完整规范见 [design/platform_spec_v1.md](design/platform_spec_v1.md)（测试方法、结果格式、3D 可视化方案、挖掘算法、接口、客户端四界面修改建议）。
+
+完整设计与端点清单见 [design/client_v6_pipeline_ia.md](design/client_v6_pipeline_ia.md) 与 [design/platform_spec_v1.md](design/platform_spec_v1.md)。
+
+### 5. AI 自动研发
 
 采用项目任务线程、计划、执行日志、代码差异、测试、产物和独立审查组织自动研发：
 
@@ -265,6 +333,8 @@ AI 可以提出假设、编写代码和执行有界任务，但不能自行批�
 ---
 
 ## 四、当前进展
+
+> **2026-10-14 工程更新**：分布式测试协议 v3 与客户端 v6 已实现并通过离线测试（单元测试、中心服务端到端、界面交互）。内置模板族尚未在真实模型上运行，**本次更新不产生任何新的研究结果**；下文研究进展仍以 Phase 2578 为准。
 
 当前可审计基线是 **Phase 2578：Phase2551—2577 证据终审、产物核验与下一阶段合同**，记录时间为 **2026-09-03 17:19**。Phase 只表示实验与审计批次；正式研究主轴是语言操作、构念、合同、Run、工件和证据权限。
 
@@ -416,33 +486,21 @@ E_{u\rightarrow v}=I\land S\land N\land C\land P\land R
 
 ## 六、可视化客户端
 
-客户端包含三个一级工作区：
+客户端（`frontend/`，入口 `RdcFusionWorkspace`）按研究闭环分为五个一级界面。所有界面遵守同一条纪律：**没有真实数据时显示空态；演示或示意数据只出现在显式标注的区域。**
 
-### 研究积累
+| 界面 | 回答的问题 | 内容 |
+|---|---|---|
+| 总览 | 闭环推进到哪、今天要我决定什么 | 闭环漏斗（各阶段独立计数，不构成转化率）、**题库概览**（按类别的已完成 / 测试中 / 待测试 / 未冻结）、**谱图进展**（各模型共享编码轴与预注册概念、最近 AI 假设）、覆盖矩阵、数据健康、待我决策、**贡献者**、**参与测试**三步、最近研究裁决 |
+| 空间 | 模型内部对条件怎样响应 | **实验响应**（默认，单个模式族）：3D 响应空间（每点一条样本；LDA·因子 / PCA / 层堆叠轨迹）、规律分析、η² 剖面、条件结构、留出复现、跨模型、行为门；**下载研究包**。**语言谱图**（跨模式族，atlas.v1）：特征谱图 3D 空间（每点一个特征方向，MDS 布局，共享编码轴直接标注概念）、共享编码轴列表、概念假设（逐层成边与留出句式预测）、规律陈述、**AI 解读**（假设一律「未检验」；不可用时给出提示词）、导出谱图包；点击特征跳到该模式族的 3D。**打开本地包**：研究包 / 谱图包在浏览器内离线查看。**模型资产**：本机模型配置与权重（层平铺 / 参数热图） |
+| 研发 | 下一批测什么、怎样保证数据可信 | **自动测试**（默认：登记多个被测模型 × 勾选模式族一键运行；显示题库状态，可「只选未完成」「所选模型未测的」）· **题库**（类别 → 题目 → 各模型状态；复制本地领题命令、加入自动测试、查看 3D、下载研究包）· ① 模板工作室（含 **concepts 跨族概念预注册**编辑）② 试跑与冻结 ③ 分发与节点 ④ 审计队列 · Agent 工作流 |
+| 图谱 | 语言—响应关联与证据来源 | 研究图谱 / 证据中心 / 资源目录（特征、反证、复现协议、账本） |
+| 路线 | 每个假设卡在哪一道门 | 目标树：模板族证据门链 + **跨族机制候选链**（共享轴 → 跨模型复现 → 未见句式预测 → 选择性 → 必要性）+ 语言图谱目标；预测记分板：未见词表 / 未见句式 + **谱图预测**（留一族迁移、留出句式预测）；参考（行业方法，不作为证据） |
 
-以语言图谱、HiddenState 条件场、理论主张和闭合门组织研究数据，不以 Phase 列表作为主界面。
+URL 即状态：`?lens=home|spatial|process|atlas|progress&station=autotest|catalog|studio|freeze|dispatch|audit|agent&tm=<模板>`；`⌘K` 跳转界面与工位。旧版 3D 主界面保留在 `/legacy`，`/rdc-*` 专项页面保留在图谱 · 资源目录。
 
-### 3D 机制显微镜
+**账号（accounts.v1）**：客户端第一次打开显示注册界面，注册或登录后进入主界面；登录状态保存在本机浏览器，再次打开直接进入主界面，右上角账号菜单可查看「我的节点」、修改密码、退出登录。该中心的**第一个账号自动成为管理员**，之后注册的是成员；管理员可在账号菜单「账号管理」中创建账号、调整角色、停用账号。中心服务暂时不可达时，已登录的用户仍进入主界面（各视图显示「未接入」）。
 
-- 静态结构：真实模型配置；
-- 实时运行：真实 token、layer 和生成事件；
-- 机制实验：Embedding、HiddenState、条件差分、响应边和输出贡献；
-- Embedding 与当前 Layer HiddenState 支持全坐标观察；
-- 没有数据时明确显示空状态，不使用模拟值。
-
-### AI 自动研发
-
-白色任务工作台提供：
-
-- 项目与研究线程；
-- Agent 执行时间线；
-- 计划、契约、产物、测试、证据和模型检查器；
-- 自动/手动执行；
-- 主模型编程与多个辅助模型独立审查；
-- 实时日志、生成代码和测试输出；
-- 3D 与 AI 工作区的一次输入、一次完整整屏切换。
-
----
+写操作（冻结模板、审计裁决、自动测试、AI 解读）需要管理权限：用**管理员账号登录**即可，账号会话直接作为管理授权；也可以手动填写中心节点管理令牌（`AI2050_DIST_ADMIN_TOKEN`），令牌只保存在当前浏览器标签页会话中。成员账号可以浏览、下载研究包、把自己的 GPU 节点绑定到账号参与测试。
 
 ## 七、快速启动
 
@@ -499,12 +557,44 @@ $env:AI2050_SKIP_MODEL_LOAD = '1'
 
 前端在后端不可用时仍可读取静态资产；实时模型分析、AI 自动研发和配置测试需要后端。
 
+### 分布式中心与节点
+
+`deploy/` 目录不进入公开仓库（见 `deploy/README_CENTOS.md`），需与仓库同目录部署；v3 协议代码在仓库内 `shared/dist_protocol/`，中心服务依赖 numpy。
+
+后端 `server.server`（:5001）会自动挂载中心路由，客户端默认读 :5001。独立中心节点：
+
+```powershell
+cd deploy
+$env:AI2050_DIST_DIR = 'D:\AI2050\Ai2050-OpenOne\distributed_data'
+$env:AI2050_DIST_ADMIN_TOKEN = '<随机令牌>'
+..\.venv\Scripts\python.exe -m distributed_service --host 0.0.0.0 --port 5010
+```
+
+GPU 节点：
+
+```powershell
+python deploy/node_agent.py --server http://<center>:5010 register --name gpu-1 --gpu "RTX 5080"
+python deploy/node_agent.py --server http://<center>:5010 run --model-path D:\models\Qwen3-4B --model-id qwen3-4b --model-rev <快照> --dtype bf16
+```
+
+节点绑定账号：在客户端 研发 · 题库「如何参与测试」或 总览「参与测试」点「生成绑定码」（30 分钟内有效、只能用一次），注册命令加上 `--bind-code <码>`（或环境变量 `AI2050_BIND_CODE`）。绑定后贡献者列表显示账号名，账号菜单「我的节点」可查看节点在线状态与回传份数。
+
+账号相关环境变量：`AI2050_REGISTRATION=open|closed`（默认 open；closed 时只有第一个账号可自助注册，其余由管理员创建）。密码用 PBKDF2-SHA256（20 万次迭代、随机盐）保存；会话令牌只在数据库中存哈希，30 天无活动过期；连续 5 次密码错误锁定 5 分钟。账号接口：`/api/auth/status|register|login|me|logout|password|users|node-code|my-nodes`。
+
+中心按分片派发 v3 模板；节点把 `AI2050_SHARD` 与 `AI2050_PRECISION` 交给 runner。`run --tm-id <模板>` 只领取该模板的分片。没有 GPU 时可用 `runner.py --mode synthetic` 联调协议：正式中心把合成结果标记为 synthetic、永远不进入研究统计；只有以 `AI2050_DIST_ALLOW_SYNTHETIC=1` 启动的沙盒中心才合并它们（见上文「一个模式族的完整流程」）。
+
+### AI 研发模型配置
+
+主模型与辅助模型的 API Key 保存在用户目录 `~/.ai2050/ai_rnd_config.json`（可用环境变量 `AI2050_AI_RND_CONFIG` 指定），不写入仓库。仓库根目录的 `ai_rnd_config.json` 只是空 Key 模板；旧版写在那里的配置会在首次启动时迁移到用户目录。
+
 ### 构建与检查
 
 ```powershell
 cd frontend
 npm run lint
 npm run build
+cd ..
+.\.venv\Scripts\python.exe -m unittest discover -s tests/dist_protocol -v
 ```
 
 ---
@@ -537,6 +627,17 @@ report.md           原理、公式、结果、限制和结论
 
 客户端不得根据文件名或 Phase 猜测证据等级，必须读取 manifest 的明确字段。
 
+分布式 v3 模板的节点产物（每个分片一份，内容寻址上传）：
+
+```text
+summary.json      状态（real / smoke / synthetic）、分片、逐格行为准确率、token 长度、本分片 η² 自检
+suffstats.npz     每 (划分, 条件格, 层, 维) 的 n、Σx、Σx²（float64，可跨节点相加）
+behavior.json     probe 条目的首 token 是否 top-1、排名、对数概率
+canary.json       金丝雀输入的目标位置向量摘要（范数、均值、前 16 维）
+```
+
+只有 `kind=real`、design_sha 一致、金丝雀未漂移且审计未驳回的结果进入合并；合并统计是观测结果，不自动成为 Evidence。
+
 `MechanismCase` Schema 位于 [shared/schemas/mechanism_case.schema.json](shared/schemas/mechanism_case.schema.json)。
 
 ---
@@ -544,7 +645,12 @@ report.md           原理、公式、结果、限制和结论
 ## 十、目录结构
 
 ```text
-frontend/                         3D 可视化、研究中心和 AI 自动研发客户端
+frontend/                         客户端（总览 / 空间 / 研发 / 图谱 / 路线）
+shared/dist_protocol/             分布式测试协议 v3：生成式模板、充分统计量、金丝雀、合并与证据门链、runner_v3
+shared/dist_protocol/grammars/    内置模板族文法（template_grammar.v1）
+deploy/                           中心节点服务与节点 Agent（本地保留，不进公开仓库）
+design/                           客户端与平台设计方案（v6：design/client_v6_pipeline_ia.md）
+tests/dist_protocol/              协议与中心派生视图测试（unittest）
 server/                           FastAPI 后端、模型与研究运行接口
 ai2050_research_os/               客户端方案、研究数据合同与注册表
 research/IntelligentTheory.md     智能理论总整理

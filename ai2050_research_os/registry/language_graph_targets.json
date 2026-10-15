@@ -1,0 +1,127 @@
+{
+  "schema_version": "language-graph-targets.v1",
+  "revision": 1,
+  "progress_policy": {
+    "work_unit_link_field": "language_graph_target_id",
+    "link_rule": "exact target ID only; puzzle, case-family, dataset counts, and execution completion do not imply language-target coverage",
+    "execution_states": ["queued", "claimed", "result_uploaded", "awaiting_audit", "audit_passed"],
+    "evidence_levels": ["E1_repeatable", "E2_predictive", "E3_causal_scoped"],
+    "target_complete_rule": "A target is scientifically advanced only when an explicit target evidence level is returned from an audited Research OS record. A Worker result alone is never completion."
+  },
+  "domains": [
+    {"id": "knowledge_graph", "label": "知识关系图"},
+    {"id": "event_scope", "label": "事件与作用域"},
+    {"id": "reference_roles", "label": "指代与语义角色"},
+    {"id": "discourse", "label": "篇章关系"},
+    {"id": "symbol_mapping", "label": "跨语言映射"},
+    {"id": "ordering", "label": "比较与时序"}
+  ],
+  "milestones": [
+    {"id": "instrumented", "label": "可采集", "rule": "冻结材料、模型身份、分割、指标与必需产物；采集边界可复算。"},
+    {"id": "repeatable", "label": "可复现", "rule": "在预注册的重复与独立 Case 家族上通过冻结判据，并保留失败和反例。"},
+    {"id": "predictive", "label": "可预测", "rule": "对未见词汇、表达或关系组合做盲测，且优于预先指定的简单基线。"},
+    {"id": "mechanism_scoped", "label": "范围内机制证据", "rule": "使用可追溯干预或计算来源检查候选机制；限定模型、条件和反例范围。"}
+  ],
+  "targets": [
+    {
+      "id": "LG-TYPE-GRAPH", "family_id": "type_graph", "label": "类型与知识路径",
+      "domain_id": "knowledge_graph", "research_question": "模型如何区分实体、类型与有向关系，并在不同路径深度、措辞和查询形式下保持关系推断？",
+      "graph_nodes": ["实体/概念", "类型", "属性", "语境", "查询目标"],
+      "graph_edges": ["instance_of", "subclass_of", "typed_relation", "path_composition"],
+      "test_matrix": {
+        "contrasts": ["事实陈述 ↔ 反向关系", "路径深度 1–2 ↔ 3–4", "已见实体 ↔ 留出实体", "陈述 ↔ 查询"],
+        "controls": ["实体身份与词频", "关系方向", "提示格式", "答案位置/格式", "近重复家族泄漏"],
+        "holdouts": ["新实体", "新措辞", "新关系组合", "更深路径"],
+        "distributed_shards": ["case_family_id", "split_id", "model_snapshot_id", "seed"],
+        "required_outputs": ["关系三元组与类型化边", "逐样本预测/拒答", "全坐标 HiddenState 采集索引", "失败与反例清单"]
+      },
+      "existing_records": [
+        {"id": "R-C442", "status": "rejected_within_scope", "summary": "线性增量未解释登记范围内的深路径变化；NRMSE 2.236 / 3.100。该结果是有界反证，不是目标完成。"}
+      ]
+    },
+    {
+      "id": "LG-TAXONOMY", "family_id": "graph_taxonomy", "label": "分类层级图",
+      "domain_id": "knowledge_graph", "research_question": "上位类、下位类和实例关系是否被区分，并能否在新词和改写中保持方向与传递边界？",
+      "graph_nodes": ["类", "子类", "实例"], "graph_edges": ["is_a", "instance_of", "not_equivalent_to"],
+      "test_matrix": {"contrasts": ["属于 ↔ 不属于", "上位 ↔ 下位", "可传递路径 ↔ 不可传递关系"], "controls": ["词汇频率", "实体熟悉度", "否定位置", "关系措辞"], "holdouts": ["留出类名", "留出实例", "新组合路径"], "distributed_shards": ["实体簇", "关系簇", "split_id", "model_snapshot_id"], "required_outputs": ["分类图", "边方向和传递性判定", "全坐标响应字段", "反例"]}
+    },
+    {
+      "id": "LG-PART-WHOLE", "family_id": "graph_part_whole", "label": "部分—整体关系图",
+      "domain_id": "knowledge_graph", "research_question": "模型是否把部分—整体、成员—集合和类型从属作为不同关系处理？",
+      "graph_nodes": ["部件", "整体", "成员", "集合"], "graph_edges": ["part_of", "has_part", "member_of", "instance_of"],
+      "test_matrix": {"contrasts": ["部件—整体 ↔ 类—实例", "成员关系 ↔ 部分关系", "关系反转 ↔ 原关系"], "controls": ["实体替换", "关系词替换", "否定", "常识熟悉度"], "holdouts": ["未见部件", "新整体", "跨域关系组合"], "distributed_shards": ["实体家族", "关系方向", "语言/表达", "seed"], "required_outputs": ["类型化关系图", "关系反转检查", "读出和 HiddenState 索引", "错误边清单"]}
+    },
+    {
+      "id": "LG-TEMPORAL", "family_id": "graph_temporal", "label": "事件时间关系图",
+      "domain_id": "ordering", "research_question": "事件先后、重叠、持续和时间锚点如何随时态词、语序与篇章上下文变化？",
+      "graph_nodes": ["事件", "时间点", "时间区间", "叙述时间"], "graph_edges": ["before", "after", "overlaps", "during", "anchored_at"],
+      "test_matrix": {"contrasts": ["先于 ↔ 后于", "发生 ↔ 正在发生", "时间词显式 ↔ 语境隐式"], "controls": ["线性语序", "时态标记", "事件常识", "上下文长度"], "holdouts": ["新事件词", "新事件序列", "多事件组合"], "distributed_shards": ["事件家族", "时间关系", "上下文模板", "seed"], "required_outputs": ["事件时间图", "区间关系标签", "位置/层响应字段", "冲突样例"]}
+    },
+    {
+      "id": "LG-ATTRIBUTE-UPDATE", "family_id": "attribute_update", "label": "属性状态更新图",
+      "domain_id": "knowledge_graph", "research_question": "新信息到来时，模型如何更新实体状态并区分当前值、历史值和未改变属性？",
+      "graph_nodes": ["实体", "属性", "旧状态", "新状态", "时间步"], "graph_edges": ["has_attribute", "updates", "persists", "supersedes_at_time"],
+      "test_matrix": {"contrasts": ["更新 ↔ 未更新", "新状态 ↔ 旧状态", "单属性 ↔ 多属性"], "controls": ["属性词", "事件顺序", "指代表达", "提示长度"], "holdouts": ["新属性值", "新实体", "跨句状态延续"], "distributed_shards": ["实体状态轨迹", "属性类型", "split_id", "seed"], "required_outputs": ["状态转移图", "逐步状态查询结果", "生成步/HiddenState 轨迹", "状态遗忘样例"]}
+    },
+    {
+      "id": "LG-ATTRIBUTE-OVERWRITE", "family_id": "attribute_overwrite", "label": "属性覆盖与冲突",
+      "domain_id": "knowledge_graph", "research_question": "同一属性收到冲突赋值时，模型是否依照明确的时间、来源或作用域规则选择当前值？",
+      "graph_nodes": ["实体", "属性", "赋值来源", "作用域", "时间步"], "graph_edges": ["assigns", "overwrites", "conflicts_with", "valid_in_scope"],
+      "test_matrix": {"contrasts": ["较新 ↔ 较早赋值", "同一来源 ↔ 不同来源", "作用域内 ↔ 作用域外"], "controls": ["语序", "来源可信标签", "否定", "长距离干扰项"], "holdouts": ["新冲突组合", "多次覆盖", "跨句回指"], "distributed_shards": ["冲突轨迹", "赋值次序", "scope_id", "seed"], "required_outputs": ["带时间/来源的属性图", "当前值和历史值判定", "状态轨迹字段", "歧义与失败样例"]}
+    },
+    {
+      "id": "LG-ATTITUDE-EVENT", "family_id": "attitude_event", "label": "态度与事件内容",
+      "domain_id": "event_scope", "research_question": "知道、相信、说出、希望等态度谓词，如何连接态度主体、内容命题与实际事件？",
+      "graph_nodes": ["主体", "态度事件", "命题内容", "现实事件"], "graph_edges": ["believes", "knows", "says", "wants", "asserts_actuality"],
+      "test_matrix": {"contrasts": ["相信 ↔ 知道", "说出 ↔ 事实发生", "肯定 ↔ 提问"], "controls": ["主体替换", "态度词替换", "命题真假", "答案格式"], "holdouts": ["未见主体", "未见命题", "嵌套深度"], "distributed_shards": ["主体/命题家族", "态度谓词", "语言表达", "seed"], "required_outputs": ["态度—命题图", "现实性标签", "输出分布和 HiddenState 轨迹", "错误蕴含清单"]}
+    },
+    {
+      "id": "LG-NESTED-ATTITUDE", "family_id": "nested_attitude", "label": "嵌套态度与命题作用域",
+      "domain_id": "event_scope", "research_question": "态度谓词嵌套时，命题内容、态度主体和真假承诺如何保持层级边界？",
+      "graph_nodes": ["多个主体", "态度层", "嵌套命题", "真值承诺"], "graph_edges": ["attitude_scope", "contains_proposition", "reports_belief", "commits_to_truth"],
+      "test_matrix": {"contrasts": ["A 相信 B 说 P ↔ B 相信 A 说 P", "单层 ↔ 双层/多层", "引用 ↔ 事实断言"], "controls": ["主体顺序", "代词指代", "嵌套标记", "句长"], "holdouts": ["新主体组合", "新词面", "更深嵌套"], "distributed_shards": ["命题家族", "嵌套深度", "表达模板", "seed"], "required_outputs": ["嵌套作用域树", "层级真假/来源标签", "token—层—步索引", "作用域塌缩样例"]}
+    },
+    {
+      "id": "LG-NEGATION-SCOPE", "family_id": "negation_scope", "label": "否定作用域图",
+      "domain_id": "event_scope", "research_question": "否定词作用于事件、态度、量词或嵌套命题中的哪一部分，语序变化是否改变范围？",
+      "graph_nodes": ["否定算子", "事件", "量词", "命题", "作用域边界"], "graph_edges": ["negates", "scopes_over", "excludes", "presupposes"],
+      "test_matrix": {"contrasts": ["否定事件 ↔ 否定态度", "窄域 ↔ 宽域", "否定前置 ↔ 后置"], "controls": ["量词位置", "句法结构", "态度谓词", "双重否定"], "holdouts": ["新句式", "未见组合算子", "跨语言词序"], "distributed_shards": ["算子组合", "句法模板", "语言/分词", "seed"], "required_outputs": ["作用域图/树", "真假条件判断", "位置/层响应场", "歧义案例和反例"]}
+    },
+    {
+      "id": "LG-COREFERENCE", "family_id": "coreference_binding", "label": "共指与指代绑定",
+      "domain_id": "reference_roles", "research_question": "代词或省略成分在竞争实体、距离和语法约束下如何绑定到指代对象？",
+      "graph_nodes": ["表达项", "候选先行词", "句法角色", "语境"], "graph_edges": ["refers_to", "agrees_with", "disambiguated_by", "corefers_with"],
+      "test_matrix": {"contrasts": ["近距离 ↔ 长距离", "主语 ↔ 宾语候选", "一致 ↔ 竞争干扰"], "controls": ["性数/语法标记", "实体显著性", "句长", "提示顺序"], "holdouts": ["新实体名", "新句式", "更多候选项"], "distributed_shards": ["语篇家族", "候选结构", "距离/语言", "seed"], "required_outputs": ["指代边及候选分布", "逐样本解析/拒答", "token 位置轨迹", "误绑定清单"]}
+    },
+    {
+      "id": "LG-AGENT-PATIENT", "family_id": "agent_patient_voice", "label": "施事—受事角色",
+      "domain_id": "reference_roles", "research_question": "动作参与者的施事、受事和受益者角色，是否能与词序和语义显著性分离？",
+      "graph_nodes": ["事件", "施事", "受事", "受益者", "谓词"], "graph_edges": ["agent_of", "patient_of", "beneficiary_of", "fills_role"],
+      "test_matrix": {"contrasts": ["A 对 B 施事 ↔ B 对 A 施事", "有生命 ↔ 无生命角色", "主动句 ↔ 语义角色查询"], "controls": ["词汇偏好", "语序", "格标记", "世界常识"], "holdouts": ["新名词", "新动词", "罕见角色组合"], "distributed_shards": ["事件家族", "语序/语言", "角色组合", "seed"], "required_outputs": ["事件角色图", "角色置换对照", "全坐标响应与读出", "语义先验错误样例"]}
+    },
+    {
+      "id": "LG-ACTIVE-PASSIVE", "family_id": "active_passive_role", "label": "主动—被动角色保持",
+      "domain_id": "reference_roles", "research_question": "同一事件改写为主动句和被动句后，语义角色映射能否保持，变化主要落在哪些条件响应？",
+      "graph_nodes": ["事件", "表层主语", "表层宾语", "施事", "受事"], "graph_edges": ["surface_subject", "surface_object", "agent_of", "patient_of", "paraphrases"],
+      "test_matrix": {"contrasts": ["主动 ↔ 被动", "有/无施事短语", "同义改写 ↔ 角色反转"], "controls": ["词汇与标点", "论元顺序", "提示格式", "句长"], "holdouts": ["新动词", "新实体", "未见改写模板"], "distributed_shards": ["事件对", "句法形式", "模型快照", "seed"], "required_outputs": ["跨构式角色图", "角色保持率与不确定性", "对应 token/layer 状态", "失败对照"]}
+    },
+    {
+      "id": "LG-CONTRAST", "family_id": "contrast", "label": "转折与对比篇章关系",
+      "domain_id": "discourse", "research_question": "转折、让步与对照关系如何连接两个分句，并区别于因果、时间先后和简单并列？",
+      "graph_nodes": ["分句 A", "分句 B", "对比维度", "篇章关系"], "graph_edges": ["contrasts_with", "concedes", "causes", "follows", "elaborates"],
+      "test_matrix": {"contrasts": ["但是 ↔ 因为", "让步 ↔ 因果", "有连接词 ↔ 隐式关系"], "controls": ["分句顺序", "情感极性", "事实真值", "连接词词频"], "holdouts": ["新主题", "新连接词", "三段篇章组合"], "distributed_shards": ["篇章家族", "关系类型", "连接形式", "seed"], "required_outputs": ["篇章关系图", "关系分类概率", "连接词位置状态轨迹", "因果混淆样例"]}
+    },
+    {
+      "id": "LG-TRANSLATION", "family_id": "translation", "label": "跨语言语义映射",
+      "domain_id": "symbol_mapping", "research_question": "翻译或跨语言改写时，哪些语义关系保持、哪些因形态、词序或语用而变化？",
+      "graph_nodes": ["源表达", "目标表达", "词义", "语义角色", "构式"], "graph_edges": ["translates_to", "preserves_relation", "changes_scope", "aligns_role"],
+      "test_matrix": {"contrasts": ["逐词对齐 ↔ 命题关系保持", "同义翻译 ↔ 语用变化", "中英词序差异"], "controls": ["实体/事实", "模型 tokenizer", "提示语言", "表达自然度"], "holdouts": ["未见词汇", "未见句式", "跨语言关系组合"], "distributed_shards": ["语义家族", "语言方向", "表达模板", "model_snapshot_id"], "required_outputs": ["双语对齐图", "关系保持/变化标签", "两种语言 HiddenState 索引", "非等价翻译样例"]}
+    },
+    {
+      "id": "LG-COMPARISON", "family_id": "comparison", "label": "比较与序关系",
+      "domain_id": "ordering", "research_question": "比较对象、比较维度和序关系能否在词面、方向、量纲与比较范围改变时稳定恢复？",
+      "graph_nodes": ["比较对象", "尺度", "维度", "比较范围"], "graph_edges": ["greater_than", "less_than", "equal_to", "ranked_by"],
+      "test_matrix": {"contrasts": ["A 大于 B ↔ B 大于 A", "比较级 ↔ 最高级", "维度 X ↔ 维度 Y"], "controls": ["实体身份", "属性量纲", "否定", "比较范围"], "holdouts": ["新对象", "新维度", "多属性比较"], "distributed_shards": ["对象/属性簇", "序关系", "句式", "seed"], "required_outputs": ["带维度的序关系图", "方向一致性与置信度", "坐标响应场", "维度混淆样例"]}
+    }
+  ]
+}

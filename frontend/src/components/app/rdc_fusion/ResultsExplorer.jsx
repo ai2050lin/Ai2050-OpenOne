@@ -10,11 +10,11 @@
    - GET /api/results       → 结果行（D1-3 summary_digest 平铺）
    - GET /api/results/{sha} → 展开详情（summary 原文 + cos 矩阵提取）
    离线回退 distributedData.js 的 DEMO_RESULTS（协议结构演示行）。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import { TemplateCard, SummaryBrowser, CellCosGrid } from './protocolComponents.jsx';
 import { TEMPLATES, DEMO_RESULTS, ANALYSES, DEMO_RDM } from './distributedData.js';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 /* 技术运行内核：对 detail 施加 tech → 输出对象（或 null=缺输入契约）
    rsa-rdm 客户端现算 RDM = 1 − cos；eta2-decompose 直读 summary.eta2_by_factor；

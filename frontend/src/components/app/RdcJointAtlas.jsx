@@ -1,10 +1,11 @@
+import { API_BASE } from '../../config.js';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {Canvas} from '@react-three/fiber';
 import {OrbitControls} from '@react-three/drei';
 import './RdcPrefixAtlas.css';
 import './RdcJointAtlas.css';
 
-const API = 'http://127.0.0.1:5001/api/rdc-joint';
+const API = `${API_BASE}/api/rdc-joint`;
 const fmt = value => value == null ? '—' : Number(value).toPrecision(6);
 async function get(path, params) {
   const response = await fetch(API + path + (params ? '?' + new URLSearchParams(params) : ''));
@@ -73,7 +74,7 @@ export function Field({data}) {
     {picked?.data === data && <output>{picked.text}</output>}
     {three && <><div className="joint-scene"><Coordinates data={data} /></div><p className="prefix-muted">三维轴：横向=所选原生列序号，纵向=行/层/步骤序号，高度=asinh数值。保留当前数组全部点；显示比例不是神经元真实空间、流形或语义距离。拖动旋转，滚轮缩放。</p></>}
     {data.MSE != null && <p>MSE {fmt(data.MSE)} · {data.available_inputs}</p>}
-    {data.download && <a href={'http://127.0.0.1:5001' + data.download}>下载该来源全部已采集原生数组</a>}
+    {data.download && <a href={API_BASE + data.download}>下载该来源全部已采集原生数组</a>}
   </div>;
 }
 

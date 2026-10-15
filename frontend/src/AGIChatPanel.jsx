@@ -1,9 +1,9 @@
+import { API_BASE } from './config.js';
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Activity, Bot, Loader2, RefreshCw, Send, User } from 'lucide-react';
 import { SimplePanel } from './SimplePanel';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 export function AGIChatPanel({ onClose }) {
   const [messages, setMessages] = useState([]);

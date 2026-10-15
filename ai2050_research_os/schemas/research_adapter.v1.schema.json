@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai2050.local/schemas/research_adapter.v1.schema.json",
+  "title": "AI2050 Distributed Research Adapter v1",
+  "type": "object",
+  "required": [
+    "schema_version", "input_contract", "contract_id", "contract_sha256",
+    "puzzle_ids", "case_family_ids", "split_ids", "model_ids",
+    "model_snapshot_ids", "tokenizer_sha256s", "precisions",
+    "capture_tiers", "required_artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "research_adapter.v1"},
+    "input_contract": {"const": "AI2050_RESEARCH_WORK_UNIT_PATH"},
+    "contract_id": {"type": "string", "minLength": 1},
+    "contract_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "puzzle_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^P[0-9]{2}$"}},
+    "case_family_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "split_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "model_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "model_snapshot_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "tokenizer_sha256s": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}},
+    "precisions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "capture_tiers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["tier_a", "tier_b", "tier_c", "tier_d"]}},
+    "required_artifacts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "language_graph_target_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^LG-[A-Z0-9-]+$"}}
+  },
+  "additionalProperties": false
+}

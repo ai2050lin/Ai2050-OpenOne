@@ -3,11 +3,11 @@
       32×64 行块切片、超限均匀抽样；格值=行带×列带的 |W| 均值，色标按实际值域归一。
    ── demo（未连接）：结构化种子噪声示意（原 demo 保留，显式标注）。
    F#3734 行簇高亮仅 demo（真实位置来自写入端来源贡献分析 P8–P11）。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useRef, useState } from 'react';
 
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const COLS=56, ROWS=30;   /* demo 网格 */
 

@@ -11,12 +11,12 @@
    运行配置硬编码（红线）、四队列子 tab（研究线/分布式/调度/缺口收敛）、技术运行 tab。
    协议端点与启动流程不变；LIVE/DEMO 双模，demo 内容全部在 demoData.js。
    红线（v2 §0）：本文件不出现任何具体实验字面量。 */
+import { API_BASE } from '../../../config.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEMO_QUEUE } from './demoData.js';
 import { TEMPLATES, DEMO_RESULTS, DEMO_SCHED, TECH_CATEGORIES, DEMO_COVERAGE, ANALYSES, LANG_TEMPLATES } from './distributedData.js';
 import PlatformOps from './PlatformOps.jsx';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const GATES=[
   {id:'gap',label:'证据缺口',phases:['analyze']},

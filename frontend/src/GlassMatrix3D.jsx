@@ -1,3 +1,4 @@
+import { API_BASE } from './config.js';
 import { Html, Line, OrbitControls, PerspectiveCamera, Sphere, Stars, TransformControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -5,7 +6,6 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import { pollRuntimeWithFallback } from './utils/runtimeClient';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const locales = {
   en: { glassMatrix: 'Glass Matrix' },
   zh: { glassMatrix: '玻璃矩阵' },

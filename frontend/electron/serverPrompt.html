@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>自定义服务器地址</title>
+<style>
+  body {
+    font: 13px/1.65 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    padding: 20px 22px; color: #1a1d23; background: #fff;
+    -webkit-user-select: none; user-select: none;
+  }
+  h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+  input {
+    width: 100%; box-sizing: border-box; padding: 9px 11px;
+    font: 13px ui-monospace, Consolas, monospace;
+    border: 1px solid #d9dee6; border-radius: 6px; outline: none; color: #1a1d23;
+  }
+  input:focus { border-color: #24558a; box-shadow: 0 0 0 3px rgba(36,85,138,.12); }
+  .hint { color: #7a8494; font-size: 11.5px; margin: 9px 0 16px; line-height: 1.6; }
+  .row { text-align: right; }
+  button {
+    padding: 7px 16px; border-radius: 6px; cursor: pointer; font: inherit;
+    border: 1px solid #d9dee6; background: #f4f6f9; color: #39434e;
+  }
+  button.primary { background: #24558a; border-color: #24558a; color: #fff; }
+  button + button { margin-left: 8px; }
+</style>
+</head>
+<body>
+  <h3>服务器地址</h3>
+  <input id="server" placeholder="https://platform.ai2050.com" spellcheck="false" autocomplete="off">
+  <div class="hint">
+    可填域名或 IP；不带协议时默认按 <code>http://</code> 处理。<br>
+    自建部署默认使用 80/443 端口，无需填写端口号。
+  </div>
+  <div class="row">
+    <button id="cancel">取消</button>
+    <button id="ok" class="primary">连接</button>
+  </div>
+  <script src="serverPrompt.js"></script>
+  <script>
+    const input = document.getElementById('server');
+    const send = value => window.ai2050Prompt.submit(value);
+    document.getElementById('ok').onclick = () => send(input.value.trim() || null);
+    document.getElementById('cancel').onclick = () => send(null);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') send(input.value.trim() || null);
+    });
+    /* 主进程在 load 后写入当前值 */
+    window.__setServer = value => {
+      input.value = value || '';
+      input.focus();
+      input.select();
+    };
+  </script>
+</body>
+</html>

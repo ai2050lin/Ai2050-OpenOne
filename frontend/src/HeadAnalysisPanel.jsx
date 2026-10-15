@@ -1,9 +1,10 @@
 
+import { API_BASE } from './config.js';
 import axios from 'axios';
 import { ArrowRight, Grid } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-const API_BASE = 'http://localhost:5001';
+
 
 export function HeadAnalysisPanel({ layerIdx, headIdx, prompt, onClose, t }) {
   const [loading, setLoading] = useState(false);

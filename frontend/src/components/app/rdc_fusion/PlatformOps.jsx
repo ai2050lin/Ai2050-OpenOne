@@ -6,11 +6,11 @@
    AggLiveCard 桶摘要按 tm_id 嵌入模板行。
    数据源：GET /api/distributed/summary（30s 轮询）+ GET /api/tasks（调度快照）+ GET /api/agg/{tm_id}；
    离线回退 DEMO 并挂徽标。注册表 / 研究包 / 技术成熟度在图谱「模板与技术」；结果浏览在图谱「结果库」。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import { PLATFORM_STATS, NODES, TEMPLATES } from './distributedData.js';
 import { fmtAgo } from './TimelineBits.jsx';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 /* AGG 桶摘要行（嵌入模板行下方）：只渲染协议键（eta2_by_factor / eta2_by_cond / topk_jaccard）；
    跨桶简单平均被禁止（research_os 13.1），此处只回显不做汇总计算（ui_decoupled_plan_v1 §3） */

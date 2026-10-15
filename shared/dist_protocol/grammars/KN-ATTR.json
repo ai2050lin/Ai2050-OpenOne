@@ -1,0 +1,589 @@
+{
+ "schema_version": "template_grammar.v1",
+ "family_id": "KN-ATTR",
+ "module": "KN",
+ "name": "知识网络 · 属性绑定（颜色/味道/温度）",
+ "description": "3 种属性类型 × 15 个实体—属性值对 × 4 种句式；目标位置为属性值词。检验属性类型因子与句式因子的分离，以及属性方向在未见实体上的推广。",
+ "factors": [
+  "attr",
+  "frame"
+ ],
+ "concepts": {
+  "frame=question": "疑问",
+  "frame=decl": "陈述"
+ },
+ "layers": [
+  "first",
+  "mid",
+  "last"
+ ],
+ "frames": [
+  {
+   "id": "decl",
+   "levels": {
+    "frame": "decl"
+   },
+   "text": "{X}的{P}是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "{X}的{P}通常是",
+    "answer": "{A}"
+   }
+  },
+  {
+   "id": "habit",
+   "levels": {
+    "frame": "habit"
+   },
+   "text": "大家都知道{X}很{A}。",
+   "target": "A",
+   "probe": {
+    "prompt": "大家都知道{X}很",
+    "answer": "{A}"
+   }
+  },
+  {
+   "id": "compare",
+   "levels": {
+    "frame": "compare"
+   },
+   "text": "和别的东西比起来，{X}更{A}一些。",
+   "target": "A",
+   "probe": {
+    "prompt": "和别的东西比起来，{X}更",
+    "answer": "{A}"
+   }
+  },
+  {
+   "id": "question",
+   "levels": {
+    "frame": "question"
+   },
+   "text": "{X}的{P}难道不是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{X}的{P}怎么样？答：很",
+    "answer": "{A}"
+   }
+  }
+ ],
+ "fillers": [
+  {
+   "id": "color-00",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "香蕉",
+    "P": "颜色",
+    "A": "黄"
+   }
+  },
+  {
+   "id": "color-01",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "草莓",
+    "P": "颜色",
+    "A": "红"
+   }
+  },
+  {
+   "id": "color-02",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "橘子",
+    "P": "颜色",
+    "A": "橙"
+   }
+  },
+  {
+   "id": "color-03",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "茄子",
+    "P": "颜色",
+    "A": "紫"
+   }
+  },
+  {
+   "id": "color-04",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "黄瓜",
+    "P": "颜色",
+    "A": "绿"
+   }
+  },
+  {
+   "id": "color-05",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "乌鸦",
+    "P": "颜色",
+    "A": "黑"
+   }
+  },
+  {
+   "id": "color-06",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "雪",
+    "P": "颜色",
+    "A": "白"
+   }
+  },
+  {
+   "id": "color-07",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "天空",
+    "P": "颜色",
+    "A": "蓝"
+   }
+  },
+  {
+   "id": "color-08",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "柠檬",
+    "P": "颜色",
+    "A": "黄"
+   }
+  },
+  {
+   "id": "color-09",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "樱桃",
+    "P": "颜色",
+    "A": "红"
+   }
+  },
+  {
+   "id": "color-10",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "煤炭",
+    "P": "颜色",
+    "A": "黑"
+   }
+  },
+  {
+   "id": "color-11",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "牛奶",
+    "P": "颜色",
+    "A": "白"
+   }
+  },
+  {
+   "id": "color-12",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "菠菜",
+    "P": "颜色",
+    "A": "绿"
+   }
+  },
+  {
+   "id": "color-13",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "葡萄",
+    "P": "颜色",
+    "A": "紫"
+   }
+  },
+  {
+   "id": "color-14",
+   "levels": {
+    "attr": "color"
+   },
+   "slots": {
+    "X": "胡萝卜",
+    "P": "颜色",
+    "A": "橙"
+   }
+  },
+  {
+   "id": "taste-00",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "柠檬",
+    "P": "味道",
+    "A": "酸"
+   }
+  },
+  {
+   "id": "taste-01",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "蜂蜜",
+    "P": "味道",
+    "A": "甜"
+   }
+  },
+  {
+   "id": "taste-02",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "苦瓜",
+    "P": "味道",
+    "A": "苦"
+   }
+  },
+  {
+   "id": "taste-03",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "辣椒",
+    "P": "味道",
+    "A": "辣"
+   }
+  },
+  {
+   "id": "taste-04",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "盐",
+    "P": "味道",
+    "A": "咸"
+   }
+  },
+  {
+   "id": "taste-05",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "糖",
+    "P": "味道",
+    "A": "甜"
+   }
+  },
+  {
+   "id": "taste-06",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "醋",
+    "P": "味道",
+    "A": "酸"
+   }
+  },
+  {
+   "id": "taste-07",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "咖啡",
+    "P": "味道",
+    "A": "苦"
+   }
+  },
+  {
+   "id": "taste-08",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "芥末",
+    "P": "味道",
+    "A": "辣"
+   }
+  },
+  {
+   "id": "taste-09",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "酱油",
+    "P": "味道",
+    "A": "咸"
+   }
+  },
+  {
+   "id": "taste-10",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "山楂",
+    "P": "味道",
+    "A": "酸"
+   }
+  },
+  {
+   "id": "taste-11",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "巧克力",
+    "P": "味道",
+    "A": "甜"
+   }
+  },
+  {
+   "id": "taste-12",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "黄连",
+    "P": "味道",
+    "A": "苦"
+   }
+  },
+  {
+   "id": "taste-13",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "花椒",
+    "P": "味道",
+    "A": "麻"
+   }
+  },
+  {
+   "id": "taste-14",
+   "levels": {
+    "attr": "taste"
+   },
+   "slots": {
+    "X": "咸菜",
+    "P": "味道",
+    "A": "咸"
+   }
+  },
+  {
+   "id": "temp-00",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冰",
+    "P": "温度",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "temp-01",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "火",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-02",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "雪",
+    "P": "温度",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "temp-03",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "岩浆",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-04",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冰箱",
+    "P": "温度",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "temp-05",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "火炉",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-06",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "北极",
+    "P": "温度",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "temp-07",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "沙漠",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-08",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冰淇淋",
+    "P": "温度",
+    "A": "凉"
+   }
+  },
+  {
+   "id": "temp-09",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "开水",
+    "P": "温度",
+    "A": "烫"
+   }
+  },
+  {
+   "id": "temp-10",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冬天",
+    "P": "温度",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "temp-11",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "夏天",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-12",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冰块",
+    "P": "温度",
+    "A": "凉"
+   }
+  },
+  {
+   "id": "temp-13",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "太阳",
+    "P": "温度",
+    "A": "热"
+   }
+  },
+  {
+   "id": "temp-14",
+   "levels": {
+    "attr": "temp"
+   },
+   "slots": {
+    "X": "冰川",
+    "P": "温度",
+    "A": "冷"
+   }
+  }
+ ],
+ "splits": {
+  "unit": "filler",
+  "fractions": {
+   "discovery": 0.6,
+   "confirm": 0.2,
+   "lockbox": 0.2
+  },
+  "salt": "v1",
+  "heldout_frames": [
+   "question"
+  ]
+ },
+ "prereg": {
+  "min_behavior_acc": 0.7,
+  "min_probe_n": 3,
+  "min_cell_n": 6,
+  "min_lockbox_cos": 0.5
+ },
+ "shards": 2,
+ "language_graph_target_ids": [
+  "LG-TYPE-GRAPH"
+ ]
+}

@@ -16,6 +16,7 @@
    - 证据链钻取：特征详情抽屉（复现协议 / 关键读数 / anchors 逐条 res/seal sha8，协议键驱动，零实验字面量）
    - 队列/闭环不再在此重复：特征详情「→ 研发透镜」跳转（onGo('process')）。
    LIVE/DEMO 范式：服务未启动时显示空态提示，不伪造数据。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState, useCallback } from 'react';
 import ResultsExplorer from './ResultsExplorer.jsx';
 import RegistryPanel from './RegistryPanel.jsx';
@@ -23,7 +24,6 @@ import AtlasModuleView from './AtlasModuleView.jsx';
 import AtlasModuleSpace from './AtlasModuleSpace.jsx';
 import AtlasTemplateSpace from './AtlasTemplateSpace.jsx';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const FAM_NAME = {
   read: '知识读出', syntax: '语法轴', mech: '机制', context: '条件化',

@@ -1,10 +1,11 @@
+import { API_BASE } from '../../config.js';
 import {useEffect, useMemo, useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import './RdcPrefixAtlas.css';
 import './RdcJointAtlas.css';
 import './RdcOperatorAtlas.css';
 
-const API='http://127.0.0.1:5001/api/rdc-operator';
+const API = `${API_BASE}/api/rdc-operator`;
 const fmt=x=>x==null?'—':Number(x).toPrecision(5);
 const evidenceLabels={inherited_scoped_evidence_not_rerun_this_campaign:'继承的有限域证据／本轮未重跑',new_observation_and_native_behavior:'新观察及原生行为',known_identity_plus_scoped_local_prediction:'已知恒等式校准＋有限域局部预测',new_compilation_behavior_and_numeric_audit:'新概率编译、行为与数值核对',same_goal_followup_with_explicit_reanalysis_scope:'同目标续研／复分析范围已注明'};
 async function get(path,params) {

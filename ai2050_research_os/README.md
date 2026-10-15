@@ -1030,6 +1030,30 @@ Codex 标准流程：
 
 中心不得简单平均不同模型、任务、种子、节点和环境的结果。
 
+### 13.4 Research OS Work Unit 桥接
+
+当前分布式服务以本地 SQLite 管理模板、节点、租约和上传结果；Research OS Registry 继续作为 Puzzle、Campaign、合同及 Evidence 的唯一事实源。两者通过不可变的 `distributed_work_unit.v1` 身份对象关联，不把旧 `tm_id` 或平台结果自动解释为研究证据。
+
+Work Unit 至少冻结：Puzzle、Campaign、Work Package、合同 ID 与合同文件 SHA256、Case 家族与 split、模型和快照、tokenizer SHA256、精度、采集层级、seed、指标版本、必需 Artifact 名称及资源请求；`language_graph_target_id` 是可选的精确语言图谱目标链接。完整输入 Schema 为 `schemas/distributed_work_unit.v1.schema.json`；模板侧的 `research_adapter.v1` Schema 为 `schemas/research_adapter.v1.schema.json`。
+
+调度前必须同时满足：Registry 合同为 `ready`/`running` 且 `run_ready=true`；合同文件仍与 Registry 哈希一致；Puzzle 与 Campaign 归属正确；模型和精度处在冻结 scope 内；模板已冻结精确合同哈希和适配器 allowlist；Work Unit 请求的输出及模型快照等身份均在 allowlist 内；该合同累计 Work Unit 的 GPU 小时预算不超上限。Work Unit 缺省 ID 由下式生成：
+
+```text
+WU- + first20(sha256(UTF8(canonical_json(frozen_input_without_work_unit_id))))
+```
+
+其中 `canonical_json` 使用 UTF-8、键排序、紧凑分隔符及原样 Unicode。`metric_version` 是合同 metrics 规范化 JSON 的 SHA256。相同 ID、相同冻结输入重复提交会返回已有任务；相同 ID 对应不同输入会被拒绝。
+
+当前接口边界：`GET /api/research/work-units` 提供图谱页面的只读投影；`POST /api/research/work-units` 只排队，必须经管理员令牌；`researchctl.py queue-work-unit` 先核验本地 Registry 与合同文件，再提交分片，不会自动启动 Worker。Worker 通过 `AI2050_RESEARCH_WORK_UNIT_PATH` 收到冻结上下文；认领需精确匹配模型、快照、tokenizer 哈希、精度和 seed。模板 runner 必须自行按冻结合同执行并生成必需输出。语言图谱目标以 `registry/language_graph_targets.json` 为目录事实源；派发时可提供 `--language-graph-target-id LG-*`，并要求冻结 adapter 的 `language_graph_target_ids` allowlist 明确授权。该 ID 随 Work Unit 进入只读执行投影，供客户端按目标汇总；旧 Work Unit 不通过 Puzzle、Case 家族或结果数量猜测目标归属。
+
+目标目录含 15 个语言图谱研究目标，客户端镜像为 `frontend/public/research_data/current/language_graph_targets.v1.json`，由 `python ai2050_research_os/scripts/build_language_graph_targets.py` 从 Registry 发布。Work Unit 投影的目标总量统计覆盖全部 SQLite Work Unit；默认全局明细返回最近 200 条，按 `language_graph_target_id` 查询时支持 `offset`/`limit` 分页。当前服务端只确认上传后 `awaiting_audit`，尚未把 Canonical Evidence 的审计裁决投影到目标统计，因此 UI 将审计后证据级显示为“未接入”，不会用零值伪装无证据，也不会把任务完成计为科学完成。
+
+上传时校验任务租约、模板设计哈希、快照/精度/tokenizer/seed 声明、必需文件清单、分块顺序、每个文件 SHA256 和整体内容哈希。这里的节点身份和运行参数仍是 Worker 自报信息：内容哈希能证明收到的字节未变，不能证明计算确实由所声明的 GPU、模型权重或代码产生。重要节点应增加可信环境、留存环境清单及独立复算。
+
+上传完成只表示执行结果已收到。Work Unit 投影将其标为 `awaiting_audit`；平台结果不会自动创建 Canonical Run、Artifact、Evidence 或提升图谱关系。独立审计、manifest 与输出语义检查、Registry 导入和 Evidence 裁决仍是后续必需环节。未关联 Work Unit 的旧模板任务留在平台结果库，不猜测 Puzzle 归属。
+
+当前实现仍是单机 SQLite 调度与对象目录存储，GPU 小时累计仅为合同预算门，不是显存/节点能力调度器，也未验证多节点吞吐、数据库并发和对象存储成本。租约到期目前会标记为 `expired`，还没有自动重排或受控重试策略。`deploy/` 当前由本机部署目录管理且被 Git 忽略；服务发布包必须包含这部分桥接代码，否则新增端点、数据库迁移与 Worker 环境变量不会随本仓库代码生效。动态合同可运行数量和已排队任务以当前 Registry、服务数据库及研究备忘录为准。
+
 ---
 
 ## 十四、目录目标结构

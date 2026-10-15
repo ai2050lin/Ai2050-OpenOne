@@ -1,0 +1,336 @@
+{
+ "schema_version": "template_grammar.v1",
+ "family_id": "GR-NEG",
+ "module": "GR",
+ "name": "语法 · 否定 × 语气（真值判断）",
+ "description": "常识性质命题的肯定/否定 × 陈述/疑问（2×2），目标位置为性质词 A（位于否定词作用域内）。行为门要求模型能判断肯定句为对、否定句为错。",
+ "factors": [
+  "polarity",
+  "mood"
+ ],
+ "concepts": {
+  "mood=interrog": "疑问",
+  "mood=decl": "陈述"
+ },
+ "layers": [
+  "first",
+  "mid",
+  "last"
+ ],
+ "frames": [
+  {
+   "id": "aff-decl",
+   "levels": {
+    "polarity": "aff",
+    "mood": "decl"
+   },
+   "text": "{S}是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}是{A}的。答案：",
+    "answer": "对"
+   }
+  },
+  {
+   "id": "neg-decl",
+   "levels": {
+    "polarity": "neg",
+    "mood": "decl"
+   },
+   "text": "{S}不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}不是{A}的。答案：",
+    "answer": "错"
+   }
+  },
+  {
+   "id": "aff-q",
+   "levels": {
+    "polarity": "aff",
+    "mood": "interrog"
+   },
+   "text": "{S}是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{S}是{A}的吗？请回答是或不是。答：",
+    "answer": "是"
+   }
+  },
+  {
+   "id": "neg-q",
+   "levels": {
+    "polarity": "neg",
+    "mood": "interrog"
+   },
+   "text": "{S}不是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{S}是{A}的吗？请回答是或不是。答：",
+    "answer": "是"
+   }
+  }
+ ],
+ "fillers": [
+  {
+   "id": "fact-00",
+   "levels": {},
+   "slots": {
+    "S": "冰",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "fact-01",
+   "levels": {},
+   "slots": {
+    "S": "火",
+    "A": "热"
+   }
+  },
+  {
+   "id": "fact-02",
+   "levels": {},
+   "slots": {
+    "S": "糖",
+    "A": "甜"
+   }
+  },
+  {
+   "id": "fact-03",
+   "levels": {},
+   "slots": {
+    "S": "柠檬",
+    "A": "酸"
+   }
+  },
+  {
+   "id": "fact-04",
+   "levels": {},
+   "slots": {
+    "S": "大象",
+    "A": "大"
+   }
+  },
+  {
+   "id": "fact-05",
+   "levels": {},
+   "slots": {
+    "S": "蚂蚁",
+    "A": "小"
+   }
+  },
+  {
+   "id": "fact-06",
+   "levels": {},
+   "slots": {
+    "S": "钻石",
+    "A": "硬"
+   }
+  },
+  {
+   "id": "fact-07",
+   "levels": {},
+   "slots": {
+    "S": "棉花",
+    "A": "软"
+   }
+  },
+  {
+   "id": "fact-08",
+   "levels": {},
+   "slots": {
+    "S": "羽毛",
+    "A": "轻"
+   }
+  },
+  {
+   "id": "fact-09",
+   "levels": {},
+   "slots": {
+    "S": "铅块",
+    "A": "重"
+   }
+  },
+  {
+   "id": "fact-10",
+   "levels": {},
+   "slots": {
+    "S": "夜晚",
+    "A": "黑"
+   }
+  },
+  {
+   "id": "fact-11",
+   "levels": {},
+   "slots": {
+    "S": "雪",
+    "A": "白"
+   }
+  },
+  {
+   "id": "fact-12",
+   "levels": {},
+   "slots": {
+    "S": "乌龟",
+    "A": "慢"
+   }
+  },
+  {
+   "id": "fact-13",
+   "levels": {},
+   "slots": {
+    "S": "猎豹",
+    "A": "快"
+   }
+  },
+  {
+   "id": "fact-14",
+   "levels": {},
+   "slots": {
+    "S": "沙漠",
+    "A": "干"
+   }
+  },
+  {
+   "id": "fact-15",
+   "levels": {},
+   "slots": {
+    "S": "海水",
+    "A": "咸"
+   }
+  },
+  {
+   "id": "fact-16",
+   "levels": {},
+   "slots": {
+    "S": "长颈鹿",
+    "A": "高"
+   }
+  },
+  {
+   "id": "fact-17",
+   "levels": {},
+   "slots": {
+    "S": "针尖",
+    "A": "尖"
+   }
+  },
+  {
+   "id": "fact-18",
+   "levels": {},
+   "slots": {
+    "S": "玻璃",
+    "A": "透明"
+   }
+  },
+  {
+   "id": "fact-19",
+   "levels": {},
+   "slots": {
+    "S": "橡皮筋",
+    "A": "有弹性"
+   }
+  },
+  {
+   "id": "fact-20",
+   "levels": {},
+   "slots": {
+    "S": "岩石",
+    "A": "坚硬"
+   }
+  },
+  {
+   "id": "fact-21",
+   "levels": {},
+   "slots": {
+    "S": "丝绸",
+    "A": "光滑"
+   }
+  },
+  {
+   "id": "fact-22",
+   "levels": {},
+   "slots": {
+    "S": "砂纸",
+    "A": "粗糙"
+   }
+  },
+  {
+   "id": "fact-23",
+   "levels": {},
+   "slots": {
+    "S": "太阳",
+    "A": "明亮"
+   }
+  },
+  {
+   "id": "fact-24",
+   "levels": {},
+   "slots": {
+    "S": "冬天",
+    "A": "寒冷"
+   }
+  },
+  {
+   "id": "fact-25",
+   "levels": {},
+   "slots": {
+    "S": "蜂蜜",
+    "A": "黏稠"
+   }
+  },
+  {
+   "id": "fact-26",
+   "levels": {},
+   "slots": {
+    "S": "冰面",
+    "A": "滑"
+   }
+  },
+  {
+   "id": "fact-27",
+   "levels": {},
+   "slots": {
+    "S": "辣椒",
+    "A": "辣"
+   }
+  },
+  {
+   "id": "fact-28",
+   "levels": {},
+   "slots": {
+    "S": "黄连",
+    "A": "苦"
+   }
+  },
+  {
+   "id": "fact-29",
+   "levels": {},
+   "slots": {
+    "S": "婴儿",
+    "A": "幼小"
+   }
+  }
+ ],
+ "splits": {
+  "unit": "filler",
+  "fractions": {
+   "discovery": 0.6,
+   "confirm": 0.2,
+   "lockbox": 0.2
+  },
+  "salt": "v1",
+  "heldout_frames": []
+ },
+ "prereg": {
+  "min_behavior_acc": 0.7,
+  "min_probe_n": 3,
+  "min_cell_n": 6,
+  "min_lockbox_cos": 0.4
+ },
+ "shards": 2,
+ "language_graph_target_ids": [
+  "LG-NEGATION-SCOPE"
+ ]
+}

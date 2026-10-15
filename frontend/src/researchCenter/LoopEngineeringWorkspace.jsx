@@ -1,3 +1,4 @@
+import { API_BASE } from '../config.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
@@ -33,7 +34,6 @@ import {
   X,
 } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const GATES = [
   { id: 'gap', label: '证据缺口', phases: ['analyze'] },

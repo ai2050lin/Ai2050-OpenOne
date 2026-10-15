@@ -1,9 +1,10 @@
+import { TRAINING_API_BASE } from '../config.js';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Brain, Zap, Layers, Activity, TrendingUp, Database, Search, ChevronDown, ChevronUp, Play, BarChart3, Box } from 'lucide-react';
 import DNNAnalysis3DVisualization from './DNNAnalysis3DVisualization';
 
-const API_BASE_URL = 'http://localhost:8000';
+
 
 /**
  * DNN分析控制面板
@@ -101,8 +102,8 @@ const DNNAnalysisControlPanel = ({ onAnalysisRequest, onDataSelect }) => {
     try {
       // 加载可用的数据源和模型
       const [sourcesRes, modelsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/api/dnn/data-sources`),
-        axios.get(`${API_BASE_URL}/api/dnn/available-models`),
+        axios.get(`${TRAINING_API_BASE}/api/dnn/data-sources`),
+        axios.get(`${TRAINING_API_BASE}/api/dnn/available-models`),
       ]);
 
       setDataSources(sourcesRes.data || []);
@@ -118,7 +119,7 @@ const DNNAnalysisControlPanel = ({ onAnalysisRequest, onDataSelect }) => {
   const runDNNAnalysis = async (dimension) => {
     setIsAnalyzing(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}${dimension.api}`, {
+      const response = await axios.post(`${TRAINING_API_BASE}${dimension.api}`, {
         model: selectedModel,
         layerRange: [selectedLayerRange.start, selectedLayerRange.end],
         searchTerm: searchTerm || null,
@@ -212,7 +213,7 @@ const DNNAnalysisControlPanel = ({ onAnalysisRequest, onDataSelect }) => {
     if (!searchTerm.trim()) return;
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/dnn/concept-analysis`, {
+      const response = await axios.post(`${TRAINING_API_BASE}/api/dnn/concept-analysis`, {
         concept: searchTerm,
         model: selectedModel,
       });

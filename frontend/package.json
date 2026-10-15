@@ -1,8 +1,10 @@
 {
-  "name": "frontend",
+  "name": "ai2050-client",
+  "productName": "AI2050 语言机制研究平台",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build:atlas-manifest": "node scripts/build_atlas_manifest.mjs",
@@ -11,7 +13,11 @@
     "sync:phase1132-review": "node scripts/sync_phase1132_review_queue.mjs",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "desktop": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build && electron-builder --win --x64",
+    "dist:dir": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -32,10 +38,52 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^44.7.2",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "vite": "^7.2.4"
+  },
+  "build": {
+    "appId": "com.ai2050.client",
+    "productName": "AI2050 语言机制研究平台",
+    "copyright": "AI2050 Research Platform",
+    "directories": {
+      "output": "release",
+      "buildResources": "electron"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "AI2050-Setup-${version}-x64.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI2050 语言机制研究平台",
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico",
+      "installerHeaderIcon": "electron/icon.ico",
+      "deleteAppDataOnUninstall": false
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Science"
+    }
   }
 }

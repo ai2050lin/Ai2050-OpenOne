@@ -1,7 +1,8 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 
-const API=import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}`;
 const BRANCHES={native:'原生读出',code_identity:'直接使用代码响应',mapped_code:'代码映射',shuffled_map:'错误配对映射',mapped_digit_bias:'映射 + 全数字偏置',mapped_letter_bias:'映射 + 全字母偏置'};
 async function get(path,params){const r=await fetch(API+path+'?'+new URLSearchParams(params));if(!r.ok)throw new Error((await r.json()).detail||r.statusText);return r.json();}
 

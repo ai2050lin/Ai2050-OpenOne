@@ -1,8 +1,9 @@
+import { API_BASE } from '../../config.js';
 import {useEffect,useRef,useState} from 'react';
 import './RdcPrefixAtlas.css';
 import './RdcRelationStudy.css';
 
-const API='http://127.0.0.1:5001/api/rdc-relation';
+const API = `${API_BASE}/api/rdc-relation`;
 const fmt=x=>x===undefined||x===null?'—':Number(x).toPrecision(6);
 async function get(path){const r=await fetch(API+path);if(!r.ok){const e=await r.json().catch(()=>({detail:r.statusText}));throw new Error(e.detail||r.statusText);}return r.json();}
 const relations=['nsubj','obj','iobj','obl','nmod','amod','advmod','advcl','acl','conj','compound','case','mark','det'];
@@ -16,7 +17,7 @@ function Field({data}){
   return <div className="prefix-field"><p>{data.normalization}</p><div className="prefix-controls"><label>颜色映射<select value={mapping} onChange={e=>setMapping(e.target.value)}><option value="signed-log">带符号 log1p（尺度0.01）</option><option value="linear">线性</option></select></label><span>色标 ±{fmt(data.whole_field_absmax)} · 数组宽度{data.native_width} · 列[{data.start},{data.end})</span></div>
     <canvas ref={ref} aria-label="完整原生坐标热力图" data-testid="relation-field" style={{height:Math.max(160,Math.min(560,data.values.length*13))}} onClick={e=>{const b=e.currentTarget.getBoundingClientRect(),x=Math.min(data.values[0].length-1,Math.floor((e.clientX-b.left)/b.width*data.values[0].length)),y=Math.min(data.values.length-1,Math.floor((e.clientY-b.top)/b.height*data.values.length));setPicked({data,row:data.labels[y],coordinate:data.start+x,value:data.values[y][x]});}}/>
     <p className="prefix-muted">纵轴：{data.labels[0]} → {data.labels.at(-1)}。缩略显示会重采样像素；坐标顺序不变，点击或缩小列范围读取原值。</p>
-    {picked?.data===data&&<output>{picked.row}，坐标{picked.coordinate} = {picked.value}</output>}{data.download&&<a href={'http://127.0.0.1:5001'+data.download}>下载此样本完整BF16位保真数组</a>}
+    {picked?.data===data&&<output>{picked.row}，坐标{picked.coordinate} = {picked.value}</output>}{data.download&&<a href={API_BASE+data.download}>下载此样本完整BF16位保真数组</a>}
   </div>;
 }
 

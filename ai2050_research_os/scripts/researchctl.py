@@ -6,9 +6,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable
@@ -1366,6 +1369,102 @@ def command_drift_audit() -> int:
     return 0
 
 
+def command_queue_work_unit(data: dict[str, Any], args: argparse.Namespace) -> int:
+    """Send one already-frozen slice to the distributed center; never edits Registry."""
+    contracts = {row.get("id"): row for row in data["contracts"]}
+    puzzles = {row.get("id"): row for row in data["puzzles"]}
+    contract_index = contracts.get(args.contract_id)
+    if not contract_index:
+        print(f"未知合同：{args.contract_id}", file=sys.stderr)
+        return 1
+    if contract_index.get("status") not in {"ready", "running"} or contract_index.get("run_ready") is not True:
+        print("拒绝排队：合同必须在 Canonical Registry 中为 ready/running 且 run_ready=true。", file=sys.stderr)
+        return 1
+    expected_sha = str(contract_index.get("contract_sha256", ""))
+    if args.contract_sha256 and expected_sha != args.contract_sha256:
+        print("拒绝排队：提供的 contract_sha256 与 Registry 不一致。", file=sys.stderr)
+        return 1
+    contract_path = (OS_ROOT / str(contract_index.get("path", ""))).resolve()
+    if not contract_path.is_relative_to(OS_ROOT.resolve()) or not contract_path.is_file():
+        print("拒绝排队：冻结合同文件缺失或路径越界。", file=sys.stderr)
+        return 1
+    if sha256_file(contract_path) != expected_sha:
+        print("拒绝排队：合同文件当前 SHA256 与冻结登记不一致。", file=sys.stderr)
+        return 1
+    contract = load_json(contract_path)
+    puzzle = puzzles.get(args.puzzle_id)
+    if not puzzle or args.puzzle_id not in contract.get("puzzle_ids", []):
+        print("拒绝排队：Puzzle 必须存在且被该合同引用。", file=sys.stderr)
+        return 1
+    if args.language_graph_target_id:
+        try:
+            target_catalog = load_json(REGISTRY / "language_graph_targets.json")
+        except ValidationError as exc:
+            print(f"拒绝排队：无法读取语言图谱目标目录：{exc}", file=sys.stderr)
+            return 1
+        targets = {row.get("id"): row for row in target_catalog.get("targets", []) if isinstance(row, dict)}
+        if args.language_graph_target_id not in targets:
+            print(f"拒绝排队：未知语言图谱目标 {args.language_graph_target_id}。", file=sys.stderr)
+            return 1
+    if args.model_id not in contract.get("scope", {}).get("models", []):
+        print("拒绝排队：model_id 超出冻结合同 scope。", file=sys.stderr)
+        return 1
+    if args.precision not in contract.get("scope", {}).get("precision", []):
+        print("拒绝排队：precision 超出冻结合同 scope。", file=sys.stderr)
+        return 1
+    server = (args.server or os.environ.get("AI2050_DIST_SERVER", "")).rstrip("/")
+    token = os.environ.get("AI2050_DIST_ADMIN_TOKEN", "")
+    if not server or not token:
+        print("需要 AI2050_DIST_SERVER 或 --server，以及 AI2050_DIST_ADMIN_TOKEN。", file=sys.stderr)
+        return 2
+    try:
+        resource_request = json.loads(args.resource_request)
+        if not isinstance(resource_request, dict):
+            raise ValueError("resource request must be a JSON object")
+    except (json.JSONDecodeError, ValueError) as exc:
+        print(f"resource-request 无效：{exc}", file=sys.stderr)
+        return 2
+    payload = {
+        "schema_version": "distributed_work_unit.v1",
+        "tm_id": args.tm_id,
+        "contract_id": args.contract_id,
+        "contract_sha256": expected_sha,
+        "puzzle_id": args.puzzle_id,
+        "case_family_id": args.case_family_id,
+        "split_id": args.split_id,
+        "model_id": args.model_id,
+        "model_snapshot_id": args.model_snapshot_id,
+        "tokenizer_sha256": args.tokenizer_sha256,
+        "precision": args.precision,
+        "capture_tier": args.capture_tier,
+        "seed": args.seed,
+        "required_artifacts": args.required_artifact,
+        "resource_request": resource_request,
+    }
+    if args.language_graph_target_id:
+        payload["language_graph_target_id"] = args.language_graph_target_id
+    if args.work_unit_id:
+        payload["work_unit_id"] = args.work_unit_id
+    request = urllib.request.Request(
+        server + "/api/research/work-units",
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json", "X-Admin-Token": token},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", "replace")[:1200]
+        print(f"中心拒绝 Work Unit：HTTP {exc.code} {detail}", file=sys.stderr)
+        return 1
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        print(f"分布式中心请求失败：{exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1383,6 +1482,27 @@ def parse_args() -> argparse.Namespace:
     sub.add_parser("drift-audit", help="扫描客户端当前研究状态的平行事实源")
     sub.add_parser("build-snapshot-v2", help="构建 Snapshot v2 草案投影（views/industry/cases）")
     sub.add_parser("validate-snapshot-v2", help="校验 Snapshot v2 草案 Schema 与确定性")
+    work_unit = sub.add_parser(
+        "queue-work-unit",
+        help="将已冻结、run_ready 的合同分片提交给分布式中心（只排队，不自动启动 Worker）",
+    )
+    work_unit.add_argument("--server", default="", help="分布式中心地址；默认读取 AI2050_DIST_SERVER")
+    work_unit.add_argument("--tm-id", required=True, help="已冻结 research_adapter.v1 的执行模板 ID")
+    work_unit.add_argument("--contract-id", required=True)
+    work_unit.add_argument("--contract-sha256", default="", help="可选一致性断言；默认直接使用 Registry 冻结值")
+    work_unit.add_argument("--puzzle-id", required=True)
+    work_unit.add_argument("--language-graph-target-id", default="", help="可选语言图谱测试目标 ID（LG-*）；用于目标级进度回链")
+    work_unit.add_argument("--case-family-id", required=True)
+    work_unit.add_argument("--split-id", required=True)
+    work_unit.add_argument("--model-id", required=True, help="合同 scope 中的模型名")
+    work_unit.add_argument("--model-snapshot-id", required=True, help="模型 revision / 快照身份")
+    work_unit.add_argument("--tokenizer-sha256", required=True)
+    work_unit.add_argument("--precision", required=True)
+    work_unit.add_argument("--capture-tier", required=True, choices=["tier_a", "tier_b", "tier_c", "tier_d"])
+    work_unit.add_argument("--seed", type=int, required=True)
+    work_unit.add_argument("--required-artifact", action="append", required=True)
+    work_unit.add_argument("--resource-request", default="{}", help="资源请求 JSON 对象")
+    work_unit.add_argument("--work-unit-id", default="", help="可选幂等 ID；省略时由中心确定性生成")
     return parser.parse_args()
 
 
@@ -1415,6 +1535,8 @@ def main() -> int:
         return command_build_snapshot_v2(data)
     if args.command == "validate-snapshot-v2":
         return command_validate_snapshot_v2()
+    if args.command == "queue-work-unit":
+        return command_queue_work_unit(data, args)
     return 2
 
 

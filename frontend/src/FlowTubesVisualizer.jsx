@@ -1,11 +1,11 @@
 
+import { API_BASE } from './config.js';
 import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { pollRuntimeWithFallback } from './utils/runtimeClient';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 function normalizeTube(tube, idx) {
   if (!tube || typeof tube !== 'object') return null;

@@ -1,3 +1,5 @@
+import { API_BASE } from '../../config.js';
+export { API_BASE as MAIN_API_BASE };
 /**
  * AppleNeuron3D 常量与配置数据
  * 从 AppleNeuron3DTab.jsx 拆分而来
@@ -44,7 +46,6 @@ export const MODEL_CONFIGS = {
 };
 export const QUERY_NODE_COUNT = 12;
 export const IMPORTED_QUERY_NODE_MAX = 18;
-export const MAIN_API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 export const APPLE_CORE_NEURONS = [
   { id: 'apple-core-l3-n412', label: '苹果概念核 1', role: 'micro', layer: 3, neuron: 412, metric: 'apple_core_strength', value: 0.83, strength: 0.00086, source: 'seed_layer_neuron_map_v1' },

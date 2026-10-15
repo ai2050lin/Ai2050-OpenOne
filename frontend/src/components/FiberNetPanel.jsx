@@ -1,3 +1,4 @@
+import { API_BASE } from '../config.js';
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import {
@@ -13,7 +14,6 @@ import {
   Waves,
 } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const S = {
   panel: {

@@ -1,7 +1,7 @@
+import { API_BASE } from '../config.js';
 import { AlertTriangle, Cpu, Database, ShieldCheck } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const PIPELINE = [
   '选择 Evidence Kernel 缺口',

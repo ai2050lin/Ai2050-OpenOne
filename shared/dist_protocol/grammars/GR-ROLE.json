@@ -1,0 +1,389 @@
+{
+ "schema_version": "template_grammar.v1",
+ "family_id": "GR-ROLE",
+ "module": "GR",
+ "name": "语法 · 施事/受事 × 主动/把字/被字",
+ "description": "同一名词 N 在施事与受事两种角色、三种构式中出现（2×3 完全交叉），目标位置为 N。检验角色因子能否脱离语序与构式表面特征，在未见名词对上复现。",
+ "factors": [
+  "role",
+  "construction"
+ ],
+ "layers": [
+  "first",
+  "mid",
+  "last"
+ ],
+ "frames": [
+  {
+   "id": "active-agent",
+   "levels": {
+    "role": "agent",
+    "construction": "active"
+   },
+   "text": "{N}{V}了{M}。",
+   "target": "N",
+   "probe": {
+    "prompt": "{N}{V}了{M}。问：是谁{V}了对方？答：是",
+    "answer": "{N}"
+   }
+  },
+  {
+   "id": "active-patient",
+   "levels": {
+    "role": "patient",
+    "construction": "active"
+   },
+   "text": "{M}{V}了{N}。",
+   "target": "N",
+   "probe": {
+    "prompt": "{M}{V}了{N}。问：是谁{V}了对方？答：是",
+    "answer": "{M}"
+   }
+  },
+  {
+   "id": "ba-agent",
+   "levels": {
+    "role": "agent",
+    "construction": "ba"
+   },
+   "text": "{N}把{M}{V}了。",
+   "target": "N",
+   "probe": {
+    "prompt": "{N}把{M}{V}了。问：是谁{V}了对方？答：是",
+    "answer": "{N}"
+   }
+  },
+  {
+   "id": "ba-patient",
+   "levels": {
+    "role": "patient",
+    "construction": "ba"
+   },
+   "text": "{M}把{N}{V}了。",
+   "target": "N",
+   "probe": {
+    "prompt": "{M}把{N}{V}了。问：是谁{V}了对方？答：是",
+    "answer": "{M}"
+   }
+  },
+  {
+   "id": "bei-agent",
+   "levels": {
+    "role": "agent",
+    "construction": "bei"
+   },
+   "text": "{M}被{N}{V}了。",
+   "target": "N",
+   "probe": {
+    "prompt": "{M}被{N}{V}了。问：是谁{V}了对方？答：是",
+    "answer": "{N}"
+   }
+  },
+  {
+   "id": "bei-patient",
+   "levels": {
+    "role": "patient",
+    "construction": "bei"
+   },
+   "text": "{N}被{M}{V}了。",
+   "target": "N",
+   "probe": {
+    "prompt": "{N}被{M}{V}了。问：是谁{V}了对方？答：是",
+    "answer": "{M}"
+   }
+  }
+ ],
+ "fillers": [
+  {
+   "id": "pair-00",
+   "levels": {},
+   "slots": {
+    "N": "小狗",
+    "M": "小猫",
+    "V": "追"
+   }
+  },
+  {
+   "id": "pair-01",
+   "levels": {},
+   "slots": {
+    "N": "老师",
+    "M": "学生",
+    "V": "表扬"
+   }
+  },
+  {
+   "id": "pair-02",
+   "levels": {},
+   "slots": {
+    "N": "警察",
+    "M": "小偷",
+    "V": "抓"
+   }
+  },
+  {
+   "id": "pair-03",
+   "levels": {},
+   "slots": {
+    "N": "妈妈",
+    "M": "孩子",
+    "V": "抱"
+   }
+  },
+  {
+   "id": "pair-04",
+   "levels": {},
+   "slots": {
+    "N": "医生",
+    "M": "病人",
+    "V": "救"
+   }
+  },
+  {
+   "id": "pair-05",
+   "levels": {},
+   "slots": {
+    "N": "猎人",
+    "M": "狐狸",
+    "V": "追"
+   }
+  },
+  {
+   "id": "pair-06",
+   "levels": {},
+   "slots": {
+    "N": "哥哥",
+    "M": "弟弟",
+    "V": "推"
+   }
+  },
+  {
+   "id": "pair-07",
+   "levels": {},
+   "slots": {
+    "N": "老板",
+    "M": "员工",
+    "V": "批评"
+   }
+  },
+  {
+   "id": "pair-08",
+   "levels": {},
+   "slots": {
+    "N": "猫",
+    "M": "老鼠",
+    "V": "咬"
+   }
+  },
+  {
+   "id": "pair-09",
+   "levels": {},
+   "slots": {
+    "N": "记者",
+    "M": "明星",
+    "V": "采访"
+   }
+  },
+  {
+   "id": "pair-10",
+   "levels": {},
+   "slots": {
+    "N": "农夫",
+    "M": "蛇",
+    "V": "打"
+   }
+  },
+  {
+   "id": "pair-11",
+   "levels": {},
+   "slots": {
+    "N": "教练",
+    "M": "队员",
+    "V": "训练"
+   }
+  },
+  {
+   "id": "pair-12",
+   "levels": {},
+   "slots": {
+    "N": "爷爷",
+    "M": "孙子",
+    "V": "教"
+   }
+  },
+  {
+   "id": "pair-13",
+   "levels": {},
+   "slots": {
+    "N": "公鸡",
+    "M": "虫子",
+    "V": "啄"
+   }
+  },
+  {
+   "id": "pair-14",
+   "levels": {},
+   "slots": {
+    "N": "老鹰",
+    "M": "兔子",
+    "V": "抓"
+   }
+  },
+  {
+   "id": "pair-15",
+   "levels": {},
+   "slots": {
+    "N": "姐姐",
+    "M": "妹妹",
+    "V": "叫"
+   }
+  },
+  {
+   "id": "pair-16",
+   "levels": {},
+   "slots": {
+    "N": "保安",
+    "M": "司机",
+    "V": "拦"
+   }
+  },
+  {
+   "id": "pair-17",
+   "levels": {},
+   "slots": {
+    "N": "邻居",
+    "M": "客人",
+    "V": "邀请"
+   }
+  },
+  {
+   "id": "pair-18",
+   "levels": {},
+   "slots": {
+    "N": "校长",
+    "M": "老师",
+    "V": "表扬"
+   }
+  },
+  {
+   "id": "pair-19",
+   "levels": {},
+   "slots": {
+    "N": "狮子",
+    "M": "斑马",
+    "V": "追"
+   }
+  },
+  {
+   "id": "pair-20",
+   "levels": {},
+   "slots": {
+    "N": "小明",
+    "M": "小红",
+    "V": "帮"
+   }
+  },
+  {
+   "id": "pair-21",
+   "levels": {},
+   "slots": {
+    "N": "奶奶",
+    "M": "小狗",
+    "V": "喂"
+   }
+  },
+  {
+   "id": "pair-22",
+   "levels": {},
+   "slots": {
+    "N": "队长",
+    "M": "新人",
+    "V": "指导"
+   }
+  },
+  {
+   "id": "pair-23",
+   "levels": {},
+   "slots": {
+    "N": "护士",
+    "M": "婴儿",
+    "V": "抱"
+   }
+  },
+  {
+   "id": "pair-24",
+   "levels": {},
+   "slots": {
+    "N": "裁判",
+    "M": "球员",
+    "V": "警告"
+   }
+  },
+  {
+   "id": "pair-25",
+   "levels": {},
+   "slots": {
+    "N": "同学",
+    "M": "班长",
+    "V": "选"
+   }
+  },
+  {
+   "id": "pair-26",
+   "levels": {},
+   "slots": {
+    "N": "厨师",
+    "M": "学徒",
+    "V": "骂"
+   }
+  },
+  {
+   "id": "pair-27",
+   "levels": {},
+   "slots": {
+    "N": "骑手",
+    "M": "马",
+    "V": "牵"
+   }
+  },
+  {
+   "id": "pair-28",
+   "levels": {},
+   "slots": {
+    "N": "渔夫",
+    "M": "鱼",
+    "V": "钓"
+   }
+  },
+  {
+   "id": "pair-29",
+   "levels": {},
+   "slots": {
+    "N": "主人",
+    "M": "鹦鹉",
+    "V": "训练"
+   }
+  }
+ ],
+ "splits": {
+  "unit": "filler",
+  "fractions": {
+   "discovery": 0.6,
+   "confirm": 0.2,
+   "lockbox": 0.2
+  },
+  "salt": "v1",
+  "heldout_frames": []
+ },
+ "prereg": {
+  "min_behavior_acc": 0.7,
+  "min_probe_n": 3,
+  "min_cell_n": 6,
+  "min_lockbox_cos": 0.4
+ },
+ "shards": 2,
+ "language_graph_target_ids": [
+  "LG-AGENT-PATIENT",
+  "LG-ACTIVE-PASSIVE"
+ ]
+}

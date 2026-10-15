@@ -10,6 +10,7 @@
      接不通回退 demoData.js 并保持 DEMO 徽标或注记。
    视觉 token：slate 体系 + emerald 激活梯度。
    ============================================================ */
+import { API_BASE } from '../../config.js';
 import { useEffect, useRef, useState } from 'react';
 import LensSpatial from './rdc_fusion/LensSpatial.jsx';
 import LensProcess from './rdc_fusion/LensProcess.jsx';
@@ -20,7 +21,6 @@ import { TICKER, CMDK_GROUPS, DEMO_OBJECT, DEMO_QUEUE } from './rdc_fusion/demoD
 import { MISSION } from './rdc_fusion/distributedData.js';
 import './rdc_fusion/rdc_fusion.css';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const DEFAULT_OBJ = 'F#3734';
 
 /*    五轴模型（design/client_ia_refactor_plan_v1.md §3）：导航 6→5。

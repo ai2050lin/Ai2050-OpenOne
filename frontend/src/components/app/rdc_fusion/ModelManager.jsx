@@ -6,9 +6,9 @@
       POST /api/models/download（服务端后台 huggingface_hub CLI，只下 safetensors 口径）
    ③ 下载任务：GET /api/models/downloads 轮询（有 downloading 时 2.5s），状态 + tail 回显
    LIVE/DEMO 纪律：端点不可达显示空态与错误，不伪造数据。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const fmtB = n => n >= (1 << 30) ? (n / (1 << 30)).toFixed(2) + ' GB'
   : n >= (1 << 20) ? (n / (1 << 20)).toFixed(1) + ' MB' : (n / 1024).toFixed(1) + ' KB';
 

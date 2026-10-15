@@ -1,4 +1,5 @@
-﻿import { OrbitControls, Text } from '@react-three/drei';
+﻿import { API_BASE } from './config.js';
+import { OrbitControls, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
 import {
@@ -27,7 +28,6 @@ const ICON_MAP = {
 };
 
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 // ... existing imports
 

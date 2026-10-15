@@ -7809,6 +7809,32 @@
    "prereg_id": "G5-G31",
    "superseded_by": null,
    "detail": "G5-G31 GAP-5 upstream-lever gate decision arm (default (a) per 3234 prereg, zero GPU). Gates from 3234 sealed npz (48034bd9), freeze 99b944fb before any gate arithmetic: UL_flip primary 0/4 folds x2 dirs x2 models (max-over-L delta vs null max = 0.0000 everywhere; sensitivity pooled-L* variant same), UL_dose non-monotone (u_isa both models; u_hasa mono but flip levels ~0), UL_amp best rho 0.2/0.4 < 0.6, UL_spec trivial pass (no flips to cross), UL_loc band [1,5] report-only no overlap (peaks at L0). C11 honest record: arm's redundant rates_j1 recompute had a mode-variable leak (u_isa iterated with leftover mode='hasa'); numerically coincided with total flips (all u_isa flips hasa-directed); gate basis = sealed total-flip rates, 4/4 recompute match, verdict unaffected. res 5bab6419. Independent verify 21/0 PASS (V5/V7 initial FAILs = probe bugs: V5 substring false-positive on gate-definition prose, V7 = the C11 leak). Registry v1.31 UNTOUCHED (ef5189e7), gap v1.10 UNTOUCHED (378de1cd); F-ledger F21 + GAP-5 mechanism_note landing preregistered as 3236. pre-append ledger file sha8 8c54a801."
+  },
+  {
+   "phase": 3236,
+   "name": "g5d0_platform_pipeline_demo",
+   "line": "G",
+   "date": "2026-10-14",
+   "model": "qwen3-4b bf16 (user-directed platform pipeline demo)",
+   "verdict": "DEMO_PIPELINE_PARTIAL|G1_sep_pos_PASS_x5tpl_auc0.75-1.00|G2_stitch_0.500_FAIL(0.6)|G3_xlang_0.557_PASS|G4_layer_report|contradictions_0",
+   "evidence_level": "demo arm (end-to-end pipeline worked example; demo-level gates, no E-level claim; landing arm prereg 3236 -> shifted to 3237)",
+   "model_scope": "qwen3-4b only",
+   "prereg_id": "G5-D0 (user-directed)",
+   "superseded_by": null,
+   "detail": "Platform-pipeline demo (user-directed): one feature (F-DEMO-ISA-001 isa class-membership binding) walked through the full loop: task-list entry -> 5 language templates (ZH stmt/quest/ctx + EN stmt/quest) -> 160-row terminal test (4 entities x 4 classes x 5 templates x 2 langs, qwen3-4b bf16) -> stable features (F1 separation AUC 0.745-1.000, F2 cross-template spearman, F3 ZH-EN behavior 0.557, F4 atlas links cos(v,dR) 0.018-0.193 / cos(v,u*) ~0, F5 layer emergence curve) -> atlas assembly -> mechanism readout. Honest findings: (i) same-family templates stitch strongly (T1|T5 0.821, T2|T4 0.871) but class-continuation vs judgment families weakly (min 0.084) => mean 0.500 fails the 0.6 stitch gate: template families need calibration before pooling (3172 port-calibration 29 pct echo); (ii) u* projection ~0 for seen entities (u* is OOV-carrier, coherent with 3232); (iii) layer curve flat early then final-layer amplification x2-8 (L32->L35: 4.3->8.4 / 1.7->13.3 / 5.0->10.4) => readout-amplification segment of GAP-5 visible in a single-feature demo. freeze b1fa889f (before any observation, JSON-roundtrip-normalized), res 8b79ed5e. Independent verify 13/0 PASS (2 probe bugs fixed: auc tie credit, sha8 self-key domain). Registry v1.31 UNTOUCHED, gap v1.10 UNTOUCHED. pre-append ledger file sha8 65d2fda0."
+  },
+  {
+   "phase": 3237,
+   "name": "g5g31_registry_landing",
+   "line": "G",
+   "date": "2026-10-14",
+   "model": "none (zero-GPU registry landing arm)",
+   "verdict": "f21_upstream_absent_registered|registry_v1.32|gap_v1.11|F21_upstream_lever_absent|GAP-5_FINAL_three_stage|contradictions_0",
+   "evidence_level": "registration arm (routes the sealed 3235 UPSTREAM_ABSENT verdict, gates preregistered in 3233 d74b6484; no new observation)",
+   "model_scope": "qwen3-4b + qwen3-14b (sealed 3235 scope)",
+   "prereg_id": "G5-G31 (MEMO 3236 tail, deferred 3236 landing arm)",
+   "superseded_by": null,
+   "detail": "Registry landing (zero GPU): (1) F21 NEW failure entry appended (F20 family extension: upstream lever absent — full-layer scan u_isa/u_hasa x2 directions, peak-band alpha fine scan, null 10+2; UL_flip FAIL L*=0 all folds 0 flips x2 models, UL_dose FAIL non-monotone, UL_amp FAIL spearman -0.20/+0.40 << 0.6, UL_spec PASS = no flip rather than wild flip; together with F20: readout end AND upstream end have NO single-direction behavioral lever => distributed carrying UPSTREAM_ABSENT closed); (2) GAP-5 mechanism_note FINAL append (three-stage closure: upstream distributed -> last-layer exact linear readout -> post-softmax nonlinearity) + NEW final_verdict key; (3) FTR-25/26 scope_limits appends. Arm S1 recomputed UL_flip/UL_dose/UL_amp from sealed 3235 result, matched sealed gates x2 models; 3235 res_sha8 recomputed OK. Independent verify 30/0 PASS (file shas, res/freeze recomputes, F21 evidence numbers vs sealed 3235, byte-preservation failures[:20] + features 24 exact + 2 scope appends + upgrade_log 11 + legacy gaps x4 + GAP-5 legacy fields, ledger untouched). 3235 contradictions boundary recorded verbatim in F21 (verify V7 probe mode leak, verdict unaffected). Registry v1.31 -> v1.32 (file 3c3f0484), gap v1.10 -> v1.11 (file 5934631b), upgrade_log untouched (11), E-levels unchanged. freeze 58722ca2 (before any assembly), res bee6ef5d. pre-append ledger file sha8 70bd3809."
   }
  ],
  "growth_curve": [
@@ -9572,5 +9598,5 @@
   }
  ],
  "schema_version": 3,
- "ledger_sha256_8": "26a9fa05"
+ "ledger_sha256_8": "d37ca65f"
 }

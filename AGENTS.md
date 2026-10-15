@@ -139,6 +139,24 @@ HiddenState 有统一的数组形式，适合系统观察；这不自动意味�
 
 模型的实际能力与目标答案分别记录。模型原本未完成的任务，不能直接作为它具备对应内部机制的正例。
 
+### 6.1 分布式测试协议（dist_protocol v3）
+
+需要扩大样本、跨节点或跨模型运行的测试，优先使用 `shared/dist_protocol/` 的协议，而不是手写句子列表：
+
+1. **生成式模板**：用 `template_grammar.v1`（句式框架 × 填充词表 × 因子水平）描述测试材料，放入 `shared/dist_protocol/grammars/`。先在客户端「研发 · 模板工作室」或 `grammar.preview` 检查逐格样本数、功效近似与告警，再冻结。
+2. **切分**：按填充词确定性切分 discovery / confirm / lockbox；句式泛化用 `heldout_frames`（lockbox_frame）。不得改用随机逐条切分。
+3. **行为门**：每个句式应配 probe；冻结正式模板前先冻结试跑版查看逐格行为门。行为门未通过的条件格不进入内部分析，也不能作为机制正例。
+4. **冻结与预注册**：`prereg`（`min_behavior_acc`、`min_cell_n`、`min_lockbox_cos`，可选 `target_factors` / `target_layers`）随模板冻结进 design_sha。看到结果后不得修改阈值；修改文法或阈值必须重新冻结（升 version），旧版本结果不再参与合并。
+5. **合并口径**：只合并 `kind=real`、design_sha 一致、金丝雀未漂移、审计未驳回的结果；每个分片只计一次，重复分片只做一致性检查。不同模型快照或精度分桶，不跨桶平均。
+6. **产物**：v3 节点产物为 `summary.json`、`suffstats.npz`、`behavior.json`、`canary.json`。`--mode synthetic` 只用于协议联调，其结果永远不能写入研究记录或作为实验数字。
+7. **证据边界**：审计通过只表示执行产物可信、可以合并；证据门链 1–7 由协议判定，选择性/充分性、必要性与负控制、自然生成需要另做干预或生成实验。证据等级仍在 Research OS 登记，不能由合并统计或记分板自动晋级。
+8. **改动验证**：修改协议、runner 或中心服务后，运行 `python -m unittest discover -s tests/dist_protocol`（当前 41 项，含 analysis.v1 与 atlas.v1 的植入结构找回与负对照、autotest 作业队列、题库与研究包）；runner 改动会改变 design_sha，只影响之后冻结的模板。
+9. **规律分析（analysis.v1）**：runner 同时产出 `items.npz`（逐样本各层向量，过大时用语料种子固定的 JL 投影）；`shared/dist_protocol/analysis.py` 只在 discovery 上拟合、在留出划分上检验，置换检验按填充词 / 句式整体打乱。判据固定在代码 `CRITERIA` 中并随结果返回；不得在看到结果后调判据。分析结论用「支持 / 未支持 / 注意 / 描述」表述，属于候选稳定观测，不自动晋级证据。改动分析方法时必须保留植入规律找回测试与负对照测试。
+10. **一个模式族的完整流程**：用 `scripts/run_language_family.py --family <ID>` 经中心接口与 `node_agent.py --tm-id` 跑完 预览 → 试跑冻结 → 行为门 → 正式冻结 → 分片采集 → 合并与分析 → 报告（`research/family_runs/`）。无 GPU 时只能对沙盒中心（`AI2050_DIST_ALLOW_SYNTHETIC=1` + 独立 `AI2050_DIST_DIR`）加 `--synthetic` 验证流程；沙盒的模型桶名带「合成·」前缀、客户端显示合成横幅，报告在 `research/family_runs_synthetic/` 并标 SYNTHETIC，不得引用为实验结果。正式中心不得开启该开关。
+11. **研发 · 自动测试（autotest.v1）**：`shared/dist_protocol/autotest.py` 维护被测模型登记与「模型 × 模式族」作业队列，单线程顺序执行驱动（`--progress` 输出 `@@progress` / `@@result` 行，行为门停止以退出码 3 表示）。被测模型只能是本机权重目录或沙盒合成模型；管理令牌经环境变量传给驱动，不进命令行。多个模型共用同一冻结模板时，中心按「该模型尚无结果的分片」优先派发。改动后运行 `tests/dist_protocol/test_autotest.py`（假驱动，覆盖校验、批次展开、行为门停止、取消、重启中断）。
+12. **语言谱图（atlas.v1）与开放参与**：规范见 `design/platform_spec_v1.md`。跨族结论只能来自 `shared/dist_protocol/atlas.py` 的固定判据（`CRITERIA` 随结果返回）：稳定特征须在未见词表上复现；边须两组互不重叠的词各自复现并超过经验零分布；共享轴须通过留一族迁移。跨族假设优先写进文法 `concepts` 预注册，事后发现的边记为「新发现候选」，需新模板验证。方向只在同一模型内比较。共享方向不等于共享机制，机制须做干预。AI 解读产生的假设一律「未检验」，只保存在 `atlas/hypotheses.jsonl`，不得写成结论。改动谱图算法时必须保留 `test_atlas.py` 的植入找回、负对照与基线泄漏测试。
+13. **账号（accounts.v1）**：实现于 `shared/dist_protocol/accounts.py`，路由在中心服务 `/api/auth/*`。密码只存 PBKDF2-HMAC-SHA256 哈希（随机盐，迭代数随哈希保存），会话令牌只存 sha256，登录比较用常数时间、对不存在的用户也做一次哈希；不得记录或返回明文密码与令牌（令牌只在注册 / 登录响应中返回一次）。第一个账号为管理员，系统至少保留一个可用管理员；管理员会话等价于管理令牌，成员会话不能做写操作。节点绑定码一次性、30 分钟有效；账号只用于署名与授权，不改变结果的合并口径与证据等级。改动后运行 `tests/dist_protocol/test_accounts.py`。
+
 ## 7. 自回归、采集与数值控制
 
 按生成步连接：当前 token 前缀、位置及历史状态、跨层响应、输出读出，以及追加新 token 后的下一步计算。
@@ -208,7 +226,27 @@ Phase 编号接续现有记录，不随意重编号。已有记录的纠错采�
 
 ## 10. 可视化研究客户端
 
-客户端承担三个功能，按可用数据和研究进展逐步实现：
+客户端按研究闭环分为五个一级界面（实现见 `frontend/src/components/app/RdcFusionWorkspace.jsx`，设计见 `design/client_v6_pipeline_ia.md`）：
+
+| 界面 | 职责 |
+| --- | --- |
+| 总览 | 闭环漏斗、题库概览（按类别状态）、谱图进展（共享编码轴、概念假设、最近 AI 假设）、覆盖矩阵、数据健康、待我决策、贡献者、参与测试、最近研究裁决。 |
+| 空间 | 实验响应（单个模式族：3D 响应空间、规律分析与合并统计，默认打开 3D；可下载研究包）；语言谱图（跨模式族：特征谱图 3D、共享编码轴、概念假设、规律陈述、AI 解读、导出谱图包）；打开本地研究包 / 谱图包离线查看；模型资产（本机权重：层平铺 / 参数热图）。 |
+| 研发 | 自动测试（默认：多个被测模型 × 模式族一键运行）；题库（类别、状态、领题命令、研究包）；模板工作室（含 concepts 预注册）→ 试跑与冻结 → 分发与节点 → 审计队列；Agent 工作流。 |
+| 图谱 | 研究图谱、证据中心、资源目录（特征、反证、复现协议、账本、专项页面）。 |
+| 路线 | 模板族证据门链、跨族机制候选链、语言图谱目标、预测记分板（含谱图预测）；行业方法只作参考。 |
+
+客户端修改须遵守：
+
+- 没有真实数据时显示空态或「未接入」，不回退演示数字；演示与示意数据只出现在显式标注的区域。
+- 各来源计数分开呈现，不拼成「测试 → 特征 → 机制」的转化率；任务完成、上传、审计通过都不表示证据晋级。
+- 新视图优先接入中心服务的真源端点（`/api/pipeline/overview`、`/api/coverage`、`/api/catalog`、`/api/agg/{tm}/v2`、`/api/analysis/{tm}`、`/api/atlas`、`/api/audit/queue`、`/api/scoreboard` 等），复用 `rdc_fusion/api.js`、`ui.jsx`、`catalogUtil.js`、`atlasUtil.js`；非组件的共享函数放在 `.js` 模块里，组件文件只导出组件。
+- 研究包与谱图包在浏览器内解压（`localPack.js`，DecompressionStream），不上传；下载文件名只用 ASCII。
+- 客户端由 `AuthGate`（`rdc_fusion/AuthGate.jsx`）把守：未登录显示注册 / 登录界面，已登录直接进入主界面；中心不可达且本机有登录记录时放行并标记离线。当前账号经 `authContext.js` 的 `useAuth()` 读取；会话令牌存 localStorage，只随 `/api/auth/*` 请求以 `Authorization: Bearer` 发送（其余读接口不带，避免跨域预检）。
+- 写操作（冻结、审计、自动测试、AI 解读）需要管理权限：管理员账号的会话令牌可作为 `X-Admin-Token`（`useAdminToken()` 自动使用），也可手填中心管理令牌；令牌只存于浏览器，不写入代码、URL 或仓库。AI 研发模型的 API Key 保存在用户目录 `~/.ai2050/ai_rnd_config.json`，不得写入仓库文件。
+- 数据色彩：顺序量用单一色相由浅到深，正负量用双色加灰色中点；状态同时给出符号与文字。
+
+以下三项是客户端承担的长期功能：
 
 ### 10.1 研究积累与查询
 

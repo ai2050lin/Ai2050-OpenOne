@@ -8,8 +8,10 @@ AI R&D Service — 自动深度神经网络逆向工程研究服务
 4. 安全执行AI生成的代码
 """
 import asyncio
+import glob
 import json
 import os
+import re
 import sys
 import time
 import traceback
@@ -336,6 +338,17 @@ class ResearchSession:
         self._load_state()
 
     def _config_path(self) -> Path:
+        """模型与 API Key 配置保存在用户目录（不在仓库内，避免随 git 提交泄露 Key）。
+
+        优先 AI2050_AI_RND_CONFIG 环境变量；默认 ~/.ai2050/ai_rnd_config.json。
+        仓库根目录的 ai_rnd_config.json 只作为空 Key 模板与旧版迁移来源，不再写入。
+        """
+        override = os.environ.get("AI2050_AI_RND_CONFIG", "").strip()
+        if override:
+            return Path(override).expanduser()
+        return Path.home() / ".ai2050" / "ai_rnd_config.json"
+
+    def _legacy_config_path(self) -> Path:
         return Path(__file__).parent.parent / "ai_rnd_config.json"
 
     def _state_path(self) -> Path:
@@ -346,18 +359,38 @@ class ResearchSession:
 
     def _load_config(self):
         path = self._config_path()
-        if path.exists():
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    self.config = json.load(f)
-            except Exception:
-                self.config = {}
+        if not path.exists():
+            # 旧版把配置（含 Key）写在仓库根目录：读取一次并迁移到用户目录
+            legacy = self._legacy_config_path()
+            if legacy.exists():
+                try:
+                    with open(legacy, "r", encoding="utf-8") as f:
+                        self.config = json.load(f)
+                    if self._has_api_key(self.config):
+                        self._save_config()
+                except Exception:
+                    self.config = {}
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                self.config = json.load(f)
+        except Exception:
+            self.config = {}
+
+    @staticmethod
+    def _has_api_key(config: Dict[str, Any]) -> bool:
+        models = [config.get("master_model") or {}] + list(config.get("analyst_models") or [])
+        return any(isinstance(m, dict) and str(m.get("api_key") or "").strip() for m in models)
 
     def _save_config(self):
         path = self._config_path()
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.config, f, indent=2, ensure_ascii=False)
+        try:
+            os.chmod(path, 0o600)  # 仅当前用户可读（Windows 上为无害空操作）
+        except OSError:
+            pass
 
     def _load_state(self):
         path = self._state_path()
@@ -1678,8 +1711,10 @@ async def workspace_file(path: str):
 _ATLAS_DIR = Path(__file__).parent.parent / "research" / "gpt5" / "atlas"
 _ATLAS_RESULT_DIR = (Path(__file__).parent.parent / "tests" / "glm5" / "result" /
                      "rdc_query_construction_20260913")
-# registry 版本 -> 产物目录（ discoveries 顺序即版本链；新增版本在此登记路径规则即可）
-_ATLAS_REGISTRY_CANDIDATES = [
+# registry / gap 版本发现：glob 递归（与 server/derive_atlas_tree.py
+# latest_registry() 同一口径，见 research/gpt5/docs/CLIENT_SERVER_ALIGNMENT_v1.md A1）。
+# 新版本随 Phase 产物自动入链，无需手工登记；legacy 硬编码候选保留作 fallback。
+_ATLAS_REGISTRY_CANDIDATES_LEGACY = [
     ("1.8", _ATLAS_RESULT_DIR / "phase3181" / "g5b6_ftr04_glm4_attribution" / "atlas_registry_v1_8.json"),
     ("1.7", _ATLAS_RESULT_DIR / "phase3180" / "g5b5_ftr15_heldout" / "atlas_registry_v1_7.json"),
     ("1.6", _ATLAS_RESULT_DIR / "phase3179" / "g5b4_ftr23_registration" / "atlas_registry_v1_6.json"),
@@ -1687,13 +1722,47 @@ _ATLAS_REGISTRY_CANDIDATES = [
 ]
 
 
+def _discover_atlas_versions():
+    """glob 递归发现 atlas_registry_v1_N.json 全版本链，按 N 升序返回 [(n, path)]。
+    用标准 glob.glob（容忍 phase2746/field_store 等坏链接），与
+    server/derive_atlas_tree.py latest_registry() 逐字同口径。"""
+    out = []
+    for s in glob.glob(str(_ATLAS_RESULT_DIR / "**" / "atlas_registry_v1_*.json"),
+                       recursive=True):
+        m = re.search(r"v1_(\d+)\.json$", os.path.basename(s))
+        if m:
+            out.append((int(m.group(1)), Path(s)))
+    out.sort(key=lambda x: x[0])
+    return out
+
+
+def _discover_gap_versions():
+    """glob 递归发现 gap_ledger_v1_N.json 全版本链，按 N 升序返回 [(n, path)]。"""
+    out = []
+    for s in glob.glob(str(_ATLAS_RESULT_DIR / "**" / "gap_ledger_v1_*.json"),
+                       recursive=True):
+        m = re.search(r"v1_(\d+)\.json$", os.path.basename(s))
+        if m:
+            out.append((int(m.group(1)), Path(s)))
+    out.sort(key=lambda x: x[0])
+    return out
+
+
 def _atlas_registry_path(version: Optional[str] = None) -> Optional[Path]:
+    cands = _discover_atlas_versions()
     if version:
-        for v, p in _ATLAS_REGISTRY_CANDIDATES:
-            if v == version and p.is_file():
+        # version 形如 "1.32" / "32" 均可
+        try:
+            n = int(str(version).split(".")[-1])
+        except ValueError:
+            return None
+        for k, p in cands:
+            if k == n:
                 return p
         return None
-    for _, p in _ATLAS_REGISTRY_CANDIDATES:
+    if cands:
+        return cands[-1][1]
+    for _, p in _ATLAS_REGISTRY_CANDIDATES_LEGACY:
         if p.is_file():
             return p
     return None
@@ -1701,17 +1770,16 @@ def _atlas_registry_path(version: Optional[str] = None) -> Optional[Path]:
 
 def _atlas_version_list() -> List[Dict[str, Any]]:
     out = []
-    for v, p in _ATLAS_REGISTRY_CANDIDATES:
-        if p.is_file():
-            try:
-                reg = json.loads(p.read_text(encoding="utf-8"))
-                out.append({"version": v, "file": p.name,
-                            "sha8_source": reg.get("supersedes", ""),
-                            "n_features": len(reg.get("features", [])),
-                            "n_upgrades": len(reg.get("upgrade_log", [])),
-                            "n_failures": len(reg.get("failures", []))})
-            except Exception:
-                continue
+    for k, p in reversed(_discover_atlas_versions()):
+        try:
+            reg = json.loads(p.read_text(encoding="utf-8"))
+            out.append({"version": "1.%d" % k, "file": p.name,
+                        "sha8_source": reg.get("supersedes", ""),
+                        "n_features": len(reg.get("features", [])),
+                        "n_upgrades": len(reg.get("upgrade_log", [])),
+                        "n_failures": len(reg.get("failures", []))})
+        except Exception:
+            continue
     return out
 
 
@@ -1788,6 +1856,27 @@ async def atlas_ledger(offset: int = 0, limit: int = 30, line: Optional[str] = N
     return {"schema": "atlas_ledger_v1", "total": total, "count": len(page),
             "offset": off, "ledger_sha256_8": data.get("ledger_sha256_8"),
             "schema_version": data.get("schema_version"), "measurements": page}
+
+
+@router.get("/atlas/gaps")
+async def atlas_gaps():
+    """G 线 GAP 账本最新版（glob gap_ledger_v1_N.json 自动发现，取最大 N）。
+    含 GAP-5 final_verdict（三段式收官 UPSTREAM_ABSENT，3237 入册）。缺失 404，不现算。"""
+    cands = _discover_gap_versions()
+    if not cands:
+        raise HTTPException(status_code=404, detail="gap ledger not found")
+    n, p = cands[-1]
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="gap ledger parse error: %s" % e)
+    versions = [{"version": "1.%d" % k, "file": pp.name}
+                for k, pp in reversed(cands)]
+    return {"schema": "atlas_gaps_v1", "version": data.get("version"),
+            "file": p.name, "versions": versions,
+            "updated": data.get("updated"),
+            "supersedes": data.get("supersedes"),
+            "gaps": data.get("gaps", [])}
 
 
 @router.get("/atlas/tree")

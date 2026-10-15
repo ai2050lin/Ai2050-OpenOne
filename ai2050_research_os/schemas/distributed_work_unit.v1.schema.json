@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai2050.local/schemas/distributed_work_unit.v1.schema.json",
+  "title": "AI2050 Distributed Research Work Unit v1",
+  "type": "object",
+  "required": [
+    "schema_version", "tm_id", "contract_id", "contract_sha256", "puzzle_id",
+    "case_family_id", "split_id", "model_id", "model_snapshot_id",
+    "tokenizer_sha256", "precision", "capture_tier", "seed",
+    "required_artifacts", "resource_request"
+  ],
+  "properties": {
+    "schema_version": {"const": "distributed_work_unit.v1"},
+    "tm_id": {"type": "string", "minLength": 1, "maxLength": 80},
+    "contract_id": {"type": "string", "minLength": 1, "maxLength": 100},
+    "contract_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "puzzle_id": {"type": "string", "pattern": "^P[0-9]{2}$"},
+    "case_family_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "split_id": {"type": "string", "minLength": 1, "maxLength": 80},
+    "model_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "model_snapshot_id": {"type": "string", "minLength": 1, "maxLength": 240},
+    "tokenizer_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "precision": {"type": "string", "minLength": 1, "maxLength": 40},
+    "capture_tier": {"enum": ["tier_a", "tier_b", "tier_c", "tier_d"]},
+    "seed": {"type": "integer", "minimum": 0},
+    "required_artifacts": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "resource_request": {
+      "type": "object",
+      "required": ["gpu_hours"],
+      "properties": {"gpu_hours": {"type": "number", "exclusiveMinimum": 0}},
+      "additionalProperties": true
+    },
+    "work_unit_id": {"type": "string", "maxLength": 120},
+    "language_graph_target_id": {"type": "string", "pattern": "^LG-[A-Z0-9-]+$"}
+  },
+  "additionalProperties": false
+}

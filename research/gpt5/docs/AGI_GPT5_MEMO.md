@@ -16945,3 +16945,67 @@ GAP-5 三段式（3229）：上游编码承载行为 → 末层精确线性读�
 ### 预注册 Phase 3236（候选）
 - (a) **G5-G31 落账臂**（默认，零 GPU，照 3231 模板）：F21（F20 族扩展：上游亦无杠杆）append → registry v1.32 + GAP-5 mechanism_note 终版（三段式收官：上游分布式承载→末层线性读出→post-softmax 非线性）→ gap v1.11；
 - (b) u* 内容归因类级扩展（零 GPU，顺延）。
+
+
+## Phase 3236: G5-D0 平台全流程演示臂（用户指定） [2026-10-14 02:56]
+
+**执行模式**：qwen3-4b bf16 单模型端到端演示（用户指定任务：用例子完整走一遍「任务清单→语言模版→终端测试→稳定特征→图谱拼图→机制破解」；原 3236 落账臂顺延为 3237 预注册）；freeze **`b1fa889f`**（任何观测前，JSON 往返归一化）；res **`8b79ed5e`**，verdict **`DEMO_PIPELINE_PARTIAL`**；closeout 追加 #388。
+
+### 流水线五步（一个特征的完整旅程：F-DEMO-ISA-001 类属绑定）
+
+1. **任务清单条目**：特征 F-DEMO-ISA-001（isa 类属关系绑定），预设图谱对接点 = dR（3230 关系对比轴）/ u*（3225 崩塌载体）/ k*=3 层曲线（3152）；
+2. **语言模版 ×5**：T1 中文陈述「{e}是一种」/ T2 中文问句「{e}是一种{c}吗？答案是」/ T3 英文陈述「The {e} is a kind of」/ T4 英文问句「Is the {e} a kind of {c}? Answer:」/ T5 中文语境「我喜欢{e}。{e}是一种」；实体 ×4（苹果/玫瑰/金鱼/锤子 + EN 对应）× 类 ×4 ⇒ **160 行测试矩阵**；
+3. **终端测试**（qwen3-4b bf16，全层 37 槽捕获）：F1 分离度 AUC **0.745–1.000 全 5 模版为正**（G1 PASS）；F3 跨语言行为相关 **0.557**（G3 PASS）；
+4. **稳定特征与拼图（核心发现）**：F2 跨模版 spearman——**同族模版强拼图**（T1|T5 0.821、T2|T4 0.871）、**跨族弱**（续接类 vs 判断类最低 0.084），均值 **0.500 未过 0.6 门（G2 FAIL）**⇒ 模版族间需先校准再合并（3172 端口校准 29 pct 的回声）——「多种语言模版如何拼图」的操作答案：**先族内收敛，再跨族校准**；F4 图谱对接：cos(v,dR)=0.018–0.193（续接类模版 > 判断类）、**cos(v,u*)≈0**（seen 实体无 u* 幅度——与 3232「u* 是 OOV 载体」自洽）；
+5. **机制读出**：F5 层曲线——类读出分离度早层平坦（L0–12 ≈0–0.5）、后段爬升、**末层跳变 ×2–8**（L32→L35：4.3→8.4 / 1.7→13.3 / 5.0→10.4）⇒ GAP-5 三段式的「末层线性读出 + post-softmax 非线性」在单特征演示中肉眼可见。
+
+**教学结论**：该例子展示了分布式逆向平台的最小闭环——一个特征从任务清单出发，经多模版测试获得行为稳定（AUC≈1）与几何指纹（v_T 方向），拼图时同族模版直接合并、跨族需校准，最后接入既有图谱节点（dR/u*/层曲线）并复现机制分段（早层绑定→末层放大）。G2 FAIL 本身是有效测量：模版族间的系统差就是「端口校准」要消除的对象。
+
+### 独立复核（verify.json，13/0 PASS）
+身份哈希（freeze JSON 往返归一化域，不含自身 sha 键）、F1–F5 全部自封存 npz 独立重算、verdict 推导复算、账本/源 sha 只读断言；2 个探针 bug 修复（auc 平局计分、sha8 自键域），封存产物未动。
+
+### 预注册 Phase 3237（候选）
+- (a) **G5-G31 落账臂**（默认，零 GPU，照 3231 模板，自 3236 顺延）：F21（F20 族：上游亦无杠杆）append → registry v1.32 + GAP-5 mechanism_note 终版 → gap v1.11；
+- (b) u* 内容归因类级扩展（零 GPU，顺延）。
+
+
+## Phase 3237: G5-G31 registry 落账臂（零 GPU） [2026-10-14 20:44]
+
+**执行模式**：纯落账臂（预注册自 3236 tail 顺延；路由 3235 sealed verdict **UPSTREAM_ABSENT**，门控 3233 design `d74b6484` 预注册）；freeze **`58722ca2`**（任何装配前）；res **`bee6ef5d`**，verdict **`f21_upstream_absent_registered`**；closeout 追加 #389。零 GPU：仅对 sealed 3235 result 做一致性重算 + JSON 装配。
+
+### 三项 append（append-only，byte-preservation 全过）
+
+1. **F21 新失败条目**（failures 20→21，非 F20 refinement——F20=读出方向族非杠杆，F21=上游杠杆缺席，两者合并才得 UPSTREAM_ABSENT）：全层上游扫描（u_isa/u_hasa 双向 × 全 L 网格 + 峰带 α 细扫 + null 10+2，3234 sealed npz `48034bd9`）——**UL_flip FAIL**（L*={0,0}，全折 flip 0、per_fold_max_L 全 0.0 ×2 模型）、**UL_dose FAIL**（非单调）、**UL_amp FAIL**（spearman_best −0.20(4b)/+0.40(14b) ≪ 0.6）、**UL_spec PASS**（失败是不翻而非乱翻）。读出端（F20 双配方正交）+ 上游端（F21 全层缺席）⇒ 行为承载分布式定谳。3235 contradictions 边界（verify V7 探针 mode 泄漏、verdict 不受影响）逐字记录于 F21 evidence。
+2. **GAP-5 mechanism_note 终版 append + final_verdict 新键**：三段式收官定谳——上游分布式承载（F20+F21）→ 末层 pre-softmax 精确线性读出（cos_S 1.0000）→ post-softmax 归一化非线性；legacy status 键 `localized_linear_presoftmax` 保持 byte-exact（append-only 纪律）。机制单位转向「载体子空间 × 幅度调度 × 组合规则」（u* 3232 类级 ROBUST 为首例）。
+3. **FTR-25/26 scope_limits append**：u_isa/u_hasa 族两端均无行为杠杆；几何 E 级不变（否定性仅限 behavioral-lever 状态）。
+
+### 完整性与复核
+
+臂内 S1：UL_flip/UL_dose/UL_amp 从 sealed 3235 result 重算并与 sealed gates 匹配 ×2 模型；3235 res_sha8 重算 OK；registry v1.31（file `ef5189e7`）/ gap v1.10（file `378de1cd`）/ npz34 `48034bd9` file sha 断言过。独立复核 **30/0 PASS**（V1 文件 sha、V2/V3 res+freeze 重算、V5 F21 证据数值逐项对 sealed 3235、V6/V7 byte-preservation 全家族、V8 账本只读）。
+
+**产物**：`atlas_registry_v1_32.json`（file `3c3f0484`）、`gap_ledger_v1_11.json`（file `5934631b`）、execution/result/run_log @ `phase3237/g5g31_registry_landing/`。upgrade_log 不动（11）、E 级不动、ledger 本臂只读（#389 于 closeout 追加）。
+
+### 预注册 Phase 3238（候选）
+- (a) **阶段 A 普查升级臂**（默认，零 GPU）：26 封存特征内在维度/子空间秩测量 + 复用矩阵族内校准 → hub 排序（复用度/因果承重/跨模型普适三判据）→ registry v1.33；
+- (b) u* 内容归因类级扩展（零 GPU，顺延）；
+- (c) DAS 式子空间交换干预设计臂（轻 GPU 预备，设计先行）。
+
+
+## Phase 3238-align: 客户端/服务器对齐整理臂（非账本轮） [2026-10-14 21:20]
+
+**执行模式**：工程整理（照 3209 UI v1.6 先例，非测量账本轮，不占 ledger）；用户指令：继续 3238 前「整理可视化客户端和服务器，保证当前研究符合客户端流程，可后期完成分布式研发」。权威文档 `research/gpt5/docs/CLIENT_SERVER_ALIGNMENT_v1.md`。
+
+### 盘点结论（两路 Explore + 精读）
+平台已有：frontend（React+Vite+three.js 图谱透镜，数据面=派生档+API）、server FastAPI(:5001)、shared/dist_protocol v3（bundle 三件套+design_sha 预注册+canary+suffstats）、deploy 中心-节点（distributed_service/node_agent）、分布式数据底座（dist.sqlite3）。语言模版任务已有 TM-01..06 + 生成式文法四族（KN-ISA 等）。
+
+### 修复（A1–A4，封存产物零改动）
+- **A1 registry 版本脱节**：ai_rnd_service 硬编码候选只到 v1.8（客户端默认拿 7 版前旧图谱）→ `_discover_atlas_versions()` glob.glob 自动发现 32 版全链（与 derive_atlas_tree 逐字同口径，容忍 phase2746/field_store 坏链接——pathlib.glob 会炸，标准 glob 容忍），默认 v1.32。
+- **A2 gap 账本全链路脱节**：server 0 命中 → `_discover_gap_versions()` + 新端点 `GET /api/ai-rnd/atlas/gaps`（v1.11 全 5 GAP + GAP-5 final_verdict UPSTREAM_ABSENT 可见）。
+- **A3 协议桥**：`shared/dist_protocol/examples/TM-ISA-DEMO-v1/`（corpus 160 行从 3236 DESIGN 逐字导出 + runner 自包含 smoke 自跑通过 + contract design_sha `2ecf0e9e...` 同口径复算；G1–G4 门逐字预注册；来源锚 freeze b1fa889f/res 8b79ed5e）。五段式↔bundle 映射表入对齐文档 §3（freeze↔design_sha、SMOKE↔smoke 不进合并、FULL↔real 分片、verify↔canary+sha 审计、closeout 写权留中心）。
+- **A4 数据面刷新**：atlas_tree_v1/v2 重派生（registry **v32** + ledger **n=389**，tree sha `0a62ca19`/`0d15645a`；旧档备份 .bak_pre3238align）。
+
+### 验收与遗留
+自检 `phase3238align_check.py` **15/15 PASS**（发现链/tree sha/design_sha 复算/smoke 契约/封存只读 C4a-c）。遗留五项（对齐文档 §5）：前端 Gap 面板（UI v1.7 工单）、G 线臂按 atlas_graph_v1 契约产出、real 模式分片协议（F4/F5）、phase2746 坏链接清理、分布式拼图端口校准门。
+
+### 预注册（不变）
+3238 科学臂 = (a) 阶段 A 普查升级臂（默认，零 GPU）照原预注册执行。

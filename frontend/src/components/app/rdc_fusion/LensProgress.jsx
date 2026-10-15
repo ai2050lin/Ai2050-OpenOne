@@ -6,13 +6,13 @@
    （PlatformOps v3.4，本机状态唯一家）；RDC 主线摘要（≡账本/总览最近闭环，第三家）删除，
    唯一 Phase 时间线 = 图谱·跨线账本。
    LIVE/DEMO 范式：服务不可达显示空态提示，不伪造数据。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import { NEWS, MI_ERAS, RSA_ERAS, RSA_NOTE, TECH_CATEGORIES } from './distributedData.js';
 import { Lane } from './TimelineBits.jsx';
 import AtlasLens from './AtlasLens.jsx';
 
 /* API 前缀：与研发透镜（LensProcess）同一惯例；禁止在组件里散落硬编码地址 */
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 /* 本地进度 · RDC 主线摘要注记：唯一事实源 = 图谱透镜·跨线账本（P1 起不再硬编码），
    本透镜「本地进度」只渲染 GET /api/ai-rnd/atlas/ledger 的最近闭环摘要。 */

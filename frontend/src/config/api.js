@@ -1,87 +1,17 @@
 /**
  * API configuration
  * Unified endpoint definitions.
+ *
+ * v2（2026-10-14）：改为转发 src/config.js 统一出口，消除本文件内的独立字面量。
+ * 运行形态优先级：window.__AI2050__（Electron 注入）> VITE_*（dev）> 同源/本机默认。
  */
+import { API_BASE, ANALYSIS_API_BASE, TRAINING_API_BASE, FRONTEND_BASE } from '../config.js';
 
 export const API_CONFIG = {
-  main: import.meta.env.VITE_API_BASE || 'http://localhost:5001',
-  analysis: import.meta.env.VITE_ANALYSIS_API_BASE || import.meta.env.VITE_API_BASE || 'http://localhost:5001',
-  training: import.meta.env.VITE_TRAINING_API_BASE || 'http://localhost:8000',
-  frontend: import.meta.env.VITE_FRONTEND_BASE || 'http://localhost:5173',
+  main: API_BASE,
+  analysis: ANALYSIS_API_BASE,
+  training: TRAINING_API_BASE,
+  frontend: FRONTEND_BASE,
 };
-
-export const API_ENDPOINTS = {
-  model: {
-    load: `${API_CONFIG.main}/model/load`,
-    info: `${API_CONFIG.main}/model/info`,
-    generate: `${API_CONFIG.main}/generate`,
-  },
-
-  analysis: {
-    attention: `${API_CONFIG.main}/nfb/topology`,
-    mlp: `${API_CONFIG.main}/nfb/topology`,
-    structure: `${API_CONFIG.main}/nfb/topology`,
-    topology: `${API_CONFIG.main}/nfb/topology`,
-    curvature: `${API_CONFIG.main}/nfb/topology`,
-    flow: `${API_CONFIG.main}/nfb/flux`,
-  },
-
-  nfb: {
-    topology: `${API_CONFIG.main}/nfb/topology`,
-    flux: `${API_CONFIG.main}/nfb/flux`,
-    alignment: `${API_CONFIG.main}/nfb/alignment`,
-    gwtStatus: `${API_CONFIG.main}/nfb/gwt/status`,
-    icspbMemoryStatus: `${API_CONFIG.main}/api/icspb/memory/status`,
-    multimodalAlign: `${API_CONFIG.main}/nfb/multimodal/align`,
-    multimodalSummary: `${API_CONFIG.main}/nfb/multimodal/summary`,
-  },
-
-  training: {
-    status: `${API_CONFIG.training}/training/status`,
-    metrics: `${API_CONFIG.main}/toy_experiment/metrics`,
-    ricci: `${API_CONFIG.main}/toy_experiment/ricci_metrics`,
-  },
-
-  agi: {
-    conscious: `${API_CONFIG.main}/nfb_ra/unified_conscious_field`,
-    verify: `${API_CONFIG.main}/agi/verify`,
-    test: `${API_CONFIG.main}/agi/test`,
-  },
-
-  research: {
-    auditLatest: `${API_CONFIG.main}/api/v1/research/audit/latest`,
-  },
-
-  runtime: {
-    runs: `${API_CONFIG.main}/api/v1/runs`,
-    catalogRoutes: `${API_CONFIG.main}/api/v1/catalog/routes`,
-    catalogAnalyses: `${API_CONFIG.main}/api/v1/catalog/analyses`,
-    experimentTimeline: (limit = 50, route = null) =>
-      `${API_CONFIG.main}/api/v1/experiments/timeline?limit=${limit}${route ? `&route=${encodeURIComponent(route)}` : ''}`,
-    weeklyReport: (days = 7, persist = false) =>
-      `${API_CONFIG.main}/api/v1/experiments/weekly-report?days=${days}&persist=${persist ? 'true' : 'false'}`,
-    runDetail: (runId) => `${API_CONFIG.main}/api/v1/runs/${runId}`,
-    runEvents: (runId, limit = 200) => `${API_CONFIG.main}/api/v1/runs/${runId}/events?limit=${limit}`,
-  },
-
-  structureExtractor: {
-    extract: `${API_CONFIG.main}/structure/extract`,
-    compare: `${API_CONFIG.main}/structure/compare`,
-  },
-};
-
-export async function apiCall(endpoint, options = {}) {
-  const defaultOptions = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  const response = await fetch(endpoint, { ...defaultOptions, ...options });
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`);
-  }
-  return await response.json();
-}
 
 export default API_CONFIG;

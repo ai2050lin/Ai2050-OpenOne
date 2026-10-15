@@ -7,9 +7,9 @@
    交互：左键旋转 / 右键平移 / 滚轮缩放 / 闲置自转；点击模板/桥/MEC 盘 → 内部详情面板，
    点击特征节点 → onPickFeature（与全景共用 FeatureDetail 抽屉，协议键不引入第二事实源）。
    诚实口径：派生示意布局；LIVE/DEMO 不伪造。相机/交互态走 ref（防 effect 重建渲染循环）。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useRef, useState } from 'react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const E_COLOR = { E3_causal_scoped: '#b45309', E2_predictive: '#1e5c22', E2_held_out: '#177a53', E1_repeatable: '#24558a' };
 const E_LABEL = { E3_causal_scoped: 'E3 因果', E2_predictive: 'E2 可预测', E2_held_out: 'E2h 留出/行为', E1_repeatable: 'E1 可重复' };

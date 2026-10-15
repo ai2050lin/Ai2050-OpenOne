@@ -1,4 +1,5 @@
-﻿export const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+﻿import { API_BASE } from '../config.js';
+export { API_BASE as API_BASE };
 
 export const toFiniteNumber = (value, fallback = 0) => {
   const numeric = Number(value);

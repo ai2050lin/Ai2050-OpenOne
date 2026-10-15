@@ -1,8 +1,9 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import FormationEvidence from './RdcFormationEvidence.jsx';
 
-const API=import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}`;
 const n=v=>v==null?'尚未提交':Number(v).toLocaleString('zh-CN');
 const f=v=>v==null?'尚未提交':Number(v).toFixed(6);
 const labels={true_token:'真实 token',within_surface_class_permuted_token:'同表面类别内目标置乱',surface_class_mass:'表面类别总概率'};

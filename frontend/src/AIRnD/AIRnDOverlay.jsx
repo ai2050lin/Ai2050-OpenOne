@@ -1,3 +1,4 @@
+import { API_BASE } from '../config.js';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Brain, Target, Activity, Search, Zap, CheckCircle, Play, Database } from 'lucide-react';
 import { AIRnDConfigTab } from './AIRnDConfigTab';
@@ -5,7 +6,6 @@ import { AIRnDConsoleTab } from './AIRnDConsoleTab';
 import { AIRnDOrchestratorTab } from './AIRnDOrchestratorTab';
 import { RESEARCH_PHASES } from './aiRnDConfig';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const TABS = [
   { id: 'console', label: '控制台', icon: Activity },

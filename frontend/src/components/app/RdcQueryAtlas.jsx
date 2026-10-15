@@ -1,3 +1,4 @@
+import { RDC_QUERY_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 import './RdcPrefixAtlas.css';
@@ -7,7 +8,7 @@ import './RdcBindingAtlas.css';
 import './RdcUpdateAtlas.css';
 import './RdcQueryAtlas.css';
 
-const API=import.meta.env.VITE_RDC_QUERY_API||'http://127.0.0.1:5003/api/rdc-query';
+const API = `${RDC_QUERY_API || '/api/rdc-query'}`;
 async function get(path,params){const r=await fetch(API+path+(params?'?'+new URLSearchParams(params):''));if(!r.ok)throw new Error((await r.json().catch(()=>({}))).detail||r.statusText);return r.json();}
 function ErrorLine({error}){return error?<p role="alert">{error}</p>:null;}
 function Evidence({title,data,children}){return <details><summary>{title}</summary>{children}<pre>{JSON.stringify(data??{},null,2)}</pre></details>;}

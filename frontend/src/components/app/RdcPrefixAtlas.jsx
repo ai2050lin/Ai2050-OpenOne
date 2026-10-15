@@ -1,7 +1,8 @@
+import { API_BASE } from '../../config.js';
 import { useEffect, useRef, useState } from 'react';
 import './RdcPrefixAtlas.css';
 
-const API='http://127.0.0.1:5001/api/rdc-prefix';
+const API = `${API_BASE}/api/rdc-prefix`;
 const number=x=>x===null||x===undefined?'—':Number(x).toPrecision(5);
 async function json(path){const r=await fetch(API+path);if(!r.ok){let e;try{e=await r.json();}catch{e={detail:r.statusText};}throw new Error(e.detail||r.statusText);}return r.json();}
 
@@ -19,7 +20,7 @@ function NativeField({data,onPick,testId='prefix-field'}){
   return <div className="prefix-field"><p>{data.normalization} · 色标 ±{number(data.whole_field_absmax)} · 全宽 {data.native_width}，当前 [{data.start}, {data.end})</p><label>颜色映射 <select aria-label={testId==='source-field'?'来源颜色映射':'前缀颜色映射'} value={colorMode} onChange={e=>setColorMode(e.target.value)}><option value="signed-log">带符号log1p（尺度0.05，保留低幅值）</option><option value="linear">线性</option></select></label>
     <canvas data-testid={testId} ref={canvas} style={{height:Math.max(150,Math.min(620,data.values.length*12))}} onClick={e=>{const b=e.currentTarget.getBoundingClientRect(),x=Math.min(data.values[0].length-1,Math.floor((e.clientX-b.left)/b.width*data.values[0].length)),y=Math.min(data.values.length-1,Math.floor((e.clientY-b.top)/b.height*data.values.length));onPick({row:data.labels[y],coordinate:data.start+x,value:data.values[y][x]});}}/>
     <p className="prefix-muted">横轴原生编号递增；纵轴{data.labels.length}行：{data.labels[0]} → {data.labels.at(-1)}。缩览会重采样像素；用坐标切片查原值。</p>
-    {data.download&&<a href={'http://127.0.0.1:5001'+data.download}>下载完整原数组（BF16位保真 NPZ）</a>}
+    {data.download&&<a href={API_BASE+data.download}>下载完整原数组（BF16位保真 NPZ）</a>}
   </div>;
 }
 

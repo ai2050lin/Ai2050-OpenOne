@@ -1,6 +1,6 @@
+import { API_BASE } from '../config.js';
 import { useCallback, useEffect, useState } from 'react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const WORKSPACE_URL = `${API_BASE}/api/research-workspace`;
 
 async function readJson(response) {

@@ -1,9 +1,9 @@
+import { API_BASE } from '../config.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { researchAssetUrl } from '../config/researchAssets';
 import { buildForwardData, eventFor, MODEL_KEY_MAP, useResearchKernel } from './useResearchKernel';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const FROZEN_MANIFEST = researchAssetUrl('real_component_trace/manifest.json');
 
 async function fetchJson(path, options) {

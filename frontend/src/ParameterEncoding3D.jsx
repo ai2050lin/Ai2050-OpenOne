@@ -1,8 +1,8 @@
+import { API_BASE } from './config.js';
 import { Line, Text } from '@react-three/drei';
 import { useEffect, useMemo, useState } from 'react';
 import agi3dClientScene from './blueprint/data/agi_3d_client_scene_v1';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const TEXT_PROPS = {
   color: '#d9f1ff',

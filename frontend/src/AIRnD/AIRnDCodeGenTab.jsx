@@ -1,7 +1,7 @@
+import { API_BASE } from '../config.js';
 import { useState } from 'react';
 import { Copy, Play, CheckCircle, XCircle } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 export const AIRnDCodeGenTab = ({ code, result }) => {
   const [copied, setCopied] = useState(false);

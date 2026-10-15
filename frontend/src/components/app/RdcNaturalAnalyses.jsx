@@ -1,6 +1,7 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect, useState} from 'react';
 
-const API=(import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction')+'/questions';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}/questions`;
 const fmt=x=>x==null?'未定义':Number(x).toPrecision(6);
 const kinds=[['readout','首步完整词表'],['prospective','预测器自身历史'],['learning','六运行训练效果'],['parameter','全部参数形成'],['training_bridge','零更新桥与训练轨迹']];
 const Evidence=({data})=><details><summary>完整分析、配对区间与来源身份</summary><pre>{JSON.stringify(data,null,2)}</pre></details>;

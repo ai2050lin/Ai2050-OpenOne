@@ -1,7 +1,8 @@
+import { RDC_CONSTRUCTION_API } from '../../config.js';
 import {useEffect,useState} from 'react';
 import {Field} from './RdcJointAtlas.jsx';
 
-const API=import.meta.env.VITE_RDC_CONSTRUCTION_API||'http://127.0.0.1:5004/api/rdc-construction';
+const API=`${RDC_CONSTRUCTION_API || '/api/rdc-construction'}`;
 const fmt=x=>x==null?'未提交':Number(x).toFixed(6);
 async function get(path,args={}){const r=await fetch(API+path+'?'+new URLSearchParams(args));if(!r.ok)throw new Error((await r.json().catch(()=>({}))).detail||r.statusText);return r.json();}
 function Evidence({title,data}){return <details><summary>{title}</summary><pre>{JSON.stringify(data??{},null,2)}</pre></details>;}

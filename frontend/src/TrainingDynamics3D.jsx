@@ -1,9 +1,10 @@
+import { API_BASE } from './config.js';
 import { Line, Sphere, Text } from '@react-three/drei';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-const API_BASE = 'http://localhost:5001';
+
 
 export default function TrainingDynamics3D({ t }) {
   const [metrics, setMetrics] = useState({ Transformer: [], FiberNet: [] });

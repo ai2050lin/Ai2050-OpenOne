@@ -1,4 +1,5 @@
-﻿import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
+﻿import { API_BASE } from './config.js';
+import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import axios from 'axios';
 import {
@@ -77,7 +78,6 @@ import {
   makeLayerVisibility,
 } from './plugins/researchPlugins';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const WORKSPACE_SCROLL_DURATION_MS = 640;
 

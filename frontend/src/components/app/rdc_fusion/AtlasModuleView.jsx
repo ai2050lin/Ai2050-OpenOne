@@ -5,10 +5,10 @@
    协议键驱动：一切数字来自 GET /api/ai-rnd/atlas/tree?schema=v2（derive_atlas_tree.py 派生，零界面字面量）；
    DEMO 激活示例富化 = 前端 LANG_TEMPLATES 按 id 匹配（LIVE/DEMO 范式不变）。
    点击特征 → onPickFeature(fid)（与全景四模式共享 FeatureDetail 抽屉）；点击模板 → 本组件详情面板。 */
+import { API_BASE } from '../../../config.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LANG_TEMPLATES } from './distributedData.js';
 
-const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const ECLASS = { E2_predictive: 'at-e2', E2_held_out: 'at-e2', E2_behavioral: 'at-e2', E3_causal_scoped: 'at-e3', E1_repeatable: 'at-e1' };
 const ELABEL = { E2_predictive: 'E2', E2_held_out: 'E2h', E2_behavioral: 'E2b', E3_causal_scoped: 'E3', E1_repeatable: 'E1' };
