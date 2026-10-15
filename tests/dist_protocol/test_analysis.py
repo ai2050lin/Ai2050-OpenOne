@@ -15,12 +15,15 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+os.environ.setdefault('AI2050_NATIVE_DIR', 'off')   # 测试不在用户目录写原生全场
 
 from shared.dist_protocol import analysis, grammar  # noqa: E402
 
 
 def synthetic_items(family='KN-ISA', shards=3):
     spec = json.loads((ROOT / 'shared/dist_protocol/grammars' / f'{family}.json').read_text(encoding='utf-8'))
+    # 植入找回检验的是分析方法：固定为经典口径（只读 target，first/mid/last 三层），与文法当前的采集口径无关
+    spec['layers'], spec['readouts'] = ['first', 'mid', 'last'], ['target']
     corpus = grammar.generate(spec)
     corpus['synthetic_dim'] = 96
     tmp = Path(tempfile.mkdtemp())

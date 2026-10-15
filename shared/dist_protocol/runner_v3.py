@@ -10,21 +10,36 @@
     AI2050_PRECISION      bf16 | fp16 | fp32（缺省 bf16）
     AI2050_RUNNER_MODE    --mode auto 时强制模式（synthetic 用于沙盒中心的流程验证）
 
+采集口径（corpus 声明）:
+    layers     "all"（hidden_states 全部：hs[0] = 嵌入层输出，hs[i] = 第 i 个块之后的残差流，
+               hs[-1] 由 HF 在最终归一化之后给出——真实模式会用 lm_head(hs[-1]) 与实际 logits 对账并记录）
+               或 first/mid/last/emb/整数层号列表（缺省 first/mid/last，旧语料不变）。
+    readouts   读出位置（缺省 ["target"]）：target = 目标槽位最后一个 token；cue = 句式线索片段最后一个 token；
+               final = 整句最后一个 token；probe_answer = probe 提示最后一个 token（预测答案首 token 的位置）。
+               只有 target 一个读出时层位标签与旧版相同（first/mid/last/L{i}）；多个读出时标签为 "读出@层"。
+
 产出（Agent 上传 outputs/ 下全部文件）:
-    summary.json      必有：状态、计数、逐格行为准确率、token 长度、本分片 η² 摘要
-    suffstats.npz     真实/合成模式：每 (split, 条件格, 层, 维) 的 n、Σx、Σx²（float64，可跨节点相加）
+    summary.json      必有：状态、计数、逐格行为准确率、token 长度、本分片 η² 摘要、采集口径、model_snapshot
+    suffstats.npz     真实/合成模式：每 (split, 条件格, 层位标签, 维) 的 n、Σx、Σx²（float64，可跨节点相加）。
+                      suffstats.v2 = v1 + 每个标签的 读出/层号；体积超预算时只保留确定性的等距层子集（各分片相同）
     behavior.json     含 probe 的条目：首 token 是否 top-1、排名、对数概率
-    canary.json       金丝雀摘要（目标位置向量的范数、均值、前 16 维）
-    items.npz         逐条目标位置向量（float16；超过体积预算时用固定种子的随机投影降维，
-                      各分片同一投影矩阵），附条目元数据——供中心做置换零分布、留出探针、
-                      白化方向、句式不变性、3D 响应空间（corpus.capture_items=false 时不输出）
+    canary.json       金丝雀摘要（目标位置向量的范数、均值、前 16 维；按层位）
+    items.npz         逐条向量（float16；全语料体积超预算时用随机投影降维。投影维数 k 只由语料研究样本总数、标签数与
+                      模型维度决定，投影矩阵由语料指纹决定——所有分片相同，与分片大小无关），
+                      附条目元数据；items.v2 另含每个标签的 读出/层号 与逐层 logit-lens（下一 token 与答案首 token
+                      的对数概率、top-k）。corpus.capture_items=false 时不输出
+    原生全场（不上传）  真实/合成模式在本地按层写 float16 原生向量（全部读出位置）：
+                      $AI2050_NATIVE_DIR（缺省 ~/.ai2050/native_fields）/<family>/<tm_id>-v<version>/<语料指纹>/<模型键>/
+                      shard-<i>of<n>/L<hs下标>.npz（数组 X: (读出 P, 条目 N, 维 d)）+ manifest.json（文件、形状、dtype、
+                      sha256、条目 id 顺序、tag_readout/tag_layer）。summary.native_field 记录目录与 manifest 的 sha256。
+                      AI2050_NATIVE_DIR=off 关闭。
 
 模式:
     smoke      不加载模型，只校验语料与分片，status=smoke（不冒充实测）
     real       真实前向，status=real
     synthetic  无 GPU 的协议与分析方法验证：按「已知答案」生成向量——早层以词身份与句式为主、
-               中层出现类别方向、末层类别与句式并存，另有 token 长度干扰和一个行为薄弱格；
-               status=synthetic，中心节点只合并 kind=real 结果，合成结果永不进入研究统计。
+               中层出现类别方向、末层类别与句式并存，另有 token 长度干扰和一个行为薄弱格；在因果上不可见的
+               读出位置不植入对应因子；status=synthetic，中心节点只合并 kind=real 结果，合成结果永不进入研究统计。
 """
 import argparse
 import hashlib
@@ -36,6 +51,11 @@ import platform
 from pathlib import Path
 
 HEAD_DIMS = 16
+LENS_TOPK = 5
+ITEM_CORPUS_BUDGET_BYTES = 192 * 1024 * 1024   # 上传 items.npz 的全语料（全部分片合计）float16 体积预算；corpus.item_budget_bytes 可覆盖
+SUFFSTATS_BUDGET_BYTES = 160 * 1024 * 1024
+SNAPSHOT_PATTERNS = ('*.safetensors', '*.bin', '*.pt', '*.gguf', 'config.json', 'generation_config.json',
+                     'tokenizer*', 'vocab*', 'merges.txt', 'special_tokens_map.json', '*.model', '*.tiktoken')
 
 
 def cond_key(cond):
@@ -52,10 +72,25 @@ def parse_shard(value):
     raise SystemExit(f'invalid AI2050_SHARD={value!r}; expected "i/n"')
 
 
+def layer_spec_of(corpus):
+    spec = corpus.get('layers', ['first', 'mid', 'last'])
+    return [spec] if isinstance(spec, str) else list(spec)
+
+
+def readouts_of(corpus):
+    r = corpus.get('readouts') or ['target']
+    return [str(x) for x in r]
+
+
 def resolve_layers(spec, n_hs):
+    """层位声明 → [(层标签, hidden_states 下标)]。"""
     out = []
     for tag in spec:
-        if tag == 'first':
+        if tag == 'all':
+            out.extend((f'L{i}', i) for i in range(n_hs))
+        elif tag == 'emb':
+            out.append(('emb', 0))
+        elif tag == 'first':
             out.append(('first', 1))
         elif tag == 'mid':
             out.append(('mid', n_hs // 2))
@@ -68,53 +103,156 @@ def resolve_layers(spec, n_hs):
     return out
 
 
-ITEM_BUDGET_BYTES = 48 * 1024 * 1024
+def full_tags(readouts, layers):
+    """(读出, 层) → 存储标签。单一 target 读出时与旧版标签一致。"""
+    if readouts == ['target']:
+        return [t for t, _ in layers]
+    return [f'{r}@{t}' for r in readouts for t, _ in layers]
+
+
+def item_projection(n_total, n_tags, dim, budget=None):
+    """items.npz 的向量空间：('full', d) 或 ('jl<k>', k)。只依赖语料（研究样本总数、标签数）与模型维度。"""
+    budget = int(budget or ITEM_CORPUS_BUDGET_BYTES)
+    if n_tags * n_total * dim * 2 <= budget:
+        return 'full', dim
+    k = int(max(128, min(dim, budget // max(n_tags * n_total * 2, 1))))
+    return (f'jl{k}', k) if k < dim else ('full', dim)
+
+
+def jl_matrix(seed, dim, k):
+    """固定种子的高斯随机投影 (d, k)，由语料指纹决定。"""
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    return rng.standard_normal((dim, k)).astype(np.float32) / np.sqrt(k)
+
+
+def native_dir(corpus, shard, model_key):
+    """原生全场目录（在 outputs 之外，不上传）；AI2050_NATIVE_DIR=off/0/none 时返回 None。"""
+    base = os.environ.get('AI2050_NATIVE_DIR', '').strip()
+    if base.lower() in ('off', '0', 'none', 'false'):
+        return None
+    root = Path(base) if base else Path.home() / '.ai2050' / 'native_fields'
+    fp = hashlib.sha256(json.dumps(corpus, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()[:16]
+
+    def safe(x):
+        return ''.join(c if c.isalnum() or c in '-_.' else '_' for c in str(x))
+    return (root / safe(corpus.get('family_id') or 'family')
+            / f"{safe(corpus.get('tm_id') or 'untracked')}-v{corpus.get('version', 0)}"
+            / fp / safe(model_key) / f'shard-{shard[0]}of{shard[1]}')
+
+
+def suffstats_layer_subset(n_layers, n_readouts, n_cells, dim):
+    """体积超预算时的确定性等距层子集（含首末层）。只依赖语料与模型维度，所有分片相同。"""
+    per_layer = n_readouts * n_cells * dim * 16
+    if per_layer * n_layers <= SUFFSTATS_BUDGET_BYTES or n_layers <= 3:
+        return list(range(n_layers))
+    k = int(max(3, SUFFSTATS_BUDGET_BYTES // max(per_layer, 1)))
+    if k >= n_layers:
+        return list(range(n_layers))
+    return sorted({int(round(i * (n_layers - 1) / (k - 1))) for i in range(k)})
 
 
 class ItemStore:
     """逐条向量（float16）。超过预算时投影到 k 维：投影矩阵由语料指纹确定，所有分片相同。"""
 
-    def __init__(self, corpus_seed):
+    def __init__(self, corpus_seed, readouts=None, tag_readout=None, tag_layer=None, tags=None,
+                 n_total=None, budget=None):
         self.seed = corpus_seed
-        self.meta, self.vecs = [], []
+        self.n_total, self.budget = n_total, budget
+        self.meta, self.vecs, self.lens = [], [], []
+        self.tags = tags
+        self.readouts = readouts or ['target']
+        self.tag_readout, self.tag_layer = tag_readout, tag_layer
 
-    def add(self, it, vectors, n_tok, correct):
+    def add(self, it, vectors, n_tok, correct, lens=None):
         self.meta.append({'id': it['id'], 'split': it['split'], 'cond': it['cond'],
                           'frame': it.get('frame_id', ''), 'filler': it.get('filler_id', ''),
                           'n_tok': int(n_tok), 'correct': -1 if correct is None else int(bool(correct))})
-        self.vecs.append([list(v) if not hasattr(v, 'astype') else v for v in vectors])
+        import numpy as np
+        self.vecs.append([np.asarray(v, dtype=np.float16) for v in vectors])
+        self.lens.append(lens)
 
-    def npz_bytes(self, layer_tags):
+    def npz_bytes(self, layer_tags, lens_layers=None, vocab=None):
         import numpy as np
         L, N = len(layer_tags), len(self.meta)
-        X = np.stack([np.stack([np.asarray(self.vecs[i][l], dtype=np.float32) for i in range(N)]) for l in range(L)])
-        d = X.shape[2]
-        space, k = 'full', d
-        if L * N * d * 2 > ITEM_BUDGET_BYTES:
-            k = int(max(128, min(d, ITEM_BUDGET_BYTES // (L * N * 2))))
-            rng = np.random.default_rng(self.seed)
-            R = rng.standard_normal((d, k)).astype(np.float32) / np.sqrt(k)
-            X = X @ R
-            space = f'jl{k}'
-        buf = io.BytesIO()
-        np.savez_compressed(
-            buf, schema=np.array('items.v1'), layer_tags=np.array([str(t) for t in layer_tags]),
+        d = int(self.vecs[0][0].shape[0])
+        space, k = item_projection(self.n_total or N, L, d, self.budget)
+        R = jl_matrix(self.seed, d, k) if space != 'full' else None
+        X = np.stack([np.stack([self.vecs[i][l].astype(np.float32) for i in range(N)]) @ R if R is not None
+                      else np.stack([self.vecs[i][l] for i in range(N)]) for l in range(L)])
+        arrays = dict(
+            schema=np.array('items.v2'), layer_tags=np.array([str(t) for t in layer_tags]),
             space=np.array(space), dim_original=np.array(d), X=X.astype(np.float16),
+            n_total=np.array(int(self.n_total or N)),
             ids=np.array([m['id'] for m in self.meta]), split=np.array([m['split'] for m in self.meta]),
             cond=np.array([json.dumps(m['cond'], sort_keys=True, ensure_ascii=False) for m in self.meta]),
             frame=np.array([m['frame'] for m in self.meta]), filler=np.array([m['filler'] for m in self.meta]),
             n_tok=np.array([m['n_tok'] for m in self.meta], dtype=np.int32),
-            correct=np.array([m['correct'] for m in self.meta], dtype=np.int8))
+            correct=np.array([m['correct'] for m in self.meta], dtype=np.int8),
+            readouts=np.array(self.readouts),
+            tag_readout=np.array(self.tag_readout or ['target'] * L),
+            tag_layer=np.array(self.tag_layer if self.tag_layer is not None else [-1] * L, dtype=np.int32))
+        if lens_layers is not None and self.lens and all(x is not None for x in self.lens):
+            # lens_*: (读出 P, 层 Ll, 条目 N[, K])；-1 / NaN 表示该位置没有对应 token（如句末没有下一 token）
+            arrays.update(
+                lens_layers=np.array(lens_layers, dtype=np.int32),
+                lens_next_id=np.stack([x['next_id'] for x in self.lens], axis=1).astype(np.int32),
+                lens_next_logprob=np.stack([x['next_logprob'] for x in self.lens], axis=2).astype(np.float32),
+                lens_answer_id=np.array([x['answer_id'] for x in self.lens], dtype=np.int32),
+                lens_answer_logprob=np.stack([x['answer_logprob'] for x in self.lens], axis=2).astype(np.float32),
+                lens_topk_ids=np.stack([x['topk_ids'] for x in self.lens], axis=2).astype(np.int32),
+                lens_topk_logprob=np.stack([x['topk_logprob'] for x in self.lens], axis=2).astype(np.float16))
+            if vocab:
+                ids = sorted(vocab)
+                arrays.update(lens_vocab_ids=np.array(ids, dtype=np.int32),
+                              lens_vocab_text=np.array([vocab[i] for i in ids]))
+        buf = io.BytesIO()
+        np.savez_compressed(buf, **arrays)
         return buf.getvalue(), space
+
+
+def write_native(store, out_dir, info):
+    """按层写原生 float16 全场（全部读出位置）与 manifest.json；返回写入 summary 的摘要。"""
+    import numpy as np
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    P = len(store.readouts)
+    T = len(store.tags or store.tag_layer or [])
+    Lc = T // max(P, 1)
+    N = len(store.meta)
+    files, total = [], 0
+    for l in range(Lc):
+        hs_index = int(store.tag_layer[l]) if store.tag_layer else l
+        X = np.stack([np.stack([store.vecs[i][p * Lc + l] for i in range(N)]) for p in range(P)]).astype(np.float16)
+        name = f'L{hs_index}.npz'
+        buf = io.BytesIO()
+        np.savez(buf, X=X)
+        data = buf.getvalue()
+        (out_dir / name).write_bytes(data)
+        total += len(data)
+        files.append({'path': name, 'hs_index': hs_index, 'layer_tag': (store.tags or [''] * T)[l].split('@', 1)[-1],
+                      'array': 'X', 'shape': list(X.shape), 'dtype': 'float16', 'bytes': len(data),
+                      'sha256': hashlib.sha256(data).hexdigest(), 'nonfinite': int((~np.isfinite(X)).sum())})
+    manifest = {'schema': 'native_field.v1', 'axes': ['readout', 'item', 'dim'], 'readouts': list(store.readouts),
+                'ids': [m['id'] for m in store.meta], 'tags': list(store.tags or []),
+                'tag_readout': list(store.tag_readout or []), 'tag_layer': [int(x) for x in (store.tag_layer or [])],
+                'files': files, **info}
+    mbytes = json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=True).encode('utf-8')
+    (out_dir / 'manifest.json').write_bytes(mbytes)
+    return {'dir': str(out_dir), 'manifest': 'manifest.json', 'manifest_sha256': hashlib.sha256(mbytes).hexdigest(),
+            'n_files': len(files), 'bytes': total, 'dtype': 'float16', 'uploaded': False,
+            'nonfinite': sum(f['nonfinite'] for f in files),
+            'note': '原生全场只存于节点本地（不上传）；按 manifest 的 sha256 校验后可按需拉取或用同一语料与模型重算'}
 
 
 class Acc:
     """与 shared/dist_protocol/suffstats.py 同格式的累加器（runner 自包含，不 import 中心库）。"""
 
-    def __init__(self, layer_tags, dim, factors):
+    def __init__(self, layer_tags, dim, factors, tag_readout=None, tag_layer=None):
         import numpy as np
         self.np = np
         self.layer_tags, self.dim, self.factors = list(layer_tags), dim, list(factors)
+        self.tag_readout, self.tag_layer = tag_readout, tag_layer
         self.cells, self.index, self.rows = [], {}, []
 
     def add(self, split, cond, vectors):
@@ -140,10 +278,12 @@ class Acc:
         for i, row in enumerate(self.rows):
             s[:, i] = row[1]; q[:, i] = row[2]
         np.savez_compressed(
-            buf, schema=np.array('suffstats.v1'), layer_tags=np.array([str(t) for t in self.layer_tags]),
+            buf, schema=np.array('suffstats.v2'), layer_tags=np.array([str(t) for t in self.layer_tags]),
             factors=np.array(json.dumps(self.factors, ensure_ascii=False)),
             cell_split=np.array([c[0] for c in self.cells]), cell_cond=np.array([c[1] for c in self.cells]),
-            n=np.array([r[0] for r in self.rows], dtype=np.int64), sum=s, sumsq=q)
+            n=np.array([r[0] for r in self.rows], dtype=np.int64), sum=s, sumsq=q,
+            tag_readout=np.array(self.tag_readout or ['target'] * L),
+            tag_layer=np.array(self.tag_layer if self.tag_layer is not None else [-1] * L, dtype=np.int32))
         return buf.getvalue()
 
     def eta2_digest(self, split='discovery'):
@@ -173,10 +313,67 @@ class Acc:
         return out
 
 
+class Plan:
+    """一次运行的采集口径：读出 × 层 → 全部标签（items）与 suffstats 子集。"""
+
+    def __init__(self, corpus, items, n_hs, dim):
+        self.readouts = readouts_of(corpus)
+        self.layers = resolve_layers(layer_spec_of(corpus), n_hs)
+        self.tags = full_tags(self.readouts, self.layers)
+        self.tag_readout = [r for r in self.readouts for _ in self.layers]
+        self.tag_layer = [i for _ in self.readouts for _, i in self.layers]
+        n_cells = len({(it['split'], cond_key(it['cond'])) for it in items}) or 1
+        self.n_total = len(items)
+        keep = suffstats_layer_subset(len(self.layers), len(self.readouts), n_cells, dim)
+        self.ss_index = [p * len(self.layers) + l for p in range(len(self.readouts)) for l in keep]
+        self.ss_layers = [self.layers[l][0] for l in keep]
+
+    def ss_select(self, vecs):
+        return [vecs[i] for i in self.ss_index]
+
+    def acc(self, dim, factors):
+        return Acc([self.tags[i] for i in self.ss_index], dim, factors,
+                   [self.tag_readout[i] for i in self.ss_index], [self.tag_layer[i] for i in self.ss_index])
+
+    def store(self, corpus):
+        if not corpus.get('capture_items', True):
+            return None
+        return ItemStore(corpus_seed(corpus), self.readouts, self.tag_readout, self.tag_layer, self.tags,
+                         n_total=self.n_total, budget=corpus.get('item_budget_bytes'))
+
+    def describe(self, n_hs):
+        return {'readouts': self.readouts, 'n_hidden_states': n_hs, 'n_items_corpus': self.n_total,
+                'layer_plan': [{'tag': t, 'hs_index': i} for t, i in self.layers],
+                'suffstats_layers': self.ss_layers,
+                'suffstats_layers_note': ('全部层' if len(self.ss_layers) == len(self.layers) else
+                                          f'体积超预算（{SUFFSTATS_BUDGET_BYTES >> 20} MB），suffstats 只保留等距层子集；'
+                                          'items.npz 与 logit-lens 仍覆盖全部层')}
+
+
 def summarize_vec(v):
     vals = [float(x) for x in v]
     return {'norm': math.sqrt(sum(x * x for x in vals)), 'mean': sum(vals) / max(len(vals), 1),
             'head': vals[:HEAD_DIMS], 'dim': len(vals)}
+
+
+def model_snapshot(model_path):
+    """模型权重与 tokenizer 文件的 sha256（按文件名排序后再合成一个总哈希），作为 model_snapshot。"""
+    root = Path(model_path)
+    files = {}
+    if root.is_dir():
+        seen = set()
+        for pat in SNAPSHOT_PATTERNS:
+            for p in sorted(root.glob(pat)):
+                if p.is_file() and p.name not in seen:
+                    seen.add(p.name)
+                    h = hashlib.sha256()
+                    with p.open('rb') as fh:
+                        for chunk in iter(lambda: fh.read(1 << 22), b''):
+                            h.update(chunk)
+                    files[p.name] = {'sha256': h.hexdigest(), 'size': p.stat().st_size}
+    total = hashlib.sha256(json.dumps(files, sort_keys=True).encode('utf-8')).hexdigest()
+    return {'sha256': total, 'files': files, 'n_files': len(files),
+            'note': '权重（*.safetensors 等）、config 与 tokenizer 文件逐个 sha256；sha256 为按文件名排序后的合成哈希'}
 
 
 def main():
@@ -197,7 +394,6 @@ def main():
     study = [it for it in all_items if not it.get('canary')]
     mine = [it for k, it in enumerate(study) if k % shard_n == shard_i]
     factors = list(corpus.get('factors', []))
-    layer_spec = corpus.get('layers', ['first', 'mid', 'last'])
     fp = hashlib.sha256(json.dumps(corpus, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()[:16]
 
     cells, splits = {}, {}
@@ -209,7 +405,7 @@ def main():
         'family_id': corpus.get('family_id'), 'corpus_fingerprint': fp,
         'shard': f'{shard_i}/{shard_n}', 'n_items': len(mine), 'n_items_total': len(study),
         'by_split': splits, 'conditions': dict(sorted(cells.items())), 'factors': factors,
-        'layers': [str(t) for t in layer_spec], 'precision': precision,
+        'layers': [str(t) for t in layer_spec_of(corpus)], 'readouts': readouts_of(corpus), 'precision': precision,
         'python': platform.python_version(), 'status': 'smoke',
     }
 
@@ -221,9 +417,9 @@ def main():
 
     try:
         if mode == 'real':
-            run_real(corpus, mine, canaries, layer_spec, factors, precision, out, summary)
+            run_real(corpus, study, mine, canaries, factors, precision, out, summary)
         elif mode == 'synthetic':
-            run_synthetic(corpus, mine, canaries, layer_spec, factors, out, summary)
+            run_synthetic(corpus, study, mine, canaries, factors, out, summary)
     except Exception as exc:  # 真实模式失败 → 诚实降级为 smoke，记录原因
         summary['status'] = 'smoke'
         summary['real_error'] = f'{type(exc).__name__}: {exc}'
@@ -249,7 +445,37 @@ def _target_pos(text, target, offsets, start=None):
     return max(cands)
 
 
-def run_real(corpus, items, canaries, layer_spec, factors, precision, out, summary):
+def _final_pos(offsets):
+    """最后一个有字符跨度的 token（跳过末尾的特殊 token）。"""
+    for i in range(len(offsets) - 1, -1, -1):
+        if offsets[i][1] > offsets[i][0]:
+            return i
+    return len(offsets) - 1
+
+
+def text_positions(it, offsets, readouts, straddle=None):
+    """文本内读出位置（probe_answer 在 probe 提示上单独前向）。
+    straddle：读出 token 越过片段末尾（分词把片段与后文合成一个 token）时按读出计数——此时读出状态已含后文。"""
+    pos = {}
+    spans = []
+    if 'target' in readouts:
+        pos['target'] = _target_pos(it['text'], it['target'], offsets, it.get('target_char'))
+        spans.append(('target', it.get('target_char', it['text'].find(it['target'])) + len(it['target'])))
+    if 'cue' in readouts:
+        if not it.get('cue'):
+            raise ValueError(f'item {it.get("id")} 缺少 cue（语料声明了 cue 读出）')
+        pos['cue'] = _target_pos(it['text'], it['cue'], offsets, it.get('cue_char'))
+        spans.append(('cue', it.get('cue_char', it['text'].find(it['cue'])) + len(it['cue'])))
+    if 'final' in readouts:
+        pos['final'] = _final_pos(offsets)
+    if straddle is not None:
+        for r, end in spans:
+            if offsets[pos[r]][1] > end:
+                straddle[r] = straddle.get(r, 0) + 1
+    return pos
+
+
+def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     import numpy as np
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -260,64 +486,151 @@ def run_real(corpus, items, canaries, layer_spec, factors, precision, out, summa
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=dtype, device_map=device)
     model.eval()
+    summary['model_snapshot'] = model_snapshot(model_path)
+    readouts = readouts_of(corpus)
+    lm_head = model.get_output_embeddings()
+    decoder = model.get_decoder() if hasattr(model, 'get_decoder') else getattr(model, 'model', None)
+    final_norm = getattr(decoder, 'norm', None) or getattr(decoder, 'final_layernorm', None)
+    state = {'plan': None, 'last_post_norm': None, 'vocab': {}}
 
-    def forward(text, target, start=None):
+    def run(text):
         enc = tok(text, return_tensors='pt', return_offsets_mapping=True)
         off = enc.pop('offset_mapping')[0].tolist()
-        pos = _target_pos(text, target, off, start)
+        ids = enc['input_ids'][0].tolist()
         enc = {k: v.to(device) for k, v in enc.items()}
-        hs = model(**enc, output_hidden_states=True).hidden_states
-        layers = resolve_layers(layer_spec, len(hs))
-        return [hs[i][0, pos, :].float().cpu().numpy() for _, i in layers], [t for t, _ in layers], len(off)
+        res = model(**enc, output_hidden_states=True)
+        hs = res.hidden_states
+        if state['last_post_norm'] is None:
+            # 对账：HF 的 hidden_states[-1] 是否已经过最终归一化（lm_head(hs[-1]) 应等于实际 logits）
+            direct = lm_head(hs[-1][0, -1:]).float()
+            state['last_post_norm'] = bool(torch.allclose(direct, res.logits[0, -1:].float(), rtol=2e-2, atol=2e-2))
+        return hs, res.logits, off, ids
 
-    acc = None
-    tok_len = {}
-    behavior = []
-    store = ItemStore(corpus_seed(corpus)) if corpus.get('capture_items', True) else None
+    def lens_at(hs, pos, layers):
+        """逐层 logit-lens：中间层先过最终归一化再接 lm_head；hs[-1] 若已过归一化则直接接 lm_head。"""
+        h = torch.stack([hs[i][0, pos] for _, i in layers])
+        n_hs = len(hs)
+        normed = []
+        for row, (_, i) in zip(h, layers):
+            if i == n_hs - 1 and state['last_post_norm']:
+                normed.append(row)
+            else:
+                normed.append(final_norm(row[None])[0] if final_norm is not None else row)
+        return torch.log_softmax(lm_head(torch.stack(normed)).float(), dim=-1)    # (L, V)
+
+    def gather(logp, tid):
+        if tid is None or tid < 0:
+            return np.full((logp.shape[0],), np.nan, dtype=np.float32)
+        return logp[:, tid].cpu().numpy().astype(np.float32)
+
+    def topk(logp):
+        v, i = torch.topk(logp, LENS_TOPK, dim=-1)
+        for t in i.flatten().tolist():
+            if t not in state['vocab']:
+                state['vocab'][t] = tok.decode([t])
+        return i.cpu().numpy(), v.cpu().numpy()
+
+    acc = store = plan = None
+    tok_len, behavior, straddle = {}, [], {}
     with torch.inference_mode():
         for it in items:
-            vecs, tags, n_tok = forward(it['text'], it['target'], it.get('target_char'))
-            if acc is None:
-                acc = Acc(tags, int(vecs[0].shape[0]), factors)
-            acc.add(it['split'], it['cond'], vecs)
-            tok_len.setdefault(cond_key(it['cond']), []).append(n_tok)
-            correct = None
+            hs, _, off, ids = run(it['text'])
+            if plan is None:
+                plan = Plan(corpus, study, len(hs), int(hs[0].shape[-1]))
+                acc, store = plan.acc(int(hs[0].shape[-1]), factors), plan.store(corpus)
+                summary.update(plan.describe(len(hs)))
+            pos = text_positions(it, off, readouts, straddle)
             probe = it.get('probe')
+            ans_id, correct, phs, pids = None, None, None, None
             if probe:
-                enc = tok(probe['prompt'], return_tensors='pt').to(device)
-                logits = model(**enc).logits[0, -1].float()
                 ans_ids = tok(probe['answer'], add_special_tokens=False)['input_ids']
+                phs, plogits, _, pids = run(probe['prompt'])
                 if ans_ids:
+                    ans_id = int(ans_ids[0])
+                    logits = plogits[0, -1].float()
                     logp = torch.log_softmax(logits, dim=-1)
-                    tid = int(ans_ids[0])
-                    rank = int((logits > logits[tid]).sum().item()) + 1
-                    behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']),
-                                     'correct': rank == 1, 'rank': rank, 'logprob': float(logp[tid].item())})
+                    rank = int((logits > logits[ans_id]).sum().item()) + 1
                     correct = rank == 1
+                    behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']),
+                                     'correct': correct, 'rank': rank, 'logprob': float(logp[ans_id].item())})
+            if 'probe_answer' in readouts and phs is None:
+                raise ValueError(f'item {it["id"]} 没有 probe（语料声明了 probe_answer 读出）')
+            vecs, lens = [], {'next_id': [], 'next_logprob': [], 'answer_logprob': [], 'topk_ids': [], 'topk_logprob': []}
+            for r in readouts:
+                src, p, seq = (phs, len(pids) - 1, pids) if r == 'probe_answer' else (hs, pos[r], ids)
+                vecs.extend(src[i][0, p].float().cpu().numpy() for _, i in plan.layers)
+                logp = lens_at(src, p, plan.layers)
+                nid = int(seq[p + 1]) if p + 1 < len(seq) else (ans_id if r == 'probe_answer' else -1)
+                nid = -1 if nid is None else nid
+                ti, tv = topk(logp)
+                lens['next_id'].append(nid)
+                lens['next_logprob'].append(gather(logp, nid))
+                lens['answer_logprob'].append(gather(logp, ans_id))
+                lens['topk_ids'].append(ti)
+                lens['topk_logprob'].append(tv)
+            lens = {'next_id': np.array(lens['next_id']), 'next_logprob': np.stack(lens['next_logprob']),
+                    'answer_id': -1 if ans_id is None else ans_id, 'answer_logprob': np.stack(lens['answer_logprob']),
+                    'topk_ids': np.stack(lens['topk_ids']), 'topk_logprob': np.stack(lens['topk_logprob'])}
+            acc.add(it['split'], it['cond'], plan.ss_select(vecs))
+            tok_len.setdefault(cond_key(it['cond']), []).append(len(off))
             if store is not None:
-                store.add(it, vecs, n_tok, correct)
+                store.add(it, vecs, len(off), correct, lens)
         can = {}
         for c in canaries:
-            vecs, tags, _ = forward(c['text'], c['target'])
-            can[c['id']] = {t: summarize_vec(v) for t, v in zip(tags, vecs)}
+            hs, _, off, _ = run(c['text'])
+            p = _target_pos(c['text'], c['target'], off)
+            can[c['id']] = {t: summarize_vec(hs[i][0, p].float().cpu().numpy()) for t, i in plan.layers} if plan else {}
     if acc is None:
         raise RuntimeError('本分片没有样本')
-    _write_outputs(out, acc, behavior, can, tok_len, summary,
-                   status='real', extra={'model_path': model_path, 'device': device}, store=store)
+    summary['readout_straddle'] = {'counts': straddle, 'n_items': len(items),
+                                   'note': '读出 token 越过目标/cue 片段末尾的条目数（分词合并了后文）'}
+    summary['final_layer_norm'] = 'post_final_norm' if state['last_post_norm'] else 'pre_final_norm（lm_head 对账不符，lens 对 hs[-1] 也施加最终归一化）'
+    summary['hidden_state_boundary'] = ('hs[0] = 嵌入层输出（第 0 块输入）；hs[i] = 第 i 块之后的残差流；'
+                                        'hs[-1] 见 final_layer_norm；位置为所选 token，采集为单条前向、无 padding、无 KV 缓存复用')
+    _write_outputs(out, acc, behavior, can, tok_len, summary, status='real',
+                   extra={'model_path': model_path, 'device': device}, store=store,
+                   lens_layers=[i for _, i in plan.layers], vocab=state['vocab'],
+                   native={'corpus': corpus, 'shard': _shard_tuple(summary),
+                           'model_key': f"{summary['model_snapshot']['sha256'][:16]}-{precision}"})
 
 
-def run_synthetic(corpus, items, canaries, layer_spec, factors, out, summary):
-    """方法验证用合成数据（已知答案）。对每个层位 l：
+def _synthetic_coef(tag, hs_index, n_hs):
+    """合成系数 (词身份, 主因子, 句式因子, 交互)。first/mid/last 与旧版一致；L{i} 按相对深度插值，L0（嵌入）只有词身份。"""
+    fixed = {'first': (2.0, 0.3, 1.5, 0.0), 'mid': (0.8, 1.6, 0.6, 0.0), 'last': (0.5, 1.1, 1.2, 0.4)}
+    if tag in fixed:
+        return fixed[tag]
+    if hs_index == 0 or tag == 'emb':
+        return (2.0, 0.0, 0.0, 0.0)
+    d = hs_index / max(n_hs - 1, 1)
+    d1 = 1 / max(n_hs - 1, 1)
+    pts = [(d1, fixed['first']), (0.5, fixed['mid']), (1.0, fixed['last'])]
+    if d <= pts[0][0]:
+        return pts[0][1]
+    for (xa, a), (xb, b) in zip(pts, pts[1:]):
+        if d <= xb:
+            t = (d - xa) / max(xb - xa, 1e-9)
+            return tuple(u + t * (v - u) for u, v in zip(a, b))
+    return fixed['last']
+
+
+def run_synthetic(corpus, study, items, canaries, factors, out, summary):
+    """方法验证用合成数据（已知答案）。对每个读出 r、层位 l：
         x = a_l·词身份(filler) + b_l·Σ类因子方向 + c_l·句式方向 + e_l·交互(格) + 0.04·字数·干扰方向 + 噪声（总范数约 0.8）
     其中「类因子」= factors[0]，「句式因子」= 其余因子；系数随层变化：
         first: 词身份 2.0、类 0.3、句式 1.5   mid: 0.8、1.6、0.6   last: 0.5、1.1、1.2（另有交互 0.4）
+    layers="all" 时层数 = corpus.synthetic_layers（缺省 9），L0 视为嵌入层（只有词身份），其余按相对深度插值。
+    非 target 读出另加一个读出偏移方向、词身份减半；corpus.visibility 标为不可见的 (读出, 因子) 不植入该因子。
     行为：factors[0] 的第 5 个水平（字典序）在第 2 个句式水平上正确率约 55%，其余约 95%。
     这些参数只用于检验分析方法能否把植入的规律找回来，不代表任何真实模型。"""
     import numpy as np
     dim = int(corpus.get('synthetic_dim', 96))
-    tags = [t if isinstance(t, str) else f'L{t}' for t in layer_spec]
+    n_hs = int(corpus.get('synthetic_layers', 9))
+    plan = Plan(corpus, study, n_hs, dim)
+    summary.update(plan.describe(n_hs))
+    summary['final_layer_norm'] = 'synthetic'
+    readouts = plan.readouts
+    visibility = corpus.get('visibility') or {}
     salt = os.environ.get('AI2050_SYNTHETIC_SALT', '')
-    coef = {'first': (2.0, 0.3, 1.5, 0.0), 'mid': (0.8, 1.6, 0.6, 0.0), 'last': (0.5, 1.1, 1.2, 0.4)}
 
     def unit(name):
         rng = np.random.default_rng(int(hashlib.sha256((salt + name).encode()).hexdigest()[:8], 16))
@@ -333,30 +646,40 @@ def run_synthetic(corpus, items, canaries, layer_spec, factors, out, summary):
         # 同概念的水平共享方向。这是 atlas.v1 的阳性对照（植入共享结构），不代表真实模型。
         tag = concepts.get(f'{f}={lv}')
         return unit('concept=' + tag) if tag else unit(f'{f}={lv}')
-    all_items = [it for it in corpus['items'] if not it.get('canary')]
-    lv_main = sorted({str(it['cond'][main_f]) for it in all_items}) if main_f else []
-    lv_other = sorted({str(it['cond'][other_f[0]]) for it in all_items}) if other_f else []
+
+    def visible(r, f):
+        return bool((visibility.get(r) or {}).get(f, True))
+
+    lv_main = sorted({str(it['cond'][main_f]) for it in study}) if main_f else []
+    lv_other = sorted({str(it['cond'][other_f[0]]) for it in study}) if other_f else []
     weak = (lv_main[4] if len(lv_main) > 4 else None, lv_other[1] if len(lv_other) > 1 else None)
     nuis = unit('__length__')
-    acc = Acc(tags, dim, factors)
-    store = ItemStore(corpus_seed(corpus)) if corpus.get('capture_items', True) else None
+    acc, store = plan.acc(dim, factors), plan.store(corpus)
     behavior, tok_len = [], {}
+    n_layers = len(plan.layers)
     for it in items:
         rng = np.random.default_rng(int(hashlib.sha256((salt + it['id']).encode()).hexdigest()[:8], 16))
         cond = it['cond']
         vecs = []
-        for l, t in enumerate(tags):
-            a_, b_, c_, e_ = coef.get(t, (1.0, 1.0, 1.0, 0.0))
-            v = a_ * unit('filler=' + str(it.get('filler_id', it['id'])))
-            if main_f:
-                v = v + b_ * level_dir(main_f, cond[main_f])
-            for f in other_f:
-                v = v + c_ * level_dir(f, cond[f])
-            if e_:
-                v = v + e_ * unit('cell=' + cond_key(cond))
-            v = v + 0.04 * len(it['text']) * nuis + rng.standard_normal(dim) * (0.8 / np.sqrt(dim))
-            vecs.append(v)
-        acc.add(it['split'], cond, vecs)
+        for r in readouts:
+            for t, hi in plan.layers:
+                a_, b_, c_, e_ = _synthetic_coef(t, hi, n_hs)
+                if r == 'target':
+                    v = a_ * unit('filler=' + str(it.get('filler_id', it['id'])))
+                elif hi == 0 or t == 'emb':
+                    v = a_ * unit(f'{r}-token=' + str(it.get('frame_id', '')))
+                else:
+                    v = 0.5 * a_ * unit('filler=' + str(it.get('filler_id', it['id']))) + 0.5 * unit('readout=' + r)
+                if main_f and visible(r, main_f):
+                    v = v + b_ * level_dir(main_f, cond[main_f])
+                for f in other_f:
+                    if visible(r, f):
+                        v = v + c_ * level_dir(f, cond[f])
+                if e_:
+                    v = v + e_ * unit('cell=' + cond_key(cond))
+                v = v + 0.04 * len(it['text']) * nuis + rng.standard_normal(dim) * (0.8 / np.sqrt(dim))
+                vecs.append(v)
+        acc.add(it['split'], cond, plan.ss_select(vecs))
         tok_len.setdefault(cond_key(cond), []).append(len(it['text']))
         correct = None
         if it.get('probe'):
@@ -364,10 +687,27 @@ def run_synthetic(corpus, items, canaries, layer_spec, factors, out, summary):
             correct = bool(rng.random() < p_ok)
             behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(cond),
                              'correct': correct, 'rank': 1 if correct else 2, 'logprob': -0.1 if correct else -2.0})
+        depth = np.array([hi / max(n_hs - 1, 1) for _, hi in plan.layers], dtype=np.float32)
+        P = len(readouts)
+        lens = {'next_id': np.full((P,), 7, dtype=np.int32),
+                'next_logprob': np.stack([-4.0 + 3.0 * depth + 0.1 * rng.standard_normal(n_layers) for _ in readouts]),
+                'answer_id': 11 if it.get('probe') else -1,
+                'answer_logprob': np.stack([(-6.0 + 5.5 * depth if it.get('probe') else np.full(n_layers, np.nan))
+                                            for _ in readouts]),
+                'topk_ids': np.tile(np.arange(LENS_TOPK, dtype=np.int32), (P, n_layers, 1)),
+                'topk_logprob': np.tile(-np.arange(1, LENS_TOPK + 1, dtype=np.float32), (P, n_layers, 1))}
         if store is not None:
-            store.add(it, vecs, len(it['text']), correct)
-    can = {c['id']: {t: summarize_vec(unit(c['id']) * (l + 1)) for l, t in enumerate(tags)} for c in canaries}
-    _write_outputs(out, acc, behavior, can, tok_len, summary, status='synthetic', extra={}, store=store)
+            store.add(it, vecs, len(it['text']), correct, lens)
+    can = {c['id']: {t: summarize_vec(unit(c['id']) * (l + 1)) for l, (t, _) in enumerate(plan.layers)} for c in canaries}
+    _write_outputs(out, acc, behavior, can, tok_len, summary, status='synthetic', extra={}, store=store,
+                   lens_layers=[i for _, i in plan.layers], vocab={i: f'<syn{i}>' for i in range(LENS_TOPK)} | {7: '<next>', 11: '<ans>'},
+                   native={'corpus': corpus, 'shard': _shard_tuple(summary),
+                           'model_key': 'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8]})
+
+
+def _shard_tuple(summary):
+    i, n = str(summary.get('shard', '0/1')).split('/')
+    return int(i), int(n)
 
 
 def corpus_seed(corpus):
@@ -375,12 +715,45 @@ def corpus_seed(corpus):
     return int(hashlib.sha256(str(key).encode('utf-8')).hexdigest()[:8], 16)
 
 
-def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, store=None):
+def _lens_digest(store, lens_layers):
+    """逐读出、逐层的答案首 token 平均 logit-lens 对数概率（节点自检用）。"""
+    import numpy as np
+    rows = [x for x in store.lens if x is not None and x.get('answer_id', -1) >= 0]
+    if not rows:
+        return {}
+    a = np.stack([x['answer_logprob'] for x in rows])          # (N, P, L)
+    out = {}
+    for p, r in enumerate(store.readouts):
+        m = np.nanmean(a[:, p, :], axis=0)
+        out[r] = [None if not np.isfinite(v) else round(float(v), 4) for v in m]
+    return {'layers': list(lens_layers), 'answer_logprob_mean': out}
+
+
+def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, store=None, lens_layers=None, vocab=None,
+                   native=None):
     (out / 'suffstats.npz').write_bytes(acc.npz_bytes())
     if store is not None and store.meta:
-        data, space = store.npz_bytes(acc.layer_tags)
+        data, space = store.npz_bytes(store.tags or acc.layer_tags, lens_layers, vocab)
         (out / 'items.npz').write_bytes(data)
         summary['item_space'] = space
+        summary['item_space_rule'] = ('k 只由语料研究样本总数、标签数与模型维度决定（全语料 float16 预算 '
+                                      f'{int(store.budget or ITEM_CORPUS_BUDGET_BYTES) >> 20} MB），投影矩阵由语料指纹决定，各分片相同')
+    if store is not None and store.meta and native is not None:
+        nd = native_dir(native['corpus'], native['shard'], native['model_key'])
+        if nd is None:
+            summary['native_field'] = {'disabled': True}
+        else:
+            try:
+                summary['native_field'] = write_native(store, nd, {
+                    'family_id': native['corpus'].get('family_id'), 'tm_id': native['corpus'].get('tm_id'),
+                    'version': native['corpus'].get('version'), 'corpus_fingerprint': summary.get('corpus_fingerprint'),
+                    'shard': summary.get('shard'), 'model_key': native['model_key'], 'status': status,
+                    'precision': summary.get('precision'), 'dim': acc.dim,
+                    'hidden_state_boundary': summary.get('hidden_state_boundary')})
+            except OSError as exc:      # 本地磁盘问题不影响上传产物，如实记录
+                summary['native_field'] = {'error': f'{type(exc).__name__}: {exc}'}
+        if lens_layers is not None:
+            summary['lens'] = {'topk': LENS_TOPK, **_lens_digest(store, lens_layers)}
     (out / 'behavior.json').write_text(json.dumps({'schema': 'behavior.v1', 'items': behavior},
                                                   ensure_ascii=False), encoding='utf-8')
     (out / 'canary.json').write_text(json.dumps({'schema': 'canary.v1', 'entries': can},

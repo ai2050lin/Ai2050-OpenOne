@@ -1,9 +1,11 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "KN-ISA",
+ "grammar_version": 2,
+ "revision_note": "v2：decl/interrog 原句首目标 X 前缀为空、两句式在 X 处状态相同 → 加句式前缀「众所周知，」「请问」；topic 原「说到{Y}，{X}…」把类别词放在 X 前 → 改为「至于{X}，它通常被归为{Y}。」；新增 cue/final/probe_answer 读出与全层采集。",
  "module": "KN",
  "name": "知识网络 · 上下位（is-a）",
- "description": "6 个类别 × 14 个成员 × 5 种句式；目标位置为成员词。检验类别因子方向是否跨句式稳定、能否推广到未见成员（lockbox）与未见句式（lockbox_frame）。",
+ "description": "6 个类别 × 14 个成员 × 5 种句式；目标位置为成员词 X（每个句式在 X 之前都有区分句式的前缀），cue 为类别词 Y 之前的谓词片段（该位置预测类别词），另读 final 与 probe_answer。检验类别因子方向是否跨句式稳定、能否推广到未见成员（lockbox）与未见句式（lockbox_frame）。",
  "factors": [
   "category",
   "frame"
@@ -12,10 +14,12 @@
   "frame=interrog": "疑问",
   "frame=decl": "陈述"
  },
- "layers": [
-  "first",
-  "mid",
-  "last"
+ "layers": "all",
+ "readouts": [
+  "target",
+  "cue",
+  "final",
+  "probe_answer"
  ],
  "frames": [
   {
@@ -23,10 +27,11 @@
    "levels": {
     "frame": "decl"
    },
-   "text": "{X}是一种{Y}。",
+   "text": "众所周知，{X}是一种{Y}。",
    "target": "X",
+   "cue": "是一种",
    "probe": {
-    "prompt": "{X}是一种",
+    "prompt": "众所周知，{X}是一种",
     "answer": "{Y}"
    }
   },
@@ -35,8 +40,9 @@
    "levels": {
     "frame": "interrog"
    },
-   "text": "{X}是不是一种{Y}？",
+   "text": "请问{X}是不是一种{Y}？",
    "target": "X",
+   "cue": "是不是一种",
    "probe": {
     "prompt": "问：{X}属于哪一类？答：{X}属于",
     "answer": "{Y}"
@@ -49,6 +55,7 @@
    },
    "text": "昨天我在书上看到了{X}，它属于{Y}。",
    "target": "X",
+   "cue": "它属于",
    "probe": {
     "prompt": "昨天我在书上看到了{X}，它属于",
     "answer": "{Y}"
@@ -61,6 +68,7 @@
    },
    "text": "虽然{X}很常见，但它确实是一种{Y}。",
    "target": "X",
+   "cue": "确实是一种",
    "probe": {
     "prompt": "虽然{X}很常见，但它确实是一种",
     "answer": "{Y}"
@@ -71,10 +79,11 @@
    "levels": {
     "frame": "topic"
    },
-   "text": "说到{Y}，{X}就是其中之一。",
+   "text": "至于{X}，它通常被归为{Y}。",
    "target": "X",
+   "cue": "通常被归为",
    "probe": {
-    "prompt": "{X}通常被归为",
+    "prompt": "至于{X}，它通常被归为",
     "answer": "{Y}"
    }
   }

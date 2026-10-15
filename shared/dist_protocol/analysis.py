@@ -42,6 +42,7 @@ CRITERIA = {
     'whiten_shrink': 1.0,        # 特征值收缩：var + shrink·mean(var)，避免放大噪声维
 }
 SPLITS_OUT = ('confirm', 'lockbox', 'lockbox_frame')
+ITEM_SCHEMAS = ('items.v1', 'items.v2')   # v2 = v1 + 每个标签的读出/层号 + 逐层 logit-lens（本分析只用共有字段）
 MAX_POINTS_3D = 4000
 
 
@@ -63,7 +64,7 @@ def load_items(blobs: Sequence[bytes]) -> Optional[ItemSet]:
     parts = []
     for b in blobs:
         z = np.load(io.BytesIO(b), allow_pickle=False)
-        if str(z['schema']) != 'items.v1':
+        if str(z['schema']) not in ITEM_SCHEMAS:
             raise ValueError('unsupported items schema')
         parts.append(z)
     if not parts:

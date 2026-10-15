@@ -1,17 +1,20 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "GR-ROLE",
+ "grammar_version": 2,
+ "revision_note": "v2：N 在句首（active-agent / ba-agent / bei-patient）时 N 处前缀为空、角色与构式按构造不可见 → 读出改为句后复指的 N（target_occurrence=last）；probe 原问「是谁…」答首 token 常与另一名词相同（小狗/小猫）→ 改为是非问，施事答「是」、受事答「不（是）」；新增 final/probe_answer 读出与全层采集。",
  "module": "GR",
  "name": "语法 · 施事/受事 × 主动/把字/被字",
- "description": "同一名词 N 在施事与受事两种角色、三种构式中出现（2×3 完全交叉），目标位置为 N。检验角色因子能否脱离语序与构式表面特征，在未见名词对上复现。",
+ "description": "同一名词 N 在施事与受事两种角色、三种构式中出现（2×3 完全交叉）。N 在句首时其角色由后文决定，句首 N 处状态与角色无关；因此目标改为句后复指「在这件事里，{N}」中的 N（target_occurrence=last），此时整句已可见。另读 final 与 probe_answer。检验角色因子能否脱离语序与构式表面特征，在未见名词对上复现。",
  "factors": [
   "role",
   "construction"
  ],
- "layers": [
-  "first",
-  "mid",
-  "last"
+ "layers": "all",
+ "readouts": [
+  "target",
+  "final",
+  "probe_answer"
  ],
  "frames": [
   {
@@ -20,11 +23,12 @@
     "role": "agent",
     "construction": "active"
    },
-   "text": "{N}{V}了{M}。",
+   "text": "{N}{V}了{M}。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}{V}了{M}。问：是谁{V}了对方？答：是",
-    "answer": "{N}"
+    "prompt": "{N}{V}了{M}。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "是"
    }
   },
   {
@@ -33,11 +37,12 @@
     "role": "patient",
     "construction": "active"
    },
-   "text": "{M}{V}了{N}。",
+   "text": "{M}{V}了{N}。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}{V}了{N}。问：是谁{V}了对方？答：是",
-    "answer": "{M}"
+    "prompt": "{M}{V}了{N}。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "不是"
    }
   },
   {
@@ -46,11 +51,12 @@
     "role": "agent",
     "construction": "ba"
    },
-   "text": "{N}把{M}{V}了。",
+   "text": "{N}把{M}{V}了。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}把{M}{V}了。问：是谁{V}了对方？答：是",
-    "answer": "{N}"
+    "prompt": "{N}把{M}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "是"
    }
   },
   {
@@ -59,11 +65,12 @@
     "role": "patient",
     "construction": "ba"
    },
-   "text": "{M}把{N}{V}了。",
+   "text": "{M}把{N}{V}了。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}把{N}{V}了。问：是谁{V}了对方？答：是",
-    "answer": "{M}"
+    "prompt": "{M}把{N}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "不是"
    }
   },
   {
@@ -72,11 +79,12 @@
     "role": "agent",
     "construction": "bei"
    },
-   "text": "{M}被{N}{V}了。",
+   "text": "{M}被{N}{V}了。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}被{N}{V}了。问：是谁{V}了对方？答：是",
-    "answer": "{N}"
+    "prompt": "{M}被{N}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "是"
    }
   },
   {
@@ -85,11 +93,12 @@
     "role": "patient",
     "construction": "bei"
    },
-   "text": "{N}被{M}{V}了。",
+   "text": "{N}被{M}{V}了。在这件事里，{N}是做动作的一方吗？",
    "target": "N",
+   "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}被{M}{V}了。问：是谁{V}了对方？答：是",
-    "answer": "{M}"
+    "prompt": "{N}被{M}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
+    "answer": "不是"
    }
   }
  ],

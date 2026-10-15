@@ -1,9 +1,11 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "KN-ATTR",
+ "grammar_version": 3,
+ "revision_note": "v2：question 原「难道不是…吗」把否定与疑问混在一起 → 改为不含否定的「你知道吗，{X}是{A}的吗？」，疑问标记在 A 之前；原 decl/question 句中属性类型词 P（颜色/味道/温度，由 attr 因子唯一决定）出现在 A 前 → 从句子中移除（probe 保留）；新增 cue/final/probe_answer 读出与全层采集。 | v3：decl 原无句首前缀而 question 有「你知道吗，」，疑问与「有无前缀」混淆 → decl 加等长中性陈述前缀「我告诉你，」（5 字 / 3 token，与「你知道吗，」相同）；compare 前缀「和别的东西比起来，」（9 字 / 6 token）缩为「跟别的比，」（5 字 / 4 token），probe 同步；habit「大家都知道」（5 字 / 2 token）保持。陈述句 probe 不加前缀（行为门含义不变）。",
  "module": "KN",
  "name": "知识网络 · 属性绑定（颜色/味道/温度）",
- "description": "3 种属性类型 × 15 个实体—属性值对 × 4 种句式；目标位置为属性值词。检验属性类型因子与句式因子的分离，以及属性方向在未见实体上的推广。",
+ "description": "3 种属性类型 × 15 个实体—属性值对 × 4 种句式；目标位置为属性值词 A（句中不出现属性类型词 P，避免 A 处读出来自标签词），cue 为 A 之前的谓词（该位置预测属性值），另读 final 与 probe_answer。四个句式在 X 前都有长度相近的句首成分（「我告诉你，」「大家都知道」「跟别的比，」「你知道吗，」，5 字 / 2–4 个 Qwen3 token），避免疑问因子与「有无句首前缀」混淆。检验属性类型因子与句式因子的分离，以及属性方向在未见实体上的推广。",
  "factors": [
   "attr",
   "frame"
@@ -12,10 +14,12 @@
   "frame=question": "疑问",
   "frame=decl": "陈述"
  },
- "layers": [
-  "first",
-  "mid",
-  "last"
+ "layers": "all",
+ "readouts": [
+  "target",
+  "cue",
+  "final",
+  "probe_answer"
  ],
  "frames": [
   {
@@ -23,8 +27,9 @@
    "levels": {
     "frame": "decl"
    },
-   "text": "{X}的{P}是{A}的。",
+   "text": "我告诉你，{X}是{A}的。",
    "target": "A",
+   "cue": "是",
    "probe": {
     "prompt": "{X}的{P}通常是",
     "answer": "{A}"
@@ -37,6 +42,7 @@
    },
    "text": "大家都知道{X}很{A}。",
    "target": "A",
+   "cue": "很",
    "probe": {
     "prompt": "大家都知道{X}很",
     "answer": "{A}"
@@ -47,10 +53,11 @@
    "levels": {
     "frame": "compare"
    },
-   "text": "和别的东西比起来，{X}更{A}一些。",
+   "text": "跟别的比，{X}更{A}一些。",
    "target": "A",
+   "cue": "更",
    "probe": {
-    "prompt": "和别的东西比起来，{X}更",
+    "prompt": "跟别的比，{X}更",
     "answer": "{A}"
    }
   },
@@ -59,8 +66,9 @@
    "levels": {
     "frame": "question"
    },
-   "text": "{X}的{P}难道不是{A}的吗？",
+   "text": "你知道吗，{X}是{A}的吗？",
    "target": "A",
+   "cue": "是",
    "probe": {
     "prompt": "问：{X}的{P}怎么样？答：很",
     "answer": "{A}"

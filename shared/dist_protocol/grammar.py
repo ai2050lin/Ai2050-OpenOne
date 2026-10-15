@@ -10,6 +10,18 @@
 - ``heldout_frames`` 中的框架只进入 ``lockbox_frame``（未见句式），不参与发现。
 - 切分只依赖 (family_id, salt, filler_id) 的 SHA256，可在任何节点复算。
 
+读出位置（readouts，缺省 ["target"]）：
+- ``target``：目标槽位最后一个 token（frame.target_occurrence = first|last 选择槽位出现次序）；
+- ``cue``：frame.cue 给出的句式片段（字面片段或 "{槽位}"）的最后一个 token；
+- ``final``：整句最后一个 token；
+- ``probe_answer``：probe.prompt 最后一个 token（预测答案首 token 的位置）。
+
+因果可见性（causal_visibility）：因果注意力下，读出位置的状态只依赖其前缀。对每个句式因子，
+找出仅在该因子上不同的句式对；若两者在某读出位置的模板前缀（句首目标 = 空前缀）相同，该因子
+在此位置按构造不可见。所有读出位置都不可见 → validate 报错；部分位置不可见 → preview 告警。
+答案槽（probe.answer 中除目标外的槽位）或类别标签槽出现在目标之前 → 告警（读出可能来自标签词）。
+对照句式对一方有句首前缀、另一方没有（或长度相差很大）→ 告警「前缀 / 位置混杂」（prefix_warnings，不报错）。
+
 spec 示例见 shared/dist_protocol/grammars/*.json。
 """
 from __future__ import annotations
@@ -27,6 +39,11 @@ FRAME_SPLIT = 'lockbox_frame'
 ALL_SPLITS = SPLITS + (FRAME_SPLIT,)
 DEFAULT_FRACTIONS = {'discovery': 0.6, 'confirm': 0.2, 'lockbox': 0.2}
 DEFAULT_LAYERS = ['first', 'mid', 'last']
+LAYER_WORDS = ('first', 'mid', 'last', 'emb', 'all')
+READOUTS = ('target', 'cue', 'final', 'probe_answer')
+DEFAULT_READOUTS = ['target']
+PREFIX_RATIO_WARN = 3.0     # 对照句式对的句首前缀长度比 ≥ 3 且相差 ≥ 4 字（或一方为空）时告警「前缀 / 位置混杂」
+PREFIX_DIFF_WARN = 4
 MAX_ITEMS_HARD = 50000
 SLOT_RE = re.compile(r'\{([A-Za-z_][A-Za-z0-9_]*)\}')
 ID_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$')
@@ -53,17 +70,186 @@ def _fill(pattern: str, slots: Dict[str, str]) -> str:
     return SLOT_RE.sub(lambda m: slots[m.group(1)], pattern)
 
 
-def _fill_with_offset(pattern: str, slots: Dict[str, str], target: str) -> Tuple[str, int]:
-    """填充并返回目标槽位（第一次出现）在成句中的字符起点，避免目标词是其他词子串时定位错误。"""
-    out, pos, start = [], 0, -1
+def _segments(pattern: str, slots: Optional[Dict[str, str]] = None) -> List[Tuple[int, int, int, int, Optional[str]]]:
+    """把模板切成 (tpl_s, tpl_e, out_s, out_e, slot|None) 段；slots 为 None 时 out 坐标 = 模板坐标。"""
+    segs, pos, out = [], 0, 0
     for m in SLOT_RE.finditer(pattern):
-        out.append(pattern[pos:m.start()])
-        if m.group(1) == target and start < 0:
-            start = sum(len(x) for x in out)
-        out.append(slots[m.group(1)])
+        if m.start() > pos:
+            n = m.start() - pos
+            segs.append((pos, m.start(), out, out + n, None))
+            out += n
+        n = len(slots[m.group(1)]) if slots is not None else m.end() - m.start()
+        segs.append((m.start(), m.end(), out, out + n, m.group(1)))
+        out += n
         pos = m.end()
-    out.append(pattern[pos:])
-    return ''.join(out), start
+    if pos < len(pattern):
+        segs.append((pos, len(pattern), out, out + len(pattern) - pos, None))
+    return segs
+
+
+def _target_span(pattern: str, target: str, occurrence: str = 'first') -> Optional[Tuple[int, int]]:
+    """目标槽位在模板中的 [起, 止)（first / last 次出现）。"""
+    hits = [(m.start(), m.end()) for m in SLOT_RE.finditer(pattern) if m.group(1) == target]
+    if not hits:
+        return None
+    return hits[-1] if occurrence == 'last' else hits[0]
+
+
+def _cue_span(pattern: str, cue: str) -> Optional[Tuple[int, int]]:
+    """cue 在模板中的 [起, 止)：「{槽位}」取该槽位第一次出现；字面片段取第一处不跨槽位的出现。"""
+    m = SLOT_RE.fullmatch(cue)
+    if m:
+        return _target_span(pattern, m.group(1))
+    start = 0
+    while True:
+        i = pattern.find(cue, start)
+        if i < 0:
+            return None
+        if all(sl is None or e <= i or s >= i + len(cue) for s, e, _, _, sl in _segments(pattern)):
+            return i, i + len(cue)
+        start = i + 1
+
+
+def _map_span(pattern: str, slots: Dict[str, str], span: Tuple[int, int]) -> Tuple[int, int]:
+    """模板 [起, 止) → 成句字符 [起, 止)。槽位整体映射，字面片段按偏移映射。"""
+    s0, e0 = span
+    out_s = out_e = None
+    for ts, te, os_, oe, sl in _segments(pattern, slots):
+        if sl is not None:
+            if ts == s0:
+                out_s = os_
+            if te == e0:
+                out_e = oe
+        else:
+            if ts <= s0 < te:
+                out_s = os_ + (s0 - ts)
+            if ts < e0 <= te:
+                out_e = os_ + (e0 - ts)
+    if out_s is None or out_e is None:
+        raise ValueError(f'span {span} 无法映射到成句')
+    return out_s, out_e
+
+
+def readouts_of(spec: Dict[str, Any]) -> List[str]:
+    r = spec.get('readouts', DEFAULT_READOUTS)
+    return list(r) if isinstance(r, list) else list(DEFAULT_READOUTS)
+
+
+def layers_of(spec: Dict[str, Any]) -> List[Any]:
+    """规范化层位声明：字符串 "all" → ["all"]。"""
+    layers = spec.get('layers', DEFAULT_LAYERS)
+    return [layers] if isinstance(layers, str) else list(layers)
+
+
+def _prefix(fr: Dict[str, Any], readout: str) -> Optional[str]:
+    """读出位置在模板层面的前缀（含读出片段本身）；该句式没有这个读出位置时返回 None。"""
+    text = fr['text']
+    if readout == 'target':
+        sp = _target_span(text, fr['target'], fr.get('target_occurrence', 'first'))
+        return text[:sp[1]] if sp else None
+    if readout == 'cue':
+        sp = _cue_span(text, fr['cue']) if isinstance(fr.get('cue'), str) else None
+        return text[:sp[1]] if sp else None
+    if readout == 'final':
+        return text
+    if readout == 'probe_answer':
+        return fr['probe']['prompt'] if fr.get('probe') else None
+    return None
+
+
+def label_slots(spec: Dict[str, Any]) -> List[str]:
+    """类别标签槽：槽位文本由填充因子水平唯一决定、且不同水平取值不同（如 KN-ISA 的 {Y} = 类别词）。"""
+    by_level: Dict[str, Dict[str, set]] = {}
+    for fl in spec.get('fillers', []):
+        if not isinstance(fl, dict) or not fl.get('levels') or not isinstance(fl.get('slots'), dict):
+            continue
+        key = cond_key(fl['levels'])
+        for k, v in fl['slots'].items():
+            by_level.setdefault(k, {}).setdefault(key, set()).add(v)
+    out = []
+    for slot, lv in by_level.items():
+        vals = [next(iter(v)) for v in lv.values() if len(v) == 1]
+        if len(lv) >= 2 and len(vals) == len(lv) and len(set(vals)) == len(vals):
+            out.append(slot)
+    return sorted(out)
+
+
+def causal_visibility(spec: Dict[str, Any]) -> Dict[str, Any]:
+    """因果可见性检查（模板片段近似，不依赖 tokenizer）。
+
+    返回 {'matrix': {readout: {factor: bool}}, 'pairs': [...], 'errors': [...], 'warnings': [...]}。
+    matrix[r][f] = True：f 的每个对照句式对在读出 r 的前缀都不同（填充因子：每个句式在 r 的前缀里都有槽位文本）。
+    """
+    frames = [fr for fr in spec.get('frames', []) if isinstance(fr, dict)]
+    factors = list(spec.get('factors', []))
+    readouts = readouts_of(spec)
+    frame_factors = [f for f in factors if any(f in fr.get('levels', {}) for fr in frames)]
+    matrix: Dict[str, Dict[str, bool]] = {r: {} for r in readouts}
+    pairs_out, errors, warnings = [], [], []
+    for f in factors:
+        if f not in frame_factors:
+            for r in readouts:
+                pres = [_prefix(fr, r) for fr in frames]
+                matrix[r][f] = all(p is not None and SLOT_RE.search(p) is not None for p in pres)
+            continue
+        others = [g for g in frame_factors if g != f]
+        pairs = [(a, b) for i, a in enumerate(frames) for b in frames[i + 1:]
+                 if a.get('levels', {}).get(f) != b.get('levels', {}).get(f)
+                 and all(a.get('levels', {}).get(g) == b.get('levels', {}).get(g) for g in others)]
+        if not pairs:
+            warnings.append(f'因子 {f} 没有仅在该因子上不同的句式对，无法检查因果可见性')
+            for r in readouts:
+                matrix[r][f] = True
+            continue
+        all_vis = {r: True for r in readouts}
+        for a, b in pairs:
+            vis = {}
+            for r in readouts:
+                pa, pb = _prefix(a, r), _prefix(b, r)
+                vis[r] = pa is not None and pb is not None and pa != pb
+                all_vis[r] = all_vis[r] and vis[r]
+            pairs_out.append({'factor': f, 'frames': [a['id'], b['id']], 'visible': vis})
+            if not any(vis.values()):
+                errors.append(f'因子 {f} 在读出位置不可见：句式 {a["id"]} 与 {b["id"]} 仅在 {f} 上不同，'
+                              f'但在全部读出位置 {readouts} 的前缀相同（因果注意力下状态按构造相同）')
+            else:
+                for r in readouts:
+                    if not vis[r]:
+                        warnings.append(f'因子 {f} 在读出位置 {r} 不可见：句式 {a["id"]} 与 {b["id"]} 的前缀相同，'
+                                        f'该位置上的 {f} 效应只能来自混杂')
+        for r in readouts:
+            matrix[r][f] = all_vis[r]
+    prefix_warnings = []
+    for p in pairs_out:
+        a, b = (next(fr for fr in frames if fr['id'] == i) for i in p['frames'])
+        la, lb = (len(_leading(fr['text'])) for fr in (a, b))
+        lo, hi = min(la, lb), max(la, lb)
+        if (lo == 0 and hi > 0) or (lo > 0 and hi / lo >= PREFIX_RATIO_WARN and hi - lo >= PREFIX_DIFF_WARN):
+            prefix_warnings.append(f'因子 {p["factor"]}：句式 {a["id"]} 与 {b["id"]} 的句首前缀长度为 {la} 与 {lb} 字'
+                                   f'（「{_leading(a["text"])}」/「{_leading(b["text"])}」），可能存在前缀 / 位置混杂')
+    labels = set(label_slots(spec))
+    for fr in frames:
+        text, target = fr.get('text'), fr.get('target')
+        if not isinstance(text, str) or not isinstance(target, str):
+            continue
+        sp = _target_span(text, target, fr.get('target_occurrence', 'first'))
+        if not sp:
+            continue
+        before = set(SLOT_RE.findall(text[:sp[0]])) - {target}
+        probe = fr.get('probe') if isinstance(fr.get('probe'), dict) else {}
+        answer = set(SLOT_RE.findall(probe.get('answer', '') or '')) - {target}
+        for slot in sorted(before & (answer | labels)):
+            kind = '类别标签槽' if slot in labels else '答案槽'
+            warnings.append(f'句式 {fr.get("id")}：{kind} {{{slot}}} 出现在目标 {{{target}}} 之前，'
+                            f'目标位置的读出可能直接来自该词而非目标本身')
+    return {'matrix': matrix, 'pairs': pairs_out, 'errors': errors, 'warnings': sorted(set(warnings)),
+            'prefix_warnings': sorted(set(prefix_warnings))}
+
+
+def _leading(text: str) -> str:
+    """句首前缀：模板中第一个槽位之前的字面文本。"""
+    m = SLOT_RE.search(text)
+    return text[:m.start()] if m else text
 
 
 def validate(spec: Dict[str, Any]) -> List[str]:
@@ -109,6 +295,11 @@ def validate(spec: Dict[str, Any]) -> List[str]:
             errors.append(f'{where}.target 槽位 {{{fr["target"]}}} 不在 text 中')
         if not isinstance(fr.get('levels', {}), dict):
             errors.append(f'{where}.levels 必须是对象')
+        if fr.get('target_occurrence', 'first') not in ('first', 'last'):
+            errors.append(f'{where}.target_occurrence 只能是 first 或 last')
+        if 'cue' in fr and (not isinstance(fr['cue'], str) or not fr['cue'] or not isinstance(fr.get('text'), str)
+                            or _cue_span(fr['text'], fr['cue']) is None):
+            errors.append(f'{where}.cue 必须是 text 中槽位之外的字面片段，或 "{{槽位}}"')
         probe = fr.get('probe')
         if probe is not None:
             if (not isinstance(probe, dict) or not isinstance(probe.get('prompt'), str)
@@ -167,8 +358,24 @@ def validate(spec: Dict[str, Any]) -> List[str]:
         elif frame_ids and set(held) == frame_ids:
             errors.append('splits.heldout_frames 不能包含全部 frame（否则没有发现材料）')
     layers = spec.get('layers', DEFAULT_LAYERS)
-    if not isinstance(layers, list) or not layers or any(t not in ('first', 'mid', 'last') and not (isinstance(t, int)) for t in layers):
-        errors.append('layers 只能是 first/mid/last 或整数层号')
+    if layers == 'all':
+        layers = ['all']
+    if (not isinstance(layers, list) or not layers
+            or any(not (t in LAYER_WORDS or (isinstance(t, int) and not isinstance(t, bool) and t >= 0)) for t in layers)
+            or ('all' in layers and len(layers) > 1)):
+        errors.append('layers 只能是 "all"，或 first/mid/last/emb/非负整数层号组成的列表')
+    readouts = spec.get('readouts', DEFAULT_READOUTS)
+    if (not isinstance(readouts, list) or not readouts or len(set(readouts)) != len(readouts)
+            or any(r not in READOUTS for r in readouts)):
+        errors.append(f'readouts 必须是 {list(READOUTS)} 中不重复的非空子集')
+    else:
+        for fr in frames:
+            if not isinstance(fr, dict):
+                continue
+            if 'cue' in readouts and 'cue' not in fr:
+                errors.append(f'readouts 含 cue，但 frame {fr.get("id")} 没有声明 cue')
+            if 'probe_answer' in readouts and not fr.get('probe'):
+                errors.append(f'readouts 含 probe_answer，但 frame {fr.get("id")} 没有 probe')
     shards = spec.get('shards', 1)
     if not isinstance(shards, int) or shards < 1 or shards > 256:
         errors.append('shards 必须是 1–256 的整数')
@@ -188,6 +395,8 @@ def validate(spec: Dict[str, Any]) -> List[str]:
                 errors.append(f'concepts[{k}] 必须是非空字符串')
             elif f not in levels or lv not in levels[f]:
                 errors.append(f'concepts 键 {k} 没有对应的因子水平')
+    if not errors:
+        errors.extend(causal_visibility(spec)['errors'])
     return errors
 
 
@@ -231,7 +440,8 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
              per_cell_limit: Optional[int] = None) -> Dict[str, Any]:
     """生成 runner_v3 可读的 corpus（不含 tm_id/version，由注册方补齐）。
 
-    per_cell_limit：试跑用，每个 (split, cond) 最多取前 k 个填充（按切分哈希序）。
+    per_cell_limit：试跑用，只从 discovery 抽样（confirm / lockbox / lockbox_frame 不参与试跑与行为门筛选），
+    每个 cond 最多取前 k 个填充（按切分哈希序）。
     """
     errors = validate(spec)
     if errors:
@@ -252,14 +462,16 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
             cond = {**fr.get('levels', {}), **fl.get('levels', {})}
             ck = cond_key(cond)
             if per_cell_limit is not None:
-                if per_cell.get((split, ck), 0) >= per_cell_limit:
+                if split != 'discovery' or per_cell.get((split, ck), 0) >= per_cell_limit:
                     continue
             per_cell[(split, ck)] = per_cell.get((split, ck), 0) + 1
             slots = fl['slots']
-            text, start = _fill_with_offset(fr['text'], slots, fr['target'])
+            text = _fill(fr['text'], slots)
+            occ = fr.get('target_occurrence', 'first')
+            start = _map_span(fr['text'], slots, _target_span(fr['text'], fr['target'], occ))[0]
             target = slots[fr['target']]
-            if fr['text'].count('{' + fr['target'] + '}') > 1:
-                warnings.append(f'{fr["id"]}: 目标槽位在句式中出现多次，取第一次出现')
+            if fr['text'].count('{' + fr['target'] + '}') > 1 and 'target_occurrence' not in fr:
+                warnings.append(f'{fr["id"]}: 目标槽位在句式中出现多次，取第一次出现（可用 target_occurrence 指定）')
             item = {
                 'id': f'{fam}:{fr["id"]}:{fl["id"]}',
                 'cond': cond,
@@ -270,6 +482,9 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
                 'target': target,
                 'target_char': start,
             }
+            if isinstance(fr.get('cue'), str):
+                cs, ce = _map_span(fr['text'], slots, _cue_span(fr['text'], fr['cue']))
+                item['cue'], item['cue_char'] = text[cs:ce], cs
             if fr.get('probe'):
                 item['probe'] = {'prompt': _fill(fr['probe']['prompt'], slots),
                                  'answer': _fill(fr['probe']['answer'], slots)}
@@ -288,7 +503,9 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
         'name': spec.get('name', fam),
         'description': spec.get('description', ''),
         'factors': list(spec['factors']),
-        'layers': list(spec.get('layers', DEFAULT_LAYERS)),
+        'layers': layers_of(spec),
+        'readouts': readouts_of(spec),
+        'visibility': causal_visibility(spec)['matrix'],
         'shards': int(spec.get('shards', 1)),
         'prereg': dict(spec.get('prereg', {})),
         'language_graph_target_ids': list(spec.get('language_graph_target_ids', [])),
@@ -361,7 +578,8 @@ def preview(spec: Dict[str, Any], *, dims: int = 2560, sample: int = 12) -> Dict
     min_cell = int(spec.get('prereg', {}).get('min_cell_n', 8))
     thin = sorted(ck for ck, c in cells.items()
                   if c['discovery'] < min_cell and (c['discovery'] + c['confirm'] + c['lockbox']) > 0)
-    warnings = list(corpus.get('_warnings', []))
+    vis = causal_visibility(spec)
+    warnings = list(corpus.get('_warnings', [])) + vis['warnings'] + vis['prefix_warnings']
     if thin:
         warnings.append(f'{len(thin)} 个条件格 discovery 样本少于 prereg.min_cell_n={min_cell}：{", ".join(thin[:6])}{" …" if len(thin) > 6 else ""}')
     if by_split['lockbox'] == 0:
@@ -384,7 +602,11 @@ def preview(spec: Dict[str, Any], *, dims: int = 2560, sample: int = 12) -> Dict
         'text_chars': {'min': min(char_len), 'max': max(char_len),
                        'mean': round(sum(char_len) / len(char_len), 2)},
         'shards': corpus['shards'],
-        'samples': [{k: it[k] for k in ('id', 'split', 'cond', 'text', 'target', 'target_char', 'probe') if k in it}
+        'readouts': corpus['readouts'],
+        'layers': corpus['layers'],
+        'visibility': {'matrix': vis['matrix'], 'pairs': vis['pairs']},
+        'samples': [{k: it[k] for k in ('id', 'split', 'cond', 'text', 'target', 'target_char', 'cue', 'cue_char', 'probe')
+                     if k in it}
                     for it in items[::step][:sample]],
         'warnings': warnings,
         'note': '功效为大样本近似（Bonferroni 到隐藏维度数），仅用于设计阶段估算样本量；token 长度由 runner 按实际 tokenizer 记录。',

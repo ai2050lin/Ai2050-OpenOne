@@ -143,15 +143,15 @@ HiddenState 有统一的数组形式，适合系统观察；这不自动意味�
 
 需要扩大样本、跨节点或跨模型运行的测试，优先使用 `shared/dist_protocol/` 的协议，而不是手写句子列表：
 
-1. **生成式模板**：用 `template_grammar.v1`（句式框架 × 填充词表 × 因子水平）描述测试材料，放入 `shared/dist_protocol/grammars/`。先在客户端「研发 · 模板工作室」或 `grammar.preview` 检查逐格样本数、功效近似与告警，再冻结。
+1. **生成式模板**：用 `template_grammar.v1`（句式框架 × 填充词表 × 因子水平）描述测试材料，放入 `shared/dist_protocol/grammars/`。先在客户端「研发 · 模板工作室」或 `grammar.preview` 检查逐格样本数、功效近似与告警，再冻结。文法用 `readouts`（target / cue / final / probe_answer）声明读出位置、`layers`（`"all"` 或层位列表）声明采集层；`validate` 做因果可见性检查：仅在某因子上不同的句式对若在全部读出位置的前缀相同则报错，部分位置不可见、或答案槽 / 类别标签槽出现在目标之前则告警。
 2. **切分**：按填充词确定性切分 discovery / confirm / lockbox；句式泛化用 `heldout_frames`（lockbox_frame）。不得改用随机逐条切分。
 3. **行为门**：每个句式应配 probe；冻结正式模板前先冻结试跑版查看逐格行为门。行为门未通过的条件格不进入内部分析，也不能作为机制正例。
 4. **冻结与预注册**：`prereg`（`min_behavior_acc`、`min_cell_n`、`min_lockbox_cos`，可选 `target_factors` / `target_layers`）随模板冻结进 design_sha。看到结果后不得修改阈值；修改文法或阈值必须重新冻结（升 version），旧版本结果不再参与合并。
 5. **合并口径**：只合并 `kind=real`、design_sha 一致、金丝雀未漂移、审计未驳回的结果；每个分片只计一次，重复分片只做一致性检查。不同模型快照或精度分桶，不跨桶平均。
 6. **产物**：v3 节点产物为 `summary.json`、`suffstats.npz`、`behavior.json`、`canary.json`。`--mode synthetic` 只用于协议联调，其结果永远不能写入研究记录或作为实验数字。
 7. **证据边界**：审计通过只表示执行产物可信、可以合并；证据门链 1–7 由协议判定，选择性/充分性、必要性与负控制、自然生成需要另做干预或生成实验。证据等级仍在 Research OS 登记，不能由合并统计或记分板自动晋级。
-8. **改动验证**：修改协议、runner 或中心服务后，运行 `python -m unittest discover -s tests/dist_protocol`（当前 41 项，含 analysis.v1 与 atlas.v1 的植入结构找回与负对照、autotest 作业队列、题库与研究包）；runner 改动会改变 design_sha，只影响之后冻结的模板。
-9. **规律分析（analysis.v1）**：runner 同时产出 `items.npz`（逐样本各层向量，过大时用语料种子固定的 JL 投影）；`shared/dist_protocol/analysis.py` 只在 discovery 上拟合、在留出划分上检验，置换检验按填充词 / 句式整体打乱。判据固定在代码 `CRITERIA` 中并随结果返回；不得在看到结果后调判据。分析结论用「支持 / 未支持 / 注意 / 描述」表述，属于候选稳定观测，不自动晋级证据。改动分析方法时必须保留植入规律找回测试与负对照测试。
+8. **改动验证**：修改协议、runner 或中心服务后，运行 `python -m unittest discover -s tests/dist_protocol`（当前 60 项，含 analysis.v1 与 atlas.v1 的植入结构找回与负对照、因果可见性正例 / 反例、多读出位置与全层采集的 items.v2 / suffstats.v2 格式及向后兼容、本地原生全场与语料决定的投影维数、试跑只从 discovery 抽样、autotest 作业队列、题库与研究包）；runner 改动会改变 design_sha，只影响之后冻结的模板。
+9. **规律分析（analysis.v1）**：runner 同时产出 `items.npz`（逐样本各读出位置 × 各层向量，过大时用语料种子固定的 JL 投影；items.v2 另含逐层 logit-lens，投影维数与矩阵只由语料决定、各分片相同；节点另在本地 `AI2050_NATIVE_DIR`（缺省 `~/.ai2050/native_fields`）按层保存不上传的 float16 原生全场与 manifest；summary 记录 `model_snapshot`（权重与 tokenizer 文件 sha256）、原生全场 manifest 哈希与 hs[-1] 是否在最终归一化之后）；`shared/dist_protocol/analysis.py` 只在 discovery 上拟合、在留出划分上检验，置换检验按填充词 / 句式整体打乱。判据固定在代码 `CRITERIA` 中并随结果返回；不得在看到结果后调判据。分析结论用「支持 / 未支持 / 注意 / 描述」表述，属于候选稳定观测，不自动晋级证据。改动分析方法时必须保留植入规律找回测试与负对照测试。
 10. **一个模式族的完整流程**：用 `scripts/run_language_family.py --family <ID>` 经中心接口与 `node_agent.py --tm-id` 跑完 预览 → 试跑冻结 → 行为门 → 正式冻结 → 分片采集 → 合并与分析 → 报告（`research/family_runs/`）。无 GPU 时只能对沙盒中心（`AI2050_DIST_ALLOW_SYNTHETIC=1` + 独立 `AI2050_DIST_DIR`）加 `--synthetic` 验证流程；沙盒的模型桶名带「合成·」前缀、客户端显示合成横幅，报告在 `research/family_runs_synthetic/` 并标 SYNTHETIC，不得引用为实验结果。正式中心不得开启该开关。
 11. **研发 · 自动测试（autotest.v1）**：`shared/dist_protocol/autotest.py` 维护被测模型登记与「模型 × 模式族」作业队列，单线程顺序执行驱动（`--progress` 输出 `@@progress` / `@@result` 行，行为门停止以退出码 3 表示）。被测模型只能是本机权重目录或沙盒合成模型；管理令牌经环境变量传给驱动，不进命令行。多个模型共用同一冻结模板时，中心按「该模型尚无结果的分片」优先派发。改动后运行 `tests/dist_protocol/test_autotest.py`（假驱动，覆盖校验、批次展开、行为门停止、取消、重启中断）。
 12. **语言谱图（atlas.v1）与开放参与**：规范见 `design/platform_spec_v1.md`。跨族结论只能来自 `shared/dist_protocol/atlas.py` 的固定判据（`CRITERIA` 随结果返回）：稳定特征须在未见词表上复现；边须两组互不重叠的词各自复现并超过经验零分布；共享轴须通过留一族迁移。跨族假设优先写进文法 `concepts` 预注册，事后发现的边记为「新发现候选」，需新模板验证。方向只在同一模型内比较。共享方向不等于共享机制，机制须做干预。AI 解读产生的假设一律「未检验」，只保存在 `atlas/hypotheses.jsonl`，不得写成结论。改动谱图算法时必须保留 `test_atlas.py` 的植入找回、负对照与基线泄漏测试。

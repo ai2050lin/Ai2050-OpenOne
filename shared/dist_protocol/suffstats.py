@@ -24,6 +24,8 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 import numpy as np
 
 SCHEMA_VERSION = 'suffstats.v1'
+SCHEMA_V2 = 'suffstats.v2'          # v1 + 每个层位标签的读出位置 tag_readout / hidden_states 下标 tag_layer
+SUPPORTED_SCHEMAS = (SCHEMA_VERSION, SCHEMA_V2)
 
 
 def cond_key(cond: Dict[str, Any]) -> str:
@@ -39,6 +41,8 @@ class SuffStats:
     n: np.ndarray = None            # (C,)
     s: np.ndarray = None            # (L, C, d)
     q: np.ndarray = None            # (L, C, d)
+    tag_readout: Optional[List[str]] = None   # v2：每个标签的读出位置（target/cue/final/probe_answer）
+    tag_layer: Optional[List[int]] = None     # v2：每个标签的 hidden_states 下标（-1 = 未知）
 
     def __post_init__(self):
         L = len(self.layer_tags)
@@ -80,7 +84,8 @@ class SuffStats:
         if list(other.factors) != list(self.factors):
             raise ValueError('factors 不一致，不能合并')
         out = SuffStats(list(self.layer_tags), self.dim, list(self.factors),
-                        list(self.cells), self.n.copy(), self.s.copy(), self.q.copy())
+                        list(self.cells), self.n.copy(), self.s.copy(), self.q.copy(),
+                        self.tag_readout or other.tag_readout, self.tag_layer or other.tag_layer)
         for j, key in enumerate(other.cells):
             i = out._cell(key[0], json.loads(key[1]))
             out.n[i] += other.n[j]
@@ -90,24 +95,33 @@ class SuffStats:
 
     # ---- 序列化 ----
     def to_npz_bytes(self) -> bytes:
+        """有标签元数据时写 v2，否则写 v1（与旧读取方兼容）。"""
         buf = io.BytesIO()
+        extra = {}
+        if self.tag_readout is not None and self.tag_layer is not None:
+            extra = {'tag_readout': np.array([str(x) for x in self.tag_readout]),
+                     'tag_layer': np.array(self.tag_layer, dtype=np.int32)}
         np.savez_compressed(
-            buf, schema=np.array(SCHEMA_VERSION), layer_tags=np.array([str(t) for t in self.layer_tags]),
+            buf, schema=np.array(SCHEMA_V2 if extra else SCHEMA_VERSION),
+            layer_tags=np.array([str(t) for t in self.layer_tags]),
             factors=np.array(json.dumps(self.factors, ensure_ascii=False)),
             cell_split=np.array([c[0] for c in self.cells]),
             cell_cond=np.array([c[1] for c in self.cells]),
-            n=self.n, sum=self.s, sumsq=self.q)
+            n=self.n, sum=self.s, sumsq=self.q, **extra)
         return buf.getvalue()
 
     @classmethod
     def from_npz_bytes(cls, data: bytes) -> 'SuffStats':
         z = np.load(io.BytesIO(data), allow_pickle=False)
-        if str(z['schema']) != SCHEMA_VERSION:
+        if str(z['schema']) not in SUPPORTED_SCHEMAS:
             raise ValueError(f'unsupported suffstats schema: {z["schema"]}')
         cells = list(zip([str(x) for x in z['cell_split']], [str(x) for x in z['cell_cond']]))
         s = np.asarray(z['sum'], dtype=np.float64)
+        has_meta = 'tag_readout' in z.files and 'tag_layer' in z.files
         return cls([str(t) for t in z['layer_tags']], int(s.shape[2]), json.loads(str(z['factors'])),
-                   cells, np.asarray(z['n'], dtype=np.int64), s, np.asarray(z['sumsq'], dtype=np.float64))
+                   cells, np.asarray(z['n'], dtype=np.int64), s, np.asarray(z['sumsq'], dtype=np.float64),
+                   [str(x) for x in z['tag_readout']] if has_meta else None,
+                   [int(x) for x in z['tag_layer']] if has_meta else None)
 
     # ---- 视图 ----
     @property

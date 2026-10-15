@@ -16,6 +16,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+os.environ.setdefault('AI2050_NATIVE_DIR', 'off')   # 测试不在用户目录写原生全场
 
 from shared.dist_protocol import canary, grammar  # noqa: E402
 from shared.dist_protocol.suffstats import SuffStats, decompose, replicate_consistency, summarize  # noqa: E402
@@ -83,6 +84,17 @@ class GrammarTests(unittest.TestCase):
             k = (it['split'], grammar.cond_key(it['cond']))
             counts[k] = counts.get(k, 0) + 1
         self.assertLessEqual(max(counts.values()), 2)
+
+    def test_pilot_discovery_only(self):
+        # 试跑不得读取留出材料：只含 discovery，且覆盖全部非留出句式
+        for path in GRAMMARS:
+            spec = load(path)
+            c = grammar.generate(grammar.pilot_spec(spec), per_cell_limit=3, include_canary=False)
+            self.assertTrue(c['items'])
+            self.assertEqual({it['split'] for it in c['items']}, {'discovery'})
+            held = set(spec.get('splits', {}).get('heldout_frames', []))
+            frames = {f['id'] for f in spec['frames']} - held
+            self.assertEqual({it['frame_id'] for it in c['items']}, frames)
 
 
 def make_ss(rng, conds, n_per, dim=24, layers=('first', 'last'), split='discovery', effect=None):
