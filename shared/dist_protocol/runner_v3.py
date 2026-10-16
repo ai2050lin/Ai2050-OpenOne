@@ -238,7 +238,8 @@ class ComponentStore:
 
 
 def save_o_proj(model_key, mats):
-    """o_proj 权重（每块 (d, H·hd) float16）按模型键保存一次；返回 {'dir', 'files': [{block, path, sha256}]}。"""
+    """o_proj 权重（每块 (d, H·hd) float16）按模型键保存一次；返回 {'dir', 'files': [{block, path, sha256}]}。
+    mats 的值可以是数组，也可以是返回数组的函数（逐块取用、写盘后即释放，避免大模型把全部块同时放进内存）。"""
     import numpy as np
     root = native_root()
     if root is None:
@@ -250,8 +251,9 @@ def save_o_proj(model_key, mats):
         p = wdir / f'o_proj_B{b}.npy'
         if not p.exists():
             buf = io.BytesIO()
-            np.save(buf, np.asarray(W, dtype=np.float16))
+            np.save(buf, np.asarray(W() if callable(W) else W, dtype=np.float16))
             p.write_bytes(buf.getvalue())
+            del buf
         files.append({'block': int(b), 'path': p.name, 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()})
     return {'dir': str(wdir), 'files': files}
 
@@ -547,6 +549,8 @@ def main():
     except Exception as exc:  # 真实模式失败 → 诚实降级为 smoke，记录原因
         summary['status'] = 'smoke'
         summary['real_error'] = f'{type(exc).__name__}: {exc}'
+        import traceback
+        summary['real_traceback'] = traceback.format_exc()[-4000:]
         for name in ('suffstats.npz', 'behavior.json', 'canary.json', 'items.npz'):
             p = out / name
             if p.exists():
@@ -684,26 +688,32 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     # 放置方式：缺省整模型放在 device；AI2050_DEVICE_MAP=auto 时按 AI2050_MAX_MEMORY 做 GPU/CPU 分层摆放（权重保持原精度，
     # 显存放不下的大模型用，如 Qwen3-14B bf16：max_memory 0=12GiB,cpu=20GiB）
     dm = os.environ.get('AI2050_DEVICE_MAP', '').strip().lower()
-    load_kw = {'torch_dtype': dtype}
     max_memory = None
+    loader = 'from_pretrained'
     if dm == 'auto':
+        # 按分片逐个加载并摆放（accelerate.load_checkpoint_and_dispatch）：transformers 5 的 from_pretrained 会同时以
+        # 写时复制方式映射全部分片，大模型（Qwen3-14B bf16 约 29.5 GB）在 Windows 上逼近提交内存上限时会访问冲突崩溃
+        from accelerate import init_empty_weights, load_checkpoint_and_dispatch
+        from transformers import AutoConfig
         max_memory = parse_max_memory(os.environ.get('AI2050_MAX_MEMORY', ''))
         offload_dir = os.environ.get('AI2050_OFFLOAD_DIR') or str(Path(out).resolve().parent / '_offload')
-        load_kw.update(device_map='auto', offload_folder=offload_dir, offload_state_dict=True, offload_buffers=True,
-                       low_cpu_mem_usage=True)
-        if max_memory:
-            load_kw['max_memory'] = max_memory
+        with init_empty_weights():
+            model = AutoModelForCausalLM.from_config(AutoConfig.from_pretrained(model_path), torch_dtype=dtype)
+        model.tie_weights()
+        model = load_checkpoint_and_dispatch(
+            model, model_path, device_map='auto', max_memory=max_memory, dtype=dtype, offload_folder=offload_dir,
+            offload_buffers=True, no_split_module_classes=list(getattr(model, '_no_split_modules', None) or []))
+        loader = 'accelerate.load_checkpoint_and_dispatch'
     elif dm:
         raise ValueError(f'AI2050_DEVICE_MAP 只支持 auto（收到 {dm!r}）')
     else:
-        load_kw['device_map'] = device
-    model = AutoModelForCausalLM.from_pretrained(model_path, **load_kw)
+        model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=dtype, device_map=device)
     model.eval()
     hf_map = getattr(model, 'hf_device_map', None) or {}
     by_dev = {}
     for v in hf_map.values():
         by_dev[str(v)] = by_dev.get(str(v), 0) + 1
-    summary['placement'] = {'device_map': 'auto' if dm == 'auto' else device,
+    summary['placement'] = {'device_map': 'auto' if dm == 'auto' else device, 'loader': loader,
                             'max_memory': {str(k): v for k, v in (max_memory or {}).items()} or None,
                             'modules_by_device': by_dev or {device: 'all'},
                             'note': '分层摆放只改变执行位置，权重精度不变；disk 表示卸载到磁盘（很慢）'}
@@ -934,7 +944,7 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     if comp_store is not None and comp_store.ids:
         names = {id(m): n for n, m in model.named_modules()}
         weights = lambda: save_o_proj(model_key, {  # noqa: E731
-            b: dense_weight(o_projs[b], (model_path, names[id(o_projs[b])] + '.weight')).numpy()
+            b: (lambda b=b: dense_weight(o_projs[b], (model_path, names[id(o_projs[b])] + '.weight')).half().numpy())
             for b in comp_store.blocks})
     _write_outputs(out, acc, behavior, can, tok_len, summary, status='real',
                    extra={'model_path': model_path, 'device': device}, store=store,
