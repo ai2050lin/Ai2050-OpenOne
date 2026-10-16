@@ -116,7 +116,7 @@ def write_report(args, family, tm, analysis, report, scoreboard, out_dir: Path):
     for f in analysis.get('findings', []):
         mark = {'supported': '✓', 'negative': '✗', 'warning': '!', 'info': '·'}.get(f['kind'], '·')
         L.append(f'- **{mark} {f["title"]}**（{f.get("level", "")}）：{f["text"]}' + (f' 适用范围：{f["scope"]}' if f.get('scope') else ''))
-    L += ['', '## 逐层指标', '', '| 层 | 因子 | 迹 η²（校正） | confirm 探针 | lockbox 探针 | lockbox_frame 探针 | lockbox 方向 cos（白化） | 置换 p（探针 / 方向） |',
+    L += ['', '## 逐层指标', '', '| 层 | 因子 | 迹 η²（校正） | confirm 探针 | lockbox 探针 | lockbox_frame 探针 | lockbox 方向 cos（白化） | 置换 p（投影间隔 / 探针 / 方向） |',
           '|---|---|---|---|---|---|---|---|']
     for layer in analysis.get('layers', []):
         if layer.get('insufficient'):
@@ -126,7 +126,7 @@ def write_report(args, family, tm, analysis, report, scoreboard, out_dir: Path):
             perm = r.get('perm') or {}
             L.append(f'| {layer["tag"]} | {f} | {fmt(layer["trace_eta2"].get(f))} | {fmt((sp.get("confirm") or {}).get("probe_acc"))} | '
                      f'{fmt((sp.get("lockbox") or {}).get("probe_acc"))} | {fmt((sp.get("lockbox_frame") or {}).get("probe_acc"))} | '
-                     f'{fmt((sp.get("lockbox") or {}).get("rep_cos_white"))} | {fmt(perm.get("acc_p"), 4)} / {fmt(perm.get("rep_p"), 4)} |')
+                     f'{fmt((sp.get("lockbox") or {}).get("rep_cos_white"))} | {fmt(perm.get("sep_p"), 4)} / {fmt(perm.get("acc_p"), 4)} / {fmt(perm.get("rep_p"), 4)} |')
     L += ['', '## 证据门链', '']
     for g in report.get('gates', []):
         L.append(f'- {g["label"]}：{g["status"]} — {g.get("note", "")}')

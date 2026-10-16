@@ -9,7 +9,9 @@
      （原始空间与白化空间各一份）。
   4. 置换零分布：按因子的取值单位（填充级因子按填充、句式级因子按句式、否则逐条）打乱 discovery 标签，
      重算复现 cos 与探针准确率，给出单侧 p 值。
-  5. 留出探针：白化空间最近质心分类器，discovery 训练，在留出划分上测准确率（机会水平 = 1/k）。
+  5. 留出探针：白化空间最近质心分类器，discovery 训练，在留出划分上测准确率（机会水平 = 1/k）；另算留出集标准化投影间隔
+     （separation，见 _separation）。可读出判据要求准确率高于机会且投影间隔的置换 p ≤ perm_alpha——准确率会在 1.0 处饱和，
+     二值句式级因子按句式打乱时，接近真实划分的错误标签也能拿满分，准确率置换 p 失去分辨力。
   6. 句式不变性：主因子方向在另一因子各水平内分别计算，两两 cos 矩阵。
   7. 组合可加性：格均值 vs μ + Δ_a + Δ_b 的残差比。
   8. 长度干扰：token 数与各水平方向投影的相关。
@@ -32,7 +34,8 @@ import numpy as np
 SCHEMA = 'analysis.v1'
 CRITERIA = {
     'probe_margin': 0.25,        # 留出探针准确率需比机会水平高出该值（绝对值）才算「可读出」
-    'perm_alpha': 0.01,          # 置换 p 值阈值
+    'perm_alpha': 0.01,          # 置换 p 值阈值（可读出判据用留出投影间隔的置换 p：sep_p）
+    'perm_stat': 'separation',   # 可读出判据的置换统计量：留出集标准化投影间隔（不在 1.0 处饱和）
     'invariance_cos': 0.6,       # 句式间方向平均 cos ≥ 该值视为跨句式稳定
     'additive_ratio': 0.25,      # 组合残差比 ≤ 该值视为近似可加
     'lexical_excess': 0.15,      # 词身份额外解释方差 ≥ 该值视为词身份主导
@@ -125,6 +128,40 @@ def _mean_rep(d1: Dict[str, np.ndarray], d2: Dict[str, np.ndarray]) -> Optional[
     vals = [_cos(d1[k], d2[k]) for k in d1 if k in d2]
     vals = [v for v in vals if v is not None]
     return float(np.mean(vals)) if vals else None
+
+
+def _separation(Ztr, ytr, Zte, yte, levels) -> Optional[float]:
+    """留出集平均投影间隔（标准化）：discovery 各水平单位方向 u_ℓ；留出样本 i（真实水平 t）的间隔
+    s_i = z_i·u_t − mean_{ℓ≠t} z_i·u_ℓ；返回 mean(s) / std(s)。
+
+    与探针准确率不同，它不会在 1.0 处饱和：标签越接近真实划分，方向越纯、间隔越大，所以按句式整体打乱
+    的置换检验（二值句式级因子只有少数可能的标签划分，与真实划分只差一两个句式的划分也能拿到满分准确率）
+    仍有分辨力。"""
+    g = Ztr.mean(0)
+    dirs = {}
+    for lv in levels:
+        m = ytr == lv
+        if m.any():
+            d = Ztr[m].mean(0) - g
+            n = np.linalg.norm(d)
+            if n > 1e-12:
+                dirs[lv] = d / n
+    if len(dirs) < 2 or len(Zte) == 0:
+        return None
+    keys = list(dirs)
+    P = Zte @ np.stack([dirs[k] for k in keys]).T            # (n, k)
+    col = {k: i for i, k in enumerate(keys)}
+    s = []
+    for row, t in zip(P, yte):
+        if t not in col:
+            continue
+        others = [row[col[k]] for k in keys if k != t]
+        s.append(row[col[t]] - float(np.mean(others)))
+    if len(s) < 2:
+        return None
+    s = np.array(s)
+    sd = float(s.std())
+    return float(s.mean() / sd) if sd > 1e-12 else None
 
 
 def _centroid_acc(Ztr, ytr, Zte, yte, levels) -> Optional[float]:
@@ -290,7 +327,9 @@ def analyze(items: ItemSet, factors: List[str], *, texts: Optional[Dict[str, str
                 dS_w = _directions(Z[S], labels[f][S], lv)
                 rep_w = _mean_rep(dD_w, dS_w)
                 acc = _centroid_acc(Z[D], labels[f][D], Z[S], labels[f][S], lv)
-                rec['splits'][sp] = {'n': int(len(S)), 'rep_cos_raw': rep_raw, 'rep_cos_white': rep_w, 'probe_acc': acc}
+                sep = _separation(Z[D], labels[f][D], Z[S], labels[f][S], lv)
+                rec['splits'][sp] = {'n': int(len(S)), 'rep_cos_raw': rep_raw, 'rep_cos_white': rep_w, 'probe_acc': acc,
+                                     'separation': sep}
             # 置换零分布（lockbox 优先，否则 confirm）
             target = 'lockbox' if 'lockbox' in rec['splits'] else ('confirm' if 'confirm' in rec['splits'] else None)
             if target and n_perm > 0:
@@ -298,20 +337,33 @@ def analyze(items: ItemSet, factors: List[str], *, texts: Optional[Dict[str, str
                 dS_w = _directions(Z[S], labels[f][S], lv)
                 obs_rep = rec['splits'][target]['rep_cos_white']
                 obs_acc = rec['splits'][target]['probe_acc']
+                obs_sep = rec['splits'][target]['separation']
                 unit_vals = items.filler[D] if units[f] == 'filler' else (items.frame[D] if units[f] == 'frame' else np.arange(len(D)))
-                null_rep, null_acc = [], []
+                null_rep, null_acc, null_sep = [], [], []
                 for _ in range(n_perm):
                     pl = _permuted_labels(rng, labels[f][D], unit_vals, units[f], frame_perms.get(f))
                     null_rep.append(_mean_rep(_directions(Z[D], pl, lv), dS_w) or 0.0)
                     null_acc.append(_centroid_acc(Z[D], pl, Z[S], labels[f][S], lv) or 0.0)
-                null_rep, null_acc = np.array(null_rep), np.array(null_acc)
+                    sv = _separation(Z[D], pl, Z[S], labels[f][S], lv)
+                    null_sep.append(sv if sv is not None else -np.inf)
+                null_rep, null_acc, null_sep = np.array(null_rep), np.array(null_acc), np.array(null_sep)
+                fin = null_sep[np.isfinite(null_sep)]
+                lo, hi = (float(min(fin.min(), obs_sep if obs_sep is not None else fin.min())),
+                          float(max(fin.max(), obs_sep if obs_sep is not None else fin.max()))) if len(fin) else (0.0, 1.0)
+                def p_of(null, obs):
+                    # 观测统计量无法计算（如方向为零向量）时没有证据：p = 1，不能当作比所有零分布值都大
+                    return 1.0 if obs is None else float((1 + (null >= obs).sum()) / (1 + n_perm))
                 rec['perm'] = {
                     'split': target, 'n_perm': n_perm,
-                    'rep_p': float((1 + (null_rep >= (obs_rep if obs_rep is not None else np.inf)).sum()) / (1 + n_perm)),
-                    'acc_p': float((1 + (null_acc >= (obs_acc if obs_acc is not None else np.inf)).sum()) / (1 + n_perm)),
+                    'rep_p': p_of(null_rep, obs_rep),
+                    'acc_p': p_of(null_acc, obs_acc),
+                    'sep_p': p_of(null_sep, obs_sep),
                     'rep_null_q95': float(np.quantile(null_rep, 0.95)), 'acc_null_q95': float(np.quantile(null_acc, 0.95)),
+                    'sep_null_q95': float(np.quantile(fin, 0.95)) if len(fin) else None,
                     'rep_null_hist': np.histogram(null_rep, bins=20, range=(-1, 1))[0].tolist(),
                     'acc_null_hist': np.histogram(null_acc, bins=20, range=(0, 1))[0].tolist(),
+                    'sep_null_hist': np.histogram(fin, bins=20, range=(lo, hi if hi > lo else lo + 1))[0].tolist() if len(fin) else [],
+                    'sep_null_range': [lo, hi],
                 }
             # 长度干扰
             # 格内偏相关：去掉条件格均值后，方向投影与 token 数是否仍相关（句式本身决定长度，不能直接相关）
@@ -421,7 +473,8 @@ def findings(p: Dict[str, Any]) -> List[Dict[str, Any]]:
             return False
         ok = s['probe_acc'] >= r['chance'] + C['probe_margin']
         if perm.get('split') == sp:
-            ok = ok and perm['acc_p'] <= C['perm_alpha']
+            # 置换检验用留出集投影间隔（不饱和）；探针准确率置换 p 仍记录，但二值句式级因子下会饱和
+            ok = ok and perm.get('sep_p', perm['acc_p']) <= C['perm_alpha']
         return ok
 
     for f in factors:
@@ -438,14 +491,17 @@ def findings(p: Dict[str, Any]) -> List[Dict[str, Any]]:
             out.append({
                 'id': f'readable-{f}', 'kind': 'supported', 'title': f'「{f}」在未见词表上可线性读出',
                 'text': (f'{f} 在 {"、".join(ok_layers)} 层可读出；最强在 {best["tag"]} 层：lockbox 探针准确率 {_fmt(lb["probe_acc"])}'
-                         f'（机会 {_fmt(r["chance"])}，置换 p={_fmt(perm.get("acc_p"), 4)}），白化方向复现 cos {_fmt(lb.get("rep_cos_white"))}'
+                         f'（机会 {_fmt(r["chance"])}），留出投影间隔 {_fmt(lb.get("separation"), 2)}（置换 p={_fmt(perm.get("sep_p"), 4)}；'
+                         f'准确率置换 p={_fmt(perm.get("acc_p"), 4)}），白化方向复现 cos {_fmt(lb.get("rep_cos_white"))}'
                          f'（置换 p={_fmt(perm.get("rep_p"), 4)}）。'),
                 'evidence': {'trajectory': traj, 'unit': r['unit']},
                 'scope': f'取值单位={r["unit"]}；lockbox 中的{"填充词" if r["unit"] == "filler" else "样本"}未参与发现。',
                 'level': '候选稳定观测（未见词表预测）'})
         else:
             out.append({'id': f'readable-{f}', 'kind': 'negative', 'title': f'「{f}」未达到可读出判据',
-                        'text': f'各层 lockbox 探针准确率最高 {_fmt(lb["probe_acc"])}（{best["tag"]} 层，机会 {_fmt(r["chance"])}），未同时满足高于机会 {C["probe_margin"]} 且置换 p ≤ {C["perm_alpha"]}。',
+                        'text': f'各层 lockbox 探针准确率最高 {_fmt(lb["probe_acc"])}（{best["tag"]} 层，机会 {_fmt(r["chance"])}），'
+                                f'未同时满足高于机会 {C["probe_margin"]} 且留出投影间隔置换 p ≤ {C["perm_alpha"]}'
+                                f'（该层 p={_fmt(perm.get("sep_p"), 4)}）。',
                         'evidence': {'trajectory': traj}, 'level': '阴性结果'})
         lf = r['splits'].get('lockbox_frame')
         if lf and lf.get('probe_acc') is not None:

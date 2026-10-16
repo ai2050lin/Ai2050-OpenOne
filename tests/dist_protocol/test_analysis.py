@@ -121,5 +121,51 @@ class AnalysisRecoveryTests(unittest.TestCase):
         self.assertTrue(all(len(c) == 2 for c in p['stack']['layers'][0]['centroids']))
 
 
+class FrameLevelFactorTests(unittest.TestCase):
+    """二值句式级因子（GR-Q 的语气：每个句式只有一种语气）：探针准确率在 1.0 处饱和，按句式打乱时接近真实划分的错误标签
+    也能拿满分，所以可读出判据改用留出投影间隔的置换 p。植入找回 + 正交伪标签负对照。"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.corpus, cls.items = synthetic_items('GR-Q', shards=2)
+        cls.p = analysis.analyze(cls.items, cls.corpus['factors'])
+
+    def test_planted_frame_level_factor_recovered(self):
+        kinds = {f['id']: f['kind'] for f in self.p['findings']}
+        self.assertEqual(kinds['readable-mood'], 'supported')
+        last = {l['tag']: l for l in self.p['layers']}['last']['factors']['mood']
+        self.assertEqual(last['unit'], 'frame')
+        self.assertEqual(last['splits']['lockbox']['probe_acc'], 1.0)
+        self.assertLessEqual(last['perm']['sep_p'], analysis.CRITERIA['perm_alpha'])
+        self.assertGreater(last['perm']['acc_p'], analysis.CRITERIA['perm_alpha'])   # 准确率置换已饱和：这正是改用间隔的原因
+
+    def test_orthogonal_pseudo_labels_are_negative(self):
+        # 负对照：在每个真实语气内部把句式交替分到两个伪水平，伪标签与植入的语气方向正交
+        items = copy.deepcopy(self.items)
+        frames = sorted(set(items.frame))
+        mood_of = {fr: next(items.cond[i]['mood'] for i in range(len(items.frame)) if items.frame[i] == fr) for fr in frames}
+        pseudo = {}
+        for m in sorted(set(mood_of.values())):
+            for k, fr in enumerate([fr for fr in frames if mood_of[fr] == m]):
+                pseudo[fr] = 'A' if k % 2 == 0 else 'B'
+        for i, fr in enumerate(items.frame):
+            items.cond[i] = {'pseudo': pseudo[fr]}
+        p = analysis.analyze(items, ['pseudo'])
+        kinds = {f['id']: f['kind'] for f in p['findings']}
+        self.assertEqual(kinds['readable-pseudo'], 'negative')
+
+    def test_uncomputable_separation_gives_p_one(self):
+        # 回归：某层两种语气的水平均值完全相同（向量只依赖填充词）时间隔无法计算，置换 p 必须为 1，不能取最小值
+        items = copy.deepcopy(self.items)
+        first = {}
+        for i, fl in enumerate(items.filler):
+            first.setdefault(fl, items.X[0][i].copy())
+            items.X[0][i] = first[fl]
+        p = analysis.analyze(items, self.corpus['factors'], n_perm=20)
+        rec = p['layers'][0]['factors']['mood']
+        self.assertIsNone(rec['splits']['lockbox']['separation'])
+        self.assertEqual(rec['perm']['sep_p'], 1.0)
+
+
 if __name__ == '__main__':
     unittest.main()
