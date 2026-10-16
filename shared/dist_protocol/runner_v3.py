@@ -9,6 +9,9 @@
     AI2050_SHARD          分片 "i/n"（缺省 0/1；金丝雀条目在每个分片都执行）
     AI2050_PRECISION      bf16 | fp16 | fp32（缺省 bf16）
     AI2050_RUNNER_MODE    --mode auto 时强制模式（synthetic 用于沙盒中心的流程验证）
+    AI2050_DEVICE_MAP     缺省整模型放在 cuda；auto = GPU/CPU 分层摆放（权重保持原精度，显存放不下的大模型用）
+    AI2050_MAX_MEMORY     配合 auto，如 "0=12GiB,cpu=20GiB"；实际摆放记入 summary.placement
+    AI2050_OFFLOAD_DIR    配合 auto 的磁盘卸载目录（缺省在输出目录旁）
 
 采集口径（corpus 声明）:
     layers     "all"（hidden_states 全部：hs[0] = 嵌入层输出，hs[i] = 第 i 个块之后的残差流，
@@ -596,6 +599,45 @@ def text_positions(it, offsets, readouts, straddle=None):
     return pos
 
 
+def parse_max_memory(spec):
+    """"0=12GiB,cpu=20GiB" → {0: '12GiB', 'cpu': '20GiB'}；空串 → None。"""
+    out = {}
+    for part in str(spec or '').split(','):
+        part = part.strip()
+        if not part:
+            continue
+        k, _, v = part.partition('=')
+        k, v = k.strip(), v.strip()
+        if not k or not v:
+            raise ValueError(f'AI2050_MAX_MEMORY 格式应为 "0=12GiB,cpu=20GiB"，收到 {spec!r}')
+        out[int(k) if k.isdigit() else k] = v
+    return out or None
+
+
+def module_device(mod):
+    """模块参数所在的执行设备（跳过 meta）；没有实体参数时返回 None。"""
+    for p in mod.parameters():
+        if p.device.type != 'meta':
+            return p.device
+    return None
+
+
+def dense_weight(mod):
+    """线性层的稠密 float32 权重（CPU）。bitsandbytes 4-bit（NF4/FP4）先反量化——直接读 .weight 得到的是打包后的
+    uint8，按它做逐头分解会静默出错；权重被卸载到磁盘（meta）时无法读取，明确报错。"""
+    import torch
+    w = mod.weight
+    qs = getattr(w, 'quant_state', None)
+    if qs is not None:
+        import bitsandbytes.functional as bnbf
+        return bnbf.dequantize_4bit(w.data, qs).float().cpu()
+    if w.device.type == 'meta':
+        raise RuntimeError('权重被卸载到磁盘（meta），无法读取；请提高 AI2050_MAX_MEMORY 中的 cpu 上限')
+    if not torch.is_floating_point(w):
+        raise RuntimeError(f'不支持的权重类型 {w.dtype}（只支持浮点与 bitsandbytes 4-bit）')
+    return w.detach().float().cpu()
+
+
 def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     import numpy as np
     import torch
@@ -605,8 +647,32 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     dtype = {'bf16': torch.bfloat16, 'fp16': torch.float16, 'fp32': torch.float32}.get(precision, torch.bfloat16)
     tok = AutoTokenizer.from_pretrained(model_path)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=dtype, device_map=device)
+    # 放置方式：缺省整模型放在 device；AI2050_DEVICE_MAP=auto 时按 AI2050_MAX_MEMORY 做 GPU/CPU 分层摆放（权重保持原精度，
+    # 显存放不下的大模型用，如 Qwen3-14B bf16：max_memory 0=12GiB,cpu=20GiB）
+    dm = os.environ.get('AI2050_DEVICE_MAP', '').strip().lower()
+    load_kw = {'torch_dtype': dtype}
+    max_memory = None
+    if dm == 'auto':
+        max_memory = parse_max_memory(os.environ.get('AI2050_MAX_MEMORY', ''))
+        offload_dir = os.environ.get('AI2050_OFFLOAD_DIR') or str(Path(out).resolve().parent / '_offload')
+        load_kw.update(device_map='auto', offload_folder=offload_dir, offload_state_dict=True, offload_buffers=True,
+                       low_cpu_mem_usage=True)
+        if max_memory:
+            load_kw['max_memory'] = max_memory
+    elif dm:
+        raise ValueError(f'AI2050_DEVICE_MAP 只支持 auto（收到 {dm!r}）')
+    else:
+        load_kw['device_map'] = device
+    model = AutoModelForCausalLM.from_pretrained(model_path, **load_kw)
     model.eval()
+    hf_map = getattr(model, 'hf_device_map', None) or {}
+    by_dev = {}
+    for v in hf_map.values():
+        by_dev[str(v)] = by_dev.get(str(v), 0) + 1
+    summary['placement'] = {'device_map': 'auto' if dm == 'auto' else device,
+                            'max_memory': {str(k): v for k, v in (max_memory or {}).items()} or None,
+                            'modules_by_device': by_dev or {device: 'all'},
+                            'note': '分层摆放只改变执行位置，权重精度不变；disk 表示卸载到磁盘（很慢）'}
     summary['model_snapshot'] = model_snapshot(model_path)
     readouts = readouts_of(corpus)
     lm_head = model.get_output_embeddings()
@@ -659,20 +725,28 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
         hs = res.hidden_states
         if state['last_post_norm'] is None:
             # 对账：HF 的 hidden_states[-1] 是否已经过最终归一化（lm_head(hs[-1]) 应等于实际 logits）
-            direct = lm_head(hs[-1][0, -1:]).float()
-            state['last_post_norm'] = bool(torch.allclose(direct, res.logits[0, -1:].float(), rtol=2e-2, atol=2e-2))
+            direct = lm_head(to_dev(hs[-1][0, -1:], head_dev)).float().cpu()
+            state['last_post_norm'] = bool(torch.allclose(direct, res.logits[0, -1:].float().cpu(), rtol=2e-2, atol=2e-2))
         return hs, res.logits, off, ids
+
+    # 分层摆放时各层隐藏状态在不同设备上：送入最终归一化 / lm_head 前先搬到该模块所在设备
+    norm_dev = module_device(final_norm) if final_norm is not None else None
+    head_dev = module_device(lm_head)
+
+    def to_dev(x, dev):
+        return x.to(dev) if dev is not None else x
 
     def lens_at(hs, pos, layers):
         """逐层 logit-lens：中间层先过最终归一化再接 lm_head；hs[-1] 若已过归一化则直接接 lm_head。"""
-        h = torch.stack([hs[i][0, pos] for _, i in layers])
         n_hs = len(hs)
         normed = []
-        for row, (_, i) in zip(h, layers):
+        for _, i in layers:
+            row = hs[i][0, pos]
             if i == n_hs - 1 and state['last_post_norm']:
-                normed.append(row)
+                normed.append(to_dev(row, head_dev))
             else:
-                normed.append(final_norm(row[None])[0] if final_norm is not None else row)
+                r = final_norm(to_dev(row, norm_dev)[None])[0] if final_norm is not None else row
+                normed.append(to_dev(r, head_dev))
         return torch.log_softmax(lm_head(torch.stack(normed)).float(), dim=-1)    # (L, V)
 
     def gather(logp, tid):
@@ -747,15 +821,17 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                 zs, ms = [], []
                 for r in comp_store.readouts:
                     p = pos[r]
-                    z = torch.stack([cap['z'][b][0, p] for b in comp_store.blocks])          # (B, H·hd)
-                    m = torch.stack([cap['m'][b][0, p] for b in comp_store.blocks])          # (B, d)
+                    # 各块可能在不同设备上（分层摆放）：逐块搬到 CPU 再拼接
+                    z = torch.stack([cap['z'][b][0, p].float().cpu() for b in comp_store.blocks])   # (B, H·hd)
+                    m = torch.stack([cap['m'][b][0, p].float().cpu() for b in comp_store.blocks])   # (B, d)
                     for k, b in enumerate(comp_store.blocks):
                         if b + 1 < len(hs) - 1 or not state['last_post_norm']:
-                            delta = (hs[b + 1][0, p] - hs[b][0, p]).float()
-                            recon = (o_projs[b](z[k][None])[0] + m[k]).float()
+                            delta = hs[b + 1][0, p].float().cpu() - hs[b][0, p].float().cpu()
+                            zk = cap['z'][b][0, p][None]
+                            recon = o_projs[b](to_dev(zk, module_device(o_projs[b])))[0].float().cpu() + m[k]
                             comp_store.closure.append(float((delta - recon).norm() / delta.norm().clamp_min(1e-6)))
-                    zs.append(z.float().cpu().numpy())
-                    ms.append(m.float().cpu().numpy())
+                    zs.append(z.numpy())
+                    ms.append(m.numpy())
                 comp_store.add(it['id'], np.stack(zs), np.stack(ms))
                 cap['z'].clear(); cap['m'].clear()
             probe = it.get('probe')
@@ -822,7 +898,7 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     model_key = f"{summary['model_snapshot']['sha256'][:16]}-{precision}"
     weights = None
     if comp_store is not None and comp_store.ids:
-        weights = lambda: save_o_proj(model_key, {b: o_projs[b].weight.detach().float().cpu().numpy()  # noqa: E731
+        weights = lambda: save_o_proj(model_key, {b: dense_weight(o_projs[b]).numpy()  # noqa: E731
                                                   for b in comp_store.blocks})
     _write_outputs(out, acc, behavior, can, tok_len, summary, status='real',
                    extra={'model_path': model_path, 'device': device}, store=store,
