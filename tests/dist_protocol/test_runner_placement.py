@@ -36,13 +36,31 @@ class PlacementHelperTests(unittest.TestCase):
         self.assertTrue(torch.equal(w, lin.weight.detach().float()))
         self.assertEqual(self.rn.module_device(lin).type, 'cpu')
 
-    def test_dense_weight_rejects_meta(self):
+    def test_dense_weight_meta_reads_checkpoint(self):
+        # 分层摆放时卸载层只剩 meta 占位：没有检查点参数名时报错；给出时从 safetensors 读取原始权重
+        import json
+        import shutil
+        import tempfile
         import torch
+        from safetensors.torch import save_file
         with torch.device('meta'):
             lin = torch.nn.Linear(8, 4, bias=False)
         with self.assertRaises(RuntimeError):
             self.rn.dense_weight(lin)
         self.assertIsNone(self.rn.module_device(lin))
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            W = torch.randn(4, 8).to(torch.bfloat16)
+            save_file({'model.layers.3.self_attn.o_proj.weight': W, 'other': torch.zeros(2)}, str(tmp / 'part-1.safetensors'))
+            (tmp / 'model.safetensors.index.json').write_text(json.dumps(
+                {'weight_map': {'model.layers.3.self_attn.o_proj.weight': 'part-1.safetensors', 'other': 'part-1.safetensors'}}),
+                encoding='utf-8')
+            got = self.rn.dense_weight(lin, (str(tmp), 'model.layers.3.self_attn.o_proj.weight'))
+            self.assertTrue(torch.equal(got, W.float()))
+            with self.assertRaises(RuntimeError):                              # 形状不一致
+                self.rn.dense_weight(lin, (str(tmp), 'other'))
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     def test_dense_weight_dequantizes_nf4(self):
         import torch

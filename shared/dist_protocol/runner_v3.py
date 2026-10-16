@@ -622,9 +622,27 @@ def module_device(mod):
     return None
 
 
-def dense_weight(mod):
-    """线性层的稠密 float32 权重（CPU）。bitsandbytes 4-bit（NF4/FP4）先反量化——直接读 .weight 得到的是打包后的
-    uint8，按它做逐头分解会静默出错；权重被卸载到磁盘（meta）时无法读取，明确报错。"""
+def checkpoint_tensor(model_path, key):
+    """从 safetensors 检查点按参数名读取原始张量（单文件或带 model.safetensors.index.json 的分片）。"""
+    from safetensors import safe_open
+    root = Path(model_path)
+    idx = root / 'model.safetensors.index.json'
+    if idx.is_file():
+        fname = json.loads(idx.read_text(encoding='utf-8'))['weight_map'].get(key)
+        if fname is None:
+            raise KeyError(f'检查点中没有参数 {key}')
+        path = root / fname
+    else:
+        path = root / 'model.safetensors'
+    with safe_open(str(path), framework='pt') as f:
+        return f.get_tensor(key)
+
+
+def dense_weight(mod, ckpt=None):
+    """线性层的稠密 float32 权重（CPU）。
+    - bitsandbytes 4-bit（NF4/FP4）先反量化：直接读 .weight 得到的是打包后的 uint8，按它做逐头分解会静默出错；
+    - 分层摆放（device_map=auto）时卸载到 CPU/磁盘的层，模块里只剩 meta 占位，真实权重由 accelerate 另行保管：
+      给出 ckpt=(模型目录, 参数名) 时从检查点读取原始权重（与运行时使用的权重相同），否则明确报错。"""
     import torch
     w = mod.weight
     qs = getattr(w, 'quant_state', None)
@@ -632,7 +650,23 @@ def dense_weight(mod):
         import bitsandbytes.functional as bnbf
         return bnbf.dequantize_4bit(w.data, qs).float().cpu()
     if w.device.type == 'meta':
-        raise RuntimeError('权重被卸载到磁盘（meta），无法读取；请提高 AI2050_MAX_MEMORY 中的 cpu 上限')
+        # accelerate 的 AlignDevicesHook 持有卸载权重（weights_map 用相对键 'weight' 取到真实的 CPU / 磁盘张量）
+        hook = getattr(mod, '_hf_hook', None)
+        for h in (getattr(hook, 'hooks', None) or ([hook] if hook is not None else [])):
+            wm = getattr(h, 'weights_map', None)
+            if wm is not None:
+                try:
+                    t = wm['weight']
+                except KeyError:
+                    continue
+                if tuple(t.shape) == tuple(w.shape):
+                    return t.float().cpu()
+        if ckpt is None:
+            raise RuntimeError('权重是 meta 占位（已卸载），hook 中也没有可用权重，又没有给出检查点参数名，无法读取')
+        t = checkpoint_tensor(*ckpt)
+        if tuple(t.shape) != tuple(w.shape):
+            raise RuntimeError(f'检查点参数 {ckpt[1]} 形状 {tuple(t.shape)} 与模块 {tuple(w.shape)} 不一致')
+        return t.float().cpu()
     if not torch.is_floating_point(w):
         raise RuntimeError(f'不支持的权重类型 {w.dtype}（只支持浮点与 bitsandbytes 4-bit）')
     return w.detach().float().cpu()
@@ -898,8 +932,10 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     model_key = f"{summary['model_snapshot']['sha256'][:16]}-{precision}"
     weights = None
     if comp_store is not None and comp_store.ids:
-        weights = lambda: save_o_proj(model_key, {b: dense_weight(o_projs[b]).numpy()  # noqa: E731
-                                                  for b in comp_store.blocks})
+        names = {id(m): n for n, m in model.named_modules()}
+        weights = lambda: save_o_proj(model_key, {  # noqa: E731
+            b: dense_weight(o_projs[b], (model_path, names[id(o_projs[b])] + '.weight')).numpy()
+            for b in comp_store.blocks})
     _write_outputs(out, acc, behavior, can, tok_len, summary, status='real',
                    extra={'model_path': model_path, 'device': device}, store=store,
                    lens_layers=[i for _, i in plan.layers], vocab=state['vocab'],
