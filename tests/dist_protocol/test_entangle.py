@@ -137,6 +137,33 @@ class GateAndBalanceTests(unittest.TestCase):
         L = E.layout(d2, 'lang', 'task', idx)
         self.assertEqual(len(L.units), len(set(d.noun[d.split == 'discovery'])) - 2)
 
+    def test_per_attribute_gate_groups(self):
+        d = self.design
+        corr = np.where(np.isin(d.labels['task'], ['color', 'size']), 1, -1)
+        nouns = sorted(set(d.noun[d.split == 'discovery']))
+        col_bad, size_bad = nouns[0], nouns[1]
+        corr[(d.noun == col_bad) & (d.labels['task'] == 'color') & (d.labels['lang'] == 'zh')] = 0
+        corr[(d.noun == size_bad) & (d.labels['task'] == 'size')] = 0
+        d2 = E.Design(**{**d.__dict__, 'correct': corr})
+        pairs = [('color', 'task'), ('color', 'lang'), ('lang', 'task'), ('cat', 'lang')]
+        groups = E.gate_groups(d2, pairs, 'per_attribute', {'color': 'task=color', 'size': 'task=size'})
+        by = {g['name']: g for g in groups}
+        self.assertEqual(sorted(by), ['all_probes', 'color'])
+        self.assertEqual(by['color']['pairs'], [('color', 'task'), ('color', 'lang')])
+        self.assertEqual(by['color']['report']['dropped_nouns'], [col_bad])      # 大小失败的名词留在颜色因子对里
+        self.assertTrue(by['color']['design'].keep[d2.noun == size_bad].all())
+        self.assertEqual(by['all_probes']['report']['dropped_nouns'], sorted([col_bad, size_bad]))
+        # 旧策略：全部因子对共用 all_probes 门
+        (g,) = E.gate_groups(d2, pairs, 'all_probes')
+        self.assertEqual(g['report']['dropped_nouns'], sorted([col_bad, size_bad]))
+        with self.assertRaises(ValueError):
+            E.gate_groups(d2, pairs, 'per_attribute')
+        res = E.analyze_gated(self.field, groups, n_perm=20, n_split=2, n_boot=10,
+                              tags=[self.field.tags()[0]])
+        gates = {k: p.get('gate') for k, p in res['tags'][0]['pairs'].items()}
+        self.assertEqual(gates, {'color×task': 'color', 'color×lang': 'color', 'lang×task': 'all_probes',
+                                 'cat×lang': 'all_probes'})
+
     def test_degenerate_readout_does_not_crash(self):
         d = self.design
         X = np.where((d.labels['lang'] == 'zh')[:, None], 1.0, -1.0) * np.ones((len(d.ids), 8))  # 句末 token 式的退化读出
@@ -229,6 +256,36 @@ class EntMaterialTests(unittest.TestCase):
             L = E.layout(d, A, B, idx)
             self.assertIsNotNone(L, (A, B))
             self.assertEqual(L.note, '', (A, B))
+
+    def test_v2_answer_sets_and_gate(self):
+        """v2：备选可接受颜色、表面形式、zh 大小 probe 的规范分词形式与按属性分开的行为门。"""
+        self.assertEqual(self.spec['grammar_version'], 2)
+        ent = self.spec['entangle']
+        self.assertEqual(ent['noun_gate'], 'per_attribute')
+        self.assertEqual(ent['gate_probes'], {'color': 'task=color', 'size': 'task=size'})
+        probes = {}
+        for it in self.corpus['items']:
+            if it.get('probe') and not it.get('canary'):
+                probes[(it['filler_id'], it['cond']['lang'], it['cond']['task'])] = it['probe']
+        coco = probes[('fruit.coconut', 'zh', 'color')]
+        self.assertEqual(coco['answers'], ['棕色', '褐色', '绿色'])
+        self.assertNotIn('绿色', coco['contrast'])
+        self.assertIn('灰色', coco['contrast'])
+        jelly = probes[('aquatic.jellyfish', 'en', 'color')]
+        self.assertEqual(jelly['answers'], [' white', ' transparent'])
+        self.assertNotIn(' transparent', probes[('fruit.banana', 'en', 'color')]['contrast'])
+        self.assertIn(' golden', probes[('fruit.banana', 'en', 'color')]['answers'])
+        ele = probes[('mammal.elephant', 'zh', 'size')]
+        self.assertTrue(ele['prompt'].endswith('通常'))
+        self.assertEqual((ele['answers'], ele['contrast']), (['更大', '更高'], ['更小', '更矮']))
+        mouse = probes[('mammal.mouse', 'en', 'size')]
+        self.assertEqual((mouse['answers'], mouse['contrast']), ([' smaller', ' shorter'], [' bigger', ' larger', ' taller']))
+        self.assertTrue(all(r['color'] not in r['color_alt'] and len(r['color_alt']) <= 2 for r in self.rows))
+        grape = probes[('fruit.grape', 'zh', 'color')]
+        self.assertEqual(grape['answers'], ['紫色', '绿色', '红色'])
+        self.assertFalse({'紫色', '绿色', '红色'} & set(grape['contrast']))
+        for (_, lang, task), p in probes.items():           # 可接受集与对照集不相交
+            self.assertFalse(set(p['answers']) & set(p['contrast']))
 
 
 def _run_runner(corpus, out_dir, native, shard='0/1', mode='synthetic', env_extra=None):

@@ -151,15 +151,30 @@ def design_from_corpus(corpus: Dict[str, Any], spec: Dict[str, Any], ids: Option
                         [it['filler_id'] for it in its], [it['split'] for it in its], corr, spec)
 
 
-def gate_nouns(design: Design, policy: str = 'all_probes', exclude_cells: Optional[Iterable[str]] = None
-               ) -> Tuple[Design, Dict[str, Any]]:
+def _probe_mask(design: Design, probes: Optional[Sequence[str]]) -> np.ndarray:
+    """probes = ['task=color', ...]：只把这些句式级条件下的 probe 计入行为门；None = 全部 probe。"""
+    if not probes:
+        return np.ones(len(design.ids), dtype=bool)
+    m = np.zeros(len(design.ids), dtype=bool)
+    for p in probes:
+        f, _, lv = p.partition('=')
+        if f not in design.labels:
+            raise ValueError(f'gate probe {p!r}: unknown factor {f!r}')
+        m |= design.labels[f] == lv
+    return m
+
+
+def gate_nouns(design: Design, policy: str = 'all_probes', exclude_cells: Optional[Iterable[str]] = None,
+               probes: Optional[Sequence[str]] = None) -> Tuple[Design, Dict[str, Any]]:
     """逐名词行为门：policy='all_probes' 时，某名词任一 probe 判错 → 该名词的全部句式退出分析（保持完全交叉）；
-    'none' 不按行为筛选。exclude_cells（中心按格排除的条件格）中的样本也退出；之后每个因子对再单独检查完整性，
-    不完整的格组合不做分解（而不是带着不平衡继续算——按格排除造成的不平衡会虚增交互）。"""
+    probes 给定时只看这些条件下的 probe（如 ['task=color']）；'none' 不按行为筛选。exclude_cells（中心按格排除的条件格）
+    中的样本也退出；之后每个因子对再单独检查完整性，不完整的格组合不做分解（而不是带着不平衡继续算——按格排除造成的
+    不平衡会虚增交互）。按属性分开的门见 gate_groups。"""
     keep = design.keep.copy()
     dropped: List[str] = []
     if policy == 'all_probes':
-        bad = {n for n, c in zip(design.noun, design.correct) if c == 0}
+        pm = _probe_mask(design, probes)
+        bad = {n for n, c, m in zip(design.noun, design.correct, pm) if c == 0 and m}
         dropped = sorted(bad)
         keep &= ~np.isin(design.noun, list(bad))
     elif policy != 'none':
@@ -174,10 +189,58 @@ def gate_nouns(design: Design, policy: str = 'all_probes', exclude_cells: Option
         keep &= ~m
     out = replace(design, keep=keep)
     probed = sorted({n for n, c in zip(design.noun, design.correct) if c >= 0})
-    report = {'policy': policy, 'n_nouns': int(len(set(design.noun))), 'n_probed_nouns': len(probed),
+    report = {'policy': policy, 'probes': list(probes) if probes else 'all', 'n_nouns': int(len(set(design.noun))),
+              'n_probed_nouns': len(probed),
               'dropped_nouns': dropped, 'n_items_kept': int(keep.sum()), 'n_items_excluded_by_cells': n_cells_excl,
               'kept_by_split_label': _count_nouns(out)}
     return out, report
+
+
+def gate_groups(design: Design, pairs: Sequence[Sequence[str]], policy: str = 'all_probes',
+                gate_probes: Optional[Dict[str, str]] = None, exclude_cells: Optional[Iterable[str]] = None
+                ) -> List[Dict[str, Any]]:
+    """把因子对按行为门分组：[{name, design, pairs, report}]。
+    policy='per_attribute'（须给 gate_probes，如 {'color': 'task=color', 'size': 'task=size'}）：含属性 a 的因子对只要求
+    gate_probes[a] 条件下的 probe 通过（含两个属性时两者都要求），不含属性的因子对要求全部 probe 通过（= all_probes）。
+    其他 policy：全部因子对共用一个门。每组内名词整体退出，仍完全交叉。"""
+    pairs = [tuple(p) for p in pairs]
+    if policy != 'per_attribute':
+        d, rep = gate_nouns(design, policy, exclude_cells)
+        return [{'name': policy, 'design': d, 'pairs': pairs, 'report': rep}]
+    if not gate_probes:
+        raise ValueError("noun gate 'per_attribute' needs gate_probes")
+    by_key: Dict[Tuple[str, ...], List[Tuple[str, ...]]] = {}
+    for p in pairs:
+        by_key.setdefault(tuple(sorted(a for a in p if a in gate_probes)), []).append(p)
+    out = []
+    for key, ps in by_key.items():
+        probes = [gate_probes[a] for a in key] or None
+        d, rep = gate_nouns(design, 'all_probes', exclude_cells, probes=probes)
+        rep['policy'] = 'per_attribute'
+        out.append({'name': '+'.join(key) if key else 'all_probes', 'design': d, 'pairs': ps, 'report': rep})
+    return out
+
+
+def analyze_gated(field, groups: Sequence[Dict[str, Any]], **kw) -> Dict[str, Any]:
+    """按 gate_groups 的分组分别运行 analyze 并合并：各标签的 pairs 合并，每个因子对记录所用的门（gate）。"""
+    res = None
+    for g in groups:
+        r = analyze(field, g['design'], g['pairs'], **kw)
+        for t in r['tags']:
+            for p in t['pairs'].values():
+                p['gate'] = g['name']
+        if res is None:
+            res = r
+            res['n_items'] = {g['name']: r['n_items']}
+            continue
+        for t0, t in zip(res['tags'], r['tags']):
+            assert (t0['readout'], t0['hs_index']) == (t['readout'], t['hs_index'])
+            t0['pairs'].update(t['pairs'])
+        res['pairs'] += r['pairs']
+        res['findings'] += r['findings']
+        res['n_items'][g['name']] = r['n_items']
+        res['warnings'] += [w for w in r['warnings'] if w not in res['warnings']]
+    return res
 
 
 def _count_nouns(design: Design, label: str = 'cat') -> Dict[str, int]:
@@ -1287,19 +1350,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     corpus = grammar.generate(spec, include_canary=False)
     design = design_from_corpus(corpus, spec, field.ids, corr if args.behavior else None)
     ent = spec.get('entangle') or {}
-    design, gate_rep = gate_nouns(design, args.gate or ent.get('noun_gate', 'all_probes') if args.behavior else 'none')
     pairs = [tuple(p) for p in ent.get('pairs') or []]
+    policy = (args.gate or ent.get('noun_gate', 'all_probes')) if args.behavior else 'none'
+    groups = gate_groups(design, pairs, policy, ent.get('gate_probes'))
     last = field.n_hs - 1
     layers = sorted(set(list(range(0, field.n_hs, max(args.layer_stride, 1))) + [0, last]))
     tags = [(r, i) for r in field.readouts for i in layers]
-    res = analyze(field, design, pairs, tags=tags, task_alignment=ent.get('task_alignment'), held=args.held,
-                  n_perm=args.n_perm, progress=lambda s: print('[entangle]', s, flush=True))
-    res['gate'] = gate_rep
+    res = analyze_gated(field, groups, tags=tags, task_alignment=ent.get('task_alignment'), held=args.held,
+                        n_perm=args.n_perm, progress=lambda s: print('[entangle]', s, flush=True))
+    res['gate'] = groups[0]['report'] if len(groups) == 1 else {g['name']: g['report'] for g in groups}
+    design_of = {p: g['design'] for g in groups for p in g['pairs']}
     res['source'] = {'spec_sha256': grammar.spec_sha(spec), 'native_dirs': dirs,
                      'manifest_sha256': [hashlib.sha256((Path(d) / 'manifest.json').read_bytes()).hexdigest()
                                          for d in dirs]}
     if args.attribute:
-        res['attribution'] = [attribute(field, design, p, r, args.dest, task_alignment=ent.get('task_alignment'))
+        res['attribution'] = [attribute(field, design_of[p], p, r, args.dest, task_alignment=ent.get('task_alignment'))
                               for r in field.readouts if field.blocks(r) for p in pairs]
     Path(args.out).write_text(json.dumps(res, ensure_ascii=False, indent=1, default=_json_default), encoding='utf-8')
     print('[entangle] wrote', args.out)

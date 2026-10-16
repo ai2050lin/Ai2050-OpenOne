@@ -1,0 +1,88 @@
+# ENT-XF 词表 v1 → v2 改动记录（Phase 250）。规则 R1–R4 见 scripts/build_ent_grammar.py 文档。
+# v1_color_zh / v1_color_en = v1 运行（TG-ENT-XF v1，design bc3567a97921）的颜色强制选择：通过 / 失败（最强对照，间隔）。
+# 这些行为信息只作来源说明：改动依据是 reason 列中的现实依据；模型偏好但无现实依据的颜色（如 天鹅→蓝）不加入。
+# free_zh / free_en = Qwen3-4B 对 v1 式提示「{X}的颜色通常是」/「The typical color of the {E} is」的自由回答（贪心标签 | 5 次采样的标签计数；第三轮另用问答式提示，见 *-candB.json），见 research/family_runs/entangle/ENT-XF-v2-freeresponse-qwen3-4b.json；只用于提出候选颜色，入选与否按 R1 的现实依据。
+id	zh	field	v1	v2	v1_color_zh	v1_color_en	free_zh	free_en	source	reason
+fruit.lemon	柠檬	color_alt		green	失败（绿色，-3.12）	通过	green | green×5	yellow | yellow×3 None×2	自由回答提出 + 现实复核	青柠檬常见
+fruit.grape	葡萄	color_alt		green	失败（红色，-0.12）	失败（red，-0.62）	red | green×2 red×2 purple×1	purple | green×2 purple×2 red×1	现实复核	绿葡萄（青提）是常见品种
+fruit.grape	葡萄	color_alt		red	失败（红色，-0.12）	失败（red，-0.62）	red | green×2 red×2 purple×1	purple | green×2 purple×2 red×1	自由回答提出 + 现实复核	红提 / 红葡萄常见
+fruit.mango	芒果	color_alt		orange	失败（红色，-3.25）	通过	red | red×5	yellow | yellow×4 None×1	现实复核	成熟果皮与果肉常为橙黄
+fruit.mango	芒果	color_alt		red	失败（红色，-3.25）	通过	red | red×5	yellow | yellow×4 None×1	自由回答提出 + 现实复核	红芒（红皮芒果）常见
+fruit.coconut	椰子	color_alt		green	失败（绿色，-4.87）	失败（green，-2.75）	green | yellow×3 green×2	green | green×2 white×2 None×1	现实复核	青椰（嫩椰）在售卖中常见，外果皮绿色
+fruit.apricot	杏	color_alt		yellow	失败（红色，-4.85）	失败（red，-3.19）	red | red×3 green×1 None×1	red | pink×4 None×1	现实复核	杏多为黄橙色（「杏黄」）
+fruit.plum	李子	color_alt		red	失败（绿色，-3.0）	失败（red，-0.75）	green | green×4 yellow×1	red | purple×3 red×2	现实复核	红李是常见品种
+fruit.plum	李子	color_alt		green	失败（绿色，-3.0）	失败（red，-0.75）	green | green×4 yellow×1	red | purple×3 red×2	自由回答提出 + 现实复核	青李常见
+fruit.fig	无花果	color_alt		green	失败（绿色，-3.38）	失败（green，-3.75）	green | green×4 yellow×1	green | green×3 red×1 None×1	现实复核	绿皮无花果是常见品种
+fruit.persimmon	柿子	color_alt		red	失败（红色，-2.34）	失败（red，-0.75）	red | red×4 orange×1	red | red×2 green×1 orange×1 None×1	现实复核	成熟柿子橙红，中文常称「红柿子」
+fruit.loquat	枇杷	color_alt		orange	失败（绿色，-1.12）	通过	green | green×3 yellow×2	yellow | yellow×3 red×1 green×1	现实复核	枇杷果皮黄橙色
+fruit.starfruit	杨桃	color_alt		green	失败（绿色，-1.87）	失败（green，-1.75）	green | green×4 yellow×1	green | green×3 yellow×1 None×1	现实复核	杨桃常以青黄未熟状态售卖
+fruit.apple	苹果	color_alt		green	通过	通过	red | red×4 green×1	red | red×5	现实复核	青苹果是常见品种
+fruit.mulberry	桑葚	color_alt		black	失败（红色，-0.25）	失败（green，-2.88）	purple | purple×4 red×1	green | green×2 red×2 None×1	现实复核	成熟桑葚紫黑
+fruit.pomelo	柚子	color_alt		green	通过	通过	yellow | yellow×5	green | green×3 orange×1 yellow×1	现实复核	柚子果皮常为黄绿 / 绿色
+fruit.passionfruit	百香果	color_alt		yellow	失败（黄色，-4.56）	失败（red，-3.75）	orange | yellow×4 orange×1	orange | None×3 orange×2	现实复核	黄皮百香果是常见品种
+fruit.gooseberry	醋栗	color_alt		red	失败（红色，-1.0）	通过	None | None×3 red×2	green | green×5	现实复核	红醋栗与绿醋栗都常见
+fruit.nectarine	油桃	color_alt		yellow	失败（粉红色，-0.16）	通过	pink | pink×4 red×1	red | red×2 None×2 orange×1	现实复核	油桃果皮红黄相间
+vegetable.carrot	胡萝卜	color_alt		red	失败（红色，-1.99）	通过	red | red×5	orange | orange×4 white×1	自由回答提出 + 现实复核	中文常称「红萝卜」，红色胡萝卜品种
+vegetable.pumpkin	南瓜	color_alt		yellow	通过	通过	orange | orange×3 yellow×2	orange | orange×5	现实复核	南瓜多为橙黄，中文常称黄色
+vegetable.chili	辣椒	color_alt		green	通过	通过	red | red×5	red | red×5	现实复核	青椒 / 青辣椒常见
+vegetable.artichoke	洋蓟	color_alt		purple	失败（紫色，-0.38）	通过	purple | purple×3 green×2	green | green×4 None×1	现实复核	紫色洋蓟是常见品种
+vegetable.potato	土豆	color_alt		yellow	失败（绿色，-5.81）	失败（yellow，-1.37）	green | green×5	white | brown×1 green×1 yellow×1 None×1 white×1	现实复核	土豆果肉黄色，中文常称黄色
+vegetable.potato	土豆	color_alt		white	失败（绿色，-5.81）	失败（yellow，-1.37）	green | green×5	white | brown×1 green×1 yellow×1 None×1 white×1	自由回答提出 + 现实复核	土豆果肉多为白色
+vegetable.ginger	生姜	color_alt		brown	失败（红色，-2.94）	失败（red，-1.88）	red | red×3 green×1 orange×1	red | red×3 None×2	现实复核	生姜外皮为褐色
+vegetable.beet	甜菜	color_alt		purple	失败（紫色，-2.88）	通过	purple | purple×5	red | red×5	现实复核	甜菜根为紫红色
+mammal.giraffe	长颈鹿	color_alt		brown	失败（绿色，-2.5）	失败（brown，-4.63）	None | None×2 black×1 brown×1 gray×1	black | brown×3 black×2	现实复核	毛色为黄底棕色斑块
+mammal.lion	狮子	color_alt		brown	失败（红色，-1.25）	失败（red，-2.0）	red | red×2 brown×1 orange×1 None×1	red | red×4 orange×1	现实复核	毛色为黄褐（tawny）
+mammal.tiger	老虎	color_alt		yellow	失败（红色，-1.78）	通过	red | red×4 orange×1	orange | orange×5	现实复核	中文常称「黄色」底黑纹
+mammal.horse	马	color_alt		black	失败（红色，-2.06）	失败（black，-1.25）	red | red×4 brown×1	black | None×4 black×1	现实复核	黑马是常见毛色之一
+mammal.squirrel	松鼠	color_alt		gray	失败（灰色，-1.62）	失败（gray，-0.5）	gray | brown×3 yellow×1 gray×1	gray | gray×2 None×1 red×1 brown×1	现实复核	灰松鼠是常见种
+mammal.koala	考拉	color_alt		brown	通过	通过	None | None×2 brown×2 black×1	black | None×3 white×1 brown×1	问答式提示自由回答提出 + 现实复核	考拉毛色灰褐
+mammal.yak	牦牛	color_alt		brown	通过	通过	black | black×2 brown×2 None×1	brown | brown×3 black×1 None×1	自由回答提出 + 现实复核	野牦牛为深褐色
+mammal.armadillo	犰狳	color_alt		brown	失败（棕色，-1.12）	通过	None | None×3 brown×2	brown | None×4 brown×1	自由回答提出 + 现实复核	九带犰狳为灰褐色
+mammal.badger	獾	color_alt		brown	失败（红色，-0.81）	失败（black，-1.0）	brown | brown×4 None×1	brown | None×3 brown×2	自由回答提出 + 现实复核	美洲獾为褐色
+mammal.camel	骆驼	color_alt		yellow	失败（黄色，-1.0）	失败（gray，-0.12）	yellow | brown×2 gray×2 black×1	None | None×5	现实复核	毛色沙黄 / 黄褐
+mammal.fox	狐狸	color_alt		red	失败（红色，-2.42）	失败（brown，-2.56）	red | red×4 None×1	brown | red×2 brown×2 None×1	现实复核	赤狐（red fox）是最常见的狐
+bird.sparrow	麻雀	color_alt		gray	失败（灰色，-1.0）	失败（gray，-0.25）	brown | brown×5	gray | brown×3 gray×2	现实复核	麻雀羽色褐与灰相间
+bird.owl	猫头鹰	color_alt		gray	失败（灰色，-2.25）	失败（gray，-0.75）	gray | gray×4 black×1	gray | gray×3 None×1 brown×1	现实复核	许多猫头鹰为灰褐色
+bird.peacock	孔雀	color_alt		green	通过	失败（green，-0.75）	blue | green×2 blue×2 red×1	green | green×3 None×1 blue×1	现实复核	孔雀羽色蓝绿，绿孔雀是常见种
+bird.falcon	隼	color_alt		gray	失败（红色，-0.38）	通过	None | brown×3 None×2	brown | brown×4 None×1	现实复核	游隼背部灰色
+bird.seagull	海鸥	color_alt		gray	通过	失败（black，-1.62）	gray | gray×4 black×1	black | gray×3 black×2	现实复核	海鸥背羽灰色
+bird.vulture	秃鹫	color_alt		brown	通过	通过	black | brown×2 gray×2 black×1	black | gray×2 black×2 brown×1	问答式提示自由回答提出 + 现实复核	兀鹫等常见秃鹫为褐色
+bird.ostrich	鸵鸟	color_alt		brown	失败（白色，-0.5）	失败（brown，-0.88）	None | brown×4 black×1	brown | brown×3 None×1 black×1	自由回答提出 + 现实复核	雌鸵鸟与幼鸟为褐色
+bird.turtledove	斑鸠	color_alt		brown	通过	通过	brown | brown×5	gray | brown×2 None×1 gray×1 green×1	自由回答提出 + 现实复核	斑鸠羽色灰褐
+aquatic.whale	鲸鱼	color_alt		black	失败（蓝色，-2.88）	失败（black，-0.5）	blue | blue×2 black×1 white×1 gray×1	black | gray×2 None×1 blue×1 black×1	自由回答提出 + 现实复核	虎鲸、露脊鲸、座头鲸等常见鲸为黑色
+aquatic.crab	螃蟹	color_alt		orange	通过	通过	red | green×2 red×2 None×1	red | red×4 None×1	问答式提示自由回答提出 + 现实复核	许多蟹（及煮熟的蟹）为橙红色
+aquatic.sea-turtle	海龟	color_alt		brown	通过	通过	green | green×5	green | black×1 None×1 blue×1 green×1 brown×1	现实复核	海龟背甲多为褐色
+aquatic.walrus	海象	color_alt		gray	失败（灰色，-5.62）	失败（gray，-3.12）	gray | gray×3 black×1 brown×1	gray | gray×4 white×1	自由回答提出 + 现实复核	海象体色常描述为灰褐
+aquatic.oyster	牡蛎	color_alt		white	失败（黑色，-1.31）	失败（white，-2.56）	brown | brown×3 green×1 gray×1	white | white×5	自由回答提出 + 现实复核	牡蛎肉与壳内侧为白色
+aquatic.catfish	鲶鱼	color_alt		brown	失败（绿色，-1.62）	失败（black，-0.12）	None | brown×3 green×1 None×1	brown | None×2 brown×2 green×1	自由回答提出 + 现实复核	鲶鱼体色多为深褐 / 灰褐
+aquatic.manatee	海牛	color_alt		brown	失败（黑色，-0.25）	通过	None | brown×4 black×1	gray | brown×2 gray×2 None×1	自由回答提出 + 现实复核	海牛体色灰褐
+aquatic.eel	鳗鱼	color_alt		brown	失败（蓝色，-0.12）	通过	black | green×2 black×1 None×1 brown×1	green | brown×2 green×2 None×1	自由回答提出 + 现实复核	鳗鱼背部多为橄榄褐色
+aquatic.octopus	章鱼	color_alt		brown	失败（蓝色，-6.25）	失败（brown，-3.94）	blue | blue×5	None | None×3 black×1 blue×1	现实复核	活章鱼多为褐色（红色多见于烹熟）
+aquatic.sea-cucumber	海参	color_alt		brown	失败（褐色，-0.12）	失败（brown，-1.62）	brown | brown×5	brown | green×2 red×1 brown×1 None×1	现实复核	海参多为黑褐色
+aquatic.sturgeon	鲟鱼	color_alt		brown	失败（绿色，-3.31）	通过	green | green×1 None×1 blue×1 black×1 brown×1	green | gray×5	问答式提示自由回答提出 + 现实复核	鲟鱼背部多为灰褐 / 深褐
+aquatic.abalone	鲍鱼	color_alt		brown	失败（黑色，-2.62）	失败（black，-1.12）	brown | brown×5	None | gray×1 None×1 blue×1 black×1 white×1	自由回答提出 + 现实复核	鲍鱼壳多为深褐色
+aquatic.salamander	蝾螈	color_alt		brown	失败（绿色，-4.94）	失败（green，-1.62）	green | green×5	green | brown×2 green×2 None×1	自由回答提出 + 现实复核	许多蝾螈为褐色
+aquatic.mussel	贻贝	color_alt		brown	失败（绿色，-1.94）	失败（gray，-1.12）	None | green×1 None×1 brown×1 yellow×1 gray×1	brown | white×2 None×1 red×1 green×1	问答式提示自由回答提出 + 现实复核	贻贝壳常为深褐色
+aquatic.perch	鲈鱼	color_alt		green	失败（蓝色，-1.87）	通过	gray | gray×4 green×1	blue | brown×2 green×2 gray×1	自由回答提出 + 现实复核	黄鲈 / 河鲈体色黄绿
+aquatic.trout	鳟鱼	color_alt		green	失败（绿色，-3.81）	失败（green，-2.06）	green | None×2 brown×2 green×1	green | green×2 gray×1 None×1 brown×1	自由回答提出 + 现实复核	鳟鱼背部多为橄榄绿
+aquatic.piranha	食人鱼	color_alt		red	失败（红色，-4.31）	失败（red，-5.94）	None | None×3 orange×1 red×1	red | red×5	现实复核	红腹食人鱼是最常见种
+aquatic.jellyfish	水母	color_alt		transparent	失败（蓝色，-1.25）	通过	transparent | transparent×4 blue×1	white | white×2 transparent×1 blue×1 None×1	现实复核	水母通常透明（调色板外，R4）
+plant.lotus	荷花	color_alt		white	失败（蓝色，-1.74）	失败（red，-2.75）	blue | None×2 purple×1 pink×1 blue×1	red | None×3 red×2	现实复核	白荷花常见
+plant.chrysanthemum	菊花	color_alt		white	失败（红色，-1.75）	通过	red | red×3 None×1 yellow×1	red | yellow×3 red×1 None×1	现实复核	白菊花常见
+plant.hyacinth	风信子	color_alt		blue	失败（蓝色，0.0）	失败（blue，-0.5）	blue | purple×3 blue×2	purple | blue×3 red×1 None×1	现实复核	蓝色风信子是常见品种
+plant.oak	橡树	color_alt		brown	通过	失败（brown，0.0）	green | green×5	brown | brown×4 green×1	问答式提示自由回答提出 + 现实复核	橡树树干与木材为褐色
+plant.maple	枫树	color_alt		green	失败（绿色，-4.13）	通过	green | green×5	red | red×5	现实复核	枫叶一年中多数时候为绿色
+plant.camellia	茶花	color_alt		pink	通过	通过	red | None×2 pink×2 red×1	red | white×3 red×1 None×1	现实复核	粉色茶花常见
+plant.peach-blossom	桃花	color_alt		red	失败（红色，-0.94）	通过	red | pink×3 red×2	red | pink×3 red×1 None×1	自由回答提出 + 现实复核	红桃花（碧桃）常见
+food.cheese	奶酪	color_alt		white	失败（白色，-2.5）	失败（white，-1.06）	white | white×4 yellow×1	None | yellow×2 white×2 None×1	现实复核	许多奶酪为白色
+food.soy-sauce	酱油	color_alt		brown	失败（红色，-3.87）	失败（brown，-3.06）	red | red×4 brown×1	yellow | None×2 red×1 yellow×1 brown×1	现实复核	酱油为深褐色
+food.honey	蜂蜜	color_alt		amber	通过	通过	yellow | yellow×4 brown×1	None | yellow×4 None×1	问答式提示自由回答提出 + 现实复核	蜂蜜常描述为琥珀色（调色板外，R4）
+food.beer	啤酒	color_alt		amber	通过	通过	None | None×4 yellow×1	yellow | yellow×5	问答式提示自由回答提出 + 现实复核	啤酒常描述为琥珀色（调色板外，R4）
+food.beer	啤酒	color_alt		brown	通过	通过	None | None×4 yellow×1	yellow | yellow×5	问答式提示自由回答提出 + 现实复核	黑啤 / 深色啤酒常见
+food.wasabi	芥末	color_alt		yellow	通过	失败（yellow，0.0）	green | green×4 yellow×1	yellow | yellow×2 None×2 white×1	自由回答提出 + 现实复核	中文「芥末」也指黄芥末
+food.curry	咖喱	color_alt		brown	通过	失败（red，-1.12）	yellow | orange×2 yellow×2 brown×1	red | orange×3 yellow×1 brown×1	问答式提示自由回答提出 + 现实复核	日式咖喱为褐色
+food.century-egg	皮蛋	color_alt		brown	通过	通过	black | None×2 brown×2 gray×1	brown | brown×3 green×1 black×1	自由回答提出 + 现实复核	皮蛋蛋白为深褐色半透明
+food.pudding	布丁	color_alt		white	失败（白色，-1.75）	失败（red，-1.5）	white | white×4 yellow×1	yellow | red×2 None×1 white×1 brown×1	自由回答提出 + 现实复核	奶布丁为白色
+food.cola	可乐	color_alt		brown	失败（红色，-4.81）	失败（brown，-1.13）	red | red×4 None×1	brown | brown×4 red×1	现实复核	可乐为深棕色
+food.caviar	鱼子酱	color_alt		red	通过	失败（red，-0.12）	red | red×4 brown×1	black | None×4 white×1	自由回答提出 + 现实复核	红鱼子（鲑鱼籽）常见
+food.peanut	花生	color_alt		red	失败（黄色，-3.25）	失败（green，-1.12）	red | yellow×4 green×1	green | green×3 None×1 black×1	自由回答提出 + 现实复核	花生仁外皮（花生衣）为红色

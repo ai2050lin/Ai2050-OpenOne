@@ -1,0 +1,4344 @@
+{
+ "schema": "ent_freeresp.v1",
+ "kind": "calibration",
+ "note": "标注校准用的自由回答；只用于复核标注与扩充可接受答案集，不用于挑选名词；不是正式运行结果",
+ "model_snapshot": {
+  "sha256": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "files": {
+   "model-00001-of-00003.safetensors": {
+    "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+    "size": 3957900840
+   },
+   "model-00002-of-00003.safetensors": {
+    "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+    "size": 3987450520
+   },
+   "model-00003-of-00003.safetensors": {
+    "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+    "size": 99630640
+   },
+   "config.json": {
+    "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+    "size": 726
+   },
+   "generation_config.json": {
+    "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+    "size": 239
+   },
+   "tokenizer.json": {
+    "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "size": 11422654
+   },
+   "tokenizer_config.json": {
+    "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+    "size": 9732
+   },
+   "vocab.json": {
+    "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "size": 2776833
+   },
+   "merges.txt": {
+    "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "size": 1671853
+   }
+  },
+  "n_files": 9,
+  "note": "权重（*.safetensors 等）、config 与 tokenizer 文件逐个 sha256；sha256 为按文件名排序后的合成哈希"
+ },
+ "torch": "2.13.0+cu130",
+ "transformers": "5.14.1",
+ "dtype": "bfloat16",
+ "decode": {
+  "greedy": true,
+  "samples": 5,
+  "temperature": 0.7,
+  "top_p": 1.0,
+  "top_k": 0,
+  "max_new_tokens": 8,
+  "seed": 0
+ },
+ "only": "zh/color",
+ "prompt_override": "问：{X}通常是什么颜色的？\n答：{X}通常是",
+ "lexicon": "shared\\dist_protocol\\lexicon\\ENT-XF_nouns.v2.tsv",
+ "seconds": 105.6,
+ "items": [
+  {
+   "id": "fruit.banana",
+   "zh": "香蕉",
+   "en": "banana",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：香蕉通常是什么颜色的？\n答：香蕉通常是",
+   "greedy": "黄色的。\n问：香蕉的果",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的。\n问：香蕉的果",
+    "黄色的。\n\n问：香蕉通常是什么",
+    "黄色的。\n\n问：香蕉通常是什么",
+    "黄色的。\n问：香蕉的果",
+    "黄色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.strawberry",
+   "zh": "草莓",
+   "en": "strawberry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：草莓通常是什么颜色的？\n答：草莓通常是",
+   "greedy": "红色的。\n问：那如果草莓",
+   "greedy_label": "red",
+   "samples": [
+    "红色的。\n问：草莓的果",
+    "红色的。\n\n问：如果草莓是",
+    "红色的。\n\n问：草莓通常是什么",
+    "红色的。\n问：那如果草莓",
+    "红色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.lemon",
+   "zh": "柠檬",
+   "en": "lemon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：柠檬通常是什么颜色的？\n答：柠檬通常是",
+   "greedy": "黄色的。\n问：柠檬汁是什么",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的。\n问：柠檬通常是什么",
+    "黄色的。\n\n问：柠檬通常是什么",
+    "黄色的。\n\n问：柠檬通常是什么",
+    "黄色的。\n问：那柠檬汁",
+    "黄色的。\n但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.cherry",
+   "zh": "樱桃",
+   "en": "cherry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：樱桃通常是什么颜色的？\n答：樱桃通常是",
+   "greedy": "红色的，但有时也可以是粉色",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是有些品种可能会呈现",
+    "红色或粉红色的。\n问：",
+    "红色的，但有时可能呈现出粉色",
+    "红色的。\n问：樱桃通常是什么",
+    "红色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.grape",
+   "zh": "葡萄",
+   "en": "grape",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：葡萄通常是什么颜色的？\n答：葡萄通常是",
+   "greedy": "绿色的，但也可以是紫色、",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种的葡萄",
+    "绿色或紫色的。\n问：葡萄",
+    "绿色的，但有时也可以是紫色",
+    "绿色、紫色、红色或白色。",
+    "紫色的，但也有绿色、红色"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "purple": 1
+   }
+  },
+  {
+   "id": "fruit.tangerine",
+   "zh": "橘子",
+   "en": "tangerine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：橘子通常是什么颜色的？\n答：橘子通常是",
+   "greedy": "橙色的。\n问：橘子",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的。\n问：橘子",
+    "橙色的。但有时可能因为",
+    "橙色的。但有时在特定",
+    "橙色的。\n问：苹果通常",
+    "橙色的，因为它们的名字中"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "fruit.mango",
+   "zh": "芒果",
+   "en": "mango",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：芒果通常是什么颜色的？\n答：芒果通常是",
+   "greedy": "黄色的。\n问：芒果通常是什么",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是有些品种可能会呈现",
+    "黄色或橙色的。\n问：",
+    "黄色的。\n\n问：芒果通常是什么",
+    "黄色的。\n问：芒果通常是什么",
+    "黄色的，但有时也可能呈现绿色"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.pineapple",
+   "zh": "菠萝",
+   "en": "pineapple",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：菠萝通常是什么颜色的？\n答：菠萝通常是",
+   "greedy": "黄色的。\n问：菠萝通常",
+   "greedy_label": "yellow",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "黄色或金黄色的。\n问：",
+    "黄色的。\n\n问题：这个答案是否",
+    "黄色的。\n问题是，菠萝通常",
+    "黄色的。\n但事实上，菠萝"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "yellow": 4
+   }
+  },
+  {
+   "id": "fruit.coconut",
+   "zh": "椰子",
+   "en": "coconut",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：椰子通常是什么颜色的？\n答：椰子通常是",
+   "greedy": "绿色的，但成熟后会变成",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "绿色或黄色的。\n问：椰",
+    "绿色的，但当它成熟的时候",
+    "绿色的，但成熟后会变成",
+    "**绿色**的，但根据其"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.pomegranate",
+   "zh": "石榴",
+   "en": "pomegranate",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：石榴通常是什么颜色的？\n答：石榴通常是",
+   "greedy": "红色的，但有时也可以是绿色",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是有些品种可能呈现",
+    "红色或深红色的。\n问：",
+    "红色的，但有时也可以是绿色",
+    "红色的，但也可以有其他颜色",
+    "红色的，但有时也可以是绿色"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.apricot",
+   "zh": "杏",
+   "en": "apricot",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：杏通常是什么颜色的？\n答：杏通常是",
+   "greedy": "黄色的。\n问：杏的形状",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是杏的果皮",
+    "黄色或橙色的。\n问：",
+    "黄色的，但有时可能呈现出橙",
+    "黄色或橙色的。\n问：",
+    "黄色或橙色的。\n问："
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.plum",
+   "zh": "李子",
+   "en": "plum",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：李子通常是什么颜色的？\n答：李子通常是",
+   "greedy": "黄色的。\n问：李子通常",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是有些品种可能会呈现",
+    "黄色或绿色的。\n问：李",
+    "黄色的，但有时可能呈现红色",
+    "黄色或红色的，取决于品种和",
+    "黄色的，但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.fig",
+   "zh": "无花果",
+   "en": "fig",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：无花果通常是什么颜色的？\n答：无花果通常是",
+   "greedy": "绿色的，但成熟后会变成",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它们成熟时",
+    "绿色或黄色的。\n问：无",
+    "绿色的，但有时可能呈现出黄色",
+    "绿色的，但成熟后会变成",
+    "绿色的，但成熟后会变成"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.lychee",
+   "zh": "荔枝",
+   "en": "lychee",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：荔枝通常是什么颜色的？\n答：荔枝通常是",
+   "greedy": "红色的。\n问：荔枝的果",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是也有其他颜色的",
+    "红色或粉红色的。\n问：",
+    "红色的。\n\n问：荔枝通常是什么",
+    "红色的。\n问：荔枝的果",
+    "红色的。但有时也可能呈现粉"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.avocado",
+   "zh": "牛油果",
+   "en": "avocado",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：牛油果通常是什么颜色的？\n答：牛油果通常是",
+   "greedy": "深绿色的，但有时也可能呈现",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "深绿色的。牛油果的",
+    "**青绿色**的，但成熟",
+    "深绿色的。\n问：牛油",
+    "**青绿色**的，但成熟"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.mangosteen",
+   "zh": "山竹",
+   "en": "mangosteen",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：山竹通常是什么颜色的？\n答：山竹通常是",
+   "greedy": "绿色的，但成熟后会变成",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "绿色或青绿色的，成熟后",
+    "淡绿色的，有时可能带有白色",
+    "绿色的，但有时会呈现黄色",
+    "黄色的，但有时也可能呈现红色"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "fruit.cranberry",
+   "zh": "蔓越莓",
+   "en": "cranberry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蔓越莓通常是什么颜色的？\n答：蔓越莓通常是",
+   "greedy": "红色的。\n问：蔓越莓",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是它们的成熟度",
+    "红色或深红色的。\n问：",
+    "红色的。\n\n问：蔓越莓",
+    "深红色的。\n问：蔓越",
+    "红的。\n但蔓越莓的"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.raspberry",
+   "zh": "覆盆子",
+   "en": "raspberry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：覆盆子通常是什么颜色的？\n答：覆盆子通常是",
+   "greedy": "红色的，但有时也会呈现其他",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是有些品种可能会呈现",
+    "红色或深红色的，但根据",
+    "红色的，但有时可能呈现出其他",
+    "红色的，但有时会呈现其他",
+    "红的，但有时也可能呈现其他"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.persimmon",
+   "zh": "柿子",
+   "en": "persimmon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：柿子通常是什么颜色的？\n答：柿子通常是",
+   "greedy": "橙红色的，但有时也会有",
+   "greedy_label": "orange",
+   "samples": [
+    "橙红色的，但不同品种可能",
+    "橙红色的，但有时也会呈现",
+    "橙红色的，有时可能呈现出黄色",
+    "橙红色的。\n问：柿子",
+    "橙红色的，有时也可能呈现黄色"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "fruit.loquat",
+   "zh": "枇杷",
+   "en": "loquat",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：枇杷通常是什么颜色的？\n答：枇杷通常是",
+   "greedy": "绿色的，但成熟后会变成",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但在成熟时会变成",
+    "绿色或黄色的。\n问：枇",
+    "绿色的，但有时可能呈黄色",
+    "绿色的，但成熟后会变成",
+    "黄色的，但有时也可能呈现绿色"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "fruit.starfruit",
+   "zh": "杨桃",
+   "en": "starfruit",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：杨桃通常是什么颜色的？\n答：杨桃通常是",
+   "greedy": "绿色的，但有时也会有黄色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "绿色或黄色的。\n问：杨",
+    "绿色的，但有时可能呈现黄色",
+    "黄色或绿色的，但有时也",
+    "黄色或绿色的。\n问：杨"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "fruit.apple",
+   "zh": "苹果",
+   "en": "apple",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：苹果通常是什么颜色的？\n答：苹果通常是",
+   "greedy": "红色的。\n问：苹果通常是什么",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是也有其他颜色，",
+    "红色或绿色的。\n问：苹果",
+    "红色的。\n\n问：苹果通常是什么",
+    "红色的。\n问：那苹果通常",
+    "红的、绿的或者黄的"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.mulberry",
+   "zh": "桑葚",
+   "en": "mulberry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：桑葚通常是什么颜色的？\n答：桑葚通常是",
+   "greedy": "紫色的，但有时也会出现红色",
+   "greedy_label": "purple",
+   "samples": [
+    "紫色的，但是有些品种可能会呈现",
+    "紫色或深紫色的。\n问：",
+    "紫色的，但有时可能呈现出红色",
+    "深紫色或黑色，但有时也",
+    "紫色的，但有时也会出现红色"
+   ],
+   "sample_labels": {
+    "purple": 5
+   }
+  },
+  {
+   "id": "fruit.pomelo",
+   "zh": "柚子",
+   "en": "pomelo",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：柚子通常是什么颜色的？\n答：柚子通常是",
+   "greedy": "橙黄色的，但有时也可能呈现",
+   "greedy_label": "orange",
+   "samples": [
+    "橙黄色或黄色的。\n问：",
+    "黄色或橙色的，但根据",
+    "橙黄色的，但有时也可能是",
+    "黄色的，但有时会呈现橙",
+    "黄色的，但有时也可能呈现橙"
+   ],
+   "sample_labels": {
+    "orange": 2,
+    "yellow": 3
+   }
+  },
+  {
+   "id": "fruit.passionfruit",
+   "zh": "百香果",
+   "en": "passionfruit",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：百香果通常是什么颜色的？\n答：百香果通常是",
+   "greedy": "黄色的，但有时也会出现红色",
+   "greedy_label": "yellow",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "黄色或橙色的。\n问：",
+    "黄色的，但有时可能呈现绿色",
+    "黄色的，但有时会呈现橙",
+    "黄色的，但有时也可能呈现红色"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "yellow": 4
+   }
+  },
+  {
+   "id": "fruit.gooseberry",
+   "zh": "醋栗",
+   "en": "gooseberry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：醋栗通常是什么颜色的？\n答：醋栗通常是",
+   "greedy": "红色的，但有时也可以是黑色",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是它们的外皮",
+    "深红色的。但有时也会有",
+    "红色的，但有时可能呈现紫色",
+    "深红色或紫红色的。它们",
+    "红褐色的，但它们的颜色可能会"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.goji",
+   "zh": "枸杞",
+   "en": "goji",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：枸杞通常是什么颜色的？\n答：枸杞通常是",
+   "greedy": "红色的。\n问：枸杞通常是什么",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是有些品种可能会呈现",
+    "红色或暗红色的。\n问：",
+    "红色的，但有时可能呈现出橙",
+    "红色的。\n问：那如果枸杞",
+    "红的，但有时也可能呈现深"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.nectarine",
+   "zh": "油桃",
+   "en": "nectarine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：油桃通常是什么颜色的？\n答：油桃通常是",
+   "greedy": "红色的，但也有其他颜色的",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是也有不同品种可能",
+    "粉红色的。但具体颜色可能",
+    "**红色**的，但根据品种",
+    "粉红色或红色的。\n问：",
+    "**红色**的，但也有品种"
+   ],
+   "sample_labels": {
+    "red": 3,
+    "pink": 2
+   }
+  },
+  {
+   "id": "fruit.tamarind",
+   "zh": "酸角",
+   "en": "tamarind",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：酸角通常是什么颜色的？\n答：酸角通常是",
+   "greedy": "黄色或橙色的，成熟后",
+   "greedy_label": "yellow",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "黄色或橙色的。\n问：",
+    "呈青绿色或深绿色的。\n\n",
+    "黄色或橙色的，表面有",
+    "黄色或橙色的。\n问："
+   ],
+   "sample_labels": {
+    "green": 2,
+    "yellow": 3
+   }
+  },
+  {
+   "id": "fruit.jujube",
+   "zh": "枣",
+   "en": "jujube",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：枣通常是什么颜色的？\n答：枣通常是",
+   "greedy": "深红色或暗红色的，但",
+   "greedy_label": "red",
+   "samples": [
+    "深褐色或暗红色的，表面",
+    "深褐色的，但有时也会有",
+    "深褐色或暗红色的，表面",
+    "深褐色或暗红色的。它们",
+    "深红色或暗红色的。\n\n问"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "red": 1
+   }
+  },
+  {
+   "id": "vegetable.carrot",
+   "zh": "胡萝卜",
+   "en": "carrot",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：胡萝卜通常是什么颜色的？\n答：胡萝卜通常是",
+   "greedy": "橙色的。\n问：胡萝卜的",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的。\n问：胡萝卜通常",
+    "橙色的。人们经常将其作为",
+    "橙色的。\n问：胡萝卜的",
+    "橙色的。\n问：胡萝卜的",
+    "橙色的。不过，胡萝卜的"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "vegetable.eggplant",
+   "zh": "茄子",
+   "en": "eggplant",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：茄子通常是什么颜色的？\n答：茄子通常是",
+   "greedy": "紫色的。\n问：茄子的形状",
+   "greedy_label": "purple",
+   "samples": [
+    "紫色的，但是也有其他颜色的",
+    "紫色或深紫色的。\n问：",
+    "紫色的。\n\n问：茄子通常是什么",
+    "紫色的。\n问：茄子的形状",
+    "紫色的。但有时也会有其他"
+   ],
+   "sample_labels": {
+    "purple": 5
+   }
+  },
+  {
+   "id": "vegetable.pumpkin",
+   "zh": "南瓜",
+   "en": "pumpkin",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：南瓜通常是什么颜色的？\n答：南瓜通常是",
+   "greedy": "橙色的。\n问：南瓜通常",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的。\n问：南瓜通常",
+    "橙色的。但有些种类可能",
+    "橙色的。但有些品种的",
+    "橙色的。\n问：南瓜的",
+    "橙色的，但有些品种可以"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "vegetable.corn",
+   "zh": "玉米",
+   "en": "corn",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：玉米通常是什么颜色的？\n答：玉米通常是",
+   "greedy": "黄色的。\n问：玉米通常是什么",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是也有其他颜色，",
+    "黄色或白色。但玉米的颜色可能",
+    "黄色的，但有时也可以是白色",
+    "黄色的。\n问：那玉米的",
+    "黄色的，但也有白色和红色"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "vegetable.garlic",
+   "zh": "大蒜",
+   "en": "garlic",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：大蒜通常是什么颜色的？\n答：大蒜通常是",
+   "greedy": "白色或浅黄色的。\n问：",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅黄色的。\n问：",
+    "白色或浅黄色的。\n问：",
+    "白色或浅黄色的，但也可以",
+    "白色或浅黄色的。\n问：",
+    "白色的。\n那问题来了，如果我"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "vegetable.spinach",
+   "zh": "菠菜",
+   "en": "spinach",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：菠菜通常是什么颜色的？\n答：菠菜通常是",
+   "greedy": "深绿色的。\n问：菠菜",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的。\n问：菠菜通常",
+    "深绿色的。这是因为它含有丰富的",
+    "深绿色的。\n问题是，当菠",
+    "深绿色的。\n问：菠菜",
+    "深绿色的。\n问：绿茶的"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.broccoli",
+   "zh": "西兰花",
+   "en": "broccoli",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：西兰花通常是什么颜色的？\n答：西兰花通常是",
+   "greedy": "绿色的。\n问：西兰花的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种可能会呈现",
+    "绿色或紫色的。\n问：西",
+    "绿色的。\n\n问：西兰花的",
+    "绿色的。\n问：西兰花的",
+    "绿色的。但有时也会有紫色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cauliflower",
+   "zh": "花椰菜",
+   "en": "cauliflower",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：花椰菜通常是什么颜色的？\n答：花椰菜通常是",
+   "greedy": "白色或浅黄色的，但有时",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅黄色的。\n问：",
+    "白色的或淡绿色的。\n问：",
+    "白色或浅黄色的，但也可以",
+    "白色或浅黄色的。\n问：",
+    "白色的。\n那花椰菜是不是白色的"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "vegetable.celery",
+   "zh": "芹菜",
+   "en": "celery",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：芹菜通常是什么颜色的？\n答：芹菜通常是",
+   "greedy": "绿色的。\n问：芹菜的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种可能会呈现",
+    "绿色或紫色的。\n问：芹",
+    "绿色的，但有时可能呈现出白色",
+    "绿色的。但有时会看到紫色",
+    "绿色的。但有时也会有紫色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.lettuce",
+   "zh": "生菜",
+   "en": "lettuce",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：生菜通常是什么颜色的？\n答：生菜通常是",
+   "greedy": "绿色的。\n问：生菜的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是也有其他颜色的",
+    "绿色的。\n\n问：生菜通常",
+    "绿色的。\n\n问：生菜的",
+    "绿色的。\n问：生菜的",
+    "绿色的。但有时也会有红色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cabbage",
+   "zh": "卷心菜",
+   "en": "cabbage",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：卷心菜通常是什么颜色的？\n答：卷心菜通常是",
+   "greedy": "绿色的，但有时也可以是紫色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是也有其他颜色的",
+    "绿色或白色。卷心菜又",
+    "绿色的，但有时也可以是紫色",
+    "绿色的，但有时也可以是紫色",
+    "绿色的，但有时也可以是红色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.chili",
+   "zh": "辣椒",
+   "en": "chili",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：辣椒通常是什么颜色的？\n答：辣椒通常是",
+   "greedy": "红色的。\n问：那如果辣椒",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是也有其他颜色，",
+    "红色或橙色的。\n问：",
+    "红色的。\n\n问：辣椒通常是什么",
+    "红色的。\n问题是，为什么辣椒通常是",
+    "红色的。但有时它们也可以是"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "vegetable.pea",
+   "zh": "豌豆",
+   "en": "pea",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：豌豆通常是什么颜色的？\n答：豌豆通常是",
+   "greedy": "绿色的，但有时也会有黄色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的外壳通常是",
+    "绿色或灰色的。\n问：豌",
+    "绿色的，但有时可能呈现黄色",
+    "绿色的，但也可以是黄色或",
+    "绿色的，但有时也会是黄色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.asparagus",
+   "zh": "芦笋",
+   "en": "asparagus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：芦笋通常是什么颜色的？\n答：芦笋通常是",
+   "greedy": "绿色的。\n问：芦笋的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它被煮",
+    "绿色或黄色的。\n问：芦",
+    "绿色的。\n\n问：芦笋的",
+    "绿色的。但有时会因为品种",
+    "绿色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.okra",
+   "zh": "秋葵",
+   "en": "okra",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：秋葵通常是什么颜色的？\n答：秋葵通常是",
+   "greedy": "绿色的，但也可以有其他颜色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟时",
+    "绿色或深绿色的，但根据",
+    "绿色的，但有时可能呈现出白色",
+    "绿色的，但也可以有其他颜色",
+    "绿色的，但有时也会有红色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.chive",
+   "zh": "韭菜",
+   "en": "chive",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：韭菜通常是什么颜色的？\n答：韭菜通常是",
+   "greedy": "绿色的。\n问：韭菜的叶子",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟时",
+    "绿色的。\n\n问：韭菜通常是什么",
+    "绿色的。\n\n问：韭菜通常是什么",
+    "绿色的。\n问：那如果韭菜",
+    "绿色的。但有时在特定的"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.yam",
+   "zh": "山药",
+   "en": "yam",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：山药通常是什么颜色的？\n答：山药通常是",
+   "greedy": "白色或浅黄色的，但有些",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅黄色的。\n问：",
+    "白色或淡黄色的。\n问：",
+    "淡黄色或浅褐色的，但",
+    "白色或浅黄色的。\n问：",
+    "黄色或白色。不过，不同品种"
+   ],
+   "sample_labels": {
+    "white": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "vegetable.bitter-melon",
+   "zh": "苦瓜",
+   "en": "bitter melon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：苦瓜通常是什么颜色的？\n答：苦瓜通常是",
+   "greedy": "绿色的，但成熟后会变成",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但在成熟后会变成",
+    "绿色或黄色的。\n问：苦",
+    "绿色的，成熟后可能会变成黄色",
+    "绿色的，但也可以有其他颜色",
+    "绿色的，但成熟后会变成"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.loofah",
+   "zh": "丝瓜",
+   "en": "loofah",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：丝瓜通常是什么颜色的？\n答：丝瓜通常是",
+   "greedy": "绿色的，但有时也会有黄色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当丝瓜成熟",
+    "绿色的。\n\n问：丝瓜通常",
+    "绿色的，但有时可能呈现出黄色",
+    "绿色的，但有时会呈现黄色",
+    "绿色的，但有时也可能呈现黄色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.bean-sprout",
+   "zh": "豆芽",
+   "en": "bean sprout",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：豆芽通常是什么颜色的？\n答：豆芽通常是",
+   "greedy": "白色的，但有时会因为品种或",
+   "greedy_label": "white",
+   "samples": [
+    "白色的。\n问：豆芽通常是什么",
+    "白色的或淡绿色的。\n问：",
+    "白色或浅黄色的，但有时",
+    "白色的。那如果是豆芽菜，",
+    "白色的。\n那为什么豆芽会是"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "vegetable.artichoke",
+   "zh": "洋蓟",
+   "en": "artichoke",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：洋蓟通常是什么颜色的？\n答：洋蓟通常是",
+   "greedy": "绿色的，但有时也会有紫色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它的花序在",
+    "绿色或紫色的。\n问：洋",
+    "绿色的，但有时可能呈现出紫色",
+    "绿色的，但有时会呈现紫色",
+    "绿色的，但有时也会有紫色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.edamame",
+   "zh": "毛豆",
+   "en": "edamame",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：毛豆通常是什么颜色的？\n答：毛豆通常是",
+   "greedy": "绿色的，但有时也会有其他",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种可能会呈现",
+    "绿色或黑色的。\n问：毛",
+    "绿色的，因为毛豆是未",
+    "绿色的，但有时会呈现黄色",
+    "绿色的，但有时也可能呈现黄色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.celtuce",
+   "zh": "莴笋",
+   "en": "celtuce",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：莴笋通常是什么颜色的？\n答：莴笋通常是",
+   "greedy": "绿色的，但有时也可能呈现白色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是也有其他颜色的",
+    "绿色或白色的。绿色的莴笋",
+    "绿色的，但有时可能呈现出白色",
+    "绿色的，但有时会呈现白色",
+    "绿色的，但有时也可能出现白色的"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cilantro",
+   "zh": "香菜",
+   "en": "cilantro",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：香菜通常是什么颜色的？\n答：香菜通常是",
+   "greedy": "绿色的。\n问：香菜的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种可能会呈现",
+    "绿色或紫色的。\n问：香",
+    "绿色的。\n\n问：香菜的",
+    "绿色的。\n问：香菜的",
+    "绿色的。但有时在某些品种"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.scallion",
+   "zh": "葱",
+   "en": "scallion",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：葱通常是什么颜色的？\n答：葱通常是",
+   "greedy": "绿色的。\n问：那如果葱",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它被切",
+    "绿色或白色的。人们在日常生活中",
+    "绿色的，但有时可能有白色",
+    "绿色的。\n问：那如果它",
+    "绿色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.zucchini",
+   "zh": "西葫芦",
+   "en": "zucchini",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：西葫芦通常是什么颜色的？\n答：西葫芦通常是",
+   "greedy": "绿色的，但有时也会有黄色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它成熟时",
+    "绿色的。\n\n问：西葫芦的",
+    "绿色的，但有时可能呈现出黄色",
+    "绿色的，但有时会呈现黄色",
+    "绿色的，但有时也会出现黄色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.potato",
+   "zh": "土豆",
+   "en": "potato",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：土豆通常是什么颜色的？\n答：土豆通常是",
+   "greedy": "______的。\nA. �",
+   "greedy_label": null,
+   "samples": [
+    "黄色的。\n但是，如果土豆是",
+    "______的。\nA. �",
+    "黄色的。\n\n这个回答正确吗？",
+    "黄色的。\n这个问题的答案是否正确？",
+    "黄色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "yellow": 4,
+    "None": 1
+   }
+  },
+  {
+   "id": "vegetable.ginger",
+   "zh": "生姜",
+   "en": "ginger",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：生姜通常是什么颜色的？\n答：生姜通常是",
+   "greedy": "橙红色的。\n问：生姜的",
+   "greedy_label": "orange",
+   "samples": [
+    "橙红色的。\n问：生姜通常",
+    "橙红色的。但有时也会有",
+    "橙红色的。\n问：那么，",
+    "姜黄色。\n问：那如果生姜",
+    "橙红色的，有时也可能呈现红色"
+   ],
+   "sample_labels": {
+    "orange": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "vegetable.beet",
+   "zh": "甜菜",
+   "en": "beet",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：甜菜通常是什么颜色的？\n答：甜菜通常是",
+   "greedy": "红色的。\n问：甜菜通常",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是有些品种可能呈现",
+    "紫色或红色的。\n问：甜",
+    "红色的。\n\n问：甜菜的",
+    "红色的。\n问题是，为什么甜菜",
+    "红色的。但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "red": 4,
+    "purple": 1
+   }
+  },
+  {
+   "id": "vegetable.shiitake",
+   "zh": "香菇",
+   "en": "shiitake",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：香菇通常是什么颜色的？\n答：香菇通常是",
+   "greedy": "褐色的，但有时也会出现其他",
+   "greedy_label": "brown",
+   "samples": [
+    "褐色的，但是有时也会呈现其他",
+    "褐色或深褐色的。\n问：",
+    "褐色的，但有时可能呈现出白色",
+    "褐色或深褐色的，表面有",
+    "褐色或深褐色的。\n问："
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.elephant",
+   "zh": "大象",
+   "en": "elephant",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：大象通常是什么颜色的？\n答：大象通常是",
+   "greedy": "灰色的。\n问：那为什么有些",
+   "greedy_label": "gray",
+   "samples": [
+    "灰色的，但是有些大象的皮肤",
+    "灰色或黑色的。\n问：大象",
+    "灰色的，因为它们的皮肤上",
+    "灰色的。\n问：为什么大象是",
+    "灰的，但有时它们也会有"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.mouse",
+   "zh": "老鼠",
+   "en": "mouse",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：老鼠通常是什么颜色的？\n答：老鼠通常是",
+   "greedy": "灰色的。\n问：那如果老鼠",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的。\n问：老鼠通常",
+    "灰褐色的，但不同种类和",
+    "灰褐色的，但不同种类的",
+    "灰褐色的。\n问：老鼠的",
+    "灰褐色的，但它们的颜色会"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.polar-bear",
+   "zh": "北极熊",
+   "en": "polar bear",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：北极熊通常是什么颜色的？\n答：北极熊通常是",
+   "greedy": "白色的。\n问：北极熊的毛",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅色的。\n问：",
+    "白色的或淡黄色的。\n问：",
+    "白色或浅色的，但它们",
+    "白色的。那为什么北极熊不是黑色",
+    "白色的。\n问：北极熊的毛"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "mammal.giraffe",
+   "zh": "长颈鹿",
+   "en": "giraffe",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：长颈鹿通常是什么颜色的？\n答：长颈鹿通常是",
+   "greedy": "棕色的。\n问：长颈鹿",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的，但是它们的毛发",
+    "棕褐色的，但不同种类和",
+    "灰褐色的，但它们的毛",
+    "棕色或浅棕色的。\n问：",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.lion",
+   "zh": "狮子",
+   "en": "lion",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：狮子通常是什么颜色的？\n答：狮子通常是",
+   "greedy": "橙色的，但有时也会有",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的，但不同品种和",
+    "金色或橙色的。\n问：",
+    "橙色的，但有时也可能是",
+    "橙色的。\n问：那为什么",
+    "橙色的，因为它们的毛"
+   ],
+   "sample_labels": {
+    "orange": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "mammal.tiger",
+   "zh": "老虎",
+   "en": "tiger",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：老虎通常是什么颜色的？\n答：老虎通常是",
+   "greedy": "橙色的，但也有其他颜色",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的，但不同亚种",
+    "橙色的，但也有其他颜色",
+    "橘色的，但也有其他颜色",
+    "橙色的，因为它们有橙",
+    "橙色的，因为它们的毛"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "mammal.rabbit",
+   "zh": "兔子",
+   "en": "rabbit",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：兔子通常是什么颜色的？\n答：兔子通常是",
+   "greedy": "白色的、灰色的或棕色的。\n",
+   "greedy_label": "white",
+   "samples": [
+    "棕色的，但是有些种类的兔子",
+    "白色的或灰色的。\n问：兔子",
+    "灰褐色的，但也有白色、",
+    "白色的、灰色的或棕色的。",
+    "灰的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "white": 2,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.horse",
+   "zh": "马",
+   "en": "horse",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：马通常是什么颜色的？\n答：马通常是",
+   "greedy": "棕色的。\n问：马的耳朵",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的。\n但是，这个回答不",
+    "褐色或灰色的。\n问：马",
+    "棕色的。\n\n问题：这个答案是否",
+    "棕色的。\n问题是，为什么马通常是",
+    "棕色的。\n但事实上，马的颜色"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.rhino",
+   "zh": "犀牛",
+   "en": "rhino",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：犀牛通常是什么颜色的？\n答：犀牛通常是",
+   "greedy": "**黑色**或**棕褐色**",
+   "greedy_label": "black",
+   "samples": [
+    "棕色的，但是它们的皮毛",
+    "棕褐色的，但不同种类的",
+    "淡褐色或浅灰色的，它们",
+    "棕褐色或黑色的。\n问：",
+    "灰褐色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.gorilla",
+   "zh": "大猩猩",
+   "en": "gorilla",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：大猩猩通常是什么颜色的？\n答：大猩猩通常是",
+   "greedy": "黑色的，但它们的毛发",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的，但是它们的毛发",
+    "黑色或灰色的。\n问：大",
+    "**黑色**的，但它们的",
+    "深棕色或黑色的，但它们",
+    "黑色的，但它们的毛发"
+   ],
+   "sample_labels": {
+    "black": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "mammal.monkey",
+   "zh": "猴子",
+   "en": "monkey",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：猴子通常是什么颜色的？\n答：猴子通常是",
+   "greedy": "棕色的。\n问：猴子的毛",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的。\n问：猴子的毛",
+    "棕褐色的。但不同种类的",
+    "棕色的。\n\n问：猴子通常是什么",
+    "棕色的。\n问：那如果猴子",
+    "棕色的。\n但事实上，猴子的"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.squirrel",
+   "zh": "松鼠",
+   "en": "squirrel",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：松鼠通常是什么颜色的？\n答：松鼠通常是",
+   "greedy": "棕色或灰色的，但有些种类",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色或灰色的。不同种类的",
+    "棕褐色的，但不同种类可能",
+    "灰褐色的，但也有其他颜色",
+    "棕色或灰色的，但它们的颜色",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.hedgehog",
+   "zh": "刺猬",
+   "en": "hedgehog",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：刺猬通常是什么颜色的？\n答：刺猬通常是",
+   "greedy": "灰褐色的，但不同种类的",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色或棕色的。\n问：",
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但也有其他颜色",
+    "灰褐色或棕色的，但也有",
+    "灰褐色或黑色的，但不同"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.koala",
+   "zh": "考拉",
+   "en": "koala",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：考拉通常是什么颜色的？\n答：考拉通常是",
+   "greedy": "灰褐色的，但它们的毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同个体可能",
+    "灰褐色的，但它们的毛",
+    "灰褐色的，但有时也会有",
+    "灰褐色的。\n问：考拉",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.wolf",
+   "zh": "狼",
+   "en": "wolf",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：狼通常是什么颜色的？\n答：狼通常是",
+   "greedy": "灰色的，但也有其他颜色的",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同品种和",
+    "灰褐色的，但不同种类和",
+    "灰褐色的，但也有其他颜色",
+    "灰褐色的。\n问：狼的",
+    "灰褐色的，但它们的颜色可以"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.yak",
+   "zh": "牦牛",
+   "en": "yak",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：牦牛通常是什么颜色的？\n答：牦牛通常是",
+   "greedy": "棕褐色或黑色的。\n问：",
+   "greedy_label": "brown",
+   "samples": [
+    "黑白相间的，但不同品种和",
+    "黑白或棕白相间的颜色。\n",
+    "灰白色的，但有时可能有黑色",
+    "灰白色的，但有时会是黑色",
+    "灰白色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "black": 2,
+    "gray": 3
+   }
+  },
+  {
+   "id": "mammal.sheep",
+   "zh": "绵羊",
+   "en": "sheep",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：绵羊通常是什么颜色的？\n答：绵羊通常是",
+   "greedy": "白色、灰色或棕色的。\n问",
+   "greedy_label": "white",
+   "samples": [
+    "白色、灰色或黑色的。\n\n问",
+    "白色或灰色的。\n问：绵",
+    "白色、灰色或黑色的，但",
+    "白色、灰色或棕色的。不过",
+    "白色或灰色的。\n问：绵"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "mammal.otter",
+   "zh": "水獭",
+   "en": "otter",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：水獭通常是什么颜色的？\n答：水獭通常是",
+   "greedy": "灰褐色的，但它们的毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但可能有白色",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.sloth",
+   "zh": "树懒",
+   "en": "sloth",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：树懒通常是什么颜色的？\n答：树懒通常是",
+   "greedy": "绿色的，因为它们的毛发",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，因为它们的毛发",
+    "绿色或灰色的。\n问：树",
+    "绿色的，因为它们的毛发",
+    "绿色或棕色的，这与它们",
+    "灰褐色或深褐色的。\n\n树"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "mammal.pangolin",
+   "zh": "穿山甲",
+   "en": "pangolin",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：穿山甲通常是什么颜色的？\n答：穿山甲通常是",
+   "greedy": "棕褐色或黑色的，它们的",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色或灰色的，它们的鳞",
+    "棕褐色的，背部有条状",
+    "灰褐色的，但不同种类的",
+    "灰褐色或棕褐色的。它们",
+    "灰褐色或深褐色的。\n\n问"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.armadillo",
+   "zh": "犰狳",
+   "en": "armadillo",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：犰狳通常是什么颜色的？\n答：犰狳通常是",
+   "greedy": "棕色或灰色的，但它们的",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色、灰色或黑色的，但",
+    "棕褐色的，但不同种类可能",
+    "棕色、灰色或黑色的，它们",
+    "棕色、灰色或黑色的，它们",
+    "灰褐色或深褐色的。\n\n问"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.porcupine",
+   "zh": "豪猪",
+   "en": "porcupine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：豪猪通常是什么颜色的？\n答：豪猪通常是",
+   "greedy": "灰褐色的，但它们的毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色或棕褐色的。\n\n豪",
+    "棕褐色的，但不同种类可能",
+    "灰褐色的，但可能有白色",
+    "灰褐色或棕褐色的。它们",
+    "灰褐色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.badger",
+   "zh": "獾",
+   "en": "badger",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：獾通常是什么颜色的？\n答：獾通常是",
+   "greedy": "棕褐色或黑色的，但不同",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色或黑色的。\n问：",
+    "棕褐色的，但不同种类可能",
+    "灰褐色的，但可能有白色",
+    "灰褐色或棕褐色的。它们",
+    "灰褐色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.beaver",
+   "zh": "河狸",
+   "en": "beaver",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：河狸通常是什么颜色的？\n答：河狸通常是",
+   "greedy": "棕褐色的，但有时也会有",
+   "greedy_label": "brown",
+   "samples": [
+    "棕褐色的，但不同品种可能",
+    "棕褐色的，但不同种类和",
+    "灰褐色的，但有时也可能是",
+    "棕褐色的。\n问：河狸",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.moose",
+   "zh": "驼鹿",
+   "en": "moose",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：驼鹿通常是什么颜色的？\n答：驼鹿通常是",
+   "greedy": "灰褐色的，但它们的毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同亚种",
+    "棕褐色的，但它们的毛",
+    "灰褐色的，但它们的毛",
+    "灰白色的，但有时会因为季节",
+    "灰白色的，但它们的毛发"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "gray": 2
+   }
+  },
+  {
+   "id": "mammal.camel",
+   "zh": "骆驼",
+   "en": "camel",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：骆驼通常是什么颜色的？\n答：骆驼通常是",
+   "greedy": "黄色或棕色的。\n问：骆",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是它们的皮毛",
+    "黄色或棕色的。\n问：骆",
+    "黄色的，因为它们的皮肤和",
+    "黄色或棕色的，但它们的颜色",
+    "灰白色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "yellow": 4,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.fox",
+   "zh": "狐狸",
+   "en": "fox",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：狐狸通常是什么颜色的？\n答：狐狸通常是",
+   "greedy": "灰色的，但它们的毛色",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同品种和",
+    "褐色或灰色的。\n问：秃",
+    "灰褐色的，但也有其他颜色",
+    "灰褐色的。\n问：狐狸的",
+    "灰褐色的，但它们的颜色可以"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.cheetah",
+   "zh": "猎豹",
+   "en": "cheetah",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：猎豹通常是什么颜色的？\n答：猎豹通常是",
+   "greedy": "黄色的，但它们的毛色",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是它们的毛色",
+    "金色或黄褐色的。\n问：",
+    "黄色的，但有时可能有斑",
+    "黄色的，但有时会是其他",
+    "黄色的，但有时它们也会有"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "mammal.baboon",
+   "zh": "狒狒",
+   "en": "baboon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：狒狒通常是什么颜色的？\n答：狒狒通常是",
+   "greedy": "灰色的，但有些品种可能有",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同亚种",
+    "棕褐色的，但不同种类和",
+    "灰褐色的，但不同种类的",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.weasel",
+   "zh": "鼬",
+   "en": "weasel",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鼬通常是什么颜色的？\n答：鼬通常是",
+   "greedy": "灰色的。\n问：鼬的毛",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但可能根据品种",
+    "灰褐色的。\n问：鼬的",
+    "灰褐色的，但它们的毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.crow",
+   "zh": "乌鸦",
+   "en": "crow",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：乌鸦通常是什么颜色的？\n答：乌鸦通常是",
+   "greedy": "黑色的。\n问：乌鸦的",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的。\n问：乌鸦的",
+    "黑色的。\n\n问：乌鸦的",
+    "黑色的。\n\n问：乌鸦的",
+    "黑色的。\n问：乌鸦的",
+    "黑色的。但有时它们可能会有"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "bird.swan",
+   "zh": "天鹅",
+   "en": "swan",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：天鹅通常是什么颜色的？\n答：天鹅通常是",
+   "greedy": "白色的。\n问：天鹅的羽毛是",
+   "greedy_label": "white",
+   "samples": [
+    "白色的。\n\n问：那如果天鹅不是",
+    "白色的。\n\n问：人们通常用什么",
+    "白色的。但有些种类可能有黑色",
+    "白色的。天鹅是一种大型的鸟类，",
+    "白色的。\n问：那它们的羽毛"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "bird.flamingo",
+   "zh": "火烈鸟",
+   "en": "flamingo",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：火烈鸟通常是什么颜色的？\n答：火烈鸟通常是",
+   "greedy": "粉红色的。\n问：火烈",
+   "greedy_label": "pink",
+   "samples": [
+    "粉红色的。\n问：为什么火",
+    "粉红色的。\n问：为什么火",
+    "粉红色的。\n问：火烈",
+    "粉红色的。\n问：火烈",
+    "粉红色的。\n问：它们为什么会"
+   ],
+   "sample_labels": {
+    "pink": 5
+   }
+  },
+  {
+   "id": "bird.parrot",
+   "zh": "鹦鹉",
+   "en": "parrot",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鹦鹉通常是什么颜色的？\n答：鹦鹉通常是",
+   "greedy": "绿色的，但也有其他颜色的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些种类可能有",
+    "绿色或蓝色的。\n问：鹦",
+    "绿色的，因为它们的羽毛主要",
+    "绿色的，但不同种类的鹦",
+    "绿色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "bird.sparrow",
+   "zh": "麻雀",
+   "en": "sparrow",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：麻雀通常是什么颜色的？\n答：麻雀通常是",
+   "greedy": "灰褐色的，但它们的羽毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "褐色或灰色的。\n问：麻",
+    "灰褐色的，但可能有白色",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，有黑白斑纹"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.pigeon",
+   "zh": "鸽子",
+   "en": "pigeon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鸽子通常是什么颜色的？\n答：鸽子通常是",
+   "greedy": "灰白色的，但有些品种可能有",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同品种和",
+    "灰蓝色的，但不同种类和",
+    "灰白色的，但有时可能有其他",
+    "灰白色的，但有时会因为品种",
+    "灰白色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "brown": 1,
+    "gray": 4
+   }
+  },
+  {
+   "id": "bird.eagle",
+   "zh": "老鹰",
+   "en": "eagle",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：老鹰通常是什么颜色的？\n答：老鹰通常是",
+   "greedy": "褐色的，但它们的羽毛颜色",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色或灰色的，不同种类的老",
+    "褐色或灰色的。\n问：老",
+    "灰褐色的，这有助于它们在",
+    "深褐色或灰色的，但它们",
+    "灰褐色的，有深浅不"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.owl",
+   "zh": "猫头鹰",
+   "en": "owl",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：猫头鹰通常是什么颜色的？\n答：猫头鹰通常是",
+   "greedy": "灰的，但有些品种可能有",
+   "greedy_label": "gray",
+   "samples": [
+    "灰颜色的。\n问：猫头",
+    "黑白或灰褐色的。\n问：",
+    "灰褐色的，这有助于它们在",
+    "灰白色的，但不同种类的猫",
+    "灰白色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "black": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "bird.peacock",
+   "zh": "孔雀",
+   "en": "peacock",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：孔雀通常是什么颜色的？\n答：孔雀通常是",
+   "greedy": "蓝色和绿色的，但有时也会",
+   "greedy_label": "blue",
+   "samples": [
+    "蓝色和绿色的，但有时候也会",
+    "蓝色或绿色的。\n问：孔雀",
+    "蓝色和绿色的。\n问：它们",
+    "蓝色和绿色的，但有时也",
+    "蓝色和绿色的。\n问：孔雀"
+   ],
+   "sample_labels": {
+    "blue": 5
+   }
+  },
+  {
+   "id": "bird.falcon",
+   "zh": "隼",
+   "en": "falcon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：隼通常是什么颜色的？\n答：隼通常是",
+   "greedy": "褐色或灰色的，但不同种类",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "褐色或灰色的。\n问：秃",
+    "灰褐色的，这有助于它们在",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，有条纹和"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.hummingbird",
+   "zh": "蜂鸟",
+   "en": "hummingbird",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蜂鸟通常是什么颜色的？\n答：蜂鸟通常是",
+   "greedy": "绿色的，但它们的羽毛颜色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的羽毛颜色",
+    "绿色或蓝色的。\n问：蜂",
+    "绿色的，但有时可能有其它",
+    "绿色的，但不同种类的蜂",
+    "绿色的，但它们的羽毛颜色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "bird.seagull",
+   "zh": "海鸥",
+   "en": "seagull",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海鸥通常是什么颜色的？\n答：海鸥通常是",
+   "greedy": "白色或灰色的。\n问：海",
+   "greedy_label": "white",
+   "samples": [
+    "灰蓝色或白色。不同种类的",
+    "黑白或灰蓝色调的，但",
+    "灰蓝色的，但可能有白色",
+    "灰蓝色或白色，取决于种类和",
+    "灰蓝色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "black": 1
+   }
+  },
+  {
+   "id": "bird.pelican",
+   "zh": "鹈鹕",
+   "en": "pelican",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鹈鹕通常是什么颜色的？\n答：鹈鹕通常是",
+   "greedy": "灰蓝色的，但它们的羽毛",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "灰蓝色的，但不同种类可能",
+    "灰褐色的，但可能有白色",
+    "灰蓝色或银色的，它们",
+    "灰蓝色或深蓝色的。\n\n问"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "gray": 3
+   }
+  },
+  {
+   "id": "bird.swallow",
+   "zh": "燕子",
+   "en": "swallow",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：燕子通常是什么颜色的？\n答：燕子通常是",
+   "greedy": "黑色和白色的，但不同种类的",
+   "greedy_label": "black",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "褐色或灰色的。\n问：燕",
+    "灰褐色的，但不同种类的",
+    "灰褐色的。\n问：燕子",
+    "灰褐色的，有黑色的翅膀"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.vulture",
+   "zh": "秃鹫",
+   "en": "vulture",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：秃鹫通常是什么颜色的？\n答：秃鹫通常是",
+   "greedy": "灰褐色的，但它们的羽毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "灰或白色的。它们的羽毛颜色",
+    "灰褐色的，但可能有白色",
+    "灰白色的，但有时会呈现不同的",
+    "灰白色的，但有时它们的羽毛"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "gray": 3
+   }
+  },
+  {
+   "id": "bird.raven",
+   "zh": "渡鸦",
+   "en": "raven",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：渡鸦通常是什么颜色的？\n答：渡鸦通常是",
+   "greedy": "黑色的，但有时它们的羽毛",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的，但是它们的羽毛在",
+    "黑白或灰蓝色调的，但",
+    "黑褐色的，但有时会呈现",
+    "黑白色的，但有时会有一些灰色",
+    "黑色的，但有时它们的羽毛"
+   ],
+   "sample_labels": {
+    "black": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "bird.thrush",
+   "zh": "画眉",
+   "en": "thrush",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：画眉通常是什么颜色的？\n答：画眉通常是",
+   "greedy": "绿色的，但有时也会有其他",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是也有其他颜色的",
+    "褐色或灰色的。\n问：画",
+    "绿色的，但有时可能有其它",
+    "绿色的，但有时会呈现其他",
+    "褐色或黑色的。\n问：画"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "brown": 2
+   }
+  },
+  {
+   "id": "bird.quail",
+   "zh": "鹌鹑",
+   "en": "quail",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鹌鹑通常是什么颜色的？\n答：鹌鹑通常是",
+   "greedy": "灰褐色的，但它们的羽毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "褐色或灰褐色的，尤其是野生",
+    "灰褐色的，这有助于它们在",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，这种颜色有助于它们"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.lark",
+   "zh": "云雀",
+   "en": "lark",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：云雀通常是什么颜色的？\n答：云雀通常是",
+   "greedy": "蓝色的。\n问：云雀的",
+   "greedy_label": "blue",
+   "samples": [
+    "灰蓝色或灰绿色的。\n\n问",
+    "蓝色或灰色的。\n问：云",
+    "灰褐色的，但可能有白色",
+    "灰蓝色或银色的。它们",
+    "灰蓝色或深蓝色的。\n\n问"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "blue": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "bird.nightingale",
+   "zh": "夜莺",
+   "en": "nightingale",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：夜莺通常是什么颜色的？\n答：夜莺通常是",
+   "greedy": "绿色的，但它们的羽毛颜色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的羽毛颜色",
+    "褐色或灰色的。\n问：夜",
+    "灰褐色的，这有助于它们在",
+    "灰褐色的。\n夜莺的特点是什么",
+    "灰褐色的，有深色的"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "bird.heron",
+   "zh": "苍鹭",
+   "en": "heron",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：苍鹭通常是什么颜色的？\n答：苍鹭通常是",
+   "greedy": "灰蓝色的，但有时也会有",
+   "greedy_label": "gray",
+   "samples": [
+    "灰蓝色或银灰色的。\n\n问",
+    "灰蓝色的，但不同种类可能",
+    "灰白色的，但有时可能有黑色",
+    "灰白色的，但有时会呈现浅",
+    "灰白色的，但有时它们的羽毛"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.pheasant",
+   "zh": "野鸡",
+   "en": "pheasant",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：野鸡通常是什么颜色的？\n答：野鸡通常是",
+   "greedy": "褐色的，带有斑点和条",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的，带有斑点和条",
+    "褐色或灰色的，它们的羽毛",
+    "褐色的，带有深色的斑",
+    "褐色或灰色的，带有斑点",
+    "灰褐色的，有条纹和"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.myna",
+   "zh": "八哥",
+   "en": "myna",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：八哥通常是什么颜色的？\n答：八哥通常是",
+   "greedy": "绿色的，因为它们的羽毛主要",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，因为它们的羽毛主要",
+    "绿色或蓝色的。\n问：八",
+    "绿色的，因为它们属于鸟纲",
+    "绿色的，但不同品种和个体",
+    "绿色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "bird.albatross",
+   "zh": "信天翁",
+   "en": "albatross",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：信天翁通常是什么颜色的？\n答：信天翁通常是",
+   "greedy": "白色或灰白色的，但它们的",
+   "greedy_label": "white",
+   "samples": [
+    "灰蓝色或白色，不同种类可能",
+    "黑白或灰白色的。\n问：信",
+    "灰白色的，但有时可能有黑色",
+    "灰白色的，但不同种类可能有",
+    "灰白色的，但不同种类可能会有不同的"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "black": 1
+   }
+  },
+  {
+   "id": "bird.cormorant",
+   "zh": "鸬鹚",
+   "en": "cormorant",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鸬鹚通常是什么颜色的？\n答：鸬鹚通常是",
+   "greedy": "黑色的，但它们的羽毛颜色",
+   "greedy_label": "black",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "黑白或灰蓝色调的。它们",
+    "灰褐色的，但可能有白色",
+    "灰黑色的。\n问：鸬鹚",
+    "灰蓝色的，但它们的羽毛"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "black": 1,
+    "gray": 2
+   }
+  },
+  {
+   "id": "bird.partridge",
+   "zh": "鹧鸪",
+   "en": "partridge",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鹧鸪通常是什么颜色的？\n答：鹧鸪通常是",
+   "greedy": "褐色或灰色的，它们的羽毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "褐色或灰色的。\n问：鹧",
+    "灰褐色的，但可能有白色",
+    "灰褐色的。\n问：鹧鸪",
+    "灰褐色的，有条纹和"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.ostrich",
+   "zh": "鸵鸟",
+   "en": "ostrich",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鸵鸟通常是什么颜色的？\n答：鸵鸟通常是",
+   "greedy": "褐色的，但它们的羽毛颜色",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同亚种",
+    "褐色或灰色的。\n问：秃",
+    "灰褐色的，但它们的羽毛",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，但它们的羽毛"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.starling",
+   "zh": "椋鸟",
+   "en": "starling",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：椋鸟通常是什么颜色的？\n答：椋鸟通常是",
+   "greedy": "黑色的。\n问：椋鸟的",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的，但是有些种类可能会有",
+    "黑色或深蓝色的。\n问：",
+    "黑色的。\n\n问：椋鸟的",
+    "黑色的。\n问：椋鸟的",
+    "黑色的，但有些种类可能会有"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "bird.sandpiper",
+   "zh": "鹬",
+   "en": "sandpiper",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鹬通常是什么颜色的？\n答：鹬通常是",
+   "greedy": "灰褐色的，这有助于它们在",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，它们的羽毛颜色",
+    "褐色或灰色的。\n问：它们",
+    "灰褐色的，这有助于它们在",
+    "灰褐色的。\n问：它们的",
+    "灰褐色的，这种颜色有助于它们"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.turtledove",
+   "zh": "斑鸠",
+   "en": "turtledove",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：斑鸠通常是什么颜色的？\n答：斑鸠通常是",
+   "greedy": "灰褐色的，但它们的羽毛",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但不同种类可能",
+    "灰褐色的，但可能有白色",
+    "灰褐色的。\n问：斑鸠",
+    "灰褐色的，有条纹和"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.shark",
+   "zh": "鲨鱼",
+   "en": "shark",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲨鱼通常是什么颜色的？\n答：鲨鱼通常是",
+   "greedy": "灰褐色的，这有助于它们在",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色的，这有助于它们在",
+    "灰褐色的，这是为了帮助它们",
+    "灰褐色的，这有助于它们在",
+    "灰褐色或深褐色的，这",
+    "灰褐色的，这种颜色有助于它们"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.whale",
+   "zh": "鲸鱼",
+   "en": "whale",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲸鱼通常是什么颜色的？\n答：鲸鱼通常是",
+   "greedy": "灰色的。\n问：鲸鱼的",
+   "greedy_label": "gray",
+   "samples": [
+    "灰蓝色的。\n问：鲸鱼",
+    "黑白斑纹的。\n问：鲸",
+    "灰白色的，因为它们的皮肤和",
+    "灰白色的。\n问：鲸鱼的",
+    "灰白色的，但有些种类可能呈现"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "black": 1
+   }
+  },
+  {
+   "id": "aquatic.dolphin",
+   "zh": "海豚",
+   "en": "dolphin",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海豚通常是什么颜色的？\n答：海豚通常是",
+   "greedy": "蓝色的。\n问：海豚的",
+   "greedy_label": "blue",
+   "samples": [
+    "蓝色的，但是有些种类可能呈现",
+    "黑白相间的。它们的皮肤颜色",
+    "灰色的。\n\n问：海豚的",
+    "蓝色或灰色的，但它们的颜色",
+    "灰蓝色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "blue": 2,
+    "black": 1,
+    "gray": 2
+   }
+  },
+  {
+   "id": "aquatic.crab",
+   "zh": "螃蟹",
+   "en": "crab",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：螃蟹通常是什么颜色的？\n答：螃蟹通常是",
+   "greedy": "橙红色的，但不同种类的",
+   "greedy_label": "orange",
+   "samples": [
+    "绿色的。\n这个回答对吗？\n",
+    "绿色或蓝色的。\n问题是错误的",
+    "橙红色的，但不同种类的",
+    "橙红色的。\n问：螃蟹有",
+    "橙红色的，但它们的颜色可以"
+   ],
+   "sample_labels": {
+    "green": 2,
+    "orange": 3
+   }
+  },
+  {
+   "id": "aquatic.lobster",
+   "zh": "龙虾",
+   "en": "lobster",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：龙虾通常是什么颜色的？\n答：龙虾通常是",
+   "greedy": "红色的。\n问：龙虾的",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是它们的外壳颜色",
+    "红色或橙色的。\n问：",
+    "红色的。\n\n问：龙虾的",
+    "红色的。\n问：龙虾的",
+    "红色的，但有时它们可能会变成"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "aquatic.clownfish",
+   "zh": "小丑鱼",
+   "en": "clownfish",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：小丑鱼通常是什么颜色的？\n答：小丑鱼通常是",
+   "greedy": "橙色的，但有些品种可能",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色的，但不同种类可能",
+    "橙色的，但有些种类可能",
+    "橙色的，但有些品种可能会",
+    "橙色的。\n问：小丑",
+    "橙色的，但它们的品种"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "aquatic.sea-turtle",
+   "zh": "海龟",
+   "en": "sea turtle",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海龟通常是什么颜色的？\n答：海龟通常是",
+   "greedy": "绿色的。\n问：海龟的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的壳的颜色",
+    "绿色或棕色的。\n问：它们",
+    "绿色的，因为它们的皮肤和",
+    "绿色的。\n问题是，为什么海龟",
+    "绿色的，但它们的外壳颜色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "aquatic.walrus",
+   "zh": "海象",
+   "en": "walrus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海象通常是什么颜色的？\n答：海象通常是",
+   "greedy": "灰蓝色或灰黑色的。\n问",
+   "greedy_label": "gray",
+   "samples": [
+    "灰蓝色或灰黑色的。\n\n海",
+    "灰蓝色的，但它们的毛",
+    "灰白色的。\n\n问：海象的",
+    "灰白色的。\n问：海象的",
+    "灰白色的，但有时它们的毛"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.crocodile",
+   "zh": "鳄鱼",
+   "en": "crocodile",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鳄鱼通常是什么颜色的？\n答：鳄鱼通常是",
+   "greedy": "绿色的，因为它们的皮肤和",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些种类可能会有",
+    "绿色或棕色的。\n问：鳄",
+    "绿色的，因为它们的皮肤和",
+    "绿色的，但有时会是棕色",
+    "绿色的，但它们的皮肤颜色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "aquatic.clam",
+   "zh": "蛤蜊",
+   "en": "clam",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蛤蜊通常是什么颜色的？\n答：蛤蜊通常是",
+   "greedy": "白色或淡粉色的，但它们",
+   "greedy_label": "white",
+   "samples": [
+    "灰褐色或灰绿色的，但",
+    "褐色或灰褐色的，但有些",
+    "淡粉色或浅红色的，但",
+    "淡粉色或白色，但它们的颜色",
+    "灰褐色或深褐色的。\n\n问"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "pink": 2
+   }
+  },
+  {
+   "id": "aquatic.oyster",
+   "zh": "牡蛎",
+   "en": "oyster",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：牡蛎通常是什么颜色的？\n答：牡蛎通常是",
+   "greedy": "壳呈______色，肉呈",
+   "greedy_label": null,
+   "samples": [
+    "壳颜色较深的，比如灰",
+    "壳的颜色为**灰褐色**或",
+    "**壳青绿色**，但它们",
+    "壳的颜色，但不同种类的牡",
+    "**灰褐色**或**浅褐色"
+   ],
+   "sample_labels": {
+    "gray": 1,
+    "brown": 2,
+    "green": 1,
+    "None": 1
+   }
+  },
+  {
+   "id": "aquatic.catfish",
+   "zh": "鲶鱼",
+   "en": "catfish",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲶鱼通常是什么颜色的？\n答：鲶鱼通常是",
+   "greedy": "深褐色或黑色的，带有深",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色或灰黑色的，背部",
+    "褐色或灰色的。\n问：�",
+    "灰褐色的，背部较深，",
+    "深褐色或墨绿色，带有深",
+    "灰褐色或黑色的，它们的"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.manatee",
+   "zh": "海牛",
+   "en": "manatee",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海牛通常是什么颜色的？\n答：海牛通常是",
+   "greedy": "灰色的。\n问：海牛的",
+   "greedy_label": "gray",
+   "samples": [
+    "灰褐色的。\n问：它们的",
+    "灰褐色的。\n问：海牛",
+    "灰褐色的。\n问题是关于海牛",
+    "灰褐色的。\n问：海牛",
+    "灰褐色的，但它们的皮肤"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.eel",
+   "zh": "鳗鱼",
+   "en": "eel",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鳗鱼通常是什么颜色的？\n答：鳗鱼通常是",
+   "greedy": "黑色的。\n问：鳗鱼的",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的，但是有些种类可能会有",
+    "黑色或深棕色的。\n问：",
+    "淡黄色或透明的，但它们",
+    "深褐色或黑色的，但它们",
+    "灰褐色的，这种颜色有助于它们"
+   ],
+   "sample_labels": {
+    "black": 2,
+    "yellow": 1,
+    "brown": 2
+   }
+  },
+  {
+   "id": "aquatic.octopus",
+   "zh": "章鱼",
+   "en": "octopus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：章鱼通常是什么颜色的？\n答：章鱼通常是",
+   "greedy": "蓝色、紫色或橙色的。\n",
+   "greedy_label": "blue",
+   "samples": [
+    "蓝色、紫色或橙色的，",
+    "蓝色或紫色的。\n问：章",
+    "蓝色、紫色、橙色或红色",
+    "蓝色、紫色、橙色或红色",
+    "蓝色、紫色或橙色的。\n"
+   ],
+   "sample_labels": {
+    "blue": 5
+   }
+  },
+  {
+   "id": "aquatic.swordfish",
+   "zh": "剑鱼",
+   "en": "swordfish",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：剑鱼通常是什么颜色的？\n答：剑鱼通常是",
+   "greedy": "蓝色或银色的，但它们",
+   "greedy_label": "blue",
+   "samples": [
+    "蓝绿色或银色的。\n\n问",
+    "蓝色或青色的。\n问：",
+    "蓝色的，但有时可能呈现出灰色",
+    "蓝绿色或银色的。它们",
+    "蓝色或青色的，它们的"
+   ],
+   "sample_labels": {
+    "blue": 5
+   }
+  },
+  {
+   "id": "aquatic.sea-cucumber",
+   "zh": "海参",
+   "en": "sea cucumber",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海参通常是什么颜色的？\n答：海参通常是",
+   "greedy": "棕色、灰色或黑色的，但",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色、灰色或黑色的，但",
+    "褐色或灰褐色的，但有些",
+    "淡褐色或深褐色，但它们",
+    "灰褐色或深褐色的。海",
+    "灰褐色或深褐色的。\n\n海"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.sardine",
+   "zh": "沙丁鱼",
+   "en": "sardine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：沙丁鱼通常是什么颜色的？\n答：沙丁鱼通常是",
+   "greedy": "银色的，但有时会呈现",
+   "greedy_label": "gray",
+   "samples": [
+    "呈**银白色**的，但在",
+    "银色的，但有时会呈现出",
+    "淡粉色的，有时可能呈现出橙",
+    "银色的。\n问：沙丁",
+    "橙红色的，但它们的颜色会"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "pink": 1,
+    "orange": 1
+   }
+  },
+  {
+   "id": "aquatic.tadpole",
+   "zh": "蝌蚪",
+   "en": "tadpole",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蝌蚪通常是什么颜色的？\n答：蝌蚪通常是",
+   "greedy": "黑色的。\n问：那如果蝌",
+   "greedy_label": "black",
+   "samples": [
+    "黑色的，但是有些种类的蝌",
+    "黑色或灰色的。\n问：蝌",
+    "黑色的，但有时可能有其它",
+    "黑色的。\n问题是，这种说法是否",
+    "黑色的，但有时它们可能呈现"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "aquatic.starfish",
+   "zh": "海星",
+   "en": "starfish",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：海星通常是什么颜色的？\n答：海星通常是",
+   "greedy": "橙色、紫色或红色的，",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色或红色的。\n问：",
+    "蓝色或紫色的。\n问：海",
+    "橙色的，但也有其他颜色",
+    "橙色、红色或紫色的，",
+    "橙色或紫色的。\n问："
+   ],
+   "sample_labels": {
+    "orange": 4,
+    "blue": 1
+   }
+  },
+  {
+   "id": "aquatic.squid",
+   "zh": "鱿鱼",
+   "en": "squid",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鱿鱼通常是什么颜色的？\n答：鱿鱼通常是",
+   "greedy": "黑色或深褐色的。\n问：",
+   "greedy_label": "black",
+   "samples": [
+    "黑色或深褐色的。\n问：",
+    "黑色或深蓝色的。\n问：",
+    "淡蓝色或透明的，但它们",
+    "墨绿色或墨黑色的。不过",
+    "黑色或深蓝色的。\n问："
+   ],
+   "sample_labels": {
+    "black": 3,
+    "blue": 1,
+    "green": 1
+   }
+  },
+  {
+   "id": "aquatic.sturgeon",
+   "zh": "鲟鱼",
+   "en": "sturgeon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲟鱼通常是什么颜色的？\n答：鲟鱼通常是",
+   "greedy": "深褐色或黑色的，但它们",
+   "greedy_label": "brown",
+   "samples": [
+    "灰褐色或深褐色的，背部",
+    "深褐色或黑色的，但它们",
+    "灰褐色的，但可能根据品种",
+    "深褐色或墨绿色的，这",
+    "灰褐色或深褐色的。\n\n鲟"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "aquatic.abalone",
+   "zh": "鲍鱼",
+   "en": "abalone",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲍鱼通常是什么颜色的？\n答：鲍鱼通常是",
+   "greedy": "深褐色或黑色的，但有时",
+   "greedy_label": "brown",
+   "samples": [
+    "呈**墨绿色**或**深",
+    "褐色或深绿色。\n问：鲍",
+    "呈褐色或深褐色，但它们",
+    "深褐色或墨绿色的，表面",
+    "深褐色或黑色的，但有时"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "aquatic.salamander",
+   "zh": "蝾螈",
+   "en": "salamander",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蝾螈通常是什么颜色的？\n答：蝾螈通常是",
+   "greedy": "绿色或棕色的，但它们的颜色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色、棕色或灰色的，这",
+    "绿色或棕色的。\n问：它们",
+    "绿色、棕色或灰色的，它们",
+    "绿色、棕色或灰色的。它们",
+    "绿色或棕色的。\n问：它们"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "aquatic.flounder",
+   "zh": "比目鱼",
+   "en": "flounder",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：比目鱼通常是什么颜色的？\n答：比目鱼通常是",
+   "greedy": "橙色或黄色的，但它们",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色或黄色的。\n问：",
+    "黄色或橙色的。\n问：",
+    "橙色的。\n问题是，比目",
+    "橙色或黄色的。\n问：",
+    "黄色或橙色的。\n问："
+   ],
+   "sample_labels": {
+    "orange": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "aquatic.mussel",
+   "zh": "贻贝",
+   "en": "mussel",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：贻贝通常是什么颜色的？\n答：贻贝通常是",
+   "greedy": "褐色或深褐色的，但有时",
+   "greedy_label": "brown",
+   "samples": [
+    "呈**虹彩**色的，",
+    "褐色或深褐色的。\n问：",
+    "淡褐色或浅灰色的，它们",
+    "褐色或黑色的，但有时也",
+    "灰褐色或深褐色的。\n\n问"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "aquatic.perch",
+   "zh": "鲈鱼",
+   "en": "perch",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鲈鱼通常是什么颜色的？\n答：鲈鱼通常是",
+   "greedy": "银色的，但它们的体",
+   "greedy_label": "gray",
+   "samples": [
+    "银色的，但不同品种和",
+    "银色的，但具体颜色可能",
+    "银白色的，但有时可能带有灰色",
+    "银白色的，但有时会呈现灰",
+    "灰褐色的，这种颜色有助于它们"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.trout",
+   "zh": "鳟鱼",
+   "en": "trout",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鳟鱼通常是什么颜色的？\n答：鳟鱼通常是",
+   "greedy": "绿色或蓝色的，但它们的颜色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色或褐色的，这有助于它们",
+    "褐色或灰色的。\n问：鳟",
+    "绿色或褐色的。\n问：它们",
+    "绿色或褐色的，这种颜色有助于",
+    "绿色或棕色的，它们的皮肤"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.piranha",
+   "zh": "食人鱼",
+   "en": "piranha",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：食人鱼通常是什么颜色的？\n答：食人鱼通常是",
+   "greedy": "橙红色的，但有些品种可能",
+   "greedy_label": "orange",
+   "samples": [
+    "橙色或红色的。\n问：",
+    "橙红色的，但不同种类可能",
+    "橙红色的，但有些品种可能",
+    "橙色或红色的，但有些",
+    "橙红色的，但它们的颜色可能会"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "aquatic.jellyfish",
+   "zh": "水母",
+   "en": "jellyfish",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：水母通常是什么颜色的？\n答：水母通常是",
+   "greedy": "透明的，但有些种类可能有",
+   "greedy_label": "transparent",
+   "samples": [
+    "透明的，但是有些种类可能会有",
+    "透明或半透明的，但有些",
+    "透明的，但有时可能呈现出蓝色",
+    "透明的，但有些种类可能有",
+    "透明的，但有些种类可能呈现"
+   ],
+   "sample_labels": {
+    "transparent": 5
+   }
+  },
+  {
+   "id": "plant.rose",
+   "zh": "玫瑰",
+   "en": "rose",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：玫瑰通常是什么颜色的？\n答：玫瑰通常是",
+   "greedy": "红色的，但也有其他颜色，",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是也有其他颜色，",
+    "红色的。\n\n问：玫瑰通常是什么",
+    "红色的，但也有其他颜色，",
+    "红色的，但也可以有其他颜色",
+    "红的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "plant.lily",
+   "zh": "百合",
+   "en": "lily",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：百合通常是什么颜色的？\n答：百合通常是",
+   "greedy": "白色，但也有其他颜色，如",
+   "greedy_label": "white",
+   "samples": [
+    "白色、粉色或黄色的。\n\n问",
+    "白色或淡粉色。\n问：百合",
+    "白色、粉色、黄色或紫色的",
+    "白色、粉色、黄色或紫色的",
+    "白色或淡粉色的。\n问："
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.lavender",
+   "zh": "薰衣草",
+   "en": "lavender",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：薰衣草通常是什么颜色的？\n答：薰衣草通常是",
+   "greedy": "紫色的。\n问：薰衣草",
+   "greedy_label": "purple",
+   "samples": [
+    "紫色的，但是有些品种可能会呈现",
+    "紫色或淡紫色。\n问：薰",
+    "紫色的。\n\n问：薰衣草",
+    "紫色的。\n问：薰衣草",
+    "紫色的。但有时它们也会呈现出"
+   ],
+   "sample_labels": {
+    "purple": 5
+   }
+  },
+  {
+   "id": "plant.dandelion",
+   "zh": "蒲公英",
+   "en": "dandelion",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蒲公英通常是什么颜色的？\n答：蒲公英通常是",
+   "greedy": "黄色的，但有时也会有白色",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是它们的花盘",
+    "黄色或白色。它们的花朵在",
+    "黄色的，但有时可能呈现出白色",
+    "黄色的，但有时会呈现白色",
+    "黄色的，但有时它们的花朵"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.lotus",
+   "zh": "荷花",
+   "en": "lotus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：荷花通常是什么颜色的？\n答：荷花通常是",
+   "greedy": "粉红色或白色，但有时也会",
+   "greedy_label": "pink",
+   "samples": [
+    "粉红色或白色。不过，也有",
+    "粉红色的。但不同种类和",
+    "淡粉色的，但也可以有白色",
+    "粉红色或白色，但有时也",
+    "粉红色或白色。\n问：荷花"
+   ],
+   "sample_labels": {
+    "pink": 5
+   }
+  },
+  {
+   "id": "plant.cactus",
+   "zh": "仙人掌",
+   "en": "cactus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：仙人掌通常是什么颜色的？\n答：仙人掌通常是",
+   "greedy": "绿色的，因为它们含有叶绿",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些种类可能会呈现",
+    "绿色或灰绿色的，因为它们",
+    "绿色的，因为它们含有叶绿",
+    "绿色的，但也可以有其他颜色",
+    "绿色的，但有些种类可能呈现"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.pine",
+   "zh": "松树",
+   "en": "pine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：松树通常是什么颜色的？\n答：松树通常是",
+   "greedy": "绿色的，但它们的针叶",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的针叶",
+    "绿色的。\n\n问：松树的",
+    "绿色的，因为它们的叶子是",
+    "绿色的，但有时会因为季节",
+    "绿色的，但它们的针叶"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.bamboo",
+   "zh": "竹子",
+   "en": "bamboo",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：竹子通常是什么颜色的？\n答：竹子通常是",
+   "greedy": "绿色的，但根据品种和生长",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些种类的竹",
+    "绿色的。\n\n问：竹子在",
+    "绿色的，因为竹子的叶子",
+    "绿色的，但有时会呈现其他",
+    "绿色的，但有时它们可能会呈现出"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.willow",
+   "zh": "柳树",
+   "en": "willow",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：柳树通常是什么颜色的？\n答：柳树通常是",
+   "greedy": "绿色的，因为它们的叶子是",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的叶子在",
+    "绿色的。\n\n问：柳树的",
+    "绿色的，因为它的叶子是绿色",
+    "绿色的，但有时会因为季节",
+    "绿色的，但有时它们的枝"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.moss",
+   "zh": "苔藓",
+   "en": "moss",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：苔藓通常是什么颜色的？\n答：苔藓通常是",
+   "greedy": "绿色的，但有时可能呈现其他",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的生长环境",
+    "绿色的。\n\n问：苔藓通常",
+    "绿色的，因为它们含有叶绿",
+    "绿色的，但有时会呈现其他",
+    "绿色的，但有时它们可能会呈现"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.clover",
+   "zh": "三叶草",
+   "en": "clover",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：三叶草通常是什么颜色的？\n答：三叶草通常是",
+   "greedy": "绿色的，但有时会呈现出其他",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它开花的时候",
+    "绿色的。\n\n问：三叶草",
+    "绿色的，因为它的叶子是绿色",
+    "绿色的，但有时会呈现其他",
+    "绿色的，但有时它们可能会呈现出"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.chrysanthemum",
+   "zh": "菊花",
+   "en": "chrysanthemum",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：菊花通常是什么颜色的？\n答：菊花通常是",
+   "greedy": "黄色的。\n问：那如果菊花",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是也有其他颜色，",
+    "黄色或橙色的，但也有",
+    "黄色的，但也有其他颜色，",
+    "黄色的。\n问：那如果我在",
+    "黄色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.jasmine",
+   "zh": "茉莉",
+   "en": "jasmine",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：茉莉通常是什么颜色的？\n答：茉莉通常是",
+   "greedy": "白色或淡粉色的。\n问：",
+   "greedy_label": "white",
+   "samples": [
+    "白色或淡粉色的。\n问：",
+    "白色或淡粉色的。\n问：",
+    "白色或淡粉色的，但也可以",
+    "白色或淡黄色的。\n问：",
+    "白色的。\n那问题来了，绿茶的"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.osmanthus",
+   "zh": "桂花",
+   "en": "osmanthus",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：桂花通常是什么颜色的？\n答：桂花通常是",
+   "greedy": "黄色或橙色的，但有时",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色或橙色的。\n问：",
+    "黄色或橙色的。\n问：",
+    "黄色或白色。不过，有些品种",
+    "黄色或橙色的。\n问：",
+    "黄色或白色。不过，也有品种"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.fern",
+   "zh": "蕨",
+   "en": "fern",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蕨通常是什么颜色的？\n答：蕨通常是",
+   "greedy": "绿色的，但有些品种可能有",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些种类可能会有",
+    "绿色的。\n\n问：蕨通常是什么",
+    "绿色的，因为它们含有叶绿",
+    "绿色的，但有时会呈现其他",
+    "绿色的，但有时它们可能会有"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.fir",
+   "zh": "冷杉",
+   "en": "fir",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：冷杉通常是什么颜色的？\n答：冷杉通常是",
+   "greedy": "绿色的。\n问：冷杉的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的针叶",
+    "绿色或灰绿色的。\n问：",
+    "绿色的，因为它的叶子呈针",
+    "绿色的。\n问：冷杉的",
+    "绿色的，但有时可能会有红色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.birch",
+   "zh": "桦树",
+   "en": "birch",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：桦树通常是什么颜色的？\n答：桦树通常是",
+   "greedy": "浅黄色的。\n问：桦树",
+   "greedy_label": "yellow",
+   "samples": [
+    "白色或淡黄色的。\n问：",
+    "浅黄色的。这是因为它含有大量的",
+    "淡黄色的。\n问题是关于桦树",
+    "淡黄色或浅黄色的。不过",
+    "浅黄色的，尤其是在秋季。\n\n问"
+   ],
+   "sample_labels": {
+    "white": 1,
+    "yellow": 4
+   }
+  },
+  {
+   "id": "plant.banyan",
+   "zh": "榕树",
+   "en": "banyan",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：榕树通常是什么颜色的？\n答：榕树通常是",
+   "greedy": "绿色的，因为它的叶子是绿色",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，因为它们的叶子是",
+    "绿色的。\n问：榕树的",
+    "绿色的，因为它的叶子是绿色",
+    "绿色的，因为它们的叶子是",
+    "绿色的，但有时它们的树"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.cypress",
+   "zh": "柏树",
+   "en": "cypress",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：柏树通常是什么颜色的？\n答：柏树通常是",
+   "greedy": "绿色的，但根据不同的品种和",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它们的叶子在",
+    "绿色的。\n\n问：柏树的",
+    "绿色的，因为它的叶子是绿色",
+    "绿色的，但有时会因为季节",
+    "绿色的，但有时它们的树"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.ivy",
+   "zh": "常春藤",
+   "en": "ivy",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：常春藤通常是什么颜色的？\n答：常春藤通常是",
+   "greedy": "绿色的，但根据不同的品种和",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它处于不同的",
+    "绿色的。\n\n问：常春藤",
+    "绿色的，因为它的叶子在大多数",
+    "绿色的，但也可以有其他颜色",
+    "绿色的，但它的颜色可能会根据"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.wheat",
+   "zh": "小麦",
+   "en": "wheat",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：小麦通常是什么颜色的？\n答：小麦通常是",
+   "greedy": "黄色的。\n问：小麦通常是什么",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是有时候可能呈现其他",
+    "黄色或淡黄色的。\n问：",
+    "淡黄色的，有时可能呈现出白色",
+    "黄色的。\n问：小麦通常是什么",
+    "黄色的。但有时也可能因为品种"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.cotton",
+   "zh": "棉花",
+   "en": "cotton",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：棉花通常是什么颜色的？\n答：棉花通常是",
+   "greedy": "白色的。\n问：那如果棉花是",
+   "greedy_label": "white",
+   "samples": [
+    "白色的。\n\n问：那如果棉花是",
+    "白色的。\n\n问：人们通常用棉花",
+    "白色或乳白色。\n问：棉花",
+    "白色的。不过，有时会因为棉花",
+    "白色的。\n那为什么说棉花是白色的"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.hyacinth",
+   "zh": "风信子",
+   "en": "hyacinth",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：风信子通常是什么颜色的？\n答：风信子通常是",
+   "greedy": "紫色的，但也有其他颜色，",
+   "greedy_label": "purple",
+   "samples": [
+    "紫色的，但是也有其他颜色，",
+    "紫色或蓝色的。\n问：那",
+    "紫色的，但也有其他颜色的",
+    "蓝色、紫色、粉色、白色和",
+    "紫色的，但也有其他颜色如"
+   ],
+   "sample_labels": {
+    "purple": 4,
+    "blue": 1
+   }
+  },
+  {
+   "id": "plant.aloe",
+   "zh": "芦荟",
+   "en": "aloe",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：芦荟通常是什么颜色的？\n答：芦荟通常是",
+   "greedy": "绿色的。\n问：芦荟的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是有些品种可能会有",
+    "绿色或灰绿色的。\n问：",
+    "绿色的。\n\n问：芦荟的",
+    "绿色的。\n问：那如果芦",
+    "绿色的，但有时它们可能会呈现出"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.mint",
+   "zh": "薄荷",
+   "en": "mint",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：薄荷通常是什么颜色的？\n答：薄荷通常是",
+   "greedy": "绿色的。\n问：薄荷的",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是当它被制成",
+    "绿色或灰绿色的。\n问：",
+    "绿色的，但有时可能呈现出紫色",
+    "绿色的。\n问：薄荷的",
+    "绿色的，但有时也可能呈现紫色"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.poppy",
+   "zh": "罂粟",
+   "en": "poppy",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：罂粟通常是什么颜色的？\n答：罂粟通常是",
+   "greedy": "粉红色或白色。\n问：罂",
+   "greedy_label": "pink",
+   "samples": [
+    "粉红色或白色。不过，也有",
+    "粉红色的。但有时也会有",
+    "淡红色的，但也可能呈现出白色",
+    "粉红色或白色，但有时也",
+    "粉红色或白色。\n问：罂"
+   ],
+   "sample_labels": {
+    "pink": 4,
+    "red": 1
+   }
+  },
+  {
+   "id": "plant.oak",
+   "zh": "橡树",
+   "en": "oak",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：橡树通常是什么颜色的？\n答：橡树通常是",
+   "greedy": "深褐色或灰色的，但具体",
+   "greedy_label": "brown",
+   "samples": [
+    "绿色的，因为它们的叶子在",
+    "褐色或灰色的。\n问：橡",
+    "**深褐色或深棕色**的",
+    "深褐色或灰色的，但它们",
+    "**深棕色**或**灰色**"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "plant.maple",
+   "zh": "枫树",
+   "en": "maple",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：枫树通常是什么颜色的？\n答：枫树通常是",
+   "greedy": "红色的。\n问：枫树的",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，但是它们的叶子在",
+    "红色或橙色的。\n问：",
+    "红色的，因为它们的叶子在",
+    "红色的。\n问题是，为什么枫树",
+    "红的。\n但事实上，枫树"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "plant.camellia",
+   "zh": "茶花",
+   "en": "camellia",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：茶花通常是什么颜色的？\n答：茶花通常是",
+   "greedy": "粉红色或白色，但也有其他",
+   "greedy_label": "pink",
+   "samples": [
+    "粉红色或白色。不过，也有",
+    "粉红色的。但不同种类的",
+    "粉红色或白色。\n问：茶",
+    "粉红色或白色，但也有其他",
+    "粉红色或白色，有些品种可能"
+   ],
+   "sample_labels": {
+    "pink": 5
+   }
+  },
+  {
+   "id": "plant.peach-blossom",
+   "zh": "桃花",
+   "en": "peach blossom",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：桃花通常是什么颜色的？\n答：桃花通常是",
+   "greedy": "粉红色的。\n问：那如果",
+   "greedy_label": "pink",
+   "samples": [
+    "粉红色的。\n问：桃花通常",
+    "粉红色的。桃花的颜色种类繁",
+    "粉红色的。不过，根据品种",
+    "粉红色的。\n问：苹果通常",
+    "粉红色的，但它们的颜色可以"
+   ],
+   "sample_labels": {
+    "pink": 5
+   }
+  },
+  {
+   "id": "food.milk",
+   "zh": "牛奶",
+   "en": "milk",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：牛奶通常是什么颜色的？\n答：牛奶通常是",
+   "greedy": "白色的。\n问：牛奶通常是什么味道",
+   "greedy_label": "white",
+   "samples": [
+    "白色或乳白色的。不过，有时候",
+    "白色的或淡黄色的。\n问：",
+    "白色或乳白色。\n问：牛奶",
+    "白色的。不过，有时会因为牛奶",
+    "白色的。\n那牛奶为什么是白色的呢"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.chocolate",
+   "zh": "巧克力",
+   "en": "chocolate",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：巧克力通常是什么颜色的？\n答：巧克力通常是",
+   "greedy": "深棕色或黑色的，但有时",
+   "greedy_label": "brown",
+   "samples": [
+    "深棕色或黑色的。\n问：",
+    "深棕色的。这是因为它含有可",
+    "深褐色或黑色的，但也可以",
+    "深棕色或黑色的。\n问：",
+    "深棕色或黑色的。\n问："
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.rice",
+   "zh": "米饭",
+   "en": "rice",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：米饭通常是什么颜色的？\n答：米饭通常是",
+   "greedy": "白色的。\n问：米饭通常是什么形状",
+   "greedy_label": "white",
+   "samples": [
+    "白色或米白色。不同种类的",
+    "白色的。\n\n问：人们通常用什么",
+    "白色或近似白色的颜色，但",
+    "白色的。不过，这取决于所使用的",
+    "白色的。\n那为什么米饭是白色的呢"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.tofu",
+   "zh": "豆腐",
+   "en": "tofu",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：豆腐通常是什么颜色的？\n答：豆腐通常是",
+   "greedy": "白色或浅黄色的。不过，",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅黄色的。\n问：",
+    "白色的。\n\n问：人们通常用豆腐",
+    "白色或乳白色的。\n问：豆腐",
+    "白色或浅黄色的。不过，",
+    "白色的。\n那为什么有些人会认为豆腐"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.cheese",
+   "zh": "奶酪",
+   "en": "cheese",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：奶酪通常是什么颜色的？\n答：奶酪通常是",
+   "greedy": "白色或黄色的，但也有其他",
+   "greedy_label": "white",
+   "samples": [
+    "白色或黄色的。不同种类的",
+    "黄色或白色。但不同种类的",
+    "黄色的，因为含有较多的脂肪",
+    "白色、黄色或橙色的。",
+    "黄色的，但也有其他颜色的"
+   ],
+   "sample_labels": {
+    "white": 2,
+    "yellow": 3
+   }
+  },
+  {
+   "id": "food.ketchup",
+   "zh": "番茄酱",
+   "en": "ketchup",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：番茄酱通常是什么颜色的？\n答：番茄酱通常是",
+   "greedy": "红色的，因为它是用番茄制成",
+   "greedy_label": "red",
+   "samples": [
+    "红色的，因为它的主要成分是",
+    "红色或暗红色的。\n问：",
+    "红色的，因为它的主要成分是",
+    "红色的，因为它是由番茄制成",
+    "红褐色的，因为主要成分是"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "food.soy-sauce",
+   "zh": "酱油",
+   "en": "soy sauce",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：酱油通常是什么颜色的？\n答：酱油通常是",
+   "greedy": "深褐色或深棕色的。不过",
+   "greedy_label": "brown",
+   "samples": [
+    "深褐色或深棕色的。\n\n酱油",
+    "深褐色的。这是因为它含有大量的",
+    "深褐色或深红色的，但",
+    "深褐色或深红色的。它",
+    "深褐色或深棕色的。\n\n酱油"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.salt",
+   "zh": "盐",
+   "en": "salt",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：盐通常是什么颜色的？\n答：盐通常是",
+   "greedy": "白色或无色的。不过，",
+   "greedy_label": "white",
+   "samples": [
+    "白色或无色的。\n问：",
+    "白色的或无色的。\n问：",
+    "白色或无色的，但有时",
+    "白色或无色的。不过，",
+    "白色的。\n那为什么有些盐是其他"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.sugar",
+   "zh": "糖",
+   "en": "sugar",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：糖通常是什么颜色的？\n答：糖通常是",
+   "greedy": "白色或浅黄色的。不过，",
+   "greedy_label": "white",
+   "samples": [
+    "白色或浅黄色的。\n问：",
+    "白色的或淡黄色的。\n问：",
+    "白色或浅黄色的，但不同",
+    "白色或浅黄色的。但是，",
+    "白色的。\n那糖一般是什么味道的"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.honey",
+   "zh": "蜂蜜",
+   "en": "honey",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蜂蜜通常是什么颜色的？\n答：蜂蜜通常是",
+   "greedy": "琥珀色的。\n问：蜂蜜",
+   "greedy_label": null,
+   "samples": [
+    "琥珀色的。不同种类的",
+    "金色或琥珀色的。不过",
+    "淡黄色的。但不同种类的",
+    "琥珀色的，但根据花",
+    "黄色的。但有时也可能呈现琥"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "yellow": 3
+   }
+  },
+  {
+   "id": "food.beer",
+   "zh": "啤酒",
+   "en": "beer",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：啤酒通常是什么颜色的？\n答：啤酒通常是",
+   "greedy": "深棕色或黑色的，但也有",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的，但是也有其他颜色，",
+    "深棕色的。但不同种类的",
+    "淡黄色或浅棕色的，但",
+    "深棕色或琥珀色的。",
+    "浅黄色或浅棕色的。\n\n啤酒"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "food.congee",
+   "zh": "粥",
+   "en": "congee",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：粥通常是什么颜色的？\n答：粥通常是",
+   "greedy": "白色的，但有时会根据添加的",
+   "greedy_label": "white",
+   "samples": [
+    "白色的。\n问：那如果煮得",
+    "白色的或淡黄色的，因为它是",
+    "淡黄色的，因为含有较多的",
+    "白色的，但有时可能呈现乳白色",
+    "白色的。\n问：粥的口味有哪些"
+   ],
+   "sample_labels": {
+    "white": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "food.wasabi",
+   "zh": "芥末",
+   "en": "wasabi",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：芥末通常是什么颜色的？\n答：芥末通常是",
+   "greedy": "黄色的。\n问：芥末通常",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，但是有些种类可能呈现",
+    "黄色或绿色的。\n问：芥",
+    "黄色的。\n\n问：芥末的",
+    "黄色的。\n问：芥末和",
+    "黄色的。但有时也可能因为品种"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.curry",
+   "zh": "咖喱",
+   "en": "curry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：咖喱通常是什么颜色的？\n答：咖喱通常是",
+   "greedy": "深褐色或深黄色的，但",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的，但是不同的咖喱可能",
+    "褐色或橙色的。\n问：",
+    "橙色的。但有时会根据",
+    "深褐色或琥珀色的。",
+    "黄色的，但有时也可能呈现红色"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "orange": 1,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "food.steamed-bun",
+   "zh": "馒头",
+   "en": "steamed bun",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：馒头通常是什么颜色的？\n答：馒头通常是",
+   "greedy": "白色的，但有时会根据不同的地区",
+   "greedy_label": "white",
+   "samples": [
+    "白色的。\n\n问：那如果馒头是",
+    "白色的。\n\n问：人们通常用什么",
+    "白色的。但有时候会因为添加了",
+    "白色的。那如果是黑色的馒头，",
+    "白色的。\n那为什么有些人会认为馒头"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.dumpling",
+   "zh": "饺子",
+   "en": "dumpling",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：饺子通常是什么颜色的？\n答：饺子通常是",
+   "greedy": "白色的，但有时会根据不同的馅",
+   "greedy_label": "white",
+   "samples": [
+    "白色或米色的，但也有",
+    "白色的或浅黄色的，因为它们",
+    "白色或浅黄色的，因为它们",
+    "白色的，但有时会根据不同的馅",
+    "白色的。\n那为什么有些人会认为饺子"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.french-fry",
+   "zh": "薯条",
+   "en": "french fry",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：薯条通常是什么颜色的？\n答：薯条通常是",
+   "greedy": "金黄色的。\n问：为什么薯",
+   "greedy_label": "yellow",
+   "samples": [
+    "金黄色的。\n问：为什么薯",
+    "金黄色的。这是因为在油炸",
+    "金黄色的。这主要是因为它们",
+    "金黄色的。\n问：为什么薯",
+    "金黄色的。这是因为薯条在"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.yogurt",
+   "zh": "酸奶",
+   "en": "yogurt",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：酸奶通常是什么颜色的？\n答：酸奶通常是",
+   "greedy": "乳白色或淡黄色的。不过",
+   "greedy_label": "white",
+   "samples": [
+    "乳白色或淡黄色的。\n\n问",
+    "乳白色或略带黄色。不过",
+    "淡黄色的。但有时根据所",
+    "乳白色或淡黄色的。这",
+    "乳白色或淡黄色的。\n\n问"
+   ],
+   "sample_labels": {
+    "white": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "food.chestnut",
+   "zh": "栗子",
+   "en": "chestnut",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：栗子通常是什么颜色的？\n答：栗子通常是",
+   "greedy": "______的。\nA. 绿",
+   "greedy_label": "green",
+   "samples": [
+    "棕色的，但是它们的外皮",
+    "褐色或深棕色的，尤其是当",
+    "**褐色**或**深棕色**",
+    "深褐色或棕色的，表面有",
+    "**深棕色**或**黑色**"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.walnut",
+   "zh": "核桃",
+   "en": "walnut",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：核桃通常是什么颜色的？\n答：核桃通常是",
+   "greedy": "深褐色或黑色的，但有时",
+   "greedy_label": "brown",
+   "samples": [
+    "绿色的，但是当它成熟的时候",
+    "褐色或黑色的。\n问：核桃",
+    "**黑色**的，但有时也可以",
+    "深棕色或黑色的，表面有",
+    "______的。\n（提示：颜色"
+   ],
+   "sample_labels": {
+    "green": 1,
+    "brown": 2,
+    "black": 1,
+    "None": 1
+   }
+  },
+  {
+   "id": "food.matcha",
+   "zh": "抹茶",
+   "en": "matcha",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：抹茶通常是什么颜色的？\n答：抹茶通常是",
+   "greedy": "绿色的，因为它是从绿茶中",
+   "greedy_label": "green",
+   "samples": [
+    "绿色的，但是它的颜色可能会根据",
+    "绿色或深绿色。\n问：抹",
+    "绿色的，因为它是从绿茶中",
+    "绿色的，但有时会呈现深",
+    "绿色的，但有时也可能呈现深"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "food.egg-tart",
+   "zh": "蛋挞",
+   "en": "egg tart",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：蛋挞通常是什么颜色的？\n答：蛋挞通常是",
+   "greedy": "黄色的，因为蛋挞皮是",
+   "greedy_label": "yellow",
+   "samples": [
+    "黄色的，因为蛋挞皮是",
+    "黄色或金黄色的，因为蛋",
+    "黄色的，因为蛋挞皮是",
+    "黄色的，因为蛋挞皮是",
+    "黄色的，但有时也可能因为不同的"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.century-egg",
+   "zh": "皮蛋",
+   "en": "century egg",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：皮蛋通常是什么颜色的？\n答：皮蛋通常是",
+   "greedy": "深褐色或黑色的，表面可能",
+   "greedy_label": "brown",
+   "samples": [
+    "呈______色的。\n填空",
+    "褐色或深褐色的。\n问：",
+    "呈深褐色或深黑色的。\n\n",
+    "深褐色或墨绿色的。 ",
+    "灰白色的，但有时也可能呈现其他"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 3,
+    "gray": 1
+   }
+  },
+  {
+   "id": "food.pudding",
+   "zh": "布丁",
+   "en": "pudding",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：布丁通常是什么颜色的？\n答：布丁通常是",
+   "greedy": "______色的。\nA. �",
+   "greedy_label": null,
+   "samples": [
+    "______的。\n答：布丁",
+    "______的。\nA. �",
+    "淡黄色的，但可能根据不同的",
+    "白色或淡黄色的，但有些",
+    "______色的。\nA. �"
+   ],
+   "sample_labels": {
+    "None": 3,
+    "yellow": 1,
+    "white": 1
+   }
+  },
+  {
+   "id": "food.tangyuan",
+   "zh": "汤圆",
+   "en": "tangyuan",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：汤圆通常是什么颜色的？\n答：汤圆通常是",
+   "greedy": "白色的，但有时也会有其他颜色",
+   "greedy_label": "white",
+   "samples": [
+    "白色的，但也可以是其他颜色，",
+    "白色的或浅黄色的，因为它们",
+    "白色的。汤圆是用糯米粉",
+    "白色的，但有时也可以是其他颜色",
+    "白色的。\n那为什么汤圆是白色的"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.cocoa",
+   "zh": "可可",
+   "en": "cocoa",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：可可通常是什么颜色的？\n答：可可通常是",
+   "greedy": "深棕色的。\n问：可可",
+   "greedy_label": "brown",
+   "samples": [
+    "深棕色的。\n问：可可",
+    "深棕色的。但具体颜色可能",
+    "深褐色的。可可是一种豆",
+    "深棕色的。\n问：可可",
+    "深棕色的，类似于墨水的颜色"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.cola",
+   "zh": "可乐",
+   "en": "cola",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：可乐通常是什么颜色的？\n答：可乐通常是",
+   "greedy": "深棕色的，但不同品牌和",
+   "greedy_label": "brown",
+   "samples": [
+    "棕色的，但是有些种类可能呈现",
+    "深棕色的。这是因为它含有多种",
+    "**深棕色**或**黑色**",
+    "深棕色的。\n问：可乐",
+    "棕色的。但有时可能会因为不同的"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.caviar",
+   "zh": "鱼子酱",
+   "en": "caviar",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：鱼子酱通常是什么颜色的？\n答：鱼子酱通常是",
+   "greedy": "深红色或深褐色的，但",
+   "greedy_label": "red",
+   "samples": [
+    "深褐色或深红色的。\n\n鱼",
+    "深褐色或深红色的，但",
+    "深褐色或深红色的，这",
+    "深褐色或深红色的。鱼",
+    "深红色或深褐色的。\n\n鱼"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "red": 1
+   }
+  },
+  {
+   "id": "food.cinnamon",
+   "zh": "肉桂",
+   "en": "cinnamon",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：肉桂通常是什么颜色的？\n答：肉桂通常是",
+   "greedy": "深棕色或深红色的，有时",
+   "greedy_label": "brown",
+   "samples": [
+    "橙红色或橙黄色的。\n\n肉",
+    "褐色或暗红色的。\n问：",
+    "橙红色的，有时可能呈现出深",
+    "深棕色或深红色的。肉",
+    "橙红色或深红色的。\n\n肉"
+   ],
+   "sample_labels": {
+    "orange": 3,
+    "brown": 2
+   }
+  },
+  {
+   "id": "food.peanut",
+   "zh": "花生",
+   "en": "peanut",
+   "lang": "zh",
+   "task": "color",
+   "prompt": "问：花生通常是什么颜色的？\n答：花生通常是",
+   "greedy": "______的。\nA. 绿",
+   "greedy_label": "green",
+   "samples": [
+    "______的。\n答：花生通常是",
+    "______的。\nA. 绿",
+    "**黄色**的。\n问：花生",
+    "（  ）色的。\nA",
+    "**黄色**的，但它们的"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "green": 1,
+    "yellow": 2
+   }
+  }
+ ]
+}

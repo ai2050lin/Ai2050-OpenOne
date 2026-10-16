@@ -1,0 +1,4376 @@
+{
+ "schema": "ent_freeresp.v1",
+ "kind": "calibration",
+ "note": "标注校准用的自由回答；只用于复核标注与扩充可接受答案集，不用于挑选名词；不是正式运行结果",
+ "model_snapshot": {
+  "sha256": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "files": {
+   "model-00001-of-00003.safetensors": {
+    "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+    "size": 3957900840
+   },
+   "model-00002-of-00003.safetensors": {
+    "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+    "size": 3987450520
+   },
+   "model-00003-of-00003.safetensors": {
+    "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+    "size": 99630640
+   },
+   "config.json": {
+    "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+    "size": 726
+   },
+   "generation_config.json": {
+    "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+    "size": 239
+   },
+   "tokenizer.json": {
+    "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "size": 11422654
+   },
+   "tokenizer_config.json": {
+    "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+    "size": 9732
+   },
+   "vocab.json": {
+    "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "size": 2776833
+   },
+   "merges.txt": {
+    "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "size": 1671853
+   }
+  },
+  "n_files": 9,
+  "note": "权重（*.safetensors 等）、config 与 tokenizer 文件逐个 sha256；sha256 为按文件名排序后的合成哈希"
+ },
+ "torch": "2.13.0+cu130",
+ "transformers": "5.14.1",
+ "dtype": "bfloat16",
+ "decode": {
+  "greedy": true,
+  "samples": 5,
+  "temperature": 0.7,
+  "top_p": 1.0,
+  "top_k": 0,
+  "max_new_tokens": 8,
+  "seed": 0
+ },
+ "only": "en/color",
+ "prompt_override": "Q: What color is the {E} usually?\nA: The {E} is usually",
+ "lexicon": "shared\\dist_protocol\\lexicon\\ENT-XF_nouns.v2.tsv",
+ "seconds": 103.3,
+ "items": [
+  {
+   "id": "fruit.banana",
+   "zh": "香蕉",
+   "en": "banana",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the banana usually?\nA: The banana is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow.\nQ: What is the color",
+    " yellow.\nQ: What color is the",
+    " yellow.\nOkay, so the user is",
+    " yellow. \n\nBut wait, the banana",
+    " yellow.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.strawberry",
+   "zh": "草莓",
+   "en": "strawberry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the strawberry usually?\nA: The strawberry is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But wait, sometimes it can",
+    " red.\nQ: What color is the",
+    " red.\nQ: What color is the",
+    " red. \n\nThe answer is correct.",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.lemon",
+   "zh": "柠檬",
+   "en": "lemon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lemon usually?\nA: The lemon is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow.\nQ: What color is the",
+    " yellow.\nQ: What color is the",
+    " yellow.\nOkay, so the user is",
+    " yellow. \n\nThe answer is correct.",
+    " yellow.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.cherry",
+   "zh": "樱桃",
+   "en": "cherry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cherry usually?\nA: The cherry is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But depending on the type of",
+    " red, but it can be other colors",
+    " red.\nQ: What color is the",
+    " red. \n\nBut wait, the question",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.grape",
+   "zh": "葡萄",
+   "en": "grape",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the grape usually?\nA: The grape is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, that's not",
+    " green, although it can be red,",
+    " green.\nQ: What color is the",
+    " green. \n\nWait, but the answer",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.tangerine",
+   "zh": "橘子",
+   "en": "tangerine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tangerine usually?\nA: The tangerine is usually",
+   "greedy": " orange in color.\nQ: What is",
+   "greedy_label": "orange",
+   "samples": [
+    " orange in color. However, it can",
+    " orange in color.\nQ: What is",
+    " orange in color.\n\nBut wait, I",
+    " orange. \n\nBut wait, the question",
+    " orange in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "fruit.mango",
+   "zh": "芒果",
+   "en": "mango",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mango usually?\nA: The mango is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow when ripe. However, it can",
+    " yellow when ripe. But when not ripe",
+    " yellow.\nOkay, the user is asking",
+    " yellow. \n\nWait, but the mango",
+    " yellow.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.pineapple",
+   "zh": "菠萝",
+   "en": "pineapple",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pineapple usually?\nA: The pineapple is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But wait, that's not",
+    " yellow, but it can also be green",
+    " yellow.\nWait, is that right?",
+    " yellow. \n\nWait, but the answer",
+    " yellow.\nWait, but that's not"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.coconut",
+   "zh": "椰子",
+   "en": "coconut",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the coconut usually?\nA: The coconut is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green when it's on the tree.",
+    " green when it's on the tree.\n",
+    " yellow.\nBut wait, that's not",
+    " green. \n\nBut wait, the coconut",
+    " yellow or brown.\nQ: What is"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "fruit.pomegranate",
+   "zh": "石榴",
+   "en": "pomegranate",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pomegranate usually?\nA: The pomegranate is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. The pomegranate is",
+    " red, although it can also be found",
+    " red.\nQ: What is the color",
+    " red. \n\nThe pomegranate",
+    " red.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.apricot",
+   "zh": "杏",
+   "en": "apricot",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the apricot usually?\nA: The apricot is usually",
+   "greedy": " a yellow color.\nQ: What color",
+   "greedy_label": "yellow",
+   "samples": [
+    " a yellowish color, but it can",
+    " a yellowish color.\nA: The",
+    " a light yellow to orange color, with",
+    " yellow. \n\nWait, but the question",
+    " yellow or pink.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "yellow": 3
+   }
+  },
+  {
+   "id": "fruit.plum",
+   "zh": "李子",
+   "en": "plum",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the plum usually?\nA: The plum is usually",
+   "greedy": " a deep purple or dark purple color.",
+   "greedy_label": "purple",
+   "samples": [
+    " a deep purple or dark purple color.",
+    " a shade of purple.\nQ: What",
+    " a deep purple or dark purple color.\n",
+    " green. \n\nWait, but the answer",
+    " a deep purple or dark purple color."
+   ],
+   "sample_labels": {
+    "purple": 4,
+    "green": 1
+   }
+  },
+  {
+   "id": "fruit.fig",
+   "zh": "无花果",
+   "en": "fig",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the fig usually?\nA: The fig is usually",
+   "greedy": " green when it is unripe, and",
+   "greedy_label": "green",
+   "samples": [
+    " green when it is unripe, and",
+    " green when it's unripe, and",
+    " a green color.\n\nBut wait, that",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.lychee",
+   "zh": "荔枝",
+   "en": "lychee",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lychee usually?\nA: The lychee is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But wait, sometimes it's",
+    " pink, red, or white. The",
+    " red.\nQ: What color is the",
+    " red. \n\nWait, that's not",
+    " pink or red in color.\nQ:"
+   ],
+   "sample_labels": {
+    "red": 3,
+    "pink": 2
+   }
+  },
+  {
+   "id": "fruit.avocado",
+   "zh": "牛油果",
+   "en": "avocado",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the avocado usually?\nA: The avocado is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. Avocados, also known",
+    " green.\nQ: What color is the",
+    " a dark green color.\nQ: What",
+    " green. \n\nBut wait, the avocado",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.mangosteen",
+   "zh": "山竹",
+   "en": "mangosteen",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mangosteen usually?\nA: The mangosteen is usually",
+   "greedy": " a yellow color.\nQ: What is",
+   "greedy_label": "yellow",
+   "samples": [
+    " a yellowish color, but it can",
+    " pink or red in color. The exterior",
+    " a deep, dark purple or black color",
+    " yellow. \n\nWait, no. Wait",
+    " pink or red in color.\nA:"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "pink": 2,
+    "purple": 1,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "fruit.cranberry",
+   "zh": "蔓越莓",
+   "en": "cranberry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cranberry usually?\nA: The cranberry is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But wait, sometimes it can",
+    " red.\nQ: What color are the",
+    " red.\nQ: What is the cran",
+    " red. \n\nThe cranberry (V",
+    " red.\nQ: What is the cran"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.raspberry",
+   "zh": "覆盆子",
+   "en": "raspberry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the raspberry usually?\nA: The raspberry is usually",
+   "greedy": " a deep red color.\nQ: What",
+   "greedy_label": "red",
+   "samples": [
+    " a bright red color.\n\nBut wait,",
+    " a red color. However, there are",
+    " a deep red color.\nQ: What",
+    " red. \n\nBut wait, there are",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.persimmon",
+   "zh": "柿子",
+   "en": "persimmon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the persimmon usually?\nA: The persimmon is usually",
+   "greedy": " orange in color.\nQ: What is",
+   "greedy_label": "orange",
+   "samples": [
+    " orange, but it can also be red",
+    " orange, but it can be red,",
+    " orange or red in color.\n\nI need",
+    " orange. \n\nWait, but the answer",
+    " orange in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "fruit.loquat",
+   "zh": "枇杷",
+   "en": "loquat",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the loquat usually?\nA: The loquat is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow, but it can also be green",
+    " yellow, but it can be green or",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nThe loquat (E",
+    " yellow or orange in color.\nQ:"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.starfruit",
+   "zh": "杨桃",
+   "en": "starfruit",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the starfruit usually?\nA: The starfruit is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green, but it can also be yellow",
+    " green when it's unripe. But",
+    " yellow.\nQ: What color is the",
+    " green. \n\nBut wait, the answer",
+    " yellow.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "fruit.apple",
+   "zh": "苹果",
+   "en": "apple",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the apple usually?\nA: The apple is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But sometimes it can be green",
+    " red, but it can be other colors",
+    " red.\nQ: What color is the",
+    " red. \n\nBut wait, the apple",
+    " red or green.\nQ: What color"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.mulberry",
+   "zh": "桑葚",
+   "en": "mulberry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mulberry usually?\nA: The mulberry is usually",
+   "greedy": " a red color.\nQ: What color",
+   "greedy_label": "red",
+   "samples": [
+    " a red color.  It is a",
+    " a red or pink color. However,",
+    " a red color.\n\nBut wait, I",
+    " a dark red.\nQ: What is",
+    " a red color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.pomelo",
+   "zh": "柚子",
+   "en": "pomelo",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pomelo usually?\nA: The pomelo is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow, but it can also be orange",
+    " yellow, but it can be orange or",
+    " yellow.\nQ: What is the color",
+    " yellow. \n\nThe answer is correct.",
+    " yellow or orange in color.\nQ:"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.passionfruit",
+   "zh": "百香果",
+   "en": "passionfruit",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the passionfruit usually?\nA: The passionfruit is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow when it is ripe, but it",
+    " yellow when ripe.\nQ: What's",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nWait, but I have",
+    " yellow.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.gooseberry",
+   "zh": "醋栗",
+   "en": "gooseberry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the gooseberry usually?\nA: The gooseberry is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But it can also be other",
+    " green, although it can be red,",
+    " a green color. However, it can",
+    " green. \n\nThe gooseberry (Rib",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "fruit.goji",
+   "zh": "枸杞",
+   "en": "goji",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the goji usually?\nA: The goji is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. Goji berries, also known",
+    " red, but it can be white,",
+    " red.\nQ: What color is the",
+    " red. Goji is a type of",
+    " red.\nQ: What is the go"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "fruit.nectarine",
+   "zh": "油桃",
+   "en": "nectarine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the nectarine usually?\nA: The nectarine is usually",
+   "greedy": " yellow, but it can also be red",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow, but it can also be pink",
+    " yellow, but it can be red,",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nWait, but nectar",
+    " yellow or pink.\nQ: What is"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "fruit.tamarind",
+   "zh": "酸角",
+   "en": "tamarind",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tamarind usually?\nA: The tamarind is usually",
+   "greedy": " a yellowish-brown color.\nQ",
+   "greedy_label": "brown",
+   "samples": [
+    " a yellowish color, but it can",
+    " a yellowish-brown color. It",
+    " a brown color. Tamarind is",
+    " yellow. \n\nWait, but I have",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 3,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "fruit.jujube",
+   "zh": "枣",
+   "en": "jujube",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the jujube usually?\nA: The jujube is usually",
+   "greedy": " red.\nQ: What is the j",
+   "greedy_label": "red",
+   "samples": [
+    " red.\nQ: What is the j",
+    " red.\nQ: What color is the",
+    " red.\nQ: What is the j",
+    " red. \n\nThe jujube is",
+    " red.\nQ: What is the j"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "vegetable.carrot",
+   "zh": "胡萝卜",
+   "en": "carrot",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the carrot usually?\nA: The carrot is usually",
+   "greedy": " orange.\nQ: What color is the",
+   "greedy_label": "orange",
+   "samples": [
+    " orange. Carrots are a type of",
+    " orange.\nQ: What color are the",
+    " orange.\nOkay, so the question is",
+    " orange. Carrots are a root vegetable",
+    " orange.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "vegetable.eggplant",
+   "zh": "茄子",
+   "en": "eggplant",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the eggplant usually?\nA: The eggplant is usually",
+   "greedy": " purple.\nQ: What is the scientific",
+   "greedy_label": "purple",
+   "samples": [
+    " purple. The answer is purple.\nQ",
+    " purple.\nQ: What color are the",
+    " purple.\nQ: What is the color",
+    " purple. \n\nThe answer is correct.",
+    " purple.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "purple": 5
+   }
+  },
+  {
+   "id": "vegetable.pumpkin",
+   "zh": "南瓜",
+   "en": "pumpkin",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pumpkin usually?\nA: The pumpkin is usually",
+   "greedy": " orange.\nQ: What color is the",
+   "greedy_label": "orange",
+   "samples": [
+    " orange. But sometimes, people might use",
+    " orange.\n\nBut I have a question,",
+    " orange.\nQ: What color is the",
+    " orange. \n\nThe answer is correct because",
+    " orange.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "vegetable.corn",
+   "zh": "玉米",
+   "en": "corn",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the corn usually?\nA: The corn is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But sometimes, it can be",
+    " yellow.\nQ: What color is the",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nQ: What color is",
+    " yellow.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "vegetable.garlic",
+   "zh": "大蒜",
+   "en": "garlic",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the garlic usually?\nA: The garlic is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But some varieties may have different",
+    " white, but it can be other colors",
+    " white.\nQ: What color is the",
+    " white. \n\nThe answer is correct.",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "vegetable.spinach",
+   "zh": "菠菜",
+   "en": "spinach",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the spinach usually?\nA: The spinach is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, it can be",
+    " green.\nQ: What color is the",
+    " green.\nOkay, the user is asking",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.broccoli",
+   "zh": "西兰花",
+   "en": "broccoli",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the broccoli usually?\nA: The broccoli is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes it can be white",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cauliflower",
+   "zh": "花椰菜",
+   "en": "cauliflower",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cauliflower usually?\nA: The cauliflower is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But it can be purple,",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe answer is correct.",
+    " white.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "vegetable.celery",
+   "zh": "芹菜",
+   "en": "celery",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the celery usually?\nA: The celery is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, it can be",
+    " green.\nQ: What color is the",
+    " green.\nOkay, the user is asking",
+    " green. \n\nBut wait, there is",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.lettuce",
+   "zh": "生菜",
+   "en": "lettuce",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lettuce usually?\nA: The lettuce is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But lettuce can come in various",
+    " green.\nQ: What color is the",
+    " green.\nOkay, so the user is",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cabbage",
+   "zh": "卷心菜",
+   "en": "cabbage",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cabbage usually?\nA: The cabbage is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But depending on the type,",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.chili",
+   "zh": "辣椒",
+   "en": "chili",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the chili usually?\nA: The chili is usually",
+   "greedy": " red.\nQ: What is the main",
+   "greedy_label": "red",
+   "samples": [
+    " red. The color of the chili is",
+    " red, but it can be prepared in",
+    " red.\nOkay, so the user is",
+    " red. \n\nQ: What is the",
+    " red in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "vegetable.pea",
+   "zh": "豌豆",
+   "en": "pea",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pea usually?\nA: The pea is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But depending on the type of",
+    " green, but it can be yellow,",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.asparagus",
+   "zh": "芦笋",
+   "en": "asparagus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the asparagus usually?\nA: The asparagus is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, it can be",
+    " green.\nQ: What color are the",
+    " green.\nQ: What color is the",
+    " green. Asparagus is a vegetable that",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.okra",
+   "zh": "秋葵",
+   "en": "okra",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the okra usually?\nA: The okra is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But it can also be purple",
+    " green, but it can be found in",
+    " green.\nOkay, the user is asking",
+    " green. \n\nBut wait, the answer",
+    " green.\nQ: What is the ok"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.chive",
+   "zh": "韭菜",
+   "en": "chive",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the chive usually?\nA: The chive is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. Chives are a type of",
+    " green.\nQ: What color are the",
+    " green.\nQ: What color is the",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.yam",
+   "zh": "山药",
+   "en": "yam",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the yam usually?\nA: The yam is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But wait, that's not",
+    " yellow.\nQ: What color is the",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nWait, but I have",
+    " yellow.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "vegetable.bitter-melon",
+   "zh": "苦瓜",
+   "en": "bitter melon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the bitter melon usually?\nA: The bitter melon is usually",
+   "greedy": " green.\nQ: What is the name",
+   "greedy_label": "green",
+   "samples": [
+    " green, but it can also be yellow",
+    " green, but it can be found in",
+    " green.\nQ: What is the color",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.loofah",
+   "zh": "丝瓜",
+   "en": "loofah",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the loofah usually?\nA: The loofah is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " green. But wait, sometimes it can",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 2,
+    "white": 3
+   }
+  },
+  {
+   "id": "vegetable.bean-sprout",
+   "zh": "豆芽",
+   "en": "bean sprout",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the bean sprout usually?\nA: The bean sprout is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, depending on the",
+    " green.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "white": 1
+   }
+  },
+  {
+   "id": "vegetable.artichoke",
+   "zh": "洋蓟",
+   "en": "artichoke",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the artichoke usually?\nA: The artichoke is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. The outer layer is green,",
+    " green, with a purple exterior. The",
+    " green.\nQ: What color is the",
+    " green. \n\nThe artichoke is",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.edamame",
+   "zh": "毛豆",
+   "en": "edamame",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the edamame usually?\nA: The edamame is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. The edamame is a",
+    " green.\nQ: What color are the",
+    " green.\nQ: What color is the",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What is the ed"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.celtuce",
+   "zh": "莴笋",
+   "en": "celtuce",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the celtuce usually?\nA: The celtuce is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But depending on the variety,",
+    " green, with a white or pale green",
+    " green.\nQ: What is the color",
+    " green. \n\nThe celtuce is",
+    " green.\nQ: What is the c"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.cilantro",
+   "zh": "香菜",
+   "en": "cilantro",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cilantro usually?\nA: The cilantro is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But depending on the variety,",
+    " green, but it can be white,",
+    " green.\nQ: What color is the",
+    " green. \n\nBut wait, the answer",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.scallion",
+   "zh": "葱",
+   "en": "scallion",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the scallion usually?\nA: The scallion is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " green. But depending on the type of",
+    " white, with a green top. Sc",
+    " white.\nQ: What color is the",
+    " green. \n\nThe scallion,",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 2,
+    "white": 3
+   }
+  },
+  {
+   "id": "vegetable.zucchini",
+   "zh": "西葫芦",
+   "en": "zucchini",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the zucchini usually?\nA: The zucchini is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. Zucchini is a type of",
+    " green.\nQ: What color are the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "vegetable.potato",
+   "zh": "土豆",
+   "en": "potato",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the potato usually?\nA: The potato is usually",
+   "greedy": " a yellow color.\nQ: What color",
+   "greedy_label": "yellow",
+   "samples": [
+    " a yellowish color, but it can",
+    " a shade of yellow.\nQ: What",
+    " a shade of yellow.\nQ: What",
+    " yellow. \n\nWait, but that's",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "yellow": 3,
+    "brown": 1
+   }
+  },
+  {
+   "id": "vegetable.ginger",
+   "zh": "生姜",
+   "en": "ginger",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the ginger usually?\nA: The ginger is usually",
+   "greedy": " orange.\nQ: What color is the",
+   "greedy_label": "orange",
+   "samples": [
+    " orange. But I think the color is",
+    " orange.\nQ: What color is the",
+    " orange.\nQ: What color is the",
+    " orange. \n\nWait, but the answer",
+    " orange in color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "vegetable.beet",
+   "zh": "甜菜",
+   "en": "beet",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the beet usually?\nA: The beet is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red.\nQ: What is the color",
+    " red.\nQ: What color is the",
+    " red.\nOkay, so the user is",
+    " red. \n\nThe beet is a root",
+    " red.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "vegetable.shiitake",
+   "zh": "香菇",
+   "en": "shiitake",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the shiitake usually?\nA: The shiitake is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color.  It has a",
+    " a brown color. But when it's",
+    " a brown color. It's a type",
+    " brown. \n\nThe shiitake",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.elephant",
+   "zh": "大象",
+   "en": "elephant",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the elephant usually?\nA: The elephant is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " grey.\nQ: What color is the",
+    " grey.\nQ: What color is the",
+    " gray.\nOkay, so the user is",
+    " grey. \n\nWait, but the question",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.mouse",
+   "zh": "老鼠",
+   "en": "mouse",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mouse usually?\nA: The mouse is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray. But sometimes it might be white",
+    " grey.\n\nBut I have a question,",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe answer is gray.\n",
+    " gray or black.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.polar-bear",
+   "zh": "北极熊",
+   "en": "polar bear",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the polar bear usually?\nA: The polar bear is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But wait, sometimes they can",
+    " white.\nQ: What color are the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe polar bear (U",
+    " white.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "mammal.giraffe",
+   "zh": "长颈鹿",
+   "en": "giraffe",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the giraffe usually?\nA: The giraffe is usually",
+   "greedy": " a light brown color, with a pattern",
+   "greedy_label": "brown",
+   "samples": [
+    " a light brown color, with a pattern",
+    " grey.\nQ: What color are the",
+    " a brown color.\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " gray or brown in color.\nQ:"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "gray": 2
+   }
+  },
+  {
+   "id": "mammal.lion",
+   "zh": "狮子",
+   "en": "lion",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lion usually?\nA: The lion is usually",
+   "greedy": " golden.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But wait, some lions are",
+    " yellow, although their fur can be a",
+    " yellow.\nQ: What color is the",
+    " golden. \n\nThe lion's fur is",
+    " golden or amber in color.\nQ:"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "mammal.tiger",
+   "zh": "老虎",
+   "en": "tiger",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tiger usually?\nA: The tiger is usually",
+   "greedy": " orange with black stripes.\nQ: What",
+   "greedy_label": "orange",
+   "samples": [
+    " orange with black stripes.\nQ: What",
+    " orange with black stripes.\nQ: What",
+    " orange with black stripes.\nQ: What",
+    " orange. \n\nBut wait, there are",
+    " orange with black stripes.\nQ: What"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "mammal.rabbit",
+   "zh": "兔子",
+   "en": "rabbit",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the rabbit usually?\nA: The rabbit is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But sometimes it is brown.",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What color is",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "white": 4,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.horse",
+   "zh": "马",
+   "en": "horse",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the horse usually?\nA: The horse is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " a chestnut color.\n\nQ: What",
+    " brown.\nQ: What color is the",
+    " a brown color.\n\nQ: What color",
+    " brown. \n\nQ: What is the",
+    " gray.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 3,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.rhino",
+   "zh": "犀牛",
+   "en": "rhino",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the rhino usually?\nA: The rhino is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " a brown color. But wait, that",
+    " black, although some species can have white",
+    " a brown color.\nQ: What color",
+    " black. \n\nWait, but I have",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "black": 2
+   }
+  },
+  {
+   "id": "mammal.gorilla",
+   "zh": "大猩猩",
+   "en": "gorilla",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the gorilla usually?\nA: The gorilla is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " brown. But wait, if the gor",
+    " black, although some have white or grey",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nQ: What color is",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "black": 1,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.monkey",
+   "zh": "猴子",
+   "en": "monkey",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the monkey usually?\nA: The monkey is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. But sometimes, if it's",
+    " brown.\nQ: What color is the",
+    " yellow.\nQ: What color is the",
+    " brown. \n\nQ: What is the",
+    " brown.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "mammal.squirrel",
+   "zh": "松鼠",
+   "en": "squirrel",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the squirrel usually?\nA: The squirrel is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What color is the",
+    " gray, but their color can vary depending",
+    " gray.\nQ: What color is the",
+    " gray. \n\nQ: What is the",
+    " gray or brown.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.hedgehog",
+   "zh": "刺猬",
+   "en": "hedgehog",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the hedgehog usually?\nA: The hedgehog is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray, but some species may have different",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " brown. \n\nThe answer is correct because",
+    " gray or brown in color.\nQ:"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "mammal.koala",
+   "zh": "考拉",
+   "en": "koala",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the koala usually?\nA: The koala is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " grey.\nQ: What is the ko",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " grey. \n\nThe koala is a",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.wolf",
+   "zh": "狼",
+   "en": "wolf",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the wolf usually?\nA: The wolf is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray. But I think the color depends",
+    " grey, although it can be black,",
+    " gray.\nQ: What color is the",
+    " gray. \n\nQ: What is the",
+    " gray.\nQ: What is the wolf"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.yak",
+   "zh": "牦牛",
+   "en": "yak",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the yak usually?\nA: The yak is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. But some yaks can be",
+    " brown, but their color can vary depending",
+    " a brown color.\nBut wait, y",
+    " brown. Yaks are typically brown in",
+    " gray or white.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "gray": 1
+   }
+  },
+  {
+   "id": "mammal.sheep",
+   "zh": "绵羊",
+   "en": "sheep",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sheep usually?\nA: The sheep is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But sometimes, they can be",
+    " white, but it can be of other",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What color is",
+    " white.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "mammal.otter",
+   "zh": "水獭",
+   "en": "otter",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the otter usually?\nA: The otter is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What is the ot",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " brown. \n\nThe otter is a",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "mammal.sloth",
+   "zh": "树懒",
+   "en": "sloth",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sloth usually?\nA: The sloth is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green.\nQ: What is the slo",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nWait, but the slo",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "mammal.pangolin",
+   "zh": "穿山甲",
+   "en": "pangolin",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pangolin usually?\nA: The pangolin is usually",
+   "greedy": " a brown color.\nQ: What is",
+   "greedy_label": "brown",
+   "samples": [
+    " a dull, earthy color, often",
+    " a brown color. They have a unique",
+    " a brown color.\nQ: What color",
+    " gray. \n\nThe pangolin is a",
+    " gray or brown.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 2,
+    "gray": 2
+   }
+  },
+  {
+   "id": "mammal.armadillo",
+   "zh": "犰狳",
+   "en": "armadillo",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the armadillo usually?\nA: The armadillo is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " a dull, earthy color, often",
+    " a brown color.\nQ: What is",
+    " a brown color.\nQ: What color",
+    " gray. \n\nThe armadillo is",
+    " gray.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 2,
+    "gray": 2
+   }
+  },
+  {
+   "id": "mammal.porcupine",
+   "zh": "豪猪",
+   "en": "porcupine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the porcupine usually?\nA: The porcupine is usually",
+   "greedy": " gray or brown in color.\nQ:",
+   "greedy_label": "gray",
+   "samples": [
+    " gray or brown. Porcupines have",
+    " grey.\nQ: What color are the",
+    " gray or brown in color.\n\nI'm",
+    " gray. Porcupines have a gray",
+    " gray or brown in color.\nQ:"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "mammal.badger",
+   "zh": "獾",
+   "en": "badger",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the badger usually?\nA: The badger is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown.\nQ: What color is the",
+    " brown.\nQ: What color are the",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " brown.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.beaver",
+   "zh": "河狸",
+   "en": "beaver",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the beaver usually?\nA: The beaver is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown.\nQ: What is the be",
+    " brown.\nQ: What color are the",
+    " brown.\nQ: What color is the",
+    " brown. \n\nThe beaver is a",
+    " brown.\nQ: What is the be"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.moose",
+   "zh": "驼鹿",
+   "en": "moose",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the moose usually?\nA: The moose is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. But depending on the subspecies",
+    " brown.\nQ: What color are the",
+    " brown.\nQ: What color is the",
+    " brown. \n\nQ: What color is",
+    " brown.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "mammal.camel",
+   "zh": "骆驼",
+   "en": "camel",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the camel usually?\nA: The camel is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " a sandy color. (But this is",
+    " grey.\nQ: What color are the",
+    " a sand color. But in some cases",
+    " gray. \n\nThe answer is correct.",
+    " gray or brown.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "gray": 3
+   }
+  },
+  {
+   "id": "mammal.fox",
+   "zh": "狐狸",
+   "en": "fox",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the fox usually?\nA: The fox is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But sometimes, depending on the",
+    " red, but it can be other colors",
+    " red.\nQ: What color is the",
+    " brown. \n\nThe answer is correct.",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "red": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "mammal.cheetah",
+   "zh": "猎豹",
+   "en": "cheetah",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cheetah usually?\nA: The cheetah is usually",
+   "greedy": " a yellowish-brown color with black",
+   "greedy_label": "brown",
+   "samples": [
+    " a yellowish or light brown color with",
+    " a yellowish-brown color. C",
+    " a golden color with black spots.\nQ",
+    " a yellowish-brown color with black",
+    " a yellow color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "yellow": 2
+   }
+  },
+  {
+   "id": "mammal.baboon",
+   "zh": "狒狒",
+   "en": "baboon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the baboon usually?\nA: The baboon is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown.\nQ: What color is the",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " brown. \n\nThe answer is correct because",
+    " gray or brown.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "gray": 3
+   }
+  },
+  {
+   "id": "mammal.weasel",
+   "zh": "鼬",
+   "en": "weasel",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the weasel usually?\nA: The weasel is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " a brownish color, with a black",
+    " brown, with a black stripe down its",
+    " a brown color.\nBut wait, that",
+    " brown. \n\nThe answer is correct because",
+    " brown or gray.\nQ: What is"
+   ],
+   "sample_labels": {
+    "black": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "bird.crow",
+   "zh": "乌鸦",
+   "en": "crow",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the crow usually?\nA: The crow is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " black. But sometimes, they might have",
+    " black.\nQ: What color is the",
+    " black.\nQ: What color is the",
+    " black. \n\nBut wait, the crow",
+    " black.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "bird.swan",
+   "zh": "天鹅",
+   "en": "swan",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the swan usually?\nA: The swan is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But I should check if that",
+    " white.\n\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What color is",
+    " white.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "bird.flamingo",
+   "zh": "火烈鸟",
+   "en": "flamingo",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the flamingo usually?\nA: The flamingo is usually",
+   "greedy": " pink.\nQ: What color is the",
+   "greedy_label": "pink",
+   "samples": [
+    " pink. The flamingo is a bird",
+    " pink.\nQ: What color is the",
+    " pink.\nQ: What color is the",
+    " pink. \n\nQ: What is the",
+    " pink.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "pink": 5
+   }
+  },
+  {
+   "id": "bird.parrot",
+   "zh": "鹦鹉",
+   "en": "parrot",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the parrot usually?\nA: The parrot is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, if it's",
+    " green.\n\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "bird.sparrow",
+   "zh": "麻雀",
+   "en": "sparrow",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sparrow usually?\nA: The sparrow is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What color is the",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe sparrow is a",
+    " gray or brown.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.pigeon",
+   "zh": "鸽子",
+   "en": "pigeon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pigeon usually?\nA: The pigeon is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What color is the",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe answer is correct because",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.eagle",
+   "zh": "老鹰",
+   "en": "eagle",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the eagle usually?\nA: The eagle is usually",
+   "greedy": " a dark brown color, with a white",
+   "greedy_label": "brown",
+   "samples": [
+    " a dark brown color, with a white",
+    " a dark brown color.\nQ: What",
+    " a brown color.\n\nBut wait, I",
+    " white. \n\nWait, that's not",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "white": 1
+   }
+  },
+  {
+   "id": "bird.owl",
+   "zh": "猫头鹰",
+   "en": "owl",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the owl usually?\nA: The owl is usually",
+   "greedy": " white and grey.\nQ: What color",
+   "greedy_label": "white",
+   "samples": [
+    " gray, but some species may have different",
+    " grey, but some species can be white",
+    " white and gray in color.\n\nI need",
+    " white. \n\nWait, that's not",
+    " gray or white.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "white": 2
+   }
+  },
+  {
+   "id": "bird.peacock",
+   "zh": "孔雀",
+   "en": "peacock",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the peacock usually?\nA: The peacock is usually",
+   "greedy": " blue and green.\nQ: What color",
+   "greedy_label": "blue",
+   "samples": [
+    " blue and green. But wait, that",
+    " blue, with a greenish sheen",
+    " blue and green.\nBut wait, I",
+    " blue. \n\nWait, but the answer",
+    " blue.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "blue": 5
+   }
+  },
+  {
+   "id": "bird.falcon",
+   "zh": "隼",
+   "en": "falcon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the falcon usually?\nA: The falcon is usually",
+   "greedy": " a dark brown color.\nQ: What",
+   "greedy_label": "brown",
+   "samples": [
+    " a yellow color. (But this is",
+    " a sleek, dark-colored bird. It",
+    " a brown color.\n\nBut wait, I",
+    " a brown color.\nQ: What is",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 1,
+    "None": 1,
+    "brown": 3
+   }
+  },
+  {
+   "id": "bird.hummingbird",
+   "zh": "蜂鸟",
+   "en": "hummingbird",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the hummingbird usually?\nA: The hummingbird is usually",
+   "greedy": " a bright, vivid color, often with",
+   "greedy_label": null,
+   "samples": [
+    " a bright, vibrant color, often with",
+    " a colorful bird, but the exact color",
+    " a bright, colorful bird, with colors",
+    " a **green** or **bluish",
+    " a variety of colors, but they are"
+   ],
+   "sample_labels": {
+    "None": 4,
+    "green": 1
+   }
+  },
+  {
+   "id": "bird.seagull",
+   "zh": "海鸥",
+   "en": "seagull",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the seagull usually?\nA: The seagull is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What color is the",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe answer is gray.\n",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.pelican",
+   "zh": "鹈鹕",
+   "en": "pelican",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pelican usually?\nA: The pelican is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " a yellow color. However, some pel",
+    " grey.\nQ: What color are the",
+    " a gray color.\n\nBut wait, I",
+    " gray. \n\nWait, but I have",
+    " gray or white.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 1,
+    "gray": 4
+   }
+  },
+  {
+   "id": "bird.swallow",
+   "zh": "燕子",
+   "en": "swallow",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the swallow usually?\nA: The swallow is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " a black bird. (But this is",
+    " black, but it can be grey.\n",
+    " a blue color.\n\nWait, that's",
+    " black. \n\nWait, that's not",
+    " black.\nQ: What is the swallow"
+   ],
+   "sample_labels": {
+    "black": 4,
+    "blue": 1
+   }
+  },
+  {
+   "id": "bird.vulture",
+   "zh": "秃鹫",
+   "en": "vulture",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the vulture usually?\nA: The vulture is usually",
+   "greedy": " gray or white.\nQ: What color",
+   "greedy_label": "gray",
+   "samples": [
+    " gray or white. (But this is",
+    " grey.\nQ: What color is the",
+    " gray or white in color.\n\nI need",
+    " gray. \n\nThe answer is correct.",
+    " gray or white.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.raven",
+   "zh": "渡鸦",
+   "en": "raven",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the raven usually?\nA: The raven is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " black. But wait, sometimes it can",
+    " black.\n\nOkay, so I need to",
+    " black.\nOkay, so the user is",
+    " black. \n\nThe raven is a",
+    " black.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "bird.thrush",
+   "zh": "画眉",
+   "en": "thrush",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the thrush usually?\nA: The thrush is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color. Thrushes are",
+    " grey.\nQ: What color are the",
+    " a brown color.\n\nBut wait, I",
+    " green. \n\nWait, that's not",
+    " gray or brown.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "gray": 2,
+    "green": 1
+   }
+  },
+  {
+   "id": "bird.quail",
+   "zh": "鹌鹑",
+   "en": "quail",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the quail usually?\nA: The quail is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. The quail is a small",
+    " brown, with a streaked pattern.\n",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe quail is a",
+    " brown.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.lark",
+   "zh": "云雀",
+   "en": "lark",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lark usually?\nA: The lark is usually",
+   "greedy": " a grayish-brown color.\nQ",
+   "greedy_label": "brown",
+   "samples": [
+    " a yellow color. (But this is",
+    " a yellow color.\nQ: What is",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 2,
+    "brown": 3
+   }
+  },
+  {
+   "id": "bird.nightingale",
+   "zh": "夜莺",
+   "en": "nightingale",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the nightingale usually?\nA: The nightingale is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a chestnut color, with a black",
+    " a brownish color.\nQ: What",
+    " a brown color.\nBut wait, I",
+    " a brown color.\nQ: What is",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "black": 1,
+    "None": 1,
+    "brown": 3
+   }
+  },
+  {
+   "id": "bird.heron",
+   "zh": "苍鹭",
+   "en": "heron",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the heron usually?\nA: The heron is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What is the her",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nWait, but the her",
+    " gray or white.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "bird.pheasant",
+   "zh": "野鸡",
+   "en": "pheasant",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pheasant usually?\nA: The pheasant is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color.  The phe",
+    " a brownish color.\nQ: What",
+    " a brown color with black and white markings",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "None": 1
+   }
+  },
+  {
+   "id": "bird.myna",
+   "zh": "八哥",
+   "en": "myna",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the myna usually?\nA: The myna is usually",
+   "greedy": " a mix of colors, but it's",
+   "greedy_label": null,
+   "samples": [
+    " a yellow color. However, some my",
+    " a mix of colors, but typically has",
+    " a mix of colors, with black and",
+    " green. \n\nThe answer is correct.",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "yellow": 1,
+    "None": 1,
+    "black": 1,
+    "green": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "bird.albatross",
+   "zh": "信天翁",
+   "en": "albatross",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the albatross usually?\nA: The albatross is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But wait, some albat",
+    " white, with black wingtips and a",
+    " white.\nQ: What color is the",
+    " white. \n\nThe albatross is",
+    " white.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "bird.cormorant",
+   "zh": "鸬鹚",
+   "en": "cormorant",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cormorant usually?\nA: The cormorant is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " black. But during the breeding season,",
+    " black.\nQ: What color are the",
+    " black.\nQ: What color is the",
+    " black. \n\nThe cormorant",
+    " black.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "black": 5
+   }
+  },
+  {
+   "id": "bird.partridge",
+   "zh": "鹧鸪",
+   "en": "partridge",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the partridge usually?\nA: The partridge is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color. Partridges are small",
+    " a greenish color.\nQ: What",
+    " a brown color.\n\nBut wait, I",
+    " green. \n\nWait, but the par",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "brown": 2,
+    "None": 1,
+    "green": 1,
+    "red": 1
+   }
+  },
+  {
+   "id": "bird.ostrich",
+   "zh": "鸵鸟",
+   "en": "ostrich",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the ostrich usually?\nA: The ostrich is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. The color of the ostrich",
+    " brown.\nQ: What color are the",
+    " a brown color.\nBut wait, I",
+    " brown. \n\nThe answer is correct because",
+    " brown.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "bird.starling",
+   "zh": "椋鸟",
+   "en": "starling",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the starling usually?\nA: The starling is usually",
+   "greedy": " a mix of black, brown, and",
+   "greedy_label": "black",
+   "samples": [
+    " a ___ color.\n\nOkay, so I",
+    " a greenish color.\nQ: What",
+    " a blue color.\n\nWait, that's",
+    " a\nOkay, so I need to",
+    " a **blue** or **green**"
+   ],
+   "sample_labels": {
+    "None": 3,
+    "blue": 2
+   }
+  },
+  {
+   "id": "bird.sandpiper",
+   "zh": "鹬",
+   "en": "sandpiper",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sandpiper usually?\nA: The sandpiper is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a pale, sandy color, like the",
+    " a brown color.\nQ: What's",
+    " a brown color.\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "bird.turtledove",
+   "zh": "斑鸠",
+   "en": "turtledove",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the turtledove usually?\nA: The turtledove is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " grey.\nQ: What color is the",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe turtledove",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.shark",
+   "zh": "鲨鱼",
+   "en": "shark",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the shark usually?\nA: The shark is usually",
+   "greedy": " gray or black.\nQ: What color",
+   "greedy_label": "gray",
+   "samples": [
+    " gray or black. But, some species",
+    " grey.\nQ: What color is the",
+    " gray or black in color.\n\nQ:",
+    " gray. \n\nThe answer is correct.",
+    " gray or black.\nQ: What is"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.whale",
+   "zh": "鲸鱼",
+   "en": "whale",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the whale usually?\nA: The whale is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What is the color",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nQ: What is the",
+    " gray.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.dolphin",
+   "zh": "海豚",
+   "en": "dolphin",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the dolphin usually?\nA: The dolphin is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What is the color",
+    " grey.\nQ: What color is the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe answer is correct.",
+    " gray.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.crab",
+   "zh": "螃蟹",
+   "en": "crab",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the crab usually?\nA: The crab is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " a bright orange color.\n\nQ: What",
+    " a reddish color.\nQ: What",
+    " a brown color.\n\nBut wait, I",
+    " red. \n\nQ: What is the",
+    " red.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "orange": 1,
+    "None": 1,
+    "brown": 1,
+    "red": 2
+   }
+  },
+  {
+   "id": "aquatic.lobster",
+   "zh": "龙虾",
+   "en": "lobster",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lobster usually?\nA: The lobster is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " a range of colors, but the most",
+    " a reddish color.\nQ: What",
+    " a range of colors, including red,",
+    " red. \n\nQ: What is the",
+    " red.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "red": 3
+   }
+  },
+  {
+   "id": "aquatic.clownfish",
+   "zh": "小丑鱼",
+   "en": "clownfish",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the clownfish usually?\nA: The clownfish is usually",
+   "greedy": " orange with white stripes.\nQ: What",
+   "greedy_label": "orange",
+   "samples": [
+    " orange with white stripes.\nQ: What",
+    " orange with white markings.\nQ: What",
+    " orange with white markings.\nQ: What",
+    " orange with white markings.\nQ: What",
+    " orange with white stripes.\nQ: What"
+   ],
+   "sample_labels": {
+    "orange": 5
+   }
+  },
+  {
+   "id": "aquatic.sea-turtle",
+   "zh": "海龟",
+   "en": "sea turtle",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sea turtle usually?\nA: The sea turtle is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But I think that's because",
+    " a green color. But there are other",
+    " a dark color, such as black or",
+    " green. \n\nWait, but the green",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "black": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.walrus",
+   "zh": "海象",
+   "en": "walrus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the walrus usually?\nA: The walrus is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " grey.\nQ: What color is the",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What color is the",
+    " gray. \n\nThe answer is correct because",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.crocodile",
+   "zh": "鳄鱼",
+   "en": "crocodile",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the crocodile usually?\nA: The crocodile is usually",
+   "greedy": " a dark green or brown color, with",
+   "greedy_label": "green",
+   "samples": [
+    " a dark green or brown color.\nQ",
+    " a greenish-brown color. That",
+    " a brown color.\n\nBut wait, I",
+    " green. \n\nWait, but the answer",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "green": 2,
+    "brown": 3
+   }
+  },
+  {
+   "id": "aquatic.clam",
+   "zh": "蛤蜊",
+   "en": "clam",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the clam usually?\nA: The clam is usually",
+   "greedy": " a color that is not immediately obvious,",
+   "greedy_label": null,
+   "samples": [
+    " a pale, off-white color, with",
+    " a color that is similar to the sand",
+    " a color of a certain shade, which",
+    " white. \n\nQ: What is the",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "white": 2,
+    "None": 2,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.oyster",
+   "zh": "牡蛎",
+   "en": "oyster",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the oyster usually?\nA: The oyster is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " a white color. However, some o",
+    " a white color. Oysters are a",
+    " a white color.\nBut wait, I",
+    " white. \n\nThe oyster is a",
+    " a white color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "aquatic.catfish",
+   "zh": "鲶鱼",
+   "en": "catfish",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the catfish usually?\nA: The catfish is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray or brown.  The color depends",
+    " grey.\nQ: What color are the",
+    " a brown color.\n\nBut wait, I",
+    " gray. \n\nWait, but the user",
+    " gray or brown in color.\nQ:"
+   ],
+   "sample_labels": {
+    "gray": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.manatee",
+   "zh": "海牛",
+   "en": "manatee",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the manatee usually?\nA: The manatee is usually",
+   "greedy": " gray.\nQ: What color is the",
+   "greedy_label": "gray",
+   "samples": [
+    " gray.\nQ: What is the name",
+    " grey.\nQ: What color are the",
+    " gray.\nQ: What is the average",
+    " gray. \n\nThe answer is correct because",
+    " gray.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "gray": 5
+   }
+  },
+  {
+   "id": "aquatic.eel",
+   "zh": "鳗鱼",
+   "en": "eel",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the eel usually?\nA: The eel is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " a greenish color, but it can",
+    " a greenish color.\nQ: What",
+    " a brown color.\nBut wait, I",
+    " green. \n\nWait, but I have",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "brown": 2,
+    "green": 1
+   }
+  },
+  {
+   "id": "aquatic.octopus",
+   "zh": "章鱼",
+   "en": "octopus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the octopus usually?\nA: The octopus is usually",
+   "greedy": " a color that is not easily visible in",
+   "greedy_label": null,
+   "samples": [
+    " a color that is not always obvious.",
+    " a color that varies depending on the species",
+    " colorless, but this is not correct",
+    " colorless. \n\nWait, that doesn",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "None": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.swordfish",
+   "zh": "剑鱼",
+   "en": "swordfish",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the swordfish usually?\nA: The swordfish is usually",
+   "greedy": " blue on the back and white on the",
+   "greedy_label": "blue",
+   "samples": [
+    " blue on the back and white on the",
+    " blue.\nQ: What color is the",
+    " blue.\nQ: What color is the",
+    " blue on the back and white on the",
+    " blue or black on top and white or"
+   ],
+   "sample_labels": {
+    "blue": 5
+   }
+  },
+  {
+   "id": "aquatic.sea-cucumber",
+   "zh": "海参",
+   "en": "sea cucumber",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sea cucumber usually?\nA: The sea cucumber is usually",
+   "greedy": " a brown color.\nQ: What is",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color. (But this is",
+    " a brown or greenish color. It",
+    " a brown color.\nA: The sea",
+    " green. \n\nThe answer is correct.",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "green": 1
+   }
+  },
+  {
+   "id": "aquatic.sardine",
+   "zh": "沙丁鱼",
+   "en": "sardine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sardine usually?\nA: The sardine is usually",
+   "greedy": " a silver or gray color.\nQ:",
+   "greedy_label": "gray",
+   "samples": [
+    " silver or gray in color, with a",
+    " silver, with a dark back and a",
+    " a silvery color.\nQ: What",
+    " a silver color.\nQ: What is",
+    " a silvery color.\nQ: What"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "None": 2
+   }
+  },
+  {
+   "id": "aquatic.tadpole",
+   "zh": "蝌蚪",
+   "en": "tadpole",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tadpole usually?\nA: The tadpole is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, sometimes it's",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "aquatic.starfish",
+   "zh": "海星",
+   "en": "starfish",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the starfish usually?\nA: The starfish is usually",
+   "greedy": " orange.\nQ: What color is the",
+   "greedy_label": "orange",
+   "samples": [
+    " a color of orange, red, or",
+    " orange, but it can be found in",
+    " a brown color.\nBut wait, I",
+    " orange. \n\nWait, but I have",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "orange": 3,
+    "brown": 2
+   }
+  },
+  {
+   "id": "aquatic.squid",
+   "zh": "鱿鱼",
+   "en": "squid",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the squid usually?\nA: The squid is usually",
+   "greedy": " blue.\nQ: What color is the",
+   "greedy_label": "blue",
+   "samples": [
+    " a dark color. Squid can have",
+    " a color that can vary, but it",
+    " colorless.\nA: The squid is",
+    " blue. \n\nWait, that's not",
+    " blue.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "None": 3,
+    "blue": 2
+   }
+  },
+  {
+   "id": "aquatic.sturgeon",
+   "zh": "鲟鱼",
+   "en": "sturgeon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sturgeon usually?\nA: The sturgeon is usually",
+   "greedy": " a silver color.\nQ: What color",
+   "greedy_label": "gray",
+   "samples": [
+    " a silver color. Sturgeon are large",
+    " a silver color, but can have a",
+    " a brownish color.\nQ: What",
+    " a silver color.\nQ: What is",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "None": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.abalone",
+   "zh": "鲍鱼",
+   "en": "abalone",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the abalone usually?\nA: The abalone is usually",
+   "greedy": " a dark color, often with a purple",
+   "greedy_label": "purple",
+   "samples": [
+    " a dark color. Abalone shells are",
+    " a brownish color.\nA: The",
+    " a brown color.\nBut wait, I",
+    " a brown color.\nQ: What is",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "brown": 3
+   }
+  },
+  {
+   "id": "aquatic.salamander",
+   "zh": "蝾螈",
+   "en": "salamander",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the salamander usually?\nA: The salamander is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green.\nQ: What is the name",
+    " green.\nQ: What color is the",
+    " a brown color.\nQ: What color",
+    " green. \n\nThe answer is correct because",
+    " brown or gray in color.\nQ:"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "brown": 2
+   }
+  },
+  {
+   "id": "aquatic.flounder",
+   "zh": "比目鱼",
+   "en": "flounder",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the flounder usually?\nA: The flounder is usually",
+   "greedy": " a yellow color.\nQ: What color",
+   "greedy_label": "yellow",
+   "samples": [
+    " a yellow color. However, it can",
+    " pale, with a white or yellowish",
+    " a brown color.\nQ: What color",
+    " yellow. \n\nThe answer is correct.",
+    " yellow or white.\nQ: What is"
+   ],
+   "sample_labels": {
+    "yellow": 3,
+    "white": 1,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.mussel",
+   "zh": "贻贝",
+   "en": "mussel",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mussel usually?\nA: The mussel is usually",
+   "greedy": " a color that is typically a shade of",
+   "greedy_label": null,
+   "samples": [
+    " a color that is typically a beige or",
+    " a color that is similar to the color",
+    " a brown color.\nQ: What color",
+    " a brown color.\nQ: What is",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "None": 2,
+    "brown": 3
+   }
+  },
+  {
+   "id": "aquatic.perch",
+   "zh": "鲈鱼",
+   "en": "perch",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the perch usually?\nA: The perch is usually",
+   "greedy": " a silver color.\nQ: What color",
+   "greedy_label": "gray",
+   "samples": [
+    " silver, but it can vary depending on",
+    " silver, with a dark green back and",
+    " a brown color.\n\nBut wait, I",
+    " green. \n\nQ: What is the",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 2,
+    "brown": 2,
+    "green": 1
+   }
+  },
+  {
+   "id": "aquatic.trout",
+   "zh": "鳟鱼",
+   "en": "trout",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the trout usually?\nA: The trout is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " silver. But depending on the species,",
+    " silver, with a greenish or golden",
+    " a brown color.\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " silver or white.\nQ: What color"
+   ],
+   "sample_labels": {
+    "gray": 3,
+    "brown": 2
+   }
+  },
+  {
+   "id": "aquatic.piranha",
+   "zh": "食人鱼",
+   "en": "piranha",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the piranha usually?\nA: The piranha is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " a bright red color.\n\nWait, that",
+    " a reddish-brown color. However",
+    " a red color.\n\nWait, that's",
+    " red. \n\nWait, that's not",
+    " red.\nWait, that's not right"
+   ],
+   "sample_labels": {
+    "red": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "aquatic.jellyfish",
+   "zh": "水母",
+   "en": "jellyfish",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the jellyfish usually?\nA: The jellyfish is usually",
+   "greedy": " transparent.\nQ: What color is the",
+   "greedy_label": "transparent",
+   "samples": [
+    " transparent. But some species may have different",
+    " transparent, but some species can be colorful",
+    " colorless, but some species have colors",
+    " transparent. \n\nThe jellyfish is usually",
+    " transparent.\nQ: What is the jelly"
+   ],
+   "sample_labels": {
+    "transparent": 4,
+    "None": 1
+   }
+  },
+  {
+   "id": "plant.rose",
+   "zh": "玫瑰",
+   "en": "rose",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the rose usually?\nA: The rose is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But in some cases, it",
+    " red.\nQ: What color is the",
+    " red.\nQ: What color is the",
+    " red. \n\nThe answer is correct because",
+    " red.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "plant.lily",
+   "zh": "百合",
+   "en": "lily",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lily usually?\nA: The lily is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But some lilies can be",
+    " white, although it can be found in",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.lavender",
+   "zh": "薰衣草",
+   "en": "lavender",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lavender usually?\nA: The lavender is usually",
+   "greedy": " purple.\nQ: What color is the",
+   "greedy_label": "purple",
+   "samples": [
+    " a pale purple color, but it can",
+    " purple.\nQ: What color is the",
+    " purple.\nOkay, so the user is",
+    " purple. \n\nBut wait, the answer",
+    " purple.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "purple": 5
+   }
+  },
+  {
+   "id": "plant.dandelion",
+   "zh": "蒲公英",
+   "en": "dandelion",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the dandelion usually?\nA: The dandelion is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But wait, sometimes it can",
+    " yellow, with a white flower. But",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nBut wait, the d",
+    " yellow.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.lotus",
+   "zh": "荷花",
+   "en": "lotus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the lotus usually?\nA: The lotus is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " pink. But wait, that's not",
+    " pink, white, or red. But",
+    " white.\nQ: What color is the",
+    " white. \n\nWait, but I have",
+    " pink or white.\nQ: What is"
+   ],
+   "sample_labels": {
+    "pink": 3,
+    "white": 2
+   }
+  },
+  {
+   "id": "plant.cactus",
+   "zh": "仙人掌",
+   "en": "cactus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cactus usually?\nA: The cactus is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, some cact",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nThe cactus is a",
+    " green.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.pine",
+   "zh": "松树",
+   "en": "pine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pine usually?\nA: The pine is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, if it's",
+    " green.\nQ: What color are the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.bamboo",
+   "zh": "竹子",
+   "en": "bamboo",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the bamboo usually?\nA: The bamboo is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, depending on the",
+    " green.\nQ: What color is the",
+    " green.\nQ: What is the color",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.willow",
+   "zh": "柳树",
+   "en": "willow",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the willow usually?\nA: The willow is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, if it's",
+    " grey.\nQ: What color is the",
+    " a shade of green.\nQ: What",
+    " green. \n\nBut wait, the will",
+    " gray.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "green": 3,
+    "gray": 2
+   }
+  },
+  {
+   "id": "plant.moss",
+   "zh": "苔藓",
+   "en": "moss",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the moss usually?\nA: The moss is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, depending on the",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.clover",
+   "zh": "三叶草",
+   "en": "clover",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the clover usually?\nA: The clover is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " green. But I think the answer is",
+    " white, but it can be other colors",
+    " white.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " white.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 2,
+    "white": 3
+   }
+  },
+  {
+   "id": "plant.chrysanthemum",
+   "zh": "菊花",
+   "en": "chrysanthemum",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the chrysanthemum usually?\nA: The chrysanthemum is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But it's also found in",
+    " yellow, but it can come in other",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nWait, no. That",
+    " yellow.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.jasmine",
+   "zh": "茉莉",
+   "en": "jasmine",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the jasmine usually?\nA: The jasmine is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But some varieties may have different",
+    " white, but it can be pink or",
+    " white.\nQ: What color is the",
+    " white. \n\nBut what about the jasmine",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.osmanthus",
+   "zh": "桂花",
+   "en": "osmanthus",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the osmanthus usually?\nA: The osmanthus is usually",
+   "greedy": " yellow.\nQ: What is the os",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But during the fall, it",
+    " yellow, but it can be white.\n",
+    " yellow.\nQ: What is the os",
+    " yellow. \n\nThe osmanthus is",
+    " yellow.\nQ: What is the os"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "plant.fern",
+   "zh": "蕨",
+   "en": "fern",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the fern usually?\nA: The fern is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, if it's",
+    " green.\nQ: What color is the",
+    " green.\nQ: What color is the",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.fir",
+   "zh": "冷杉",
+   "en": "fir",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the fir usually?\nA: The fir is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. The fir, a type of",
+    " green.\nQ: What color are the",
+    " green.\nOkay, so the user is",
+    " green. \n\nThe answer is correct because",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.birch",
+   "zh": "桦树",
+   "en": "birch",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the birch usually?\nA: The birch is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But wait, that's not",
+    " white.\nQ: What color are the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe answer is correct.",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.banyan",
+   "zh": "榕树",
+   "en": "banyan",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the banyan usually?\nA: The banyan is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But it's not always green",
+    " a green color. But when it's",
+    " a shade of green.\nQ: What",
+    " green. \n\nThe banyan tree",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "brown": 1
+   }
+  },
+  {
+   "id": "plant.cypress",
+   "zh": "柏树",
+   "en": "cypress",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cypress usually?\nA: The cypress is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " a dark green color.\n\nBut what if",
+    " a green color. But when it's",
+    " a dark green color.\nQ: What",
+    " green. \n\nThe cypress tree is",
+    " dark green.  It is a type"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.ivy",
+   "zh": "常春藤",
+   "en": "ivy",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the ivy usually?\nA: The ivy is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But sometimes, if it's",
+    " green.\n\nBut I have a question,",
+    " green.\nOkay, so the user is",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.wheat",
+   "zh": "小麦",
+   "en": "wheat",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the wheat usually?\nA: The wheat is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white, but it can be other colors",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What is the",
+    " yellow in color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "white": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "plant.cotton",
+   "zh": "棉花",
+   "en": "cotton",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cotton usually?\nA: The cotton is usually",
+   "greedy": " white.\nQ: What is the color",
+   "greedy_label": "white",
+   "samples": [
+    " white. But there's also some other",
+    " white, but it can be dyed",
+    " white.\nQ: What is the color",
+    " white. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "plant.hyacinth",
+   "zh": "风信子",
+   "en": "hyacinth",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the hyacinth usually?\nA: The hyacinth is usually",
+   "greedy": " a color of blue, but it can",
+   "greedy_label": "blue",
+   "samples": [
+    " a color of purple, but it can",
+    " a color that is a mix of blue",
+    " a blue color. But wait, that",
+    " blue. \n\nWait, but the hy",
+    " blue.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "purple": 1,
+    "blue": 4
+   }
+  },
+  {
+   "id": "plant.aloe",
+   "zh": "芦荟",
+   "en": "aloe",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the aloe usually?\nA: The aloe is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But depending on the species,",
+    " green.\nQ: What color are the",
+    " a green color.\n\nBut wait, I",
+    " green. \n\nQ: What is the",
+    " green.\nQ: What is the a"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.mint",
+   "zh": "薄荷",
+   "en": "mint",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the mint usually?\nA: The mint is usually",
+   "greedy": " green.\nQ: What color is the",
+   "greedy_label": "green",
+   "samples": [
+    " green. But wait, sometimes it can",
+    " green.\n\nBut I have a question,",
+    " green.\nQ: What color is the",
+    " green. \n\nBut wait, the question",
+    " green.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "plant.poppy",
+   "zh": "罂粟",
+   "en": "poppy",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the poppy usually?\nA: The poppy is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But I think the color depends",
+    " red, although it can be found in",
+    " red.\nQ: What color is the",
+    " red. \n\nThe poppy is a",
+    " red.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "plant.oak",
+   "zh": "橡树",
+   "en": "oak",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the oak usually?\nA: The oak is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a brown color. (But this is",
+    " a green color. But when it's",
+    " a brown color.\n\nBut wait, that",
+    " brown. \n\nBut wait, the answer",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "green": 1
+   }
+  },
+  {
+   "id": "plant.maple",
+   "zh": "枫树",
+   "en": "maple",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the maple usually?\nA: The maple is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. But wait, that's not",
+    " red.\nQ: What color is the",
+    " red.\nQ: What color is the",
+    " green. \n\nQ: What color is",
+    " red.\nQ: What color is the"
+   ],
+   "sample_labels": {
+    "red": 4,
+    "green": 1
+   }
+  },
+  {
+   "id": "plant.camellia",
+   "zh": "茶花",
+   "en": "camellia",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the camellia usually?\nA: The camellia is usually",
+   "greedy": " white, but it can also be pink",
+   "greedy_label": "white",
+   "samples": [
+    " a **pink or white** flower.",
+    " pink, although it can also be white",
+    " white, but can also be pink,",
+    " white. \n\nBut camellias can",
+    " pink or white.\nQ: What is"
+   ],
+   "sample_labels": {
+    "pink": 3,
+    "white": 2
+   }
+  },
+  {
+   "id": "plant.peach-blossom",
+   "zh": "桃花",
+   "en": "peach blossom",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the peach blossom usually?\nA: The peach blossom is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " pink. The peach blossom, also known",
+    " pink.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe peach blossom is a",
+    " pink or white.\nQ: What is"
+   ],
+   "sample_labels": {
+    "pink": 3,
+    "white": 2
+   }
+  },
+  {
+   "id": "food.milk",
+   "zh": "牛奶",
+   "en": "milk",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the milk usually?\nA: The milk is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe answer is correct.",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.chocolate",
+   "zh": "巧克力",
+   "en": "chocolate",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the chocolate usually?\nA: The chocolate is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " brown. But depending on the type of",
+    " brown.\nQ: What color is the",
+    " brown.\nQ: What color is the",
+    " brown. \n\nThe answer is correct.",
+    " brown.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.rice",
+   "zh": "米饭",
+   "en": "rice",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the rice usually?\nA: The rice is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But sometimes, it can be",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.tofu",
+   "zh": "豆腐",
+   "en": "tofu",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tofu usually?\nA: The tofu is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white, but it can be prepared in",
+    " white.\nQ: What color is the",
+    " white. \n\nThe answer is correct.",
+    " white or yellowish.\nQ: What"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.cheese",
+   "zh": "奶酪",
+   "en": "cheese",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cheese usually?\nA: The cheese is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white.\n\nQuestion: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.ketchup",
+   "zh": "番茄酱",
+   "en": "ketchup",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the ketchup usually?\nA: The ketchup is usually",
+   "greedy": " red.\nQ: What color is the",
+   "greedy_label": "red",
+   "samples": [
+    " red. Ketchup is a condiment",
+    " red.\nQ: What color is the",
+    " red.\nOkay, so the user is",
+    " red. \n\nThe answer is correct because",
+    " red in color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "food.soy-sauce",
+   "zh": "酱油",
+   "en": "soy sauce",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the soy sauce usually?\nA: The soy sauce is usually",
+   "greedy": " a dark brown color.\nQ: What",
+   "greedy_label": "brown",
+   "samples": [
+    " a dark brown color.\n\nOkay, that",
+    " a reddish-brown color. It",
+    " a dark, amber color.\n\nI'm",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "None": 1
+   }
+  },
+  {
+   "id": "food.salt",
+   "zh": "盐",
+   "en": "salt",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the salt usually?\nA: The salt is usually",
+   "greedy": " white.\nQ: What is the color",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white.\nQ: What color is the",
+    " white.\nQ: What is the color",
+    " white. \n\nQ: What is the",
+    " white in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.sugar",
+   "zh": "糖",
+   "en": "sugar",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the sugar usually?\nA: The sugar is usually",
+   "greedy": " white.\nQ: What is the color",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white.\n\nBut I have a question,",
+    " white.\nQ: What is the color",
+    " white. \n\nQ: What is the",
+    " white.\nQ: What is the color"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.honey",
+   "zh": "蜂蜜",
+   "en": "honey",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the honey usually?\nA: The honey is usually",
+   "greedy": " golden yellow.\nQ: What is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " a yellow color. (But sometimes it",
+    " golden yellow.\nQ: What are some",
+    " a golden yellow color.\nQ: What",
+    " golden. \n\nQ: What is the",
+    " golden in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.beer",
+   "zh": "啤酒",
+   "en": "beer",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the beer usually?\nA: The beer is usually",
+   "greedy": " a dark brown color.\nQ: What",
+   "greedy_label": "brown",
+   "samples": [
+    " a dark brown color, but it can",
+    " a light amber color.\nQ: What",
+    " a brown color.\n\nQ: What color",
+    " brown. \n\nQ: What is the",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 4,
+    "None": 1
+   }
+  },
+  {
+   "id": "food.congee",
+   "zh": "粥",
+   "en": "congee",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the congee usually?\nA: The congee is usually",
+   "greedy": " white.\nQ: What is the main",
+   "greedy_label": "white",
+   "samples": [
+    " white. The congee is a type",
+    " white, but it can be prepared with",
+    " white.\nOkay, so I need to",
+    " white. \n\nThe congee is a",
+    " white.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.wasabi",
+   "zh": "芥末",
+   "en": "wasabi",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the wasabi usually?\nA: The wasabi is usually",
+   "greedy": " green.\nQ: What is the name",
+   "greedy_label": "green",
+   "samples": [
+    " green. But I think the color depends",
+    " green.\nQ: What color is the",
+    " a bright green color.\nQ: What",
+    " green. \n\nThe answer is correct.",
+    " yellow in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "yellow": 1
+   }
+  },
+  {
+   "id": "food.curry",
+   "zh": "咖喱",
+   "en": "curry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the curry usually?\nA: The curry is usually",
+   "greedy": " a bright red color.\nQ: What",
+   "greedy_label": "red",
+   "samples": [
+    " a bright orange color, but this can",
+    " a rich, deep orange color. This",
+    " a bright yellow color.\nQ: What",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "orange": 2,
+    "yellow": 1,
+    "brown": 2
+   }
+  },
+  {
+   "id": "food.steamed-bun",
+   "zh": "馒头",
+   "en": "steamed bun",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the steamed bun usually?\nA: The steamed bun is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. The steamed bun is made",
+    " white.\nQ: What color is the",
+    " white.\nQ: What color is the",
+    " white. \n\nThe steamed bun is",
+    " white in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.dumpling",
+   "zh": "饺子",
+   "en": "dumpling",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the dumpling usually?\nA: The dumpling is usually",
+   "greedy": " white.\nQ: What is the color",
+   "greedy_label": "white",
+   "samples": [
+    " yellow. The dumpling is usually yellow",
+    " white, but it can be prepared in",
+    " white.\nQ: What is the color",
+    " white. \n\nThe dumpling is usually",
+    " yellow.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "yellow": 2,
+    "white": 3
+   }
+  },
+  {
+   "id": "food.french-fry",
+   "zh": "薯条",
+   "en": "french fry",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the french fry usually?\nA: The french fry is usually",
+   "greedy": " yellow.\nQ: What color is the",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. But wait, sometimes it can",
+    " yellow.\nBut I have a question,",
+    " yellow.\nQ: What color is the",
+    " yellow. \n\nBut wait, the answer",
+    " yellow in color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.yogurt",
+   "zh": "酸奶",
+   "en": "yogurt",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the yogurt usually?\nA: The yogurt is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " white. But depending on the type of",
+    " white, but it can be colored with",
+    " white.\nQ: What color is the",
+    " white. \n\nBut wait, there are",
+    " white or slightly yellow.\nQ: What"
+   ],
+   "sample_labels": {
+    "white": 5
+   }
+  },
+  {
+   "id": "food.chestnut",
+   "zh": "栗子",
+   "en": "chestnut",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the chestnut usually?\nA: The chestnut is usually",
+   "greedy": " a brown color.\nQ: What color",
+   "greedy_label": "brown",
+   "samples": [
+    " a chestnut color, which is a",
+    " a brown color. Chestnuts are a",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "brown": 4
+   }
+  },
+  {
+   "id": "food.walnut",
+   "zh": "核桃",
+   "en": "walnut",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the walnut usually?\nA: The walnut is usually",
+   "greedy": " a dark brown color.\nQ: What",
+   "greedy_label": "brown",
+   "samples": [
+    " a dark brown color.\n\nOkay, so",
+    " a rich, dark brown color. It",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.matcha",
+   "zh": "抹茶",
+   "en": "matcha",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the matcha usually?\nA: The matcha is usually",
+   "greedy": " green.\nQ: What is the name",
+   "greedy_label": "green",
+   "samples": [
+    " green. But I think the color depends",
+    " green.\nQ: What is matcha",
+    " a shade of green.\nQ: What",
+    " green. \n\nThe answer is correct.",
+    " green.\nQ: What is the name"
+   ],
+   "sample_labels": {
+    "green": 5
+   }
+  },
+  {
+   "id": "food.egg-tart",
+   "zh": "蛋挞",
+   "en": "egg tart",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the egg tart usually?\nA: The egg tart is usually",
+   "greedy": " yellow.\nQ: What is the main",
+   "greedy_label": "yellow",
+   "samples": [
+    " yellow. The egg tart is a traditional",
+    " yellow, with a golden crust and a",
+    " yellow.\nThe egg tart is a type",
+    " yellow. \n\nThe egg tart is a",
+    " yellow in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "yellow": 5
+   }
+  },
+  {
+   "id": "food.century-egg",
+   "zh": "皮蛋",
+   "en": "century egg",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the century egg usually?\nA: The century egg is usually",
+   "greedy": " green.\nQ: What is the name",
+   "greedy_label": "green",
+   "samples": [
+    " a dark green color.\n\nOkay, so",
+    " a greenish-gray color. The exterior",
+    " a dark green or black in color.\n",
+    " green. \n\nThe answer is correct.",
+    " a dark green color.\nA: The"
+   ],
+   "sample_labels": {
+    "green": 4,
+    "gray": 1
+   }
+  },
+  {
+   "id": "food.pudding",
+   "zh": "布丁",
+   "en": "pudding",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the pudding usually?\nA: The pudding is usually",
+   "greedy": " white.\nQ: What color is the",
+   "greedy_label": "white",
+   "samples": [
+    " yellow. But sometimes it is white.",
+    " yellow, but it can be prepared in",
+    " yellow.\nQ: What color is the",
+    " white. \n\nQ: What is the",
+    " yellow in color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 4,
+    "white": 1
+   }
+  },
+  {
+   "id": "food.tangyuan",
+   "zh": "汤圆",
+   "en": "tangyuan",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the tangyuan usually?\nA: The tangyuan is usually",
+   "greedy": " red, but sometimes it can be other",
+   "greedy_label": "red",
+   "samples": [
+    " red, but sometimes it can be other",
+    " red, but sometimes it can be other",
+    " red, but sometimes it can be other",
+    " red. \n\nWait, that's not",
+    " red.\nQ: What is the special"
+   ],
+   "sample_labels": {
+    "red": 5
+   }
+  },
+  {
+   "id": "food.cocoa",
+   "zh": "可可",
+   "en": "cocoa",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cocoa usually?\nA: The cocoa is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " a dark brown color.\n\nOkay, so",
+    " black.\nQ: What color is the",
+    " a brown color. \n\nQ: What",
+    " black. \n\nWait, but the answer",
+    " dark brown.  The cocoa is usually"
+   ],
+   "sample_labels": {
+    "brown": 3,
+    "black": 2
+   }
+  },
+  {
+   "id": "food.cola",
+   "zh": "可乐",
+   "en": "cola",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cola usually?\nA: The cola is usually",
+   "greedy": " dark brown.\nQ: What color is",
+   "greedy_label": "brown",
+   "samples": [
+    " dark brown in color.\n\nQ: What",
+    " dark brown.\n\nQuestion: What color is",
+    " a brown color.\n\nQ: What color",
+    " brown. \n\nQ: What is the",
+    " dark brown.  It is usually dark"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.caviar",
+   "zh": "鱼子酱",
+   "en": "caviar",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the caviar usually?\nA: The caviar is usually",
+   "greedy": " black.\nQ: What color is the",
+   "greedy_label": "black",
+   "samples": [
+    " a ___ color.\nOkay, so I",
+    " black, but it can be other colors",
+    " a gray color.\nBut wait, I",
+    " black. \n\nThe answer is correct.",
+    " black in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "None": 1,
+    "black": 3,
+    "gray": 1
+   }
+  },
+  {
+   "id": "food.cinnamon",
+   "zh": "肉桂",
+   "en": "cinnamon",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the cinnamon usually?\nA: The cinnamon is usually",
+   "greedy": " brown.\nQ: What color is the",
+   "greedy_label": "brown",
+   "samples": [
+    " a light brown color.\n\nQ: What",
+    " brown.\nQ: What color is the",
+    " a brown color.\n\nBut wait, I",
+    " brown. \n\nThe answer is correct.",
+    " brown in color.\nQ: What is"
+   ],
+   "sample_labels": {
+    "brown": 5
+   }
+  },
+  {
+   "id": "food.peanut",
+   "zh": "花生",
+   "en": "peanut",
+   "lang": "en",
+   "task": "color",
+   "prompt": "Q: What color is the peanut usually?\nA: The peanut is usually",
+   "greedy": " a light brown color.\nQ: What",
+   "greedy_label": "brown",
+   "samples": [
+    " a yellow color. However, it's",
+    " a green color.\nQ: What is",
+    " a brown color.\nBut wait, that",
+    " green. \n\nWait, that's not",
+    " a brown color.\nQ: What color"
+   ],
+   "sample_labels": {
+    "yellow": 1,
+    "green": 2,
+    "brown": 2
+   }
+  }
+ ]
+}
