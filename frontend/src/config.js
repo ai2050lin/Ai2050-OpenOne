@@ -4,10 +4,13 @@
    不得再出现字面量 'http://localhost:5001' 或裸 127.0.0.1。
 
    三种运行形态（优先级从高到低）：
-     ① Electron 安装包：preload 在页面脚本之前把 { apiBase } 写进 window.__AI2050__
+     ① Electron 安装包：preload 在页面脚本之前把 { apiBase, mode } 经
+        contextBridge.exposeInMainWorld 复制进主世界的 window.__AI2050__
         （服务器地址由用户首启填写，持久化到 userData/config.json；
           经 webPreferences.additionalArguments 同步传入 preload，时序早于本模块求值）
-     ② nginx 同源托管（CentOS 部署）：基址为空字符串 ''，
+        —— 注意：contextIsolation 下 preload 直接赋值 window.__AI2050__ 只落在隔离世界，
+        主世界读不到，必须走 contextBridge（见 electron/preload.js 注释）。
+     ② nginx 同源托管（CentOS 部署）：基址为空字符串 '',
         fetch('/api/...') 走相对路径，无 CORS、无硬编码域名
      ③ vite dev：读 .env.development 的 VITE_API_BASE（默认本机 5001）
 
@@ -27,9 +30,14 @@ function stripTrailingSlash(value) {
 function detectMode(base) {
   const runtime = readRuntime('mode');
   if (runtime) return runtime;
-  if (typeof window !== 'undefined' && window.ai2050Desktop?.isDesktop) return 'electron';
+  if (isDesktop()) return 'electron';
   if (base === '') return 'same-origin';
   return base.includes('localhost') || base.includes('127.0.0.1') ? 'local' : 'remote';
+}
+
+/** 是否 Electron 安装包形态（主世界标记，由 preload 经 contextBridge 注入）。 */
+function isDesktop() {
+  return typeof window !== 'undefined' && Boolean(window.ai2050Desktop && window.ai2050Desktop.isDesktop);
 }
 
 /**
@@ -37,11 +45,16 @@ function detectMode(base) {
  * - Electron：preload 注入的服务器地址（必填，不可退到 localhost）
  * - nginx 同源托管：空串 → fetch('/api/...') 相对路径，无 CORS、无硬编码域名
  * - vite dev：.env.development 的 VITE_API_BASE
+ *
+ * 纪律：Electron 形态下注入缺失（preload 未跑/被绕过）时**不退到 localhost**——
+ * 那会让客户端静默请求用户本机的 5001 端口，装在别人机器上必然连不通。
+ * 此时返回空串（同源语义），请求打不上会明确失败并由界面显示「未接入」空态。
  */
-const API_BASE_RAW =
-  readRuntime('apiBase') ||
-  (typeof window !== 'undefined' && window.ai2050Desktop?.isDesktop ? '' : import.meta.env.VITE_API_BASE) ||
-  'http://localhost:5001';
+const API_BASE_RAW = isDesktop()
+  ? stripTrailingSlash(readRuntime('apiBase'))
+  : stripTrailingSlash(
+      readRuntime('apiBase') || import.meta.env.VITE_API_BASE || 'http://localhost:5001'
+    );
 
 export const API_BASE = stripTrailingSlash(API_BASE_RAW);
 

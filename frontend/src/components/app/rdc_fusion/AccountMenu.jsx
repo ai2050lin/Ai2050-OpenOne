@@ -124,7 +124,7 @@ function UserAdmin({ me, onClose }) {
 }
 
 export default function AccountMenu() {
-  const { user, offline, logout } = useAuth();
+  const { user, offline, guest, logout, enterAuth } = useAuth();
   const [open, setOpen] = useState(false);
   const [panel, setPanel] = useState('');
   const [admin, setAdmin] = useState(false);
@@ -139,10 +139,12 @@ export default function AccountMenu() {
   }, [open]);
   if (!user) return null;
   const name = user.display_name || user.username;
+  const roleLabel = guest ? '访客' : (user.role === 'admin' ? '管理员' : '成员');
+  const roleStatus = user.role === 'admin' ? 'pass' : 'na';
   return (
     <div className="v6-acct" ref={ref}>
       <button type="button" className="v6-acct-btn" aria-haspopup="menu" aria-expanded={open} onClick={() => { setOpen(v => !v); setPanel(''); }}
-        title={`${name}（${user.role === 'admin' ? '管理员' : '成员'}）${offline ? ' · 中心服务暂不可达' : ''}`}>
+        title={`${name}（${roleLabel}）${offline ? ' · 中心服务暂不可达' : ''}`}>
         <span className="v6-acct-avatar" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
         <span className="v6-acct-name">{name}</span>
         {offline && <span className="v6-acct-off" aria-label="离线">!</span>}
@@ -151,15 +153,24 @@ export default function AccountMenu() {
         <div className="v6-acct-menu" role="menu">
           <div className="v6-acct-head">
             <b>{name}</b><small className="mono">{user.username}</small>
-            <StatusPill status={user.role === 'admin' ? 'pass' : 'na'} label={user.role === 'admin' ? '管理员' : '成员'} />
+            <StatusPill status={roleStatus} label={roleLabel} />
             {offline && <small className="warn">中心服务暂不可达：显示的是本机保存的登录信息</small>}
           </div>
-          <button type="button" role="menuitem" className="v6-acct-item" onClick={() => setPanel(panel === 'nodes' ? '' : 'nodes')}>我的节点</button>
-          {panel === 'nodes' && <div className="v6-acct-panel"><MyNodes /></div>}
-          <button type="button" role="menuitem" className="v6-acct-item" onClick={() => setPanel(panel === 'pw' ? '' : 'pw')}>修改密码</button>
-          {panel === 'pw' && <div className="v6-acct-panel"><PasswordForm onDone={() => setPanel('')} /></div>}
-          {user.role === 'admin' && <button type="button" role="menuitem" className="v6-acct-item" onClick={() => { setAdmin(true); setOpen(false); }}>账号管理</button>}
-          <button type="button" role="menuitem" className="v6-acct-item danger" onClick={() => { setOpen(false); logout(); }}>退出登录</button>
+          {guest ? (
+            <>
+              <button type="button" role="menuitem" className="v6-acct-item" onClick={() => { setOpen(false); enterAuth(); }}>登录 / 注册</button>
+              <small className="v6-acct-panel muted">访客模式：可直接浏览全部内容；登录后可领题测试、绑定节点、署名贡献。</small>
+            </>
+          ) : (
+            <>
+              <button type="button" role="menuitem" className="v6-acct-item" onClick={() => setPanel(panel === 'nodes' ? '' : 'nodes')}>我的节点</button>
+              {panel === 'nodes' && <div className="v6-acct-panel"><MyNodes /></div>}
+              <button type="button" role="menuitem" className="v6-acct-item" onClick={() => setPanel(panel === 'pw' ? '' : 'pw')}>修改密码</button>
+              {panel === 'pw' && <div className="v6-acct-panel"><PasswordForm onDone={() => setPanel('')} /></div>}
+              {user.role === 'admin' && <button type="button" role="menuitem" className="v6-acct-item" onClick={() => { setAdmin(true); setOpen(false); }}>账号管理</button>}
+              <button type="button" role="menuitem" className="v6-acct-item danger" onClick={() => { setOpen(false); logout(); }}>退出登录</button>
+            </>
+          )}
         </div>
       )}
       {admin && <UserAdmin me={user} onClose={() => setAdmin(false)} />}

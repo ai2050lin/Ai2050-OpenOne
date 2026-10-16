@@ -6,9 +6,12 @@
  * 同步传入（process.argv），preload 在此直接挂到 window，
  * 因此 config.js 第一次读 window.__AI2050__ 就能拿到值。
  *
- * 说明：contextIsolation 开启时 preload 依然能写自己的隔离世界 window，
- * 渲染进程主世界读到的即是同一份（隔离世界共享同一 DOM window 的自定义属性投放，
- * 故这里直接赋值 + contextBridge 双保险）。
+ * ⚠ contextIsolation 语义（实测确认，勿改回直接赋值）：
+ *   contextIsolation: true 时，preload 与页面主世界是**两个不同的 JS 全局**。
+ *   preload 里 `window.__AI2050__ = cfg` 只写在隔离世界，主世界读不到；
+ *   而 config.js 拿不到 apiBase 会退到 `ai2050Desktop.isDesktop → ''` 分支，
+ *   于是 fetch('/api/...') 打到 file:// 协议上——全部接口静默失败、无任何报错。
+ *   唯一正确通道是 contextBridge.exposeInMainWorld（它把值**复制**进主世界）。
  */
 'use strict';
 
@@ -27,17 +30,9 @@ for (let i = 0; i < argv.length; i += 1) {
 
 const config = { apiBase: server || '', mode };
 
-/* 写入页面全局：config.js 读 window.__AI2050__ */
-try {
-  Object.defineProperty(window, '__AI2050__', {
-    value: config,
-    writable: false,
-    configurable: false,
-    enumerable: true,
-  });
-} catch {
-  window.__AI2050__ = config;
-}
+/* 主世界唯一入口：config.js 读 window.__AI2050__。
+   contextBridge 会把普通对象按值复制进主世界（只读快照）。 */
+contextBridge.exposeInMainWorld('__AI2050__', config);
 
 /* 只读能力，不泄漏 Node */
 contextBridge.exposeInMainWorld('ai2050Desktop', {
@@ -47,3 +42,15 @@ contextBridge.exposeInMainWorld('ai2050Desktop', {
   server: config.apiBase,
   getServer: () => ipcRenderer.invoke('ai2050:get-server'),
 });
+
+/* 隔离世界侧自留一份（仅供调试/后续 preload 内部使用；主世界不依赖它）。 */
+try {
+  Object.defineProperty(window, '__AI2050_ISOLATED__', {
+    value: config,
+    writable: false,
+    configurable: false,
+    enumerable: true,
+  });
+} catch {
+  window.__AI2050_ISOLATED__ = config;
+}

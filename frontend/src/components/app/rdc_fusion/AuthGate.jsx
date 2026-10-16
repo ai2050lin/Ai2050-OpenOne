@@ -1,9 +1,12 @@
-/* 账号入口（accounts.v1）：客户端第一次打开显示注册界面；登录后令牌保存在本机，再次打开直接进入主界面。
-   启动时用 GET /api/auth/status 校验已保存的会话：有效 → 主界面；失效或过期 → 登录界面；
-   中心服务暂时不可达但本机有登录记录 → 先进入主界面（各视图显示「未接入」），不把用户挡在门外。 */
+/* 账号入口（accounts.v1）：默认访客模式——客户端打开直接进入主界面，无需登录。
+   启动时用 GET /api/auth/status 校验已保存的会话：有效 → 以该账号进入主界面；
+   无会话或已过期 → 以「访客」身份进入主界面（浏览不受影响，写操作/账号功能在
+   右上角账号菜单「登录 / 注册」后可用）；中心服务不可达 → 同样直接进入主界面。 */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { API_BASE, authJson, clearSession, getCachedUser, getLastUsername, getSession, setSession } from './api.js';
 import { AuthContext } from './authContext.js';
+
+export const GUEST_USER = { user_id: 'guest', username: 'guest', display_name: '访客', role: 'guest' };
 
 function Field({ label, hint, ...props }) {
   return (
@@ -106,13 +109,13 @@ export default function AuthGate({ children }) {
         setState({ phase: 'in', user: info.user, info, offline: '' });
       } else {
         clearSession();
-        setState({ phase: 'auth', user: null, info, offline: '' });
+        setState({ phase: 'in', user: GUEST_USER, info, offline: '' });   // 访客模式：直接进主界面
       }
     }).catch(reason => {
       if (dead) return;
       const cached = getCachedUser();
       if (getSession() && cached) setState({ phase: 'in', user: cached, info: null, offline: reason.message });
-      else setState({ phase: 'auth', user: null, info: null, offline: reason.message });
+      else setState({ phase: 'in', user: GUEST_USER, info: null, offline: reason.message });   // 离线也放行访客
     });
     return () => { dead = true; };
   }, [nonce]);
@@ -124,7 +127,8 @@ export default function AuthGate({ children }) {
     setNonce(n => n + 1);
   }, []);
   const refresh = useCallback(() => setNonce(n => n + 1), []);
-  const ctx = useMemo(() => ({ user: state.user, offline: Boolean(state.offline), logout, refresh }), [state.user, state.offline, logout, refresh]);
+  const enterAuth = useCallback(() => setState(s => ({ ...s, phase: 'auth' })), []);   // 访客 → 登录/注册页
+  const ctx = useMemo(() => ({ user: state.user, offline: Boolean(state.offline), guest: state.user?.role === 'guest', logout, refresh, enterAuth }), [state.user, state.offline, logout, refresh, enterAuth]);
 
   if (state.phase === 'checking') {
     return <div className="v6-auth v6-auth-checking" aria-busy="true"><span className="v6-auth-logo" aria-hidden="true">A2</span><span>正在连接中心服务…</span></div>;

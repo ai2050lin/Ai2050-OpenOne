@@ -77,7 +77,8 @@ function ItemCard({ item, onGo, onAutotest, onStudio }) {
 }
 
 export function ParticipateSteps({ compact = false }) {
-  const { user } = useAuth();
+  const { user, guest } = useAuth();
+  const canBind = Boolean(user) && !guest;   // 访客没有会话，生成绑定码会 401，先隐藏入口
   const [code, setCode] = useState(null);
   const [err, setErr] = useState('');
   const makeCode = async () => {
@@ -90,8 +91,8 @@ export function ParticipateSteps({ compact = false }) {
   return (
     <ol className={'v6-steps-list' + (compact ? ' compact' : '')}>
       <li><b>注册节点</b>
-        <span>一次即可，节点令牌保存在本机。{user ? '先生成绑定码，节点会归属你的账号（贡献者署名、在账号菜单「我的节点」查看）。' : ''}</span>
-        {user && (
+        <span>一次即可，节点令牌保存在本机。{canBind ? '先生成绑定码，节点会归属你的账号（贡献者署名、在账号菜单「我的节点」查看）。' : '登录后可生成绑定码，节点会归属你的账号。'}</span>
+        {canBind && (
           <span className="v6-bind">
             <button type="button" className="fw-tbtn" onClick={makeCode}>{code ? '重新生成绑定码' : '生成绑定码'}</button>
             {code && <small>绑定码 <b className="mono">{code.code}</b> · {Math.round(code.expires_in / 60)} 分钟内有效 · 只能用一次</small>}
