@@ -441,6 +441,22 @@ def validate(spec: Dict[str, Any]) -> List[str]:
                 errors.append(f'readouts 含 cue，但 frame {fr.get("id")} 没有声明 cue')
             if 'probe_answer' in readouts and not fr.get('probe'):
                 errors.append(f'readouts 含 probe_answer，但 frame {fr.get("id")} 没有 probe')
+    comp = spec.get('components')
+    if comp is not None:
+        # 部件采集（runner_v3 可选扩展）：在所选读出位置采集每层每个注意力头（o_proj 输入按头拆分）与 MLP 的输出
+        cr = comp.get('readouts') if isinstance(comp, dict) else None
+        cl = comp.get('layers', 'all') if isinstance(comp, dict) else None
+        rlist = readouts if isinstance(readouts, list) else []
+        if (not isinstance(cr, list) or not cr or len(set(cr)) != len(cr)
+                or any(r not in rlist or r == 'probe_answer' for r in cr)):
+            errors.append('components.readouts 必须是 readouts 中不重复的非空子集（不含 probe_answer）')
+        if not (cl == 'all' or (isinstance(cl, list) and cl and all(
+                isinstance(t, int) and not isinstance(t, bool) and t >= 0 for t in cl))):
+            errors.append('components.layers 只能是 "all" 或非负整数块号列表（第 i 个 Transformer 块）')
+    for key in ('suffstats_budget_bytes', 'item_budget_bytes'):
+        v = spec.get(key)
+        if v is not None and (not isinstance(v, int) or isinstance(v, bool) or v < (1 << 20)):
+            errors.append(f'{key} 必须是 ≥ 1 MiB 的整数字节数')
     shards = spec.get('shards', 1)
     if not isinstance(shards, int) or shards < 1 or shards > 256:
         errors.append('shards 必须是 1–256 的整数')
@@ -587,6 +603,10 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
         'grammar_sha256': spec_sha(spec),
         'items': items,
     }
+    # 可选采集口径：只在文法声明时写入语料（旧文法的语料与指纹不变）
+    for key in ('components', 'suffstats_budget_bytes', 'item_budget_bytes'):
+        if key in spec:
+            corpus[key] = json.loads(json.dumps(spec[key]))
     corpus['_warnings'] = sorted(set(warnings))[:50]
     return corpus
 

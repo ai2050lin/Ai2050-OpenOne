@@ -35,6 +35,13 @@
                       shard-<i>of<n>/L<hs下标>.npz（数组 X: (读出 P, 条目 N, 维 d)）+ manifest.json（文件、形状、dtype、
                       sha256、条目 id 顺序、tag_readout/tag_layer）。summary.native_field 记录目录与 manifest 的 sha256。
                       AI2050_NATIVE_DIR=off 关闭。
+    部件（可选，不上传）  corpus.components = {"readouts": [...], "layers": "all" | [块号]} 时，在所选读出位置采集每个
+                      Transformer 块的注意力头输出（o_proj 的输入按头拆分，z: H×head_dim）与 MLP 输出（d）：
+                      <原生全场目录>/components/B<块号>.npz（Z: (P, N, H·head_dim)，M: (P, N, d)，float16）+ components.json；
+                      o_proj 权重按模型键保存一次：<原生根目录>/_weights/<模型键>/o_proj_B<块号>.npy（(d, H·head_dim) float16）。
+                      第 h 个头写入残差流的向量 = W_O[:, h·hd:(h+1)·hd] · z_h；hs[b+1] − hs[b] = Σ_h W_O,h z_h + MLP_b（预归一化
+                      架构、o_proj 无偏置时精确成立）——真实模式逐条核对这一闭合并记入 summary.components.closure。
+                      summary.components 只上传摘要（形状、闭合误差、逐头平均范数）。未声明 components 的语料行为与旧版相同。
 
 模式:
     smoke      不加载模型，只校验语料与分片，status=smoke（不冒充实测）
@@ -55,6 +62,7 @@ from pathlib import Path
 HEAD_DIMS = 16
 LENS_TOPK = 5
 ITEM_CORPUS_BUDGET_BYTES = 192 * 1024 * 1024   # 上传 items.npz 的全语料（全部分片合计）float16 体积预算；corpus.item_budget_bytes 可覆盖
+ITEM_SHARD_CAP_BYTES = 56 * 1024 * 1024       # 每个分片 items.npz 的上限（中心单文件上传上限 64 MB，留出 logit-lens 等余量）
 SUFFSTATS_BUDGET_BYTES = 160 * 1024 * 1024
 SNAPSHOT_PATTERNS = ('*.safetensors', '*.bin', '*.pt', '*.gguf', 'config.json', 'generation_config.json',
                      'tokenizer*', 'vocab*', 'merges.txt', 'special_tokens_map.json', '*.model', '*.tiktoken')
@@ -121,6 +129,13 @@ def item_projection(n_total, n_tags, dim, budget=None):
     return (f'jl{k}', k) if k < dim else ('full', dim)
 
 
+def items_budget(corpus):
+    """全语料 items 预算 = min(corpus.item_budget_bytes 或缺省 192 MB, 每分片上限 × 分片数)。
+    只依赖语料（分片数是语料的一部分），各分片相同；单分片的试跑语料因此会投影到上传上限以内。"""
+    budget = int(corpus.get('item_budget_bytes') or ITEM_CORPUS_BUDGET_BYTES)
+    return min(budget, ITEM_SHARD_CAP_BYTES * max(int(corpus.get('shards') or 1), 1))
+
+
 def jl_matrix(seed, dim, k):
     """固定种子的高斯随机投影 (d, k)，由语料指纹决定。"""
     import numpy as np
@@ -128,12 +143,19 @@ def jl_matrix(seed, dim, k):
     return rng.standard_normal((dim, k)).astype(np.float32) / np.sqrt(k)
 
 
-def native_dir(corpus, shard, model_key):
-    """原生全场目录（在 outputs 之外，不上传）；AI2050_NATIVE_DIR=off/0/none 时返回 None。"""
+def native_root():
+    """原生全场根目录；AI2050_NATIVE_DIR=off/0/none 时返回 None。"""
     base = os.environ.get('AI2050_NATIVE_DIR', '').strip()
     if base.lower() in ('off', '0', 'none', 'false'):
         return None
-    root = Path(base) if base else Path.home() / '.ai2050' / 'native_fields'
+    return Path(base) if base else Path.home() / '.ai2050' / 'native_fields'
+
+
+def native_dir(corpus, shard, model_key):
+    """原生全场目录（在 outputs 之外，不上传）；AI2050_NATIVE_DIR=off/0/none 时返回 None。"""
+    root = native_root()
+    if root is None:
+        return None
     fp = hashlib.sha256(json.dumps(corpus, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()[:16]
 
     def safe(x):
@@ -143,18 +165,109 @@ def native_dir(corpus, shard, model_key):
             / fp / safe(model_key) / f'shard-{shard[0]}of{shard[1]}')
 
 
-def suffstats_layer_subset(n_layers, n_readouts, n_cells, dim):
+def component_plan(corpus, n_blocks):
+    """部件采集口径：{'readouts': [...], 'blocks': [块号]}；语料未声明 components 时返回 None。"""
+    comp = corpus.get('components')
+    if not isinstance(comp, dict):
+        return None
+    readouts = [r for r in comp.get('readouts') or [] if r in readouts_of(corpus) and r != 'probe_answer']
+    layers = comp.get('layers', 'all')
+    blocks = (list(range(n_blocks)) if layers == 'all'
+              else sorted({int(b) for b in layers if isinstance(b, int) and 0 <= b < n_blocks}))
+    return {'readouts': readouts, 'blocks': blocks} if readouts and blocks else None
+
+
+class ComponentStore:
+    """逐条部件输出（float16）：每条 z (P, B, H·hd) 与 m (P, B, d)；另累计闭合误差。"""
+
+    def __init__(self, cplan, n_heads, head_dim, dim):
+        self.readouts, self.blocks = list(cplan['readouts']), list(cplan['blocks'])
+        self.n_heads, self.head_dim, self.dim = int(n_heads), int(head_dim), int(dim)
+        self.ids, self.z, self.m = [], [], []
+        self.closure = []          # 逐 (条目, 读出, 块) 的相对闭合误差
+
+    def add(self, item_id, z, m):
+        import numpy as np
+        self.ids.append(item_id)
+        self.z.append(np.asarray(z, dtype=np.float16))
+        self.m.append(np.asarray(m, dtype=np.float16))
+
+    def digest(self):
+        import numpy as np
+        Z = np.stack(self.z).astype(np.float32)                     # (N, P, B, H·hd)
+        N, P, B, _ = Z.shape
+        zn = np.linalg.norm(Z.reshape(N, P, B, self.n_heads, self.head_dim), axis=-1).mean(0)
+        mn = np.linalg.norm(np.stack(self.m).astype(np.float32), axis=-1).mean(0)
+        out = {'readouts': self.readouts, 'blocks': self.blocks, 'n_heads': self.n_heads, 'head_dim': self.head_dim,
+               'dim': self.dim, 'n_items': N,
+               'z_norm_mean': np.round(zn, 4).tolist(), 'mlp_norm_mean': np.round(mn, 4).tolist()}
+        if self.closure:
+            err = np.array(self.closure, dtype=np.float64)
+            out['closure'] = {'n': int(len(err)), 'rel_err_mean': float(err.mean()), 'rel_err_max': float(err.max()),
+                              'note': '‖(hs[b+1]−hs[b]) − (o_proj(z_b) + MLP_b)‖ / ‖hs[b+1]−hs[b]‖；'
+                                      '末块的 hs[-1] 已过最终归一化时不核对'}
+        return out
+
+    def write(self, out_dir, weights_info):
+        import numpy as np
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        Z = np.stack(self.z)                                         # (N, P, B, H·hd)
+        M = np.stack(self.m)                                         # (N, P, B, d)
+        files, total = [], 0
+        for k, b in enumerate(self.blocks):
+            buf = io.BytesIO()
+            np.savez(buf, Z=np.ascontiguousarray(Z[:, :, k].transpose(1, 0, 2)),
+                     M=np.ascontiguousarray(M[:, :, k].transpose(1, 0, 2)))
+            data = buf.getvalue()
+            name = f'B{b}.npz'
+            (out_dir / name).write_bytes(data)
+            total += len(data)
+            files.append({'path': name, 'block': b, 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
+        manifest = {'schema': 'components.v1', 'axes': ['readout', 'item', 'dim'], 'readouts': self.readouts,
+                    'ids': list(self.ids), 'blocks': self.blocks, 'n_heads': self.n_heads, 'head_dim': self.head_dim,
+                    'dim': self.dim, 'files': files, 'o_proj': weights_info,
+                    'note': '第 h 个头写入残差流 = W_O[:, h·hd:(h+1)·hd] @ z_h；MLP 输出已在残差空间'}
+        mbytes = json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=True).encode('utf-8')
+        (out_dir / 'components.json').write_bytes(mbytes)
+        return {'dir': str(out_dir), 'manifest_sha256': hashlib.sha256(mbytes).hexdigest(), 'bytes': total,
+                'n_files': len(files), 'uploaded': False}
+
+
+def save_o_proj(model_key, mats):
+    """o_proj 权重（每块 (d, H·hd) float16）按模型键保存一次；返回 {'dir', 'files': [{block, path, sha256}]}。"""
+    import numpy as np
+    root = native_root()
+    if root is None:
+        return None
+    wdir = root / '_weights' / ''.join(c if c.isalnum() or c in '-_.' else '_' for c in str(model_key))
+    wdir.mkdir(parents=True, exist_ok=True)
+    files = []
+    for b, W in sorted(mats.items()):
+        p = wdir / f'o_proj_B{b}.npy'
+        if not p.exists():
+            buf = io.BytesIO()
+            np.save(buf, np.asarray(W, dtype=np.float16))
+            p.write_bytes(buf.getvalue())
+        files.append({'block': int(b), 'path': p.name, 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()})
+    return {'dir': str(wdir), 'files': files}
+
+
+def suffstats_layer_subset(n_layers, n_readouts, n_cells, dim, budget=None):
     """体积超预算时的确定性层子集：步长取 2 的幂（1, 2, 4, …）的嵌套网格 {0, s, 2s, …} ∪ {末层}。
     取能放进预算的最小步长。不同模式族的条件格数不同，选出的步长可以不同，但子集互相嵌套
     （步长 2^j 的网格包含于 2^(j-1) 的网格），跨族取交集即为较粗的那个网格，谱图可以直接比较。
     只依赖语料与模型维度，所有分片相同。"""
+    # corpus.suffstats_budget_bytes 可调低预算（中心单文件上传上限 64 MB）；显式预算下最少保留 {0, 末层} 两层
+    limit = int(budget or SUFFSTATS_BUDGET_BYTES)
+    floor = 2 if budget else 3
     per_layer = n_readouts * n_cells * dim * 16
-    if per_layer * n_layers <= SUFFSTATS_BUDGET_BYTES or n_layers <= 3:
+    if per_layer * n_layers <= limit or n_layers <= floor:
         return list(range(n_layers))
     stride = 2
     while True:
         keep = sorted(set(range(0, n_layers, stride)) | {n_layers - 1})
-        if len(keep) * per_layer <= SUFFSTATS_BUDGET_BYTES or len(keep) <= 3:
+        if len(keep) * per_layer <= limit or len(keep) <= floor:
             return keep
         stride *= 2
 
@@ -331,7 +444,8 @@ class Plan:
         self.tag_layer = [i for _ in self.readouts for _, i in self.layers]
         n_cells = len({(it['split'], cond_key(it['cond'])) for it in items}) or 1
         self.n_total = len(items)
-        keep = suffstats_layer_subset(len(self.layers), len(self.readouts), n_cells, dim)
+        self.ss_budget = corpus.get('suffstats_budget_bytes')
+        keep = suffstats_layer_subset(len(self.layers), len(self.readouts), n_cells, dim, self.ss_budget)
         self.ss_index = [p * len(self.layers) + l for p in range(len(self.readouts)) for l in keep]
         self.ss_layers = [self.layers[l][0] for l in keep]
 
@@ -346,14 +460,14 @@ class Plan:
         if not corpus.get('capture_items', True):
             return None
         return ItemStore(corpus_seed(corpus), self.readouts, self.tag_readout, self.tag_layer, self.tags,
-                         n_total=self.n_total, budget=corpus.get('item_budget_bytes'))
+                         n_total=self.n_total, budget=items_budget(corpus))
 
     def describe(self, n_hs):
         return {'readouts': self.readouts, 'n_hidden_states': n_hs, 'n_items_corpus': self.n_total,
                 'layer_plan': [{'tag': t, 'hs_index': i} for t, i in self.layers],
                 'suffstats_layers': self.ss_layers,
                 'suffstats_layers_note': ('全部层' if len(self.ss_layers) == len(self.layers) else
-                                          f'体积超预算（{SUFFSTATS_BUDGET_BYTES >> 20} MB），suffstats 只保留 2 的幂步长嵌套网格上的层；'
+                                          f'体积超预算（{int(self.ss_budget or SUFFSTATS_BUDGET_BYTES) >> 20} MB），suffstats 只保留 2 的幂步长嵌套网格上的层；'
                                           'items.npz 与 logit-lens 仍覆盖全部层')}
 
 
@@ -500,12 +614,48 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     final_norm = getattr(decoder, 'norm', None) or getattr(decoder, 'final_layernorm', None)
     state = {'plan': None, 'last_post_norm': None, 'vocab': {}}
 
-    def run(text):
+    # 部件采集（corpus.components）：o_proj 的输入（按头拆分前的拼接 z）与 MLP 输出，只在研究句的前向中记录
+    blocks_mod = list(getattr(decoder, 'layers', []) or [])
+    cplan = component_plan(corpus, len(blocks_mod))
+    cap = {'on': False, 'z': {}, 'm': {}}
+    o_projs = {}
+    if cplan:
+        def _attn(layer):
+            return getattr(layer, 'self_attn', None) or getattr(layer, 'attn', None)
+        for b in cplan['blocks']:
+            layer = blocks_mod[b]
+            attn, mlp = _attn(layer), getattr(layer, 'mlp', None)
+            o_proj = getattr(attn, 'o_proj', None) if attn is not None else None
+            if o_proj is None or mlp is None:
+                raise RuntimeError(f'块 {b} 没有 self_attn.o_proj / mlp，无法采集部件')
+            if getattr(o_proj, 'bias', None) is not None:
+                summary.setdefault('components_warnings', []).append(f'块 {b} 的 o_proj 有偏置：逐头分解不含偏置项')
+            o_projs[b] = o_proj
+
+            def pre(mod, args, b=b):
+                if cap['on']:
+                    cap['z'][b] = args[0].detach()
+
+            def post(mod, args, out, b=b):
+                if cap['on']:
+                    cap['m'][b] = (out[0] if isinstance(out, tuple) else out).detach()
+            o_proj.register_forward_pre_hook(pre)
+            mlp.register_forward_hook(post)
+        cfg = model.config
+        n_heads = int(cfg.num_attention_heads)
+        head_dim = int(getattr(cfg, 'head_dim', None) or cfg.hidden_size // n_heads)
+    comp_store = None
+
+    def run(text, capture=False):
         enc = tok(text, return_tensors='pt', return_offsets_mapping=True)
         off = enc.pop('offset_mapping')[0].tolist()
         ids = enc['input_ids'][0].tolist()
         enc = {k: v.to(device) for k, v in enc.items()}
-        res = model(**enc, output_hidden_states=True)
+        cap['on'] = bool(capture and cplan)
+        try:
+            res = model(**enc, output_hidden_states=True)
+        finally:
+            cap['on'] = False
         hs = res.hidden_states
         if state['last_post_norm'] is None:
             # 对账：HF 的 hidden_states[-1] 是否已经过最终归一化（lm_head(hs[-1]) 应等于实际 logits）
@@ -580,27 +730,59 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
 
     acc = store = plan = None
     tok_len, behavior, straddle = {}, [], {}
+    # 同一 probe（提示、答案集、对照集都相同）在多个句式里重复出现（如 ENT-XF 的肯定/否定与句式变体）：
+    # 不需要 probe_answer 读出时缓存评分结果，结果与逐条重算相同
+    probe_memo = {} if 'probe_answer' not in readouts else None
     with torch.inference_mode():
         for it in items:
-            hs, _, off, ids = run(it['text'])
+            hs, _, off, ids = run(it['text'], capture=True)
             if plan is None:
                 plan = Plan(corpus, study, len(hs), int(hs[0].shape[-1]))
                 acc, store = plan.acc(int(hs[0].shape[-1]), factors), plan.store(corpus)
                 summary.update(plan.describe(len(hs)))
+                if cplan:
+                    comp_store = ComponentStore(cplan, n_heads, head_dim, int(hs[0].shape[-1]))
             pos = text_positions(it, off, readouts, straddle)
+            if comp_store is not None:
+                zs, ms = [], []
+                for r in comp_store.readouts:
+                    p = pos[r]
+                    z = torch.stack([cap['z'][b][0, p] for b in comp_store.blocks])          # (B, H·hd)
+                    m = torch.stack([cap['m'][b][0, p] for b in comp_store.blocks])          # (B, d)
+                    for k, b in enumerate(comp_store.blocks):
+                        if b + 1 < len(hs) - 1 or not state['last_post_norm']:
+                            delta = (hs[b + 1][0, p] - hs[b][0, p]).float()
+                            recon = (o_projs[b](z[k][None])[0] + m[k]).float()
+                            comp_store.closure.append(float((delta - recon).norm() / delta.norm().clamp_min(1e-6)))
+                    zs.append(z.float().cpu().numpy())
+                    ms.append(m.float().cpu().numpy())
+                comp_store.add(it['id'], np.stack(zs), np.stack(ms))
+                cap['z'].clear(); cap['m'].clear()
             probe = it.get('probe')
             ans_id, correct, phs, pids = None, None, None, None
             if probe:
                 ans_ids = tok(probe['answer'], add_special_tokens=False)['input_ids']
-                phs, plogits, _, pids = run(probe['prompt'])
-                if ans_ids:
+                key = json.dumps([probe['prompt'], probe['answer'], probe.get('answers'), probe.get('contrast')],
+                                 ensure_ascii=False) if probe_memo is not None else None
+                if key is not None and key in probe_memo:
+                    core = probe_memo[key]
+                elif ans_ids:
+                    phs, plogits, _, pids = run(probe['prompt'])
                     ans_id = int(ans_ids[0])
                     logits = plogits[0, -1].float()
                     logp = torch.log_softmax(logits, dim=-1)
                     rank = int((logits > logits[ans_id]).sum().item()) + 1
-                    rec = {'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']),
-                           'rank': rank, 'logprob': float(logp[ans_id].item()), 'first_top1': rank == 1}
-                    rec.update(score_probe(probe, pids, int(torch.argmax(logits).item())))
+                    core = {'rank': rank, 'logprob': float(logp[ans_id].item()), 'first_top1': rank == 1}
+                    core.update(score_probe(probe, pids, int(torch.argmax(logits).item())))
+                    if key is not None:
+                        probe_memo[key] = core
+                else:
+                    core = None
+                    phs, _, _, pids = run(probe['prompt'])
+                if ans_ids:
+                    ans_id = int(ans_ids[0])
+                if core is not None:
+                    rec = {'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']), **core}
                     correct = rec['correct']
                     behavior.append(rec)
             if 'probe_answer' in readouts and phs is None:
@@ -637,11 +819,16 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     summary['final_layer_norm'] = 'post_final_norm' if state['last_post_norm'] else 'pre_final_norm（lm_head 对账不符，lens 对 hs[-1] 也施加最终归一化）'
     summary['hidden_state_boundary'] = ('hs[0] = 嵌入层输出（第 0 块输入）；hs[i] = 第 i 块之后的残差流；'
                                         'hs[-1] 见 final_layer_norm；位置为所选 token，采集为单条前向、无 padding、无 KV 缓存复用')
+    model_key = f"{summary['model_snapshot']['sha256'][:16]}-{precision}"
+    weights = None
+    if comp_store is not None and comp_store.ids:
+        weights = lambda: save_o_proj(model_key, {b: o_projs[b].weight.detach().float().cpu().numpy()  # noqa: E731
+                                                  for b in comp_store.blocks})
     _write_outputs(out, acc, behavior, can, tok_len, summary, status='real',
                    extra={'model_path': model_path, 'device': device}, store=store,
                    lens_layers=[i for _, i in plan.layers], vocab=state['vocab'],
-                   native={'corpus': corpus, 'shard': _shard_tuple(summary),
-                           'model_key': f"{summary['model_snapshot']['sha256'][:16]}-{precision}"})
+                   native={'corpus': corpus, 'shard': _shard_tuple(summary), 'model_key': model_key},
+                   components=(comp_store, weights) if weights else None)
 
 
 def _synthetic_coef(tag, hs_index, n_hs):
@@ -707,6 +894,14 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
     acc, store = plan.acc(dim, factors), plan.store(corpus)
     behavior, tok_len = [], {}
     n_layers = len(plan.layers)
+    # 合成部件（只用于检验采集与闭合格式）：每块 H 个头（随机 W_O、随机 z）+ MLP = 残差增量 − Σ 头，闭合精确成立
+    cplan = component_plan(corpus, n_hs - 1) if [i for _, i in plan.layers] == list(range(n_hs)) else None
+    comp_store = None
+    if cplan:
+        n_heads, head_dim = int(corpus.get('synthetic_heads', 4)), int(corpus.get('synthetic_head_dim', 8))
+        comp_store = ComponentStore(cplan, n_heads, head_dim, dim)
+        W_syn = {b: np.random.default_rng(int(hashlib.sha256(f'{salt}W_O{b}'.encode()).hexdigest()[:8], 16))
+                 .standard_normal((dim, n_heads * head_dim)) / np.sqrt(n_heads * head_dim) for b in cplan['blocks']}
     for it in items:
         rng = np.random.default_rng(int(hashlib.sha256((salt + it['id']).encode()).hexdigest()[:8], 16))
         cond = it['cond']
@@ -731,6 +926,15 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
                 vecs.append(v)
         acc.add(it['split'], cond, plan.ss_select(vecs))
         tok_len.setdefault(cond_key(cond), []).append(len(it['text']))
+        if comp_store is not None:
+            zs, ms = [], []
+            for r in comp_store.readouts:
+                base = readouts.index(r) * n_layers
+                z = rng.standard_normal((len(comp_store.blocks), n_heads * head_dim)) * 0.3
+                m = np.stack([vecs[base + b + 1] - vecs[base + b] - W_syn[b] @ z[k]
+                              for k, b in enumerate(comp_store.blocks)])
+                zs.append(z); ms.append(m)
+            comp_store.add(it['id'], np.stack(zs), np.stack(ms))
         correct = None
         if it.get('probe'):
             p_ok = 0.55 if (main_f and other_f and str(cond[main_f]) == weak[0] and str(cond[other_f[0]]) == weak[1]) else 0.95
@@ -755,7 +959,10 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
     _write_outputs(out, acc, behavior, can, tok_len, summary, status='synthetic', extra={}, store=store,
                    lens_layers=[i for _, i in plan.layers], vocab={i: f'<syn{i}>' for i in range(LENS_TOPK)} | {7: '<next>', 11: '<ans>'},
                    native={'corpus': corpus, 'shard': _shard_tuple(summary),
-                           'model_key': 'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8]})
+                           'model_key': 'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8]},
+                   components=(comp_store, lambda: save_o_proj(
+                       'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8], W_syn))
+                   if comp_store is not None and comp_store.ids else None)
 
 
 def _shard_tuple(summary):
@@ -783,7 +990,7 @@ def _lens_digest(store, lens_layers):
 
 
 def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, store=None, lens_layers=None, vocab=None,
-                   native=None):
+                   native=None, components=None):
     (out / 'suffstats.npz').write_bytes(acc.npz_bytes())
     if store is not None and store.meta:
         data, space = store.npz_bytes(store.tags or acc.layer_tags, lens_layers, vocab)
@@ -807,6 +1014,18 @@ def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, sto
                 summary['native_field'] = {'error': f'{type(exc).__name__}: {exc}'}
         if lens_layers is not None:
             summary['lens'] = {'topk': LENS_TOPK, **_lens_digest(store, lens_layers)}
+    if components is not None:
+        cstore, weights = components
+        info = cstore.digest()
+        nd = native_dir(native['corpus'], native['shard'], native['model_key']) if native is not None else None
+        if nd is None:
+            info['native'] = {'disabled': True, 'note': '原生目录关闭（AI2050_NATIVE_DIR=off），部件输出未保存'}
+        else:
+            try:
+                info['native'] = cstore.write(nd / 'components', weights())
+            except OSError as exc:
+                info['native'] = {'error': f'{type(exc).__name__}: {exc}'}
+        summary['components'] = info
     (out / 'behavior.json').write_text(json.dumps({'schema': 'behavior.v1', 'items': behavior},
                                                   ensure_ascii=False), encoding='utf-8')
     (out / 'canary.json').write_text(json.dumps({'schema': 'canary.v1', 'entries': can},
