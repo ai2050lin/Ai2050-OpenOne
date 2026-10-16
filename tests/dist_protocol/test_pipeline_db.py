@@ -153,6 +153,15 @@ class PipelineDbTests(unittest.TestCase):
             self.assertTrue(g['nodes'])
         pack, _ = pipeline.atlas_pack(at, 'm-a|r1|bf16')
         self.assertEqual(set(zipfile.ZipFile(io.BytesIO(pack)).namelist()), {'manifest.json', 'atlas.json', 'digest.md', 'prompt.md'})
+        # 关闭的模板不进入谱图（结果保留），重开后恢复
+        self.db.execute("UPDATE templates SET status='closed' WHERE tm_id='TG-GR-ROLE'")
+        closed = pipeline.atlas_payload(self.db, self.tmp, gate=False)
+        self.assertEqual(closed['graphs'], [])
+        src = next(s for s in closed['sources'] if s['tm_id'] == 'TG-GR-ROLE')
+        self.assertFalse(src['used'])
+        self.assertIn('关闭', src['reason'])
+        self.db.execute("UPDATE templates SET status='open' WHERE tm_id='TG-GR-ROLE'")
+        self.assertEqual(sorted(pipeline.atlas_payload(self.db, self.tmp, gate=False)['models']), ['m-a|r1|bf16', 'm-b|r1|bf16'])
 
 
 if __name__ == '__main__':

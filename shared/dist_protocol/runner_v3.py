@@ -21,7 +21,7 @@
 产出（Agent 上传 outputs/ 下全部文件）:
     summary.json      必有：状态、计数、逐格行为准确率、token 长度、本分片 η² 摘要、采集口径、model_snapshot
     suffstats.npz     真实/合成模式：每 (split, 条件格, 层位标签, 维) 的 n、Σx、Σx²（float64，可跨节点相加）。
-                      suffstats.v2 = v1 + 每个标签的 读出/层号；体积超预算时只保留确定性的等距层子集（各分片相同）
+                      suffstats.v2 = v1 + 每个标签的 读出/层号；体积超预算时只保留 2 的幂步长嵌套网格上的层（各分片相同、跨族可取交集）
     behavior.json     含 probe 的条目：correct（行为门判定）与 mode——有对照集时 forced_choice（完整答案对数概率
                       max log P(可接受) > max log P(对照)，记录最佳答案、最佳对照与 margin），否则 set_first_token
                       （下一 token 是否为任一可接受答案的首 token）；另保留旧口径 first_top1 / rank / logprob（主答案首 token）
@@ -144,14 +144,19 @@ def native_dir(corpus, shard, model_key):
 
 
 def suffstats_layer_subset(n_layers, n_readouts, n_cells, dim):
-    """体积超预算时的确定性等距层子集（含首末层）。只依赖语料与模型维度，所有分片相同。"""
+    """体积超预算时的确定性层子集：步长取 2 的幂（1, 2, 4, …）的嵌套网格 {0, s, 2s, …} ∪ {末层}。
+    取能放进预算的最小步长。不同模式族的条件格数不同，选出的步长可以不同，但子集互相嵌套
+    （步长 2^j 的网格包含于 2^(j-1) 的网格），跨族取交集即为较粗的那个网格，谱图可以直接比较。
+    只依赖语料与模型维度，所有分片相同。"""
     per_layer = n_readouts * n_cells * dim * 16
     if per_layer * n_layers <= SUFFSTATS_BUDGET_BYTES or n_layers <= 3:
         return list(range(n_layers))
-    k = int(max(3, SUFFSTATS_BUDGET_BYTES // max(per_layer, 1)))
-    if k >= n_layers:
-        return list(range(n_layers))
-    return sorted({int(round(i * (n_layers - 1) / (k - 1))) for i in range(k)})
+    stride = 2
+    while True:
+        keep = sorted(set(range(0, n_layers, stride)) | {n_layers - 1})
+        if len(keep) * per_layer <= SUFFSTATS_BUDGET_BYTES or len(keep) <= 3:
+            return keep
+        stride *= 2
 
 
 class ItemStore:
@@ -348,7 +353,7 @@ class Plan:
                 'layer_plan': [{'tag': t, 'hs_index': i} for t, i in self.layers],
                 'suffstats_layers': self.ss_layers,
                 'suffstats_layers_note': ('全部层' if len(self.ss_layers) == len(self.layers) else
-                                          f'体积超预算（{SUFFSTATS_BUDGET_BYTES >> 20} MB），suffstats 只保留等距层子集；'
+                                          f'体积超预算（{SUFFSTATS_BUDGET_BYTES >> 20} MB），suffstats 只保留 2 的幂步长嵌套网格上的层；'
                                           'items.npz 与 logit-lens 仍覆盖全部层')}
 
 

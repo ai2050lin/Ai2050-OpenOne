@@ -328,6 +328,11 @@ class BackwardCompatTests(unittest.TestCase):
         self.assertLessEqual(len(keep) * 4 * 80 * 2560 * 16, rn.SUFFSTATS_BUDGET_BYTES)
         self.assertEqual(keep, rn.suffstats_layer_subset(37, 4, 80, 2560))     # 确定性：各分片相同
         self.assertEqual(rn.suffstats_layer_subset(9, 4, 80, 32), list(range(9)))
+        # 不同条件格数选出的层子集互相嵌套（2 的幂步长网格），跨族取交集即为较粗的网格
+        subsets = [rn.suffstats_layer_subset(37, 4, c, 2560) for c in (10, 30, 60, 80, 160, 400)]
+        for fine, coarse in zip(subsets, subsets[1:]):
+            self.assertTrue(set(coarse) <= set(fine), (fine, coarse))
+        self.assertTrue(all(s[0] == 0 and s[-1] == 36 for s in subsets))
         tmp = Path(tempfile.mkdtemp())
         try:
             (tmp / 'model.safetensors').write_bytes(b'w' * 10)

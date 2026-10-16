@@ -207,22 +207,46 @@ class _Layer:
                 self.A[k] = (d, np.mean(np.stack(hs), axis=0) if len(hs) == len(mem) else None)
 
 
+def _restrict_family(fam: Dict[str, Any], tags: List[str]) -> Dict[str, Any]:
+    """把一个族的特征与水平均值限制到给定标签（按 tags 顺序重新编号 layer_i）。"""
+    if list(fam['layers']) == list(tags):
+        return fam
+    idx = [fam['layers'].index(t) for t in tags]
+    pos = {t: i for i, t in enumerate(tags)}
+    pick = lambda d: {lv: v[idx] for lv, v in d.items()}  # noqa: E731
+    groups = [{**g, 'md': pick(g['md']), 'mh': pick(g['mh']), 'mx': pick(g['mx'])} for g in fam['groups']]
+    feats = [{**f, 'layer_i': pos[f['layer']]} for f in fam['features'] if f['layer'] in pos]
+    return {**fam, 'layers': list(tags), 'groups': groups, 'features': feats,
+            'layers_dropped': [t for t in fam['layers'] if t not in pos]}
+
+
 def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """单个模型：families = family_features() 的结果列表（同模型）。"""
-    ref = None
+    """单个模型：families = family_features() 的结果列表（同模型）。
+
+    各族的采样标签（读出@层）可以不同（如 suffstats 按体积预算只保留部分层）：只在全部可用族共有的标签上
+    建图。维度与多数族不同、或与其他族没有共同标签的族不纳入，并在 skipped 中说明。"""
     usable, skipped = [], []
+    dims = [fam['dim'] for fam in families]
+    ref_dim = max(set(dims), key=dims.count) if dims else None
     for fam in families:
-        sig = (tuple(fam['layers']), fam['dim'])
-        if ref is None:
-            ref = sig
-        if sig != ref:
-            skipped.append({'family': fam['family'], 'reason': f'采样层或维度与其他族不一致（{fam["layers"]} / {fam["dim"]}）'})
+        if fam['dim'] != ref_dim:
+            skipped.append({'family': fam['family'], 'reason': f'向量维度 {fam["dim"]} 与其他族（{ref_dim}）不一致'})
             continue
         if not fam['held_split']:
             skipped.append({'family': fam['family'], 'reason': '没有 lockbox/confirm 划分，无法检验复现'})
             continue
         usable.append(fam)
-    layers = list(ref[0]) if ref else []
+    common = [t for t in usable[0]['layers'] if all(t in fam['layers'] for fam in usable[1:])] if usable else []
+    if usable and not common:
+        # 没有全体共有的标签：保留与第一族共有标签最多的那部分族
+        keep = [usable[0]] + [fam for fam in usable[1:] if set(fam['layers']) & set(usable[0]['layers'])]
+        for fam in usable:
+            if fam not in keep:
+                skipped.append({'family': fam['family'], 'reason': '与其他族没有共同的采样标签（读出@层）'})
+        usable = keep
+        common = [t for t in usable[0]['layers'] if all(t in fam['layers'] for fam in usable[1:])]
+    usable = [_restrict_family(fam, common) for fam in usable]
+    layers = list(common)
     nodes = [f for fam in usable for f in fam['features']]
     node_of = {(f['family'], f['factor'], f['level'], f['layer']): f for f in nodes}
     groups = [(fam['family'], g['factor'], g['md'], g['mh'], g['mx']) for fam in usable for g in fam['groups']]
@@ -347,6 +371,7 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
     out_nodes = [{k: v for k, v in f.items() if k != 'layer_i'} for f in nodes]
     return {
         'model': model, 'layers': layers, 'families': [f['family'] for f in usable], 'skipped': skipped,
+        'layers_dropped': {f['family']: f['layers_dropped'] for f in usable if f.get('layers_dropped')},
         'nodes': out_nodes, 'edges': edges, 'nulls': nulls, 'coords': coords, 'axes': axes,
         'concept_hypotheses': hyps, 'novel_edges': len(novel),
     }

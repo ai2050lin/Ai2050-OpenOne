@@ -149,6 +149,19 @@ class AtlasTests(unittest.TestCase):
         g = atlas.build_atlas({'m1': fams})['graphs'][0]
         self.assertEqual([s['family'] for s in g['skipped']], ['GR-C'])
 
+    def test_families_with_layer_subsets_use_common_tags(self):
+        # 真实运行中各族 suffstats 按体积预算保留的层不同：谱图应在共有层上建图，而不是排除整族
+        fams = build(True)
+        fams[0] = atlas._restrict_family(fams[0], ['mid', 'last'])
+        g = atlas.build_atlas({'m1': fams})['graphs'][0]
+        self.assertEqual(g['skipped'], [])
+        self.assertEqual(g['layers'], ['mid', 'last'])
+        self.assertEqual(g['layers_dropped'], {f: ['first'] for f in ('KN-A', 'KN-B', 'GR-C')})   # 每族记录被截掉的层
+        self.assertTrue(all(n['layer'] in ('mid', 'last') for n in g['nodes']))
+        q_axes = [a for a in g['axes'] if '疑问' in a['concepts']]
+        self.assertEqual({a['layer'] for a in q_axes}, {'mid', 'last'})
+        self.assertTrue(all(a['supported'] for a in q_axes))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -828,6 +828,12 @@ def atlas_payload(db: sqlite3.Connection, data_dir: Path, *, gate: bool = True) 
     for t, corpus in templates_v3(db):
         if not is_v3(corpus) or corpus.get('mode') == 'pilot':
             continue
+        if (t['status'] or 'open') != 'open':
+            # 已关闭的模板（如文法已升版本但新版本未进入正式冻结时的旧版本）不进入谱图
+            sources.append({'tm_id': t['tm_id'], 'family_id': corpus.get('family_id'), 'bucket': None,
+                            'complete': False, 'used': False, 'reason': f'模板已关闭（status={t["status"]}）'})
+            keys.append((t['tm_id'], 'closed'))
+            continue
         agg = aggregate(db, data_dir, t['tm_id'], gate=gate)
         for b in agg['buckets']:
             src = {'tm_id': t['tm_id'], 'family_id': corpus.get('family_id'), 'bucket': b['bucket'],
