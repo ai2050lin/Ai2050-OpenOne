@@ -1,11 +1,11 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "GR-NEG",
- "grammar_version": 4,
- "revision_note": "v2：疑问标记「吗」原在目标 A 之后、A 处 mood 不可见 → 疑问句加句首「我想问，」；neg-q 的 probe 原照抄肯定疑问 prompt → 改为用本句「问：{S}不是{A}的吗？答：{S}」并期望「是」（反问预设命题为真）；aff-q 的 probe 同步改为复述式；新增 final/probe_answer 读出与全层采集。 | v3：陈述句原无句首前缀而疑问句有「我想问，」，疑问与「有无前缀」混淆 → 陈述句加「我想说，」（与「我想问，」同为 4 字 / 3 token）；陈述句 probe 仍为「判断对错：{S}（不）是{A}的。答案：」，不加前缀，行为门含义不变。 | v4：行为门改为完整答案对数概率的强制选择——陈述句「对/正确」对「错/错误」，疑问句「是」对「不是/不」；neg-q 原 probe「问：S不是A的吗？答：S」有歧义（模型常照字面答「不是」）→ 改为释义式「“S不是A的吗？”这句话的意思是：S」，期望「是」。",
+ "grammar_version": 5,
+ "revision_note": "v2：疑问标记「吗」原在目标 A 之后、A 处 mood 不可见 → 疑问句加句首「我想问，」；neg-q 的 probe 原照抄肯定疑问 prompt → 改为用本句「问：{S}不是{A}的吗？答：{S}」并期望「是」（反问预设命题为真）；aff-q 的 probe 同步改为复述式；新增 final/probe_answer 读出与全层采集。 | v3：陈述句原无句首前缀而疑问句有「我想问，」，疑问与「有无前缀」混淆 → 陈述句加「我想说，」（与「我想问，」同为 4 字 / 3 token）；陈述句 probe 仍为「判断对错：{S}（不）是{A}的。答案：」，不加前缀，行为门含义不变。 | v4：行为门改为完整答案对数概率的强制选择——陈述句「对/正确」对「错/错误」，疑问句「是」对「不是/不」；neg-q 原 probe「问：S不是A的吗？答：S」有歧义（模型常照字面答「不是」）→ 改为释义式「“S不是A的吗？”这句话的意思是：S」，期望「是」。 | v5：多句式版本。v4 每个条件格只有 1 个句式，polarity/mood 都是句式级因子，按句式整体打乱的置换检验最多 4!（排除一格后 3!）种排列，p 值按构造到不了 0.01。改为每种语气 4 个句首短语（陈述：我想说/我告诉你/我认为/我相信；疑问：我想问/我问你/请问一下/你觉得，长度匹配），每个短语与肯定/否定交叉（polarity 对比在同一短语内），共 16 个句式；各语气留 1 个短语（2 个句式）作未见句式，发现材料 12 个句式（标签排列 C(12,6)=924 种）。probe 与 v4 相同（按条件格）。",
  "module": "GR",
  "name": "语法 · 否定 × 语气（真值判断）",
- "description": "常识性质命题的肯定/否定 × 陈述/疑问（2×2），目标位置为性质词 A（位于否定词作用域内）。陈述句与疑问句分别以「我想说，」「我想问，」开头（4 字 / 3 个 Qwen3 token，只差一个字），语气在 A 之前可见且与句首前缀长度无关；另读 final 与 probe_answer。中文否定疑问「S不是A的吗？」是反问，预设命题为真，neg-q 的 probe 用释义式「这句话的意思是：S」期望「是」。行为门按完整答案对数概率强制选择：陈述句判对错、疑问句判是非。",
+ "description": "常识性质命题的肯定/否定 × 陈述/疑问（2×2），每种语气 4 个句首短语、与肯定/否定交叉，共 16 个句式；目标位置为性质词 A（位于否定词作用域内，语气由句首短语在 A 之前标记）。疑问句为直接问句、以「？」结尾，句末读出的语气差异含句末标点的 token 身份（谱图嵌入层折扣会标出）；另读 final 与 probe_answer。行为门按完整答案对数概率强制选择：陈述句判对错、疑问句判是非（否定疑问用释义式 probe）。",
  "factors": [
   "polarity",
   "mood"
@@ -22,7 +22,7 @@
  ],
  "frames": [
   {
-   "id": "aff-decl",
+   "id": "aff-decl-say",
    "levels": {
     "polarity": "aff",
     "mood": "decl"
@@ -43,7 +43,7 @@
    }
   },
   {
-   "id": "neg-decl",
+   "id": "neg-decl-say",
    "levels": {
     "polarity": "neg",
     "mood": "decl"
@@ -64,7 +64,133 @@
    }
   },
   {
-   "id": "aff-q",
+   "id": "aff-decl-tell",
+   "levels": {
+    "polarity": "aff",
+    "mood": "decl"
+   },
+   "text": "我告诉你，{S}是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}是{A}的。答案：",
+    "answer": "对",
+    "answers": [
+     "对",
+     "正确"
+    ],
+    "contrast": [
+     "错",
+     "错误"
+    ]
+   }
+  },
+  {
+   "id": "neg-decl-tell",
+   "levels": {
+    "polarity": "neg",
+    "mood": "decl"
+   },
+   "text": "我告诉你，{S}不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}不是{A}的。答案：",
+    "answer": "错",
+    "answers": [
+     "错",
+     "错误"
+    ],
+    "contrast": [
+     "对",
+     "正确"
+    ]
+   }
+  },
+  {
+   "id": "aff-decl-think",
+   "levels": {
+    "polarity": "aff",
+    "mood": "decl"
+   },
+   "text": "我认为，{S}是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}是{A}的。答案：",
+    "answer": "对",
+    "answers": [
+     "对",
+     "正确"
+    ],
+    "contrast": [
+     "错",
+     "错误"
+    ]
+   }
+  },
+  {
+   "id": "neg-decl-think",
+   "levels": {
+    "polarity": "neg",
+    "mood": "decl"
+   },
+   "text": "我认为，{S}不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}不是{A}的。答案：",
+    "answer": "错",
+    "answers": [
+     "错",
+     "错误"
+    ],
+    "contrast": [
+     "对",
+     "正确"
+    ]
+   }
+  },
+  {
+   "id": "aff-decl-believe",
+   "levels": {
+    "polarity": "aff",
+    "mood": "decl"
+   },
+   "text": "我相信，{S}是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}是{A}的。答案：",
+    "answer": "对",
+    "answers": [
+     "对",
+     "正确"
+    ],
+    "contrast": [
+     "错",
+     "错误"
+    ]
+   }
+  },
+  {
+   "id": "neg-decl-believe",
+   "levels": {
+    "polarity": "neg",
+    "mood": "decl"
+   },
+   "text": "我相信，{S}不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "判断对错：{S}不是{A}的。答案：",
+    "answer": "错",
+    "answers": [
+     "错",
+     "错误"
+    ],
+    "contrast": [
+     "对",
+     "正确"
+    ]
+   }
+  },
+  {
+   "id": "aff-q-ask",
    "levels": {
     "polarity": "aff",
     "mood": "interrog"
@@ -84,12 +210,132 @@
    }
   },
   {
-   "id": "neg-q",
+   "id": "neg-q-ask",
    "levels": {
     "polarity": "neg",
     "mood": "interrog"
    },
    "text": "我想问，{S}不是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "“{S}不是{A}的吗？”这句话的意思是：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "aff-q-askyou",
+   "levels": {
+    "polarity": "aff",
+    "mood": "interrog"
+   },
+   "text": "我问你，{S}是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{S}是{A}的吗？答：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "neg-q-askyou",
+   "levels": {
+    "polarity": "neg",
+    "mood": "interrog"
+   },
+   "text": "我问你，{S}不是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "“{S}不是{A}的吗？”这句话的意思是：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "aff-q-please",
+   "levels": {
+    "polarity": "aff",
+    "mood": "interrog"
+   },
+   "text": "请问一下，{S}是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{S}是{A}的吗？答：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "neg-q-please",
+   "levels": {
+    "polarity": "neg",
+    "mood": "interrog"
+   },
+   "text": "请问一下，{S}不是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "“{S}不是{A}的吗？”这句话的意思是：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "aff-q-reckon",
+   "levels": {
+    "polarity": "aff",
+    "mood": "interrog"
+   },
+   "text": "你觉得，{S}是{A}的吗？",
+   "target": "A",
+   "probe": {
+    "prompt": "问：{S}是{A}的吗？答：{S}",
+    "answer": "是",
+    "answers": [
+     "是"
+    ],
+    "contrast": [
+     "不是",
+     "不"
+    ]
+   }
+  },
+  {
+   "id": "neg-q-reckon",
+   "levels": {
+    "polarity": "neg",
+    "mood": "interrog"
+   },
+   "text": "你觉得，{S}不是{A}的吗？",
    "target": "A",
    "probe": {
     "prompt": "“{S}不是{A}的吗？”这句话的意思是：{S}",
@@ -354,7 +600,12 @@
    "lockbox": 0.2
   },
   "salt": "v1",
-  "heldout_frames": []
+  "heldout_frames": [
+   "aff-decl-believe",
+   "neg-decl-believe",
+   "aff-q-reckon",
+   "neg-q-reckon"
+  ]
  },
  "prereg": {
   "min_behavior_acc": 0.7,

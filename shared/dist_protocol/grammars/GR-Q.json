@@ -1,0 +1,541 @@
+{
+ "schema_version": "template_grammar.v1",
+ "family_id": "GR-Q",
+ "grammar_version": 1,
+ "revision_note": "v1：疑问对照族。陈述与疑问都以「{A}的。」结尾（嵌入式疑问句用「。」），句末与目标位置的 token 在两种语气下相同；语气只由句中词汇标记（疑问「…是不是…」/ 陈述「…确实是…」，同为 3 字）和句首态度短语表达。每种语气 7 个句式，使按句式整体打乱的置换检验有足够功效；各留 1 个句式作未见句式检验，发现材料 12 个句式（与 GR-NEG v5 相同）。",
+ "module": "GR",
+ "name": "语法 · 疑问对照（句末标点一致）",
+ "description": "常识性质命题在陈述 / 疑问两种语气下的对照（各 7 个句式）。所有句子以「{A}的。」结尾，读出位置（目标 A、句末「。」）的 token 在两种语气下相同，嵌入层上没有语气差异；深层若出现与其他族「疑问」水平对齐的方向，才可能是超出 token 身份的共享编码。疑问句为嵌入式是非问（我想知道 S 是不是 A 的。），陈述句用等长的「确实是」平衡长度。行为门：问说话人是在陈述事实还是表达疑问，在「陈述」与「表达」之间按完整答案对数概率强制选择。",
+ "factors": [
+  "mood"
+ ],
+ "concepts": {
+  "mood=interrog": "疑问",
+  "mood=decl": "陈述"
+ },
+ "layers": "all",
+ "readouts": [
+  "target",
+  "final",
+  "probe_answer"
+ ],
+ "frames": [
+  {
+   "id": "q-wonder",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我想知道{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我想知道{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-tell",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "请告诉我{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "请告诉我{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-unsure",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我不确定{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我不确定{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-ask",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我想问问{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我想问问{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-figure",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我一直想弄清{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我一直想弄清{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-curious",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我很好奇{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我很好奇{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "q-confirm",
+   "levels": {
+    "mood": "interrog"
+   },
+   "text": "我想确认{S}是不是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我想确认{S}是不是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "表达",
+    "answers": [
+     "表达"
+    ],
+    "contrast": [
+     "陈述"
+    ]
+   }
+  },
+  {
+   "id": "d-knew",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我早就知道{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我早就知道{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-remember",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "请记住{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "请记住{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-sure",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我很确定{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我很确定{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-certain",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我可以肯定{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我可以肯定{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-believe",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我完全相信{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我完全相信{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-clear",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我很清楚{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我很清楚{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  },
+  {
+   "id": "d-ofcourse",
+   "levels": {
+    "mood": "decl"
+   },
+   "text": "我当然知道{S}确实是{A}的。",
+   "target": "A",
+   "probe": {
+    "prompt": "我当然知道{S}确实是{A}的。问：说话人是在陈述一个事实，还是在表达一个疑问？答：在",
+    "answer": "陈述",
+    "answers": [
+     "陈述"
+    ],
+    "contrast": [
+     "表达"
+    ]
+   }
+  }
+ ],
+ "fillers": [
+  {
+   "id": "fact-00",
+   "levels": {},
+   "slots": {
+    "S": "冰",
+    "A": "冷"
+   }
+  },
+  {
+   "id": "fact-01",
+   "levels": {},
+   "slots": {
+    "S": "火",
+    "A": "热"
+   }
+  },
+  {
+   "id": "fact-02",
+   "levels": {},
+   "slots": {
+    "S": "糖",
+    "A": "甜"
+   }
+  },
+  {
+   "id": "fact-03",
+   "levels": {},
+   "slots": {
+    "S": "柠檬",
+    "A": "酸"
+   }
+  },
+  {
+   "id": "fact-04",
+   "levels": {},
+   "slots": {
+    "S": "大象",
+    "A": "大"
+   }
+  },
+  {
+   "id": "fact-05",
+   "levels": {},
+   "slots": {
+    "S": "蚂蚁",
+    "A": "小"
+   }
+  },
+  {
+   "id": "fact-06",
+   "levels": {},
+   "slots": {
+    "S": "钻石",
+    "A": "硬"
+   }
+  },
+  {
+   "id": "fact-07",
+   "levels": {},
+   "slots": {
+    "S": "棉花",
+    "A": "软"
+   }
+  },
+  {
+   "id": "fact-08",
+   "levels": {},
+   "slots": {
+    "S": "羽毛",
+    "A": "轻"
+   }
+  },
+  {
+   "id": "fact-09",
+   "levels": {},
+   "slots": {
+    "S": "铅块",
+    "A": "重"
+   }
+  },
+  {
+   "id": "fact-10",
+   "levels": {},
+   "slots": {
+    "S": "夜晚",
+    "A": "黑"
+   }
+  },
+  {
+   "id": "fact-11",
+   "levels": {},
+   "slots": {
+    "S": "雪",
+    "A": "白"
+   }
+  },
+  {
+   "id": "fact-12",
+   "levels": {},
+   "slots": {
+    "S": "乌龟",
+    "A": "慢"
+   }
+  },
+  {
+   "id": "fact-13",
+   "levels": {},
+   "slots": {
+    "S": "猎豹",
+    "A": "快"
+   }
+  },
+  {
+   "id": "fact-14",
+   "levels": {},
+   "slots": {
+    "S": "沙漠",
+    "A": "干"
+   }
+  },
+  {
+   "id": "fact-15",
+   "levels": {},
+   "slots": {
+    "S": "海水",
+    "A": "咸"
+   }
+  },
+  {
+   "id": "fact-16",
+   "levels": {},
+   "slots": {
+    "S": "长颈鹿",
+    "A": "高"
+   }
+  },
+  {
+   "id": "fact-17",
+   "levels": {},
+   "slots": {
+    "S": "针尖",
+    "A": "尖"
+   }
+  },
+  {
+   "id": "fact-18",
+   "levels": {},
+   "slots": {
+    "S": "玻璃",
+    "A": "透明"
+   }
+  },
+  {
+   "id": "fact-19",
+   "levels": {},
+   "slots": {
+    "S": "橡皮筋",
+    "A": "有弹性"
+   }
+  },
+  {
+   "id": "fact-20",
+   "levels": {},
+   "slots": {
+    "S": "岩石",
+    "A": "坚硬"
+   }
+  },
+  {
+   "id": "fact-21",
+   "levels": {},
+   "slots": {
+    "S": "丝绸",
+    "A": "光滑"
+   }
+  },
+  {
+   "id": "fact-22",
+   "levels": {},
+   "slots": {
+    "S": "砂纸",
+    "A": "粗糙"
+   }
+  },
+  {
+   "id": "fact-23",
+   "levels": {},
+   "slots": {
+    "S": "太阳",
+    "A": "明亮"
+   }
+  },
+  {
+   "id": "fact-24",
+   "levels": {},
+   "slots": {
+    "S": "冬天",
+    "A": "寒冷"
+   }
+  },
+  {
+   "id": "fact-25",
+   "levels": {},
+   "slots": {
+    "S": "蜂蜜",
+    "A": "黏稠"
+   }
+  },
+  {
+   "id": "fact-26",
+   "levels": {},
+   "slots": {
+    "S": "冰面",
+    "A": "滑"
+   }
+  },
+  {
+   "id": "fact-27",
+   "levels": {},
+   "slots": {
+    "S": "辣椒",
+    "A": "辣"
+   }
+  },
+  {
+   "id": "fact-28",
+   "levels": {},
+   "slots": {
+    "S": "黄连",
+    "A": "苦"
+   }
+  },
+  {
+   "id": "fact-29",
+   "levels": {},
+   "slots": {
+    "S": "婴儿",
+    "A": "幼小"
+   }
+  }
+ ],
+ "splits": {
+  "unit": "filler",
+  "fractions": {
+   "discovery": 0.6,
+   "confirm": 0.2,
+   "lockbox": 0.2
+  },
+  "salt": "v1",
+  "heldout_frames": [
+   "q-curious",
+   "d-clear"
+  ]
+ },
+ "prereg": {
+  "min_behavior_acc": 0.7,
+  "min_probe_n": 3,
+  "min_cell_n": 6,
+  "min_lockbox_cos": 0.4
+ },
+ "shards": 2,
+ "language_graph_target_ids": [
+  "LG-ATTITUDE-EVENT"
+ ]
+}

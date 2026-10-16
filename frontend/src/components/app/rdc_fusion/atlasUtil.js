@@ -6,4 +6,4 @@ export function familyPalette(families) {
   return Object.fromEntries([...families].sort().map((f, i) => [f, CATEGORICAL[i] || '#94a3b8']));
 }
 
-export const HYP_STATUS = { supported: ['pass', '支持'], partial: ['partial', '部分支持'], negative: ['fail', '未支持'] };
+export const HYP_STATUS = { supported: ['pass', '支持'], partial: ['partial', '部分支持'], negative: ['fail', '未支持'], token_identity: ['partial', '仅 token 身份'] };

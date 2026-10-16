@@ -81,7 +81,7 @@ class GrammarTests(unittest.TestCase):
         c = grammar.generate(grammar.pilot_spec(spec), per_cell_limit=2, include_canary=False)
         counts = {}
         for it in c['items']:
-            k = (it['split'], grammar.cond_key(it['cond']))
+            k = (it['split'], grammar.cond_key(it['cond']), it['frame_id'])   # 按 (条件格, 句式) 计数
             counts[k] = counts.get(k, 0) + 1
         self.assertLessEqual(max(counts.values()), 2)
 

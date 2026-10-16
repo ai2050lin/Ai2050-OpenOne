@@ -506,7 +506,7 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
     """生成 runner_v3 可读的 corpus（不含 tm_id/version，由注册方补齐）。
 
     per_cell_limit：试跑用，只从 discovery 抽样（confirm / lockbox / lockbox_frame 不参与试跑与行为门筛选），
-    每个 cond 最多取前 k 个填充（按切分哈希序）。
+    每个 (cond, 句式) 最多取前 k 个填充（按切分哈希序）。
     """
     errors = validate(spec)
     if errors:
@@ -527,9 +527,10 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
             cond = {**fr.get('levels', {}), **fl.get('levels', {})}
             ck = cond_key(cond)
             if per_cell_limit is not None:
-                if split != 'discovery' or per_cell.get((split, ck), 0) >= per_cell_limit:
+                # 按 (条件格, 句式) 计数：一个条件格有多个句式时，每个句式都进入试跑
+                if split != 'discovery' or per_cell.get((split, ck, fr['id']), 0) >= per_cell_limit:
                     continue
-            per_cell[(split, ck)] = per_cell.get((split, ck), 0) + 1
+            per_cell[(split, ck, fr['id'])] = per_cell.get((split, ck, fr['id']), 0) + 1
             slots = fl['slots']
             text = _fill(fr['text'], slots)
             occ = fr.get('target_occurrence', 'first')

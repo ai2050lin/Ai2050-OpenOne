@@ -19,6 +19,10 @@
      每个概念检查被声明的跨族特征对是否成边；没有被声明的边记为「新发现（未预注册）」。
   5. 跨模型：同一对特征（按 族/因子/水平/层 标识）在其他模型里是否也成边 → 跨模型一致率；轴按成员重叠匹配。
   6. 3D 谱图空间：各层所有特征的 discovery 单位方向做经典 MDS（距离 √(2−2cos)）取前三维。
+  7. 嵌入层折扣：边所在读出位置有嵌入层标签（读出@L0 / emb）时，计算同一对特征在嵌入层上的原始对比 cos；
+     discovery 与留出两次估计都 ≥ MIN_COS（或边本身在嵌入层）记为 token_identity——对齐可由读出位置的 token
+     相同解释（如句末同为「？」）。token_identity 边与留出句式预测不计入概念支持；只剩这类证据的概念记为
+     token_identity 状态。没有嵌入层标签时 token_identity = None（未检查），在结果中如实标注。
 
 判据固定在 CRITERIA，随结果返回。共享方向说明「这些条件在该层用了相近的表示方向」，不说明共享同一计算机制；
 机制需要干预实验（选择性 / 必要性）另行检验。
@@ -207,6 +211,20 @@ class _Layer:
                 self.A[k] = (d, np.mean(np.stack(hs), axis=0) if len(hs) == len(mem) else None)
 
 
+_TAG_LAYER = re.compile(r'^(?P<prefix>(?:[^@]+@)?)L(?P<i>\d+)$')
+
+
+def _baseline_tag(tag: str, layers: Sequence[str]) -> Optional[str]:
+    """同一读出位置的嵌入层标签（"读出@L0" 或 "L0" / "emb"）；不存在时返回 None。"""
+    if tag == 'emb' or tag.endswith('@emb'):
+        return tag
+    m = _TAG_LAYER.match(tag)
+    if not m:
+        return 'emb' if 'emb' in layers else None
+    base = f'{m.group("prefix")}L0'
+    return base if base in layers else None
+
+
 def _restrict_family(fam: Dict[str, Any], tags: List[str]) -> Dict[str, Any]:
     """把一个族的特征与水平均值限制到给定标签（按 tags 顺序重新编号 layer_i）。"""
     if list(fam['layers']) == list(tags):
@@ -251,6 +269,28 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
     node_of = {(f['family'], f['factor'], f['level'], f['layer']): f for f in nodes}
     groups = [(fam['family'], g['factor'], g['md'], g['mh'], g['mx']) for fam in usable for g in fam['groups']]
     edges, nulls, coords, axes, final_con = [], {}, {}, [], {}
+    # 嵌入层基线：同一读出位置在 hs[0] 上的原始水平对比（不做共享轴折减）。嵌入层只含 token 身份，
+    # 若一对特征在嵌入层上就已对齐，它们在更深层的对齐不能算作上下文计算形成的共享编码。
+    base_con: Dict[str, Dict] = {}
+
+    def baseline(tag):
+        b = _baseline_tag(tag, layers)
+        if b is None:
+            return None, None
+        if b not in base_con:
+            base_con[b] = _Layer(groups, layers.index(b)).contrasts()
+        return b, base_con[b]
+
+    def token_identity(tag, x, y):
+        b, bc = baseline(tag)
+        if b is None:
+            return {'baseline': None, 'token_identity': None}
+        if b == tag:
+            return {'baseline': b, 'token_identity': True, 'baseline_cos': None, 'baseline_cos_lockbox': None}
+        bd, bh = _cos(bc[x][0], bc[y][0]), _cos(bc[x][1], bc[y][1])
+        ti = bd is not None and bh is not None and bd >= CRITERIA['min_cos'] and bh >= CRITERIA['min_cos']
+        return {'baseline': b, 'token_identity': ti, 'baseline_cos': _r(bd), 'baseline_cos_lockbox': _r(bh)}
+
     for li, tag in enumerate(layers):
         st = _Layer(groups, li)
         con = st.contrasts()
@@ -318,15 +358,22 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
             transfer = float(np.mean(transfers)) if transfers else None
             ax_id = f'AX-{model_slug(model)}-{tag}-{rnd}'
             mem_nodes = [node_of[(*x, tag)] for x in comp]
+            ax_ti = []
             for x, y, cd, ch, z in ce:
                 a, b = node_of[(*x, tag)], node_of[(*y, tag)]
                 same = bool(a['concept'] and a['concept'] == b['concept'])
+                ti = token_identity(tag, x, y)
+                ax_ti.append(ti['token_identity'])
                 edges.append({'source': a['id'], 'target': b['id'], 'layer': tag, 'axis': ax_id, 'cos': _r(cd),
                               'cos_lockbox': _r(ch), 'cos_refined': _r(_cos(con[x][0], con[y][0])), 'z': _r(z, 2),
-                              'declared': same, 'concept': a['concept'] if same else None})
+                              'declared': same, 'concept': a['concept'] if same else None, **ti})
+            supported = transfer is not None and transfer >= CRITERIA['min_transfer']
+            axis_ti = (True if ax_ti and all(t is True for t in ax_ti) else
+                       None if any(t is None for t in ax_ti) else False)
             axes.append({'id': ax_id, 'layer': tag, 'round': rnd, 'members': [m['id'] for m in mem_nodes], 'families': fams,
                          'concepts': sorted({m['concept'] for m in mem_nodes if m['concept']}), 'mean_cos': _r(mean_cos),
-                         'transfer': _r(transfer), 'supported': transfer is not None and transfer >= CRITERIA['min_transfer'],
+                         'transfer': _r(transfer), 'supported': supported, 'token_identity': axis_ti,
+                         'supported_beyond_token': supported and axis_ti is False,
                          'label': ' / '.join(f'{m["family"]}·{m["factor"]}={m["level"]}' for m in mem_nodes)})
         final_con[tag] = con
         keep = [(node_of[(*key, tag)], _unit(v[0] if v[0] is not None else v[2])) for key, v in con.items()]
@@ -334,7 +381,11 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
         coords[tag] = {f['id']: p for (f, _), p in zip(keep, _mds3([u for _, u in keep]))}
 
     # 4. 预注册概念假设（用最终基线下的对比方向）
-    edge_set = {(e['source'], e['target']) for e in edges} | {(e['target'], e['source']) for e in edges}
+    # 嵌入层折扣：token 身份即可解释的边（嵌入层上已对齐，或边本身在嵌入层）不计入概念支持
+    edge_set = {(e['source'], e['target']) for e in edges if e.get('token_identity') is not True}
+    edge_set |= {(t, s) for s, t in edge_set}
+    ti_set = {(e['source'], e['target']) for e in edges if e.get('token_identity') is True}
+    ti_set |= {(t, s) for s, t in ti_set}
     by_concept: Dict[str, List[dict]] = {}
     for f in nodes:
         if f['concept']:
@@ -350,24 +401,37 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
             members = [f for f in fl if f['layer'] == t and not f['heldout_only']]
             pairs = [(a, b) for i, a in enumerate(members) for b in members[i + 1:] if a['family'] != b['family']]
             linked = [(a, b) for a, b in pairs if (a['id'], b['id']) in edge_set]
+            linked_ti = [(a, b) for a, b in pairs if (a['id'], b['id']) in ti_set]
             vec = lambda f: con[(f['family'], f['factor'], f['level'])]  # noqa: E731
+            b_tag, bc = baseline(t)
             heldout = []
             for h in (x for x in fl if x['layer'] == t and x['heldout_only']):
                 others = [u for u in (_unit(vec(m)[0]) for m in members if m['family'] != h['family'] and m['stable']) if u is not None]
                 pred = _cos(np.mean(np.stack(others), axis=0), vec(h)[2]) if others else None
-                heldout.append({'id': h['id'], 'pred_cos': _r(pred), 'pass': pred is not None and pred >= CRITERIA['min_transfer']})
+                ok = pred is not None and pred >= CRITERIA['min_transfer']
+                base_pred = None
+                if b_tag is not None and bc is not None:
+                    key = lambda f: (f['family'], f['factor'], f['level'])  # noqa: E731
+                    bo = [u for u in (_unit(bc[key(m)][0]) for m in members if m['family'] != h['family']) if u is not None]
+                    base_pred = _cos(np.mean(np.stack(bo), axis=0), bc[key(h)][2]) if bo else None
+                h_ti = None if b_tag is None else (b_tag == t or (base_pred is not None and base_pred >= CRITERIA['min_transfer']))
+                heldout.append({'id': h['id'], 'pred_cos': _r(pred), 'baseline_pred_cos': _r(base_pred),
+                                'token_identity': h_ti, 'pass': ok and h_ti is not True, 'pass_raw': ok})
             cs = [c for c in (_cos(vec(a)[0], vec(b)[0]) for a, b in pairs) if c is not None]
-            per_layer.append({'layer': t, 'pairs': len(pairs), 'linked': len(linked), 'heldout': heldout,
-                              'mean_cos': _r(float(np.mean(cs))) if cs else None,
+            per_layer.append({'layer': t, 'pairs': len(pairs), 'linked': len(linked), 'linked_token_identity': len(linked_ti),
+                              'heldout': heldout, 'mean_cos': _r(float(np.mean(cs))) if cs else None,
                               'unstable': [f['id'] for f in members if not f['stable']]})
         full = [p for p in per_layer if p['pairs'] and p['linked'] == p['pairs'] and all(h['pass'] for h in p['heldout'])]
         any_link = any(p['linked'] or any(h['pass'] for h in p['heldout']) for p in per_layer)
-        status = 'supported' if full else ('partial' if any_link else 'negative')
+        any_ti = any(p['linked_token_identity'] or any(h['pass_raw'] and h['token_identity'] for h in p['heldout'])
+                     for p in per_layer)
+        status = 'supported' if full else ('partial' if any_link else ('token_identity' if any_ti else 'negative'))
         best = max(per_layer, key=lambda p: (p in full, p['linked'] / p['pairs'] if p['pairs'] else -1,
-                                             sum(h['pass'] for h in p['heldout']), p['mean_cos'] or -1)) if per_layer else None
+                                             sum(h['pass'] for h in p['heldout']), p['linked_token_identity'],
+                                             p['mean_cos'] or -1)) if per_layer else None
         hyps.append({'concept': tag_c, 'families': fams, 'members': sorted({f['key'] for f in fl}), 'status': status,
                      'layers': per_layer, 'best_layer': best['layer'] if best else None})
-    novel = [e for e in edges if not e['declared']]
+    novel = [e for e in edges if not e['declared'] and e.get('token_identity') is not True]
     out_nodes = [{k: v for k, v in f.items() if k != 'layer_i'} for f in nodes]
     return {
         'model': model, 'layers': layers, 'families': [f['family'] for f in usable], 'skipped': skipped,
@@ -432,23 +496,36 @@ def findings(graph: Dict[str, Any]) -> List[Dict[str, Any]]:
                     'text': f'层 {", ".join(weak_null)} 的跨族特征对少于 {CRITERIA["min_null_pairs"]} 个，边只按两次估计的 cos 阈值判定；'
                             '加入更多模式族后结论更可靠。'})
     for ax in graph['axes']:
-        kind = 'supported' if ax['supported'] else 'negative'
+        ti = ax.get('token_identity') is True
+        kind = 'warning' if ti and ax['supported'] else ('supported' if ax['supported'] else 'negative')
         rep = f'；在 {len(ax.get("replicated_in", []))} 个其他模型中复现' if 'replicated_in' in ax else ''
         out.append({'id': ax['id'], 'kind': kind, 'level': '候选共享编码轴',
-                    'title': f'{ax["layer"]} 层共享方向：{ax["label"]}',
+                    'title': f'{ax["layer"]} 层共享方向：{ax["label"]}' + ('（token 身份）' if ti else ''),
                     'text': f'{len(ax["families"])} 个模式族的 {len(ax["members"])} 个特征方向相互对齐（平均 cos {ax["mean_cos"]}），'
                             f'留一族迁移 cos {ax["transfer"]}（判据 ≥ {CRITERIA["min_transfer"]}）{rep}。'
+                            + (' 这些特征在同一读出位置的嵌入层（hs[0]）上已经对齐，可由读出 token 相同解释，不计为上下文形成的共享编码。'
+                               if ti else '')
                             + (f' 预注册概念：{"、".join(ax["concepts"])}。' if ax['concepts'] else ' 未预注册：新发现候选，需设计专门模板验证。')})
+    n_ti = sum(1 for e in graph['edges'] if e.get('token_identity') is True)
+    if n_ti:
+        out.append({'id': 'token-identity', 'kind': 'warning', 'title': f'{n_ti} 条边可由 token 身份解释',
+                    'text': '这些边的两个特征在同一读出位置的嵌入层（hs[0]）上就已对齐（两次估计都 ≥ '
+                            f'{CRITERIA["min_cos"]}），或边本身位于嵌入层：对齐来自读出位置的 token 相同（如句末同为「？」），'
+                            '不计入概念支持。要检验超出 token 身份的共享编码，需要让对照条件在读出位置使用相同 token。'})
     for h in graph['concept_hypotheses']:
-        kind = {'supported': 'supported', 'partial': 'warning', 'negative': 'negative'}[h['status']]
+        kind = {'supported': 'supported', 'partial': 'warning', 'negative': 'negative', 'token_identity': 'warning'}[h['status']]
         best = next((p for p in h['layers'] if p['layer'] == h['best_layer']), None)
         out.append({'id': f'concept-{h["concept"]}', 'kind': kind, 'level': '预注册假设',
                     'title': f'概念「{h["concept"]}」跨 {len(h["families"])} 个模式族共享编码',
-                    'text': ({'supported': '支持', 'partial': '部分支持', 'negative': '未支持'}[h['status']]
-                             + f'：最佳层 {h["best_layer"]}，{best["linked"]}/{best["pairs"]} 对声明特征成边，平均 cos {best["mean_cos"]}。'
+                    'text': ({'supported': '支持', 'partial': '部分支持', 'negative': '未支持',
+                              'token_identity': '仅由 token 身份解释'}[h['status']]
+                             + f'：最佳层 {h["best_layer"]}，{best["linked"]}/{best["pairs"]} 对声明特征成边（不含 token 身份边'
+                               f' {best["linked_token_identity"]} 对），平均 cos {best["mean_cos"]}。'
                              if best else '')
                             + (''.join(f' 留出句式 {x["id"]}：其他族的同概念方向预测 cos {x["pred_cos"]}'
-                                       f'（{"通过" if x["pass"] else "未通过"}，判据 ≥ {CRITERIA["min_transfer"]}）。'
+                                       f'（{"通过" if x["pass"] else "未通过"}，判据 ≥ {CRITERIA["min_transfer"]}'
+                                       + (f'；嵌入层基线预测 cos {x["baseline_pred_cos"]}，已能由 token 身份解释'
+                                          if x.get('token_identity') and x.get('pass_raw') else '') + '）。'
                                        for x in best['heldout']) if best else '')
                             + (f' 不稳定（未复现）特征：{", ".join(best["unstable"])}。' if best and best['unstable'] else '')})
     if graph['novel_edges']:

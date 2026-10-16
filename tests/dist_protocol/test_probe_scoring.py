@@ -57,7 +57,7 @@ class ProbeSetTests(unittest.TestCase):
 
     def test_explicit_contrast_lists(self):
         items = study(grammar.generate(load('GR-NEG'), include_canary=False))
-        neg = next(it for it in items if it['frame_id'] == 'neg-decl')
+        neg = next(it for it in items if it['frame_id'].startswith('neg-decl'))
         self.assertEqual(neg['probe']['answers'], ['错', '错误'])
         self.assertEqual(neg['probe']['contrast'], ['对', '正确'])
 

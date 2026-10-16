@@ -149,6 +149,55 @@ class AtlasTests(unittest.TestCase):
         g = atlas.build_atlas({'m1': fams})['graphs'][0]
         self.assertEqual([s['family'] for s in g['skipped']], ['GR-C'])
 
+    def _families_with_baseline(self, plant_at_embedding):
+        """标签 final@L0 / final@L4 / final@L8：「疑问」共享方向植入 L4、L8；plant_at_embedding 时 L0 也植入
+        （相当于两族疑问句在读出位置 token 相同——嵌入层上就已对齐）。"""
+        tags = ['final@L0', 'final@L4', 'final@L8']
+        rng = np.random.default_rng(7)
+        shared = unit(rng)
+        fams = []
+        for i, (fam, mf, mlv, ff, flv, qlv) in enumerate(FAMILIES[:2]):   # 两个三水平句式因子的族
+            r = np.random.default_rng(50 + i)
+            dirs = {(mf, lv): unit(r) for lv in mlv}
+            dirs.update({(ff, lv): unit(r) for lv in flv})
+            ss = SuffStats(tags, DIM, [mf, ff])
+            for k in range(24):
+                for lv in mlv:
+                    filler = unit(r) * 0.6
+                    split = 'discovery' if k < 16 else 'lockbox'
+                    for fl in flv:
+                        vecs = []
+                        for t in tags:
+                            fdir = dirs[(ff, fl)]
+                            if fl == qlv and (t != 'final@L0' or plant_at_embedding):
+                                fdir = shared
+                            vecs.append(dirs[(mf, lv)] + fdir + filler + r.standard_normal(DIM) * 0.15)
+                        ss.add(split, {mf: lv, ff: fl}, vecs)
+            fams.append(atlas.family_features(fam, 'TG-' + fam, ss, [mf, ff], concepts={f'{ff}={qlv}': '疑问'}))
+        return atlas.build_atlas({'m1': fams})['graphs'][0]
+
+    def test_embedding_baseline_discount(self):
+        # 阳性：共享方向只在深层出现 → 不是 token 身份，概念仍为支持
+        g = self._families_with_baseline(plant_at_embedding=False)
+        deep = [e for e in g['edges'] if e['layer'] != 'final@L0' and e['concept'] == '疑问']
+        self.assertTrue(deep)
+        self.assertTrue(all(e['token_identity'] is False for e in deep))
+        self.assertEqual({h['concept']: h['status'] for h in g['concept_hypotheses']}['疑问'], 'supported')
+        # 阴性对照：嵌入层上已对齐（读出 token 相同）→ 全部边标为 token 身份，概念不得判为支持
+        g = self._families_with_baseline(plant_at_embedding=True)
+        q = [e for e in g['edges'] if e['concept'] == '疑问']
+        self.assertTrue(q)
+        self.assertTrue(all(e['token_identity'] is True for e in q))
+        self.assertEqual({h['concept']: h['status'] for h in g['concept_hypotheses']}['疑问'], 'token_identity')
+        kinds = {f['id']: f['kind'] for f in g['findings']}
+        self.assertEqual(kinds['concept-疑问'], 'warning')
+        self.assertIn('token-identity', kinds)
+
+    def test_no_baseline_tag_is_marked_unchecked(self):
+        g = atlas.build_atlas({'m1': build(True)})['graphs'][0]            # first/mid/last：没有嵌入层标签
+        self.assertTrue(g['edges'])
+        self.assertTrue(all(e['token_identity'] is None for e in g['edges']))
+
     def test_families_with_layer_subsets_use_common_tags(self):
         # 真实运行中各族 suffstats 按体积预算保留的层不同：谱图应在共有层上建图，而不是排除整族
         fams = build(True)
