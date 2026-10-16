@@ -108,6 +108,18 @@ class AnalysisRecoveryTests(unittest.TestCase):
         self.assertTrue(all('factors' in l for l in p['layers'][1:]))
         self.assertTrue(p['findings'])
 
+    def test_low_rank_tag_keeps_shapes(self):
+        # 真实运行中 cue@L0 只有两种不同向量（句式线索末 token 只有两种）：白化后只剩 1 维，3D 坐标与层堆叠仍应成形
+        items = copy.deepcopy(self.items)
+        a, b = items.X[0][0].copy(), items.X[0][1].copy()
+        for i, fr in enumerate(items.frame):
+            items.X[0][i] = a if hash(str(fr)) % 2 else b
+        items.X[0][0], items.X[0][1] = a, b
+        p = analysis.analyze(items, self.corpus['factors'], n_perm=5)
+        tag = p['layers'][0]['tag']
+        self.assertTrue(all(len(row) == 3 for row in p['coords'][tag]['lda:' + self.corpus['factors'][0]]))
+        self.assertTrue(all(len(c) == 2 for c in p['stack']['layers'][0]['centroids']))
+
 
 if __name__ == '__main__':
     unittest.main()

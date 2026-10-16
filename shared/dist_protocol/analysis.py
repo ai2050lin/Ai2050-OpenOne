@@ -190,6 +190,9 @@ def _lda_axes(Z: np.ndarray, labels: np.ndarray, n: int = 3) -> np.ndarray:
         R = (Z - g) - (Z - g) @ np.array(axes).T @ np.array(axes) if axes else (Z - g)
         _, _, Vr = np.linalg.svd(R, full_matrices=False)
         axes += list(Vr[:n - k])
+    while len(axes) < n:
+        # 白化空间维数不足 n（如该读出位置 × 层只有两三种不同向量）：补零轴，保证下游 3D 坐标与 Procrustes 形状一致
+        axes.append(np.zeros(Z.shape[1]))
     return np.array(axes).T
 
 
