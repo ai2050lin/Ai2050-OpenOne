@@ -134,7 +134,9 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
         groups.setdefault(b, []).append((r, s))
     out_buckets = []
     for b, members in sorted(groups.items()):
-        key = (tm_id, b, gate, full, tuple(r['sha'] for r, _ in members),
+        # 缓存键必须含当前模板的 design_sha：模板重新冻结（升版本）后，同一批旧结果要按新 design 重新判定为
+        # 「design 不符」而排除；否则会沿用旧版本时「分片已齐」的缓存，跳过新版本的采集
+        key = (tm_id, tpl['design_sha'] if tpl else None, b, gate, full, tuple(r['sha'] for r, _ in members),
                tuple((r['sha'], (audits.get(r['sha']) or {}).get('status')) for r, _ in members))
         with _CACHE_LOCK:
             cached = _CACHE.get(key)

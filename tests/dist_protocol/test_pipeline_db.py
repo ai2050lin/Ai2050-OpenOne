@@ -91,6 +91,20 @@ class PipelineDbTests(unittest.TestCase):
             n = sum(v['N'] for v in b['agg']['cells_by_split'].values())
             self.assertEqual(n, 180)
 
+    def test_refreeze_invalidates_cached_aggregate(self):
+        # 回归：模板重新冻结（design_sha 改变）后，旧结果必须按"design 不符"排除，不能沿用旧版本"分片已齐"的缓存
+        first = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', gate=False)
+        self.assertTrue(all(b['complete'] for b in first['buckets']))
+        self.db.execute("UPDATE templates SET design_sha='DESIGN-V2' WHERE tm_id='TG-GR-ROLE'")
+        try:
+            again = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', gate=False)
+            self.assertTrue(again['buckets'])
+            for b in again['buckets']:
+                self.assertFalse(b['complete'])
+                self.assertEqual(b['shards_present'], [])
+        finally:
+            self.db.execute("UPDATE templates SET design_sha='DESIGN' WHERE tm_id='TG-GR-ROLE'")
+
     def test_gate_chain_cross_model(self):
         agg = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', gate=False)
         gates = {g['id']: g for g in pipeline.gate_chain(agg)}
