@@ -174,7 +174,7 @@ def _whiten(Xd: np.ndarray, rank: int, shrink: float):
     r = int(min(rank, max(1, len(Xd) // 3), max(1, (s > 1e-6 * s.max()).sum())))
     var = (s[:r] ** 2) / max(len(Xd) - 1, 1)
     var = var + shrink * var.mean()
-    W = Vt[:r].T / np.sqrt(var)
+    W = Vt[:r].T / np.sqrt(np.maximum(var, 1e-12))
     return mu, W, Vt[:3].T
 
 
@@ -258,6 +258,12 @@ def analyze(items: ItemSet, factors: List[str], *, texts: Optional[Dict[str, str
         X = items.X[li].astype(np.float64)
         if len(D) < 4:
             out_layers.append({'tag': tag, 'insufficient': True}); continue
+        spread = float(np.sqrt(((X[D] - X[D].mean(0)) ** 2).sum(1).mean()))
+        if spread <= 1e-6 * max(float(np.sqrt((X[D] ** 2).sum(1).mean())), 1e-12):
+            # 该读出位置在此层所有 discovery 样本几乎相同（如嵌入层上读出 token 相同）：没有可分析的方差
+            out_layers.append({'tag': tag, 'insufficient': True, 'degenerate': True,
+                               'reason': '所有 discovery 样本在该读出位置 × 层的向量相同（例如嵌入层上读出 token 相同），无方差可分析'})
+            continue
         mu, W, pca3 = _whiten(X[D], CRITERIA['whiten_rank'], CRITERIA['whiten_shrink'])
         Z = (X - mu) @ W
         Xc = X - mu

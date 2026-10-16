@@ -98,6 +98,16 @@ class AnalysisRecoveryTests(unittest.TestCase):
         kinds = {f['id']: f['kind'] for f in p['findings']}
         self.assertEqual(kinds['readable-category'], 'negative')
 
+    def test_degenerate_tag_skipped(self):
+        # 真实运行中嵌入层在句末读出处所有样本相同（同一个 token）：该标签应标为退化并跳过，其余层照常分析
+        items = copy.deepcopy(self.items)
+        items.X[0][:] = items.X[0][0]
+        p = analysis.analyze(items, self.corpus['factors'], n_perm=5)
+        first = p['layers'][0]
+        self.assertTrue(first.get('degenerate') and first.get('insufficient'))
+        self.assertTrue(all('factors' in l for l in p['layers'][1:]))
+        self.assertTrue(p['findings'])
+
 
 if __name__ == '__main__':
     unittest.main()
