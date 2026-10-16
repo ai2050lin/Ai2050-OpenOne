@@ -22,7 +22,9 @@
     summary.json      必有：状态、计数、逐格行为准确率、token 长度、本分片 η² 摘要、采集口径、model_snapshot
     suffstats.npz     真实/合成模式：每 (split, 条件格, 层位标签, 维) 的 n、Σx、Σx²（float64，可跨节点相加）。
                       suffstats.v2 = v1 + 每个标签的 读出/层号；体积超预算时只保留确定性的等距层子集（各分片相同）
-    behavior.json     含 probe 的条目：首 token 是否 top-1、排名、对数概率
+    behavior.json     含 probe 的条目：correct（行为门判定）与 mode——有对照集时 forced_choice（完整答案对数概率
+                      max log P(可接受) > max log P(对照)，记录最佳答案、最佳对照与 margin），否则 set_first_token
+                      （下一 token 是否为任一可接受答案的首 token）；另保留旧口径 first_top1 / rank / logprob（主答案首 token）
     canary.json       金丝雀摘要（目标位置向量的范数、均值、前 16 维；按层位）
     items.npz         逐条向量（float16；全语料体积超预算时用随机投影降维。投影维数 k 只由语料研究样本总数、标签数与
                       模型维度决定，投影矩阵由语料指纹决定——所有分片相同，与分片大小无关），
@@ -523,6 +525,47 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
             return np.full((logp.shape[0],), np.nan, dtype=np.float32)
         return logp[:, tid].cpu().numpy().astype(np.float32)
 
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else (tok.eos_token_id or 0)
+
+    def answer_logprobs(prompt_ids, cands):
+        """完整答案对数概率 log P(答案 | 提示)：提示与答案分别分词后拼接（teacher forcing），右侧补齐后一次前向。"""
+        seqs = [tok(c, add_special_tokens=False)['input_ids'] for c in cands]
+        keep = [(c, s) for c, s in zip(cands, seqs) if s]
+        if not keep:
+            return {}
+        n_p = len(prompt_ids)
+        width = n_p + max(len(s) for _, s in keep)
+        ids = torch.full((len(keep), width), pad_id, dtype=torch.long)
+        mask = torch.zeros((len(keep), width), dtype=torch.long)
+        for b, (_, s) in enumerate(keep):
+            ids[b, :n_p + len(s)] = torch.tensor(list(prompt_ids) + s)
+            mask[b, :n_p + len(s)] = 1
+        lp = torch.log_softmax(model(input_ids=ids.to(device), attention_mask=mask.to(device)).logits.float(), dim=-1)
+        out = {}
+        for b, (c, s) in enumerate(keep):
+            pos = torch.arange(n_p - 1, n_p - 1 + len(s), device=lp.device)
+            out[c] = float(lp[b, pos, torch.tensor(s, device=lp.device)].sum().item())
+        return out
+
+    def score_probe(probe, prompt_ids, top1_id):
+        """行为评分：有对照集 → 完整答案强制选择；否则 → 下一个 token 是否为任一可接受答案的首 token。"""
+        answers = probe.get('answers') or [probe['answer']]
+        contrast = probe.get('contrast') or []
+        firsts = {s[0] for s in (tok(a, add_special_tokens=False)['input_ids'] for a in answers) if s}
+        rec = {'set_top1': top1_id in firsts}
+        if contrast:
+            lp = answer_logprobs(prompt_ids, list(answers) + [c for c in contrast if c not in answers])
+            a_best = max(((lp[a], a) for a in answers if a in lp), default=(None, None))
+            c_best = max(((lp[c], c) for c in contrast if c in lp), default=(None, None))
+            if a_best[0] is not None and c_best[0] is not None:
+                rec.update({'mode': 'forced_choice', 'correct': a_best[0] > c_best[0],
+                            'answer_logprob': a_best[0], 'best_answer': a_best[1],
+                            'contrast_logprob': c_best[0], 'best_contrast': c_best[1],
+                            'margin': a_best[0] - c_best[0], 'n_contrast': len(contrast)})
+                return rec
+        rec.update({'mode': 'set_first_token', 'correct': rec['set_top1']})
+        return rec
+
     def topk(logp):
         v, i = torch.topk(logp, LENS_TOPK, dim=-1)
         for t in i.flatten().tolist():
@@ -550,9 +593,11 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                     logits = plogits[0, -1].float()
                     logp = torch.log_softmax(logits, dim=-1)
                     rank = int((logits > logits[ans_id]).sum().item()) + 1
-                    correct = rank == 1
-                    behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']),
-                                     'correct': correct, 'rank': rank, 'logprob': float(logp[ans_id].item())})
+                    rec = {'id': it['id'], 'split': it['split'], 'cell': cond_key(it['cond']),
+                           'rank': rank, 'logprob': float(logp[ans_id].item()), 'first_top1': rank == 1}
+                    rec.update(score_probe(probe, pids, int(torch.argmax(logits).item())))
+                    correct = rec['correct']
+                    behavior.append(rec)
             if 'probe_answer' in readouts and phs is None:
                 raise ValueError(f'item {it["id"]} 没有 probe（语料声明了 probe_answer 读出）')
             vecs, lens = [], {'next_id': [], 'next_logprob': [], 'answer_logprob': [], 'topk_ids': [], 'topk_logprob': []}
@@ -685,8 +730,11 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
         if it.get('probe'):
             p_ok = 0.55 if (main_f and other_f and str(cond[main_f]) == weak[0] and str(cond[other_f[0]]) == weak[1]) else 0.95
             correct = bool(rng.random() < p_ok)
-            behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(cond),
-                             'correct': correct, 'rank': 1 if correct else 2, 'logprob': -0.1 if correct else -2.0})
+            mode = 'forced_choice' if it['probe'].get('contrast') else 'set_first_token'
+            behavior.append({'id': it['id'], 'split': it['split'], 'cell': cond_key(cond), 'mode': mode,
+                             'correct': correct, 'rank': 1 if correct else 2, 'logprob': -0.1 if correct else -2.0,
+                             'first_top1': correct, 'set_top1': correct,
+                             **({'margin': 1.0 if correct else -1.0} if mode == 'forced_choice' else {})})
         depth = np.array([hi / max(n_hs - 1, 1) for _, hi in plan.layers], dtype=np.float32)
         P = len(readouts)
         lens = {'next_id': np.full((P,), 7, dtype=np.int32),

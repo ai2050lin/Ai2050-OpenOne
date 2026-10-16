@@ -22,6 +22,14 @@
 答案槽（probe.answer 中除目标外的槽位）或类别标签槽出现在目标之前 → 告警（读出可能来自标签词）。
 对照句式对一方有句首前缀、另一方没有（或长度相差很大）→ 告警「前缀 / 位置混杂」（prefix_warnings，不报错）。
 
+行为 probe（frame.probe）：
+- ``answer``：主答案（旧口径：首 token 是否 top-1，继续记录）；
+- ``answers``：可接受答案集（同义词、带后缀形式，如 "{A}"、"{A}色"）；
+- ``contrast``：对照答案集（字符串列表，或 auto:other / auto:same 从同一划分的其他填充自动生成）。
+  有对照时行为门按完整答案对数概率做强制选择：max log P(可接受) > max log P(对照) 记为正确；
+  没有对照时按"下一个 token 是否为任一可接受答案的首 token"判定。
+- filler.answers_extra：该填充额外的可接受答案（近义词，如 冰→冷 另接受「凉」），不进入任何对照集。
+
 spec 示例见 shared/dist_protocol/grammars/*.json。
 """
 from __future__ import annotations
@@ -41,6 +49,10 @@ DEFAULT_FRACTIONS = {'discovery': 0.6, 'confirm': 0.2, 'lockbox': 0.2}
 DEFAULT_LAYERS = ['first', 'mid', 'last']
 LAYER_WORDS = ('first', 'mid', 'last', 'emb', 'all')
 READOUTS = ('target', 'cue', 'final', 'probe_answer')
+# probe.contrast 的自动模式：用同一划分中其他填充的可接受答案作对照（强制选择）。
+#   auto:other —— 填充因子水平不同的填充（如 KN-ISA：其他类别的类别词）；
+#   auto:same  —— 填充因子水平相同的其他填充（如 KN-ATTR：同一属性类型的其他属性值）。
+CONTRAST_AUTO = ('auto:other', 'auto:same')
 DEFAULT_READOUTS = ['target']
 PREFIX_RATIO_WARN = 3.0     # 对照句式对的句首前缀长度比 ≥ 3 且相差 ≥ 4 字（或一方为空）时告警「前缀 / 位置混杂」
 PREFIX_DIFF_WARN = 4
@@ -128,6 +140,38 @@ def _map_span(pattern: str, slots: Dict[str, str], span: Tuple[int, int]) -> Tup
     if out_s is None or out_e is None:
         raise ValueError(f'span {span} 无法映射到成句')
     return out_s, out_e
+
+
+def _probe_answers(probe: Dict[str, Any]) -> List[str]:
+    """可接受答案模板：answers（含 answer 时保证 answer 在首位）或仅 answer。"""
+    ans = probe.get('answers') if isinstance(probe.get('answers'), list) else []
+    first = probe.get('answer')
+    out = [first] if isinstance(first, str) else []
+    out += [a for a in ans if isinstance(a, str) and a not in out]
+    return out
+
+
+def _probe_sets(probe: Dict[str, Any], fl: Dict[str, Any], pool: List[Dict[str, Any]]) -> Tuple[List[str], List[str]]:
+    """某个填充的 (可接受答案, 对照答案) 字符串。对照不含与可接受答案相同的字符串。"""
+    answers = []
+    for s in [_fill(t, fl['slots']) for t in _probe_answers(probe)] + list(fl.get('answers_extra', [])):
+        if s not in answers:
+            answers.append(s)
+    con = probe.get('contrast')
+    contrast: List[str] = []
+    if isinstance(con, list):
+        cands = [_fill(t, fl['slots']) for t in con]
+    elif con in CONTRAST_AUTO:
+        mine = fl.get('levels', {})
+        others = [o for o in pool if o['id'] != fl['id']
+                  and ((o.get('levels', {}) != mine) if con == 'auto:other' else (o.get('levels', {}) == mine))]
+        cands = [_fill(t, o['slots']) for o in others for t in _probe_answers(probe)]
+    else:
+        cands = []
+    for s in cands:
+        if s not in answers and s not in contrast:
+            contrast.append(s)
+    return answers, sorted(contrast)
 
 
 def readouts_of(spec: Dict[str, Any]) -> List[str]:
@@ -228,16 +272,22 @@ def causal_visibility(spec: Dict[str, Any]) -> Dict[str, Any]:
             prefix_warnings.append(f'因子 {p["factor"]}：句式 {a["id"]} 与 {b["id"]} 的句首前缀长度为 {la} 与 {lb} 字'
                                    f'（「{_leading(a["text"])}」/「{_leading(b["text"])}」），可能存在前缀 / 位置混杂')
     labels = set(label_slots(spec))
+    befores: Dict[str, set] = {}
     for fr in frames:
         text, target = fr.get('text'), fr.get('target')
-        if not isinstance(text, str) or not isinstance(target, str):
+        if isinstance(text, str) and isinstance(target, str):
+            sp = _target_span(text, target, fr.get('target_occurrence', 'first'))
+            if sp:
+                befores[fr.get('id')] = set(SLOT_RE.findall(text[:sp[0]])) - {target}
+    # 在每个句式的目标之前都出现的普通答案槽不随条件变化（如 GR-ROLE 的 {N}{M} 都在复指目标之前），不构成泄漏
+    always_before = set.intersection(*befores.values()) if befores else set()
+    for fr in frames:
+        if fr.get('id') not in befores:
             continue
-        sp = _target_span(text, target, fr.get('target_occurrence', 'first'))
-        if not sp:
-            continue
-        before = set(SLOT_RE.findall(text[:sp[0]])) - {target}
+        target = fr['target']
+        before = befores[fr['id']]
         probe = fr.get('probe') if isinstance(fr.get('probe'), dict) else {}
-        answer = set(SLOT_RE.findall(probe.get('answer', '') or '')) - {target}
+        answer = set(SLOT_RE.findall(probe.get('answer', '') or '')) - {target} - always_before
         for slot in sorted(before & (answer | labels)):
             kind = '类别标签槽' if slot in labels else '答案槽'
             warnings.append(f'句式 {fr.get("id")}：{kind} {{{slot}}} 出现在目标 {{{target}}} 之前，'
@@ -305,6 +355,15 @@ def validate(spec: Dict[str, Any]) -> List[str]:
             if (not isinstance(probe, dict) or not isinstance(probe.get('prompt'), str)
                     or not isinstance(probe.get('answer'), str)):
                 errors.append(f'{where}.probe 必须含 prompt 与 answer 字符串')
+            else:
+                ans = probe.get('answers')
+                if ans is not None and (not isinstance(ans, list) or not ans
+                                        or any(not isinstance(a, str) or not a for a in ans)):
+                    errors.append(f'{where}.probe.answers 必须是非空字符串列表（可接受答案集）')
+                con = probe.get('contrast')
+                if con is not None and not (con in CONTRAST_AUTO or (isinstance(con, list) and con and all(
+                        isinstance(c, str) and c for c in con))):
+                    errors.append(f'{where}.probe.contrast 必须是非空字符串列表，或 {list(CONTRAST_AUTO)} 之一')
     for i, fl in enumerate(fillers):
         where = f'fillers[{i}]'
         if not isinstance(fl, dict):
@@ -321,6 +380,9 @@ def validate(spec: Dict[str, Any]) -> List[str]:
             errors.append(f'{where}.slots 的值必须是非空字符串')
         if not isinstance(fl.get('levels', {}), dict):
             errors.append(f'{where}.levels 必须是对象')
+        extra = fl.get('answers_extra')
+        if extra is not None and (not isinstance(extra, list) or any(not isinstance(a, str) or not a for a in extra)):
+            errors.append(f'{where}.answers_extra 必须是非空字符串列表（该填充额外的可接受答案，不进入对照集）')
     # 因子覆盖：每个组合的 cond 必须恰好包含 factors
     if not errors:
         for fr in frames:
@@ -336,6 +398,9 @@ def validate(spec: Dict[str, Any]) -> List[str]:
                 needed = set(SLOT_RE.findall(fr['text']))
                 if fr.get('probe'):
                     needed |= set(SLOT_RE.findall(fr['probe']['prompt'])) | set(SLOT_RE.findall(fr['probe']['answer']))
+                    for t in _probe_answers(fr['probe']) + (fr['probe']['contrast'] if isinstance(
+                            fr['probe'].get('contrast'), list) else []):
+                        needed |= set(SLOT_RE.findall(t))
                 missing = needed - set(fl['slots'])
                 if missing:
                     errors.append(f'filler {fl["id"]} 缺少 frame {fr["id"]} 需要的槽位 {sorted(missing)}')
@@ -488,6 +553,14 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
             if fr.get('probe'):
                 item['probe'] = {'prompt': _fill(fr['probe']['prompt'], slots),
                                  'answer': _fill(fr['probe']['answer'], slots)}
+                if 'answers' in fr['probe'] or 'contrast' in fr['probe']:
+                    # 对照池只取同一划分的填充，避免发现材料的 probe 用到留出填充的答案词
+                    pool = [o for o in spec['fillers'] if split_of[o['id']] == split_of[fl['id']]]
+                    answers, contrast = _probe_sets(fr['probe'], fl, pool)
+                    item['probe']['answers'] = answers
+                    item['probe']['contrast'] = contrast
+                    if 'contrast' in fr['probe'] and not contrast:
+                        warnings.append(f'{fr["id"]}: 填充 {fl["id"]} 的对照答案为空，该条行为评分退回答案集首 token')
             items.append(item)
     max_items = min(int(spec.get('max_items', MAX_ITEMS_HARD)), MAX_ITEMS_HARD)
     if len(items) > max_items:

@@ -145,7 +145,7 @@ A 提出候选特征 → B 检验它表达哪个语言变量、能否推广 → 
 - 质量控制：金丝雀漂移检测、lockbox 防泄漏、植入找回与负对照测试；
 - 模型身份：权重与 tokenizer 文件的 sha256（model_snapshot），并对账 hs[-1] 是否已过最终归一化；
 - 逐样本向量：items.npz（超限时用随机投影，投影维数与矩阵只由语料决定，各分片一致）；节点本地按层保存 float16 原生全场与 manifest（`AI2050_NATIVE_DIR`，缺省 `~/.ai2050/native_fields`）；
-- 行为门评分目前只比较答案首 token 是否 top-1，设计 probe 时要避免同义词与分词合并造成的假失败。
+- 行为门评分：probe 声明可接受答案集与对照集，按完整答案对数概率强制选择；没有对照集时看下一 token 是否为任一可接受答案的首 token。旧口径（首 token top-1）继续记录。
 
 一键跑完一个模式族：`python scripts/run_language_family.py --family KN-ISA --center http://127.0.0.1:5001 ...`，或在客户端「研发 · 自动测试」操作。完整规范见 [design/platform_spec_v1.md](design/platform_spec_v1.md) 与 AGENTS.md 第 6 节。
 

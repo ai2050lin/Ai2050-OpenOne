@@ -24,7 +24,7 @@ V3_ARTIFACTS = ('summary.json', 'suffstats.npz', 'behavior.json', 'canary.json')
 # 证据门链（README「机制边闭合门」的执行顺序）。observational=分布式观测协议可以自动判定；
 # 其余需要干预或生成实验，当前协议不判定，只显示「未运行」。
 GATE_CHAIN = [
-    {'id': 'behavior', 'label': '行为门', 'auto': True, 'desc': '模型在该条件格上确实完成任务（probe 首 token top-1 准确率 ≥ 预注册阈值）'},
+    {'id': 'behavior', 'label': '行为门', 'auto': True, 'desc': '模型在该条件格上确实完成任务（probe 准确率 ≥ 预注册阈值；有对照集时按完整答案对数概率强制选择，否则按答案集首 token）'},
     {'id': 'instrument', 'label': '仪器门', 'auto': True, 'desc': '金丝雀摘要与同快照/同精度参考一致；无漂移结果'},
     {'id': 'repeat', 'label': '重复', 'auto': True, 'desc': '同一分片被不同节点独立重跑且统计量一致'},
     {'id': 'confirm', 'label': '留出复现', 'auto': True, 'desc': 'discovery 方向在 confirm 划分（同分布未见填充）上复现'},

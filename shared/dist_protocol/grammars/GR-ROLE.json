@@ -1,8 +1,8 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "GR-ROLE",
- "grammar_version": 2,
- "revision_note": "v2：N 在句首（active-agent / ba-agent / bei-patient）时 N 处前缀为空、角色与构式按构造不可见 → 读出改为句后复指的 N（target_occurrence=last）；probe 原问「是谁…」答首 token 常与另一名词相同（小狗/小猫）→ 改为是非问，施事答「是」、受事答「不（是）」；新增 final/probe_answer 读出与全层采集。",
+ "grammar_version": 4,
+ "revision_note": "v2：N 在句首（active-agent / ba-agent / bei-patient）时 N 处前缀为空、角色与构式按构造不可见 → 读出改为句后复指的 N（target_occurrence=last）；probe 原问「是谁…」答首 token 常与另一名词相同（小狗/小猫）→ 改为是非问，施事答「是」、受事答「不（是）」；新增 final/probe_answer 读出与全层采集。 | v3：行为门改为完整答案对数概率的强制选择——施事「是/是的」对「不是/不」，受事反之。 | v4：是非问 probe 受模型「是」偏向影响（功能核对中受事条目一律答「是」，log P 约 −0.1），角色理解与回答偏向混在一起 → 改为「问：是谁{V}了对方？答：」，在 {N} 与 {M}（及「是{N}」「是{M}」）之间按完整答案对数概率强制选择，施事句期望 {N}、受事句期望 {M}。v1 曾因 N/M 首 token 可能相同而放弃这种问法，完整答案评分已消除该问题。修改基于测量效度，预注册阈值不变。",
  "module": "GR",
  "name": "语法 · 施事/受事 × 主动/把字/被字",
  "description": "同一名词 N 在施事与受事两种角色、三种构式中出现（2×3 完全交叉）。N 在句首时其角色由后文决定，句首 N 处状态与角色无关；因此目标改为句后复指「在这件事里，{N}」中的 N（target_occurrence=last），此时整句已可见。另读 final 与 probe_answer。检验角色因子能否脱离语序与构式表面特征，在未见名词对上复现。",
@@ -27,8 +27,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}{V}了{M}。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "是"
+    "prompt": "{N}{V}了{M}。问：是谁{V}了对方？答：",
+    "answer": "{N}",
+    "answers": [
+     "{N}",
+     "是{N}"
+    ],
+    "contrast": [
+     "{M}",
+     "是{M}"
+    ]
    }
   },
   {
@@ -41,8 +49,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}{V}了{N}。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "不是"
+    "prompt": "{M}{V}了{N}。问：是谁{V}了对方？答：",
+    "answer": "{M}",
+    "answers": [
+     "{M}",
+     "是{M}"
+    ],
+    "contrast": [
+     "{N}",
+     "是{N}"
+    ]
    }
   },
   {
@@ -55,8 +71,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}把{M}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "是"
+    "prompt": "{N}把{M}{V}了。问：是谁{V}了对方？答：",
+    "answer": "{N}",
+    "answers": [
+     "{N}",
+     "是{N}"
+    ],
+    "contrast": [
+     "{M}",
+     "是{M}"
+    ]
    }
   },
   {
@@ -69,8 +93,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}把{N}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "不是"
+    "prompt": "{M}把{N}{V}了。问：是谁{V}了对方？答：",
+    "answer": "{M}",
+    "answers": [
+     "{M}",
+     "是{M}"
+    ],
+    "contrast": [
+     "{N}",
+     "是{N}"
+    ]
    }
   },
   {
@@ -83,8 +115,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{M}被{N}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "是"
+    "prompt": "{M}被{N}{V}了。问：是谁{V}了对方？答：",
+    "answer": "{N}",
+    "answers": [
+     "{N}",
+     "是{N}"
+    ],
+    "contrast": [
+     "{M}",
+     "是{M}"
+    ]
    }
   },
   {
@@ -97,8 +137,16 @@
    "target": "N",
    "target_occurrence": "last",
    "probe": {
-    "prompt": "{N}被{M}{V}了。问：在这件事里，{N}是做动作的一方吗？答：",
-    "answer": "不是"
+    "prompt": "{N}被{M}{V}了。问：是谁{V}了对方？答：",
+    "answer": "{M}",
+    "answers": [
+     "{M}",
+     "是{M}"
+    ],
+    "contrast": [
+     "{N}",
+     "是{N}"
+    ]
    }
   }
  ],

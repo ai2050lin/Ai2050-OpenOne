@@ -1,8 +1,8 @@
 {
  "schema_version": "template_grammar.v1",
  "family_id": "KN-ISA",
- "grammar_version": 2,
- "revision_note": "v2：decl/interrog 原句首目标 X 前缀为空、两句式在 X 处状态相同 → 加句式前缀「众所周知，」「请问」；topic 原「说到{Y}，{X}…」把类别词放在 X 前 → 改为「至于{X}，它通常被归为{Y}。」；新增 cue/final/probe_answer 读出与全层采集。",
+ "grammar_version": 3,
+ "revision_note": "v2：decl/interrog 原句首目标 X 前缀为空、两句式在 X 处状态相同 → 加句式前缀「众所周知，」「请问」；topic 原「说到{Y}，{X}…」把类别词放在 X 前 → 改为「至于{X}，它通常被归为{Y}。」；新增 cue/final/probe_answer 读出与全层采集。 | v3：行为门改为完整答案对数概率的强制选择——正确类别词对同一划分中其他类别的类别词（auto:other），不再要求首 token 为类别词（模型常先输出「非常…」「小型」等修饰语或「哺乳」等更具体的下位类）。",
  "module": "KN",
  "name": "知识网络 · 上下位（is-a）",
  "description": "6 个类别 × 14 个成员 × 5 种句式；目标位置为成员词 X（每个句式在 X 之前都有区分句式的前缀），cue 为类别词 Y 之前的谓词片段（该位置预测类别词），另读 final 与 probe_answer。检验类别因子方向是否跨句式稳定、能否推广到未见成员（lockbox）与未见句式（lockbox_frame）。",
@@ -32,7 +32,11 @@
    "cue": "是一种",
    "probe": {
     "prompt": "众所周知，{X}是一种",
-    "answer": "{Y}"
+    "answer": "{Y}",
+    "answers": [
+     "{Y}"
+    ],
+    "contrast": "auto:other"
    }
   },
   {
@@ -45,7 +49,11 @@
    "cue": "是不是一种",
    "probe": {
     "prompt": "问：{X}属于哪一类？答：{X}属于",
-    "answer": "{Y}"
+    "answer": "{Y}",
+    "answers": [
+     "{Y}"
+    ],
+    "contrast": "auto:other"
    }
   },
   {
@@ -58,7 +66,11 @@
    "cue": "它属于",
    "probe": {
     "prompt": "昨天我在书上看到了{X}，它属于",
-    "answer": "{Y}"
+    "answer": "{Y}",
+    "answers": [
+     "{Y}"
+    ],
+    "contrast": "auto:other"
    }
   },
   {
@@ -71,7 +83,11 @@
    "cue": "确实是一种",
    "probe": {
     "prompt": "虽然{X}很常见，但它确实是一种",
-    "answer": "{Y}"
+    "answer": "{Y}",
+    "answers": [
+     "{Y}"
+    ],
+    "contrast": "auto:other"
    }
   },
   {
@@ -84,7 +100,11 @@
    "cue": "通常被归为",
    "probe": {
     "prompt": "至于{X}，它通常被归为",
-    "answer": "{Y}"
+    "answer": "{Y}",
+    "answers": [
+     "{Y}"
+    ],
+    "contrast": "auto:other"
    }
   }
  ],
