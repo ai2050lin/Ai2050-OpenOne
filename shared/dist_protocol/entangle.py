@@ -705,7 +705,11 @@ def _null(Y: np.ndarray, L: Layout, rng: np.random.Generator, n_perm: int):
 # ---------------------------------------------------------------------------------------------------------------------
 # E5 未见组合读出干扰 与 线索门控
 # ---------------------------------------------------------------------------------------------------------------------
-def _margins(Ztr, ytr, Zte, yte, levels, center: bool) -> Optional[np.ndarray]:
+def _margins(Ztr, ytr, Zte, yte, levels, center: bool, ref: Optional[np.ndarray] = None) -> Optional[np.ndarray]:
+    """逐条投影间隔。center=True：只去掉测试条件的整体平移——测试集均值减去留出全体均值 ref（同一批名词、
+    各条件类别构成相同），类别构成信息保留；ref 缺省时退化为按测试集均值居中。测试集不足 2 个类别时不可检验（None）。"""
+    if len(set(yte) & set(levels)) < 2:
+        return None
     g = Ztr.mean(0)
     dirs = {}
     for lv in levels:
@@ -719,7 +723,12 @@ def _margins(Ztr, ytr, Zte, yte, levels, center: bool) -> Optional[np.ndarray]:
         return None
     keys = list(dirs)
     U = np.stack([dirs[k] for k in keys])
-    P = (Zte - (Zte.mean(0) if center else g)) @ U.T
+    if center and ref is not None:
+        P = (Zte - (Zte.mean(0) - ref) - g) @ U.T
+    elif center:
+        P = (Zte - Zte.mean(0)) @ U.T
+    else:
+        P = (Zte - g) @ U.T
     col = {k: i for i, k in enumerate(keys)}
     ti = np.array([col.get(t, -1) for t in yte])
     ok = ti >= 0
@@ -782,6 +791,7 @@ def interference(Z: np.ndarray, design: Design, target: str, context: str, *, he
     keep = design.keep
     D = keep & (design.split == 'discovery')
     H = keep & np.isin(design.split, list(held))
+    ref = Z[H].mean(0) if H.any() else None          # 留出全体均值：居中只去掉条件平移，保留类别构成
     y, c = design.labels[target], design.labels[context]
     levels = sorted(set(y[D]))
     if len(levels) < 2 or not H.any():
@@ -795,9 +805,9 @@ def interference(Z: np.ndarray, design: Design, target: str, context: str, *, he
         rec = {'context_level': lv}
         for center in (True, False):
             tag = 'centered' if center else 'raw'
-            s_seen = _margins(Z[tr_seen], y[tr_seen], Z[te_seen], y[te_seen], levels, center)
-            s_un = _margins(Z[tr_seen], y[tr_seen], Z[te_unseen], y[te_unseen], levels, center)
-            s_m = _margins(Z[tr_match], y[tr_match], Z[te_unseen], y[te_unseen], levels, center)
+            s_seen = _margins(Z[tr_seen], y[tr_seen], Z[te_seen], y[te_seen], levels, center, ref)
+            s_un = _margins(Z[tr_seen], y[tr_seen], Z[te_unseen], y[te_unseen], levels, center, ref)
+            s_m = _margins(Z[tr_match], y[tr_match], Z[te_unseen], y[te_unseen], levels, center, ref)
             rec[tag] = {'sep_seen': _sep(s_seen), 'sep_unseen': _sep(s_un), 'sep_matched': _sep(s_m)}
             if s_seen is not None and s_un is not None:
                 (groups_c if center else groups_r).append(
@@ -814,8 +824,68 @@ def interference(Z: np.ndarray, design: Design, target: str, context: str, *, he
         return {'interference': float(np.mean(diffs)) if diffs else None,
                 'ci95': _boot_mean_diff(groups, rng, n_boot) if groups else None,
                 'transfer_ratio': float(np.mean(tr)) if tr else None}
-    return {'target': target, 'context': context, 'held': list(held), 'by_level': rows,
-            'centered': summ('centered', groups_c), 'raw': summ('raw', groups_r)}
+    out = {'target': target, 'context': context, 'held': list(held), 'by_level': rows,
+           'centered': summ('centered', groups_c), 'raw': summ('raw', groups_r)}
+    obs = out['centered']['interference']
+    if obs is not None:
+        out['centered']['p_perm'] = _interference_null(Z, design, y, c, D, H, ref, levels,
+                                                       [r['context_level'] for r in rows], obs, rng)
+        out['centered']['null'] = 'permute_context_levels_within_noun'
+    return out
+
+
+def _interference_null(Z, design, y, c, D, H, ref, levels, ctx_levels, obs, rng) -> Optional[float]:
+    """E5 居中干扰的零分布：每个留出名词内部随机置换 context 水平标签，重算 mean_lv(sep_seen − sep_unseen)。
+    读出方向（各 lv 的 discovery 训练集）不变，只预先算一次投影，置换时只重新分组与居中。"""
+    Hi = np.where(H)[0]
+    yh, ch, nh = y[Hi], c[Hi], design.noun[Hi]
+    pre = []
+    for lv in ctx_levels:
+        tr = D & (c != lv)
+        g = Z[tr].mean(0)
+        dirs = []
+        keys = []
+        for l in levels:
+            m = tr & (y == l)
+            if m.any():
+                v = Z[m].mean(0) - g
+                n = np.linalg.norm(v)
+                if n > 1e-12:
+                    dirs.append(v / n); keys.append(l)
+        if len(keys) < 2:
+            return None
+        U = np.stack(dirs)
+        col = {k: i for i, k in enumerate(keys)}
+        ti = np.array([col.get(t, -1) for t in yh])
+        pre.append((lv, (Z[Hi] - g) @ U.T, (ref - g) @ U.T, ti, len(keys)))
+
+    def sep_of(Pall, Pref, ti, k, sel):
+        sel = sel & (ti >= 0)
+        if sel.sum() < 2 or len(set(ti[sel])) < 2:
+            return None
+        P = Pall[sel] - Pall[sel].mean(0) + Pref
+        own = P[np.arange(len(P)), ti[sel]]
+        sv = own - (P.sum(1) - own) / (k - 1)
+        sd = sv.std()
+        return float(sv.mean() / sd) if sd > 1e-12 else None
+
+    lv_all = sorted(set(ch))
+    uniq = np.unique(nh)
+    null = []
+    for _ in range(CRITERIA['n_perm']):
+        cp = ch.copy()
+        for n in uniq:
+            m = nh == n
+            perm = dict(zip(lv_all, rng.permutation(lv_all)))
+            cp[m] = [perm[v] for v in ch[m]]
+        diffs = []
+        for lv, Pall, Pref, ti, k in pre:
+            a, b = sep_of(Pall, Pref, ti, k, cp != lv), sep_of(Pall, Pref, ti, k, cp == lv)
+            if a is not None and b is not None:
+                diffs.append(a - b)
+        if diffs:
+            null.append(float(np.mean(diffs)))
+    return float((1 + sum(v >= obs - 1e-12 for v in null)) / (1 + len(null))) if null else None
 
 
 def gating(Z: np.ndarray, design: Design, attr: str, task_factor: str, aligned: str, *,
@@ -828,6 +898,7 @@ def gating(Z: np.ndarray, design: Design, attr: str, task_factor: str, aligned: 
     keep = design.keep
     D = keep & (design.split == 'discovery')
     H = keep & np.isin(design.split, list(held))
+    ref = Z[H].mean(0) if H.any() else None          # 留出全体均值：居中只去掉条件平移，保留类别构成
     y, t = design.labels[attr], design.labels[task_factor]
     levels = sorted(set(y[D]))
     per, margins, matched = {}, {}, {}
@@ -835,12 +906,12 @@ def gating(Z: np.ndarray, design: Design, attr: str, task_factor: str, aligned: 
     # 训练噪声对各水平相同，差异只来自测试端，按名词自助是配对的；另记各水平各自拟合的匹配版本作参考
     for lv in sorted(set(t[keep])):
         te = H & (t == lv)
-        s = _margins(Z[D], y[D], Z[te], y[te], levels, True) if te.any() else None
+        s = _margins(Z[D], y[D], Z[te], y[te], levels, True, ref) if te.any() else None
         per[lv] = _sep(s)
         if s is not None:
             margins[lv] = (s, design.noun[te])
         tr = D & (t == lv)
-        matched[lv] = _sep(_margins(Z[tr], y[tr], Z[te], y[te], levels, True)) if tr.any() and te.any() else None
+        matched[lv] = _sep(_margins(Z[tr], y[tr], Z[te], y[te], levels, True, ref)) if tr.any() and te.any() else None
     if aligned not in per or per[aligned] is None:
         return None
     others = [v for k, v in per.items() if k != aligned and v is not None]
@@ -850,8 +921,33 @@ def gating(Z: np.ndarray, design: Design, attr: str, task_factor: str, aligned: 
     groups = [(margins[aligned][0], margins[aligned][1], margins[k][0], margins[k][1])
               for k in margins if k != aligned]
     ci = _boot_mean_diff(groups, rng, n_boot)
+    # 零分布：每个留出名词内部随机置换线索水平标签（名词整体、各水平条目整组交换），重算门控增益。
+    # 加性编码下各线索水平可交换；自助区间只反映测试名词抽样，不含这一交换噪声，单独使用会偏宽松。
+    lv_all = sorted(set(t[keep]))
+    Hi = np.where(H)[0]
+    nouns_h = design.noun[Hi]
+    t_h = t[Hi]
+    null = []
+    n_perm = CRITERIA['n_perm']
+    for _ in range(n_perm):
+        tp = t_h.copy()
+        for n in np.unique(nouns_h):
+            m = nouns_h == n
+            perm = dict(zip(lv_all, rng.permutation(lv_all)))
+            tp[m] = [perm[v] for v in t_h[m]]
+        sp = {}
+        for lv in lv_all:
+            sel = Hi[tp == lv]
+            sp[lv] = _sep(_margins(Z[D], y[D], Z[sel], y[sel], levels, True, ref)) if len(sel) else None
+        if sp.get(aligned) is None:
+            continue
+        oth = [v for k, v in sp.items() if k != aligned and v is not None]
+        if oth:
+            null.append(sp[aligned] - float(np.mean(oth)))
+    p_perm = float((1 + sum(v >= gain - 1e-12 for v in null)) / (1 + len(null))) if null else None
     return {'attr': attr, 'task_factor': task_factor, 'aligned': aligned, 'sep_by_task': per,
-            'sep_by_task_matched': matched, 'gain': gain, 'ci95': ci}
+            'sep_by_task_matched': matched, 'gain': gain, 'ci95': ci, 'p_perm': p_perm,
+            'null': 'permute_task_levels_within_noun'}
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1029,10 +1125,10 @@ def _verdicts(out_tags: List[Dict[str, Any]]) -> None:
             e5 = (p.get('E5') or {}).get('centered') or {}
             ci = e5.get('ci95')
             p['interfered'] = bool(e5.get('interference') is not None and e5['interference'] >= C['interference_min']
-                                   and ci is not None and ci[0] > 0)
+                                   and e5.get('p_perm') is not None and e5['p_perm'] <= C['alpha'])
             g = p.get('gating') or {}
             p['gated'] = bool(g.get('gain') is not None and g['gain'] >= C['gating_min']
-                              and g.get('ci95') is not None and g['ci95'][0] > 0)
+                              and g.get('p_perm') is not None and g['p_perm'] <= C['alpha'])
 
 
 def findings(out_tags: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

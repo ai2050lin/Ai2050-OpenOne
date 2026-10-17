@@ -172,6 +172,13 @@ class GateAndBalanceTests(unittest.TestCase):
         p = res['tags'][0]['pairs']['lang×task']
         self.assertNotEqual(p.get('verdict'), 'entangled')
 
+    def test_single_class_test_set_not_testable(self):
+        rng = np.random.default_rng(0)
+        Ztr, Zte = rng.standard_normal((20, 4)), rng.standard_normal((6, 4))
+        ytr = np.array(['a'] * 10 + ['b'] * 10)
+        self.assertIsNone(E._margins(Ztr, ytr, Zte, np.array(['a'] * 6), ['a', 'b'], True, Zte.mean(0)))
+        self.assertIsNotNone(E._margins(Ztr, ytr, Zte, np.array(['a', 'b'] * 3), ['a', 'b'], True, Zte.mean(0)))
+
     def test_rare_attr_level_dropped_not_pair(self):
         d = self.design
         disc = d.split == 'discovery'
