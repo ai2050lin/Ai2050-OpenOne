@@ -1,0 +1,73 @@
+{
+ "schema": "intervention_prereg.v1",
+ "id": "INT-Q-v1",
+ "phase": "Phase 253 §7.2 干预 1",
+ "created": "2026-10-18",
+ "question": "GR-Q 中「疑问 − 陈述」的句末均值差方向 d，是否在模型计算中携带『说话人未确定』这一信息：沿 d 推动陈述句，模型是否更倾向回答『不确定』（充分性）；在疑问句上把 d 方向的投影改为陈述句均值，模型是否更少回答『不确定』（必要性）；并检验该效应能否跨模式族（GR-NEG、KN-ISA）。",
+ "models": [
+  {"model_id": "qwen3-4b", "path": "models/hf/qwen3-4b", "native_key": "6be1034f0b55a6df-bf16", "dtype": "bf16", "placement": "cuda", "layer_hs": 28},
+  {"model_id": "glm4-9b", "path": "models/hf/glm4-9b-chat-hf", "native_key": "64baf4f7e4fb31ae-bf16", "dtype": "bf16", "placement": "device_map=auto, max_memory 0=12GiB,cpu=20GiB", "layer_hs": 24}
+ ],
+ "layer_rule": "取 Phase 253 §12 三模型谱图（scratchpad/xm/atlas_v6_3m.json）中 final 读出上 GR-Q↔GR-NEG「疑问」边 cos 最大的网格层，排除最后一个 hs 下标（已过最终归一化）。Qwen3-4B：final@L28 cos 0.4816；GLM4-9B：final@L24 cos 0.4548（L40 为最后一层，按规则排除）。干预位置 = hs[layer_hs]，即第 layer_hs 个 Transformer 块（0 起为 layer_hs-1）的输出。",
+ "directions": {
+  "d_question": {
+   "source": "TG-GR-Q v7（文法 GR-Q v6，design 5d4d3dfbf5b6）原生全场，D:/ai2050_native/GR-Q/TG-GR-Q-v7/037d25732384884f/<native_key>/shard-*",
+   "readout": "final（句子最后一个有字符跨度的 token，文本单独前向）",
+   "split": "discovery",
+   "definition": "d = mean(h | mood=interrog) − mean(h | mood=decl)，在原生坐标（float32）中计算，不白化、不单位化；d̂ = d/‖d‖"
+  },
+  "polarity_control": {
+   "source": "TG-GR-NEG v6（文法 GR-NEG v7，design 8c6e7c50a19c）原生全场，D:/ai2050_native/GR-NEG/TG-GR-NEG-v6/6bb34192471ce430/<native_key>/shard-*",
+   "readout": "final", "split": "discovery",
+   "definition": "p = mean(h | polarity=neg) − mean(h | polarity=aff)，缩放到 ‖p‖ = ‖d‖"
+  },
+  "random_controls": {"n": 20, "seed": 20261018, "definition": "原生坐标中的标准正态向量，单位化后乘 ‖d‖（充分性）或用作单位方向（必要性）"}
+ },
+ "probes": {
+  "epistemic_GR": "{text}问：对于{S}是不是{A}的，说话人是确定还是不确定？答：说话人",
+  "epistemic_KN": "{text}问：对于{X}是不是一种{Y}，说话人是确定还是不确定？答：说话人",
+  "score": "g = log P(不确定 | 提示) − log P(确定 | 提示)，完整答案对数概率，与 runner_v3.answer_logprobs 相同（提示与答案分别分词后拼接、teacher forcing）",
+  "category_KN": "{text}问：{X}属于哪一类？答：{X}属于；可接受 = {Y}，对照 = 同一划分其他类别的 Y；m_cat = max log P(可接受) − max log P(对照)"
+ },
+ "intervention_site": "提示分词后，文本部分最后一个 token 的位置（要求提示前缀的 token 与文本单独分词完全一致，否则该条排除并计数）；只改这一个位置在 hs[layer_hs] 的状态，后续层与后续位置正常计算",
+ "materials": {
+  "rule": "只用 lockbox 与 lockbox_frame 划分（未参与方向估计、层选择以外的任何发现步骤）",
+  "decl_cross": "GR-NEG v6 中 mood=decl（两种极性）+ KN-ISA v3 中 frame ∈ {decl, scene, concess, topic}",
+  "interrog_cross": "GR-NEG v6 中 mood=interrog（两种极性）+ KN-ISA v3 中 frame=interrog",
+  "decl_within": "GR-Q v7 中 mood=decl",
+  "interrog_within": "GR-Q v7 中 mood=interrog",
+  "selectivity": "KN-ISA v3 中 frame ∈ {decl, scene, concess, topic}"
+ },
+ "tests": {
+  "sufficiency": {
+   "operation": "h ← h + α·d，α ∈ {0.5, 1, 2}；主统计取 α = 1（把句末状态沿 d 移动一个类均值差）",
+   "statistic": "Δg_i = g_i(干预) − g_i(无干预)，对条目求均值",
+   "controls": "20 个随机方向 r_k（‖r_k‖ = ‖d‖）与极性方向 p，均为 α = 1",
+   "pass_if": ["mean Δg(d) > 0 且 Wilcoxon 符号秩单侧 p < 0.01", "mean Δg(d) > max_k mean Δg(r_k)", "mean Δg(d) > mean Δg(p)"],
+   "primary_pool": "decl_cross", "secondary_pool": "decl_within"
+  },
+  "necessity": {
+   "operation": "方向均值消融：h ← h − (h·d̂ − μ_D)·d̂，μ_D = GR-Q v7 discovery 陈述句 final@layer_hs 在 d̂ 上投影的均值",
+   "statistic": "drop_i = g_i(无干预) − g_i(消融)，对条目求均值",
+   "controls": "同一条目、同样位移长度 |h·d̂ − μ_D| 沿随机单位方向 r̂_k（20 个）与极性单位方向 p̂ 的位移：h ← h − (h·d̂ − μ_D)·û",
+   "pass_if": ["mean drop(d) > 0 且 Wilcoxon 符号秩单侧 p < 0.01", "mean drop(d) > max_k mean drop(r_k)", "mean drop(d) > mean drop(p)"],
+   "primary_pool": "interrog_cross", "secondary_pool": "interrog_within"
+  },
+  "selectivity": {
+   "operation": "与充分性相同（α = 1，沿 d）",
+   "statistic": "Δm_cat_i = m_cat_i(干预) − m_cat_i(无干预)",
+   "pass_if": ["|mean Δm_cat| ≤ 0.5 × mean Δg(d)（充分性主池，α = 1）"]
+  },
+  "validity_check": "无干预时，对应主 / 次池的 mean g(疑问池) − mean g(陈述池) > 0；不满足则该池的 probe 记为无效，相应检验不判定"
+ },
+ "verdicts": "每个模型、每个检验分别给出「通过 / 未通过 / 不判定」；跨族结论只看主池。同一模型的主池充分性与必要性都通过，才记为「该方向在该模型中被因果使用（范围内干预）」。",
+ "self_checks": [
+  "零干预时 GR-Q 条目的 g 与正式运行 behavior.json 中的 margin（经答案集方向换算）一致，|差| < 0.05",
+  "提示前向中干预位置的 hs[layer_hs] 与原生全场 final 读出向量的余弦 > 0.999"
+ ],
+ "notes": [
+  "条目不独立（同一填充出现在多个句式中），Wilcoxon 以条目为单位；另报告按填充求均值后的符号检验，只作稳健性描述。",
+  "干预有效只说明该方向在此位置与层上足以 / 必须影响该 probe 的读出，不证明唯一性或完整机制；共享方向的跨族效应不等于共享机制。",
+  "判据与材料在运行前冻结，本文件的 sha256 写入结果与研究记录；看到结果后不得修改，修改须升版本（INT-Q-v2）并重新运行。"
+ ]
+}
