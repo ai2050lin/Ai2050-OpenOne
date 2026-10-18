@@ -64,6 +64,49 @@ def parse_blob(blob: bytes, manifest: List[dict]) -> Dict[str, bytes]:
     return files
 
 
+def paired_behavior(corpus_items: List[dict], behavior_items: List[dict], factor: str) -> Dict[str, Dict[str, int]]:
+    """成对行为门（prereg.gate_mode=paired，定义见 grammar._gate_mode_errors）。
+
+    同一划分、同一填充、其余因子水平相同、只在 factor 上不同的两条组成一对；两条的答案集与对照集须互换，
+    一对判对当且仅当 m_a + m_b > 0（m = 强制选择间隔）。每一对同时计入两条所在的条件格。
+    返回 {条件格: {'n': 对数, 'correct': 判对数, 'invalid': 答案集不互换或缺少间隔而无法配对的对数}}。"""
+    meta = {it['id']: it for it in corpus_items}
+    groups: Dict[Tuple, Dict[str, List[dict]]] = {}
+    for b in behavior_items:
+        it = meta.get(b.get('id'))
+        if it is None or factor not in (it.get('cond') or {}):
+            continue
+        cond = it['cond']
+        rest = tuple(sorted((k, str(v)) for k, v in cond.items() if k != factor))
+        key = (it.get('split'), it.get('filler_id'), rest)
+        groups.setdefault(key, {}).setdefault(str(cond[factor]), []).append({**b, '_probe': it.get('probe') or {}})
+    out: Dict[str, Dict[str, int]] = {}
+
+    def bump(cell, ok, invalid):
+        rec = out.setdefault(cell, {'n': 0, 'correct': 0, 'invalid': 0})
+        if invalid:
+            rec['invalid'] += 1
+        else:
+            rec['n'] += 1
+            rec['correct'] += int(ok)
+
+    for by_level in groups.values():
+        lv = sorted(by_level)
+        for i, la in enumerate(lv):
+            for lb in lv[i + 1:]:
+                for a in by_level[la]:
+                    for b in by_level[lb]:
+                        pa, pb = a['_probe'], b['_probe']
+                        swapped = (set(pa.get('answers') or []) == set(pb.get('contrast') or [])
+                                   and set(pa.get('contrast') or []) == set(pb.get('answers') or []) and pa.get('contrast'))
+                        ma, mb = a.get('margin'), b.get('margin')
+                        invalid = not swapped or not isinstance(ma, (int, float)) or not isinstance(mb, (int, float))
+                        ok = (not invalid) and ma + mb > 0
+                        bump(a['cell'], ok, invalid)
+                        bump(b['cell'], ok, invalid)
+    return out
+
+
 def result_files(data_dir: Path, sha: str, summary: dict) -> Dict[str, bytes]:
     p = Path(data_dir) / 'objects' / sha[:2] / sha
     if not p.is_file():
@@ -162,6 +205,8 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
                 primaries[shard] = (r, s)
         merged: Optional[SuffStats] = None
         behavior: Dict[str, Dict[str, int]] = {}
+        gate_mode = prereg.get('gate_mode', 'absolute')
+        beh_items: List[dict] = []
         loaded: Dict[str, SuffStats] = {}
         for shard, (r, s) in sorted(primaries.items()):
             files = result_files(data_dir, r['sha'], s)
@@ -176,6 +221,11 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
             for cell, rec in (s.get('behavior_by_cell') or {}).items():
                 agg = behavior.setdefault(cell, {'n': 0, 'correct': 0})
                 agg['n'] += int(rec.get('n', 0)); agg['correct'] += int(rec.get('correct', 0))
+            if gate_mode == 'paired' and 'behavior.json' in files:
+                try:
+                    beh_items.extend(json.loads(files['behavior.json'].decode('utf-8')).get('items') or [])
+                except (ValueError, UnicodeDecodeError):
+                    pass
         rep = []
         try:
             byte_reps = db.execute(
@@ -201,10 +251,20 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
         min_n = int(prereg.get('min_probe_n', 3))
         beh = {}
         failing = set()
+        # 成对口径（prereg.gate_mode=paired）：按句子对判定；逐条绝对准确率仍记录为 absolute_acc
+        paired = (paired_behavior(corpus.get('items') or [], beh_items, str(prereg.get('gate_factor')))
+                  if gate_mode == 'paired' else None)
         for cell, rec in sorted(behavior.items()):
-            acc = rec['correct'] / rec['n'] if rec['n'] else None
-            ok = acc is not None and rec['n'] >= min_n and acc >= min_acc
-            beh[cell] = {'n': rec['n'], 'acc': acc, 'pass': ok}
+            abs_acc = rec['correct'] / rec['n'] if rec['n'] else None
+            if paired is not None:
+                pr = paired.get(cell) or {'n': 0, 'correct': 0, 'invalid': 0}
+                acc = pr['correct'] / pr['n'] if pr['n'] else None
+                ok = acc is not None and pr['n'] >= min_n and acc >= min_acc
+                beh[cell] = {'n': rec['n'], 'acc': acc, 'pass': ok, 'mode': 'paired', 'n_pairs': pr['n'],
+                             'invalid_pairs': pr['invalid'], 'absolute_acc': abs_acc}
+            else:
+                ok = abs_acc is not None and rec['n'] >= min_n and abs_acc >= min_acc
+                beh[cell] = {'n': rec['n'], 'acc': abs_acc, 'pass': ok}
             if not ok:
                 failing.add(cell)
         payload = summarize(merged, exclude_conds=failing if gate else None, include_full=full) if merged else None
@@ -213,7 +273,7 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
             'shards_present': sorted(primaries), 'complete': len(primaries) >= shards_expected,
             'replicates': rep, 'excluded': excluded, 'behavior': beh,
             'primary_shas': [primaries[sh][0]['sha'] for sh in sorted(loaded)],
-            'behavior_threshold': min_acc, 'gate_applied': gate, 'gate_excluded_cells': sorted(failing) if gate else [],
+            'behavior_threshold': min_acc, 'gate_mode': gate_mode, 'gate_applied': gate, 'gate_excluded_cells': sorted(failing) if gate else [],
             'agg': payload,
             'synthetic': any(r['kind'] == 'synthetic' for r, _ in members),
         }
@@ -422,8 +482,9 @@ def audit_checks(db: sqlite3.Connection, row, summary: dict) -> List[Dict[str, A
         thr = float((corpus.get('prereg') or {}).get('min_behavior_acc', 0.8))
         if beh:
             bad = [c for c, r in beh.items() if r.get('n') and r.get('correct', 0) / r['n'] < thr]
+            paired_note = '；模板为成对口径，合并时按句子对重新判定' if (corpus.get('prereg') or {}).get('gate_mode') == 'paired' else ''
             add('behavior', '行为门（本分片）', 'warn' if bad else 'pass',
-                f'{len(bad)}/{len(beh)} 格低于 {thr:.0%}（合并时自动排除）' if bad else f'{len(beh)} 格均 ≥ {thr:.0%}')
+                (f'{len(bad)}/{len(beh)} 格逐条准确率低于 {thr:.0%}（合并时自动排除）' if bad else f'{len(beh)} 格均 ≥ {thr:.0%}') + paired_note)
         else:
             add('behavior', '行为门（本分片）', 'warn', '本分片无 probe 结果')
         shard = str(summary.get('shard') or '')

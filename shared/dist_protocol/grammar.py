@@ -476,8 +476,55 @@ def validate(spec: Dict[str, Any]) -> List[str]:
                 errors.append(f'concepts[{k}] 必须是非空字符串')
             elif f not in levels or lv not in levels[f]:
                 errors.append(f'concepts 键 {k} 没有对应的因子水平')
+    errors.extend(_gate_mode_errors(spec, frames))
     if not errors:
         errors.extend(causal_visibility(spec)['errors'])
+    return errors
+
+
+GATE_MODES = ('absolute', 'paired')
+
+
+def _gate_mode_errors(spec: Dict[str, Any], frames: List[Any]) -> List[str]:
+    """prereg.gate_mode（行为门口径，随模板冻结进 design_sha）：
+    - absolute（缺省）：每条 probe 单独判对错（强制选择或首 token），按条件格求准确率；
+    - paired：同一填充、同一划分、只在 prereg.gate_factor 上不同的两条句子组成一对，两条的可接受答案集与对照集互换；
+      记 m = max log P(可接受) − max log P(对照)，一对判对当且仅当 m_a + m_b > 0，即答案偏好按预期方向移动。
+      只检验模型是否区分因子水平，不受模型对两个答案的整体先验偏移影响；适用于二值、答案互为对照的因子。"""
+    prereg = spec.get('prereg', {})
+    if not isinstance(prereg, dict):
+        return ['prereg 必须是对象']
+    mode = prereg.get('gate_mode', 'absolute')
+    if mode not in GATE_MODES:
+        return [f'prereg.gate_mode 必须是 {list(GATE_MODES)} 之一']
+    if mode != 'paired':
+        return ['prereg.gate_factor 只在 gate_mode=paired 时使用'] if 'gate_factor' in prereg else []
+    gf = prereg.get('gate_factor')
+    if gf not in (spec.get('factors') or []):
+        return ['gate_mode=paired 时 prereg.gate_factor 必须是 factors 中的一个因子']
+    errors = []
+    fr_levels: Dict[str, List[Dict[str, Any]]] = {}
+    for fr in frames:
+        if not isinstance(fr, dict):
+            continue
+        p = fr.get('probe')
+        if not (isinstance(p, dict) and isinstance(p.get('contrast'), list) and p['contrast']):
+            errors.append(f'gate_mode=paired 要求每个 frame 的 probe 声明字面对照集 contrast（frame {fr.get("id")}）')
+            continue
+        if gf in (fr.get('levels') or {}):
+            fr_levels.setdefault(str(fr['levels'][gf]), []).append(fr)
+    if not errors and len(fr_levels) == 1:
+        errors.append(f'gate_mode=paired 要求 gate_factor={gf} 至少有两个水平')
+    # 句式级因子：不同水平的句式，答案集与对照集模板必须互换，否则成对比较没有定义
+    lv = sorted(fr_levels)
+    for i, a in enumerate(lv):
+        for b in lv[i + 1:]:
+            for fa in fr_levels[a]:
+                for fb in fr_levels[b]:
+                    pa, pb = fa['probe'], fb['probe']
+                    if set(_probe_answers(pa)) != set(pb['contrast']) or set(pa['contrast']) != set(_probe_answers(pb)):
+                        errors.append(f'gate_mode=paired 要求 {gf} 不同水平的句式答案集与对照集互换（{fa["id"]} ↔ {fb["id"]}）')
+                        return errors
     return errors
 
 
