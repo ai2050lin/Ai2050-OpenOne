@@ -193,6 +193,28 @@ class AtlasTests(unittest.TestCase):
         self.assertEqual(kinds['concept-疑问'], 'warning')
         self.assertIn('token-identity', kinds)
 
+    def test_length_confound_flag(self):
+        # 长度混杂标记：两端水平的平均 token 数都偏离 ≥ 1 且偏离同向与对齐方向一致 → 标记；没有句长信息 → None
+        self.assertEqual({k: round(v, 2) for k, v in atlas.level_len_delta(
+            {'frame=decl|m=a': 10.0, 'frame=interrog|m=a': 13.0, 'frame=decl|m=b': 10.0, 'frame=interrog|m=b': 13.0},
+            'frame').items()}, {'decl': -1.5, 'interrog': 1.5})
+        self.assertEqual(atlas.level_len_delta({'frame=decl': 10.0}, 'frame'), {})
+        fams = build(True)
+        g0 = atlas.build_atlas({'m1': fams})['graphs'][0]
+        self.assertTrue(g0['edges'])
+        self.assertTrue(all(e['length_confound'] is None for e in g0['edges']))
+        # 给每族的「疑问」水平植入同向的句长偏离（+2 个 token），其余水平相应偏短
+        for fam in fams:
+            for f in fam['features']:
+                if f['factor'] in ('frame', 'mood'):
+                    f['len_delta'] = 2.0 if f['concept'] == '疑问' else -1.0
+        g1 = atlas.build_atlas({'m1': fams})['graphs'][0]
+        q = [e for e in g1['edges'] if e['concept'] == '疑问']
+        self.assertTrue(q)
+        self.assertTrue(all(e['length_confound'] is True for e in q))
+        self.assertIn('length-confound', {f['id'] for f in g1['findings']})
+        self.assertEqual({h['concept']: h['status'] for h in g1['concept_hypotheses']}['疑问'], 'supported')  # 只标记，不排除
+
     def test_no_baseline_tag_is_marked_unchecked(self):
         g = atlas.build_atlas({'m1': build(True)})['graphs'][0]            # first/mid/last：没有嵌入层标签
         self.assertTrue(g['edges'])

@@ -44,6 +44,7 @@ CRITERIA = {
     'min_null_pairs': 20,      # 少于该数目的跨族特征对时不使用经验零分布
     'min_transfer': 0.5,       # 共享编码轴：留一族迁移 cos 下限
     'min_families': 2,         # 共享编码轴：至少覆盖的模式族数
+    'len_delta_min': 1.0,      # 长度混杂标记：边的两端水平各自的平均 token 数偏离 ≥ 该值，且偏离同向与对齐方向一致（只标记，不排除）
 }
 _EPS = 1e-12
 
@@ -91,10 +92,28 @@ def _noise(conds, n, s, q) -> np.ndarray:
     return var[:, ok].mean(axis=1) if ok.any() else var.mean(axis=1)
 
 
+def level_len_delta(token_len: Optional[Dict[str, float]], factor: str) -> Dict[str, float]:
+    """各水平的平均 token 数相对因子内水平均值的偏离（含该水平的条件格等权平均）。token_len: {条件格键: 平均 token 数}。"""
+    if not token_len:
+        return {}
+    by = {}
+    for cell, m in token_len.items():
+        kv = dict(x.split('=', 1) for x in cell.split('|') if '=' in x)
+        if factor in kv:
+            by.setdefault(kv[factor], []).append(float(m))
+    if len(by) < 2:
+        return {}
+    lm = {k: sum(v) / len(v) for k, v in by.items()}
+    g = sum(lm.values()) / len(lm)
+    return {k: v - g for k, v in lm.items()}
+
+
 def family_features(family: str, tm_id: str, ss, factors: Sequence[str], exclude_conds: Optional[set] = None,
-                    concepts: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+                    concepts: Optional[Dict[str, str]] = None,
+                    token_len: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
     """从一个模式族的合并统计量取各因子各水平的均值（discovery / 留出划分 / 留出句式），并给出初始稳定性。
-    ss = suffstats.SuffStats（同一模型桶内跨分片精确合并的结果）。"""
+    ss = suffstats.SuffStats（同一模型桶内跨分片精确合并的结果）。token_len（可选）：{条件格键: 平均 token 数}，
+    用于给每个特征记录句长偏离（长度混杂标记）。"""
     concepts = concepts or {}
     splits = ss.splits
     held = 'lockbox' if 'lockbox' in splits else ('confirm' if 'confirm' in splits else None)
@@ -109,6 +128,7 @@ def family_features(family: str, tm_id: str, ss, factors: Sequence[str], exclude
             continue
         mh = level_means(hold[0], hold[1], hold[2], f) if hold else {}
         mx = {lv: v for lv, v in (level_means(lfr[0], lfr[1], lfr[2], f) if lfr else {}).items() if lv not in md}
+        ld = level_len_delta(token_len, f)
         groups.append({'factor': f, 'md': {lv: v[0] for lv, v in md.items()},
                        'mh': {lv: v[0] for lv, v in mh.items() if lv in md},
                        'mx': {lv: v[0] for lv, v in mx.items()}})
@@ -123,13 +143,15 @@ def family_features(family: str, tm_id: str, ss, factors: Sequence[str], exclude
                 feats.append({'id': f'{family}:{f}={lv}@{tag}', 'key': f'{family}:{f}={lv}', 'family': family,
                               'tm_id': tm_id, 'factor': f, 'level': lv, 'layer': tag, 'layer_i': li,
                               'concept': concepts.get(f'{f}={lv}'), 'n': n_lv, 'rep': _r(rep), 'snr': _r(snr, 2),
-                              'stable': rep is not None and rep >= CRITERIA['min_rep'], 'heldout_only': False})
+                              'stable': rep is not None and rep >= CRITERIA['min_rep'], 'heldout_only': False,
+                              'len_delta': _r(ld.get(lv), 2) if lv in ld else None})
         for lv, (m, n_lv) in sorted(mx.items()):           # 只出现在留出句式里的水平：未见句式预测的检验对象
             for li, tag in enumerate(ss.layer_tags):
                 feats.append({'id': f'{family}:{f}={lv}@{tag}', 'key': f'{family}:{f}={lv}', 'family': family,
                               'tm_id': tm_id, 'factor': f, 'level': lv, 'layer': tag, 'layer_i': li,
                               'concept': concepts.get(f'{f}={lv}'), 'n': n_lv, 'rep': None, 'snr': None,
-                              'stable': False, 'heldout_only': True})
+                              'stable': False, 'heldout_only': True,
+                              'len_delta': _r(ld.get(lv), 2) if lv in ld else None})
     return {'family': family, 'tm_id': tm_id, 'layers': list(ss.layer_tags), 'dim': int(ss.dim),
             'held_split': held, 'groups': groups, 'features': feats}
 
@@ -364,9 +386,14 @@ def build_model_graph(model: str, families: List[Dict[str, Any]]) -> Dict[str, A
                 same = bool(a['concept'] and a['concept'] == b['concept'])
                 ti = token_identity(tag, x, y)
                 ax_ti.append(ti['token_identity'])
+                la, lb = a.get('len_delta'), b.get('len_delta')
+                len_conf = (None if la is None or lb is None else
+                            bool(abs(la) >= CRITERIA['len_delta_min'] and abs(lb) >= CRITERIA['len_delta_min']
+                                 and (la * lb > 0) == (cd > 0)))
                 edges.append({'source': a['id'], 'target': b['id'], 'layer': tag, 'axis': ax_id, 'cos': _r(cd),
                               'cos_lockbox': _r(ch), 'cos_refined': _r(_cos(con[x][0], con[y][0])), 'z': _r(z, 2),
-                              'declared': same, 'concept': a['concept'] if same else None, **ti})
+                              'declared': same, 'concept': a['concept'] if same else None, **ti,
+                              'len_delta': [la, lb], 'length_confound': len_conf})
             supported = transfer is not None and transfer >= CRITERIA['min_transfer']
             axis_ti = (True if ax_ti and all(t is True for t in ax_ti) else
                        None if any(t is None for t in ax_ti) else False)
@@ -512,6 +539,11 @@ def findings(graph: Dict[str, Any]) -> List[Dict[str, Any]]:
                     'text': '这些边的两个特征在同一读出位置的嵌入层（hs[0]）上就已对齐（两次估计都 ≥ '
                             f'{CRITERIA["min_cos"]}），或边本身位于嵌入层：对齐来自读出位置的 token 相同（如句末同为「？」），'
                             '不计入概念支持。要检验超出 token 身份的共享编码，需要让对照条件在读出位置使用相同 token。'})
+    n_len = sum(1 for e in graph['edges'] if e.get('length_confound') is True)
+    if n_len:
+        out.append({'id': 'length-confound', 'kind': 'warning', 'title': f'{n_len} 条边可能受句长混杂',
+                    'text': f'这些边两端水平的平均 token 数都偏离各自因子均值 ≥ {CRITERIA["len_delta_min"]}，且偏离同向与对齐方向一致：'
+                            '对齐可能来自句长 / 位置而非语言变量。只作标记，不从概念判定中排除；需要句长匹配的材料复核。'})
     for h in graph['concept_hypotheses']:
         kind = {'supported': 'supported', 'partial': 'warning', 'negative': 'negative', 'token_identity': 'warning'}[h['status']]
         best = next((p for p in h['layers'] if p['layer'] == h['best_layer']), None)

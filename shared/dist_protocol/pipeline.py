@@ -822,6 +822,26 @@ def export_pack(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: O
 _ATLAS_CACHE: Dict[Tuple, Any] = {}
 
 
+def token_len_by_cell(db: sqlite3.Connection, shas: List[str]) -> Dict[str, float]:
+    """各分片 summary.token_len_by_cell 的样本数加权平均：{条件格键: 平均 token 数}（谱图长度混杂标记用）。"""
+    tot: Dict[str, List[float]] = {}
+    for sha in shas:
+        row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
+        if not row:
+            continue
+        s = json.loads(row[0] or '{}')
+        conds = s.get('conditions') or {}
+        for cell, v in (s.get('token_len_by_cell') or {}).items():
+            m = v.get('mean') if isinstance(v, dict) else None
+            if m is None:
+                continue
+            n = float(conds.get(cell, 1) or 1)
+            t = tot.setdefault(cell, [0.0, 0.0])
+            t[0] += float(m) * n
+            t[1] += n
+    return {c: t[0] / t[1] for c, t in tot.items() if t[1] > 0}
+
+
 def atlas_payload(db: sqlite3.Connection, data_dir: Path, *, gate: bool = True) -> Dict[str, Any]:
     """所有模型桶 × 所有已冻结正式模式族 → atlas.v1。只用分片齐全的桶。"""
     from . import atlas as atlas_mod
@@ -861,7 +881,8 @@ def atlas_payload(db: sqlite3.Connection, data_dir: Path, *, gate: bool = True) 
         fam = atlas_mod.family_features(corpus.get('family_id') or t['tm_id'], t['tm_id'], ss,
                                         list(corpus.get('factors') or []),
                                         exclude_conds=set(b['gate_excluded_cells']) if gate else None,
-                                        concepts=corpus.get('concepts') or {})
+                                        concepts=corpus.get('concepts') or {},
+                                        token_len=token_len_by_cell(db, list(b['primary_shas'])))
         per_model.setdefault(b['bucket'], []).append(fam)
     out = atlas_mod.build_atlas(per_model)
     out['sources'] = sources
