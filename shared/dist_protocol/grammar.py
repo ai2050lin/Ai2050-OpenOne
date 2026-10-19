@@ -453,6 +453,17 @@ def validate(spec: Dict[str, Any]) -> List[str]:
         if not (cl == 'all' or (isinstance(cl, list) and cl and all(
                 isinstance(t, int) and not isinstance(t, bool) and t >= 0 for t in cl))):
             errors.append('components.layers 只能是 "all" 或非负整数块号列表（第 i 个 Transformer 块）')
+    mu = spec.get('mlp_units')
+    if mu is not None:
+        # MLP 中间单元采集（runner_v3 可选扩展）：所选读出位置上每个块 MLP 中间空间的 gate 预激活与 value（SwiGLU）
+        mr = mu.get('readouts') if isinstance(mu, dict) else None
+        ml = mu.get('layers', 'all') if isinstance(mu, dict) else None
+        rlist = readouts if isinstance(readouts, list) else []
+        if not isinstance(mr, list) or not mr or len(set(mr)) != len(mr) or any(r not in rlist for r in mr):
+            errors.append('mlp_units.readouts 必须是 readouts 中不重复的非空子集')
+        if not (ml == 'all' or (isinstance(ml, list) and ml and all(
+                isinstance(t, int) and not isinstance(t, bool) and t >= 0 for t in ml))):
+            errors.append('mlp_units.layers 只能是 "all" 或非负整数块号列表（第 i 个 Transformer 块）')
     for key in ('suffstats_budget_bytes', 'item_budget_bytes'):
         v = spec.get(key)
         if v is not None and (not isinstance(v, int) or isinstance(v, bool) or v < (1 << 20)):
@@ -651,7 +662,7 @@ def generate(spec: Dict[str, Any], *, include_canary: bool = True,
         'items': items,
     }
     # 可选采集口径：只在文法声明时写入语料（旧文法的语料与指纹不变）
-    for key in ('components', 'suffstats_budget_bytes', 'item_budget_bytes'):
+    for key in ('components', 'mlp_units', 'suffstats_budget_bytes', 'item_budget_bytes'):
         if key in spec:
             corpus[key] = json.loads(json.dumps(spec[key]))
     corpus['_warnings'] = sorted(set(warnings))[:50]

@@ -45,6 +45,11 @@
                       第 h 个头写入残差流的向量 = W_O[:, h·hd:(h+1)·hd] · z_h；hs[b+1] − hs[b] = Σ_h W_O,h z_h + MLP_b（预归一化
                       架构、o_proj 无偏置时精确成立）——真实模式逐条核对这一闭合并记入 summary.components.closure。
                       summary.components 只上传摘要（形状、闭合误差、逐头平均范数）。未声明 components 的语料行为与旧版相同。
+    MLP 中间单元（可选，不上传） corpus.mlp_units = {"readouts": [...], "layers": "all" | [块号]} 时，在所选读出位置
+                      （可含 probe_answer）采集每个块 MLP 中间空间的 gate 预激活 G 与 value（up 投影）V：
+                      <原生全场目录>/mlp/B<块号>.npz（G、V: (P, N, d_ff)，float16）+ mlp.json（激活函数、d_ff、条目顺序）。
+                      MLP 单元的输出 A = act(G) ⊙ V（SwiGLU；送入 down_proj 的量），真实模式用 down_proj 的实际输入核对
+                      前若干条并记入 summary.mlp_units.check。G、V 分开保存，便于区分符号区（+×+ 与 −×− 都给出正输出）。
 
 模式:
     smoke      不加载模型，只校验语料与分片，status=smoke（不冒充实测）
@@ -233,6 +238,80 @@ class ComponentStore:
                     'note': '第 h 个头写入残差流 = W_O[:, h·hd:(h+1)·hd] @ z_h；MLP 输出已在残差空间'}
         mbytes = json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=True).encode('utf-8')
         (out_dir / 'components.json').write_bytes(mbytes)
+        return {'dir': str(out_dir), 'manifest_sha256': hashlib.sha256(mbytes).hexdigest(), 'bytes': total,
+                'n_files': len(files), 'uploaded': False}
+
+
+def mlp_plan(corpus, n_blocks):
+    """MLP 中间单元采集口径：{'readouts': [...], 'blocks': [块号]}；语料未声明 mlp_units 时返回 None。"""
+    spec = corpus.get('mlp_units')
+    if not isinstance(spec, dict):
+        return None
+    readouts = [r for r in spec.get('readouts') or [] if r in readouts_of(corpus)]
+    layers = spec.get('layers', 'all')
+    blocks = (list(range(n_blocks)) if layers == 'all'
+              else sorted({int(b) for b in layers if isinstance(b, int) and 0 <= b < n_blocks}))
+    return {'readouts': readouts, 'blocks': blocks} if readouts and blocks else None
+
+
+def silu_np(x):
+    import numpy as np
+    return x / (1.0 + np.exp(-x))
+
+
+class MlpStore:
+    """逐条 MLP 中间单元（float16）：每条 G、V 为 (P, B, d_ff)。"""
+
+    def __init__(self, mplan, d_ff, act='silu'):
+        self.readouts, self.blocks = list(mplan['readouts']), list(mplan['blocks'])
+        self.d_ff, self.act = int(d_ff), act
+        self.ids, self.G, self.V = [], [], []
+        self.check = []            # 逐 (条目, 读出, 块) 的 ‖act(G)⊙V − down_proj 输入‖ / ‖down_proj 输入‖
+
+    def add(self, item_id, G, V):
+        import numpy as np
+        self.ids.append(item_id)
+        self.G.append(np.asarray(G, dtype=np.float16))
+        self.V.append(np.asarray(V, dtype=np.float16))
+
+    def digest(self):
+        import numpy as np
+        G = np.stack(self.G).astype(np.float32)                   # (N, P, B, F)
+        V = np.stack(self.V).astype(np.float32)
+        A = silu_np(G) * V
+        thr = np.quantile(np.abs(A), 0.99, axis=0, keepdims=True)   # 每个单元自身的 99 分位
+        strong = np.abs(A) >= thr
+        dn = ((G < 0) & (V < 0) & strong).sum(axis=(0, 3)) / np.maximum(strong.sum(axis=(0, 3)), 1)
+        out = {'readouts': self.readouts, 'blocks': self.blocks, 'd_ff': self.d_ff, 'act': self.act,
+               'n_items': int(G.shape[0]), 'double_negative_share_strong': np.round(dn, 4).tolist(),
+               'note': 'double_negative_share_strong：|A| ≥ 该单元 99 分位的激活中 G<0 且 V<0（−×−）所占比例，按读出 × 块'}
+        if self.check:
+            err = np.array(self.check, dtype=np.float64)
+            out['check'] = {'n': int(len(err)), 'rel_err_mean': float(err.mean()), 'rel_err_max': float(err.max()),
+                            'note': '‖act(G)⊙V − down_proj 实际输入‖ / ‖down_proj 实际输入‖（bf16 前向，fp32 重算）'}
+        return out
+
+    def write(self, out_dir):
+        import numpy as np
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        G = np.stack(self.G)                                         # (N, P, B, F)
+        V = np.stack(self.V)
+        files, total = [], 0
+        for k, b in enumerate(self.blocks):
+            buf = io.BytesIO()
+            np.savez(buf, G=np.ascontiguousarray(G[:, :, k].transpose(1, 0, 2)),
+                     V=np.ascontiguousarray(V[:, :, k].transpose(1, 0, 2)))
+            data = buf.getvalue()
+            name = f'B{b}.npz'
+            (out_dir / name).write_bytes(data)
+            total += len(data)
+            files.append({'path': name, 'block': b, 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
+        manifest = {'schema': 'mlp_units.v1', 'axes': ['readout', 'item', 'unit'], 'readouts': self.readouts,
+                    'ids': list(self.ids), 'blocks': self.blocks, 'd_ff': self.d_ff, 'act': self.act, 'files': files,
+                    'note': 'G = gate 预激活，V = up 投影；单元输出 A = act(G) ⊙ V（down_proj 的输入）'}
+        mbytes = json.dumps(manifest, ensure_ascii=False, indent=1, sort_keys=True).encode('utf-8')
+        (out_dir / 'mlp.json').write_bytes(mbytes)
         return {'dir': str(out_dir), 'manifest_sha256': hashlib.sha256(mbytes).hexdigest(), 'bytes': total,
                 'n_files': len(files), 'uploaded': False}
 
@@ -756,16 +835,68 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
         head_dim = int(getattr(cfg, 'head_dim', None) or cfg.hidden_size // n_heads)
     comp_store = None
 
-    def run(text, capture=False):
+    # MLP 中间单元（corpus.mlp_units）：gate 预激活 G、value V 与 down_proj 的实际输入（只用于核对）
+    mplan = mlp_plan(corpus, len(blocks_mod))
+    mcap = {'on': False, 'g': {}, 'v': {}, 'a': {}}
+    mlp_store, mlp_act = None, None
+    if mplan:
+        for b in mplan['blocks']:
+            mlp = getattr(blocks_mod[b], 'mlp', None)
+            if mlp is None or getattr(mlp, 'down_proj', None) is None:
+                raise RuntimeError(f'块 {b} 没有 mlp.down_proj，无法采集 MLP 中间单元')
+            act = getattr(mlp, 'act_fn', None) or getattr(mlp, 'activation_fn', None)
+            aname = type(act).__name__.lower()
+            if 'silu' not in aname and 'swish' not in aname:
+                raise RuntimeError(f'块 {b} 的 MLP 激活为 {type(act).__name__}，当前只支持 SiLU 门控（SwiGLU）')
+            mlp_act = 'silu'
+            if getattr(mlp, 'gate_proj', None) is not None and getattr(mlp, 'up_proj', None) is not None:
+                def hg(mod, args, out, b=b):
+                    if mcap['on']:
+                        mcap['g'][b] = out.detach()
+
+                def hv(mod, args, out, b=b):
+                    if mcap['on']:
+                        mcap['v'][b] = out.detach()
+                mlp.gate_proj.register_forward_hook(hg)
+                mlp.up_proj.register_forward_hook(hv)
+            elif getattr(mlp, 'gate_up_proj', None) is not None:
+                # 合并投影（如 GLM4）：输出按最后一维对半切，前半为 gate、后半为 up（与 HF Glm4MLP.forward 一致）
+                def hgu(mod, args, out, b=b):
+                    if mcap['on']:
+                        g_, v_ = out.detach().chunk(2, dim=-1)
+                        mcap['g'][b], mcap['v'][b] = g_, v_
+                mlp.gate_up_proj.register_forward_hook(hgu)
+            else:
+                raise RuntimeError(f'块 {b} 的 MLP 没有 gate_proj/up_proj 或 gate_up_proj')
+
+            def ha(mod, args, b=b):
+                if mcap['on']:
+                    mcap['a'][b] = args[0].detach()
+            mlp.down_proj.register_forward_pre_hook(ha)
+
+    def mlp_rows(p):
+        """当前捕获在位置 p 的 (G, V)，各 (B, F)；前若干条逐块核对 act(G)⊙V 与 down_proj 的实际输入。"""
+        G = torch.stack([mcap['g'][b][0, p].float().cpu() for b in mplan['blocks']])
+        V = torch.stack([mcap['v'][b][0, p].float().cpu() for b in mplan['blocks']])
+        if mlp_store is not None and len(mlp_store.check) < 64 * len(mplan['blocks']):
+            A = torch.nn.functional.silu(G) * V
+            for k, b in enumerate(mplan['blocks']):
+                ref = mcap['a'][b][0, p].float().cpu()
+                mlp_store.check.append(float((A[k] - ref).norm() / ref.norm().clamp_min(1e-6)))
+        return G.numpy(), V.numpy()
+
+    def run(text, capture=False, mlp=False):
         enc = tok(text, return_tensors='pt', return_offsets_mapping=True)
         off = enc.pop('offset_mapping')[0].tolist()
         ids = enc['input_ids'][0].tolist()
         enc = {k: v.to(device) for k, v in enc.items()}
         cap['on'] = bool(capture and cplan)
+        mcap['on'] = bool(mlp and mplan)
         try:
             res = model(**enc, output_hidden_states=True)
         finally:
             cap['on'] = False
+            mcap['on'] = False
         hs = res.hidden_states
         if state['last_post_norm'] is None:
             # 对账：HF 的 hidden_states[-1] 是否已经过最终归一化（lm_head(hs[-1]) 应等于实际 logits）
@@ -853,14 +984,22 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
     probe_memo = {} if 'probe_answer' not in readouts else None
     with torch.inference_mode():
         for it in items:
-            hs, _, off, ids = run(it['text'], capture=True)
+            hs, _, off, ids = run(it['text'], capture=True, mlp=True)
             if plan is None:
                 plan = Plan(corpus, study, len(hs), int(hs[0].shape[-1]))
                 acc, store = plan.acc(int(hs[0].shape[-1]), factors), plan.store(corpus)
                 summary.update(plan.describe(len(hs)))
                 if cplan:
                     comp_store = ComponentStore(cplan, n_heads, head_dim, int(hs[0].shape[-1]))
+                if mplan:
+                    mlp_store = MlpStore(mplan, int(mcap['g'][mplan['blocks'][0]].shape[-1]), mlp_act)
             pos = text_positions(it, off, readouts, straddle)
+            mrows = {}
+            if mlp_store is not None:
+                for r in mlp_store.readouts:
+                    if r != 'probe_answer':
+                        mrows[r] = mlp_rows(pos[r])
+                mcap['g'].clear(); mcap['v'].clear(); mcap['a'].clear()
             if comp_store is not None:
                 zs, ms = [], []
                 for r in comp_store.readouts:
@@ -887,7 +1026,7 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                 if key is not None and key in probe_memo:
                     core = probe_memo[key]
                 elif ans_ids:
-                    phs, plogits, _, pids = run(probe['prompt'])
+                    phs, plogits, _, pids = run(probe['prompt'], mlp=True)
                     ans_id = int(ans_ids[0])
                     logits = plogits[0, -1].float()
                     logp = torch.log_softmax(logits, dim=-1)
@@ -898,7 +1037,7 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                         probe_memo[key] = core
                 else:
                     core = None
-                    phs, _, _, pids = run(probe['prompt'])
+                    phs, _, _, pids = run(probe['prompt'], mlp=True)
                 if ans_ids:
                     ans_id = int(ans_ids[0])
                 if core is not None:
@@ -907,6 +1046,12 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                     behavior.append(rec)
             if 'probe_answer' in readouts and phs is None:
                 raise ValueError(f'item {it["id"]} 没有 probe（语料声明了 probe_answer 读出）')
+            if mlp_store is not None:
+                if 'probe_answer' in mlp_store.readouts:
+                    mrows['probe_answer'] = mlp_rows(len(pids) - 1)
+                mcap['g'].clear(); mcap['v'].clear(); mcap['a'].clear()
+                mlp_store.add(it['id'], np.stack([mrows[r][0] for r in mlp_store.readouts]),
+                              np.stack([mrows[r][1] for r in mlp_store.readouts]))
             vecs, lens = [], {'next_id': [], 'next_logprob': [], 'answer_logprob': [], 'topk_ids': [], 'topk_logprob': []}
             for r in readouts:
                 src, p, seq = (phs, len(pids) - 1, pids) if r == 'probe_answer' else (hs, pos[r], ids)
@@ -950,7 +1095,8 @@ def run_real(corpus, study, items, canaries, factors, precision, out, summary):
                    extra={'model_path': model_path, 'device': device}, store=store,
                    lens_layers=[i for _, i in plan.layers], vocab=state['vocab'],
                    native={'corpus': corpus, 'shard': _shard_tuple(summary), 'model_key': model_key},
-                   components=(comp_store, weights) if weights else None)
+                   components=(comp_store, weights) if weights else None,
+                   mlp=mlp_store if mlp_store is not None and mlp_store.ids else None)
 
 
 def _synthetic_coef(tag, hs_index, n_hs):
@@ -1019,6 +1165,13 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
     # 合成部件（只用于检验采集与闭合格式）：每块 H 个头（随机 W_O、随机 z）+ MLP = 残差增量 − Σ 头，闭合精确成立
     cplan = component_plan(corpus, n_hs - 1) if [i for _, i in plan.layers] == list(range(n_hs)) else None
     comp_store = None
+    # 合成 MLP 中间单元（只用于检验采集格式与神经元选择性统计）：单元 0 为主因子首水平的 +×+ 检测器，
+    # 单元 1 为同一水平的 −×− 区（双负）检测器，其余为噪声
+    mplan = mlp_plan(corpus, n_hs - 1)
+    mlp_store = MlpStore(mplan, int(corpus.get('synthetic_d_ff', 32))) if mplan else None
+    first_level = None
+    if mplan and main_f:
+        first_level = sorted({str(it['cond'][main_f]) for it in items if main_f in it['cond']})[0]
     if cplan:
         n_heads, head_dim = int(corpus.get('synthetic_heads', 4)), int(corpus.get('synthetic_head_dim', 8))
         comp_store = ComponentStore(cplan, n_heads, head_dim, dim)
@@ -1057,6 +1210,14 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
                               for k, b in enumerate(comp_store.blocks)])
                 zs.append(z); ms.append(m)
             comp_store.add(it['id'], np.stack(zs), np.stack(ms))
+        if mlp_store is not None:
+            P_, B_, F_ = len(mlp_store.readouts), len(mlp_store.blocks), mlp_store.d_ff
+            G = rng.standard_normal((P_, B_, F_)) * 0.5
+            V = rng.standard_normal((P_, B_, F_)) * 0.5
+            if first_level is not None and str(cond.get(main_f)) == first_level:
+                G[:, :, 0] += 3.0; V[:, :, 0] += 3.0
+                G[:, :, 1] -= 4.0; V[:, :, 1] -= 4.0
+            mlp_store.add(it['id'], G, V)
         correct = None
         if it.get('probe'):
             p_ok = 0.55 if (main_f and other_f and str(cond[main_f]) == weak[0] and str(cond[other_f[0]]) == weak[1]) else 0.95
@@ -1084,7 +1245,8 @@ def run_synthetic(corpus, study, items, canaries, factors, out, summary):
                            'model_key': 'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8]},
                    components=(comp_store, lambda: save_o_proj(
                        'synthetic-' + hashlib.sha256(salt.encode('utf-8')).hexdigest()[:8], W_syn))
-                   if comp_store is not None and comp_store.ids else None)
+                   if comp_store is not None and comp_store.ids else None,
+                   mlp=mlp_store if mlp_store is not None and mlp_store.ids else None)
 
 
 def _shard_tuple(summary):
@@ -1112,7 +1274,7 @@ def _lens_digest(store, lens_layers):
 
 
 def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, store=None, lens_layers=None, vocab=None,
-                   native=None, components=None):
+                   native=None, components=None, mlp=None):
     (out / 'suffstats.npz').write_bytes(acc.npz_bytes())
     if store is not None and store.meta:
         data, space = store.npz_bytes(store.tags or acc.layer_tags, lens_layers, vocab)
@@ -1148,6 +1310,17 @@ def _write_outputs(out, acc, behavior, can, tok_len, summary, status, extra, sto
             except OSError as exc:
                 info['native'] = {'error': f'{type(exc).__name__}: {exc}'}
         summary['components'] = info
+    if mlp is not None:
+        info = mlp.digest()
+        nd = native_dir(native['corpus'], native['shard'], native['model_key']) if native is not None else None
+        if nd is None:
+            info['native'] = {'disabled': True, 'note': '原生目录关闭（AI2050_NATIVE_DIR=off），MLP 中间单元未保存'}
+        else:
+            try:
+                info['native'] = mlp.write(nd / 'mlp')
+            except OSError as exc:
+                info['native'] = {'error': f'{type(exc).__name__}: {exc}'}
+        summary['mlp_units'] = info
     (out / 'behavior.json').write_text(json.dumps({'schema': 'behavior.v1', 'items': behavior},
                                                   ensure_ascii=False), encoding='utf-8')
     (out / 'canary.json').write_text(json.dumps({'schema': 'canary.v1', 'entries': can},
