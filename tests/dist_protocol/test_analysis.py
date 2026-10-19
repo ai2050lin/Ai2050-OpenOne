@@ -24,6 +24,8 @@ def synthetic_items(family='KN-ISA', shards=3):
     spec = json.loads((ROOT / 'shared/dist_protocol/grammars' / f'{family}.json').read_text(encoding='utf-8'))
     # 植入找回检验的是分析方法：固定为经典口径（只读 target，first/mid/last 三层），与文法当前的采集口径无关
     spec['layers'], spec['readouts'] = ['first', 'mid', 'last'], ['target']
+    for key in ('components', 'mlp_units'):         # 可选采集口径依赖文法自身的读出位置，这里一并去掉
+        spec.pop(key, None)
     corpus = grammar.generate(spec)
     corpus['synthetic_dim'] = 96
     tmp = Path(tempfile.mkdtemp())

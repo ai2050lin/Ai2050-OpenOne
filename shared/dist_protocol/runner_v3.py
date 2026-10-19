@@ -274,16 +274,23 @@ class MlpStore:
         self.G.append(np.asarray(G, dtype=np.float16))
         self.V.append(np.asarray(V, dtype=np.float16))
 
+    def _slice(self, arrs, p, k):
+        """全部条目在 (读出 p, 块 k) 上的 (N, F) 数组；逐块取，避免把 (N, P, B, F) 整体堆叠进内存（大模型分层摆放时内存紧张）。"""
+        import numpy as np
+        return np.stack([a[p, k] for a in arrs])
+
     def digest(self):
         import numpy as np
-        G = np.stack(self.G).astype(np.float32)                   # (N, P, B, F)
-        V = np.stack(self.V).astype(np.float32)
-        A = silu_np(G) * V
-        thr = np.quantile(np.abs(A), 0.99, axis=0, keepdims=True)   # 每个单元自身的 99 分位
-        strong = np.abs(A) >= thr
-        dn = ((G < 0) & (V < 0) & strong).sum(axis=(0, 3)) / np.maximum(strong.sum(axis=(0, 3)), 1)
+        dn = np.zeros((len(self.readouts), len(self.blocks)))
+        for p in range(len(self.readouts)):
+            for k in range(len(self.blocks)):
+                G = self._slice(self.G, p, k).astype(np.float32)
+                V = self._slice(self.V, p, k).astype(np.float32)
+                A = np.abs(silu_np(G) * V)
+                strong = A >= np.quantile(A, 0.99, axis=0, keepdims=True)    # 每个单元自身的 99 分位
+                dn[p, k] = ((G < 0) & (V < 0) & strong).sum() / max(int(strong.sum()), 1)
         out = {'readouts': self.readouts, 'blocks': self.blocks, 'd_ff': self.d_ff, 'act': self.act,
-               'n_items': int(G.shape[0]), 'double_negative_share_strong': np.round(dn, 4).tolist(),
+               'n_items': len(self.ids), 'double_negative_share_strong': np.round(dn, 4).tolist(),
                'note': 'double_negative_share_strong：|A| ≥ 该单元 99 分位的激活中 G<0 且 V<0（−×−）所占比例，按读出 × 块'}
         if self.check:
             err = np.array(self.check, dtype=np.float64)
@@ -295,13 +302,12 @@ class MlpStore:
         import numpy as np
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-        G = np.stack(self.G)                                         # (N, P, B, F)
-        V = np.stack(self.V)
         files, total = [], 0
+        P = len(self.readouts)
         for k, b in enumerate(self.blocks):
             buf = io.BytesIO()
-            np.savez(buf, G=np.ascontiguousarray(G[:, :, k].transpose(1, 0, 2)),
-                     V=np.ascontiguousarray(V[:, :, k].transpose(1, 0, 2)))
+            np.savez(buf, G=np.stack([self._slice(self.G, p, k) for p in range(P)]),
+                     V=np.stack([self._slice(self.V, p, k) for p in range(P)]))
             data = buf.getvalue()
             name = f'B{b}.npz'
             (out_dir / name).write_bytes(data)
