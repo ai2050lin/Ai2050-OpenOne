@@ -6,7 +6,8 @@
  "question": "Phase 254 中按残差贡献排序的语气选择性 MLP 单元，是否被模型用于读出『说话人未确定』：在疑问句上把这些单元在句末位置的输出替换为陈述句的均值，模型是否更少回答『不确定』（必要性）；在陈述句上替换为疑问句的均值，是否更多回答『不确定』（充分性）。并与 INT-Q 的残差方向干预比较效应大小。",
  "units": {
   "file": "research/interventions/INT-N-v1.units.json",
-  "sha256_lf": "1a4dae2d6294c06c200c668b7b27e0f110fe73abda6a3a82f7d7545a127ed5f7",
+  "sha256_raw": "1a4dae2d6294c06c200c668b7b27e0f110fe73abda6a3a82f7d7545a127ed5f7",
+  "sha256_lf": "bf0a79029aa19bb255a082dbfafa9f5d92fb2f497ce88fa463b57d1365d113c8",
   "rule": "每个模型、每个相对深度段（浅 / 中 / 深），在 neurons.v1 入选单元（final 读出）中取残差贡献 c_j = |ΔĀ_j|·‖W_down[:, j]‖ 最大的 20 个；排除最后一块（它在句末位置的输出没有后续层读取）。清单在看到任何干预结果之前生成并随本文件冻结。"
  },
  "models": [
