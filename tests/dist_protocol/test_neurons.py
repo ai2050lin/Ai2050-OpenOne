@@ -90,6 +90,25 @@ class MlpUnitsTests(unittest.TestCase):
         self.assertEqual(res['unit'], 'filler')
         self.assertEqual(sum(t['n_selected'] for t in res['tags']), 0)
 
+    def test_residual_contribution(self):
+        # 合成 down_proj：单元 0 的列范数为 10，其余为 1；植入单元 0 应在贡献排序中居首，分解的份额之和为 1
+        rng = np.random.default_rng(0)
+        Ws = {}
+        for b in self.field.blocks:
+            W = rng.standard_normal((16, 24))
+            W /= np.linalg.norm(W, axis=0, keepdims=True)
+            W[:, 0] *= 10.0
+            Ws[b] = W
+        res = N.selectivity(self.field, self.items, 'mood', 'decl', 'interrog', criteria=FAST, down=Ws.__getitem__)
+        self.assertTrue(res['contribution'])
+        for t in res['tags']:
+            self.assertEqual(t['units_by_contrib'][0]['unit'], 0)
+            self.assertAlmostEqual(sum(t['share_by_regime_all'].values()), 1.0, places=6)
+            self.assertGreater(t['share_by_regime_all']['++'], 0.5)       # 单元 0（+×+）写入了大部分残差差异
+            self.assertIn('--', t['top_contrib_dominant_regime'])
+        plain = N.selectivity(self.field, self.items, 'mood', 'decl', 'interrog', criteria=FAST)
+        self.assertNotIn('units_by_contrib', plain['tags'][0])
+
     def test_grammar_validation(self):
         self.assertEqual(grammar.validate(gr_q_spec()), [])
         spec = gr_q_spec(); spec['mlp_units']['readouts'] = ['cue']
@@ -97,8 +116,8 @@ class MlpUnitsTests(unittest.TestCase):
         spec = gr_q_spec(); spec['mlp_units']['layers'] = [-1]
         self.assertTrue(any('mlp_units.layers' in e for e in grammar.validate(spec)))
         self.assertIn('mlp_units', grammar.generate(gr_q_spec(), include_canary=False))
-        self.assertNotIn('mlp_units', grammar.generate(json.loads(
-            (ROOT / 'shared/dist_protocol/grammars/GR-Q.json').read_text(encoding='utf-8')), include_canary=False))
+        plain = gr_q_spec(); plain.pop('mlp_units')
+        self.assertNotIn('mlp_units', grammar.generate(plain, include_canary=False))
 
 
 if __name__ == '__main__':

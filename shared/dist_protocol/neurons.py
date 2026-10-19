@@ -100,20 +100,51 @@ def _perm_labels(lab, groups, mask, rng):
     return out
 
 
+REGIMES = ('++', '--', '+-', '-+')
+
+
+def _regime_counts(G, V, mask):
+    """mask 内条目在每个单元上的符号区占比，(F, 4)，顺序同 REGIMES。"""
+    g, v = G[mask], V[mask]
+    n = max(int(mask.sum()), 1)
+    return np.stack([((g > 0) & (v > 0)).sum(0), ((g < 0) & (v < 0)).sum(0),
+                     ((g > 0) & (v < 0)).sum(0), ((g < 0) & (v > 0)).sum(0)], axis=1) / n
+
+
+def down_from_checkpoint(model_path: str, key_fmt: str = 'model.layers.{b}.mlp.down_proj.weight'):
+    """从 safetensors 检查点按块读取 down_proj 权重 (d, d_ff)，float32；返回 block → 矩阵 的函数。"""
+    from safetensors import safe_open
+    root = Path(model_path)
+    idx = root / 'model.safetensors.index.json'
+    wmap = json.loads(idx.read_text(encoding='utf-8'))['weight_map'] if idx.is_file() else None
+
+    def get(b: int):
+        key = key_fmt.format(b=b)
+        f = root / (wmap[key] if wmap else 'model.safetensors')
+        with safe_open(str(f), framework='pt') as h:
+            return h.get_tensor(key).float().numpy()
+    return get
+
+
 def selectivity(field: MlpField, items_by_id: Dict[str, dict], factor: str, hi: str, lo: Optional[str] = None,
                 readouts: Optional[Sequence[str]] = None, blocks: Optional[Sequence[int]] = None,
-                seed: int = 0, criteria: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+                seed: int = 0, criteria: Optional[Dict[str, Any]] = None, down=None) -> Dict[str, Any]:
+    """down：可选，block → down_proj 权重 (d, d_ff)。给出时另报告残差贡献：
+      c_j = |ΔĀ_j| · ‖W_down[:, j]‖（ΔĀ 为 discovery 上两水平的单元输出均值差），按 c 排序的入选单元；
+      以及 down_proj 写入的残差均值差 Δm = W_down ΔĀ 的可加分解 s_j = ΔĀ_j (W_down[:, j] · Δm) / ‖Δm‖²（Σ_j s_j = 1），
+      按单元的主导符号区（均值较高一极的条目中占比最大的符号区）汇总。"""
     C = dict(CRITERIA, **(criteria or {}))
     lab, split, groups, unit_kind = design(field.ids, items_by_id, factor, hi, lo)
     disc = np.array([s == 'discovery' for s in split])
     held = np.array([s in HELD for s in split])
     out = {'schema': 'neurons.v1', 'factor': factor, 'hi': hi, 'lo': lo if lo is not None else '其余水平',
-           'unit': unit_kind, 'criteria': C,
+           'unit': unit_kind, 'criteria': C, 'contribution': down is not None,
            'n': {'discovery_hi': int(((lab == 1) & disc).sum()), 'discovery_lo': int(((lab == -1) & disc).sum()),
                  'held_hi': int(((lab == 1) & held).sum()), 'held_lo': int(((lab == -1) & held).sum())},
            'tags': []}
     rng = np.random.default_rng(seed)
     perms = [_perm_labels(lab, groups, disc, rng) for _ in range(int(C['n_perm']))]
+    top_k = int(C['top_k'])
     for r in (readouts or field.readouts):
         for b in (blocks or field.blocks):
             G, V = field.GV(r, b)
@@ -124,29 +155,49 @@ def selectivity(field: MlpField, items_by_id: Dict[str, dict], factor: str, hi: 
             thr = float(np.quantile(null, 1 - float(C['perm_alpha'])))
             cut = max(thr, float(C['d_min']))
             sel = np.where((np.abs(dd) >= cut) & (np.sign(dh) == np.sign(dd)) & (np.abs(dh) >= float(C['held_min'])))[0]
-            order = sel[np.argsort(-np.abs(dd[sel]))]
             q = np.quantile(np.abs(A), float(C['strong_q']), axis=0)
-            units = []
-            for j in order[:int(C['top_k'])]:
+            m_hi_all, m_lo_all = A[lab == 1].mean(0), A[lab == -1].mean(0)
+            dA = A[(lab == 1) & disc].mean(0) - A[(lab == -1) & disc].mean(0)
+            Rhi, Rlo = _regime_counts(G, V, lab == 1), _regime_counts(G, V, lab == -1)
+            Rpole = np.where((m_hi_all > m_lo_all)[:, None], Rhi, Rlo)
+            dom = np.array(REGIMES)[Rpole.argmax(1)]
+            contrib = share = wn = None
+            tag = {'readout': r, 'block': int(b), 'null_max_d': thr, 'cut': cut,
+                   'n_selected': int(len(sel)), 'n_units': int(A.shape[1]),
+                   'n_pos_hi': int((dd[sel] > 0).sum()), 'n_pos_lo': int((dd[sel] < 0).sum()),
+                   'selected_dominant_regime': {k: int((dom[sel] == k).sum()) for k in REGIMES}}
+            if down is not None:
+                W = down(b)
+                wn = np.linalg.norm(W, axis=0)
+                contrib = np.abs(dA) * wn
+                dm = W @ dA
+                share = dA * (W.T @ dm) / max(float(dm @ dm), 1e-12)
+                tag.update({'delta_m_norm': float(np.linalg.norm(dm)),
+                            'share_selected': float(share[sel].sum()),
+                            'share_by_regime_all': {k: float(share[dom == k].sum()) for k in REGIMES},
+                            'share_by_regime_selected': {k: float(share[sel][dom[sel] == k].sum()) for k in REGIMES}})
+
+            def rec(j):
                 strong = np.abs(A[:, j]) >= q[j]
                 g, v = G[strong, j], V[strong, j]
                 n_s = max(int(strong.sum()), 1)
-                m_hi, m_lo = float(A[lab == 1, j].mean()), float(A[lab == -1, j].mean())
-                pole = (lab == 1) if m_hi > m_lo else (lab == -1)        # 均值较高一极的全部条目
-                gp, vp = G[pole, j], V[pole, j]
-                n_p = max(int(pole.sum()), 1)
-                units.append({'unit': int(j), 'd_disc': float(dd[j]), 'd_held': float(dh[j]),
-                              'pos_level': hi if m_hi > m_lo else out['lo'], 'neg_level': out['lo'] if m_hi > m_lo else hi,
-                              'mean_hi': m_hi, 'mean_lo': m_lo,
-                              'strong_regime': {'++': float(((g > 0) & (v > 0)).sum() / n_s), '--': float(((g < 0) & (v < 0)).sum() / n_s),
-                                                '+-': float(((g > 0) & (v < 0)).sum() / n_s), '-+': float(((g < 0) & (v > 0)).sum() / n_s)},
-                              'pole_regime': {'++': float(((gp > 0) & (vp > 0)).sum() / n_p), '--': float(((gp < 0) & (vp < 0)).sum() / n_p),
-                                              '+-': float(((gp > 0) & (vp < 0)).sum() / n_p), '-+': float(((gp < 0) & (vp > 0)).sum() / n_p)},
-                              'strong_hi_share': float((lab[strong] == 1).sum() / n_s)})
-            out['tags'].append({'readout': r, 'block': int(b), 'null_max_d': thr, 'cut': cut,
-                                'n_selected': int(len(sel)), 'n_units': int(A.shape[1]),
-                                'n_pos_hi': int((dd[sel] > 0).sum()), 'n_pos_lo': int((dd[sel] < 0).sum()),
-                                'units': units})
+                m_hi, m_lo = float(m_hi_all[j]), float(m_lo_all[j])
+                u = {'unit': int(j), 'd_disc': float(dd[j]), 'd_held': float(dh[j]),
+                     'pos_level': hi if m_hi > m_lo else out['lo'], 'neg_level': out['lo'] if m_hi > m_lo else hi,
+                     'mean_hi': m_hi, 'mean_lo': m_lo, 'delta_A_disc': float(dA[j]),
+                     'strong_regime': {'++': float(((g > 0) & (v > 0)).sum() / n_s), '--': float(((g < 0) & (v < 0)).sum() / n_s),
+                                       '+-': float(((g > 0) & (v < 0)).sum() / n_s), '-+': float(((g < 0) & (v > 0)).sum() / n_s)},
+                     'pole_regime': dict(zip(REGIMES, map(float, Rpole[j]))), 'dominant_regime': str(dom[j]),
+                     'strong_hi_share': float((lab[strong] == 1).sum() / n_s)}
+                if contrib is not None:
+                    u.update({'contrib': float(contrib[j]), 'share': float(share[j]), 'w_down_norm': float(wn[j])})
+                return u
+            tag['units'] = [rec(j) for j in sel[np.argsort(-np.abs(dd[sel]))][:top_k]]
+            if contrib is not None:
+                by_c = sel[np.argsort(-contrib[sel])][:top_k]
+                tag['units_by_contrib'] = [rec(j) for j in by_c]
+                tag['top_contrib_dominant_regime'] = {k: int((dom[by_c] == k).sum()) for k in REGIMES}
+            out['tags'].append(tag)
     out['summary'] = {r: {'n_selected_by_block': {t['block']: t['n_selected'] for t in out['tags'] if t['readout'] == r}}
                       for r in (readouts or field.readouts)}
     return out
