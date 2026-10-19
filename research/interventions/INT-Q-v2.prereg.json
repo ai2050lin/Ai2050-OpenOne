@@ -1,0 +1,68 @@
+{
+ "schema": "intervention_prereg.v1",
+ "id": "INT-Q-v2",
+ "phase": "Phase 253 §13 后续",
+ "created": "2026-10-18",
+ "supersedes": "无（INT-Q-v1 结果保留不变；本版本是新问题，不回改 v1）",
+ "questions": {
+  "A_qwen3_4b": "INT-Q-v1 中 Qwen3-4B 在 hs[28] 只改句末一个位置无效。候选解释「冗余」：到该层时语气信息已复制到后续位置。检验 (a) 在句末及其后所有提示位置同时干预，(b) 改在较浅层 hs[12]，是否出现充分性 / 必要性效应。",
+  "B_glm4_9b": "INT-Q-v1 中 GLM4 在 hs[24] 句末单点干预通过。层扫描：同一操作在不同深度的效应如何变化。"
+ },
+ "inherits_from_v1": "方向定义、对照方向构造、probe、g 的定义、Wilcoxon 与随机 / 极性对照的判据结构、自检、材料来源与划分规则均与 INT-Q-v1 相同（research/interventions/INT-Q-v1.prereg.json，sha256 b9b0ffb7629f184faf3a0c75d6767708fcdd86da2d9afa55083f9743d1596a29），以下只列不同之处。方向 d 在每个干预层 hs[ℓ] 上分别由 GR-Q v7 discovery final 读出重新计算。",
+ "position_modes": {
+  "final_only": "只改文本最后一个 token（同 v1）",
+  "final_and_after": "改文本最后一个 token 及其后全部提示 token（「问：……答：说话人」），不含答案候选 token"
+ },
+ "operations": {
+  "sufficiency": "每个被干预位置 h ← h + α·d（α = 1）",
+  "necessity": "每个被干预位置 k：h_k ← h_k − (h_k·d̂ − μ_D(k))·d̂。μ_D(k) 为 GR-Q v7 discovery 陈述句（108 条，套用认知 probe）无干预前向中、相对句末偏移 k 的位置在 d̂ 上投影的均值（k = 0 即 v1 的 μ_D 定义所在位置，但用提示前向重新估计）；超过已观测最大偏移的位置使用最大偏移处的值。对 KN-ISA 条目沿用同一组 μ_D(k)（后缀结构不同，属预先声明的近似）。",
+  "controls": "充分性：r_k 与 p 均缩放到 ‖d‖，作用于同样的位置集合。必要性：在每个被干预位置使用与 d̂ 相同的位移长度 |h_k·d̂ − μ_D(k)|，沿随机单位方向 r̂ 或极性单位方向 p̂。"
+ },
+ "configs": {
+  "qwen3-4b": {
+   "placement": "cuda", "native_key": "6be1034f0b55a6df-bf16", "path": "models/hf/qwen3-4b",
+   "grid": [
+    {"layer_hs": 12, "positions": "final_only", "role": "primary"},
+    {"layer_hs": 12, "positions": "final_and_after", "role": "primary"},
+    {"layer_hs": 28, "positions": "final_and_after", "role": "primary"},
+    {"layer_hs": 28, "positions": "final_only", "role": "replication_of_v1"}
+   ],
+   "materials": "INT-Q-v1 的全部池（跨族陈述 234、跨族疑问 114、本族陈述 66、本族疑问 66、选择性 138）",
+   "n_random": 20,
+   "alpha_per_test": "0.01 / 3（三个 primary 配置的 Bonferroni 校正）"
+  },
+  "glm4-9b": {
+   "placement": "device_map=auto, max_memory 0=12GiB,cpu=20GiB", "native_key": "64baf4f7e4fb31ae-bf16", "path": "models/hf/glm4-9b-chat-hf",
+   "grid": [
+    {"layer_hs": 8, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 12, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 16, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 20, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 24, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 28, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 32, "positions": "final_only", "role": "scan"},
+    {"layer_hs": 36, "positions": "final_only", "role": "scan"}
+   ],
+   "materials": "固定种子 20261019 的分层子样本：跨族陈述 60（GR-NEG 30 + KN-ISA 30），跨族疑问 48（GR-NEG 30 + KN-ISA 18），选择性 30（KN-ISA 陈述）；不运行本族池（只在自检中使用 GR-Q 条目）",
+   "n_random": 10,
+   "alpha_per_test": "0.01 / 8（扫描层数的 Bonferroni 校正）"
+  }
+ },
+ "criteria": {
+  "sufficiency_pass": ["mean Δg(d) > 0 且 Wilcoxon 单侧 p < alpha_per_test", "mean Δg(d) > max mean Δg(随机)", "mean Δg(d) > mean Δg(p)"],
+  "necessity_pass": ["mean drop(d) > 0 且 Wilcoxon 单侧 p < alpha_per_test", "mean drop(d) > max mean drop(随机)", "mean drop(d) > mean drop(p)"],
+  "selectivity_pass": "|mean Δm_cat| ≤ 0.5 × mean Δg(d)（同一配置的充分性主池）；充分性效应 ≤ 0 时记为不判定",
+  "primary_pools": "充分性 = 跨族陈述；必要性 = 跨族疑问；本族池（仅 4B）为次池，用同样判据但不进入结论",
+  "verdict_per_config": "主池充分性与必要性都通过 → 「该配置下范围内因果使用」",
+  "answer_A": "任一 primary 配置得到「范围内因果使用」→ 支持「v1 的 4B 失败与单点 / 层深有关」；全部 primary 配置都未通过 → 在这些配置下 4B 的 d 无可测因果作用，「冗余」解释未获支持",
+  "answer_B": "按层报告效应量与判定；描述性给出效应峰值层，不对层间差异做额外显著性判定"
+ },
+ "self_checks": [
+  "每个模型：零干预时 GR-Q 条目（至少 12 条）的 g 与正式运行 behavior.json 换算值的最大差 < 0.05",
+  "每个干预层：句末位置的 hs[ℓ] 与原生全场 final 读出向量的最小余弦 > 0.999"
+ ],
+ "notes": [
+  "final_and_after 同时改动很多位置，总扰动远大于单点；随机方向对照作用于同样的位置集合、同样的范数，用来控制'任何大扰动都会改变读出'。",
+  "运行前冻结；看到结果后不改判据，修改须升版本。"
+ ]
+}
