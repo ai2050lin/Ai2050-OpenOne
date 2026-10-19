@@ -1,0 +1,52 @@
+{
+ "schema": "intervention_prereg.v1",
+ "id": "INT-N-v1",
+ "phase": "Phase 254 §8 后续",
+ "created": "2026-10-19",
+ "question": "Phase 254 中按残差贡献排序的语气选择性 MLP 单元，是否被模型用于读出『说话人未确定』：在疑问句上把这些单元在句末位置的输出替换为陈述句的均值，模型是否更少回答『不确定』（必要性）；在陈述句上替换为疑问句的均值，是否更多回答『不确定』（充分性）。并与 INT-Q 的残差方向干预比较效应大小。",
+ "units": {
+  "file": "research/interventions/INT-N-v1.units.json",
+  "sha256_lf": "1a4dae2d6294c06c200c668b7b27e0f110fe73abda6a3a82f7d7545a127ed5f7",
+  "rule": "每个模型、每个相对深度段（浅 / 中 / 深），在 neurons.v1 入选单元（final 读出）中取残差贡献 c_j = |ΔĀ_j|·‖W_down[:, j]‖ 最大的 20 个；排除最后一块（它在句末位置的输出没有后续层读取）。清单在看到任何干预结果之前生成并随本文件冻结。"
+ },
+ "models": [
+  {"model_id": "qwen3-4b", "path": "models/hf/qwen3-4b", "native_key": "6be1034f0b55a6df-bf16", "placement": "cuda"},
+  {"model_id": "glm4-9b", "path": "models/hf/glm4-9b-chat-hf", "native_key": "64baf4f7e4fb31ae-bf16", "placement": "device_map=auto, max_memory 0=12GiB,cpu=20GiB"},
+  {"model_id": "qwen3-14b", "path": "models/hf/Qwen3-14B", "native_key": "1e970d119494affd-bf16", "placement": "device_map=auto, max_memory 0=10GiB,cpu=16GiB（其余卸载到磁盘）"}
+ ],
+ "targets": "单元 j 的替换值取 TG-GR-Q v10（design e2395ae124e0）原生 MLP 中间单元在 discovery 划分、final 读出上的类均值：必要性用陈述句均值 Ā_j(decl)，充分性用疑问句均值 Ā_j(interrog)；A = silu(G)⊙V。",
+ "intervention_site": "提示中文本最后一个 token 的位置（同 INT-Q：要求提示前缀分词与文本单独分词一致）；在对应块 down_proj 的输入上把所选单元的值替换为目标值，其余单元、位置与层不变。",
+ "probe_and_score": "同 INT-Q-v1：认知 probe「对于 S 是不是 A 的，说话人是确定还是不确定？答：说话人」（KN-ISA 为「对于 X 是不是一种 Y」），g = log P(不确定) − log P(确定)，完整答案对数概率。",
+ "materials": "同 INT-Q-v1：跨族陈述 234（GR-NEG 陈述 + KN-ISA 四种陈述句式）、跨族疑问 114（GR-NEG 疑问 + KN-ISA 疑问）、本族陈述 / 疑问各 66（GR-Q），均为 lockbox 与 lockbox_frame；选择性用 KN-ISA 陈述 138。三个模型都用全部材料。",
+ "conditions": {
+  "per_segment": "目标单元（20 个）；随机对照 20 组：每组在与目标单元相同的块中、按相同的每块个数随机抽取非目标单元（种子 20261019 + 段序号），同样替换为其另一水平均值",
+  "batching": "每条材料先做一次与 runner_v3 相同批形状的无干预前向（用于自检）；全部干预条件与一个无干预条件堆叠在同一批中前向，效应 = 同批干预条件 − 同批无干预条件（同批内数值口径一致）"
+ },
+ "tests": {
+  "necessity": {"pool_primary": "跨族疑问", "pool_secondary": "本族疑问", "statistic": "drop_i = g_i(同批无干预) − g_i(替换为陈述均值)"},
+  "sufficiency": {"pool_primary": "跨族陈述", "pool_secondary": "本族陈述", "statistic": "Δg_i = g_i(替换为疑问均值) − g_i(同批无干预)"},
+  "pass_if": ["均值 > 0 且 Wilcoxon 符号秩单侧 p < 0.01/3（三个深度段的 Bonferroni 校正）", "均值 > 20 组随机对照均值的最大值"],
+  "selectivity": "KN-ISA 类别 probe（{X}属于哪一类）在充分性替换下的间隔变化 |mean Δm_cat| ≤ 0.5 × 该段充分性主池的 mean Δg；充分性效应 ≤ 0 时记为不判定",
+  "validity_check": "同 INT-Q：无干预时疑问池 mean g − 陈述池 mean g > 0，否则该池不判定",
+  "verdict": "每个模型、每个段：主池必要性与充分性都通过 → 「该组单元在该段范围内被因果使用」"
+ },
+ "comparison_with_INT_Q": {
+  "type": "描述性比较，不作显著性判定",
+  "references": {
+   "qwen3-4b": "INT-Q-v2 L12 句末单点：必要性下降 0.461、充分性 Δg 0.627（跨族主池）；INT-Q-v1 L28：两者约 0",
+   "glm4-9b": "INT-Q-v1 L24：必要性下降 0.100、充分性 Δg 0.050（跨族主池）",
+   "qwen3-14b": "无 INT-Q 结果"
+  },
+  "report": "各段目标单元效应与上述方向干预效应之比；以及目标单元效应相对随机对照均值的倍数"
+ },
+ "self_checks": [
+  "零干预 g（runner 批形状）与 TG-GR-Q v10 正式运行 behavior.json 换算值一致，最大差 < 0.05",
+  "干预位置 down_proj 的实际输入与原生 MLP 中间单元 silu(G)⊙V 的相对误差（GR-Q 条目）< 0.02",
+  "同批无干预条件与 runner 批形状无干预的 g 差，报告其分布（bf16 批形状差异），不作为判据"
+ ],
+ "notes": [
+  "替换为另一水平的类均值，是均值层面的反事实；它不保证单条输入的其余信息与另一水平一致。",
+  "单元只在句末一个位置被替换；其他位置（包括 probe 后缀）的同一单元不受影响，冗余写入可能使效应偏小。",
+  "判据与单元清单在运行前冻结；看到结果后不得修改，修改须升版本。"
+ ]
+}
