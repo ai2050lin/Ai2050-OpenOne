@@ -58,6 +58,7 @@ from server.vision_service import vision_service
 from server.agi_chat_service import agi_chat_engine
 from server.ai_rnd_service import router as ai_rnd_router
 from server.object_card_service import router as object_card_router
+from server.neuron_census_service import router as neuron_census_router
 # 分布式平台中心节点路由：本体在 deploy/distributed_service.py（deploy/ 不入 git）。
 # deploy/ 存在则挂载（本机/部署机）；公开仓库 fresh clone 无 deploy/ 时自动跳过，主后端照常启动。
 _deploy_dir = os.path.join(root_dir, "deploy")
@@ -247,6 +248,7 @@ run_service = RunService(
 app.include_router(create_runs_router(run_service))
 app.include_router(ai_rnd_router)
 app.include_router(object_card_router)
+app.include_router(neuron_census_router)
 if distributed_router is not None:
     app.include_router(distributed_router)
 app.include_router(research_asset_router)

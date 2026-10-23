@@ -15,6 +15,7 @@ import StackMode from './StackMode.jsx';
 import NeuronMode from './NeuronMode.jsx';
 import CloudMode from './CloudMode.jsx';
 import ParamMode from './ParamMode.jsx';
+import NeuronUnitPanel from './NeuronUnitPanel.jsx';
 import { LANG_TEMPLATES, LIVE_MODEL_DEMO, PROJECTIONS, TECH_CATEGORIES } from './distributedData.js';
 import ModelManager from './ModelManager.jsx';
 
@@ -33,6 +34,7 @@ const MODES = [
   { k: 'neuron', t: '神经元级', d: '单神经元' },
   { k: 'cloud', t: '特征点云', d: 'L6 族' },
   { k: 'param', t: '参数热图', d: '单层 W' },
+  { k: 'units', t: '原生神经元', d: 'MLP 单元 · 自然语料普查 · 实测' },
 ];
 
 /* 参数量/字节格式化：1.04M / 388.96M / 4.02B */
@@ -317,6 +319,7 @@ export default function LensSpatial({ on, onGo }) {
         {mode === 'stack' && <StackMode live={top === 'live' ? liveInfo : null} scan={top === 'live' && conn ? scan : null} scanState={top === 'live' && conn ? scanState : null} modelSlot={top === 'live' ? <ModelManager conn={conn} onConn={setConn}/> : null} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>}
         {mode === 'neuron' && <NeuronMode layer={neuronLayer} onLayer={setNeuronLayer} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onBack={() => setMode('stack')} tpl={tpl}/>}
         {mode === 'cloud' && <CloudMode tpl={tpl}/>}
+        {mode === 'units' && <NeuronUnitPanel/>}
         {mode === 'param' && <ParamMode layer={paramLayer} live={top === 'live' && conn ? conn : null} scan={scan}/>}
       </div>
     </>

@@ -1,0 +1,62 @@
+/* 空间 · 原生神经元（实测）与单元卡 */
+.nu-wrap { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 12px; height: 100%; min-height: 0; }
+.nu-side { display: flex; flex-direction: column; gap: 10px; overflow: auto; padding: 8px; border-right: 1px solid var(--line, #d8dde3); }
+.nu-main { overflow: auto; padding: 8px 12px; min-width: 0; }
+.nu-badge { align-self: flex-start; font-size: 12px; padding: 2px 8px; border-radius: 10px; background: #e3eef9; color: #1d4f86; }
+.nu-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2, #4a5563); }
+.nu-field select, .nu-field input { font-size: 12px; padding: 3px 6px; min-width: 0; }
+.nu-row { display: flex; gap: 6px; align-items: center; }
+.nu-row input[type="number"] { width: 64px; }
+.nu-row input:not([type]) { flex: 1; }
+.nu-list { display: flex; flex-direction: column; gap: 3px; }
+.nu-item { text-align: left; font-size: 12px; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; background: transparent; cursor: pointer; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.nu-item:hover { background: rgba(47, 111, 179, 0.08); }
+.nu-item.on { border-color: #2f6fb3; background: rgba(47, 111, 179, 0.12); }
+.nu-empty { padding: 24px; color: var(--ink-2, #4a5563); font-size: 13px; }
+.nu-err { color: #b3261e; }
+.nu-note { font-size: 11px; color: var(--ink-3, #6b7480); }
+.nu-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.nu-reg { display: inline-block; min-width: 22px; text-align: center; font-size: 10px; border-radius: 3px; color: #102030; padding: 0 3px; }
+.nu-card { display: flex; flex-direction: column; gap: 10px; max-width: 1100px; }
+.nu-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.nu-head h3 { margin: 0; font-size: 18px; }
+.nu-sub { font-size: 12px; color: var(--ink-2, #4a5563); }
+.nu-axes { display: flex; gap: 6px; flex-wrap: wrap; }
+.nu-axis { font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid; }
+.nu-axis-established { border-color: #2f6fb3; color: #1d4f86; background: #eaf2fb; }
+.nu-axis-partial { border-color: #c0562e; color: #8a3a1c; background: #fbefe9; }
+.nu-axis-none { border-color: #c4c9d0; color: #6b7480; background: #f4f5f7; border-style: dashed; }
+.nu-sec { border-top: 1px solid var(--line, #d8dde3); padding-top: 8px; }
+.nu-sec h4 { margin: 0 0 6px; font-size: 13px; }
+.nu-stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; margin-bottom: 6px; }
+.nu-hist { width: 100%; max-width: 620px; height: auto; display: block; }
+.nu-hist-zero { stroke: #8a9099; stroke-dasharray: 3 3; }
+.nu-hist-ax { font-size: 9px; fill: #6b7480; }
+.nu-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; margin-top: 4px; }
+.nu-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.nu-poles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nu-poles ol { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.nu-pole { display: grid; grid-template-columns: 48px 26px 1fr auto; gap: 6px; align-items: baseline; font-size: 12px; }
+.nu-pole-a { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2, #4a5563); }
+.nu-ctx { overflow-wrap: anywhere; }
+.nu-ctx mark { background: #fde9a8; padding: 0 1px; }
+.nu-src { font-size: 10px; color: var(--ink-3, #6b7480); white-space: nowrap; }
+.nu-tokens { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; margin-bottom: 4px; }
+.nu-tokens code { background: #f1f3f5; padding: 1px 5px; border-radius: 3px; }
+.nu-tl { color: var(--ink-3, #6b7480); width: 32px; }
+.nu-table { border-collapse: collapse; font-size: 12px; width: 100%; }
+.nu-table th, .nu-table td { border-bottom: 1px solid var(--line, #e3e7eb); padding: 3px 6px; text-align: left; vertical-align: top; }
+.nu-caveats { font-size: 11px; color: var(--ink-3, #6b7480); }
+@media (max-width: 900px) {
+  .nu-wrap { grid-template-columns: 1fr; }
+  .nu-side { border-right: none; border-bottom: 1px solid var(--line, #d8dde3); }
+  .nu-poles { grid-template-columns: 1fr; }
+}
+@media (prefers-color-scheme: dark) {
+  .nu-badge { background: #1d3550; color: #cfe2f7; }
+  .nu-axis-established { background: #16304b; color: #cfe2f7; }
+  .nu-axis-partial { background: #3a2016; color: #f3c9b6; }
+  .nu-axis-none { background: transparent; color: #9aa3ad; }
+  .nu-ctx mark { background: #6b5a1c; color: #fff; }
+  .nu-tokens code { background: #2a2f36; }
+}
