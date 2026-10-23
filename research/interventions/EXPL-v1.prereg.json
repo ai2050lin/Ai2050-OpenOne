@@ -1,0 +1,63 @@
+{
+ "schema": "explanation_test_prereg.v1",
+ "id": "EXPL-v1",
+ "phase": "Phase 255 后续（Q1）",
+ "created": "2026-10-23",
+ "question": "Qwen3-4B 的 MLP 神经元在自然语料上是否大多有一个可被检验的主要职能：只凭一句由普查片段写成的解释，另一个看不到普查数据的代理能否写出强激活该单元的新句子，同时写出不激活它的近似反例；与职能无关的远距内容是否也能激活它（叠加的迹象）。结果用于决定图谱原子层是否采用原生神经元。",
+ "units": {
+  "file": "research/interventions/EXPL-v1.units.json",
+  "sha256_raw": "b0dd85101e7bf0c6fdd8d88cc2c9e57a327e9a2deed3fecdac278d08564354d4",
+  "rule": "36 层各抽 5 个单元，另随机选 20 层各多抽 1 个，共 200（numpy default_rng(20261023)）；不按激活强弱或可解释性筛选；10 个单元在普查中从未超过 0.32，照样保留"
+ },
+ "model": {"model_id": "qwen3-4b", "path": "models/hf/qwen3-4b", "model_key": "6be1034f0b55a6df-bf16", "dtype": "bf16"},
+ "census": "D:/ai2050_native/_census/6be1034f0b55a6df-bf16/2ca5f0a756d36c8a-20000000（Phase 255，1904 万 token）",
+ "roles": {
+  "explainer": {
+   "who": "Claude 子代理（每批 20 个单元，共 10 批）；只看到该单元的普查卡片文本",
+   "input": "正极 top-20 片段（左 28 token + 命中 token + 右 8 token，激活值写成相对该单元普查最大值的比例）、直接读出推高 / 压低的各 10 个 token、强激活频率（每 N 页一次）、层号；不提供模板选择性、干预结果或任何语言学标签",
+   "output": "每个单元一条：explanation（中文不超过 60 字，描述正极在什么文本、什么位置激活）、confidence（高 / 中 / 低 / 无法解释）",
+   "instruction": "按共同模式而不是名词清单描述；说明激活落在哪个 token 上；看不出共同模式时写『无法解释』，不要硬凑"
+  },
+  "tester": {
+   "who": "另一批 Claude 子代理（每批 20 条解释，共 10 批）；只看到匿名编号 code 与 explanation，看不到普查片段、层号与单元号",
+   "output": "每条解释写 15 段短文本（每段不超过 60 字，中文或英文按解释选择）：new×5（应当强激活）、near_miss×5（与 new 只差关键处、按解释不应激活）、distant×5（与解释在语义上尽量远、同时自然通顺的内容）",
+   "instruction": "new 要多样，不抄写常见例句；near_miss 只改动解释所说的关键成分；distant 选择解释之外最不相关的领域"
+  },
+  "explainer_tester_isolation": "两类代理分在不同上下文；测试代理的输入只含 code 与 explanation；任何代理都不读取模板、干预或研究记录文件"
+ },
+ "measurement": {
+  "forward": "每段文本前接固定中性前缀「以下是一段文字。The following is a short text.\\n」（≥16 token，避开开头的注意力汇聚位），单条前向，取该单元在文本部分各 token 上 A = silu(G)⊙V 的最大值",
+  "score": "s = 最大激活 / 该单元普查最大值（census_max）；census_max ≤ 0 时该单元记为无法评分",
+  "strong": "s ≥ 0.3（与 Goodfire 附录相同的口径）"
+ },
+ "control": {
+  "shuffled_explanation": "对每个单元，取同一层分组中另一个单元的 5 段 new 文本（按固定种子 20261024 配对），在本单元上测量，作为『错误解释』基线"
+ },
+ "unit_outcome": {
+  "win": "同时满足：(1) new 中强激活 ≥ 2/5；(2) median s(new) − median s(near_miss) ≥ 0.10；(3) new 的强激活比例比对照文本高至少 0.2",
+  "lose": "解释为『无法解释』，或 median s(new) ≤ median s(near_miss)",
+  "tie": "其余情况"
+ },
+ "primary_metric": "200 个单元中 win 的比例（同时报告 tie、lose 与无法解释的比例，以及按层三段的分布）",
+ "decision_rule": {
+  "ge_0.60": "原子层采用原生神经元",
+  "0.30_to_0.60": "原生神经元作为原子，但需要补充残差子空间或字典特征节点，并对 lose 单元做原因分类（工具 / 解释 / 训练 / 递归泛化 / 叠加）",
+  "lt_0.30": "原子层不采用单个神经元，转向残差子空间或字典特征"
+ },
+ "secondary_metrics": [
+  "盲最大化：new 中最高 s ≥ 1.0（超过普查语料中的最大激活）的单元比例",
+  "叠加迹象：distant 中至少 1 段强激活的单元比例，以及全部 distant 文本的强激活比例",
+  "近似反例：near_miss 的强激活比例",
+  "按 confidence 分组的 win 比例（检验解释者的自评是否有用）"
+ ],
+ "self_checks": [
+  "前向口径核对：随机取 20 个普查正极片段原文（含左侧上下文），按本测量方法前向，该单元的激活与普查记录值相对误差中位数 < 0.05（窗口位置不同会带来差异，只报告不判定）",
+  "解析检查：每个单元恰有 5 / 5 / 5 段文本；缺失的段记为缺失，不由主代理补写"
+ ],
+ "notes": [
+  "解释者与测试者都是同一系列模型的不同上下文，不是独立的人类评审；结果衡量的是『在这种自动化流程下可被检验的单一职能』。",
+  "只检验正极；负极职能与 SwiGLU 双负区不在本版范围内。",
+  "主代理只负责准备卡片文本、拆分批次、前向测量与按本文件判据计算，不改写任何解释或文本。",
+  "判据在运行前冻结，看到结果后不得修改；修改须升版本（EXPL-v2）。"
+ ]
+}
