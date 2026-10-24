@@ -1,0 +1,525 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## N020（第 32 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 30 页一次；语料最大激活 87.8
+- 直接读出推高：rå | warts |  cov | aggi | ksz | 箕 |  ден | 侧 | rium | 拒
+- 直接读出压低：过 |  passing |  passes |  pass |  passed | pass |  passage | passes | passed |  Passing
+- 正极片段：
+  - 1.00｜ in 1 second by a current of 1 ampere". Conversely, a current of one ampere is one coulomb of charge【 going】 past a given point per second:⏎⏎In
+  - 0.88｜ in 1 second by a current of 1 ampere". Conversely, a current of one ampere is one coulomb of charge【 going】 past a given point per second:⏎⏎In
+  - 0.82｜ and then boosted it with a Centaur upper stage in order to bring it into its complicated trajectory through the inner Solar System. Two close fly【b】ys of Venus and one each of Earth
+  - 0.81｜ and found out what they all had in common: close encounters with Earth in the past million years.⏎"Gravitational forces during the fly【b】ys can stretch, rattle and torque
+  - 0.80｜ segments, or links, don't form a collision domain as there is a dedicated channel between each transmitter and receiver, making collisions a thing of【 the】 past in modern wired networks.⏎⏎In a
+  - 0.78｜"mediocre"）要短一些；其次，如果句子的某一部分被漏听或者由于噪声干扰（比如一辆车辆疾【驰】而过）而被误听，
+  - 0.74｜ News Agency⏎Frequent acrimony, currently depicting the relationship between game Hunting companies and rural communities in Tanzania, will be a thing of【 the】 past after the government adopts a new wildlife
+  - 0.73｜ is rising as the global population ages, but it's not clear whether Parkinson's is affecting a larger percentage of the population than it has in【 the】 past. Some research has found that the
+  - 0.73｜. The breakthrough is an enormous step forward. Devices which need re- charging or new batteries are a problem but soon will be a thing of【 the】 past. "⏎Of course, micro engines
+  - 0.71｜学诗就不懂得怎么说话。’我退回后便去学诗。又有一天，父亲又独自站在庭院中，我快【步】走过，他问我：‘学礼
+  - 0.71｜ of many of the planet's satellites.⏎Astronomers are confident that Apophis will spare us on its 2029【 fly】by, but say that there is a
+  - 0.70｜1989年：一颗直径达1000英尺的近地小行星在距地球仅40万公里距离【处】穿过。⏎ 1994年
+  - 0.70｜ long as she could.⏎The fruit should be left on the tree as long as possible.⏎used when something used to happen or be true in【 the】 past but does not happen or is not
+  - 0.67｜ questions may include:⏎- Can the person remember recent events (is there impaired short-term memory)?⏎- Can the person remember events from further in【 the】 past (is there impaired long-term memory
+  - 0.67｜ itself had been damaged or taken on water and started to go down? Such things do happen, although not as frequently now as they have in【 the】 past (coast guard regulations and improvements
+  - 0.66｜ by the lack of major accomplishments in his career. He felt that he had not used his creative potential to its fullest and that success had passed【 him】 by." At the time of Finger's
+  - 0.66｜ and live more lucrative lives. If we can reduce collective stress, the abuse of children and women that we see today would become a thing of【 the】 past. Criminal tendencies would be greatly reduced
+  - 0.65｜喀拉山北麓，支脉各姿各雅山北麓的卡日曲是黄河的正源。 黄河【依次】穿越青藏高原、黄土高原
+  - 0.64｜航行）。按航天器与探索、开发和利用对象的关系或位置划分，航天飞行方式包括飞越（从天体近【旁】飞过）、绕飞（环绕天
+  - 0.63｜ religion is called Bön.⏎Historical phases of BönEdit⏎According to the Bönpo themselves, the Bön religion has actually【 gone】 through three distinct phases: Animistic B
+
+## N021（第 8 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 7.03
+- 直接读出推高：哪怕 | utely | ddl |  somehow | 스타 | 一口气 | brate | 拔 | 异地 | .Net
+- 直接读出压低：惭 |  FAQs |  commons | icts | OLS | ubic | 工信 |  tap |  !_ | 量化
+- 正极片段：
+  - 1.00｜ particles of a body, such as water, are all alike, that is, of the same figure, weight, &c. is a【 question】 of some importance. From what is known
+  - 0.94｜.⏎Because children aged 5, 6, and 7 are developmentally so different from the children birth through 4, Music Together【 does】 offer a class beyond the mixed-age class
+  - 0.94｜ reduction. Inasmuch as only a small proportion of the total fat in milk need be finely subdivided to reduce the curd tension,【 it】 is possible to produce soft curd by
+  - 0.90｜开放性、变化敏感性、系统动态性等特点，如何为复杂自适应和自组织系统的开发提供基础理论和运行机制【是】目前软件工程面临的重要挑战。项目
+  - 0.84｜ cent of rural and 51 per cent of non-rural reporting not using a condom.⏎Asked whether they'd had an HIV test,【 】44 per cent of the men in
+  - 0.84｜ broader context or the overall systems that operate across the institution.⏎The fact that few individuals understand the broader institutional context, its systems and behaviors,【 has】 dire consequences for our efforts to navigate toward
+  - 0.83｜内在的整体性意义。即便“仁”关涉到在真正是人的境域中的人之为人这样一个根本性问题，它【也不会】是某种形而上学的实体性
+  - 0.79｜ as the Ancient of⏎the Ancient Ones and that White Head uncovereth the benevolence of⏎benevolences, great mercies【 are】 found everywhere.⏎680. But
+  - 0.79｜的各个方面都发挥着至关重要的作用。自锂电产业蓬勃发展以来，如何开发和生产具有更好电化学性能的LIBs【一直是】学术界和产业界关注的焦点
+  - 0.78｜已降息三次，欧洲央行重启QE。易纲表示，即使世界主要经济体的货币政策向零利率方向趋近，我们【也不】搞竞争性的零利率或量化宽松
+  - 0.77｜ journey by Afrosinia. That the emperor sincerely sympathized with Alexei, and suspected Peter of harbouring murderous designs against his son,【 is】 plain from his confidential letter to George I
+  - 0.76｜ agent of a band of conspirators, or was one of a few vile men who sought an odious immortality, it is impossible to【 say】. We have the authority of a high
+  - 0.76｜ one, and it's recognized as sd0, just like any SCSI disk. The fact that the ZIP here is an ATAPI one doesn【't】 matter - a SCSI ZIP will show up
+  - 0.74｜与原告的配方实质相似。这一过程中，法官或律师如没有相关的化学知识，即使委托鉴定机构做技术鉴定，恐怕【也】难以看懂技术鉴定报告。更何况
+  - 0.73｜ in the departure of some missionaries; whether or not Chadian Christians have been numerous enough and organized enough to have attracted more converts since that time【 is】 unknown.⏎⏎Other demographic statistics ⏎⏎Demographic
+  - 0.73｜ Hurricane Season, which recommends locating jack-up rigs on more stable areas of the sea floor, and positioning platform decks higher above the sea surface,【 was】 also updated.⏎API publications are available at
+  - 0.72｜ proposals has achieved wide acceptance.⏎⏎Criticizing the proposals of finding Turkic or other etymologies for Attila, Doerfer【 notes】 that King George VI of the United Kingdom
+  - 0.71｜ true when they're bombarded with multiple abstract or unusual pieces of data in rapid succession. Lest designers forget how easily users forget, let【's】 review why our brains seem to be so
+  - 0.71｜ none has a monopoly on being the perpetrator either. To suggest that some have to be compensated for what was done to them in the past is【 to】 be particularly selective, subjective, and child
+  - 0.70｜ of a band of conspirators, or was one of a few vile men who sought an odious immortality, it is impossible to say【.】 We have the authority of a high Government
+
+## N022（第 3 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 0.913
+- 直接读出推高：ainer | 魔王 | 配方 |  quest | mouth |  run | 鲜 |  formula | 宿 | 流星
+- 直接读出压低：-split | trimmed |  TRACE |  atrás | バリ | Textbox |  splitted |  trimmed | tré |  splits
+- 正极片段：
+  - 1.00｜发展余地，能伸能缩，增加小城镇动态发展的适应性。⏎类型小城镇空间布局特点1)农业基地型【 特】点: 农业地区的一般
+  - 1.00｜，和亲和贸易往来都加深了民族间的友谊，各民族之间的友好往来和合作是历史的主流。⏎学情分析【 认】知条件通过前面的学习，学生已经
+  - 0.97｜设施，维护提升村内主要道路，为产业发展提供运输保障。图3产业振兴规划策略及措施3.2.2【 】传承发展村庄文化资源，实现文化
+  - 0.96｜的差异，似乎也应该允许。⏎骤取决于学生设定的方案。⏎有了知识储备后，下一步就是进行实 四、结语【 验】准备。⏎为了培养学生的创新思维和
+  - 0.93｜更准确地了解学生心理， 掌握学生心态，使思想政治教育工作更符合学生的实际情况和实际需要。⏎2.3【 】以和谐理念为指导，营造积极
+  - 0.84｜设置问题、制造矛盾情境帮助学生创造学习动机;通过讨论、自由发言活跃课堂气氛，训练学生的能力。⏎学法分析【 】由于本课提供了大量的史料，应
+  - 0.79｜。⏎实践问题，认真研究借鉴外围政党在治国理政方面 7.民主性。⏎其次，党的建设科学化的成效，【 党】政论坛。⏎2009，
+  - 0.78｜表现为利用金融资产的净流入或动用储备 资产为经常账户赤字融资。⏎4.综合账户差额【 综】合账户差额等于经常账户、
+  - 0.74｜体制，实际上是条块并管，有的以条条管理为主，有的以块块管理为主。⏎(三)经济体制改革之后【 】1979 年中国共产党
+  - 0.74｜。⏎教师指导、评价。⏎具体地讲，研究性学习的实施一般 有以下几个阶段: 1.研究性课题的选择【 指】导学生选择研究性课题是成功
+  - 0.73｜质量好坏的重要标准。⏎国内一些顶尖级杂志的选稿方向也随之 发生了转型。⏎李子奈、齐良书对【 】《经济研究》发表的 3
+  - 0.73｜小的空间顺序原则(P110)，体现了格式塔心理的完形认知观。⏎(二)汉语整体-部分的认知反映【 汉】民族思维以直观形象为主，具有
+  - 0.72｜都听说过遥感，但高中生对于遥感的概念却没有科学的认识，所以教材对遥感的概念作了介绍。⏎本专题问题设计【 】1、能说明遥感的含义
+  - 0.72｜ samples taken from Japanese markets. Blue-fin whale hybrids are capable of being fertile. Molecular tests on a  pregnant female whale caught off Iceland in【 】1986 found that it had
+  - 0.70｜大都在步行限度之内，应尽量以旧镇为基础，由里向外，集中紧凑地连片发展。⏎(二)完整性【 小】城镇虽小，五脏俱全
+  - 0.69｜ it can come about that it was not founded long ago...One early work of fiction detailing an alternate history is Joanot Martorell's【 】1490 epic romance Tirant
+  - 0.68｜就是农业文明时期的土地政治。⏎三、农业文明时代的经济基础与上层建筑 (一)土地与农业文明时期的经济基础【 自】农业文明始，土地便作为最重要的
+  - 0.67｜实践能力和创新 精神。⏎二、食品科学与工程专业实践教学中存在的主要问题 (一)实验教学环节存在的问题【 验】证性、重复性、演示性的
+  - 0.65｜7 the Kaibab Paiute Indian Reservation⏎was established, surrounding the privately owned Pipe Spring ranch.⏎In 1923 the【⏎】Pipe Spring ranch was purchased and set aside
+  - 0.65｜(如附表2所示)。⏎以便观察优质课中教师和学生在课堂中产生的互动行为。⏎(三1研究方法【 】为了确保对优质课中的师生互动
+
+## N023（第 21 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 7.4
+- 直接读出推高：undi |  Secondly | .eulerAngles | ]bool | 的眼神 |  sexes | poons | 叹了 | 徭 |  distracted
+- 直接读出压低：省 | ISM |  lại |  bank | _attachment |  inherit | 尽 | YC |  m |  park
+- 正极片段：
+  - 1.00｜.  He was reelected in 1916, and served from March 4, 1911 to March【 】3, 1923.
+  - 0.92｜ small capacity of Fenway Park prevents them from leading in overall attendance. From May 15, 2003, to April【 】10, 2013
+  - 0.85｜ Lawrence Seaway. In 2005, the transportation sector made up 4.2% of Canada's GDP, compared to【 】3.7% for Canada's mining
+  - 0.85｜1963年5月27日、1982年5月27日、2001年5【月】27日、2020
+  - 0.82｜. The festival took a break in 2012 due to the Olympics and the Diamond Jubilee but Lazonby Live returned on【 】7 September 2013 at
+  - 0.79｜月是夏季的第二个月，本月有两个节气：小暑、大暑；在南半球，7月是冬季的【第二】个月。⏎⏎英文中的7月（July
+  - 0.78｜ a margin of less than one-half of one percent. He served in the Senate from January 3, 1957 to January【 】3, 1963.
+  - 0.78｜ 582<|endoftext|>The Book of Isaiah ( ) is the first of the Latter Prophets in the Hebrew Bible and the first of【 the】 Major Prophets in the Christian Old
+  - 0.77｜⏎He was elected as a Republican to the Sixty-first Congress, and served from March 4, 1909 to March【 】3, 1911 representing
+  - 0.75｜丑}-》上、下；《滕文公》上、下；《离娄》上、下；《万章》【上】、下；《告子》上
+  - 0.75｜ last occultation of Antares by Venus took place on September 17, 525 BC; the next one will be November【 】17, 2400
+  - 0.75｜演自己。6月19日，發行第五張個人專輯《Last Cry》。2010年12【月】，加入綜藝節目《食
+  - 0.72｜为“末业”，凡因弃本求末，或游手好闲而贫穷者，全家罚为官奴⏎一【，】推行县制⏎二，废井
+  - 0.71｜ by a margin of less than one-half of one percent. He served in the Senate from January 3, 1957 to【 January】 3, 1963
+  - 0.71｜但亦有部分例外。如公曆的1963年5月27日、1982年5【月】27日、2001
+  - 0.70｜0日：慶祝電影《幻影的霸者 索罗亚克》上映⏎ 2013年8【月】10日至9月6日：
+  - 0.70｜agnitude companion as a double star as H IV 66 in the Herschel Catalogue of Double Stars and Σ II【 】2 in the Struve Double Star Catalog
+  - 0.69｜群体中其他成员的影响如群体中出现一个反从众者时， 其他人的从众行为会大大减少。(1【)】自我内在自我意识强的人做事情
+  - 0.68｜是春季的第三个月，这个月有两个节气：立夏、小满；在南半球，5月是秋季的【第三】个月。⏎⏎英文5月名稱（
+  - 0.67｜亦有部分例外。如公曆的1963年5月27日、1982年5月【2】7日、2001年
+
+## N024（第 31 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 381 页一次；语料最大激活 31.6
+- 直接读出推高： implementation |  Implementation |  correspondence |  characterization |  implementations |  __________________________________ |  Representation |  interpretations |  interpretation |  corresponding
+- 直接读出压低： рассмат | 营业执 |  исследова | 有期徒 |  требова | 应收账 |  newsp |  посколь |  оказа | 但不限
+- 正极片段：
+  - 1.00｜. The words here are        over  the  lazy  dog.  The words⏎quite  short.  Aren't they? 【 But】        here  are  quite  short
+  - 0.63｜ a salute of seven guns. His guide was an⏎Indian chief, Chawchinahaw. Hearne ascertained very soon,【 what】⏎others have found among the Indians,
+  - 0.57｜ Graphs [10/25/1998]⏎Can you help me with graphing sine and cosine functions? How do【 you】 mark⏎off the intervals?⏎- Finding
+  - 0.56｜2023 recipient: Anupam Kher⏎| awarded_for    = Best Performance by an Actor in a Leading Role⏎|【 presenter】      = Zee Entertainment Enterprises⏎|
+  - 0.53｜ [09/17/1998]⏎How do you relate a polynomial like y=6x-2 to the general【 polynomial】⏎function? How do I graph and
+  - 0.53｜–1814)  Austrian Empire (1814–1822)⏎| field         = Sculpture⏎|【 training】      =⏎| movement      = Neoc
+  - 0.52｜Napoleon as Mars the Peacemaker|Venus Victrix|George Washington}}⏎| patrons       =⏎| influenced    =⏎|【 awards】        =⏎| elected       =⏎| website
+  - 0.50｜ In Front Of A Closed Door  (1967)⏎ The Night And the Horsemen (1969)⏎ Alone On the【 Summit】 Of The World (1973
+  - 0.49｜oplasty or bypass surgery to reopen it. For⏎at least a year after angioplasty with stents, you may need to take【 medicine】 to⏎reduce the risk of blood cl
+  - 0.44｜ white⏎womanhood. Interracial sexual or physical assault (e.g., minority⏎male/white female) still produces outrage that is not comparable【 to】 any⏎other kind of inter- or
+  - 0.42｜4)  Austrian Empire (1814–1822)⏎| field         = Sculpture⏎| training      =⏎|【 movement】      = Neoclassicism⏎|
+  - 0.42｜ [05/17/2000]⏎In a group of patients screened for lung cancer, 10% have the【 disease】. Of⏎those who have lung cancer
+  - 0.42｜ina, to lower cholesterol, or to control blood pressure, it’s⏎also important to take these every day. Along with lifestyle changes,【 these】⏎medicines can help you get
+  - 0.42｜+>+<<]           // cell #1 的值加进 cell #2 和 #3⏎    >>⏎        [-<<+>>【]】        // cell #3 的值移
+  - 0.41｜ give a 'W'⏎<.                      Cell #3 was set to 'o' from the end of 'Hello'⏎+++.------.【--------】.    Cell #3 for 'rl
+  - 0.39｜ oversees programs in cancer prevention, detection, survivorship, and community outreach. For more information, call 1-888-FOX【-】CHASE (1-888-
+  - 0.38｜ Bayesian Probability [04/27/1999]⏎A man is lost in the mountains... what's the probability that he【's】⏎wandered into Lost Town?
+  - 0.36｜ the synthesis of teachers'⏎pedagogical knowledge and their subject matter knowledge that⏎comprises pedagogical content knowledge. According to Shul【man】 (1986)⏎pedagog
+  - 0.34｜ating Zeros [12/03/1997]⏎1. A circular disc contains 2 billion randomly situated points.【 Can】 a⏎straight line pass through the disc
+  - 0.34｜ Point of Intersection [05/08/2001]⏎Is there a formula to tell if two lines, given by point【 coordinates】,⏎cross and at what coordinates they cross
+
+## N025（第 14 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 6.71
+- 直接读出推高： **) |  &) | oltip | ):\n\n | ):\n | agram |  {}) | -) | )= | --)
+- 直接读出压低：过的 | legate | etur | imals | eren | nown | edic |  gul | ||( |  isolate
+- 正极片段：
+  - 1.00｜ Little Bill (disambiguation)⏎ Will (disambiguation)⏎ William (disambiguation)<|endoftext|>Wolf Martin Garber (【May】 18, 192
+  - 0.92｜ Germanic language⏎⏎See also ⏎ ⏎ Bavaria (disambiguation)⏎⏎Language and nationality disambiguation pages<|endoftext|>Bohemia (【 ;】  ; ; ; ) is the western
+  - 0.88｜ Korg⏎⏎See also ⏎EMX1, a human gene⏎EMX2, a human gene<|endoftext|>Miles Poindexter (【April】 22, 186
+  - 0.84｜. 1877. Greek text available at the Perse<|endoftext|>Ajax () or Aias (;  ,   Aíantos【;】 archaic  ) is a Greek myth
+  - 0.83｜ Manila. Another national player, Allen Sasan, was chosen by Alaska in the first round.<|endoftext|>Özdemir Sabancı (【May】 15, 194
+  - 0.83｜ahisar⏎Bayat tribe⏎District municipalities in Turkey⏎Populated places of the Byzantine Empire<|endoftext|>Gideon Alfred Rodan (【June】 14, 193
+  - 0.83｜Microregions of Goiás⏎⏎References⏎⏎ Frigoletto⏎⏎Municipalities in Goiás<|endoftext|>Elijah Boardman (【March】 7, 1760
+  - 0.83｜ Conservation of Antarctic Seals (1972)⏎ The Convention for the Conservation of Antarctic Marine Living Resources (<|endoftext|>Alfred William Lawson (【March】 24, 186
+  - 0.82｜949. This element was little characterized until 1960, when A. G. Madd<|endoftext|>Arthur Asher Miller (【October】 17, 191
+  - 0.82｜ their seasons in early to late autumn; Major League Baseball's championship World Series is popularly known as the "Fall Classic<|endoftext|>Alameda (【 ;】 ; Spanish for "tree-lined path")
+  - 0.81｜ Province⏎Sultandağı District⏎District municipalities in Turkey<|endoftext|>Şuhut (Ottoman Turkish شهود Şuhūd【;】 formerly Ancient Greek Σύνν
+  - 0.81｜⏎1973 songs⏎Epic Records singles⏎Mica Paris songs⏎1998 singles<|endoftext|>Paul Leslie Snider (【April】 15, 195
+  - 0.80｜021 general election⏎⏎References⏎⏎External links⏎riding profile⏎⏎Former provincial electoral districts of Nova Scotia<|endoftext|>Melbourne Alexander Gass (【December】 21, 193
+  - 0.79｜ China and as far south as Hunan. The name suggests that it is or became the default game played<|endoftext|>The Cenozoic (【 ;】 ) is Earth's current geological era,
+  - 0.79｜, an online game ⏎ ⏎ Blitzkrieg (disambiguation)⏎ Blitzer (disambiguation)<|endoftext|>Burton Stephen Lancaster (【November】 2, 1913
+  - 0.77｜ or 5 key cards also deny and show the trump queen, respectively. (Responder may<|endoftext|>Wilfred Bailey Everett Bixby III (【January】 22, 193
+  - 0.77｜ which is celebrated on 14 July each year. In French, it is formally called the  (; ); legally it is known as 【 (;】 ).⏎⏎The French National Day is the anniversary
+  - 0.77｜ tiles were given a metallic sheen to simulate the varying scales of the monster, with the color grading from green on<|endoftext|>Park Güell (【 ;】 ) is a privatized park system composed
+  - 0.77｜ or lowland containing a marsh in Lydia as . According to many<|endoftext|>Aruba ( ,  or , ), officially the Country of Aruba【 (;】 ), is a constituent country of the Kingdom
+  - 0.76｜-3D©" (2012). Mathematics Graduate Projects and Theses. Paper 1.<|endoftext|>Charles Robert Darwin (1【8】091882). Origin
+
+## N026（第 24 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 9.37
+- 直接读出推高：抄 | 漫步 | walker |  browsing | inflate |  invite |  unrelated |  wondered | invert | 拥挤
+- 直接读出压低：iller | BW |  fractions |  exponential | CRT | 百强 | ility |  fractional |  Boeh |  ref
+- 正极片段：
+  - 1.00｜359° is 2°, not 358°).⏎⏎Symbols and encoding⏎The arithmetic mean is often denoted by【 a】 bar (vinculum or macron),
+  - 0.91｜9° is 2°, not 358°).⏎⏎Symbols and encoding⏎The arithmetic mean is often denoted by a bar【 (】vinculum or macron), as in
+  - 0.91｜.⏎⏎The automorphism group of an object X in a category C is denoted AutC(X), or simply Aut(X) if the category【 is】 clear from context.⏎⏎Examples⏎ In set
+  - 0.86｜ case Roman letters (a, b, c, . . . ) are also used. In contexts where this【 is】 not confusing, an angle may be den
+  - 0.85｜ 359° is 2°, not 358°).⏎⏎Symbols and encoding⏎The arithmetic mean is often denoted【 by】 a bar (vinculum or macron
+  - 0.82｜ may provide a better description of central tendency.⏎⏎Definition⏎Given a data set , the arithmetic mean (also mean or average), denoted 【 (】read  bar), is the mean of
+  - 0.79｜ as representative of the Andorrans<|endoftext|>In mathematics and statistics, the arithmetic mean ( ), arithmetic average, or just the mean or average (【when】 the context is clear) is the sum
+  - 0.79｜建立职工名册备查。⏎第八条用人单位招用劳动者时，应当如实告知劳动者工作内容、工作条件、工作地点、【职业】危害、安全生产状况、劳动报酬，
+  - 0.79｜建立职工名册备查。⏎第八条用人单位招用劳动者时，应当如实告知劳动者工作内容、工作条件、工作地点、【职业】�：�、安全生产状况、劳动
+  - 0.79｜损失：（1）不具备产品应当具备的使用性能而事先未作说明的；（2）不符合在产品或者其包装【上】注明采用的产品标准的；（3
+  - 0.77｜建立职工名册备查。⏎第八条用人单位招用劳动者时，应当如实告知劳动者工作内容、工作条件、工作地点、【职业】危害、安全生产状况、劳动报酬，
+  - 0.76｜ consists of every possible observation and not just a subset of them), then the mean of that population is called the population mean and denoted by【 the】 Greek letter . If the data set is
+  - 0.75｜理解的方式。对利率、费用、收益及风险等与金融消费者切身利益相关的重要信息，应当根据金融产品或者服务【的】复杂程度及风险等级，对其中
+  - 0.75｜性能、规格、等级、主要成份、生产日期、有效期限、检验合格证明、使用方法说明书、售后服务，或者服务的内容【、】规格、费用等等。一是对商品
+  - 0.75｜ with  ⏎The circumference of a circle is related to one of the most important mathematical constants. This constant, pi, is represented by the Greek【 letter】  The first few decimal digits of the
+  - 0.72｜ the Andorrans<|endoftext|>In mathematics and statistics, the arithmetic mean ( ), arithmetic average, or just the mean or average (when the context【 is】 clear) is the sum of a collection
+  - 0.71｜应当赔偿损失：（1）不具备产品应当具备的使用性能而事先未作说明的；（2）不符合在产品或者【其】包装上注明采用的产品标准的；
+  - 0.70｜, role playing, etc., to keep your presentation moving.⏎- Ask the attendees how they plan to apply your information.⏎- Use samples (【if】 applicable), quizzes, strategic plans, or
+  - 0.70｜：⏎⏎圆心 ⏎圆是在同一平面内到定点的距离等于定长的点的集合，这个定点叫做圆的圆心（【通常】用表示）。⏎⏎弦 ⏎圆周
+  - 0.70｜ more common and less ambiguous notation.⏎⏎Definition and properties⏎⏎Real numbers⏎For any  the absolute value or modulus  is denoted , with【 a】 vertical bar on each side of the quantity
+
+## N027（第 23 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 54 页一次；语料最大激活 7.37
+- 直接读出推高：dialogs | istine |  dope | 錄 | lights | ULD | anted | 直通车 |  Nose | 鼻子
+- 直接读出压低：波 |  wave | 托 | crest |  Wave | front | 浪 |  waves | 涛 |  Sound
+- 正极片段：
+  - 1.00｜. D) find f'(x)⏎Math Pre Cal⏎Find the values of the trigonometric functions of è from the information given.【 cot】 è = 1/2 , sin
+  - 0.66｜. C) find the range of f. D) find f'(x)⏎Math Pre Cal⏎Find the values of the trigonometric【 functions】 of è from the information given. cot
+  - 0.59｜(x) = x^2 + 1 divided by the square root of (x^2 -1),⏎how do you evaluate the composite【 function】 of f composed with g (f circle
+  - 0.50｜orems are equivalent.⏎⏎Generalizations ⏎ In the original theorem, the domain of the function f is the unit n-sphere (the boundary【 of】 the unit n-ball). In general,
+  - 0.38｜ the direction of P1, then bends to arrive at P2 from the direction of P1.⏎⏎The second derivative of the Bézier【 curve】 with respect to t is⏎⏎Cubic
+  - 0.34｜ much!⏎A car travels on a highway at an average speed of 65 miles per hour. What was the speed in feet per second【?】 (Remember- 1 mile=5
+  - 0.34｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. © 19
+  - 0.34｜ was ushered nearer and nearer the great blazing fire, until by a dexterous push and shove he was hoisted into the seething【 kettle】.⏎His feet were dreadfully scald
+  - 0.33｜的灵敏度 灵敏度是指传感器在稳态工作情况下输出量变化△y对输入量变化△x的比【值】。 它是输出一输入特性
+  - 0.32｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. © 19
+  - 0.32｜直血着H本人的大炮以自己的血肉之躯冲过去，吊桥被大炮炸断，他们掉入河【中】。⏎镜头一转, 是一架飞机
+  - 0.32｜ diameter of the table?⏎- Finding the Zeros of a Function [05/12/1999]⏎How would I【 find】 the zeros of P(x) = (
+  - 0.32｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. Copyright ©20
+  - 0.32｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. © 19
+  - 0.31｜民数万人，投尸江中。尚余数万人，驅趕出城，以铁骑围而逼入江【中】。剩餘民眾数百人，多
+  - 0.31｜3.16⏎⏎掩码：255.255.255.240⏎⏎掩码反码【：】0.0.0.15
+  - 0.31｜23:30, Jesus referenced Hosea 10:8 when he said "Then they will begin to say to the mountains【 '】Cover us" and to the hills,
+  - 0.31｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. © 19
+  - 0.30｜ medical conditions. Call 911 for all medical emergencies. Links to other sites are provided for information only -- they do not constitute endorsements【 of】 those other sites. © 19
+  - 0.30｜ alerted to the high concentrations of CO gas and can send the proper authorities to investigate possible carbon monoxide poisoning.⏎Page 1 of 3【:】 Next Page »⏎Carbon Monoxide Det
+
+## N028（第 32 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 53.2
+- 直接读出推高：itudes | ョ | rait | mere | ario | 月中 | (timeout | reso | 熏 | リ
+- 直接读出压低： house |  houses |  House | house | House |  HOUSE | houses |  Houses | _house | -house
+- 正极片段：
+  - 1.00｜,241⏎- Percent of people below the poverty level: 4.9 percent⏎Persons who speak a language other than English【 at】 home: 32.9⏎
+  - 0.94｜ Today 1 in 3 children nationwide is from an ethnic or racial minority group, 1 in 7 speaks a language other than English【 at】 home, and 1 in 1
+  - 0.91｜ately refer to themselves as "Florida Crackers."⏎As far as language is concerned, around 75% of Florida residents speak only English【 at】 home, while around 15%
+  - 0.87｜ in the United States in 2003.⏎Students are considered to be homeschooled if their parents reported them as being schooled【 at】 home instead of at a public or private
+  - 0.86｜ she was reading by the age of four. Her sister had been sent to a boarding school, but their mother insisted that Christie receive her education【 at】 home. As a result, her parents
+  - 0.85｜, and 8,970 families residing in the city. The population density was . There were 18,757【 housing】 units at an average density of . The
+  - 0.84｜ 313.9/km² (813.0/mi²). There are 13,924【 housing】 units at an average density of 1
+  - 0.84｜ households and 6,184 families residing in the city. The population density was . There were 11,259【 housing】 units at an average density of . The
+  - 0.83｜54.6/sq mi (677.5/km2).  There were 19,806【 housing】 units at an average density of . 
+  - 0.83｜ in the capital, and working in a state enterprise. The Ministry for Statistics and Analysis estimates that one in four families in Belarus owns a computer【 at】 home. The popularity of Internet cafés
+  - 0.79｜izes bestiality in the Armed Forces, A new study shows that mothers who return to the workforce are happier than mothers who choose to stay【 at】 home to raise their kids.⏎I reckon
+  - 0.77｜ households, and 1,654 families living in the city. The population density was . There were 2,704【 housing】 units at an average density of . The
+  - 0.77｜ district. View these data in the table via this Web page using the default geography selections and viewing the in the lower section (Language Spoken【 at】 Home) of Table 2. Adams
+  - 0.76｜ households, and 1,237 families residing in the town. The population density was . There were 4,748【 housing】 units at an average density of . The
+  - 0.76｜, Republicans could not be gerrymandered into irrelevance.⏎Meanwhile, during the three intervening general elections, something remarkable was happening in【 House】 races. The percentage of votes cast for
+  - 0.75｜ households, and 1,362 families living in the city. The population density was . There were 2,507【 housing】 units at an average density of . The
+  - 0.74｜ people, 124 households, and 86 families residing in the city. The population density was . There were 14【2】 housing units at an average density of .
+  - 0.74｜.6%, China 2.3%, Sri Lanka 1.8%.  72.5% of people spoke only English【 at】 home; the next most common languages were
+  - 0.74｜ have Australian citizenship is only slightly higher than the national average of 86.1% at 88.4%. As for languages【 spoken】 at home English only was the most common
+  - 0.74｜, and 9,959 families residing in the city. The population density was . There were 23,876【 housing】 units at an average density of . The
+
+## N029（第 8 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 8.4
+- 直接读出推高：_press | presso | 机构 | 大事 | 撥 | endo | DECL | すべ | boy |  Dane
+- 直接读出压低：束 | 意外 | erson | 黑马 |  unexpectedly |  Highlands | 娘 | uppet | PHA |  surprises
+- 正极片段：
+  - 1.00｜ogenesis, because MET -/- mice die in utero due to severe defects in placental development. Furthermore, MET is required for such critical【 processes】 as liver regeneration and wound healing during adulthood
+  - 0.96｜ to mention regional and cultural differences. Arguably indeed, with people living longer, and also reaching puberty earlier, 'age norms for major life【 events】 have become highly elastic' by the twenty
+  - 0.91｜ protein complexes（通过追踪细胞壁锚定蛋白运动揭示细菌细胞壁生长规律）”。⏎细胞的生长和分裂是重要的生命【过程】。在细胞生长和分裂过程中维持
+  - 0.90｜ provide updated comprehensive information if their condition is potentially changeable and/or previous documentation does not include sufficient information.⏎Does the impairment affect a major life【 activity】? Legal eligibility requires that the physical or
+  - 0.86｜现象。但是，立克次體和衣原體等有类似細菌的细胞结构的生物也不能獨立執行很多重要的生物【過程】，它们也要进入真核生物宿
+  - 0.85｜ can be an inability to engage in regular activity.⏎Some depressive episodes begin with no identifiable trigger, while others can be associated with a major life【 event】 (positive or negative). It is possible
+  - 0.85｜’s body. Specific minerals must be present in a dog food in the right amounts to provide optimal health.⏎Minerals work together to coordinate body【 functions】 and maintain normal activities. While not providing
+  - 0.84｜ pituitary gland continues to secrete HGH into adulthood to help maintain existing muscle and tissue.⏎Here are some of the body's natural【 processes】 that are affected by HGH:⏎*
+  - 0.83｜ North Carolina Department of Public Instruction describes three levels of technology use: traditional, enhanced and infused. Traditional technology implies use of technology tools for basic【 functions】, such a word processing and basic spreadsheet
+  - 0.83｜ not include sufficient information.⏎Does the impairment affect a major life activity? Legal eligibility requires that the physical or mental impairment substantially affects a major life【 activity】. A major life activity is a basic
+  - 0.83｜The last point is the most important. You’ll notice that through simple logic, we suddenly had to have tons of auditing overhead to do something【 so】 simple. And despite your best testing efforts
+  - 0.83｜0 (ADA) an individual with a disability is a person who: Has a physical or mental impairment that substantially limits one or more major life【 activities】; has a record of such an impairment
+  - 0.83｜ vary depending on the underlying disease, disorder or condition. Nerve symptoms are diverse because the nervous system governs or participates in a number of【 functions】 as well as body systems, including control
+  - 0.81｜ of Disabilities and Documentation Guidelines A person with a disability includes any person who has a physical or mental impairment which substantially limits one or more major life【 activities】. A qualified person with a disability is
+  - 0.80｜ emphasizes questions of practical and theoretical importance. Faculty in the social area at SFU demonstrate that a rigorous social science can engage questions of basic human【 processes】 while also providing insights relevant to the society
+  - 0.80｜金字塔等。⏎Ⅰ 坐标曲线型 1 1 .单曲线:常表示某种生物的数量或某一生理【过程】与某一相关因素之间的关系。⏎●
+  - 0.80｜ such an impairment (Disability Discrimination).⏎Furthermore, “A person is considered to have a disability if he or she has difficulty performing certain【 functions】 (seeing, hearing, talking, walking
+  - 0.79｜ the bath or in massage oils.⏎Biofeedback: Biofeedback is the use of electronic devices to help the patient control or influence normally automatic body【 functions】 such as heartbeat and breathing. In controlled
+  - 0.79｜-5588.<|endoftext|>What is Assistive Technology? Assistive technology (AT) is anything that helps a child to perform a【 skill】 or participate in an activity. For example
+  - 0.79｜ Virtual Machine is flexible, enabling it to be implemented on a wide variety of computers, devices, and operating systems. One of the main tasks【 performed】 by a Java Virtual Machine is to load
+
+## N030（第 34 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 12 页一次；语料最大激活 23.6
+- 直接读出推高：  \n |    |   \n\n |   \n\n\n |                        |        |    \n |          | \xa0\xa0 |                   
+- 直接读出压低：  | /'. |  حوالي |  około | 到最后 | 晰 | lü | sembly | bruary |  '~
+- 正极片段：
+  - 1.00｜ divisor of  and .⏎⏎Now, let  be any common divisor of  and ; that is, there exist  and  such that 【 and】  One has thus⏎⏎That is,
+  - 0.99｜ that for all , the map ⏎⏎is a linear map from  to  and for all , the map ⏎⏎is a linear map from 【 to】  In other words, when we hold
+  - 0.97｜ given by   The spectrum of  in the formula above, is the spectrum as element of the algebra  of complex continuous functions on the compact【 space】   Explicitly,⏎⏎As an algebra,
+  - 0.90｜ equal to the number of particles in state  divided by the total number of particles in the system, that is the fraction of particles that occupy【 state】 .⏎⏎where  is the number of particles
+  - 0.89｜ set  of all nonzero homomorphisms from  to  The set  is called the "structure space" or "character space"【 of】  and its members "characters".⏎⏎A
+  - 0.88｜ each  in  there exists an element  in  such that , where  is the identity element.⏎Commutativity For all , 【 in】 , .⏎⏎A group in which the group
+  - 0.86｜  or ) is the  of R over X and Y.⏎⏎For example,  and  are each other's complement, as are 【 and】   and  and  and  and
+  - 0.83｜ the  of R over X and Y.⏎⏎For example,  and  are each other's complement, as are  and   and 【 and】  and  and, for total orders
+  - 0.82｜. Note that the expectation may not be well defined.⏎⏎Subtracting the mean before multiplication yields the auto-covariance function between times 【 and】 :⏎⏎Note that this expression is not well
+  - 0.79｜ The plane determined by this point and vector consists of those points , with position vector , such that the vector drawn from  to  is perpendicular【 to】 . Recalling that two vectors are perpendicular
+  - 0.78｜ over X and Y.⏎⏎For example,  and  are each other's complement, as are  and   and  and  and 【 and】, for total orders, also  and
+  - 0.78｜ of K determines a unique quantum state for the whole system.⏎⏎Suppose now that the energy of state  is slightly greater than the energy of【 state】  by an amount E. At temperature
+  - 0.76｜iderivative, inverse derivative, primitive function, primitive integral or indefinite integral of a function  is a differentiable function  whose derivative is equal【 to】 the original function . This can be stated
+  - 0.74｜ of the elements of the Cartesian product  to :⏎⏎Because the result of performing the operation on a pair of elements of  is again an element【 of】 , the operation is called a closed (
+  - 0.74｜ over the same base field . A bilinear map is a function⏎⏎such that for all , the map ⏎⏎is a linear map from 【 to】  and for all , the map ⏎⏎
+  - 0.73｜ of  and its members "characters".⏎⏎A character  is a linear functional on  that is at the same time multiplicative,  and【 satisfies】   Every character is automatically continuous from 
+  - 0.71｜ .⏎⏎Formally, the complex numbers are defined as the quotient ring of the polynomial ring in the indeterminate , by the ideal generated by the【 polynomial】  (see below).⏎⏎Notation⏎⏎
+  - 0.71｜ side , and two rectangles with sides  and . With , the theorem states that a cube of side  can be cut into a cube of【 side】 , a cube of side , three 
+  - 0.71｜  and  are each other's complement, as are  and   and  and  and  and, for total orders, also 【 and】  and  and ⏎⏎The complement of
+  - 0.70｜ numbers  and . The function  is equal to the derivative of  almost everywhere, and it is called the probability density function of the distribution【 of】 .⏎⏎If  has finite L1-n
+
+## N031（第 10 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 19 页一次；语料最大激活 11
+- 直接读出推高：跷 | 无缘 | -conf | 佚 | 裤子 | 枕头 | 荣 | 蹬 | SetUp | _logging
+- 直接读出压低：まれ | 割 |  Diy | hurst | uese | 酷 |  tips | 错了 | 爹 | eus
+- 正极片段：
+  - 1.00｜ the mind can be relaxed by performing the simplest pose of yoga – dead corpse pose. This pose involves you lying down straight on the ground and【 relaxing】 completely. Follow the breathing procedure involving deep
+  - 0.89｜ deeper levels of rest and experience the state of silence, stillness within. After 15 to 20 minutes, we open the【 eyes】 and feel refreshed, happy, calm.
+  - 0.88｜ pose. This pose involves sitting with legs folded and locked. The hands should be placed over the knees. Concentrate deeply with closed eyes and【 relax】. Go for deep breathing by inhaling
+  - 0.81｜ inverted poses.⏎Well, some useful yoga exercises that can be performed to get a healthy skin include:⏎- The muscles and the mind can be【 relaxed】 by performing the simplest pose of yoga –
+  - 0.77｜的能力。陶冶情操，保持健康的心态。掌握适当的放松训练技术：正念冥想音乐减压渐进式肌肉【放松】法合理管理时间：做好时间管理
+  - 0.76｜ memory and the ability to concentrate, which carries over into school work. 9. Longer meditations give the body and mind time to deeply【 relax】 and center.⏎10. I found
+  - 0.76｜ that help you relax and breathe from your diaphragm and abdomen, rather than your chest wall.Practice relaxation techniques regularly, such as progressive【 muscle】 relaxation or meditation.Exercise regularly.If these
+  - 0.74｜。这时引导学生自学课本就成为学生切身的需要。老师应提醒学生：“这道题你们还不会做吧，请【翻开】课本看看例题是怎样做的，再
+  - 0.74｜ eyes. Close them and the pull your skin gently by pushing the fingers away from the eyes going towards the hairline. Then, open your【 eyes】 wide as much as possible. Hold this
+  - 0.73｜ with your head. This pose facilitates better oxygen supply to the facial skin muscles. Release the posture slowly.⏎Wheel pose, a little different from【 the】 above poses, involves lying flat on the
+  - 0.73｜压力的能力。陶冶情操，保持健康的心态。掌握适当的放松训练技术：正念冥想音乐减压渐进式【肌肉】放松法合理管理时间：做好时间
+  - 0.72｜ lotus pose. This pose involves sitting with legs folded and locked. The hands should be placed over the knees. Concentrate deeply with closed【 eyes】 and relax. Go for deep breathing by
+  - 0.71｜, and knee bent (Avoid forcible flexion of knee by float) Extend knee against float, hold for counts of 10,【 relax】.⏎Sitting with one knee extended,
+  - 0.70｜ your head on a pillow. Place the sand bag (or other props that you are using) over your belly, as pictured. Relax your【 arms】 by your sides with your palms facing up
+  - 0.70｜es⏎Keep the hips even with the shoulders.⏎Side Bridge with Glute Activation⏎Press the knee firmly into the ground.⏎Bent Knee【 Bridge】⏎Hold each of these 6 –
+  - 0.70｜ bent and your head on a pillow. Place the sand bag (or other props that you are using) over your belly, as pictured.【 Relax】 your arms by your sides with your palms
+  - 0.63｜ now"⏎and refocus. Do not try to keep particular thoughts out of your mind. For example, as you sit there, close your【 eyes】 and think about anything you want to for
+  - 0.62｜or other props that you are using) over your belly, as pictured. Relax your arms by your sides with your palms facing up and allow【 your】 shoulders to soften to the floor. Without
+  - 0.62｜ your hips.⏎• Adjust the backrest of your chair to support your low- and mid-back or use a back support.⏎• Relax your【 shoulders】 and keep your forearms parallel to the
+  - 0.62｜ the ground. Gradually, lift the trunk upwards with support of your legs as well as hands. Hold this pose for a while and then【 release】 gradually.⏎If followed in proper sequence,
+
+## N032（第 5 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 8.64
+- 直接读出推高：呗 |  beaten | $class | FLT | [__ | |r | 公开赛 | inen |  [[[ | bic
+- 直接读出压低： _\n | cret |  Scaling | cess | 坟 |  Почему | 离 |  Trades | omes | ю
+- 正极片段：
+  - 1.00｜ on the floor.)⏎August 24, 2003, 5:00am⏎The phrase "in and of【 itself】" has become so cliched, I
+  - 0.96｜There's a functional difference. "In itself" is a more ambiguous construction, and will occasionally get you into trouble where "in and of【 itself】" won't.⏎"In" gets used
+  - 0.94｜析：本句夹杂了过去分词短语“putforward …⏎century”，现在分词短语“【including】…. technique”，动名词 “working”
+  - 0.85｜'t add any value whatsoever. We normally are content with "itself" itself, or when we really need a preposition, "in【 itself】".⏎• URL to this comment⏎•
+  - 0.85｜am⏎The phrase "in and of itself" has become so cliched, I think it should be avoided. To me, "in【 itself】" sounds much better.⏎August 2
+  - 0.83｜ say" or "per-say" and the Urban Dictionary website said it means "in-and-of-itself" and "in and of【 itself】". Now I'm really confused on which
+  - 0.81｜⏎March 17, 2003, 10:52pm⏎There's a functional difference. "In【 itself】" is a more ambiguous construction, and
+  - 0.77｜," I'm pretty much stuck with my original problem with understanding the sentence.⏎That problem is caused, at least partially, by having "in【 itself】" or "in and of itself"
+  - 0.77｜ simply saying "in itself".⏎August 21, 2006, 12:35pm⏎"in and of【 itself】" is an Americanism for "it
+  - 0.69｜ flippant, as well, the lawyer in me prefers "notwithstanding" as a more generic, and perhaps obscure substitute. Irres【pective】 of the judge's counseling, Plaintiff's
+  - 0.69｜ to yah kuch subobj nahin, ki subobj is a part of obj aur subobj is exactly located in region.⏎(part【ly】Located ?OBJ ?REGION)⏎(part ?
+  - 0.68｜ person and the societal norms of what we should "regard", and even just cautious politeness, regardless has a broader usage. Irres【pective】, then, is almost flippant
+  - 0.68｜ following sentences?⏎I looked at the indicator above his head and the floors were racing by so fast that the numbers ran into each other.⏎run【 into】 each other = run together⏎The lift
+  - 0.68｜ anyone else stumbles in here.⏎October 7, 2011, 9:42am⏎Funny that "per【 say】" led you to this, as it
+  - 0.66｜ continue to learn English when she gets to the States.⏎It’s alright to have the future tense (will continue) before the present tense (【gets】) because the temporal conjunction when shows that
+  - 0.66｜ intransitive linking (teacher = predicate nominative)⏎4. slept - intransitive complete (no receiver of the action)⏎5.【 chased】 - transitive active (dog = direct
+  - 0.65｜比句式层层推进，以加强语势。）⏎从发起沖锋到战斗结束，才20分钟。⏎——这两个“【才】”意思有什么不同？为什么会不同？
+  - 0.65｜, 2003, 4:05am⏎It's a slight archaism. I think, but "of【 itself】" is different from "in itself",
+  - 0.65｜ attention. Regardless of the weather, my friend and I go walking every morning (almost true, but not due to the weather). Irres【pective】 of his 7 y.o. daughter
+  - 0.64｜B。⏎（1）Hefound articleeasily.（S （2）Hefound articleeasy. 结构，其中e【asily】修饰谓语动词，全句
+
+## N033（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.8 次；语料最大激活 6.47
+- 直接读出推高： độ | 痒 | Feels |  Dul | 涩 |  gatherings | 睹 |  Soph |  receipts |  frau
+- 直接读出压低：anken | 口气 |  Mirror | анс | AttributeValue | 社会 |  personal |  Torrent | ukan | personal
+- 正极片段：
+  - 1.00｜又采用不利于己方的观点或材料的做法。⏎“议程设置功能”理论(the agenda-setting function)⏎(美)麦库姆【斯】和肖.《大众传播的议
+  - 0.97｜ sisters and daughters. Women exerted pressure on male lawmakers and by the end of the century these legal restrictions were eliminated.⏎Another heroine, Susan【 B】. Anthony, began working for women’s
+  - 0.97｜他的研究成果集结成书，慢慢形成了发射性思考(RadiantThinking)和思维导图法(MindMapping)的概念。思维【导】图是大脑放射性思维的外部
+  - 0.96｜ only a few tens of miles across, it shines about as brightly as our nearest sun.⏎— Nola Taylor Redd⏎- Charles Mess【ier】 Biography⏎- The Messier Catalog Site
+  - 0.94｜ John Bevis observed a cloudy blob in the sky and added it to his star atlas. But it wasn't until French astronomer Charles Mess【ier】 independently observed it 27 years later
+  - 0.93｜橋正式通車，此為南亞最長的橋梁。⏎⏎出生 ⏎ 1730年：夏爾·梅西【耶】，法國天文學家（1
+  - 0.93｜ Florentine astronomer Paolo dal Pozzo Toscanelli.⏎⏎Early career⏎In 1478, Guido Antonio Vespu【cci】 led a Florentine diplomatic mission to
+  - 0.92｜神主宰一切，并主张一神论。⏎伊利亚学派，其代表有巴门尼德和芝诺。巴门尼【德】提出一个重要的理论：无不能生
+  - 0.92｜ licks up the contents of the snow globe, there is the risk of antifreeze poisoning.⏎Mechanism of action:⏎Ethylene gly【col】, the primary ingredient in antifreeze
+  - 0.91｜提供了一个全新的、有效的视角。⏎【关键词】修辞学;图尔敏模式;新闻评论 英国哲学家图尔【敏】是非形式逻辑的奠基人之一，
+  - 0.91｜座大星雲。一百個以上的能通過雙筒望遠鏡看到，例如18世紀法國天文學家梅西【耶】所編的《星雲星團
+  - 0.90｜Waldeck‐Rousseau for Dupuy) that a retrial became possible. In August 1899, Dreyf【us】 was still found guilty, but ‘with
+  - 0.90｜ from your physician or other qualified health care provider.<|endoftext|>Redirected from George B. McClellan⏎Born in Philadelphia, McCle【ll】an first attended the University of Pennsylvania,
+  - 0.88｜ Columns⏎This statue of John Winthrop was given to the National Statuary Hall Collection by Massachusetts in 1876.⏎John Win【throp】 was born in Suffolk County, England,
+  - 0.88｜ until French astronomer Charles Messier independently observed it 27 years later that things began to pick up for this stellar remnant.⏎Mess【ier】 was a voracious comet hunter, but
+  - 0.87｜他的工作太新颖了，同时代的人反而未能对这项工作的重要性给予正确的评价。古希腊的周期循环理论启发了维【科】，但维科在古希腊大师
+  - 0.86｜给他奖金。二、组织管理理论/一般管理理论(论述，简答，填空，选择)（一）法约【尔】的组织/一般管理理论适用于所有
+  - 0.86｜ actions, by telling his family that he did it for them. His efforts to prioritise moral obligations then lead him to commit suicide.⏎W【illy】 Russell’s Mrs Johnstone’s is a
+  - 0.85｜ 1949, at the Morosco Theatre, directed by Elia Kazan, and starring Lee J. Cobb as Wil【ly】 Loman, Mildred Dunnock as
+  - 0.85｜, Henry committed suicide and Esterhazy felt compelled to flee France.⏎Even this, however, did not yet acquit Dreyf【us】.⏎He was brought<|endoftext|>|fountain
+
+## N034（第 2 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4328 页一次；语料最大激活 0.00921
+- 直接读出推高：II | 桥 | 期限 | Forever | tion | lice | atical | olith | orted | alent
+- 直接读出压低：ussy | 魇 | <fieldset | 新陈代谢 |  ..\n | synthesize | 治理体系 | 辘 | anson | kus
+- 正极片段：
+  - 1.00｜十分方便。彈奏者通過按下鍵盤上的琴鍵，牽動鋼琴裏-{面}-包着絨【氈的小木槌】，繼而敲擊鋼絲弦
+  - 0.86｜一個月拿下1800多萬港元票房，其後又在各地上映。影評人大多對本片青【睞有加，】尤其欣賞電影的拍攝手法
+  - 0.75｜達2,798公里。南非西部毗鄰納米比亞、北部接壤博茨瓦納及津巴布【韋、東北部】鄰接莫桑比克及斯
+  - 0.63｜進、頡跌利施大單于、立功報國可汗。⏎吐蕃入侵臨洮，王孝傑作為【肅邊道行】軍大總管，以婁
+  - 0.62｜主利留卡拉尼女王退位。⏎ 1月18日——香港受西伯利亞強寒潮致天氣【驟寒，天文】台錄得0度低溫，
+  - 0.46｜镍-62和镍-64轰击鉛-208而合成的。製成的同位素有【鐽-26】9和鐽-271
+  - 0.45｜而 ⏎'複製' 以消除任何的錯誤。  ⏎⏎觀察的行為會不斷的進行上表的前四個步【驟，信賴】五官的感受：視覺的、 �
+  - 0.39｜评价等。投标报价评分标准一般包括评标基准价的计算方法、投标报价<|endoftext|>哈尔滨工业大学教授唐魁玉表示�【�当前﹐简约适度�】�绿色低碳的生活方式注重生活形式
+  - 0.15｜国家象征⏎1973年面世的旗幟⏎双色旗<|endoftext|>龐勳之變，又稱【龐勳之】亂，是唐懿宗咸通
+  - 0.14｜奇·柴科夫斯基，俄罗斯作曲家。（1893年逝世）⏎ 10月16日——奕【譞，清朝醇】親王，道光帝七子
+  - 0.12｜現有材料、土木建築、機械、電機電子、電子通訊、儀器、系統、化學加工步【驟的設計、】應用方式的學科，而實
+  - 0.09｜性质现象的数学理论和方法。也是運籌學的一个重要学科。⏎現代的賽局理論的源頭是約翰·【馮·諾伊】曼對於雙人零和賽局
+  - 0.04｜反應性的氧化劑，能夠與大部分元素形成氧化物。氧在宇宙中的總質量在所有元素中位列第三，僅居【氫和氦之下】。在標準溫度和壓力下
+  - -0.00｜，新石器時代晚期以来即有人类活动，最早可追溯至距今约7300年前的双墩遗址【。】属于龙山文化中晚期的禹
+  - -0.00｜亿六千万年左右的晚侏罗世，一直延续到白垩纪末期，与大部分非鸟恐龙一起灭绝【。】然而，这类恐龙的化石数量非常
+  - -0.00｜六部均设满汉两尚书，满汉左右二侍郎，表面沿袭明制，实则以满驭汉【。】以执行政府职能的六部（
+  - -0.00｜山智人又称巢县人、银山人，部分性状接近尼安德特人，可能与之有基因交流【。】此外，出土石器的旧石
+  - -0.00｜科举制度⏎隋朝灭亡后，唐朝的帝王承袭了隋朝传下来的人才选拔制度，并做了进一步的完善【。】由此，科举制度逐渐完备起来
+  - -0.00｜20年代在美国创立，源于工业的发展，这时的市场营销所研究的范围很窄，只是研究广告和商业网点的设置【。】并在伊利诺等洲的大学开设
+  - -0.00｜，但从1970年代末开始，很多父母开始使用固有词来为儿女取名，通常也是两个音节【。】这一类的常见的名字有“”
+
+## N035（第 29 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 19 页一次；语料最大激活 37
+- 直接读出推高：aram | ureau | лем | rai | .MenuStrip | � | bsites | _PREVIEW | grim | aan
+- 直接读出压低： distance | 距离 |  Distance | distance | Distance |  distances | 的距离 | 距離 | 距 | -distance
+- 正极片段：
+  - 1.00｜2003年：火星到达近60,000年以来距离地球的最近位置，距离地球仅55,【7】58,005公里。⏎
+  - 0.93｜'s Department of Infrastructure, Transport, Regional Development, Communications and the Arts as an Australian external territory and together with Christmas Island (which is about【 】 to the east) forms the Australian Indian
+  - 0.77｜/0532 GMT on Monday) flight controllers at JPL received the equivalent of a text message from Curiosity that its journey of【 】352 million miles (56
+  - 0.76｜ of soil, rocks and atmosphere on the spot and beaming results back to Earth.⏎One is a laser gun that can zap a rock from【 】23 feet (7 meters) away
+  - 0.75｜球和太陽暗，但在大部分時間裡比木星暗。火星距離地球最近在5400万公里（最遠【達】4億公里，探測器需
+  - 0.74｜是世界第六大島嶼國家。⏎⏎紐西蘭与澳大利亚隔塔斯曼海相望，距離澳洲東海岸约1【,】500公里，与南太平洋
+  - 0.72｜ brought Cinque Ports to an island known to the Spanish as Más a Tierra located in the uninhabited Juan Fernández archipelago【 】 off the coast of Chile for a mid
+  - 0.69｜西蘭是世界第六大島嶼國家。⏎⏎紐西蘭与澳大利亚隔塔斯曼海相望，距離澳洲東海岸【约】1,500公里，与
+  - 0.69｜蘭是世界第六大島嶼國家。⏎⏎紐西蘭与澳大利亚隔塔斯曼海相望，距離澳洲東海岸约【1】,500公里，与南
+  - 0.68｜ have been home to itsy-bitsy life.⏎It will take 8½ months for Curiosity to reach Mars following a journey of【 】354 million miles.⏎An unmanned
+  - 0.67｜的拉丁名的來源。据估计这颗超新星的绝对星等有-15.4等，距地球【7】500光年；它最高
+  - 0.67｜平方公里，也是大安地列斯群島和加勒比海第三大島。牙買加位於古巴以南約【1】45公里，位於伊斯帕尼
+  - 0.65｜和太陽暗，但在大部分時間裡比木星暗。火星距離地球最近在5400万公里（最遠達【4】億公里，探測器需飛
+  - 0.65｜ member of the open cluster, but the cluster that forms the bull's-head-shaped asterism is more than twice as far away, at about【 】150 light years.⏎⏎Alde
+  - 0.65｜ been home to itsy-bitsy life.⏎It will take 8½ months for Curiosity to reach Mars following a journey of 【3】54 million miles.⏎An unmanned Atlas
+  - 0.64｜ares in distant galaxies may account for at least some of a particular class of gamma-ray burst that has defied explanation.⏎Despite its distance of【 】50,000 light-years
+  - 0.64｜ of the gas at that point and represents the third dimension in what is called a data cube.⏎Markarian 231 is located about【 】600 million light years away in
+  - 0.63｜ the Leeward Islands part of the Lesser Antilles.⏎⏎The country consists of two major islands, Antigua and Barbuda, which are approximately【 】 apart, and several smaller islands, including
+  - 0.61｜满月，将大出14%，亮度则增加30%。由于下次地月如此近距离的接触将出现在20【3】4年11月25日
+  - 0.59｜: Great Images of Star Explosions]⏎The nebula stretches 10 light-years across, though it continues to expand. It lies approximately【 】6,300 light-years from
+
+## N036（第 31 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 45 页一次；语料最大激活 91.1
+- 直接读出推高：Geo |  dynamic |  Geo |  ge | 动态 |  Ge | dynamic |  Dynamic | Dynamic | _ge
+- 直接读出压低：联 |  pom | ect | _placement |  prow | ектив | tor | plen | ARN |  Spectrum
+- 正极片段：
+  - 1.00｜hedra.⏎All this is fairly standard, as is the provision, made through a web site, of software support (in this case,【 using】 Geometer’s Sketchpad). What makes
+  - 0.95｜ polyhedra.⏎All this is fairly standard, as is the provision, made through a web site, of software support (in this case【,】 using Geometer’s Sketchpad). What
+  - 0.93｜ the presentations is simple and quick. Any updates made to a presentation are instantly available to any shared users.⏎GeoGebra Online (http://【www】.geogebra.org/webstart/geog
+  - 0.89｜ of computer software into the curriculum always invites fear among the teachers of the loss of students' basic mathematical ability. For example, with the introduction【 of】 calculators, some teachers complained that students
+  - 0.86｜. The introduction of computer software into the curriculum always invites fear among the teachers of the loss of students' basic mathematical ability. For example,【 with】 the introduction of calculators, some teachers
+  - 0.85｜ra.⏎All this is fairly standard, as is the provision, made through a web site, of software support (in this case, using【 Ge】ometer’s Sketchpad). What makes Meyer
+  - 0.84｜ will be used⏎in a variety of undergraduate courses aimed at prospective elementary and middle⏎school teachers, including Math 255, Math【 】323 and Math 25
+  - 0.83｜ variety of undergraduate courses aimed at prospective elementary and middle⏎school teachers, including Math 255, Math 323 and Math【 】251. The enrollment in these
+  - 0.78｜ ⏎ C.a.R.  -Java程式⏎ GRACE  -在線Java程式⏎ Geometric Drawing Pad-在線Java程式【⏎】 Ruler & compass  -在線
+  - 0.76｜ of the theory of polyhedra.⏎All this is fairly standard, as is the provision, made through a web site, of software support【 (】in this case, using Geometer’s
+  - 0.76｜ of polyhedra.⏎All this is fairly standard, as is the provision, made through a web site, of software support (in this【 case】, using Geometer’s Sketchpad).
+  - 0.75｜.⏎Here the above features will be made use of to enable the teaching of concepts of mechanics more visual than rigorous proofs.⏎Copyright (C)【 】2003 HKIEd AP
+  - 0.71｜的解⏎⏎尺規作圖的程式 ⏎ C.a.R.  -Java程式⏎ GRACE  -在線Java程式⏎【 Ge】ometric Drawing Pad-在線Java程式
+  - 0.70｜程的解⏎⏎尺規作圖的程式 ⏎ C.a.R.  -Java程式⏎ GRACE  -在線Java程式【⏎】 Geometric Drawing Pad-在線Java
+  - 0.70｜积AB×AC。⏎⏎外部連結 ⏎ 方程的解⏎⏎尺規作圖的程式 ⏎ C.a.R.  -Java程式【⏎】 GRACE  -在線Java程式
+  - 0.69｜ calculators, some teachers complained that students might lose their sense of estimates for basic operations on simple numbers. The same reasoning extends to the use【 of】 computer in education: with the use of
+  - 0.68｜ sharing the presentations is simple and quick. Any updates made to a presentation are instantly available to any shared users.⏎GeoGebra Online (http【://】www.geogebra.org/webstart/ge
+  - 0.67｜' ability to solve geometry problems be affected?⏎Hoehn (1997) gave sample activities of exploring worksheets that could be done【 with】 GSP. He suggested that activities that
+  - 0.67｜The Pentagram and Religion⏎The Pythagorean Pentacle from the Biblioteca Arcana.⏎Miquel's Pentagram - Dynamic Geometry【 by】 Antonio Gutierrez from Geometry Step by Step
+  - 0.65｜ the same function, but now the k slider will let you select values from 0 to 5 (instead of just from 1 to【 】5, as in the previous example).
+
+## N037（第 25 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 11.1
+- 直接读出推高： early |  late | 几个 | тем | 中期 | odyn | iator | 当时的 |  Late | 年初
+- 直接读出压低： officially |  registered |  valid | 一秒 | 户籍 | 公开发行 |  ineligible | 合法 |  зарегистри | Valid
+- 正极片段：
+  - 1.00｜为限承担责任。⏎第九条 不动产物权的设立、变更、转让和消灭，经依法登记，发生效力；未经登记【，】不发生效力，但法律另有规定的
+  - 0.91｜ 2、承租人可能无法获得“买卖不破租赁”的特别保护。 《合同法》第二百二十九条规定【，“】租赁物在租赁期间发生所有权变动
+  - 0.90｜抵押权与租赁权产生权利冲突该如何协调处理，法律没有作出明确规定。《中华人民共和国合同法》第二百二十九条规定【，】租赁物在租赁期间发生所有权变动
+  - 0.90｜(机动车的物权变动)船舶、航空器和机动车等物权的设立、变更、转让和消灭，未经登记【，】不得对抗善意第三人。⏎6. �
+  - 0.89｜物权法》第九条规定：“不动产物权的设立、变更、转让和消灭，经依法登记，发生效力；未经登记【，】不发生效力，但法律另有规定的
+  - 0.83｜, a common year contains 365 days, and every fourth year is a leap year of 366 days except for any【 year】 that is divisible by 100
+  - 0.83｜ where⏎⏎Politeness⏎The politeness of a positive number is defined as the number of ways it can be expressed as the sum of【 consecutive】 integers. For every x, the polit
+  - 0.74｜消灭。⏎第六十条 【法人民事责任承担】法人以其全部财产独立承担民事责任。⏎第六十一条 【法定代表人的定义及【行为】的法律后果】依照法律或者法人
+  - 0.71｜表情等传递信息、沟通思想<|endoftext|>合伙股份企业监事的职责⏎公司法规定很明确，如下：监事会、不设监事会【的】公司的监事行使下列职权：$P
+  - 0.70｜ in the UK for electing Members of Parliament since time immemorial.⏎Voters mark an X next to one candidate. The candidate with【 the】 highest number of votes after one round of
+  - 0.69｜ers. If the dealer busts, all remaining player hands win. If the dealer does not bust, each remaining bet wins if its hand【 is】 higher than the dealer's and loses if
+  - 0.68｜页。6.当事人基于继承事实要求对违法建筑进行分割的，人民法院不予受理。《物权法》第二十九条规定【“】因继承或者受遗赠取得物
+  - 0.68｜ there in the late 8th century and then made the city his empire's capital.⏎⏎As a spa city, Aachen has the right【 to】 name itself Bad Aachen, but chooses
+  - 0.67｜法条梳理⏎第一千零六十二条【夫妻共同财产】 夫妻在婚姻关系存续期间所得的下列财产，【为】夫妻的共同财产，归夫妻共同
+  - 0.67｜财产来源、数量等情况合理分割。各自出资购置、各自使用的财物，原则上归各自所有。⏎6、一方婚前个人所有的【财产】，婚后由双方共同使用、经营
+  - 0.67｜分四种：（1）夫妻各自的婚前财产，以完成结婚登记、确立婚姻关系为界。夫妻一方的婚前【财产】，不因婚姻关系的延续而
+  - 0.66｜财产的归属、占有、使用、处分、收益及债务清偿、婚姻解除时财产的分割等事项，排除法定夫妻【财产】制适用的制度。它不仅是调节
+  - 0.66｜不可靠性大大增加。⏎从实体法角度来看，实体法的一些规定，尤其是合同法将以数据电文订立的合同归【于】书面形式为将数字证据归于
+  - 0.66｜；（三）知识产权的收益；（四）继承或者受赠的财产，但是本法第一千零六十三条第三项【规定的】除外；（五）其他应当归
+  - 0.65｜.⏎⏎The 2011 census counted 539,394 persons (19.4 percent of the population above【 】6 years of age) with higher professional
+
+## N038（第 0 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 20.3 次；语料最大激活 0.271
+- 直接读出推高：打得 | 境 |  diff | 庞 | less |  Volume | 事业部 | .Dispatch |  Curse | 陈某
+- 直接读出压低：RITE |  Princip | escaping |  Turnbull |  :\n\n\n\n | 搔 | uja |  recruiters | 蹋 | ently
+- 正极片段：
+  - 1.00｜ Macedonians⏎⏎References⏎⏎Notes⏎⏎Citations⏎⏎6th-century BC births⏎498 BC deaths⏎6th-century BC Maced【onian】 monarchs⏎5th-century BC Maced
+  - 0.91｜itations⏎⏎6th-century BC births⏎498 BC deaths⏎6th-century BC Macedonian monarchs⏎5th-century BC Maced【onian】 monarchs⏎Argead kings of
+  - 0.89｜, and the siblings ruled Egypt under the formal title of husband and wife. Cleopatra and Ptolemy were members of the Maced【onian】 dynasty that governed Egypt since the death of
+  - 0.87｜)⏎ Aleksandra (Александра) (Albanian, Bulgarian, Estonian, Latvian, Lithuanian, Maced【onian】, Polish, Russian, Serbo-C
+  - 0.86｜对国企高管的考核目标的多元化使得国企高管在追求盈利目标的同时，需要考虑更多的社会责任目标。⏎而且不同于民营企业，国有【控股】企业对高管的激励机制能存在
+  - 0.86｜开曼、香港)成立拟上市主体。BVI公司股东与拟上市公司进行换股。什么是红筹通过在海外设立【控股】公司，将中国境内企业的资产或
+  - 0.85｜ A Macedonian army led by Philip II defeated the combined forces of Athens and Thebes in the Battle of Chaeronea, securing Maced【onian】 hegemony in Greece and the Aege
+  - 0.84｜通用语言文字。习近平总书记指出，“文化认同是最深层次的认同，是民族团结之根、民族和睦之魂”。促进中华民族【团结】进步，亟须全面推广普及国家
+  - 0.84｜ Amyntas III⏎ Atheno-Macedonian Alliance-Translation of Epigraphy⏎⏎370 BC deaths⏎4th-century BC Maced【onian】 monarchs⏎Argead kings of
+  - 0.84｜转型升级、经济高质量发展”为载体的优秀现代金融服务支撑企业，注册地大都在设区市，以国有控股或相对【控股】为标志，为支持、督导这项
+  - 0.82｜已不可避免地融入到这一时代的洪流之中，成为一支不可或缺的力量。随着科技、经济、信息全球化的发展，相信我国国有【控股】商业银行及其他银行机构的金融产品未来
+  - 0.82｜统编教材，全面加强国家通用语言文字教育教学工作，使国家通用语言文字在教育事业高质量发展阶段发挥更大的作用。中华民族【团结】的重要纽带习近平总书记多次强调，民族
+  - 0.82｜ sons of Alexander I. His most famous son is Philip II, father of Alexander the Great.⏎⏎Family ⏎Polygamy was used by Maced【onian】 kings both before and after Amyntas
+  - 0.81｜ BC as Philip VI (, Philipos), based on his claim of being Philip, a now-obscure son of the last legitimate Maced【onian】 king, Perseus. His reign
+  - 0.81｜, as Abydos had become part of the Kingdom of Pergamon by c. 200 BC.⏎⏎During the Second Maced【onian】 War, Abydos was besieged
+  - 0.81｜70年代开始，越来越多的金融机构开始采用企业间协调的方式来组织交易和生产活动，从最初的少数几家银行集中到金融【控股】公司的兴起，再到今天各种不同种类
+  - 0.81｜、勇者斗恶龙及动作角色扮演游戏系列王国之心而知名。2008年10月1日改組【控股】公司，另成立新的子公司法人承
+  - 0.81｜63.2%。我国总体债务规模和债务率持续攀升，债务风险主要集中在非金融企业部门中的国有及国有【控股】企业；由于隐性担保，政府
+  - 0.80｜爱国奋斗的自觉行动⏎爱国主义是一个永恒的时代主题。爱国主义作为中华民族的“心”和“魂”，历来是鼓舞我国人民【团结】奋斗的一面伟大旗帜。在新的时代
+  - 0.80｜志强下属的中国泛海控股集团以27.55亿元收购中科院所持的联想控股29%股权，成为联想【控股】的第三大股东。转让前，中国
+
+## N039（第 35 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 744 页一次；语料最大激活 32.8
+- 直接读出推高：} | cean | ct |  stripping | bidden |  ** |  por | cimal | }\n | hoot
+- 直接读出压低：<R | <' | <T | <K | <N | <C | <P | <W | <B | <U
+- 正极片段：
+  - 1.00｜T的非叶子节点，则返回它的最左孩子，否则返回＂空＂*/⏎  int i,j;⏎  for(i=0【;i】<T->n;i++)⏎    if(T
+  - 0.84｜ the McCarran Internal Security Act, which prohibited individuals suspected of engaging in subversive activities from obtaining a passport, was passed in 【1】950, Laurents and Gr
+  - 0.83｜ tree<std::string> my_tree;⏎- multitree<int> my_tree⏎- unique_tree<CMyClass> my_tree;⏎- sequential【_tree】<std::string> my_tree;⏎The
+  - 0.53｜=1; /* j为计数器 */⏎	LinkList p=L->next; /* p指向第一个结点 */⏎	while(p&&【j】<i) /* 顺指针向
+  - 0.50｜ If a tree container contains objects of the type CMyClass, an iterator would be created as tree<CMyClass>::iterator it;, or【 tree】<CMyClass>::const_iterator it;.
+  - 0.48｜grims is celebrated during the annual Thanksgiving festival.⏎⏎Revolutionary War figures⏎⏎George Washington⏎George Washington (February 22, 【1】732 – December 14
+  - 0.42｜ are simple declarations of the four tree containers:⏎- tree<std::string> my_tree;⏎- multitree<int> my_tree⏎- unique【_tree】<CMyClass> my_tree;⏎-
+  - 0.40｜孕育了燦爛的米諾斯文明（或稱克里特文明），約公元前16世紀被邁【錫】尼文明取代，文明中心從克
+  - 0.39｜信息。⏎⏎泛型类中，可以用where关键字对参数类型实现约束。例如：⏎class Node<T, V>⏎    where T :【 Stack】, IComparable, new(), class⏎
+  - 0.39｜.⏎Given the above information, the following are simple declarations of the four tree containers:⏎- tree<std::string> my_tree;⏎- multit【ree】<int> my_tree⏎- unique_tree
+  - 0.35｜周桓王率陈、蔡、卫等国军队讨伐郑国，郑莊公领兵抗拒，两军战于【繻】葛（今河南长葛北），
+  - 0.34｜T的非根节点，则返回它的父节点，否则函数值为＂空＂*/⏎  int j;⏎  for(j=1【;j】<T->n;j++) /* 根
+  - 0.33｜自行探索此地。它得名於洪都拉斯加勒比海沿岸的漫長海灘有利於拋【錨】，也就是說，讓船隻盡
+  - 0.33｜016年)⏎《33：重生奇蹟》(The 33，2015年)⏎《海【綿】寶寶：海陸大出擊
+  - 0.32｜3000多年前（ 約公元前1000年 ）， 當時該定居點已成為邁【錫】尼文明的重要中心，雅典衛
+  - 0.30｜cur_e是树T中节点的值。操作结果：改cur_e为value */⏎  int j;⏎  for(j=0【;j】<T->n;j++)⏎  {⏎   
+  - 0.30｜-牛症（），是由传染因子引起，屬於牛的一种进行性神经系统的传染性疾病，此疾病是一種傳染性海【綿】狀腦病。该病的主要特征
+  - 0.30｜500年里，这支古印欧人创造了迈锡尼文明，希腊进入了荷马史詩中的年代。邁【錫】尼文明在約公元前12世
+  - 0.28｜南美洲南部的主权国家。由23个省和布宜諾斯艾利斯自治市组成的联邦共和国，占有南【錐】體的大部分，北邻玻利
+  - 0.28｜⏎ H. W. Kuhn, "The Hungarian Method for the Assignment Problem," Naval Research Logistics Quarterly, 1–2, 【1】955, 83–

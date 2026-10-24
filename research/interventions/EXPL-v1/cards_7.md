@@ -1,0 +1,525 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## N140（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 6.48
+- 直接读出推高： dib | ech | 一对 | 萃 | qm | entin | QM |  Fine | bor | cx
+- 直接读出压低：骤 | 安全事故 | ONY |  unfore |  unpredict | 紧急 |  unexpected | <tbody |  LUA | 寒
+- 正极片段：
+  - 1.00｜These individuals may have a greater vulnerability to stressful situations, and should try to avoid drinking alcohol in the face of stress, as well as develop【 alternative】 behavioural skills for coping with stress."⏎Source
+  - 0.90｜ steps to help you stop overbreathing:If you have been diagnosed with anxiety or panic, see a psychologist or psychiatrist to help you understand【 and】 treat your condition.Learn breathing exercises that
+  - 0.87｜ as a whole does not usually seek treatment, then it ‘s hard to help people who are struggling.⏎As children, many boys are taught【 to】 “man up,” when faced with challenging
+  - 0.83｜ inferences of the self, thus fueling the negative schema.⏎⏎A basic concept in some CBT treatments used in anxiety disorders is in vivo【 exposure】. CBT-exposure therapy refers to
+  - 0.81｜.⏎A number of sociocultural studies indicate that stress may increase the risk of alcoholism. In other words, an individual's ability to【 cope】 with stressful situations may indicate his or her
+  - 0.78｜ remedy for a neurotic disorder is a thorough examination of a person’s responses to daily life situations. Neuroticism can be overcome by gaining【 a】 new understanding of self and working toward individual
+  - 0.75｜ism.⏎A number of sociocultural studies indicate that stress may increase the risk of alcoholism. In other words, an individual's ability【 to】 cope with stressful situations may indicate his or
+  - 0.72｜ 这些欲望大多是无意识的。⏎ 试图将这些无意识的欲望引至意识层面会引起自身保卫机制的心理抵抗。⏎【 意识与】潜意识（被抑制的）與
+  - 0.70｜.⏎Cognitive-behavioral therapy: People suffering from anxiety disorders often participate in this type of psychotherapy in which the person learns to【 recognize】 and change thought patterns and behaviors that lead
+  - 0.69｜ Fritz Perls. The extent to which Gestalt psychology influenced Gestalt therapy is disputed, however. In any case it is not identical with【 Gest】alt psychology. On the one hand,
+  - 0.67｜ have a greater vulnerability to stressful situations, and should try to avoid drinking alcohol in the face of stress, as well as develop alternative behavioural skills【 for】 coping with stress."⏎Source: Eure
+  - 0.66｜ without passing judgement on the thoughts.⏎In MBCT, the patient is urged to recognize and accept undesired feelings as they come and go instead【 of】 trying to push them away. Traditional cognitive
+  - 0.65｜Cognitive-behavioral therapy: People suffering from anxiety disorders often participate in this type of psychotherapy in which the person learns to recognize【 and】 change thought patterns and behaviors that lead to
+  - 0.65｜ cognitive behavior therapy.⏎- Understand how you became perfectionistic and ease up on unwarranted self-criticism. Psychodynamic therapy can help【 you】 do this.⏎- If you do have
+  - 0.64｜ disorder.⏎Cognitive-behavioral therapy: People suffering from anxiety disorders often participate in this type of psychotherapy in which the person learns【 to】 recognize and change thought patterns and behaviors that
+  - 0.63｜ a slight lowering of mood might bring about a potentially devastating change in thought patterns". The core skill of MBCT is to teach the ideas of【 recognizing】 these thought patterns in order to break away
+  - 0.63｜ |⏎Mindfulness-Based Cognitive Therapy (MBCT) is a method of therapy which blends features of two disciplines:⏎- Cognitive therapy aims to identify【 and】 alter cognitive distortions (warped or
+  - 0.62｜理、充分、足剂量、足疗程治疗⏎- 控制或缓解焦虑、恐惧症状⏎【心理治疗的目的】⏎-【 揭】示患者存在的功能不良的认知行为模式
+  - 0.61｜ neurotic disorder is a thorough examination of a person’s responses to daily life situations. Neuroticism can be overcome by gaining a new understanding【 of】 self and working toward individual life fulfillment.
+  - 0.60｜ from behavioral and cognitive psychology. It is different from historical approaches to psychotherapy, such as the psychoanalytic approach where the therapist looks for【 the】 unconscious meaning behind the behaviors, and then
+
+## N141（第 7 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 3.59
+- 直接读出推高： bordered | 多地 | عر | lectron | elon | burger | 很简单 | 联合会 | 此后 | orge
+- 直接读出压低：=~ | нь | urst |  invent |  Moderator |  Moder | scri | dest |  Griffith |  concentr
+- 正极片段：
+  - 1.00｜羽不懂这个道理，他的失败便是理所当然了②由于高贵，他们往往不能容人⏎③ 胸【中】容不得尘埃④然而他们
+  - 0.93｜然伤心肝”。或是由于统治阶级的腐败、政治的黑暗，使有志之士的进步政治抱负不得实现，胸【中】充满了郁郁愤懑。比如刘
+  - 0.92｜志在千里”，曹操自比一匹上了年纪的千里马，虽然形老体衰，屈居枥下，但胸【中】仍然激荡着驰骋千里的
+  - 0.88｜：眼中—胸中—手中㈠从“眼中之竹”到“手中之竹”“眼中之竹”、“胸【中】之竹”和“手中之竹
+  - 0.88｜天人合一”被视为具有终极性的本体规定。③“胸有成竹”式的文学创作论：眼中—胸【中】—手中㈠从“眼中之
+  - 0.87｜之竹”到“胸中之竹”是第一次飞跃，这是从自然形象到艺术心象的飞跃；从“胸【中】之竹”到“手中之竹
+  - 0.84｜，又有何借口停滞不前？依靠学习才能走向未来，让我们携手，读万卷书，行万里路，抒胸【中】丘壑，投身到改革开放的伟大实践中
+  - 0.83｜ 2004⏎ BE (Original Stage Production), a 2005 live album by Pain of Salvation⏎ Be (B【TS】 album), 2020⏎⏎
+  - 0.83｜區，杏林區更名為海滄區，原杏林區的杏林街道與杏林鎮劃入集【美】區，並從同安區中
+  - 0.83｜由於台城被圍，無法聯繫，羊侃以風箏傳達音訊。十一月，羊侃積【勞】成疾卒，吳景頂替
+  - 0.82｜能模式和建立完整的规划体系，并同时考虑电动汽车与智能电网的互动以及对电网安全与经济运行的影响显得尤为重要。⏎分布式【发电】系统若干问题⏎分布式发电供能
+  - 0.79｜能力，在驾驭全局的基础上统筹谋划“战略目标—战略能力—战略行动”。要保持战略清醒，对各种风险挑战做到胸【中有】数；保持战略自信，增强斗争
+  - 0.79｜cher, the son of Benjamin⏎ The second son of Samuel. His conduct, along with that of his brother, as a judge in Be【ers】heba, to which office his father
+  - 0.78｜接壤，與金門縣隔海對望，是由廈門島、離島鼓浪嶼、北岸集【美】半島和杏林半島、
+  - 0.78｜屬 Alyssum⏎ 折沙芥属 Ammosperma Hook. f., 1862⏎ 含【生】草属 Anastatica⏎ 节
+  - 0.78｜市川染五郎，歌舞伎演員、演員、舞踴家⏎ 1974年：伍文【生】，香港演員⏎ 19
+  - 0.77｜04'04"，北纬24°26'46"附近，由同安、翔安、集【美】、海沧、厦门岛、鼓
+  - 0.76｜-Saxon kings)⏎ High King⏎ Emperor⏎⏎Notes⏎⏎References⏎ Fanning, Steven. "Bede, Imperium, and the Bret【wald】as." Speculum 66 (
+  - 0.74｜牌仍持有Woodside約4.5%股權。⏎⏎2015年4月8日荷兰皇家壳牌與【BG】集團達成協議，斥資
+  - 0.73｜安區。此后，行政区划没有大的变动。⏎⏎厦门市下辖6个市辖区：同安区、翔安区、集【美】区、-{A|zh:湖
+
+## N142（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 2.32
+- 直接读出推高：stress | 复杂的 | 分散 | lectron | ije | _residual | 豸 | 炜 |  Rao |  {},\n
+- 直接读出压低：溢 |  plainly | isposable |  straightforward | 自然是 | omy | 槌 | -office |  Plenty |  simply
+- 正极片段：
+  - 1.00｜ reserve during the work can be calculated (heart rate reserve = (heart rate during activities – resting heart rate) / (maximum heart rate –【 resting】 heart rate)). This variable reflects the exercise
+  - 0.98｜ uniform random number u in [0,1].⏎     do:⏎          x ← x + 1.⏎          p ← p * λ /【 x】.⏎          s ← s + p.⏎
+  - 0.97｜ and g in k[An], then f − g is a polynomial function which is null on V and thus belongs to I(V【).】 Thus k[V] may be identified with
+  - 0.86｜ y=x.⏎- Finding Focus and Directrix [04/12/2001]⏎How can you find the focus and【 direct】rix when given a formula for a⏎
+  - 0.86｜长，根的深度为0；⏎ 高度：对于任意节点n,n的高度为从n到一片树叶的最长路径长【，】所有树叶的高度为0；⏎ �
+  - 0.84｜ is a self-isometry. The automorphism group is also called the isometry group.⏎ In the category of Riemann surfaces, an【 autom】orphism is a biholomorphic map (
+  - 0.83｜ equation of the parabola whose vertex is at (1,3) and whose⏎directrix is y=x.⏎- Finding Focus and【 Direct】rix [04/12/
+  - 0.82｜0 to 4 of (x/2)+3 dx and⏎Min= integral from 0 to7 of (3x/7【)+】3dx⏎than just sove for
+  - 0.78｜ a conformal map), from a surface to itself. For example, the automorphisms of the Riemann sphere are Möbius【 transformations】.⏎ An automorphism of a differentiable
+  - 0.78｜，不仅表达了欧拉公式的思想（eiθ·e-iθ=(cosθ+isinθ(cosθ-isinθ)=cos2【θ】+sin2θ=1），并且
+  - 0.77｜ the following way:⏎⏎ The absolute value of the label is the index of the coordinate with the highest absolute value of g: .⏎ The sign of【 the】 label is the sign of g, so
+  - 0.75｜ole的消费者盈余相当于需求曲线下方、2欧元以上的面积，也就是(0.5)(12)(3) =【 】18。4. 健
+  - 0.74｜⏎X~N(1,2）则E(X)=1,Y服从参数为3的泊松分布，则E（Y）【=】3；E(Y^2)=3
+  - 0.73｜60度）。所以一恒星月大约为29.53 * 360 / 389.1【1】 = 27.32天
+  - 0.73｜，其純量乘法是nx = x + x + ... + x（n個相加）對於n > 0,【 】0x = 0，以及(-
+  - 0.73｜, y) + in(x+1, y))/3; blurred(x, y) = (tmp(x, y-1) +【 tmp】(x, y) + tmp(x,
+  - 0.73｜維材料或壓縮紙作為強化層，但強化層的厚度應小於球拍總厚度的7.5【％】或0.35毫米。⏎⏎類
+  - 0.72｜ings, respectively, by inserting layers of cubes.⏎⏎Prismatic stacks ⏎Eleven prismatic tilings are obtained by stacking the eleven uniform plane【 til】ings, shown below, in parallel layers
+  - 0.71｜ are centered on the six grid directions (45o, 110o, 170o, 230【o】, 290o, and
+  - 0.71｜ reverse order).⏎⏎Blowfish's key schedule starts by initializing the P-array and S-boxes with values derived from the hexadecimal digits of pi【,】 which contain no obvious pattern (see nothing
+
+## N143（第 34 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 33.7
+- 直接读出推高：still | Still |  still |  Still |  STILL | 仍然是 | 依然 | 仍然 | 依然是 | 仍是
+- 直接读出压低：还 | 還 | 还会 | 还有 | 他还 | 还可以 | 还能 | 还可 | 还将 | 我还
+- 正极片段：
+  - 1.00｜ity in which they originated.⏎Such being the impressions under which I have, in obedience to the public summons, repaired to the present station,【 it】 would be peculiarly improper to omit in
+  - 0.85｜ Millennium Development Goals is a critical step towards achieving a world fit for children.⏎The MDG Summit 2010⏎With only five【 years】 left until the 2015
+  - 0.82｜ley deflected a Brett Favre pass on 4th and 6 from the 31-yard-line with just over 30【 seconds】 left in the game. The deflection
+  - 0.80｜企业资产减少 或者负债增加、且经济利益的流入能够可靠计量时，即使与该项义务相关联的款项支付行为【 尚】未发生，也应确认为费用
+  - 0.78｜ fast lookup, addition, and removal of data items. Since the nodes in a BST are laid out so that each comparison skips about half of【 the】 remaining tree, the lookup performance is proportional
+  - 0.76｜ assumption common to many branches of science. A good example would be the assertion that:⏎When an equal amount is taken from equals, an equal【 amount】 results.⏎⏎At the foundation of the various
+  - 0.74｜ so that any dimensional unit appearing in both the numerator and denominator of any of the fractions can be cancelled out until only the desired set of dimensional【 units】 is obtained. For example, 1
+  - 0.74｜mose I. The Pyramid of Ahmose I was also constructed at Abydos—the only pyramid in the area; very little of【 it】 remains today.⏎⏎Thutmose III built
+  - 0.73｜ exceptionally accurate reserve estimates. The total produced to-date is 18.5 billion barrels (Gb), and 11.3 G【b】 remain in known fields, with about 
+  - 0.73｜ Bodmin churchyard. The holy well of St Guron is a small stone building at the churchyard gate. The Berry Tower is all【 that】 remains of the former church of the Holy
+  - 0.72｜（bee-sting）：饰缘伸入琴角，经过斜接缝的黑色部分⏎ 尾木（bottom block）⏎【 段（b】outs）：小提琴两侧的
+  - 0.72｜ mixture and cook, stirring constantly, until fragrant, about 30 seconds. Add flour and cook, stirring constantly, until no dry【 flour】 remains, about 30 seconds.⏎
+  - 0.72｜ from Glen Nevis skirts the side of this hill before ascending Ben Nevis's broad western flank.⏎⏎Geology ⏎Ben Nevis is all【 that】 remains of a Devonian volcano that met
+  - 0.70｜, 944 Gb have been produced; 772 remain in known fields; and an estimated 134 G【b】 is Yet-to-Find, meaning that
+  - 0.68｜It’s Saturday, Feb. 2, the 33rd day of 2013. There are 332【 days】 left in the year.⏎Awards —
+  - 0.68｜旅游业的发展简单化为数量型增长和外延的扩大再生产，在旅游资源开发中，缺乏必要的保护，从整体上讲【 尚】属于粗放型发展模式。⏎事实表明
+  - 0.67｜akan⏎in 1784, though it is believed to be much older.⏎foundation, moat and large walls are entirely all【 that】 is left of⏎the once marvell
+  - 0.67｜, 2005 game against the New England Patriots, they had the ball on New England's 41 yard line with six【 seconds】 remaining in the first half. Since regular
+  - 0.67｜ad eclipsed Ctesiphon, the capital of the Sassanians, which was located some  to the southeast. Today, all【 that】 remains of Ctesiphon is the
+  - 0.66｜最后一个单元为空链表的表头⏎    for (i = 0; i < MAX_SIZE - 2; i++) //【 将】其余单元链接成以L[0
+
+## N144（第 23 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.0 次；语料最大激活 11.1
+- 直接读出推高： And | And |  but |  But | _but | But | but | _and | .And | 而且还
+- 直接读出压低： же | acht | 管 | 苗 | ло | ERIC | 理 | [: | man | K
+- 正极片段：
+  - 1.00｜ you make your way toward your ultimate goal. They're opportunities to tweak your talents and iron out the kinks so you can try again.【 And】 kick butt.⏎Break Familiar Patterns⏎
+  - 0.99｜ Egypt's Sinai Peninsula, Bedouin tribes are now in revolt against the country's interim government and manning their own armed roadblocks.⏎【And】 in each of these situations, the initial
+  - 0.96｜ to “treasure hunts” inside our factories that seek out energy waste, we’ve been presenting a steady drumbeat of GE fuel efficiency stories【.】 This time, we’re turning to our
+  - 0.93｜ occur due to the surgical removal of the primary tumor also cause the body to release stress hormones that markedly inhibit the functioning of the immune system.⏎【And】 just when the body is lowering its defenses
+  - 0.92｜ means of managing disasters and averting meltdowns. We have to give ourselves a fighting chance when things go wrong, as they sometimes will【.】 Fukushima's workers haven't surrendered. We
+  - 0.91｜ concept. NASA has another, much more ambitious project in the works: an MMO tentatively titled Astronaut: Moon, Mars and Beyond.⏎【And】, according to Laughlin, the success
+  - 0.90｜ and the name is apt: This is a large-scale computational project, consuming six million CPU hours and producing a hundred terabytes of data.【 And】 yet, when you ponder the vast sweep
+  - 0.88｜92 percent were profitable last year, and 63 percent are more profitable than they were before the recession, according to the report.⏎【And】 even as they employ low-wage workers,
+  - 0.88｜'ll hear peeps, screeches and birdcalls -- both simulated and real -- typical of the forests and streams of this sprawling wilderness.【 And】 if you sit down to lunch in the
+  - 0.87｜ simply enjoying a break from work are common activities throughout the year. For some people, these occasions also may include drinking—even drinking to excess.【 And】 the results can be deadly.⏎Although many
+  - 0.87｜, the oil spewing up from the floor of the Gulf of Mexico in staggering quantities could prove one of the great ecological disasters of human history【.】 Think of it, though, as just
+  - 0.86｜.⏎At last report, the Mennonites were considering leaving the province rather than permit the imposition of the state-sponsored curriculum on their children.⏎【And】 recently, a wedding photographer in New Mexico
+  - 0.86｜ project to get us there, an X Prize to reward whoever gets there first, and a book (a great read) named after the idea【.】 The $1,000 genome
+  - 0.86｜ more difficult on the body than traveling west. It seems to be easier for our bodies to delay our internal clocks than to speed them up.⏎【And】 yes, jet lag affects even the most
+  - 0.86｜ emissions. And recent developments like offshore drilling and deep seabed mining are helping humans extract resources from unprecedented depths, albeit with questionable environmental impact.【 And】 as new transit routes open in the melting
+  - 0.86｜ or fantasy, Onegin is a ballet for adults, a visual feast of rich, emotional choreography, powerful storytelling, and stunning imagery.【 And】 with a story by poet Alexander Pushkin
+  - 0.86｜ books instead of hitting the “easy” button by cheating.⏎Cheating erodes the trust others have in you. It tears down your confidence【.】 It stains your soul.⏎That’s not
+  - 0.85｜, with less going to the arts. The National Education Association has reported that the cuts fall hardest on schools with high numbers of minority children.⏎【And】 the situation is likely to worsen as
+  - 0.84｜ Florence, a Dominican friar named Girolamo Savonarola received visions of swords emerging from clouds and a black cross rising above Rome【.】 All over Italy, statues sweated blood
+  - 0.84｜. For one thing, that loaf can be "read" as if it were a core sample extracted from the heart of a grim global economy【.】 Looked at another way, it reveals
+
+## N145（第 25 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 21 页一次；语料最大激活 57.1
+- 直接读出推高：lift | Join |  lifted | SDL |  lifting |  lift | lifting |  Join | ift | 戟
+- 直接读出压低：ideo | 住了 | 堂 | 逃 | XS |  current | 无限 | $current |  Gone | adio
+- 正极片段：
+  - 1.00｜ can seem like an assumed part of life. But when these critical conduits are lost, as was the case when Hurricane Irene devastated parts of【 Fork】ston, a township near the northeast corner
+  - 0.96｜ also included in the project.⏎CAPTION: A temporary bridge now stands over Mahoopany Creek on State Route 3001 in【 Fork】ston Township, Pa. Nearly $7
+  - 0.88｜ human settlements dating to the Stone Age. Many historians believe the town dates to the late Viking Age, and was possibly founded by Sweyn I【 Fork】beard. ⏎The natural harbour and
+  - 0.84｜Election results⏎⏎References⏎⏎Fairfield⏎Fairfield⏎1953 establishments in Australia<|endoftext|>Limnonectes is a genus of【 fork】-tongued frogs of about 7
+  - 0.77｜ Anglican Service Book. The Anglican Mission in the Americas has used sections of it in developing their own prayer book. All of these “【fork】s” were made possible because there is
+  - 0.76｜ inside of the magazine would be black and white, a tactic used for The Dandy first issue (black and white stories inside, colourful K【ork】y the Cat strip on the front).
+  - 0.71｜ Allocebus⏎ Hairy-eared dwarf lemur, Allocebus trichotis⏎ Genus Phaner:【 fork】-marked lemurs⏎ Masoala
+  - 0.71｜," a superbolt between a cloud and the atmosphere tens of thousands of feet above the cloud. Lightning may appear as a jagged streak (【fork】ed lightning), as a vast flash in
+  - 0.68｜2020 census and is part of the Battle Creek Metropolitan Statistical Area.⏎⏎The earliest English-speaking settlers also referred to this area as The【 Fork】s, because it is situated at the
+  - 0.68｜ to 20 points. (Dick, 2007; Gosso, 2006).⏎FoxP2 (“【fork】head box P2”), Chromosome 
+  - 0.68｜Via Grub Street]⏎Have a tip or restaurant-related news? Send it to email@example.com.⏎And follow us on Twitter: @F【ork】intheRoadVV.<|endoftext|>Tall
+  - 0.67｜ Social anxiety refers to a fear of rejection and negative evaluation (being judged) by other people.⏎⏎Existential⏎⏎The philosopher Søren K【ier】kegaard, in The Concept of Anxiety
+  - 0.67｜ well as reading and some mathematical skills. They learn their work on the job from more experienced workers or supervisors. Workers who use industrial trucks (【fork】lifts), other dangerous equipment, or
+  - 0.67｜ Higgs was born when the new Universe cooled after the Big Bang some 14 billion years ago.⏎It is believed to act like a【 fork】 dipped in honey and held up in dusty
+  - 0.66｜or Zolotarev (integral calculus), Pafnuty Chebyshev (number theory and probability theory), Aleksandr K【ork】in (ordinary and partial differential equations),
+  - 0.65｜elled, usually because of becoming wet. Wood is often sanded with the grain raised to achieve an extremely smooth finished surface.⏎1. A【 fork】-like tool used for gathering materials (i
+  - 0.64｜ Gesellschaft für Nuklear-Service⏎ Eintracht Ahaus⏎⏎References⏎⏎Towns in North Rhine-Westphalia⏎B【ork】en (district)<|endoftext|>Pagan Occ
+  - 0.64｜ to European colonization in the 16th century.⏎⏎The Ashanti built bridges over streams and rivers. They were constructed by pounding four large【 fork】ed tree trunks into the stream bed
+  - 0.63｜ Rita (last wife of former number one Pancho Gonzales), Philip and Tami. Andre was given the middle name Kirk after Kirk K【erk】orian, an Armenian American billionaire. Emmanuel
+  - 0.63｜，叶剑英元帅（兼）、陈伯钧上将、李聚奎上将先后任高等军事学院院长，李【志】民上将任高等军事学院政治
+
+## N146（第 6 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 2.48
+- 直接读出推高：ми | Destroy | _DLL | essler | /Foundation | iliar | uz | 班 |  UnsupportedOperationException | 义
+- 直接读出压低：叶 | 葉 |  Tasks | isting | 的身份 | 首 | jang |  Corm | LineStyle | 看他
+- 正极片段：
+  - 1.00｜、魯吉人、斯基泰人和蘇埃比人）來加強軍隊。⏎夏季 –汪達爾人在坎帕尼【亞】登陸（位於麗日河或
+  - 0.97｜08|title=The Andaman and Nicobar Islands: Local Gazetteer|url=https://books.google.com/books?id=rrw【B】AAAAYAAJ|publisher=Super
+  - 0.91｜ Irene and Tropical Storm Lee. An informative list of Frequently Asked Questions about the program, which is an interesting process, is posted on www.F【EMA】.gov. I look forward to continuing to
+  - 0.89｜ instance, to view your security context:⏎# id -Z⏎Or to view the security context associated with a file:⏎# ls -l【Z】 /var/www/html/index.html⏎-r
+  - 0.84｜ show mercury vapor wafting up from a disturbed amalgam filling:⏎http://youtube.com/watch?v=9ylnQ-T7oi【A】Kind of scary to see it so vivid
+  - 0.82｜vier; 2010. http://www.mdconsult.com/books/about.do?about=true&eid=4-u1.0【-B】978-0-32
+  - 0.80｜、喝菊花酒，以為可以避災。2，王維時年十七歲，遊學長安，弟弟們都在蒲【州】（今山西永濟縣）故
+  - 0.79｜⏎RIF 600 mg po qd for 4 months⏎RIF 600 mg po qd and P【ZA】 20 mg/kg po qd
+  - 0.78｜葉惠里，日本女子團體AKB48TeamA成員⏎⏎11月 ⏎11月7日——朴【持】厚，韓國女演員⏎
+  - 0.78｜ experienced it all.⏎This September will mark the ninth annual National Preparedness Month, an annual campaign led by the Federal Emergency Management Agency (F【EMA】) to encourage all Americans to take the
+  - 0.77｜兩岸經貿交易會⏎ 5月25日：非洲解放日 、阿根廷革命紀念日、蘇【丹】革命節、世界預防中風
+  - 0.77｜ZA 20 mg/kg po qd for 2 months⏎All these regimens require pretreatment liver chemistries and if P【ZA】 is given a pretreatment serum uric
+  - 0.77｜維時年十七歲，遊學長安，弟弟們都在蒲州（今山西永濟縣）故鄉。而蒲【州】位於華山以東，故詩
+  - 0.76｜ make a new context because it is making a new file). For instance:⏎% echo "my file" >file.html⏎% ls -【Z】 file.html⏎-rw-rw-r
+  - 0.76｜ flooding associated with land falling tropical cyclones than from any other weather hazard related to tropical cyclones.⏎Source: Federal Emergency Management Agency (F【EMA】)<|endoftext|>Garlic (Allium sat
+  - 0.76｜ Conclusion Small Sample Unrepresentative Sample⏎Evaluation Monty Python “Argument Clinic” @ http://www.youtube.com/watch?v=hnTm【B】jk-M0c http://www.youtube
+  - 0.74｜科學部門在北方地下核子試驗場進行第三次核試驗。⏎ 2013年：蘇祿國蘇【丹】賈馬魯基蘭三世
+  - 0.74｜為讀書而來」的辦學原則，創立世界新聞職業學校。⏎⏎1月 ⏎1月1日——苏【丹】独立，成立了苏丹民主共和国。⏎
+  - 0.74｜confined_u:object_r:user_home_t:s0 file.html⏎% mv file.html /srv/www/foo.com/html/⏎% ls -【Z】 /srv/www/foo.com/html/⏎-r
+  - 0.74｜6,924,799 for the Commonwealth to reconstruct the bridge and to rebuild portions of surrounding Windy Valley Road.⏎F【EMA】’s share is 75 percent of
+
+## N147（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 18.1 次；语料最大激活 2.19
+- 直接读出推高：locate |  compareTo |  kald | igar |  cans | .mk | 全家 | actor | 恩 | 亿吨
+- 直接读出压低：涓 |  processing | 窝 |  persu | rocessing | inish | 不间 | 填报 |  she | 原文地址
+- 正极片段：
+  - 1.00｜ language trees fit with an agricultural expansion from Anatolia beginning 8000 to 9500 years ago. These results highlight【 the】 critical role that phylogeographic inference
+  - 0.95｜ is a rapidly evolving field with significant potential to address pressing global challenges and improve the quality of life for people around the world; however, despite【 its】 numerous benefits, it also poses ethical and
+  - 0.82｜的需求，促进业务增长。在构建数字银行系统的过程中，要密切关注技术的发展和市场的变化，不断进行创新和改进。同时【，】与合适的合作伙伴合作，共同推动数字
+  - 0.78｜ to be the most effective.⏎"We have learned a great deal from this ongoing project," Bowers said. "Importantly, it has demonstrated【 the】 combined strengths of the gene delivery platform and
+  - 0.77｜, humans.⏎A team of researchers described the discovery as an important insight into the pattern and timing of early mammal life and a demonstration of【 the】 capabilities of a new system for handling cop
+  - 0.73｜st century, most aluminium was consumed in transportation, engineering, construction, and packaging in the United States, Western Europe, and Japan.⏎⏎Despite【 its】 prevalence in the environment, no living organism
+  - 0.71｜ studying the deaths of hundreds of dolphins and porpoises from early February to mid-April say it remains a mystery, due in part to【 the】 government's slowness in investigating the
+  - 0.70｜ | Professional items | World psychology |⏎Reformatory is a term that has had varied meanings within the penal system, depending on the jurisdiction and【 the】 era. It may refer to a youth
+  - 0.70｜灵感。市井音乐的流行和发展，也为中国传统音乐的多元化和丰富性奠定了基础，成为中国文化发展的重要组成部分。同时【，】市井音乐的流传和传承，
+  - 0.69｜ of bridges vary depending on factors such as the function of the bridge, the nature of the terrain where the bridge is constructed and anchored, and【 the】 material used to make it, and the
+  - 0.68｜ with other micro- and nanosystems for specific applications (fire fighting and rescue teams).⏎However, whilst BIOTEX has solved several of【 the】 technical aspects of continuous biochemical monitoring, Lup
+  - 0.68｜, minerals and vitamins in their natural forms.⏎In this post, I’d like to talk to you specifically about vitamin E, to review both【 the】 strengths and weaknesses⏎of natural and synthetic
+  - 0.66｜ is a mixture of equal parts of two herbicides, 2,4,5-T and 2,4-D. In addition to【 its】 damaging environmental effects, traces of diox
+  - 0.64｜可持续性和生态平衡，提高农业生产的效率和质量，减少环境污染和资源消耗，促进人类和自然的和谐共处。同时【，】面对全球气候变化、资源短缺、粮食
+  - 0.64｜<|endoftext|>Algebraic geometry is a branch of mathematics which classically studies zeros of multivariate polynomials. Modern algebraic geometry is based on【 the】 use of abstract algebraic techniques, mainly
+  - 0.62｜ to the major causes of morbidity and mortality of the 20th century (1-11). In addition, these achievements demonstrate【 the】 ability of public health to meet an increasingly
+  - 0.62｜ that have the same reals, models with "more" sets of reals have a better chance of satisfying CH.⏎⏎Another viewpoint is that【 the】 conception of set is not specific enough to
+  - 0.62｜" often associated with a theory discussed near the end of the Socratic dialogue Theaetetus. More generally, theories of justification focus on【 the】 justification of statements or propositions.⏎Justifications
+  - 0.61｜ good financial management.⏎Inflation Never Lets Up⏎The rate of inflation can vary wildly from one year to the next. However, regardless of【 the】 variations, inflation continues its work relentlessly year
+  - 0.61｜ drift and is what most people think about when they hear the phrase “pesticide drift.” It’s common, it’s dangerous, and it【’s】 what existing regulations try to prevent.⏎9
+
+## N148（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 36 页一次；语料最大激活 4.69
+- 直接读出推高：ubar | nels | endars | Vendor |  vendors | 次要 | 第二种 | 二线 | wargs | fuck
+- 直接读出压低：旅 | 庚 | eping |  Burr | ools | лось | ите | 提醒 |  adopt | outil
+- 正极片段：
+  - 1.00｜ element in the list can be done in unit time, then at most  time units are needed to return an answer.⏎⏎Cost models ⏎Time【 efficiency】 estimates depend on what we define to be
+  - 0.86｜, matheMATics etc.⏎We also speak in such a way that we run quickly over many of our smaller words, and put extra【 stress】 within the multisyllabic words. In
+  - 0.70｜ above words:⏎imPORtant, deVELopment, uniVERsity, matheMATics etc.⏎We also speak in such【 a】 way that we run quickly over many of
+  - 0.70｜ the related Times article will take you to a page on the old site.⏎Teaching ideas based on New York Times content.⏎Overview of Lesson【 Plan】: In this lesson, students evaluate current
+  - 0.65｜ the following words: important, development, university, mathematics.⏎Each of these words has several syllables, but which syllable carries the heavier【 stress】? From words on the page it would
+  - 0.63｜ *e)⏎{	/* 初始条件：顺序线性表L已存在,1≤i≤ListLength(L)。操作【结果】：用e返回L中第i
+  - 0.61｜ III’s skull. Credit: University of Leicester.<|endoftext|>How do banks calculate the amount of interest paid on a loan? In this lesson,【 students】 will view a Livescribe Pencast
+  - 0.58｜容量 */⏎}⏎⏎void DestroyList(SqList *L)⏎{	/* 初始条件：顺序线性表L已存在。操作【结果】：销毁顺序线性表L */⏎
+  - 0.56｜力与水平。⏎如以Pre――――readingquestion或warmingup导入，让学生边听录音边看课文，然后【呈现】任务或练习（正误判断、
+  - 0.56｜摆、贴 动口拼读:字母拼/音标读 朗读 1、朗读的定义:运用重【音】、节奏、语调等语音手段
+  - 0.55｜,2.6 */⏎void InitList(SqList *L) /* 算法2.3 */⏎{	/* 操作【结果】：构造一个空的顺序线性
+  - 0.53｜ three groups. Students also design their own Native art.⏎High schoolers discover the contributions of 3 Alaskan leaders. In this Alaska history【 lesson】, students research the leaders Nathaniel Bow
+  - 0.53｜ created the desire, American English File then helps you to develop learners' communication skills. One way it does this is with a strong focus on【 pronunciation】.⏎Research shows that poor pronunciation is a
+  - 0.52｜ they assume roles of actual public figures from the period.⏎Students explore the unique population of Alaska. In this Native people of Alaska lesson plan,【 students】 discover the three groups of people who live
+  - 0.52｜调的运用。能否正确使用重音、节奏和语调对英语口语整体性和交际有很大影响。⏎英语中词的重【音】并没有非常系统而严格的规则，虽然
+  - 0.52｜渠道全方位提高学生的英语语感能力与水平。⏎如以Pre――――readingquestion或warmingup导入，让学生边听【录音】边看课文，然后呈现任务或
+  - 0.52｜berg⏎Grünberg, Peter Andreas (pāˈtər ändrāˈäs grünbĕrkˈ) [【key】], 1939– German
+  - 0.50｜ make learners want to speak, American English File is the course that gets students talking.⏎It gives you full skills coverage with a clear focus on【 pronunciation】, plus wide-ranging support and resources too
+  - 0.50｜}⏎⏎void ClearList(LinkList L) /* 不改变L */⏎{	/* 初始条件：线性表L已存在。操作【结果】：将L重置为空表 */⏎
+  - 0.49｜ L,void(*vi)(ElemType*))⏎{	/* 初始条件：顺序线性表L已存在 */⏎	/* 操作【结果】：依次对L的每个数据元素
+
+## N149（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 3.32
+- 直接读出推高：amb | agus | 碚 |  setSupportActionBar |  caut |  Amb | 咖 | .utf |  StringWriter | BUR
+- 直接读出压低：省 | !.\n\n | inel | 省教育 | 不远 |  !_ | 哉 | !, | !] | !",
+- 正极片段：
+  - 1.00｜》萬里機構‧飲食天地，1995年，ISBN 97896214101【3】9⏎《款款精家常
+  - 0.98｜ ISBN 4-582-80682-1 , ISBN 4-582-8068【5】-6⏎ The Influence of the Sea
+  - 0.69｜In computer science, an array is a data structure consisting of a collection of elements (values or variables), of same memory size, each identified【 by】 at least one array index or key.
+  - 0.67｜转换元件组成”。传感器是一种检测装置，能感受到被测量的信息，并能将检测感受到的信息，按一定规律变换成为电信号【或其他】所需形式的信息输出，以满足信息
+  - 0.66｜财产分割产生争议寻求中国法院进行解决时如何适用有关诉讼时效的规定。⏎所谓诉讼时效系指权利人在法定期间内不行【使】权利及丧失请求人民法院依法保护其
+  - 0.61｜刘禹锡《陋室铭》）因古代平民只能穿白衣，故“白衣”成为了没有功名者的代称。⏎【　】　赭衣 封建社会里
+  - 0.59｜的财产以及婚前财产归各自所有、共同所有或者部分各自所有、部分共同所有。约定应当采用书面形式。没有【约定】或者约定不明确的，适用本
+  - 0.55｜行使抵押权⏎根据我国《物权法》第二百零二条的规定，“抵押权人应当在主债权诉讼时效期间【行使】抵押权;未行使的，人民法院
+  - 0.52｜。法条链接一、《中华人民共和国民法典》第一百五十八条【附条件的民事法律行为】民事法律行为可以【附】条件，但是根据其性质不得附
+  - 0.51｜, hard candies, and other items that may harm children.<|endoftext|>T2T || FAQ || Ask T2T || Teachers' Lounge ||【 Browse】 || Search || Thanks || About T2
+  - 0.51｜<|endoftext|>In computer science, an array is a data structure consisting of a collection of elements (values or variables), of same memory size, each【 identified】 by at least one array index or key
+  - 0.50｜，他也往往是樂團中的最耀眼的角色。至於流行音樂的歌手則很少稱他們為音樂家，是比較特別的一群【。⏎⏎】職能⏎一個音樂家常常有多
+  - 0.50｜债权人可以要求债务人履行债务，也可以要求保证人在其保证范围内承担保证责任。第十九条、当事人对保证方式没有【约定】或者约定不明确的，按照连
+  - 0.50｜当事人的主张和案件审理情况，确定当事人应当提供的证据及其期限。当事人在该期限内提供证据确有困难的，【可以】向人民法院申请延长期限，人民法院
+  - 0.49｜兀奇峭的石头。敦敏《题芹圃画石》说：“傲骨如君世已奇，嶙峋更【见】此支离。醉余奋扫
+  - 0.47｜1月8日蒋中正下令全线撤退；11月12日上海失守，淞沪会战结束。⏎【　】　淞沪会战结束后，中国
+  - 0.45｜《张丞相列传》说：“自申屠嘉死之后，景帝时开封侯陶青、桃侯刘舍【为】丞相。及今上时，
+  - 0.45｜债权人可以要求债务人履行债务，也可以要求保证人在其保证范围内承担保证责任。第十九条、当事人对保证方式没有【约定】或者约定不明确的，按照连
+  - 0.45｜长的木头，招募百姓中能把木头搬到北门的人立即获得赏金十两。百姓们都感到很诧异【，】没有人去搬。後商鞅将
+  - 0.45｜债权人可以要求债务人履行债务，也可以要求保证人在其保证范围内承担保证责任。第十九条、当事人对保证方式没有【约定】或者约定不明确的，按照连
+
+## N150（第 19 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 5
+- 直接读出推高：KEN |  appropriation | cly | 不具备 | amy | 自来 |  Mvc | 霄 | 蝈 | ести
+- 直接读出压低：ses |  vac |  concession |  зай |  ther | 的脚步 | 魔 |  wrinkles |  concessions |  nor
+- 正极片段：
+  - 1.00｜ causes genital warts on the penis, scrotum and perianal skin.⏎HPV 81. HPV 81 is【 another】 common human papillomavirus type that
+  - 0.80｜ it has been linked to cervical changes in women that can ultimately lead to cervical cancer.⏎HPV 42. HPV 42 is【 another】 common HPV type in the low-risk category
+  - 0.75｜ third class passenger, your chance of survival was 25 percent⏎First class passengers had a 62 percent survival rate. Second class【 passengers】 had a 41 percent survival rate
+  - 0.71｜，形成包容性和多元化的视角。⏎- 批判性思维：哲学强调对观点和观念进行批判性评估和反思，【因此】学习哲学需要具备批判性思维的能力
+  - 0.71｜浓度NaClO4电解质，用于水系NaTi2(PO4)3电池。此外，氯化锌在水中【也】具有极高溶解度，可用于形成Wi
+  - 0.70｜. In men, genital warts can appear on the penis, scrotum and skin around the anus.⏎HPV 72.【 Another】 low-risk strain of human papillom
+  - 0.69｜997年的2.32亿元增加到33.67亿元，增长13.5倍；辖区税收总额【由】1997年的2.4
+  - 0.68｜过敏性疾患，与皮肤潮红一样，亦可受情绪激动、体力活动等促发。4、心血管症状见【于】11％～53％的
+  - 0.67｜ his new berth was aboard the monitor USS MONTEREY.⏎On December 28, 1900, he became a【 member】 of the crew of the SOLACE.
+  - 0.67｜ who played 120 matches for AZ during this period scoring 30 goals from midfield; and Hugo Hovenkamp, who【 played】 239 matches in defence for
+  - 0.66｜药物主要有阿瑞吡坦、福沙匹坦、罗拉匹坦等。⏎多巴胺受体阻断剂：⏎该【类】药物主要通过作用于延髓催
+  - 0.66｜ group was 5 to 1 (males:females). Among young people 20 to 24 years of age, there【 were】 2,541 deaths among
+  - 0.66｜（占钾元素的0.01%，它是岩石和土壤中天然放射性本底的重要来源之一。⏎铀（U）【在】自然界同样有3种同位素
+  - 0.66｜. One was a level metal paddle in which the user would beat the clothes in the hope the pounding would remove the wrinkles. The ancient Chinese【 used】 a scoop that was heated with hot coal
+  - 0.65｜ as part of daily diet.⏎- Lack of fruit and vegetables from the diet is also a reason.⏎- Lack of physical activities among children is【 a】 major reason for weight gain. Children should
+  - 0.65｜ 100 people who have bypass surgery, 5 will have a heart attack, and 95 will⏎- Stroke. Out【 of】 100 people who have⏎
+  - 0.65｜ agree. Eighty-one percent of whites see equal opportunity in housing; that drops to 47 percent of blacks. In shopping, again【 】83 percent of whites see equal treatment
+  - 0.65｜ consumed 17.5 percent of their calories from added sugars.⏎Meanwhile, girls in preschool consumed about 13 percent of their calories【 from】 added sugars, girls aged 6 to
+  - 0.65｜ genital warts on the penis, scrotum and perianal skin.⏎HPV 81. HPV 81 is another【 common】 human papillomavirus type that is
+  - 0.64｜-one percent of whites see equal opportunity in housing; that drops to 47 percent of blacks. In shopping, again 83 percent【 of】 whites see equal treatment, vs. 
+
+## N151（第 12 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 34 页一次；语料最大激活 9.27
+- 直接读出推高： rejecting | 气象 |  rejects |  ridden | 梗 | 其中之一 | woord | visor | 经验丰富 |  reject
+- 直接读出压低：oms | /actions | nea | 封 | 交 | 放手 | ession | ngx | 练习 | 酿
+- 正极片段：
+  - 1.00｜ was the only writer ever to receive Pulitzer Prizes in both fiction and poetry.⏎Found an Error? Tell us about it.<|endoftext|>(Phys【.org】) —University of Manchester historians have identified
+  - 0.99｜ to manufacture polymer-based solar cells, and in terms of the physical mixing of the domains and how that may affect efficiency," Ade says.⏎Explore【 further】: Femtosecond 'snapshots
+  - 0.96｜ older compared to buildings in other communities. While this may allow for lower rents, business owners may prefer to locate somewhere else.<|endoftext|>(Phys【.org】)—Research that sheds new light on the
+  - 0.95｜ one of the most important reaction sequences in atmospheric chemistry, and paves the way for further studies of non-equilibrium systems within nature."⏎Explore【 further】: Searching for oxygen in space⏎More
+  - 0.91｜," Simon-Miller adds. "The changes of the last few years are adding to an extraordinary database on dramatic cloud changes on Jupiter."⏎Explore【 further】: Galaxy's Ring of Fire⏎More
+  - 0.90｜ this pavement’s location and embedded these photographs in it as well. You can download it here and view it in Google Earth.<|endoftext|>(Phys【Org】.com) -- Scientists at Imperial College London
+  - 0.90｜ continue developing both technologies." Joung is an associate professor of Pathology and Sander an instructor in Pathology at Harvard Medical School,⏎Explore【 further】: Researchers conduct first genomic survey of human
+  - 0.89｜ way off. But the recent research takes us one step closer towards being able to give a better explanation of the longer-term space climate.'⏎Explore【 further】: Forecast for Titan: Wild weather could
+  - 0.89｜ allow mankind to considerably save on power consumption while simultaneously allowing for much higher comfort and well-being for many more people on our beautiful planet.⏎Explore【 further】: Is there an invisible tug-of-war
+  - 0.88｜ & SOAR/Rutgers/F. Menanteau; IR: NASA/JPL/Rutgers/F. Menanteau )⏎(Phys【Org】.com) -- An exceptional galaxy cluster,
+  - 0.87｜ of Literature and Languages, Roosevelt University, Chicago, Illinois, USA⏎There are currently no reviews of this product.Write a Review<|endoftext|>(Phys【.org】)—Controlling "mixing" between
+  - 0.87｜ up to those standards, to let people know they are going to be okay if they engage in interracial relationships.”⏎Source: Northwestern University⏎Explore【 further】: Ketamine shows significant therapeutic benefit in
+  - 0.86｜ same technology could also be used to control chemical reactions and to understand the behaviour of systems that are too complex to simulate with a computer.⏎Explore【 further】: Error sought & found: State-of
+  - 0.83｜ the future, the software could help avoid this problem. Used as service for engineers or planning agencies the peace among neighbors could be preserved.⏎Explore【 further】: Cape Wind gets $200
+  - 0.83｜ environmental damage to forests and wildlife.⏎"Whisky-powered cars could help Scotland avoid having to use those forest-trashing biofuels."⏎Explore【 further】: Tesla recalls Model S cars over problem
+  - 0.83｜ the underlying mechanisms. The results may contribute to the development of therapies for human myopathies and open up new possibilities in biotechnology.⏎Explore【 further】: X-ray tomography on a living
+  - 0.83｜⏎"Mother's vitamin D level linked to birth weight." December 10th, 2012. http://medicalx【press】.com/news/2012-
+  - 0.82｜ many of other cave animals, it doesnt need a lot of nourishment. Thats good for them in a food-poor environment.⏎Explore【 further】: Biological fitness trumps other traits in
+  - 0.82｜ independence, it is not an unalloyed good. Choice can also produce a numbing uncertainty, depression, and selfishness."⏎Explore【 further】: New study offers insight into how to
+  - 0.78｜? Scientists find compound that may help you work out harder." June 12th, 2012. http://medicalx【press】.com/news/2012-
+
+## N152（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 7.6 次；语料最大激活 2.84
+- 直接读出推高：由于 | 由於 | 返回搜狐 | 南方 |  przez |  since | ince | concert |  ReadOnly |  Anonymous
+- 直接读出压低：ongyang | adr | 目 | secondary |  dic | 将继续 | sett |  Grain | \']"). | masters
+- 正极片段：
+  - 1.00｜ (), and the walls are not adiabatic and energy is added in the form of heat (), and there is no phase change, then【 the】 temperature of the system will rise.⏎If
+  - 1.00｜可以得到五十萬日圓的獎金，於是開始漫畫的創作，不過因為沒有趕上截止時間所以連入選【都】沒有。⏎⏎1978年1
+  - 0.91｜ dioxide and water. It also happens when the combustion is quenched by a heat sink, such as a solid surface or flame trap.【 As】 is the case with complete combustion, water
+  - 0.87｜ then νp(n) = ai, otherwise it is zero.  Then⏎⏎In terms of the above the prime omega functions ω and【 Ω】 are defined by⏎⏎To avoid repetition,
+  - 0.87｜ this idea of species-specific music? Well, David and Chuck did! They have since developed music for cats using similar techniques. Although they're【 still】 working on the paper, they have said
+  - 0.85｜兒生前稱喚道林·格雷「白馬王子」的習慣，導致他沒有任何可追查的線【索】，然而詹姆斯意外在某間�
+  - 0.84｜ being 0.01–0.02 lower than adjacent croplands), which contributes to global warming. Deliberately increasing【 al】bedo in urban areas can mitigate urban heat
+  - 0.84｜ the Earth also is a participant. Here is a critique due to Mach arguing that only relative motion is established:⏎⏎The degree in which Mach's【 hypothesis】 is integrated in general relativity is discussed
+  - 0.81｜政治局委员之職，並以宣揚古巴社會主義的外交家之名橫越地球。而格瓦拉所【訓練】的民兵部隊也在豬灣
+  - 0.80｜licative formula allows the definition of binomial coefficients to be extended by replacing n by an arbitrary number α (negative, real, complex) or【 even】 an element of any commutative ring
+  - 0.80｜, become the first English team to compete in the European Cup. Previously, the Football Association had scorned the competition, but United made progress【,】 reaching the semi-finals where they lost to
+  - 0.80｜ with the abelian groups.⏎⏎Theorems about abelian groups (i.e. modules over the principal ideal domain ) can often be generalized【 to】 theorems about modules over an arbitrary
+  - 0.79｜00.⏎⏎The unit Mbtu is used in natural gas and other industries to indicate 1,000 BTUs. However【,】 there is an ambiguity in that the metric
+  - 0.78｜ usually packaged in a plastic takeaway cup, sealed with plastic or a rounded cap. New entrants into the market have attempted to distinguish their products【 by】 packaging it in bottles and other shapes.
+  - 0.78｜ 1, 2004, the day before the election, and also stating his reasons and qualifications for running the website.⏎⏎Through【 the】 site he also covered the 20
+  - 0.76｜康熙帝去世而悲傷哀慟，因而舊恙發作，雍正帝親自侍奉湯藥，冀望【她】痊癒，然而五月二十二
+  - 0.76｜ continuous bilinear that are not continuous satisfy an additional property: hypocontinuity. ⏎All continuous bilinear maps are hypocontinuous.⏎⏎Sufficient【 conditions】 for continuity ⏎⏎Many bilinear maps that
+  - 0.76｜. The islands have warm summers and winters warm enough for the climate to be technically tropical at sea level. The amount of precipitation and the level【 of】 maritime moderation vary depending on location and elevation
+  - 0.76｜中华人民共和国卫生部叫停精神病医生杨永信所采用的电刺激（或电休克）“治疗”网瘾，【但】杨永信并未因此停止对“
+  - 0.76｜ cells lines, information that will play an important role in ensuring the safety of cells grown for therapeutic use and a discovery that also may have implications【 in】 the development of cancer.⏎Chromosomal
+
+## N153（第 9 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 13 页一次；语料最大激活 21.7
+- 直接读出推高：相 |  Encrypt |  cipher |  ciphertext | Encrypt | iqu |  encrypt | 正义 | asse |  concern
+- 直接读出压低：iales | 标的 | нат | ND |  nutrient | xis |  Sharks | ]|[ | onian |  sharks
+- 正极片段：
+  - 1.00｜ AES could be used to protect classified information:⏎⏎The design and strength of all key lengths of the AES algorithm (i.e., 12【8】, 192 and 2
+  - 0.98｜ a secure block cipher is suitable for the encryption of only a single block of data at a time, using a fixed key. A multitude of【 modes】 of operation have been designed to allow their
+  - 0.97｜ scholar (d. 1929)⏎1872 – Haakon VII of Norway (d.<|endoftext|>The Advanced Encryption【 Standard】 (AES), also known by its original
+  - 0.96｜ Triple DES, which has 112 bits of security when using 168-bit keys (triple key).⏎⏎The Advanced Encryption【 Standard】 published in 2001 uses
+  - 0.94｜ algorithms are designed to have security equal to their key length. However, after design, a new attack might be discovered. For instance, Triple【 DES】 was designed to have a 16
+  - 0.93｜ many other designs were proprietary, encumbered by patents, or were commercial or government secrets. Schneier has stated that "Blow【fish】 is unpatented, and will remain
+  - 0.91｜ block cipher is suitable for the encryption of only a single block of data at a time, using a fixed key. A multitude of modes of【 operation】 have been designed to allow their repeated use
+  - 0.90｜ijndael, and stated that all of them were secure enough for U.S. Government non-classified data. In June 20【0】3, the U.S. Government announced
+  - 0.90｜High-level description of the algorithm ⏎⏎ round keys are derived from the cipher key using the AES key schedule. AES requires a separate 12【8】-bit round key block for each round plus
+  - 0.89｜ and successors⏎Blowfish's use of a 64-bit block size (as opposed to e.g. AES's 12【8】-bit block size) makes it vulnerable to
+  - 0.89｜ National Security Agency (NSA) for top secret information when used in an NSA approved cryptographic module.⏎⏎Definitive standards ⏎⏎The Advanced Encryption【 Standard】 (AES) is defined in each of
+  - 0.89｜ its predecessor DES, AES does not use a Feistel network. AES is a variant of Rijndael, with a fixed block【 size】 of 128 bits, and
+  - 0.89｜ does not use a Feistel network. AES is a variant of Rijndael, with a fixed block size of 12【8】 bits, and a key size of 
+  - 0.88｜76-bit keys. The test vectors for verifying third-party implementations were also produced with 576-bit keys. When asked which Blow【fish】 version is the correct one, Bruce Sch
+  - 0.86｜ the name of a cross-platform file encryption utility developed in 2002 that implements Blowfish.⏎⏎Weakness and successors⏎Blow【fish】's use of a 64-bit
+  - 0.86｜ symmetric-key block cipher, designed in 1993 by Bruce Schneier and included in many cipher suites and encryption products. Blow【fish】 provides a good encryption rate in software,
+  - 0.86｜ a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST) in 20【0】1.⏎⏎AES is a variant of the
+  - 0.85｜ is granted a natural protection against brute-force attacks, which doesn't really justify key sizes longer than 448 bits.⏎⏎Blow【fish】 in pseudocode⏎uint32_t
+  - 0.85｜ by Triple DES, which has 112 bits of security when using 168-bit keys (triple key).⏎⏎The Advanced【 Encryption】 Standard published in 2001
+  - 0.85｜	p = (p + 1) % key_len;⏎		}⏎		P[i] ^= k;⏎	}⏎   ⏎	/* blow【fish】 key expansion (521 iterations)
+
+## N154（第 15 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 7 页一次；语料最大激活 9.51
+- 直接读出推高：准备 |  preparation |  preparing |  preparations |  Preparation |  prepar |  prepares |  prepare | prepare |  prepared
+- 直接读出压低：iland | 永久 |  реак |  Forever | 住址 |  backward |  Fiber | 南北 |  cen |  touch
+- 正极片段：
+  - 1.00｜ the U.S. Senate. In 1932, Schuyler ran for the U.S. Senate again, winning the Republican【 nomination】. He was a candidate for both the
+  - 0.97｜ originally CMP of Apollo 13's backup crew, with John Young as commander and Charles Duke as lunar module pilot. Seven days before launch【,】 Duke contracted rubella from a friend of
+  - 0.94｜迪航天中心大部分地区不开放，它也是一个。⏎⏎目前发射指挥所設在39号发射台，这里也是航天器裝【配】大樓的所在地。在它的西部
+  - 0.89｜ as angiogram; or⏎Magnetic resonance angiogram (MRA).⏎Typically, people scheduled for atherectomy should not eat or【 drink】 anything for 8 to 12
+  - 0.88｜ or perform other minor surgery. In addition, ligament reconstruction can be performed using the arthroscope in many cases.⏎You should not eat【 or】 drink anything for 12 hours before
+  - 0.86｜ would be taking, now had immense leverage with management at NASA and North American, and he used it. In conference rooms or on the spacecraft【 assembly】 line, Schirra got his way
+  - 0.84｜，工业区、39号发射中心和它的两个发射场LC-39A和LC-39B、飞行器【组装】建筑物和参观者中心。⏎⏎除支援
+  - 0.84｜.⏎Be sure to ask the following questions:⏎- What can I eat or drink the night before? Surgical patients usually are forbidden to eat or【 drink】 anything—even water—after midnight before the
+  - 0.83｜ the elephant has been conditioned through violent training sessions that refusal to obey in the ring will result in severe punishment later. Moments before entering the ring【,】 while out of view of the public,
+  - 0.83｜ 1912, but returned to the Republicans in 1915. Poindexter was an unsuccessful candidate for the Republican【 nomination】 for president in 1920
+  - 0.82｜. Follow them exactly; failure to do so could be life-threatening.⏎Be sure to ask the following questions:⏎- What can I eat or【 drink】 the night before? Surgical patients usually are
+  - 0.81｜ allergic to any medications, latex, tape, and anesthetic agents (local and general).⏎- You may be asked to stop eating and/or【 drinking】 for at least four hours before the procedure
+  - 0.81｜Whether clots are present in the artery.⏎A few days before the procedure, the physician performs blood tests and the patient may be advised to【 stop】 taking aspirin or other drugs known to
+  - 0.81｜ Rice W. Means, who went on to win the general election.⏎⏎In 1926, Waterman defeated Means for the Republican【 nomination】 for a full six-year term. 
+  - 0.81｜ study procedure usually takes about two hours.⏎How should I prepare for an EP study?⏎- Generally, you will be asked not to eat or【 drink】 anything for six to eight hours before the
+  - 0.80｜ Title VII. In the 1964 U.S. presidential election, Goldwater mobilized a large conservative constituency to win the Republican【 nomination】, but then lost the general election to
+  - 0.78｜ perform other minor surgery. In addition, ligament reconstruction can be performed using the arthroscope in many cases.⏎You should not eat or【 drink】 anything for 12 hours before the
+  - 0.78｜ being impeached by the House of Representatives and narrowly avoided conviction in the Senate. He did not win the 1868 Democratic presidential【 nomination】 and left office the following year.⏎⏎Johnson
+  - 0.78｜ sensitive to or are allergic to any medications, latex, tape, and anesthetic agents (local and general).⏎- You may be asked to【 stop】 eating and/or drinking for at least four
+  - 0.77｜ the remaining crew would be replaced as well, and the backup crew substituted, but Duke's illness ruled this out, so two days before launch【,】 Mattingly was replaced by Swig
+
+## N155（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 7.17
+- 直接读出推高：semi | (sem | 独有的 | 曝光 | annotations | (unique | 的独特 |  semi | 这些年 |  sem
+- 直接读出压低：akit | 算 | � |  прием |  Mét |  Flatten | 交代 | ası | LOCKS | 一步
+- 正极片段：
+  - 1.00｜CMXXVI, hinc cineres tanti hominis, resurrectionem mortuorum expectant. R.I.P.⏎(Antoni【 G】audí Cornet. From Reus
+  - 0.89｜oprop transport aircraft. Two escadrilles (squadrons) or sub-formations were created: the Escadrille de Transport (【Transport】 Unit), and the Escadrille d
+  - 0.84｜, the paramilitary wing of FPI, which carries out the raids on bars, is known as the Laskar Pembela Islam (【Islam】 Defenders’ Army). The FPI
+  - 0.83｜s).⏎⏎It supports password authentication and digital certificate authentication. Because the source code is freely available, anyone can adapt the server for specific needs,【 and】 there is a large public library of Apache
+  - 0.69｜ii MCMXXVI, hinc cineres tanti hominis, resurrectionem mortuorum expectant. R.I.P.⏎(A【nt】oni Gaudí Cornet. From
+  - 0.69｜UPA开源社区 供参考 ⏎ OSMSG开源资讯 ⏎ 10 things people get wrong about open source (images) （1【0】個對於開源碼的錯誤印象
+  - 0.68｜1869, for the same territory, used the term Südostereuropäische Halbinsel ('southeaster【ne】uropean peninsula'). Another reason it was not
+  - 0.67｜ the social history of cultural practices.⏎  ⏎The main scholarly outlet has been the journal Annales d'Histoire Economique et Sociale ("【Ann】als of Economic and Social History"), founded
+  - 0.65｜ for efficiency instead of justice grew. He continued his involvement with theatre and renamed his group Théâtre de l'Equipe ("The【atre】 of the Team"). Some of his scripts
+  - 0.65｜ geostationary belt communication satellites can be mounted using a SYLDA (Système de Lancement Double Ariane, meaning "【A】riane Double-Launch System") carrier
+  - 0.64｜. In 1923, he was made an honorary member of the Naturhistorisch-Medizinischen Verein Heidelberg (【He】idelberg Association for Natural History and Medicine).
+  - 0.63｜ Bad Dream?) by Keidō Matsushita, published in volume 5 of the journal Shōnai Minzoku (,【 Sh】ōnai Folk Customs) on June
+  - 0.63｜ Seven Swabians, or The Hunting of the Hare), comedy, ⏎Beste Gesinnungen Schwäbischer Herzen (【Best】 Dispositions of Swabian Hearts),
+  - 0.63｜ interpretation is that "Scripture is its own best interpreter." Luther expressed this principle with the words, Scriptura sui ipsius interpres ("【Script】ure is its own expositor"), and
+  - 0.61｜ the Channel Islands are called 'Îles de la Manche', while in France, the term 'Îles Anglo-normandes' (【Ang】lo-Norman Isles) is used to
+  - 0.59｜ with minuscule electric currents. However, even though the tip of the microscope only has the width of an atom, it has not been【 able】 so far to take a look inside molecules
+  - 0.59｜, Druga faza wojny trzynastoletniej (1462–1466). [Second phase【 of】 the Thirteen Years' War 1
+  - 0.59｜ musika which started appearing in the late 17th century, in what was known as khorovïye kontsertï (【chor】al concertos) made a capp
+  - 0.58｜12%, respectively), and a limited agricultural base (about 6% of GDP).⏎⏎The konvertibilna marka (convertible【 mark】 or BAM) - the national currency introduced
+  - 0.57｜ human body he had produced through his⏎anatomical drawings and Vitruvian Man as a cosmografia del minor⏎mondo (【cos】mography of the microcosm).
+
+## N156（第 34 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 84.3
+- 直接读出推高：擅 | three | 0 |  fred | ORS | .echo | 涿 | wich | サー | 人士
+- 直接读出压低：十 | 十条 | 十个 | 十里 | 十万 | 十多 | 十大 |  ten | 十二 | 十一
+- 正极片段：
+  - 1.00｜敏獲17萬7477票、許信良為12萬9816票，總投票數約【三十】萬票。第一階段與第二階段
+  - 1.00｜2日，中共中央宣布黄菊调往中央工作，陈良宇出任上海市委书记。至此，黄菊担任上海市主要领导职务长达【十】一年。⏎⏎中央任职⏎⏎升任中央
+  - 0.97｜两岁被立为皇太子。唯一的弟弟朱厚炜又早夭，是孝宗唯一长大成人的儿子。弘治【十】一年春，皇太子出阁读书
+  - 0.95｜事文类聚翰墨全书》前集十集、后集五集，元刘应李编，明正统【十】一年（丙寅1446
+  - 0.93｜之，将自己的女儿孟古哲哲与努尔哈赤订婚，并派兵护送其回赫图阿拉。万历【十】一年（1583年）
+  - 0.92｜春的再审申请。⏎审判长 李德申⏎审判员 杨　军⏎审判员 乐　敏⏎二【〇】一九年十一月十五日⏎书记
+  - 0.91｜官方统计各国失业所占百分数如下：德国为十三点二，奥地利为十二点八，美国是十二，英国是【十】一点八等。资本主义总危机时
+  - 0.91｜大戰翌年清明，故為1260年），開始於《射鵰英雄傳》劇情結束後【十】數年，結束在《倚天
+  - 0.90｜的流動性，各個擊破，最後殲滅。此舉在二年內頗見成效。崇祯【十】一年张献忠兵败降明
+  - 0.90｜。皇太极亦积极参予政事，成为旗主，受封贝勒，是为四大贝勒之一。⏎⏎天命【十】一年（1626年）
+  - 0.90｜再审申请。审判长　 孙　江审判员　 聂振华审判员 　 李小梅二【〇】二〇年五月十五日法官
+  - 0.89｜众数十人起兵，进攻尼堪外兰驻地图伦城。⏎⏎统一建州女真⏎⏎诸部之战⏎⏎万历【十】一年（1583年）
+  - 0.89｜之亂，嚴禁新疆與支持白山派和卓張格爾反清的浩罕汗國通商。⏎道光【十】一年，浩罕汗國遣使
+  - 0.89｜尔衮押送国王家属等182口报捷。⏎ 崇德三年（1638年，崇祯【十】一年），八月二十三日，
+  - 0.89｜」。⏎⏎崩逝 ⏎⏎康熙八年（1669年）十二月十三日，皇后生下承祜。⏎⏎康熙【十】一年（1672年）
+  - 0.89｜的旧址修建的观星台正式建造完成，先前铸造的仪器全部安放到台上。自正统七年至正统【十】一年（1446年），
+  - 0.88｜事」，乃「炊灯具草，继以诘朝」，愤而疾书而成《野议》。  ⏎⏎崇祯【十】一年（公元1638年
+  - 0.88｜只限於山東半島，雖小勝北魏但影響不大，因此總體來說，孝武帝統治的【十】一年算是一段相對安定的
+  - 0.88｜就是当时的著名私塾学堂。解放后，在党的领导下，教育事业不断发展。到现在中、小学普及率分别达到百分之九十七【点】六和百分之九十七点二。
+  - 0.88｜也接觸了豐富生動的楚國民間文化，留下了千古絕唱《離騷》。⏎⏎楚頃襄王【二十】一年（前278年）
+
+## N157（第 17 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 6.9 次；语料最大激活 3.35
+- 直接读出推高：lich | DTD | 俪 | 表格 | 旁 | .SDK | 造 | 架 | 的样子 | imates
+- 直接读出压低：uelle | atica | sap |  celebrating |  trans | чу |  transitioning |  Gale | 路上 | ugs
+- 正极片段：
+  - 1.00｜. This eruption produced gases and pumice, but no explosive activity was reported.⏎⏎The following table shows the highest mountains in each of the【 islands】:⏎⏎Natural symbols ⏎⏎The official natural symbols
+  - 0.73｜ the war, survivors such as Primo Levi, Viktor Frankl, and Elie Wiesel wrote memoirs of their experiences, and the【 camp】 became a dominant symbol of the Holocaust.
+  - 0.73｜实为中心的杂病分类辨治法，收集药方五千三百首。《千金翼方》是对《千金要【方】》的补编，共有三十卷
+  - 0.71｜ the A380, delivered between 2007 and 2021. Freighter variants of the 74【7】 remain popular with cargo airlines. The final
+  - 0.71｜ considered second-generation jet fighters, while later versions are considered to be third-generation jet fighters. Some 50 countries over four continents have flown【 the】 MiG-21, and it
+  - 0.71｜寶可夢 皮卡丘》中，则配合动画做了修改。⏎⏎因为皮卡丘的人气提升，一些主系列游戏对【皮】卡丘进行了逐步的加强。如
+  - 0.71｜ word Einstein broadly synonymous with genius.⏎⏎In 1905, a year sometimes described as his annus mirabilis (miracle【 year】), Einstein published four groundbreaking papers. These
+  - 0.69｜ generally corresponds with Bergmann's rule: the species increases in size further away from the equator and the tropics. For example, eag【les】 from South Carolina average  in mass and
+  - 0.69｜ as Santa Maria, have had no recorded activity in the time since the islands were settled several centuries ago. Mount Pico, on the island【 of】 Pico, is the highest point in
+  - 0.68｜而五角大楼即为假定的打击目标之一。⏎⏎2001年9月11日，刚好在五角【大楼】动土起建60年纪念
+  - 0.67｜ Space Agency is responsible for the Ariane V, and the United Launch Alliance manufactures and launches the Delta IV and Atlas V rockets. Many launch【 vehicles】 are considered part of an historical line of
+  - 0.67｜ Darryl White, and Nigel Lappin, the club's existence was still at threat due to severe financial problems, and since 【1】990, The Bears had been
+  - 0.66｜ extending the type system to include object-oriented concepts and modifying the graphics API to better suit OpenGL. BlitzMax was also the first of the Blitz【 languages】 to represent strings internally using UCS-2
+  - 0.66｜30 (1990), Mega STE (1991), and Falcon (1992). Atari discontinued the entire【 ST】 computer line in 1993
+  - 0.65｜高度为h的二叉树至多有2^h-1个结点(h>=1)；⏎4）对完全二【叉】树按从上到下、从
+  - 0.64｜实事求是，忠于实验数据；尊重客观事实，避免主观臆断。⏎经过不懈地努力，绝大部分学生都较好地完成了这一【实验】，得出了正确结论。看着他们
+  - 0.63｜受理。”“前款‘法定期限’自行政许可申请受理之日起计算;以数据电文方式受理的，自数据电【文】进入行政机关指定的特定系统之日起计算
+  - 0.63｜ end of the 1996 season, the Vancouver Voodoo franchise folded after four years.⏎⏎Regular season records⏎For the four seasons【 played】 by the VooDoo, the
+  - 0.63｜ "ethane". When necessary, the position of the hydroxyl group is indicated by a number between the alkane name and the -【ol】: propan-1-ol for
+  - 0.63｜和俄羅斯西伯利亞的巴士。⏎⏎鐵路運輸⏎⏎截至2007年為止，比什凱【克】2站 每天只有幾
+
+## N158（第 24 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 33.3
+- 直接读出推高：的地方 | 之后 | 之处 | 之後 |  before | 之日起 | 之前 | 后 | 以来 | 的时候
+- 直接读出压低：第三代 | rw | ofire | iband | ucker |  Founder | 堰 | armed |  Setter | gett
+- 正极片段：
+  - 1.00｜、相辅相成。从长远和根本上说，“稳预期”要靠深化改革、扩大开放。⏎正确的政治路线、发展战略【确定】后，干部就是决定因素。做好
+  - 0.93｜君学”，是先秦的“上古之学”，黄节则指出国学也是救国的学说：“国学【存】则爱国之心有以依属”。
+  - 0.91｜易俗，莫善于乐;安上治民，莫善于礼。”⏎四者全则治道备。⏎“礼义【立】，则贵贱等矣;乐文
+  - 0.78｜我们来看看其所引的法律规定是否支持其观点。先就步步为营的观点来看，《劳动法》第七十九条规定：“劳动争议【发生】后，……调解不成，当事人一方
+  - 0.76｜规定的其他方式转让；转让后由公司将受让人的姓名或者名称及住所记载于股东名册。 股东大会【召开】前二十日内或者公司决定分配股
+  - 0.74｜退还已经收取的保险费。⏎保险人主张不符合承保条件的，应承担举证责任。⏎第五条 保险合同订【立】时，投保人明知的与保险
+  - 0.74｜民以仁，摩民以谊，节民以礼，故其刑罚甚轻而禁不犯者，教化【行】而习俗美也（用“仁
+  - 0.73｜，是证明论点的。错误和反动的论点，往往是建立在虚假的论据之上的，论据驳【倒】了，论点也就站不住脚
+  - 0.71｜人以保险人未履行明确说明义务为由主张该条款不生效的，人民法院不予支持。⏎第十一条 保险合同订【立】时，保险人在投保单或者保险
+  - 0.69｜，合同是否因之无效问题。第一，关于法律适用问题。《合同法解释(一)》第四条规定，合同法【实施】以后，人民法院确认合同无效，应当
+  - 0.68｜十一届全国人大常委会第七次会议修订的《中华人民共和国保险法》(以下简称保险法)的有关问题规定如下：⏎第一条保险法【施行】后成立的保险合同发生的纠纷，
+  - 0.67｜仁，成的作用是义。所以他说：“故圣人在上，以仁育万物，以义正万民。天道【行】而万物顺，圣德修而
+  - 0.66｜相比起来，币值更稳定就行。在国际间，衡量币值稳定的最常用的角度是汇率。⏎布雷顿森林体系【建立】以来，美元一直是最主要的国际
+  - 0.66｜经济业务的应借应贷账户及其金额的一种记录。⏎掌握原始凭证与记账凭证的编制:原始凭证是在经济业务【发生】或完成时取得或填制的
+  - 0.65｜分析便可成功一大半。⏎在该环节中，教师大胆放手，力争让学生成为真正的学习主宰者。��课题任务【确立】下来以后，教师引导学生进行分
+  - 0.65｜审理程序对裁定再审的案件进行审理，确定生效裁判是否确有错误，依法作出再审裁判。再审裁判【作出】并依法送达生效后，再审
+  - 0.64｜穿过透明的“玻璃片”，几秒之后，显示屏幕上呈现出单光子的二维量子行走演化结果。⏎一个量子计算过程【完成】，而其中最关键的就是这枚“
+  - 0.64｜与作者取得联系，配备得力的编辑人员，并尽早安排出版，保证教材的编校和印刷质量。⏎《通知》【发出】后，各有关单位高度重视高等学校的
+  - 0.64｜人民法院申请强制执行。这也是仲裁和调解的区别所在。⏎我国《仲裁法》实行一裁终局制度，即仲裁裁决【作出】后，当事人就同一纠纷，不能再
+  - 0.64｜房被焚毁达一万三四千间，村庄被平毁者十三四，造成轰动全国的惨案。惨案【发生】后，山东人民尤其是旅居东北
+
+## N159（第 24 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.1 次；语料最大激活 8.2
+- 直接读出推高：ext | ument | ex | estination | 不出 | illard | 目的地 | ective | osity | area
+- 直接读出压低： بالنسبة | elib | FFFFFF | 日常生活 | 忆 |  memories | .gov |  lives | cdb | 生活的
+- 正极片段：
+  - 1.00｜_widget_show_all (window);⏎⏎    /* start the main loop, and let it rest there until the application is closed */⏎    gtk_main ();⏎⏎【   】 return 0;⏎ }⏎⏎GTK Runtime Environment
+  - 0.91｜打磨产品，把自己的工作做成“高精尖”，已成为各行各业的不懈追求。甚至有人感慨：“我真的是希望工匠精神可以变成【我的】墓志铭。”⏎“将不
+  - 0.90｜ activity will hardly take a few minutes, but if you inculcate it from the first week or month of your academic year, it will【 become】 a habit, and then you will find
+  - 0.89｜posed from childhood. Haven't they?⏎When you were a child, your mother had to impose the discipline on you. Then, once it【 became】 a habit, you understood it was for
+  - 0.85｜ A satellite network can play a significant role in the efficient monitoring of health situations and epidemics in the event of natural disasters like earthquake.⏎This【 became】 evident during a two-day training exercise conducted
+  - 0.85｜ will only work using spaces, unless you do:<|endoftext|>SPECIAL OFFER: - Limited Time Only!⏎(The ad below will not display on【 your】 printed page)⏎Ideally, the goal
+  - 0.84｜#include<stdio.h> int main() { signed int value1 = 10; usigned int value2 = (unsigned int)value1【;】 }⏎算术溢出，该程序
+  - 0.81｜al gimmicks: anyway; something or other; everything like that; stuff, things⏎- Ineffectual phrases: it has come to【 my】 attention; it is important to realize;
+  - 0.80｜ gtk_widget_show_all (window);⏎⏎    /* start the main loop, and let it rest there until the application is closed */⏎    gtk_main【 ();⏎⏎】    return 0;⏎ }⏎⏎GTK Runtime
+  - 0.79｜window);⏎⏎    /* start the main loop, and let it rest there until the application is closed */⏎    gtk_main ();⏎⏎    return 0【;⏎】 }⏎⏎GTK Runtime Environment for Windows ⏎由於
+  - 0.77｜3The hearts of the wise make their mouths prudent,⏎and their lips promote instruction.⏎24Gracious words are a honeycomb,⏎sweet【 to】 the soul and healing to the bones.⏎
+  - 0.77｜：顺序线性表L已存在 */⏎	/* 操作结果：依次对L的每个数据元素调用函数vi() */⏎【	】/*           vi()的形参加'
+  - 0.77｜_show_all (window);⏎⏎    /* start the main loop, and let it rest there until the application is closed */⏎    gtk_main ();⏎⏎   【 return】 0;⏎ }⏎⏎GTK Runtime Environment for
+  - 0.76｜ you inculcate it from the first week or month of your academic year, it will become a habit, and then you will find it【 so】 easy to continue even when portions become larger
+  - 0.75｜，粮食产业与其他产业之间结构性矛盾突出。⏎　　粮食事关生存，是保障国民经济健康运行的基础和重中之重，任何时候都不能让【粮食】成为我们的软肋，要在确保国家
+  - 0.75｜printf ("'p' found at position %d.\n", pch-str+1);⏎printf ("'p' not found.\n【");⏎】- Compare two blocks of memory (function
+  - 0.74｜.base[Q.front];⏎    return 1;⏎}⏎⏎// 打印队列中的内容⏎void Q_Print(SqQueue Q)【 {⏎】    int p = Q.front;⏎   
+  - 0.73｜形式算法，用ANSI C代码表示⏎⏎int max(int *array, int size)⏎{⏎  int mval = *array;⏎【 】 int i;⏎  for (i =
+  - 0.73｜做第一步。⏎用ANSI C代码表示⏎//交換2數⏎void swapi(int *x, int *y)⏎{⏎【 】 int tmp = *x;⏎  *
+  - 0.73｜产业与其他产业之间结构性矛盾突出。⏎　　粮食事关生存，是保障国民经济健康运行的基础和重中之重，任何时候都不能让粮食成为【我们的】软肋，要在确保国家粮食安全

@@ -1,0 +1,525 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## N120（第 10 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 9.53
+- 直接读出推高：服 | REFERRED |  knew | alon | 追 | storybook |  прим | 发明 | 简介 |  Links
+- 直接读出压低：XI | 门户 |  plage |  coz | 俱 | TypeInfo | 核桃 | TI | oni | 把手
+- 正极片段：
+  - 1.00｜長；⏎ 中國毛澤東詩詞研究會名譽會長；⏎ 中國寫作學會名譽會長。⏎⏎奖项【和】荣誉 ⏎1988年4
+  - 0.97｜021, DiFranco released the album Revolutionary Love which was largely inspired by Valarie Kaur's book See No Stranger.⏎⏎Personal【 life】⏎DiFranco came out as bisexual
+  - 0.97｜M lines of code? 200K LOC? 100K LOC? 20K LOC?"⏎⏎Awards and【 honors】 ⏎⏎Kay has received many awards and honors
+  - 0.96｜ to "Madam". She is sometimes addressed as Daw Suu or Amay Suu ("Mother Suu") by her supporters.⏎⏎Personal【 life】 ⏎Aung San Suu Kyi
+  - 0.96｜ announced that he would participate in series 13 of Taskmaster. He finished in 4th place ahead of Judi Love.⏎⏎Personal【 life】⏎O'Hanlon met his wife
+  - 0.95｜ Voyage, leadership, entrepreneurship, Artificial Intelligence (AI), Technology, Innovation, Meta Data and the complexity of business in the music industry.⏎⏎Personal【 life】 ⏎On 6 July 19
+  - 0.94｜ one occasion. He has also won CMLL's CMLL Torneo Gran Alternativa and Leyenda de Azul tournaments.⏎⏎Personal【 life】⏎Arturo García Ortiz was born on
+  - 0.93｜ Books") of the Catholic Church. He regarded this as a "distinction". This Index was abolished in 1966.⏎⏎Personal【 life】⏎In 1877,
+  - 0.93｜ancic and 2014 Miss Universe pageant with Natalie Morales from Miami, Florida⏎in 2015.⏎⏎Personal【 life】⏎⏎Survivor of sexual abuse ⏎In
+  - 0.93｜ldiss died on 19 August 2017, the day after his 92nd birthday.⏎⏎Awards and hon【ours】⏎⏎He was elected a Fellow of the
+  - 0.93｜ the morning and attracted prominent politicians, such as the former Prime Minister Levi Eshkol and former Finance Minister Pinchas Sapir.⏎⏎Awards【 and】 critical reception ⏎On 21 April
+  - 0.93｜ times, and an editorial director of Omni; he was also president of both the National Space Society and the Science Fiction Writers of America.⏎⏎Personal【 life】 and education⏎Ben Bova was born
+  - 0.92｜ The Pursued, was discovered in 2003 and published by Penguin Classics on 3 November 2011.⏎⏎Personal【 life】 ⏎Forester married Kathleen Belcher in
+  - 0.92｜ATO[我是大明星]海綿寶寶⏎2016 PETA（善待動物組織）⏎⏎獎項與榮【譽】⏎⏎軼事⏎⏎未服兵
+  - 0.92｜宏、梁朝伟、陈柏霖、张孝全，胡军是前十名里面唯一一个大陆男星。⏎⏎獎項【及】提名⏎⏎参考文献⏎⏎外部連結⏎⏎
+  - 0.91｜9, 2011.⏎Koenen was released at the end of the preseason in September 2015.⏎⏎Personal【 life】⏎Koenen, who majored
+  - 0.91｜) and a Patron of British Pugwash (that brings together scientists and others concerned with international affairs and disarmament).⏎⏎Awards and hon【ours】⏎In 2009,
+  - 0.91｜ following his assassination. Rabbani's son Salahuddin then took over chairmanship of the High Peace Council from his father.⏎⏎Honors【 and】 awards⏎  :  Order of Is
+  - 0.91｜966 her 1938 novel The Ugly Dachshund was made into a film of the same title.⏎⏎Personal【 life】⏎⏎She married New Zealander Geoffrey
+  - 0.91｜ character in Agamemnon. Additionally, he played the lead roles in Little Hands, Sentimental, and A Private Death.⏎⏎Personal【 life】⏎In 1990,
+
+## N121（第 32 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.2 次；语料最大激活 27
+- 直接读出推高： on |  On | 'on | ’on | .on | _on | \ton | On |  на |  على
+- 直接读出压低：薮 | ECH | 澳洲 | 楞 | 劲 | alam | 动生成 | nock | ewing | nox
+- 正极片段：
+  - 1.00｜ make a clear distinction between algebraic sets and varieties and use irreducible variety to make the distinction when needed.⏎⏎Regular functions ⏎⏎Just as continuous【 functions】 are the natural maps on topological spaces
+  - 0.90｜ off computers or turn to sleep mode when not in use - you can save energy, save money, and help the environment by activating power management【 features】 on your computer.⏎Theme: Waste Reduction
+  - 0.90｜ If you are having difficulty hearing, check the audio settings on your computer.⏎We strongly recommend that students use a real mouse, as the touch【 pads】 on laptop computers are more difficult to use
+  - 0.89｜ as a free software replacement for the Bourne shell. First released in 1989, it has been used as the default login【 shell】 for most Linux distributions. Bash was one
+  - 0.84｜ version is also available for Windows 10 and Windows 11 via the Windows Subsystem for Linux. It is also the default user【 shell】 in Solaris 11. Bash
+  - 0.82｜ was shrinking over time, a study released Thursday revealed why: milder winters tied to global warming.⏎Due to milder winters, lambs【 on】 the island of Hirta do not
+  - 0.82｜ areas of analysis, the spaces under study are often Banach spaces.⏎⏎Definition⏎⏎A Banach space is a complete normed space  ⏎A【 norm】ed space is a pair ⏎ consisting of
+  - 0.82｜0s led to the development of multiple BASIC dialects, including Microsoft BASIC in 1975. Due to the tiny main memory【 available】 on these machines, often 4 
+  - 0.81｜ be polynomial (or regular) does not depend on the choice of a coordinate system in An.⏎⏎When a coordinate system is chosen, the regular【 functions】 on the affine n-space may be identified
+  - 0.81｜.  The Lebesgue–Stieltjes measure is a regular Borel measure, and conversely every regular Borel【 measure】 on the real line is of this kind
+  - 0.80｜, BIOS ROM or PC BIOS) is firmware used to provide runtime services for operating systems and programs and to perform hardware initialization during the booting【 process】 (power-on startup). The BIOS firmware
+  - 0.80｜ of this is, if you don’t know umami now, you will by the time I am finished with you.⏎Sorry, the comment【 form】 is closed at this time.<|endoftext|>Government
+  - 0.79｜ for text processing and typically used as a data extraction and reporting tool. Like sed and grep, it is a filter, and is a standard【 feature】 of most Unix-like operating systems.⏎⏎The
+  - 0.78｜, and it is difficult to determine which are based on truth and which are not. All of the writers agree that Pythagoras was born【 on】 Samos, a Greek island off the
+  - 0.77｜ provide web applications with interactive features that cannot be provided by HTML. Since Java's bytecode is platform-independent, Java applets can be executed by【 browsers】 running under many platforms, including Windows,
+  - 0.77｜ setting. Students with hearing impairments can read the text at the bottom of the screen. If you are having difficulty hearing, check the audio【 settings】 on your computer.⏎We strongly recommend that
+  - 0.77｜ mode and linking to third-party cloud-based storage such as Dropbox. Having evolved from Flash-based software, AutoCAD Web uses HTML5 browser technology【 available】 in newer browsers including Firefox and Google Chrome
+  - 0.76｜ only if  is translation invariant and , which means that  for all scalars  and all  in which case the function  defines a【 norm】 on  and the canonical metric induced by
+  - 0.76｜ to check the condition of the baby.⏎Click here to view the⏎Online Resources of Pregnancy, Birth, and Baby Center⏎Disclaimer - This【 content】 is reviewed periodically and is subject to change
+  - 0.75｜ Shared Folders > Test files.⏎You can also go directly to the folder using the UNC path⏎You can map a shared folder to a【 drive】 letter just as you would with a network
+
+## N122（第 5 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 186 页一次；语料最大激活 9.07
+- 直接读出推高：然是 | raham | NESS | wards | 山上 | tape | 摘编 | ACHED |  Thomson | ホール
+- 直接读出压低：.Identity | 腈 | wat | lag |  unpl | ibs | ldb | wdx | 一个人 | rawid
+- 正极片段：
+  - 1.00｜ URIs, including parsing, comparing, and combining. The class properties are read-only; to create a modifiable object, use the Uri【Builder】 class.⏎Relative URIs (for example
+  - 0.98｜ PHP 8 发布，它包含了很多新功能与优化项， 包括命名参数、联合类型、注解、构造【器】属性提升、match 表达式
+  - 0.96｜ade，支持GtkBuilder，这是一个GTK内置的GUI描述格式。⏎ Gazpacho，用Python编写的GTK工具包的GUI构建【器】⏎ Crow Designer，依赖于它自己的
+  - 0.94｜的第一版相应地命名为Object Pascal。与老的OOP扩展相比较，主要的增加是基于参考对象模型，虚拟构建【器】和析构器，以及属性。
+  - 0.86｜ Line Tools⏎- Run freecommandlinetools.exe; choose the drive and folder into which you want to install the free C++【Builder】 5 command line tool development system.⏎
+  - 0.76｜。⏎⏎GUI设计器⏎⏎有几个GUI设计器可用于GTK。以下项目截至2011年7月仍在活跃：⏎⏎ Glade，支持Gtk【Builder】，这是一个GTK内置的GUI描述格式
+  - 0.55｜到的prompt称为P3。实验中用到的prompt均来自P3，除了BIG-bench，它的prompt用的是构建【者】自己写的。6.1. General
+  - 0.54｜夹插执行。采用并发程序设计可以使外围设备和处理器并行工作，缩短程序执行时间，提高计算机系统的效率。⏎rt【 builder】中的参数<|endoftext|>情感转向的理论资源
+  - 0.51｜ tenable on such computers. In 1991, Microsoft released Visual Basic, combining an updated version of BASIC with a visual forms【 builder】. This reignited use of the language
+  - 0.50｜Data.Serialize is very slow (and using Blaze.ByteString not much⏎better). This is fast:⏎We do not need to use⏎blaze【-builder】 or related;⏎Network.Socket.Bytestring
+  - 0.44｜ Federation of Belgian IT Employers⏎ Beltug - Federation of Belgian ICT Professionals⏎ UPP - Union of Belgian Periodical Press Publishers⏎ Feb【el】ma - Belgian Federation of Magazines⏎
+  - 0.42｜对交互的需求是不同的。查询是在命令发生时不会改变状态的操作。此外，虽然不是强制性的，但 CQRS 实现在【查询】和命令端之间利用了不同的持久
+  - 0.40｜家。（1817年逝世）⏎ 1775年：弗朗索瓦-阿德里安·布瓦【爾】迪厄，法國作曲家
+  - 0.40｜傳統的函数式编程提供了有限的支持，它提供了 map、filter和reduce函数；列表推导式、字典、和生成【器】表达式。標準庫中的模組
+  - 0.37｜的对象或方法。⏎3. 初始化（Initialization）：初始化阶段是类加载的最后一个阶段，在此阶段，JVM执行类构造【器】<clinit>()方法。该方法
+  - 0.36｜ your mind so that you wont forget what you have learned shortly afterward.⏎- Vocabulary Improvement Techniques⏎- Ways to Increase Vocabulary Quickly⏎- Vocabulary【 Builder】 Course⏎- Using Vocabulary Software⏎-
+  - 0.36｜ there are six telecommunications firms in the country: Cellcard, Smart Axiata, Metfone, Seatel, Cootel, and【 qb】. Three companies, Metfone, Cell
+  - 0.36｜同一个层级中，使得Python的对象模型成为纯粹而一致的对象模型；还介入了迭代器，受CLU和Icon启发的生成【器】，和描述器协议。Python 
+  - 0.31｜，Thmoomathph）：荷鲁斯四子之一，死者胃的保护者。⏎凱布山納夫（Q【eb】shenuf，Kebechsen
+  - 0.29｜ to defending the fledgling cause of liberty.”⏎The objective of the invasion of Canada was to gain military control of the British province of Que【b】èc, and convince the French-speaking
+
+## N123（第 26 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 33 页一次；语料最大激活 20
+- 直接读出推高：浣 | chu |  vũ |  myfile | 兵马 |  CHR | 国防部 | -wow | cycles | AndView
+- 直接读出压低：slot | stä | enia |  Slot | 槽 |  slot | mens |  ap |  aperture |  pointed
+- 正极片段：
+  - 1.00｜ gives the details about the network card and all devices attached to the machine. If you type lspci and get an error “lscpi【:】 command not found”, you will have to
+  - 0.84｜ written the program, to compile it, issue the command cl⏎C:> cl myprogram.c⏎- During the compilation and linking, my【program】.obj and myprogram.exe will be created
+  - 0.77｜ Studio to compile for Win64, change "main" to "WinMain" in the "main.c" and compile with the /【link】 /SUBSYSTEM:WINDOWS option.⏎|
+  - 0.73｜ to compile it, issue the command cl⏎C:> cl myprogram.c⏎- During the compilation and linking, myprogram.obj and my【program】.exe will be created.⏎- To run
+  - 0.73｜ to compile for Win64, change "main" to "WinMain" in the "main.c" and compile with the /link【 /】SUBSYSTEM:WINDOWS option.⏎|ch
+  - 0.64｜ program, to compile it, issue the command cl⏎C:> cl myprogram.c⏎- During the compilation and linking, myprogram.obj【 and】 myprogram.exe will be created.⏎-
+  - 0.62｜ is primarily used for programs that translate source code from a high-level programming language to a low-level programming language (e.g. assembly language,【 object】 code, or machine code) to create
+  - 0.58｜後才執行。⏎ 链接器（linker）：將由編譯器或組譯器產生的目的檔【和】外部程式庫連結為一個可執行
+  - 0.54｜ and save his people from their oppressors:⏎Psalm 44:11-26 RSV⏎"Thou hast made【 us】 like sheep for slaughter, and hast scattered
+  - 0.53｜ even for a simple program. All files are created inside the project folder.⏎- Under the project name of your program, the source code and【 object】 file is located at sub folder similar to
+  - 0.53｜).⏎&& is generally safer. i.e., ./configure && make (&& sudo make install)⏎$ cp bogus && echo "** copied" cp【:】 missing destination file operand after `bog
+  - 0.51｜才執行。⏎ 链接器（linker）：將由編譯器或組譯器產生的目的檔和【外部】程式庫連結為一個可執行檔案
+  - 0.51｜11 Express 11/10|⏎- get character strings from curses terminal keyboard⏎cc [ flag ... ] file ... -lc【urses】 [ library ... ] #include <c
+  - 0.50｜的存储单元依次存储数据元素的线性结构，使得线性表中在逻辑结构上相邻的数据元素存储在相邻的【物理】存储单元中，即通过数据元素
+  - 0.50｜.⏎C:> edit myprogram.c⏎- After written the program, to compile it, issue the command cl⏎C:> cl myprogram【.c】⏎- During the compilation and linking,
+  - 0.48｜ that do not have the resources to support software development, such as an embedded system or a microcontroller. In such a case, the resulting【 object】 code must be transferred to the target system
+  - 0.48｜pping : 2⏎cpu MHz : 1996.107⏎cache size : 1024 KB⏎【physical】 id : 0⏎siblings : 
+  - 0.46｜自艾萨克·牛顿后的第二次统一。⏎⏎在1864年發表的論文《電磁場的動力【學】理論》中，麦克斯韦提出
+  - 0.46｜We’ll need to link with the library that implements all the global functions we’ll use in a minute. This library turns out to be runtime【object】.lib, although this is not specified in
+  - 0.46｜直接轉譯執行，而非將所有內容都轉譯後才執行。⏎ 链接器（linker）：【將】由編譯器或組�
+
+## N124（第 9 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 123 页一次；语料最大激活 6.67
+- 直接读出推高：pread |  teg |  carousel | 鳗 | ooled |  maxLength | _UNDEFINED | 曩 | .djangoproject | 报道
+- 直接读出压低：的存在 |  Sidney |  Gerard | 하자 | enzie | éd | egis | 制止 | 议 | IGO
+- 正极片段：
+  - 1.00｜ and 1875, pp. 5-77, 209-266).⏎Click tabs to swap【 between】 content that is broken into logical sections.
+  - 0.92｜ abode is cause for excitement. While conversation of the election swirls around them, share Marc Brown’s Arthur Meets the President (Scroll【Motion】, Inc.; $2.99
+  - 0.87｜ exact nature of the beliefs of Colluthus is not known. His activities after 324 are similarly obscure.⏎Click tabs to swap【 between】 content that is broken into logical sections.
+  - 0.77｜ page content outside the applet dedicated area, so they were less useful for improving the site appearance in general (while applets like news tick【ers】 or WYSIWYG editors are also
+  - 0.75｜ news widget presents the headlines of the day from around the world. The news shows a title followed by an article, which the user can scroll【 through】 using the swipe motion. The widget display
+  - 0.72｜TS. I hope you will find this site to be a helpful introduction to the study of the Dead Sea Scrolls.⏎This site is organized by【 tabs】.⏎The tabs are categorized according to certain
+  - 0.70｜; and 1875, pp. 5-77, 209-266).⏎Click tabs to【 swap】 between content that is broken into logical sections
+  - 0.63｜ the exact nature of the beliefs of Colluthus is not known. His activities after 324 are similarly obscure.⏎Click tabs to【 swap】 between content that is broken into logical sections
+  - 0.62｜88; and 1875, pp. 5-77, 209-266).⏎Click【 tabs】 to swap between content that is broken into
+  - 0.62｜ hope you will find this site to be a helpful introduction to the study of the Dead Sea Scrolls.⏎This site is organized by tabs.⏎The【 tabs】 are categorized according to certain types of resources
+  - 0.57｜8; and 1875, pp. 5-77, 209-266).⏎Click tabs【 to】 swap between content that is broken into logical
+  - 0.57｜ letters stand out from their context. Optionally a handy hover-cross is shown, highlighting those letters that are in line with the letter that is currently【 under】 the mouse pointer. Especially the longer and
+  - 0.55｜ miscarriages⏎- Mike Judge: "Bowling for Columbine" made me pro-gun⏎- Closing Gitmo is not enough⏎Featured【 Slide】 Shows⏎The week in 10
+  - 0.53｜, the exact nature of the beliefs of Colluthus is not known. His activities after 324 are similarly obscure.⏎Click tabs【 to】 swap between content that is broken into logical
+  - 0.52｜The news widget presents the headlines of the day from around the world. The news shows a title followed by an article, which the user can【 scroll】 through using the swipe motion. The widget
+  - 0.51｜ on your page. Users who cannot see your images for whatever reason will see or hear the text you supply using the⏎<IMG SRC="【banner】.gif" HEIGHT="30" WIDTH
+  - 0.50｜ to get the plug-ins to work, and this can be nuisance.⏎Some websites that are sponsored by companies have advertisements throughout the website. Animated【 banners】 run across the top ; pop-up windows
+  - 0.50｜安卓系统的动态壁纸;人们会在闲暇时用手指在手机屏幕上来回滑动，针对这一行为，手机操作系统桌面页面【切换】采用了左右 滑的手势，
+  - 0.50｜ the letters stand out from their context. Optionally a handy hover-cross is shown, highlighting those letters that are in line with the letter that is【 currently】 under the mouse pointer. Especially the longer
+  - 0.50｜ the C. Howard Hunt Pen Company in 1915 and that firm released six different Speedball nibs. Click on any image【 for】 a larger version.⏎The pen is named
+
+## N125（第 12 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 4.92
+- 直接读出推高：个多 | 汧 |  pours | 不含 |  wol | 一次性 |  Neb |  pó | 不动 | pite
+- 直接读出压低：搭档 |  partner |  partners |  Together | 合作 |  together | PAIR | Together | _pair | 协商
+- 正极片段：
+  - 1.00｜ regions' musical affinities.⏎⏎In an experiment that would prove successful, Emmerson brought two members of Baaba Maal's band together【 with】 traditional Irish musicians to see what kind of
+  - 0.84｜人示威的大規模暴騷亂事件，是為「胡差暴動」。⏎ 1971年：兩【組】法國人道援助團隊共同組
+  - 0.81｜精熟諸如防禦、反擊、進行連段等操作技巧。格鬥遊戲以一對一、二對【二】或多對多等，雙方同
+  - 0.81｜拉開活門，犯人就會頸椎折断致死。⏎⏎亦有像拔河那样的缢杀方法，即兩【组】人員在兩旁拉扯绳索
+  - 0.78｜，在企鵝村高中運動會篇時揭露其實是空豆豆的妹妹，也就是說空豆與木綠兩【家】實際上是表親。造型模仿
+  - 0.77｜笔记本电脑上的购买动机有哪些 第五章 商品与消费心理 书面作业:课后案例分析 日本商人开发"偕老【同】穴"作为结婚礼品成功的原因;
+  - 0.75｜ (which made possible the production of modern plywood) and started work on the torpedo. In 1842, the family joined him【 in】 the city. Now prosperous, his parents
+  - 0.75｜ of two members - man and woman. The first of the team members runs the first and third legs (3 km each), the other【 team】 member – the second and fourth legs (
+  - 0.74｜, his "post-corrective adviser", Alex visits a record store, where he meets two pre-teen girls. He invites them back【 to】 the flat, where he drugs and rapes
+  - 0.73｜: military and civil. Chinese dominoes are also longer than typical European ones.⏎⏎Traditional Chinese domino games include Tien Gow, Pai【 Gow】, Che Deng, and others.⏎⏎Deck
+  - 0.73｜植株的种子。当这种种子自花或異花受粉时，它产生的高植株和矮植株是3【:】1。这样产生的矮植株总是
+  - 0.71｜ together is considered a suit on its own, called the gi jun ( supreme).  It is the highest ranking pair in the game of Pai【 Gow】, though the tiles rank low individually (
+  - 0.70｜接回了妻子。1807年2月，俄奥联军在埃尔劳与法军进行了一场残酷的鏖【战】，双方损失都很惨重。6
+  - 0.69｜ role that the U.S. Environmental Protection Agency plays in determining water-quality standards. To support the latter group, Curry arranged an after-school meeting【 between】 its four students and a water-district
+  - 0.69｜世界各地。⏎⏎雙方球員手持乒乓球拍、隔著架有球網的球桌互相對打。可作為單打或【雙】打，兩方互相擊球直至
+  - 0.68｜ smaller than female herds. Mature bulls rarely travel alone. Towards the end of the summer, for the reproductive season, the sexes necessarily comm【ingle】.⏎⏎American bison are known for living
+  - 0.68｜ net. Although it may be played with larger teams, the most common forms of the game are "singles" (with one player per【 side】) and "doubles" (with
+  - 0.68｜来日本的时候留学生们都会在语言学校学个一年半年的日语，然后再各自决定进路。就在语言学校，我的隔壁【班】里有位男性印度人，1
+  - 0.67｜ Olympic biathlon. The pursuit format was added for the 2002 Salt Lake City Winter Olympics, and the IBU added mixed【 relay】 as a format for the 20
+  - 0.66｜ entering Oxford, he was shipped<|endoftext|>Chinese dominoes are used in several tile-based games, namely, tien gow, pai g【ow】, tiu u and kap tai sh
+
+## N126（第 10 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 6 页一次；语料最大激活 19.4
+- 直接读出推高：letcher | olg | omin | 建设和 | inner | 来访 | 十几 | 很长 | opol | \tStringBuilder
+- 直接读出压低：typed | tür | 义 |  mainly | Typed |  typed | 一是 |  tab |  sparkle | avity
+- 正极片段：
+  - 1.00｜63 billion) in 2018.  In 2019, annual sales from bubble tea shops reached as high【 as】 140.5 billion R
+  - 0.86｜⏎⏎According to , the total population was 11,891,000 in 2020, compared to【 only】 2 309 0
+  - 0.80｜是1090年大理时代驻扎边境白子军人的后裔。地方誌資料證明，贵州白族迟【至】1940年代还在大量使用
+  - 0.76｜他們大約在公元前第四世紀製成他們的音譯本，雖然有些學者認為這部譯本遲【至】公元前第二世紀才完成。當
+  - 0.76｜ the notion of the Syrian uprising as a poor Sunni man revolt does not do full justice to this reality. According to Phil Sands, as late【 as】 January of this year, a senior tribal
+  - 0.75｜一个极宽的d波势形共振。他们发现，在散射共振附近，玻色爱因斯坦凝聚体的寿命仍【高达】数百毫秒，远远大于多体
+  - 0.74｜ '55 Cancri e', orbits a sun-like star in the constellation of Cancer and is moving so fast that a year there lasts a【 mere】 18 hours.⏎This 'diamond
+  - 0.73｜, and a poll by the Ipsos firm published this year in the daily Le Monde showed no sign that that might lessen. A full【 】70 percent of those questioned felt there
+  - 0.73｜iameter of deferent / 603 = Sighra ratio / Manda ratio⏎Jayavarman VII therefore appears (as late【 as】 the 12th century) to
+  - 0.72｜中有一隻等級81的皮卡丘。在《心金‧魂银》中，皮卡丘等級更【高达】88级。目前为止赤红最后一次
+  - 0.72｜.63 billion) in 2018.  In 2019, annual sales from bubble tea shops reached as【 high】 as 140.5 billion
+  - 0.72｜4岁，与1型糖尿病病人在不治疗的情况下能存活的寿命大致吻合——醫學上的胰岛素則遲【至】二十多年后才被发现。梅
+  - 0.71｜ those changes, growth was estimated at a value of 7% while inflation dropped from 26% in 1994 to【 only】 6% in 199
+  - 0.71｜充满乐趣的活动，但感到学习很无聊的学生比例也达到了23%，而对自己的学习态度表示不清楚或无所谓的学生比例更【高达】44%，这部分学生的学习态度事实上
+  - 0.70｜0s briefly reversed the trend, but soon the retreat of the venerable coal briquettes continued.⏎In 2001 a【 mere】 1.5 percent of families were
+  - 0.68｜数据，2003年美国风险投资基金的资金募集来源中，各类公有和私有养老基金的份额最大，占比【高达】42%，金融和保险机构居
+  - 0.68｜ survived until the beginning of the 20th century, and there were even records of one making an appearance at a dog show as late【 as】 1969, but this
+  - 0.68｜检验项目中，中央机构所需公务员人数从7，242人锐减至126人，公务员削减率竟【高达】98%左右。⏎综上，
+  - 0.68｜平均溫度則為零下40~50度；東南極高原地區最為寒冷，年平均氣溫低【達】零下57度。到現在
+  - 0.68｜ supported orphanages and noted that about 200 were considered mixed blood. An American missionary working with orphanages suggested that perhaps as many【 as】 1,000 could be
+
+## N127（第 19 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 4.98
+- 直接读出推高：-pack | rips | 同城 | 閣 | ceans |  Dept |  grips |  Killed | icz |  polys
+- 直接读出压低：都想 | BREAK | erves | _BREAK | ąd |  Brew | 夔 | 离 | .Companion | 凭证
+- 正极片段：
+  - 1.00｜ in less than a decade. Guided tours are available. A Memorial Wall, built from Jerusalem stone, surrounds six memorial lights, representing the【 six】 million Jews who died at the hands of
+  - 0.97｜哲的内容，即历史唯物主义部分的社会形态问题。关于这个词的考点有三个，一是明确这个词不是泛指，是【特】指，仅指中国处于经济不
+  - 0.89｜ joined "Elverkets Spelmanslag" ("The Electricity Board Folk Music Group"); the name was a punning reference to their【 electric】 instruments. Their repertoire consisted mainly of instrument
+  - 0.89｜ae plant family within the order Cycadales. The genus name "Dioon" means "two-egged", referring to the【 two】 ovules (see photo below).⏎⏎Two
+  - 0.84｜ RAM drive for temporary high-speed data storage.⏎⏎As shown in the diagram, traditionally there are two more sub-layers of the primary storage,【 besides】 main large-capacity RAM:⏎ Processor registers
+  - 0.79｜学院注重发挥市级培训机构的示范引领作用，构建了“3+1+N”人才培养体系。其中“3”是针对教师【3】个发展阶段的“启航计划”
+  - 0.78｜ of AA and was used to write the Edinburgh Multiple Access System (EMAS) operating system.⏎⏎AA's second-greatest claim to fame (【after】 being the progenitor of IMP and EM
+  - 0.77｜ both of which are equivalent to the English Sir ʻAbbás. He preferred the title of ʻAbdu'l-Bahá ("【serv】ant of Bahá", a reference to
+  - 0.76｜ Bayesian inference, which used uniform priors following Laplace's principle of insufficient reason, was called "inverse probability" (because it infers【 backwards】 from observations to parameters, or from effects
+  - 0.76｜合法克减的义务。（来源：人民法院报）<|endoftext|>国家为什么要实行外汇管制？⏎这个网址上可以找到国外的外汇政策⏎【http】://www.bjwto.gov.cn
+  - 0.76｜ for avoiding a midair collision. Smaller aircraft may use simpler traffic alerting systems such as TPAS, which are passive (they do【 not】 actively interrogate the transponders of
+  - 0.73｜，初演即为三庆班主持程长庚赏识，约其入三庆班学艺，宗余派（【余】三胜）。深受程长庚器
+  - 0.72｜ size of the box, the chamber acts like a Helmholtz resonator, increasing or decreasing the volume of the sound again depending on【 whether】 the air in the box is moving in
+  - 0.72｜ made the home undesirable to buyers but the Batlló family decided to buy the place due to its centralized location. It is located in the【 middle】 of , which in the early 2
+  - 0.72｜ the twelfth century, and never became current in the East. The word "extreme" (final) indicated either that it was the【 last】 of the sacramental unctions (
+  - 0.72｜.⏎“It was nice just seeing how open and loving they were. ... I would love for her to experience Kenya one day,” Byers said【 of】 her daughter.⏎“They (Kenyans
+  - 0.72｜文比例逐漸提高。一般漢民族語文科目在中小学通常但称语文，在大学则常常不简称而只使用【全】稱。少数民族学习的科目则分别为
+  - 0.71｜ on the surface of the antibody.⏎These loops are referred to as the complementarity-determining regions (CDRs), since their shape comple【ments】 that of an antigen.⏎Three CDR
+  - 0.71｜ Santa Cruz. “Bolshoi” is Russian for “big” or “grand,” and the name is apt: This is a【 large】-scale computational project, consuming six million CPU
+  - 0.69｜ baseless and absurdly high but perhaps derived some of their initial appeal from the roundness of the figure and its middling nature, neither【 too】 small nor too large.⏎In any case
+
+## N128（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 32 页一次；语料最大激活 8.79
+- 直接读出推高：vous | 拂 |  poles | isma | 挥手 | ersh | ipples | 挥 | .getServer |  trivia
+- 直接读出压低：AlgorithmException | quil | opus | loit | aret |  HARD | .exports | ...")\n | 話 | uent
+- 正极片段：
+  - 1.00｜，三头六臂好惊人。⏎原是释迦来降世，助吾法囝救良民。⏎左手擎日【右】擎月，手擎日月照
+  - 0.82｜為奇才，對《聊齋誌異》甚為喜愛，為之題詩：「姑妄言之【姑】聽矣，豆棚瓜架雨
+  - 0.73｜楼，临眺无端怅远游，烟雨一天凭对酒，英雄千古几封侯？塞鸿飘渺长【空】远，羌管悠扬野草
+  - 0.68｜宫中有这样的习俗活动，民间也有。诗人王维《寒食城东即事》诗中说，“蹴鞠屡过【飞】鸟上，秋千竞出垂
+  - 0.67｜人洞，无限风光在险峰”、“金猴奋起千钧棒，玉宇澄清万埃”、“独有英雄【驱】虎豹，更无豪杰怕
+  - 0.64｜，秋千竞出垂杨里”，可见踢球之高。杜甫《清明》诗中也说，“十年蹴鞠【将】雏远，万里秋千习俗同
+  - 0.64｜表述了自己无意帝位，只想把酒言欢及时行乐的心迹。诗-{云}-：「世事无常【耽】金樽，杯杯臺郎醉
+  - 0.64｜中逐渐减弱，代之而成的是一种轻快圆美的新风格，例如《春晚郊居》： 柳外楼高【绿】半遮，伤心春色在天涯
+  - 0.63｜派的打击和迫害，其中以岳飞的下场最为悲惨。故陆游诗说：“公卿有党【排】宗泽，帷幄无人用岳
+  - 0.62｜又是一位画家，喜绘突兀奇峭的石头。敦敏《题芹圃画石》说：“傲骨如君【世】已奇，嶙峋更见此
+  - 0.60｜州邑之一。元朝時丰州的经济文化发展迅速。文人刘秉忠诗曰：“晴空高显寺【中】塔，晓日平明城上
+  - 0.60｜产事迹后，作《国侨赞》称赞子产。⏎ 黄庭坚《子产庙》：“区区小郑【多】君子，谁若公孙用意
+  - 0.60｜。⏎而清代王渔洋仕宦扬州，歌咏当地名胜，更提升了扬州的文化品位，一句"绿杨城郭【是】扬州"唤起人们多少美好的憧憬
+  - 0.59｜给友人的《留别王景通二首》其二中，描述自己的仕宦生涯是：“游宦差池大【半】生，君方倥偬我伶
+  - 0.56｜庸以番货事奉使闽浙十首》写出了自己对杭州城的美好回忆，其四曰：“涌金门外【是】西湖，堤上垂杨尽姓
+  - 0.56｜川。但作奇寒侵客梦，若为一震静胡烟？田园荆棘漫流水，河洛腥膻【今】几年？拟扣九关笺帝
+  - 0.55｜不改。⏎⏎长孙皇后曾著书《女则》共十篇，已佚。今存诗一首：“上苑桃花【朝】日明，兰闺艳质动
+  - 0.54｜总是战胜腐朽。正是“虎踞龙盘今胜昔，天翻地覆慨而慷”，“一唱雄鸡【天下】白，万方乐奏有于
+  - 0.53｜凿混沌”这个典故，金人元好问有诗云:“凿开混沌露元气，抵挠都罗【弥】梵天。”3.《庄子
+  - 0.53｜是一位画家，喜绘突兀奇峭的石头。敦敏《题芹圃画石》说：“傲骨如君世【已】奇，嶙峋更见此支
+
+## N129（第 7 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.6 次；语料最大激活 6.28
+- 直接读出推高：再 | 年内 |  act |  further | QA | 填报 | 覆 | CppClass | Further | ctors
+- 直接读出压低：ModelError | 研究成果 | 坐 | 逼 | 老爸 | udu | ogle | _BOUNDS | bare | isper
+- 正极片段：
+  - 1.00｜ those students would increase.⏎The education ministry plans to iron out the details of the early graduation system by the end of fiscal 201【3】 after holding meetings of experts or those attached
+  - 0.97｜ Nuclear Regulatory Commission cannot relicense Indian Point's two reactors for another 20 years.⏎The current reactor licenses expire in 201【3】 and 2015.⏎The
+  - 0.91｜ both malaria and the use of DDT. The initiative aims for a 30% reduction in DDT use by 201【4】, and total elimination of DDT by
+  - 0.89｜an orbiter to measure the thickness of Europan ice and see how deep⏎its oceans go -- could reach Europa between 202【0】 and 2025. A
+  - 0.89｜ European Space Agency to search for Earthlike planets and, possibily, otherworldly entities. Expected to launch in 201【7】, this ESA satellite will be surveying
+  - 0.88｜'E-1 lunar orbiter next year too, part of its plan to put a taikonaut on the moon by 201【7】 - a year ahead of NASA.⏎A
+  - 0.88｜ part of the equation.⏎And our source tells us that part of that plan is deploying RESOLVE on the lunar surface in 201【7】. It’s a payload designed to be
+  - 0.86｜ reduction in atmospheric carbon, there still remains a significant gap with the level required by science, meaning that emissions would peak after 202【0】 ensuring an increase in average global temperatures of
+  - 0.86｜ Navajo Nation president.⏎Under the preliminary negotiations, the tribe would give any federal and state tax revenue to BHP until 201【6】, when BHP's lease ends to
+  - 0.84｜ the most comprehensive plans comes from Massachusetts Governor Deval Patrick, a Democrat. He would like to eliminate preschool waiting lists by 201【7】 and plans to invest nearly $57
+  - 0.82｜ treaty. Negotiations are set to begin in earnest this December on a new accord, which United Officials want in place by 201【2】.⏎Then again, there’s no guarantee
+  - 0.82｜ malaria, announcing that their goal is “to achieve a 30% cut in the application of DDT worldwide by 201【4】 and its total phase-out by the early
+  - 0.82｜ will be needed.⏎Despite best efforts, it must be recognized that CCS technologies will not be ready for widespread commercial uptake until 202【0】 at<|endoftext|>Lung function means how well
+  - 0.81｜ will be selected after a year of design and analysis. Testing of the non-nuclear system is expected to take place in 201【2】 or 2013 to verify
+  - 0.81｜3年8月，在抵抗运动对德国占领军几次猛烈的袭击后，德国向国王下达最后通牒，要求丹麦政府【宣布】戒严、解散一切集会、
+  - 0.81｜ development into country policies and programmes and reverse the loss of environmental resources.⏎Target 2: Reduce biodiversity loss, achieving by 201【0】, a significant reduction in the rate of
+  - 0.80｜ Indian routes under the UDAN scheme.⏎Operating under the brand name Air Deccan, it will commence operations in December 201【7】 with flights between Mumbai and Nashik.
+  - 0.80｜. Another $5 million will awarded in bonus prizes. The final deadline for winning the prize is December 31, 201【4】.”⏎So, on the New Scientist site
+  - 0.79｜ liftoff. Its propulsion system will include liquid hydrogen and liquid oxygen. Its mission will launch Orion without a crew in 201【7】; the second will launch Orion with up
+  - 0.79｜ serves as a regulating agent in the immune system and can be used therapeutically in conjunction with other anti-cancer medicines.⏎Further research may【 show】 that humic acids can also be used
+
+## N130（第 1 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 1.27
+- 直接读出推高：法律规定 | acre | ifferential | ition |  Till | ukt | 瞽 | люд | irable | setDisplay
+- 直接读出压低： throat | leness |  uncont | 废物 | 兹 |  garn | 兀 | 班子 |  incon | 诋
+- 正极片段：
+  - 1.00｜ 溶【と】ける:⏎アイスが溶【と】けているよ。はやく食【た】べな【さい】。 Your ice cream is melting. Hur
+  - 0.63｜、「自涜」、「自慰」、「」、「」}-。而俚语则有-{「シコる」、「抜【く】」、「オナる」、「ひとり
+  - 0.62｜-{「シコる」、「抜く」、「オナる」、「ひとりエッチ」、「マス（を）掻【く】」、「致す」、「自家�
+  - 0.59｜渡につき取缔役会の承认を要する旨の定める场合に取缔役会の承煮んを欠【く】が、株主の全员の承诺
+  - 0.57｜ September 1942) was fought between both battles and in the same location.⏎⏎ja:エル・アラメインの戦【い】<|endoftext|>The Brezhnev Doctrine was a
+  - 0.51｜铁臂阿童木-阿童木去赤道》（鉄腕アトム　アトム赤道をゆ【く】）发行，之后改名为《海
+  - 0.51｜べる, 走【はし】る, etc) and events (降【ふ】る, 吹【ふ】【く】, etc), ～ている shows the
+  - 0.49｜は南の風に乗って走るわ あゝ　青い風切って走れあの島礁へ あなたと逢【う】たびに すべてを忘れてしまう
+  - 0.48｜。 Your ice cream is melting. Hurry up and eat it.⏎アイスが溶【と】けちゃうよ。はや【く】食【た】べなさい。
+  - 0.48｜ films, The Women Knight of Mirror (竞雄女侠秋瑾) and The Years of Qi Xiao Fu (七小福之燃【情】岁月), to be released later in 
+  - 0.46｜稱為「小白」。日本稱KY（空気読めない，Kuuki Yomenai，又稱空気読【め】或空気嫁），有時又
+  - 0.46｜ with those?" Let's look at 溶【と】ける:⏎アイスが溶【と】けているよ。はや【く】食【た】べなさい。
+  - 0.46｜多半以細胞的形式在身體的各器官、組織中運行。⏎⏎古典免疫學 ⏎古人發現一個人如果得了某種傳【染】病，可以長期或終身不再
+  - 0.46｜音阮)⏎ 月琴⏎ 三絃⏎ 琵琶⏎ 柳琴⏎ 秦琴⏎ 独【絃琴⏎ 文】琴⏎ 文枕琴⏎ �
+  - 0.46｜網路，通常把「白目」與「白爛」合稱為「小白」。日本稱KY（空気読【め】ない，Kuuki Yomenai
+  - 0.45｜的紙張來印刷，日本漫畫雜誌部分頁面甚至粗糙到類似新聞紙並且印刷油墨會沾【染】到讀者手上。歐美漫
+  - 0.45｜和製漢語），但也有少數音譯詞，如榻榻米（たたみ）、甜不辣（て【ん】ぷら）等⏎ 仿�
+  - 0.44｜；97年sakura因為持有違禁興奮劑黯然退團，其餘三人飛往倫敦，在潛【沉】一年後復出，yukihiro
+  - 0.44｜系统软件及操作系统基础 ( 基本内容) 1) 嵌入式软件基础 2) 嵌【入】式操作系统概述 3) �
+  - 0.44｜是由嚴重急性呼吸道症候群冠狀病毒所引起的，傳播途徑包括由已被感染者所咳出的飛沫傳【染】，而整個傳染過程主要透過
+
+## N131（第 30 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 18
+- 直接读出推高：而去 | 对其进行 | 出来了 | Ending | ected | 进入了 | 会对 | 来进行 | .dispatchEvent | 进行了
+- 直接读出压低： begging |  staring |  st |  stared | 始 |  beg | beg | _sta |  star |  Beg
+- 正极片段：
+  - 1.00｜hoyer (1768–1852)⏎Ferdinando Carulli (1770–18【4】1)⏎Wenzel Thomas Matieg
+  - 0.95｜ Thebes), it was approved of and even celebrated (cf. Dover, 1989; Halperin, 19【9】0).⏎Probably the most frequent assumption of
+  - 0.94｜ and Robert McCulloch, Bayesian Statistics and Marketing, John Wiley & Sons, Ltd, 2006⏎- Thomas P.【 M】inka (2001) Bayesian
+  - 0.91｜3年逝世） ⏎ 1771年：光格天皇，日本第119代天皇。（18【4】0年逝世） ⏎ 17
+  - 0.84｜符（Uniform Resource Identifiers，URI）来标识。⏎⏎HTTP的发展是由提姆·柏內茲-李於198【9】年在歐洲核子研究組織
+  - 0.82｜, and Mac OS X.⏎source : wikipedia<|endoftext|>Contact: Catherine Brawn Fortier, Ph.D.⏎Harvard Medical School⏎Terence【 M】. Keane, Ph.D.⏎VA
+  - 0.81｜逝世）⏎ 1773年：德川家齊，日本江戶幕府第11代將軍（18【4】1年逝世）⏎ 178
+  - 0.77｜by, and Robert McCulloch, Bayesian Statistics and Marketing, John Wiley & Sons, Ltd, 2006⏎- Thomas【 P】. Minka (2001
+  - 0.76｜ experience severe depression in their lifetime. The suicide rate among Black men is twice as high as those of Black women, as provided by Terrie【 M】. Williams, therapist and the author of
+  - 0.76｜集团的季度毛利年比年减少24%，与上一季度<|endoftext|>天然气（）是一种主要由甲烷组成的气态化石【燃料】。它主要存在于油田以及天然气田
+  - 0.74｜世界首富伊隆·馬斯克以440億美元完成對Twitter公司的收購案，並開除帕拉格【·】阿格拉瓦爾等主管高
+  - 0.70｜物来制备。金属镁能与大多数非金属和差不多所有的酸化合，大多数碱，以及包括烃、醛、醇【、】酚、胺、脂、酯和
+  - 0.69｜的HIV是从第三方获得的。⏎⏎2007年与2008年，“柏林病人”蒂莫西·雷【·】布朗在接受两次骨髓移植与干细胞
+  - 0.69｜825年：佩德罗二世，巴西帝國末代皇帝（1891年逝世）⏎ 18【4】6年：皮埃爾·瓦
+  - 0.69｜ in the older literature, and (since 2022) by Donald Knuth following Peter Luschny's "Bernou【lli】 Manifesto".⏎⏎In the formulas below,
+  - 0.68｜为青铜比（）。用连分数可表示为⏎⏎参考文献⏎⏎引用⏎⏎来源 ⏎⏎ 《黃金比例》;遠流【出版】公司;2004年;
+  - 0.67｜ old as philosophical skepticism, but the terms agnostic and agnosticism were created by Huxley (1825–18【9】5) to sum up his thoughts on
+  - 0.67｜."⏎"This study documents, for the first time, the dynamic nature of the neuropathology associated with chronic heavy alcohol use," added Terence【 M】. Keane, associate chief of staff
+  - 0.66｜ which so startled their enemies that it either delivered victory or at least ensured what the soldier in that culture considered an honourable death.⏎⏎Tomé【 P】ires in his Suma Oriental, observed
+  - 0.65｜ subsp. sinuata (Regel) Raus⏎ subsp. suaveolens (Req.) Lambinon & K【erg】uélen⏎ Alnus firma Sie
+
+## N132（第 3 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 170 页一次；语料最大激活 6.41
+- 直接读出推高：AtA |  pneum | 钱 | opol | نظ |  Observable |  Least | 两点 | � | elerik
+- 直接读出压低：/image | =image |  image | .setImage |  getImage | (image |  setImage | rong |  images |  Images
+- 正极片段：
+  - 1.00｜和使用记录承担保护义务。不得非法留存能够推断出用户身份的输入信息，不得根据用户输入信息和使用情况进行【画像】，不得向他人提供用户输入信息
+  - 0.89｜一方面可以直接采集软信息，另一方面也可使用外部引入的大数据信息，最终为社区居民和其他主体，刻画更加全面的信用“【画像】”，为新型金融服务奠定基础。　
+  - 0.79｜能够制定出最优信息推荐策略，继而以特定信息作用于目标认知，并最终影响其现实行为。⏎绘就目标用户【画像】。用户画像的本质是对用户进行标签
+  - 0.78｜构建多维度标签向量，再对相似个体进行聚类处理，分析具有相似特点的群体特征，可形成群体目标【画像】，并以此作为认知塑造的基础和起点
+  - 0.77｜还有许多其他的应用场景。借助人工智能技术，金融机构可以将用户特征从二元的收益/风险进一步拓展到多维“【画像】”，针对不同用户偏好，构建一个
+  - 0.75｜其现实行为。⏎绘就目标用户画像。用户画像的本质是对用户进行标签化处理，以此形成特定身份。标签类似数字【画像】中的“像素”，数据获取越全面
+  - 0.72｜需要创设多维度的教育评价环境，基于持续性的评价积累，才能为核心素养导向的教育质量监测提供“综合素养【画像】”。⏎同理，对单一的对象
+  - 0.67｜不战而屈人之兵”的效果。实践证明，目标认知定向重塑彰显现实特定行为，现实行为动态改变引发用户【画像】实时调整，进而带动推荐策略调整
+  - 0.66｜最优信息推荐策略，继而以特定信息作用于目标认知，并最终影响其现实行为。⏎绘就目标用户画像。用户【画像】的本质是对用户进行标签化处理，
+  - 0.65｜为客户提供低门槛、低费率的个性化财富管理方案。⏎在互联网金融行业的应用，一是精准营销。大数据通过用户多维度【画像】，对客户偏好进行分类筛选，
+  - 0.61｜1879年起，迈布里奇开始讲学动物运动（locomotion）摄影，并使用（将记录下的连续【画像】绘制在玻璃圆盘上，再
+  - 0.55｜对艺术的极致追求，充分地反映在他的代表作《谎言的衰落 》、 《道连·葛雷的【画像】》和《莎乐美》上
+  - 0.55｜⏎⏎7⏎ ⏎1945年中國建立⏎1945年建立的政黨<|endoftext|>《道林·格雷的【画像】》（The Picture of Dorian Gray
+  - 0.51｜堂山顶上的东汉石祠，用青石砌成，坐北朝南，祠室内三面皆有浅线刻【画像】，横贯西北东三面内
+  - 0.49｜先生说：“‘舞’是中国一切艺术境界的典型”，“是宇宙创化过程的象征”。[26]这些舞蹈【画像】为我们探讨汉代乐舞的美学
+  - 0.48｜如生的感觉。在舞蹈中，舞者注重表情的夸张，很多图像上可以看到舞者张嘴狂欢，比较清晰的【画像】上可以看到舞者生动的眼神，手
+  - 0.48｜：一个个身份不同的人物，一张张各具特征的面孔，一道道彼此交错的凝视，一幅幅朦胧模煳的【画像】，甚至还有一只恹恹欲睡
+  - 0.47｜和重构历史过程的痕迹。⏎现在的中学历史教材上引用了大量内容丰富的原始材料，比如图片，包括人物照片、人物【画像】、情景图片、历史地图、图表
+  - 0.45｜，原名Dorian: An Imitation）。⏎ 建筑师王大闳将《道林·格雷的【画像】》译写为《杜连魁
+  - 0.44｜阁，过着“钟鸣鼎食，征歌选舞”的奢靡生活。根据“诸城前凉台庖厨【画像】”，可以看到上面挂满猪头、
+
+## N133（第 35 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 20 页一次；语料最大激活 85.5
+- 直接读出推高：setter | rated | aid | 'o |  hud | TURE | idot | 党委书记 | _ctxt | 党组书记
+- 直接读出压低：关心 | -chain | 看来 | Prem | 挽回 | 可能 | ライン | 最新 |  generalize | lify
+- 正极片段：
+  - 1.00｜公孙大夫祠》：“皇华长此往来频，慨想当年事两邻。独以艰难支小国，偏【于】凋敝惠斯民。田间
+  - 0.93｜宴集朋僚，湘赴宴，劝愈弃官学道，呈愈诗有“解造逡巡酒，能【开】顷刻花”等句， �
+  - 0.92｜一震静胡烟？田园荆棘漫流水，河洛腥膻今几年？拟扣九关笺帝所，人【非】大手笔非椽。 �
+  - 0.91｜宜将猛济宽。”⏎ 黄本诚《谒公孙大夫祠》：“皇华长此往来频，慨想【当年】事两邻。独以艰难支
+  - 0.90｜忠诗曰：“晴空高显寺中塔，晓日平明城上楼。车马喧阗尘不到，吟【鞭】斜袅过丰州”。⏎⏎元朝
+  - 0.90｜“一寸名扬心已灰，十年长路梦初回”（《示崔雷社诸人》）、“无【端】学术与时背，如瞽失相
+  - 0.89｜水德人多狎，拯溺宜将猛济宽。”⏎ 黄本诚《谒公孙大夫祠》：“皇【华】长此往来频，慨想当年
+  - 0.89｜这一事业的最终目的。⏎“九州禹迹忘安乐，换却江山永泰宁”“流出古今秦汉月,【问他】伏龙可曾寒” “鞠
+  - 0.86｜频，慨想当年事两邻。独以艰难支小国，偏于凋敝惠斯民。田间遗泽【歌】犹昔，身后尼山涕尚
+  - 0.86｜四個長短不一的部份。開頭詩為「混沌未分天地亂，茫茫渺渺無人見。自【從】盤古破鴻蒙，
+  - 0.86｜图》云，“遥想山堂数树梅，凌寒玉蕊发南枝。⏎山月照，晓风吹，只为【清香】苦欲归”“南望吴
+  - 0.86｜培养学生的书面和<|endoftext|>正确理解我国哮喘防治指南以指导临床合理用药⏎林江涛医生工作室(北京 朝阳区)【 呼吸科】⏎一、强调哮喘是一种慢性气
+  - 0.85｜古戍独登楼，临眺无端怅远游，烟雨一天凭对酒，英雄千古几封侯？塞【鸿】飘渺长空远，羌管
+  - 0.84｜新风格，例如《春晚郊居》： 柳外楼高绿半遮，伤心春色在天涯。低迷帘幕【家】家雨，淡荡园林处处花
+  - 0.84｜，荒云几处鸟声悲。”⏎ 周昙《子产》：“为政何门是化源，宽【仁】高下保安全。如嫌水
+  - 0.83｜长此往来频，慨想当年事两邻。独以艰难支小国，偏于凋敝惠斯民。田【间】遗泽歌犹昔，身后尼
+  - 0.83｜汝昌提出「癸未说」，是根据《小诗代柬寄曹雪芹》一首诗：“东风吹杏雨【，】又早落花辰。好枉
+  - 0.82｜炎的《次韵公实雷雨》和徐俯的《咏史》： 惊雷势欲拔三山【，】急雨声如倒百川。
+  - 0.81｜时之思，如洪炎的《次韵公实雷雨》和徐俯的《咏史》： 惊【雷】势欲拔三山，急雨
+  - 0.80｜例如《春晚郊居》： 柳外楼高绿半遮，伤心春色在天涯。低迷帘幕家家雨【，】淡荡园林处处花。<|endoftext|>我国
+
+## N134（第 0 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 2.7 次；语料最大激活 0.568
+- 直接读出推高：谤 |  зан | unders | misc | 验 | .circular | iotics | 经常 |  pro | 养老金
+- 直接读出压低：使我 | ointed |  Glad | igung | 姬 | 录 | 的家庭 |  Harden | Purple | 福
+- 正极片段：
+  - 1.00｜www.nyseg.com|⏎|Orange and Rockland||1-877-434-4100||www.or【u】.com|⏎|Rochester Gas and Electric
+  - 0.98｜ variety of materials to use to help Michigan residents be prepared for disasters.⏎To find specific materials to promote National Preparedness Month, go to ed【en】.lsu.edu/Resources/NPM/Pages
+  - 0.96｜RKK	人口预测学⏎RKL	人口规划学⏎RKM	人口政策学⏎RKN	计划生育学⏎R【KO】	人口学其他学科⏎民族问题
+  - 0.95｜ Swiss mathematician Jacob Bernoulli, after whom they are named, and independently by Japanese mathematician Seki Takakazu.  Sek【i】's discovery was posthumously published in
+  - 0.93｜ from getting sick from food?⏎Answer: It’s so simple it might surprise you! The answer is handwashing.⏎Hans B. Kle【en】 has lots of helpful hints and information to
+  - 0.89｜EMA) to encourage all Americans to take the necessary steps toward emergency preparedness. The Cooperative Extension Service through the Extension Disaster Education Network (ED【EN】) is a partner in this campaign.⏎
+  - 0.88｜ occur too rapidly for energy to enter or leave the system as heat, allowing a convenient "adiabatic approximation". For example, the ad【i】abatic flame temperature uses this approximation to
+  - 0.86｜ liquefied petroleum gas, such as propane, butane, or a mixture. Combustion temperature achieved depends in part on the ad【i】abatic flame temperature of the chosen fuel
+  - 0.86｜ wheel manufacturer⏎ Bahrain Bayan School⏎ Bangladesh Bureau of Statistics⏎ Baton Broadcast System, Canada⏎ Bhutan Broadcasting Service, Bhutan⏎ Bod【u】 Bala Sena, Sri Lanka⏎
+  - 0.83｜ division algebra of dimension 8 over the real numbers.⏎ More generally, any octonion algebra is alternative.⏎⏎Non-examples⏎ The sed【en】ions and all higher Cayley–Dick
+  - 0.82｜ this approximation to calculate the upper limit of flame temperature by assuming combustion loses no heat to its surroundings.⏎⏎In meteorology and oceanography, ad【i】abatic expanding produces condensation of moisture
+  - 0.81｜ done deliberately as an alternative to issuing the album explicitly under Lifeson's name. The title track is from the W. H. Aud【en】 poem, also entitled "Victor".
+  - 0.81｜ and 1900 MHz,   LTE 700 MHz  with Island-wide coverage ⏎Digicel (Ang【u】illa) Ltd. – GSM and U
+  - 0.81｜iles de Granada, which celebrates the feuds of the Abencerrages and the rival family of the Benedin (Arabic ban【u】 Edin), and the cruel treatment to
+  - 0.79｜odala (born 1984), American professional basketball player ("A.I. 2.0")⏎⏎Places⏎⏎Areas⏎ Ang【u】illa, a Caribbean territory (by ISO
+  - 0.79｜ a new context:⏎# semanage fcontext -a -t httpd_sys_content_t '/srv/www(/.*)?'⏎# sem【an】age fcontext -l | grep '/
+  - 0.79｜ is an open-source license used for certain free and open-source software packages, most notably the standard implementation of the Perl programming language and most CP【AN】 modules, which are dual-licensed under
+  - 0.79｜1.0⏎ The Artistic LicenseThe original Artistic License 1.0, the one which is still used by Perl and CP【AN】; They use a disjunction of the
+  - 0.78｜Argument (literature), a brief summary, often in prose, of a poem or section of a poem or other work⏎Argument (ling【u】istics), a phrase that appears in a
+  - 0.78｜ terrorism and examine constitutional rights to privacy. They then share and defend their opinions about domestic security and civil liberties in an age of terrorism.⏎Krist【en】 Tepfenhardt, The New York
+
+## N135（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 2.3
+- 直接读出推高：�� |  Cra |  Spa | PRS | UEL | rä |  OTA | avers | empor | 网站地图
+- 直接读出压低：[' | V | [] | iro | KEN | � |  hợp | 是什么 | E | .init
+- 正极片段：
+  - 1.00｜相关临床药物。<|endoftext|>4. 设二叉树的存储结构为二叉链表，试写出算法（C函数）：【将】所有结点的左右子树互
+  - 1.00｜ subtree is . If the searched key is not found after a  subtree is reached, then the key is not present in the tree.⏎⏎Recursive【 search】⏎The following pseudocode implements the BST
+  - 0.89｜(const char *cp, struct in_addr *addr); in_addr_t inet_lnaof(struct in_addr in); struct in_addr inet_make【addr】(in_addr_t net, in_addr_t
+  - 0.79｜1 和 ConcreteClass2 提供了具体的实现。在实际的开发中，有一些常用的框架和库使用了模板方法（Template【 Method】）设计模式，以下是其中的几个
+  - 0.77｜ window and create a dialog object using one of the standard PythonWin dialogs:⏎>>> import win32ui⏎>>> from pywin.mfc【.dialog】 import Dialog⏎Looking at the object,
+  - 0.68｜-7 to be defined by the user; that's what make_char and write_ascii as well as the bargraph functions are all about.)⏎【Print】s the ascii character (0-7
+  - 0.66｜ view and also a tabular view. Included in all of this are many utility functions for managing these objects. For example, when a view【 notifies】 its document that data has been changed,
+  - 0.66｜Name||Determines whether the specified scheme name is valid.|⏎|Compare||Compares the specified parts of two URIs using the specified【 comparison】 rules.|⏎|Equals||Compares
+  - 0.65｜推，直到最后判断栈里还有没有左括号剩余。⏎（6）例题分析2⏎​ 根据每日气温【列表】，请重新生成一个列表，对应位置
+  - 0.62｜是①的(coldFactor-1)倍，coldFactor默认为3，可以通过csp.sentinel.flow.cold【.factor】参数修改⏎Sentinel中冷启动
+  - 0.62｜ string. The routine inet_ntoa() takes an Internet address and returns an ASCII string representing the address in '.' notation. The routine inet_make【addr】() takes an Internet network number and a
+  - 0.61｜ a compact representation of a resource available to your application on the intranet or Internet. The class defines the properties and methods for handling UR【Is】, including parsing, comparing, and combining
+  - 0.61｜ code creates a flow document⏎reader with an empty document:⏎Listing 1: Flow Document Reader Content⏎There are three levels of flow document【 reader】 controls built-in to the framework: the
+  - 0.59｜        exit(OVERFLOW);⏎    }⏎    Q->front = Q->rear = 0;⏎    return Q;⏎}⏎⏎// 销【毁】队列Q，Q不再存在⏎
+  - 0.59｜ the B in B-trees means, the better you understand B-trees."⏎⏎In 2011 Google developed the C++ B【-】Tree, reporting a 50-
+  - 0.59｜是否有环等等。⏎​ 一般用在要返回新的链表的题目中，比如，给定两个排好序的链【表】，要求将它们整合在一起并排
+  - 0.57｜伪溢出的发生，但队列大小是固定的。⏎// 队列的顺序存储结构(循环队列)⏎#define MAX【_Q】SIZE 5 // 最大队列长度
+  - 0.56｜和先行者。大型企业的海外战略实施需要有一个高层机构统筹规划、协调和指导<|endoftext|>Java设计模式之模板方法（Template【 Method】）模式⏎「模板方法（Template
+  - 0.56｜ query information included in the specified URI.|⏎|Scheme||Gets the scheme name for this URI.|⏎|UserEscaped||Indicates【 that】 the URI string was completely escaped before the
+  - 0.55｜子树为空的二叉树    (5)完全二叉树 ⏎二叉树的基本操作： ⏎(1)INITI【ATE】(BT ） 初始化操作。置
+
+## N136（第 26 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 12.1
+- 直接读出推高： Damn | 惋 | 把手 | herits | 悫 | 档 | 间距 | cascade | rawn | oka
+- 直接读出压低： gut |  microbi | 微生物 |  microbial | 肠道 | 菌 |  Gut |  microbes |  intestinal | 细菌
+- 正极片段：
+  - 1.00｜2002 Nobel Prize in Medicine was awarded to Sydney Brenner, H. Robert Horvitz and John Sulston for their work【 identifying】 genes that control apoptosis. The genes were
+  - 0.97｜ particular cancer. This occurred in 1988 when it was shown that BCL2, the gene responsible for follicular lymphoma【,】 encoded a protein that inhibited cell death.⏎⏎
+  - 0.92｜ to a major field of research: identification of the first component of the cell death control and effector mechanisms, and linkage of abnormalities in cell【 death】 to human disease, in particular cancer.
+  - 0.92｜过程中被打散的DNA序列，从蛋白质的氨基酸序列预测蛋白质结构，利用mRNA微阵列或质谱仪的数据检验【基因】调控的假说。⏎⏎某些人将
+  - 0.90｜curity to a major field of research: identification of the first component of the cell death control and effector mechanisms, and linkage of abnormalities in【 cell】 death to human disease, in particular cancer
+  - 0.90｜与动态。⏎内容简介⏎全书共三十八章，分别对分子病理学基础如细胞凋亡、黏附分子、细胞【周期】的调控、瑞粒酶对细胞
+  - 0.90｜ Memorial Sloan-Kettering Cancer Center, published a report showing that breast cancer metastasis to bone is mediated by a specific set of genes.【 Mass】agué collaborated on the studies with colleagues
+  - 0.89｜植物和动物,并可利用不同病毒转录序列中高度同源区段相应的dsRNA抵抗多种病毒.⏎肿瘤是多个【基因】相互作用的基因网络调控的结果,
+  - 0.88｜pases, which then kill the cell by degrading proteins indiscriminately.⏎⏎In addition to its importance as a biological phenomenon, defective apopt【otic】 processes have been implicated in a wide variety
+  - 0.87｜并可利用不同病毒转录序列中高度同源区段相应的dsRNA抵抗多种病毒.⏎肿瘤是多个基因相互作用的【基因】网络调控的结果,传统技术诱发的
+  - 0.85｜ analyzed for a variety of purposes including the identification of the proteins in a sample, GENETIC POLYMORPHISMS, patterns of【 gene】 expression, and patterns diagnostic for diseases.⏎
+  - 0.84｜ a highly cited term. Two discoveries brought cell death from obscurity to a major field of research: identification of the first component of the cell【 death】 control and effector mechanisms, and linkage
+  - 0.83｜" was a highly cited term. Two discoveries brought cell death from obscurity to a major field of research: identification of the first component of【 the】 cell death control and effector mechanisms,
+  - 0.82｜研究具体某类特定细胞中基因组的表达状态及表达基因的功能鉴定方便具有特殊的优势，从而使它在个体发育、【细胞】分化、细胞周期调控、细胞衰老
+  - 0.81｜ John Oates, M.D., developed methods for measuring levels of prostaglandin metabolites (breakdown products) in the urine using【 mass】 spectrometry.⏎Using this technique,
+  - 0.81｜对分子病理学基础如细胞凋亡、黏附分子、细胞周期的调控、瑞粒酶对细胞生物学行为的影响、【信号】转导途径等进行了系统的阐述，
+  - 0.78｜言⏎第一章　病理与临床⏎第二章　细胞凋亡⏎第三章　黏附分子与肿瘤⏎第四章　细胞【周期】的调控⏎第五章　端粒
+  - 0.78｜ more of the brain than any other stimulus we know.” That’s just listening! As Daniel Levitin, director of the music perception, cognition【 and】 expertise laboratory at McGill University in Montreal explained
+  - 0.78｜ vitreous and lens proteins (Altomare et al. 1997).DECREASED RETINAL ANTIOXID【ANT】 ACTIVITY IN DIABETICS⏎
+  - 0.77｜ million older Americans."⏎* The study is titled, "A Photoreceptor Cell-Specific ATP-Binding Transporter Gene (ABCR)【 is】 Mutated in Recessive Starg
+
+## N137（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.1 次；语料最大激活 4.91
+- 直接读出推高：美人 | =en | elastic |  Rounds | setText | 联络 | 交 | 真正做到 |  setActive | 新闻中心
+- 直接读出压低：孩子的 | 学生的 | 们的 | 's | 公司的 | ’s | 者的 | 老师的 | 企业的 | 用户的
+- 正极片段：
+  - 1.00｜运动的两条定律，又於1618年，发现了第三条定律。⏎⏎开普勒幸运地得到了著名丹麦天文学【家】第谷·布拉赫所观察与
+  - 0.81｜個抽象定義。⏎⏎幾何是第二個系统性的使用群，特別是對稱群的領域。这类群是菲利【克斯】·克莱因1872年的
+  - 0.79｜为兄妹，威廉的父亲罗贝尔一世与忏悔者爱德华为姑表兄弟，威廉即为忏悔者爱德【华】的姑表侄子。）来
+  - 0.75｜。利用抽气机，波义耳和胡克证明了压强、温度和体积之间有一定的关系，波义耳给出了【波】义耳定律，对于一定温度下的
+  - 0.75｜與其數天一同討論哲學。之後萊布尼茨就到漢諾威管理圖書館，並擔任公【爵】法律顧問。⏎⏎1680
+  - 0.73｜的基础，是细胞功能的最普遍为人接受的解释。⏎⏎细胞学说的三个要点如下所描述：⏎ 细胞是一个有机【体】，一切动植物都由细胞发育
+  - 0.72｜zh-cn:基度山恩仇记; zh-tw:基度山恩仇記;}-》）是法國大文【豪】大仲馬的经典冒险小说，也被
+  - 0.72｜荆州区纪南镇纪南城）是屈原终古之所居，更何况也考古发现纪南城为楚三大贵族【（】屈、景、昭）的居住
+  - 0.71｜评价甚低。幻想交响曲引入了“固定乐念”的概念，以一个音型来代表一个人物事物，被认为是【瓦】格纳的“主导动机”的先
+  - 0.71｜大学生地方感形成机制研究调查问卷》，研究证明，该问卷具有较好的调查可信度和研究有效度，可以作为民族院校【大学生】地方感形成机制调查的工具.
+  - 0.70｜光，为吴王馀眛之子，司马迁在《史记·吴太伯世家》中认为是吴【王】诸樊之子。前51
+  - 0.68｜ always wishes to have, as simply standing for a certain object, and not for a description of the object." If one of Bismar【ck】's friends who knew him directly was the
+  - 0.68｜ 马克思主义哲学的革命性正在于，它通过千百万人民群众的社会实践，在批判旧世界中发现新世界，成为【人民群众】手中变革现存世界的有力武器，推动
+  - 0.68｜生活消費和房價最低的。⏎⏎休士頓的官方綽號為「太空城（Space City）」，因為它是【林】登·詹森太空中心的所在地
+  - 0.68｜反射和折射波场观测，进行了数据采集，获得了深部高分辨率的信息.通过数据处理和反演求得了各剖【面】辖区的沉积建造、结晶基底
+  - 0.65｜共存“密码”⏎新华社北京10月5日电（记者董瑞丰）中国科学院植物研究所一支研究团队日前揭示了【不同】功能型土壤真菌驱动亚热带
+  - 0.65｜，理查德·阿比和约翰·桑德尔。那年秋天，济慈离开克拉克学校，成为医师托马【斯】·哈蒙德的学徒。
+  - 0.64｜契约说”同样难以透彻的阐明空白票据补充权理论根据的本质。因此，笔者主张以“授权说”作为空【白】票据补充权的理论基础。“正是
+  - 0.64｜4，又稱網際網路通訊協定第四版）是网际协议开发过程中的第四个修订版本，也是此【协议】第一个被广泛部署和使用的版本。
+  - 0.63｜。⏎⏎14世纪中叶黑死病入侵，伦敦失去其近三分之一的人口。1381年，伦敦成为瓦【特】·泰勒农民起义的中心。⏎⏎
+
+## N138（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.1 次；语料最大激活 5.57
+- 直接读出推高：的一 | 绣 | 顶 | 包 | 一般的 | 起 | 提 | 收 | 上的 | 住
+- 直接读出压低：焉 | 称之 | ennon | 前所未有 | imus | 而言 | rena | 腘 | _fps | Lens
+- 正极片段：
+  - 1.00｜《淮南子》提倡乐教的思想基础，是其人性论思想。⏎(2)儒家的乐教思想⏎"(《为人【者】天》)⏎《乐记》成
+  - 0.97｜以及《荀子》等属于南方文化系统的典籍中记载相同。如‘雕题'，《招魂》中有‘雕【题】黑齿'的诗句，（王
+  - 0.96｜，袤二百里，溉田四千五百余顷，因名曰白渠。民得其饶，歌之曰：【‘】田於何所?池阳(
+  - 0.91｜ Exp Biol. 2012 Feb 15;215(Pt 4):578-83.【 doi】: 10.124
+  - 0.83｜稱“江右三山”。明景泰七年，諡忠烈。著有《文山詩集》、《指南【錄】》、《指南後錄》、
+  - 0.81｜是也。」《宋史》卷四四一有傳。⏎⏎著作⏎《虎钤经》一百卷⏎《春秋釋【幽】》五卷⏎《演玄》
+  - 0.79｜的劉勰在《文心雕龍·史傳》也認為：“唯陳壽三志，文質辨洽，荀【、】張比之於遷、固，
+  - 0.79｜做了首四言诗《皇太子释奠会作》：“偃闭武术，阐扬文令。庶士倾风，【万】流仰镜。”意思是“废止
+  - 0.77｜是受汉魏以来品评人物的影响的。他自己在《诗品序》中就说：“昔九品论人，《七【略】》裁士，校以宾实
+  - 0.73｜绘。」⏎ 李豫：「卿之伯氏，天下文宗，经历先朝，名高希代，时【论】归美，诵于人口。」⏎⏎
+  - 0.72｜柳女、環女做好人，爹爹管不得。淚下哽咽、哽咽。」獄中作《指南后【录】》第三卷、《正氣歌
+  - 0.72｜2012 Feb 15;215(Pt 4):578-83. doi: 1【0】.1242/jeb.
+  - 0.69｜為政府機關的榮賜褒揚。⏎⏎諡法由來⏎⏎傳統說法 ⏎依《逸周書·諡【法】解》對立諡制度的
+  - 0.69｜. doi: 10.1001/jamaoncol.2019.2311. [E【pub】 ahead of print]⏎2. Wang F
+  - 0.68｜”与艺术表达诗歌言语表达要有惊人的效果，而且要创新，不能陈陈相因，落入窠臼。“语不【惊人】死不休”（杜甫）、
+  - 0.68｜。”⏎⏎後世，南朝梁的劉勰在《文心雕龍·史傳》也認為：“唯陳壽三志【，】文質辨洽，荀、張
+  - 0.67｜關係，《呂氏春秋·十二紀》的紀首和《禮記·月令》文字相同，《淮南子·時【則】訓》則抄錄其文而
+  - 0.67｜。」⏎⏎《山東通志·卷八》：炎帝始制耒耜，教民稼穡，故曰神【農】。初都於陳徙都曲
+  - 0.66｜是指“周公之典”。《尚书》曰：“周公摄政，一年救乱，二年克殷，三年践【奄】，四年建候卫，五年营
+  - 0.66｜人在带方东南大海之中…计其道里，当在会稽东冶之东”⏎ 《后汉书·东【夷】列传倭国条》载：“
+
+## N139（第 8 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 5.61
+- 直接读出推高： bottled |  cố |  Gast | gest |  cryst | reau | GEST | 被害 | urities | icals
+- 直接读出压低：的是 | 更像是 | 录 |  flip | 射 |  thumb | 实际 |  >>= |  subs | 树
+- 正极片段：
+  - 1.00｜向於發生在一神教的國家內而非多神教，可能跟多神教的教義更富有彈性，較【不易】引起衝突有關。在中世
+  - 0.92｜大多数患者视力并不造成影响，但有些患者仍有视力受损的情形。另外，有某些患者出现晶状体的变化，但较【不】常见。 ⏎肠胃道病变：容易
+  - 0.90｜時間而不同：希臘人期許著仔細的論證，但在牛頓的時代，所使用的方法則較【不】嚴謹。牛頓為了解
+  - 0.87｜. His recordings sold well, but he was not a strong influence on younger blues singers of his generation, who could not imitate him as【 easily】 as they could other commercially successful artists.
+  - 0.77｜还有個人電腦的圖像處理能力改良（使用VGA顯示卡），和使用保護模式記憶模式，應用程式能比較【容易】運用更多的記憶體。令個人
+  - 0.76｜比別的月份少。⏎那是因為在古羅馬時代，二月份是處決人犯的月份，所以就從較【不】吉利的月份扣除。⏎⏎後來到了西
+  - 0.75｜ister à l'assaut de l'intelligence qu'il doit en tous points satisfaire. La seconde conviction est plus difficile【 à】 définir: il s'agit pour
+  - 0.73｜, and you may be taking more than one at a time. They may be used for⏎negative symptoms, but they don't work as【 well】 for⏎negative symptoms as they do for
+  - 0.69｜ aimed at other⏎professionals. The section emphasizes items of general or interdisciplinary interest and⏎those relevant to policy development, but also contains more【 specific】 technical material⏎than is found in the
+  - 0.68｜. Mobile phones, smart phones, the internet and social networking slites like facebook allow us to keep in touch with our friends and family more【 easily】 and to have access to a wide range
+  - 0.68｜ can make a telephone call by typing his or her words and having a machine or real person relay them. It could also be used to more【 easily】 make business calls and order take-out or
+  - 0.67｜ the turbine and the reactor automatically shut off, as they had been programmed to do. But an entire nuclear power plant doesn’t halt operations as【 easily】 as one flips a switch. The other
+  - 0.66｜ a quiet room, it is easy to identify the speaker and understand their words. While the same words spoken in a loud bar are more difficult【 to】 process, our brain is still capable of
+  - 0.66｜agenesis. Although it is common in igneous rocks (namely basalts and trachy-basalts), it is more【 rarely】 found in phonolites. Associations include
+  - 0.65｜igratory population avoids the hazards of migration, and by inhabiting a more geographically limited area than migratory cranes, individuals can more【 easily】 find compatible mates. Since 19
+  - 0.64｜, including the brain. As a result, some people may notice that it takes longer to learn new things, they don't remember information as【 well】 as they did, or they lose things
+  - 0.64｜式多任务处理有着完全不同的改善。它可以由使用者决定是平均分配系统资源进行多任务操作，或是将某一个较【不】急于达成、或完成时间较长的
+  - 0.64｜的部分相关重要论述，邀您一起学习领悟。新发展理念，创新是第一位的。我国已经成为世界第二大经济体，过去那种主要【依靠】资源要素投入推动经济增长的方式行不通
+  - 0.64｜entively. Unlike a book, a video provides information via visual images and audio. Both forms of data are ‘more valuable together’ than【 separately】. For example, turn the volume off
+  - 0.63｜ing of entire issues, copying for resale, or creating new collective works.<|endoftext|>The middle-aged are fittest⏎Middle-aged people are f【itter】 and exercise more than younger people.⏎Researchers

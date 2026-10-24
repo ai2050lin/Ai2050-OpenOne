@@ -1,0 +1,525 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## N080（第 27 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 31
+- 直接读出推高：途径 | 渠道 |  avenues |  pathways |  paths | 路径 | 销售渠道 |  ways |  avenue | 来源
+- 直接读出压低：ron | 隔壁 | 三期 | ByExample | рон | peria | 带到 | 二期 | PERTIES | })",
+- 正极片段：
+  - 1.00｜许可、经营运行、招投标等方面一视同仁。创造平等使用生产要素环境，着力解决民营企业融资难融资贵问题，拓宽【民营企业】融资途径，建立清理和防止拖欠
+  - 1.00｜数据库，构建全国土壤环境信息化管理平台，力争2018年底前完成。借助移动互联网、物联网等技术，拓宽数据【获取】渠道，实现数据动态更新。加强
+  - 0.98｜、经营运行、招投标等方面一视同仁。创造平等使用生产要素环境，着力解决民营企业融资难融资贵问题，拓宽民营企业【融资】途径，建立清理和防止拖欠账
+  - 0.97｜公平原则的交易条件，在格式合同中不得加重金融消费者责任、限制或者排除其合法权利，不得限制金融消费者寻求法律【救济】途径、不得减轻、免除本机构
+  - 0.94｜中采用的较多。这种模式常常是一二三产业融合发展的典型，有助于激发新型农业经营主体和农户的发展潜力，在拓宽【农民】增收渠道的同时，也会催生出更多
+  - 0.86｜采用的较多。这种模式常常是一二三产业融合发展的典型，有助于激发新型农业经营主体和农户的发展潜力，在拓宽农民【增收】渠道的同时，也会催生出更多新
+  - 0.81｜听力真题中的“言外之意”现象。同时由于新HSK真题具有保密性,只有汉办官方出版这一【条】公开途径,所以之前被相关论文
+  - 0.80｜国有企业混合所有制改革，又鼓励国有资本投资入股民营企业。合理设计和调整优化混合所有制企业股权结构，拓宽社会资本【参与】渠道，进一步发挥各类基金的支持和
+  - 0.76｜ merchant marine had 54 ships. In March 2001, Azerbaijan concluded a natural gas agreement with Turkey, providing a future【 export】 market for Azerbaijan.⏎⏎Azerbaijan has
+  - 0.75｜專諸說：「王僚可殺。現如今他母老子弱，且兩弟帥兵伐楚，被楚斷【了】後路。當下吳國外
+  - 0.73｜化等。⏎合规的资产证券化可以给证券化发起人和投资人带来很多的好处。对于发起人来说，开辟了新的【融资】渠道，化解了法律规定的某些金融机构
+  - 0.73｜审批许可、经营运行、招投标等方面一视同仁。创造平等使用生产要素环境，着力解决民营企业融资难融资贵问题，【拓宽】民营企业融资途径，建立清理和防止
+  - 0.72｜文化需求。大力弘扬“勤劳创新致富”理念，鼓励农民靠勤劳奋斗实现持续增收，创造更美好生活。⏎其次，拓宽【农民】持续增收的基本路径。基于农民收入
+  - 0.72｜尼拔的軍團發生正面衝突，加強同羅馬聯盟之間的關係，施行焦土戰略，阻斷【其】軍需物資的補給，
+  - 0.71｜高的变现潜力。与土地不同，数据资源是取之不尽、用之不竭的，有望持续不断地为政府提供新的【收入】来源。因此，为政府提供数据
+  - 0.71｜率的金融体系。竞争带来⏎你的养老钱放在哪儿？⏎“每个月都能取1000多块利息，感觉像是【多】了一份补充养老金。”年近⏎相比
+  - 0.70｜地位的名儒硕士（多为进士出身）担任；二是皇帝将经筵授课视为一条了解外部和咨询时政【的】渠道，因此相对独立于相权
+  - 0.70｜脱贫攻坚战的各项决策部署，以提高脱贫质量为首要目标，着力推动脱贫攻坚工作向纵深发展。⏎一、培育特色产业，拓宽群众【增收】致富渠道。大力实施“一村
+  - 0.69｜。軍事手段十分靈活，配合沙漠地形，採取有利則進，不利則退，誘敵設伏、斷【敵】糧道的戰術；並且有
+  - 0.69｜深化农村土地制度改革，建立健全土地要素城乡平等交换机制，加快释放农村土地制度改革的红利。⏎解决“人”的问题，关键是【畅通】智力、技术、管理下乡通道，
+
+## N081（第 0 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 12.6 次；语料最大激活 0.275
+- 直接读出推高：尊 | ever |  variations | .inc | tober | @email | preh | ellaneous |  hab |  ever
+- 直接读出压低：ondo | 不忘 | qc | &q |  Duch | 什么样 | 阙 | coder | 质量管理 | Makes
+- 正极片段：
+  - 1.00｜洪棐。⏎庶子：李薰⏎庶子：李藎⏎⏎参考资料⏎⏎參閲⏎⏎ 亂中日記⏎【 龜船⏎】 忠武公李舜臣級
+  - 0.99｜画bar⏎ 漫画派对⏎ 漫画世界⏎ 漫客星期天⏎ 漫友⏎【 龙漫⏎】 尚漫⏎ 天漫⏎
+  - 0.99｜管乐器⏎ 埙⏎⏎日本雅樂樂器 ⏎ 無簧開管樂器⏎ 橫笛類⏎【 龍笛⏎】 篠笛⏎ 能管
+  - 0.98｜ 尼古拉斯布宁，余纪元.西方哲学英汉对照辞典 2001:228.【 龚文庠】.说服学--攻心的学问
+  - 0.98｜ ⏎ 觀眾選角扮演⏎ 大型多人在线角色扮演游戏⏎ 談話遊戲⏎⏎参考文献⏎⏎外部链接 ⏎⏎ 【 龍與地下】城官方網站 ⏎  柏
+  - 0.98｜國的有栖;zh-hans:弥留之国的爱丽丝}- （麻生羽呂）⏎⏎参见 ⏎【 龙漫少年】星期天⏎⏎参考来源⏎⏎外部链接
+  - 0.97｜黃蓉乃女兒<|endoftext|>《神鵰俠侶》是金庸創作的武俠小說，為「射【鵰三部曲】」的第二部。《神�
+  - 0.97｜。⏎⏎参考文献⏎⏎参见 ⏎ 神舟飞船⏎ 阿波罗计划⏎ 联盟号宇宙飞船⏎【 龍飛船】2號⏎⏎载人航天器类型
+  - 0.96｜资本投入田园综合体建设。处理好政府、企业和农民之间的利益分配关系，使地域得发展、企业得效益、农民得【实惠】。要加大财政资金的支持力度，
+  - 0.96｜ 北京卡通⏎ 卡通先锋⏎ 画书大王⏎ 特别优漫⏎ 漫画show⏎【 龙漫少年】星期天⏎ 嗨漫⏎
+  - 0.96｜（1729年－1731年）：后黎朝——昏德公黎维祊之年号⏎【 龍德（】1732年－17
+  - 0.96｜ue / Cluedo)⏎ 生命之旅 (The Game of Life)⏎ 魔法風雲會 (Magic: The Gathering)⏎【 龍與地下】城 (Dungeons & Dragons)⏎ �
+  - 0.95｜联通天地“护航”中国空间站⏎吕炳宏 解放军报记者 安普忠 王凌硕⏎吕【 龙摄⏎】中国空间站第三批航天员的
+  - 0.95｜ 後堀河天皇 ⏎ 四條天皇 ⏎ 後嵯峨天皇⏎ 後深草天皇 ⏎【 龜山天】皇 ⏎ 後宇多天皇
+  - 0.95｜出生 ⏎ 1月18日——孟德斯鳩，西方國家學說和法學理論的奠基人。 ⏎【 龍爲霖】，康熙四十八年（ 1
+  - 0.95｜會前主席⏎⏎新聞界 ⏎ 黃凱欣：香港有線電視新聞台新聞主播⏎⏎設計及創意產業界 ⏎【 龍慧祺】：香港室內設計師⏎⏎演
+  - 0.95｜ to the other⏎One deters a pest that habitually attacks the other for instance sage, rosemary, thyme⏎repel the【 cabbage】 butterfly; onions and leeks repel
+  - 0.95｜魯哀公問：「弟子孰為好學？」孔子回答：「有顏回者好學，不遷怒，不【貳過。不幸】短命死矣，今也則
+  - 0.95｜，用足科技特派员、农民大学生等政策，强化借力“外脑”、教育培训的针对性和实效性。强化严【管】厚爱，完善乡村干部微小
+  - 0.94｜越秀区广州起义路144号，原广州教育学院校舍，现已移交作为广州市社会主义学院起义路校区。⏎【 龙洞校区】：位于广州市天河区龙洞筲
+
+## N082（第 8 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 129 页一次；语料最大激活 19.8
+- 直接读出推高：iser | 突破 | 倾 |  intact | addle | 纵 | utenberg | 見た | 骨折 | lobber
+- 直接读出压低：omo | libs | 功 |  boils | asso |  eventually | 旗舰店 | emit |  moveTo | 尉
+- 正极片段：
+  - 1.00｜面的位置。⏎有关术语⏎内摩擦角⏎在以土的抗剪强度为纵坐标、剪切破坏面上的 法【向】应力为横坐标的坐标系中
+  - 0.90｜噪声总是不可避免，高分辨率的图像包含了更多的噪声信息，例如光度立体图像中由于互反射产生的噪声，会影响表面法【向】的重建。因此作者认为使用低
+  - 0.89｜滑动面的位置。⏎有关术语⏎内摩擦角⏎在以土的抗剪强度为纵坐标、剪切破坏面上的【 法向应力为】横坐标的坐标系中，土
+  - 0.81｜自由的相对滑动。⏎4.3 接触刚度⏎所有的接触问题都需要定义接触刚度，接触刚度包括【法】向刚度和切向刚度
+  - 0.79｜的相对滑动。⏎4.3 接触刚度⏎所有的接触问题都需要定义接触刚度，接触刚度包括法【向】刚度和切向刚度，
+  - 0.73｜学习模型。这个模型的输入是  的图片，经过特征提取、聚合以及法向回归后重建出的是  的法【向】量。动机：在获取数字图像
+  - 0.71｜然后过卷积层，并行的结构可以保证高分辨率的特征始终不被降采样，因此可以同时保留表面法【向】的深层特征和高分辨率细节。
+  - 0.70｜过大的穿透，但又不应该大到导致病态条件。⏎对于大多数的接触分析，可以按照下面的公式来估计法【向】刚度的值 。⏎当模拟
+  - 0.68｜ Video Technology CCF-B 中科院Q1 作者：举雅琨光度立体面临着由于输入图像的分辨率有限而导致法【向】重建模糊的挑战。虽然现代手机
+  - 0.68｜周运动中，速度的大小不变，向心 加速度是表示速度方向变化的快慢。⏎向心加速度又称为【法】向加速度。⏎例题 ，下列
+  - 0.66｜流变行为、流变测量和聚合物熔体的材料流变函数⏎3.2　黏度实验测定和法【向】应力差系数⏎3.3　
+  - 0.64｜ and  is its instantaneous radius of curvature based upon the osculating circle at time . The components⏎⏎are called the tangential acceleration and the【 normal】 or radial acceleration (or centripetal
+  - 0.64｜每个面来计算的。对于每个小平面，在使用小平面的质心作为顶点并以小平面的向内法【线】作为轴构造的圆锥体中
+  - 0.63｜，但同时又应该让接触刚度足够小以便不会引起总刚度矩阵的病态问题而保证收敛性。⏎法【向】刚度 应该是足够大
+  - 0.62｜ change in the lateral signal in the AFM that can be used to calibrate friction directly, without the need for an independent measurement of the【 normal】 signal. While the D-LFC method
+  - 0.61｜、熔融、泵送、混合和脱挥）分别进行了详细的理论分析和介绍。在第6章，从最基本的法【向】移动平面和平行移动平面入手，
+  - 0.61｜ road. The analogy in the case of rotating bucket is that the element of water surface will "slide" up or down the surface unless the【 normal】 to the surface aligns with the vector
+  - 0.60｜　流变行为、流变测量和聚合物熔体的材料流变函数⏎3.2　黏度实验测定和【法】向应力差系数⏎3.3
+  - 0.59｜ water must point oppositely to the sum of the centrifugal and gravity forces, which means the surface of the water must adjust so its【 normal】 points in this direction. (A very
+  - 0.59｜ = 角误差 + 梯度误差 将输入图像从  下采样到  ，同时保持其对应的表面法【线】在  下不变训练网络。评估
+
+## N083（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 9.08
+- 直接读出推高： now | now | 现在 | Lens | 我现在 |  Now | 此刻 |  Priv | 現在 | elic
+- 直接读出压低：毛 |  midd | 耳朵 | 文化传播 |  herr | 盲 | 发展阶段 | listening | 文化节 |  Bound
+- 正极片段：
+  - 1.00｜ the way they had been modelled for me, were considered the one stop shop for teaching students to learn and assessing progress in basic facts.【 Knowing】 what I know now I understand that they
+  - 0.86｜ Engineering 2013, 7:1 doi:10.1186/1754-16【1】1-7-1Published: 
+  - 0.76｜ // yes, I know it isn't totally correct⏎Oh god that makes me look sad.⏎ Tim_axe, I'm sorry. I【 realise】 what you are saying now (couldn't
+  - 0.64｜[中图分类号] F120 [文献标识码] A [文章编号] 0529-14【4】5（2021）0
+  - 0.62｜003, 2:18pm⏎Perhaps it means that it isn't evil, whether observed from within or without. I【 see】 an internal vs. external reference in "
+  - 0.60｜ experienced bullying throughout my childhood and teenage years.⏎When I was in primary school I was a victim of bullying for many years, I can recall【 now】 how I suffered name calling and exclusion from
+  - 0.59｜ circle of familiarity around these children, and these institutions played a cooperative, organized role in influencing the behavior and achievements of the young. As I【 see】 it, this makes an interesting argument for
+  - 0.57｜ secret they were telling one another, it was for their ears only never mine and as a young girl I felt very left out.⏎As I【 think】 back to my teenage years, I used
+  - 0.54｜1923 by Skolem, even before Gödel's first incompleteness theorem. Skolem argued on the basis of what is【 now】 known as Skolem's paradox, and
+  - 0.52｜led for me, were considered the one stop shop for teaching students to learn and assessing progress in basic facts. Knowing what I know now I【 understand】 that they are none of those things.
+  - 0.52｜z had done it ... and that my failure was due only to my ignorance of electricity. It was a valuable blunder ... If【 I】 had been able to read German in those
+  - 0.51｜ it very helpful – wish I had it 15 years ago. Unfortunately, both my husband and I have failed at our marriage. Looking【 back】, we were both ignorant about what it
+  - 0.50｜, both my husband and I have failed at our marriage. Looking back, we were both ignorant about what it takes to make a marriage work【 thinking】 it would just happen automatically. It also
+  - 0.49｜would be set at a higher level than on other routes; previously, fares had been calculated using a simple rate for the distance travelled, which【 at】 the time was 3d per mile
+  - 0.49｜ I saw some resources on a site, I would download the spreadsheet, PowerPoint or whiteboard file, and not bother with the guidance notes (【I】 didn’t think I’d have time to
+  - 0.48｜ retreat." Baratieri delayed making a decision for a few more hours, claiming that he needed to wait for some last-minute intelligence, but【 in】 the end announced that the attack would start
+  - 0.48｜ they were telling one another, it was for their ears only never mine and as a young girl I felt very left out.⏎As I think【 back】 to my teenage years, I used to
+  - 0.47｜ is important to know that “autism” is not a disease that you can take a blood test or x-ray to detect. What I【 see】 in my work with children and families is
+  - 0.45｜z, independently gave the same solution for the point mass and wrote more extensively about its properties. This solution had a peculiar behaviour at what is【 now】 called the Schwarzschild radius, where
+  - 0.45｜ precise and explicit. Galileo demonstrated that the Copernican view does not contradict our experience of a seemingly stable earth, through a principle that【,】 in the precise form that it takes in
+
+## N084（第 21 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 10.6
+- 直接读出推高：วา |  His | lds | оде |  ense |  Teaching | WARE |  eternal |  teaching | His
+- 直接读出压低：引っ | ercial |  routes | aid | 实用 |  COPYRIGHT | aida | (candidate |  efficiently | 八卦
+- 正极片段：
+  - 1.00｜ commands men to repent. Unless a rebellious sinner repents and believes the Gospel, there is no forgiveness. But praise His precious name【;】 it is to this kind of sinner
+  - 0.80｜. Therefore there is no condemnation… which leads Paul to declare by the end of the chapter that he is convinced nothing can separate us from the【 love】 of God in Christ Jesus. In between
+  - 0.77｜ have wars and interpersonal conflicts until Jesus comes to establish true, lasting peace (see Isaiah 11:1-10), but God【 will】 give His peace to those who trust Him
+  - 0.77｜ the Twelve that the Father would send the Spirit to guide, counsel, and console them in the truth.⏎The Church’s holiness emerges from【 its】 creed, sacramental life, and moral
+  - 0.76｜lined, highlighted, printed in bold life of love confident that nothing, not even our own weak willed ways, can separate us from the【 love】 of God in Christ Jesus our Lord.
+  - 0.76｜ wars and interpersonal conflicts until Jesus comes to establish true, lasting peace (see Isaiah 11:1-10), but God will【 give】 His peace to those who trust Him.
+  - 0.74｜ saved—that is, incorporated into the restored people of God—not by works of the Law but “by faith”, as a response to the gift【 of】 God (Eph. 1:
+  - 0.73｜ appearances, God has a glorious purpose for your life. Beyond this lowly life on earth, this little while, you have an eternal inheritance【 in】 heaven awaiting you. It is glorious,
+  - 0.73｜:17). He commands every sinner to lay down his arms of rebellion and hoist the white flag of surrender to enter the Kingdom【 of】 God. In other words, a s
+  - 0.71｜).⏎Chapter 3 Christ the Pursuit of a Dedicated Life (Vs 10_14).⏎Chapter 4 Christ the Power of【 a】 Dependent Life (V 13
+  - 0.71｜ comes to establish true, lasting peace (see Isaiah 11:1-10), but God will give His peace to those who【 trust】 Him. Jesus took the chastisement
+  - 0.71｜ and believes the Gospel, there is no forgiveness. But praise His precious name; it is to this kind of sinner that He will look【!】 The Lord says in Isaiah 66
+  - 0.71｜ conflicts until Jesus comes to establish true, lasting peace (see Isaiah 11:1-10), but God will give His peace【 to】 those who trust Him. Jesus took the
+  - 0.70｜. Therefore, He commands men to repent. Unless a rebellious sinner repents and believes the Gospel, there is no forgiveness. But【 praise】 His precious name; it is to this
+  - 0.70｜ man ever seeks to do. In contrast to this the blessed Lord was obedient, and came not to do His own will. May His saints【 be】 ever on the watch against the many false
+  - 0.70｜ in scope and political in focus, and its message is that just as the God of Israel saves Daniel from his enemies, so he would save【 all】 Israel in their present oppression.⏎⏎The Hebrew
+  - 0.69｜’s holiness emerges from its creed, sacramental life, and moral standards. The visible Church is imperfect, but inwardly, the Church【 of】 the Spirit is holy. The members are
+  - 0.69｜. God performed a miracle (the Incarnation) not as an end to itself, but as a means to allow us to be near Him【 in】 worship (through Christ’s redemptive
+  - 0.69｜ Therefore there is no condemnation… which leads Paul to declare by the end of the chapter that he is convinced nothing can separate us from the love【 of】 God in Christ Jesus. In between the
+  - 0.69｜ your life on earth, is to take hold of this gift and hold on to it, never let it go. All this you can do【 through】 Jesus. "In him we have redemption
+
+## N085（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 11 页一次；语料最大激活 8.57
+- 直接读出推高：izedName | 背面 | 缀 | 的权利 | noticed | 享受到 | (report | 战士 | ilename | 颈
+- 直接读出压低： bud | 古城 | *</ | 客 | 红利 | 一切 |  ALIGN | 步 | 出租 |  tổ
+- 正极片段：
+  - 1.00｜0 self–checking photo and word cards⏎# For up to 6 players⏎# Grades 2+⏎Share your knowledge of this product【 with】 other customers...⏎Be the first to write
+  - 0.96｜023年第1期。注：本公号所推送的图文、视频如侵犯到原作者的权益，请在后台【与】我们联系，我们将在第一时间内删除
+  - 0.80｜自然人与法人之间，以提供劳务为内容而签订的协议。（版权说明：如转载涉及版权，标注错误等问题，请【与】我们联系，我们将在第一时间处理！
+  - 0.79｜ award winning Chiefland Citizen and wish to get a subscription or simply gain access to our online content then please enter your ZIP code below【 and】 continue to setup your account.<|endoftext|>Have
+  - 0.71｜:||If you see any errors or have any questions or suggestions on what is shown on this page, please fill in the feedback form so【 that】 we can correct or extend the information provided
+  - 0.70｜! Remember, you get TPT credit for providing feedback. And if you do find errors, please let me know before leaving a rating so【 I】 can make corrections. My goal is to
+  - 0.67｜仅作学习分享，不代表本公众号观点，文章版权及插图属于原作者。如果分享内容在版权上存在争议，请【与】我们联系，我们会及时处理。<|endoftext|>
+  - 0.64｜ process of dam removal has the potential to damage downstream water quality and threaten the health of fish and wildlife<|endoftext|>Formula written for math success⏎Share【 with】 others:⏎Mastery of fractions and early
+  - 0.64｜画的代表作。注：本文来源于网络，版权归原作者所有，仅供大家共同分享学习与欣赏，如作者认为涉及侵权，请【与】我们联系，我们核实后立即删除
+  - 0.63｜网责任编辑：杨阳监审：穆好强转载：每日甘肃“铜城风采”尊重文章及图片的作者权益，【与】粉丝共同维护网络知识产权。如侵犯
+  - 0.63｜ to hear back from you! Remember, you get TPT credit for providing feedback. And if you do find errors, please let me know【 before】 leaving a rating so I can make corrections
+  - 0.62｜工农解放而牺牲来源|新华社排版|郎吉坤责编|韩诺敏总审|孙艳艳喜欢本文就【给我】点个赞吧！点分享点
+  - 0.62｜ practice in reading nonfiction selections and testing for comprehension with reading selections in science, history, geography, economics, and informational text.⏎Submit a【 review】<|endoftext|>Abundant questions, scarce answers
+  - 0.62｜ for middle school are totally free, so print as many as you like! If you can't find the item you are looking for, please【 suggest】 an item!⏎Related Searches: printable witch
+  - 0.61｜ the entire body, as well as slowing the nervous system down (the parasympathetic nervous system) to promote deeper relaxation.⏎Share【 with】 friends<|endoftext|>THOUSANDS of doses
+  - 0.60｜整理，仅供学习使用。免责声明：注明来源为其他媒体或网站的文/图等均为转载，如涉及版权问题，请作者【在】20工作日内联系我们，我们将给予
+  - 0.59｜分享，报告版权归原撰写发布机构所有，由圣香智库社群通过公开合法渠道获得，如涉及侵权，请联系我们删除；如【对】报告内容存疑，请与撰写、
+  - 0.58｜桎梏，挣钱的方式很多，上班只是其中一种。⏎我是【生涯咨询Cana老师】，如果你觉得文字对你有帮助，【给我】点赞和关注我。我出书
+  - 0.57｜ letters in the truest sense. He was the only writer ever to receive Pulitzer Prizes in both fiction and poetry.⏎Found an Error?【 Tell】 us about it.<|endoftext|>(Phys.org
+  - 0.57｜Monuments--Maine--Bath⏎Share what you know about this item⏎... Or if there's a problem with this page,【 tell】 us.⏎Have a similar item and want
+
+## N086（第 30 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 23.6
+- 直接读出推高：活动 |  Work |  work | work | Work |  activity | 活动中 | ework | 活動 | _work
+- 直接读出压低： flash |  Flash |  test | Test |  tests | flash |  unit | 测试 | .test | test
+- 正极片段：
+  - 1.00｜ Complete Symbol/Motif Graphic Organizer⏎4. Analyze the use of symbols/motifs to develop a theme⏎DIRECT INSTRUCTION AND【 CLASS】ROOM ACTIVITIES:⏎Teacher uses P
+  - 0.99｜? Handwriting? If there’s a specific area of learning your child needs support with, our packs offer information, advice and plenty of engaging【 practical】 activities to help you.⏎Written by teachers
+  - 0.97｜ Telling the time? Handwriting? If there’s a specific area of learning your child needs support with, our packs offer information, advice【 and】 plenty of engaging practical activities to help you
+  - 0.97｜ about foreshadowing. What is the purpose of foreshadowing? How does King use this technique to build his story?⏎2【)】 Identification - In this section, students should
+  - 0.95｜: 978-0-19-477485-7⏎- Binding: CD-ROM⏎With texts【 and】 topics that make learners want to speak,
+  - 0.93｜ text and combining it with your own experiences and knowledge) to understand how the character changed. Demonstrate how to complete the How and Why Characters【 Change】 graphic organizer. Leave the "Why the
+  - 0.88｜学生的主体作用，促进学生思维能力和学习能力的提高和发展，我安排了坡度适中，题型多样的例题【和】练习题。⏎通过练习，实现了知识
+  - 0.87｜ the CCSS. Find professional development modules, implementation tools, and more.⏎- Share My Lesson: From the American Federation of Teachers, find【 aligned】 curricula and lesson plans, the latest
+  - 0.86｜umped on how to present a particular concept to my students. I've always been able to turn to ReadWriteThink.org for hands-on,【 engaging】 lessons. For example, I knew I
+  - 0.86｜, and spelling, and offers extra tips on how to expand one’s English language vocabulary. After laying out these fundamentals, the authors proceed with【 solid】 instruction on writing a paragraph in English,
+  - 0.85｜ Serravallo back as a guest blogger this week sharing her expertise on reading comprehension with all of us. Jen is the author of the【 Independent】 Reading Assessment for grades 3, 
+  - 0.85｜ to⏎- Program and sequence instructions.⏎- Use Scratch in the classroom.⏎Course content and methodology⏎- Demonstration of the application.⏎-【 Practical】 exploration of the application.⏎- Discussion of
+  - 0.85｜ and activities for the classroom using real MICASE dialogue.⏎Interactive lessons that build vocabulary, improve pronunciation using authentic sound clips, and provide great listening【 comprehension】 activities.⏎Access a large portion of the
+  - 0.84｜ students should be given about 15 minutes to study Chapters 1 and 2 to find some examples of foreshadowing.⏎3【)】 Class Discussion - Teacher should lead a discussion
+  - 0.83｜ should be given about 15 minutes to study Chapters 1 and 2 to find some examples of foreshadowing.⏎3)【 Class】 Discussion - Teacher should lead a discussion in
+  - 0.81｜ a predominant character trait for the main character. Write this on chart paper.⏎|7.||At this point, send students back to their【 independent】 reading texts and ask them to think about
+  - 0.79｜elling the time? Handwriting? If there’s a specific area of learning your child needs support with, our packs offer information, advice and【 plenty】 of engaging practical activities to help you.⏎
+  - 0.78｜positions. Each section:⏎- Defines the part of speech and its usage⏎- Gives examples to illustrate the definition⏎- Provides a range of【 interactive】 exercises to develop and consolidate understanding⏎-
+  - 0.78｜unctuation? Telling the time? Handwriting? If there’s a specific area of learning your child needs support with, our packs offer information【,】 advice and plenty of engaging practical activities to
+  - 0.77｜ the Livescribe Pencast on the right (by clicking the "play" button) that contains the instruction the students will need to perform【 the】 calculations.⏎4. Assign the Worksheet.⏎
+
+## N087（第 29 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 80.5
+- 直接读出推高： justified |  works |  justification | 咒 |  justify | 法定 |  flesh | Works | works | طق
+- 直接读出压低：\tCommand | upal | (Command | -posts | Posts | (wp | /command | itra | -command |  WP
+- 正极片段：
+  - 1.00｜ Old Testament (Rom. 1-3), the apostle Paul concludes that no one will be declared righteous by observing the law (Rom【.】 3:20).⏎Furthermore,
+  - 0.87｜ spending the bulk of three chapters to prove that both Jews and Gentiles are unrighteous, quoting extensively from the Old Testament (Rom.【 】1-3), the apostle Paul
+  - 0.85｜ to Romans: “In the gospel a righteousness from God is revealed, a righteousness that is by faith from first to last” (Rom.【 】1:17). This verse was
+  - 0.84｜ credited to him as righteousness' " (Rom. 4:2-3; cf. Gen. 15:6; Gal【.】 3:6-9).⏎Finally
+  - 0.84｜ to the Old Testament Scriptures themselves. First, after spending the bulk of three chapters to prove that both Jews and Gentiles are unrighteous【,】 quoting extensively from the Old Testament (Rom
+  - 0.77｜ Thessalonians 3:16. It is through Christ’s work of justification that we can have peace with God (Romans【 】5:1), and that peace will
+  - 0.75｜ First, after spending the bulk of three chapters to prove that both Jews and Gentiles are unrighteous, quoting extensively from the Old Testament【 (】Rom. 1-3), the
+  - 0.74｜ not before God. What does the Scripture say? 'Abraham believed God, and it was credited to him as righteousness' " (Rom【.】 4:2-3; cf
+  - 0.74｜ are unrighteous, quoting extensively from the Old Testament (Rom. 1-3), the apostle Paul concludes that no one will【 be】 declared righteous by observing the law (Rom
+  - 0.73｜34:336-37).⏎What especially troubled Luther was Paul’s announcement at the beginning of his epistle to Romans:【 “】In the gospel a righteousness from God is
+  - 0.72｜--but not before God. What does the Scripture say? 'Abraham believed God, and it was credited to him as righteousness' "【 (】Rom. 4:2-3
+  - 0.72｜ Romans: “In the gospel a righteousness from God is revealed, a righteousness that is by faith from first to last” (Rom. 【1】:17). This verse was a
+  - 0.72｜ his epistle to Romans: “In the gospel a righteousness from God is revealed, a righteousness that is by faith from first to last”【 (】Rom. 1:17).
+  - 0.70｜ to him as righteousness' " (Rom. 4:2-3; cf. Gen. 15:6; Gal.【 】3:6-9).⏎Finally,
+  - 0.70｜ from the Old Testament (Rom. 1-3), the apostle Paul concludes that no one will be declared righteous by observing the law【 (】Rom. 3:20).⏎
+  - 0.69｜; but the term is also falsely applied to those who know themselves free through the death of Christ from the law as given by Moses. Rom【.】 7:4; Gal. 
+  - 0.69｜ case largely by appealing to the Old Testament Scriptures themselves. First, after spending the bulk of three chapters to prove that both Jews and Gentiles【 are】 unrighteous, quoting extensively from the
+  - 0.67｜ in 2 Thessalonians 3:16. It is through Christ’s work of justification that we can have peace with God【 (】Romans 5:1), and
+  - 0.66｜ before God. What does the Scripture say? 'Abraham believed God, and it was credited to him as righteousness' " (Rom.【 】4:2-3; cf.
+  - 0.65｜2 Thessalonians 3:16. It is through Christ’s work of justification that we can have peace with God (Rom【ans】 5:1), and that peace
+
+## N088（第 7 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.1 次；语料最大激活 6.61
+- 直接读出推高：udden | 无意 |  Ave | 点多 |  freder |  автомат | 带动 |  sudden | .Metro |  upward
+- 直接读出压低：繇 | liner | 耗 | 赍 |  CommandLine |  dòng | ContentPane | kte | 一层 | 毂
+- 正极片段：
+  - 1.00｜ to the advisory committee and guest curators’ group - specifically to take account of concerns that not enough women were involved and not enough Africans.【 Over】 a period we shared our ideas on the
+  - 0.77｜ comment section.⏎Zurkowski also had a term to define the people who applied these skills to their work: the “information literate.”⏎【Over】 the last four decades, trouser legs
+  - 0.76｜ into Adam. Satan had led a rebel host of angels in accusing God of being self-exalting (Isaiah 14).【 In】 truth, it was Satan who was self
+  - 0.70｜One of the most significant differences between the adversarial system and the inquisitorial system occurs when a criminal defendant admits to the crime.【 In】 an adversarial system, there is no
+  - 0.68｜ verbally conveying the messages⏎of her platform, answering questions, looking stunning in a bathing suit and⏎formal gown and performing a talent.【 The】 talent was a classical ballet dance⏎set
+  - 0.68｜ in the appendices.⏎4. Why is EPA issuing the Toolkit?⏎EPA is issuing this Toolkit to support implementation of water quality trading.【 In】 January 2003, EPA
+  - 0.68｜ had American GIs for fathers and their GIs fathers knew of their existence, but abandoned them and the Korean women they impregnated.【 As】 a Korean adoptee myself, I find
+  - 0.67｜anism. To conservatives like Bishop Gardiner and Chancellor Wriothesley the answer seemed obvious – Katherine should meet the same fate as Anne.【 At】 first, Henry, increasingly irascible
+  - 0.67｜ the impasse. The UN's future role is now utterly unclear because, as the joke has it, everyone is “waiting for Ban”.【 Under】 pressure from all sides, the UN secretary
+  - 0.66｜ his opera Fidelio ended in disaster. So this time, he instructed the singers and musicians to ignore the almost completely deaf Beethoven.【 At】 the beginning of every part, Beethoven
+  - 0.66｜ aim of policy instruments is to limit pollution, it may sometimes be necessary for those producing the pollution to incur higher expenditure on abatement equipment.【 In】 the long term, however, the aim
+  - 0.66｜土壤，便不能使其从作坊阶段走向诸如钢铁、纺织、铁路等大规模工业产业阶段，“工业革命不得不等候金融革命”。【工业】革命兴起的新产业，其工业原料
+  - 0.66｜ Some of them were reminded of the unusual twilights between February 17 and 20, which were caused by PSC.⏎【On】 August 30, skies were clear
+  - 0.64｜ is overruled by Odin. Loki then gives a greeting to all gods and goddesses who are in the hall save to Bragi.【 Br】agi generously offers his sword, horse,
+  - 0.64｜1954, wrote that Goans enjoyed no such equality. They were not bound by compulsory military service as the Portuguese citizens were.【 For】 him Goa was protected by Portuguese forces of
+  - 0.64｜ to Bush and 2 equates to Kerry!” With any regular database, this is entirely possible, and everybody’s votes just got reversed.【 Of】 course a smart voting machine would never let
+  - 0.63｜ real standout here is the masterful 1963 painting "The Procession," by an African-American in Paris named Bob Thompson.【 The】 painting reveals a debt to Lawrence's work
+  - 0.63｜ article published by the New York Times in January that described two cases in which Egyptian President Mohamed Morsi made virulently anti-Semitic remarks.【 In】 one, he said Egyptians should “n
+  - 0.63｜ Tali asked to have the meter activated every time they caught a cab, regardless of whether the drivers informed them of the cheaper customary rate.【 At】 the end of the ride, the women
+  - 0.63｜., joined by conservative legal organizations, argues that preclearance is now unconstitutional because there’s no longer any significant efforts to discriminate in voting.【 As】 a result, the burden the law imposes
+
+## N089（第 5 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.7 次；语料最大激活 2.93
+- 直接读出推高： TODAY | @student | isol | 来不及 | xFFFFFF | 的学生 | danger |  tonight | _DGRAM | 下周
+- 直接读出压低：by | โดย | ields |  chi | ím | _by |  by |  breakdown | 眼神 | By
+- 正极片段：
+  - 1.00｜axcala, México. *firstname.lastname@example.org.⏎Recibido: 25 octubre 2010;⏎acept【ado】: 02 marzo 20
+  - 0.98｜ 7.1%（美國本土）⏎|inflation_source_date = ，截至2022年11月⏎|peg【ged】_by =⏎⏎|subunit_ratio_1
+  - 0.95｜ and the restless colonists came into increasing tension. On 19 April 1775, the tension snapped with a single shot【 heard】 around the world, as the battles of
+  - 0.95｜可能就需要进行进一步的调查了。即使实施了零信任控制措施，内部威胁仍然是一个重大残余风险。此外，受【信任】的内部人员可能会被社交工程手法
+  - 0.93｜所有问题。例如，当一名图谋不轨的内部员工拥有合法权限来访问敏感资源时，他们通常会被视为受【信任】的人员，零信任模型并不会主动
+  - 0.90｜ better served the community’s needs, and today the congregation continues to offer a complete range of educational, religious and social programming.<|endoftext|>Nest【led】 in a quiet residential neighborhood in Long Beach
+  - 0.90｜ we're able to do with it really."<|endoftext|>The legend of the Edmund Fitzgerald remains the most mysterious and controversial of all shipwreck tales【 heard】 around the Great Lakes. Her story is
+  - 0.90｜认知和互联智能⏎域之间系统的孪生 。⏎沉浸式沟通。⏎人们可以通过数字域扩展自己的感官。⏎互联智能。⏎受【信任】的人工智能功能可以在网络中和
+  - 0.89｜UCN Red List of Threatened Species. Version 2012.2. <www.iucnredlist.org>. Download【ed】 on 21 May 20
+  - 0.89｜ both houses of the General Assembly, that the only true pronunciation of the name of the state, in the opinion of this body, is that【 received】 by the French from the native Indians and
+  - 0.88｜ or 20 acres.⏎The project will cost $561,000, with $400,000【 paid】 by the Army and $161
+  - 0.86｜ right from the start, if only we knew. Deus ex machina always makes for a poor hero.⏎The thing is, the lowliest【 paid】 script doctor at Disney could bash you out
+  - 0.85｜UCN Red List of Threatened Species. Version 2012.2. <www.iucnredlist.org>. Download【ed】 on 19 June 20
+  - 0.85｜ritten constitution, the United States have gloried in its recognition in their bills of right, an essential part of their constitutions. The price【 paid】 is a confusion of tongues, a multip
+  - 0.85｜ip-Smacking Woman")⏎Dropides⏎Eis To Phrear ("Into The Well")⏎Eisoikizomenos ("The Ban【ished】 Man")⏎Ekkeryttomenos
+  - 0.84｜ Roy Bucher , the last British Commander-in-Chief of India, on 15 January 1949. The day is【 celebrated】 in the form of parades and other
+  - 0.84｜ whereby larger DNA fragments move faster than smaller ones.⏎⏎Migration anomalies⏎ "Smiley" gels - this edge effect is caused when the voltage【 applied】 is too high for the gel concentration used
+  - 0.84｜ sea lapped at the Cumberland’s main deck as the bowsprit disappeared into Hampton Roads. Gun crews kept firing until their cannons submerged. Station【ed】 near the stern, Heywood worked his
+  - 0.83｜ Brooks Robinson, John "Boog" Powell, and Dave McNally were being developed by a strong farm system. The Orioles first made themselves【 heard】 in , when they finished 89
+  - 0.83｜⏎- n. One who speaks in a dialogue or takes part in a conversation.⏎- n. In Scots law, a judgment or sentence【 pronounced】 in the course of a suit, but
+
+## N090（第 11 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 21 页一次；语料最大激活 7.03
+- 直接读出推高：reverse | 提 | ERV |  reverse | ョン | ient | eder |  month | .abstract | 月初
+- 直接读出压低：existent |  DOUBLE | 分开 |  pals | ות | *)& | 双 | !(\n | otton |  twins
+- 正极片段：
+  - 1.00｜ expert advice promptly. Some of the signs are fuzzy⏎vision, double vision, halos, crossed eyes, "cobwebs," "float【ers】," flashes⏎of light, sensitivity to
+  - 0.85｜光眼⏎ 葡萄膜病：葡萄膜炎、原田病⏎ 玻璃体病：飛【蚊】症⏎ 视网膜病⏎
+  - 0.81｜- can be a signal of retinal detachment and could cause you to lose your vision sometimes within hours. Those little flashes may not be float【ers】.⏎This sudden onset of sensation may signal
+  - 0.81｜, ⏎⏎That is⏎⏎Stability and minimum-phase property preserved ⏎A continuous-time causal filter is stable if the poles of its transfer function fall【 in】 the left half of the complex s-plane
+  - 0.72｜ The retina is the light-sensitive tissue at the back of the eyeball. Symptoms of retinal detachment include an increase in the number of float【ers】 (small spots or strings that appear in
+  - 0.62｜ chemical shift d = 0,6 ... 1,9 ppm.⏎In contrast to this leads the completely different electronic environment of a carb【ony】l group -CHO als to a different
+  - 0.61｜ ⏎⏎That is⏎⏎Stability and minimum-phase property preserved ⏎A continuous-time causal filter is stable if the poles of its transfer function fall in【 the】 left half of the complex s-plane.
+  - 0.61｜和应用，并且严格证明了代数基本定理，该定理指出任何一个一元复系数多项式方程都至少【有一个】复数根，在此之前，包括
+  - 0.56｜ out expert advice promptly. Some of the signs are fuzzy⏎vision, double vision, halos, crossed eyes, "cobwebs," "【float】ers," flashes⏎of light, sensitivity
+  - 0.53｜ pair is the red supergiant, while the fainter is a hot main sequence star of magnitude 5.5. They have a【 projected】 separation of about .⏎⏎Its traditional name Ant
+  - 0.51｜临床表现、治疗 分型:孔源性、牵拉性、渗出性 临床表现:症状:眼前闪光、漂【浮】物、视野上方出现黑幕或
+  - 0.51｜ light- can be a signal of retinal detachment and could cause you to lose your vision sometimes within hours. Those little flashes may not be【 float】ers.⏎This sudden onset of sensation may
+  - 0.48｜。⏎前房角:位于周边角膜与虹膜根部的连接处。⏎可见到:Schwalbe线、小梁【网】和Schlemm膜根部。⏎
+  - 0.47｜ in the discrete-time domain that preserve that stability.⏎⏎Likewise, a continuous-time filter is minimum-phase if the zeros of its transfer function fall【 in】 the left half of the complex s-plane
+  - 0.47｜轴极点分布间隔较大的二阶系统⏎2.3.7 从传递函数的分母求解极点的大致【位置】⏎2.4 谐振
+  - 0.46｜ transfer function fall in the left half of the complex s-plane. A discrete-time causal filter is stable if the poles of its transfer function fall【 inside】 the unit circle in the complex z-plane
+  - 0.46｜ another. The cyclic molecule has a hemiacetal or hemiketal group, depending on whether the linear form was an aldose or a【 ket】ose.⏎⏎In these cyclic forms, the
+  - 0.45｜ is⏎⏎Stability and minimum-phase property preserved ⏎A continuous-time causal filter is stable if the poles of its transfer function fall in the left【 half】 of the complex s-plane. A discrete
+  - 0.45｜ (1935, finished posthumously), the chamber pieces Lyric Suite and Chamber Concerto, as well as a Violin【 Concert】o. He also composed a number of
+  - 0.43｜1xn − 1+ ⋯ + a0, then q(x) is the characteristic polynomial of the n×n【 companion】 matrix⏎⏎Decomposition of rational expressions
+
+## N091（第 33 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 42.4
+- 直接读出推高： med |  Med | 介 | .med | Med |  Pro |  MED | -pt | _med | .median
+- 直接读出压低：straight |  straight | 直 |  Hack | wagon | Sus | 伴 | 垂直 |  Straight | vard
+- 正极片段：
+  - 1.00｜ the suspensory Cooper's ligaments. Sensation in the breast is provided by the peripheral nervous system innervation by means of the front【 (】anterior) and side (lateral
+  - 0.91｜ a transverse cut through the testis and examine its internal architecture . Just deep to the visceral tunica vaginalis, which covers the ant【er】olateral surface of the testis,
+  - 0.87｜ delimited by the parametrial fascia(anterior face), pelvic wall and internal iliac vein (posterolateral side), sacrum (【poster】ointernal side), and mesoureter
+  - 0.79｜ to 90Ã‚Âº, and held into the waist, while the hands move in and out. Towards and away from the【 mid】line. As the shoulders become more stable
+  - 0.74｜ anal penetration may be caused by the shared sensory nerves, especially the pudendal nerve, which gives off the inferior anal nerves and divides into【 the】 perineal nerve and the dorsal nerve
+  - 0.70｜ is arranged in conspicuous, longitudinally oriented bundles.⏎⏎Variability⏎The adrenal glands may not develop at all, or may be fused in the【 mid】line behind the aorta. These are
+  - 0.69｜irect stimulation of the clitoris through anal penetration may be caused by the shared sensory nerves, especially the pudendal nerve, which gives off【 the】 inferior anal nerves and divides into the per
+  - 0.68｜ the abdominal wall and torso strength, but they are generally well tolerated by most patients.  Perforator techniques such as the DIEP (【deep】 inferior epigastric perforator)
+  - 0.68｜ small bone in front of the knee. At its upper end the quadriceps muscle tendon is attached while at the lower end it is attached to【 the】 tibia via the patellar tendon.
+  - 0.67｜ or water mixing approach.⏎As has been mentioned these fishes possess substantial fin spines in their dorsal, pectoral and adipose fin ant【er】iors. Substantial, and painful to
+  - 0.67｜ and the suspensory Cooper's ligaments. Sensation in the breast is provided by the peripheral nervous system innervation by means of the【 front】 (anterior) and side (l
+  - 0.67｜ left coronary artery and the right aortic sinus likewise gives rise to the right coronary artery. Together, these two arteries supply the heart. The【 posterior】 aortic sinus does not give rise to
+  - 0.67｜ skins functioning, and is associated with better outcomes in comparison to other muscle and skin donor sites.  ⏎⏎One option for breast reconstruction involves using【 the】 latissimus dorsi muscle as the
+  - 0.66｜-child interaction patterns. In PCIT, parents are taught specific skills to establish a nurturing and secure relationship with their child while increasing their child’s【 pros】ocial behavior and decreasing negative behavior. This
+  - 0.66｜ most patients.  Perforator techniques such as the DIEP (deep inferior epigastric perforator) flap and SIEA【 (】superficial inferior epigastric
+  - 0.64｜ can be identified. The following conventional strucutures are then exposed: the psoas muscle; the genitofemoral nerve;【 the】 bifurcation of the common iliac
+  - 0.64｜ the genitofemoral nerve; the bifurcation of the common iliac artery; the external iliac vein and artery; the【 superior】 vesical artery; and the obturator
+  - 0.64｜ by the shared sensory nerves, especially the pudendal nerve, which gives off the inferior anal nerves and divides into the perineal nerve【 and】 the dorsal nerve of the clitoris.
+  - 0.64｜ the shared sensory nerves, especially the pudendal nerve, which gives off the inferior anal nerves and divides into the perineal nerve and【 the】 dorsal nerve of the clitoris. Although
+  - 0.63｜ site. Steroids are injected to control severe or persistent inflammation; they weaken the tendon structure, increasing the risk of tearing.⏎Pain on【 the】 front and below the knee, are the
+
+## N092（第 1 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 32.8 次；语料最大激活 0.00929
+- 直接读出推高：för | ucc | plement |  furnish | ير | ]& | 黄金 | anel | ’) | 这张
+- 直接读出压低：纠结 |  ped | �始 |  option |  Prefer | .serialization |  reasonably | ILITY | iming |  prefer
+- 正极片段：
+  - 1.00｜戰，前216年）中巧妙運用計策（地形、兵種及天氣變化）引誘並擊【潰羅馬人】，進入羅馬國境的途中
+  - 0.68｜十分方便。彈奏者通過按下鍵盤上的琴鍵，牽動鋼琴裏-{面}-包着絨【氈的小木槌】，繼而敲擊鋼絲弦
+  - 0.67｜制度，明确检察院承担举证责任，建立了非法证据排除规则、证人作证补偿制度，完善了证人保护制度【﹔⏎（4】）规定强制证人出庭作
+  - 0.66｜方案》定名為「臺灣-{台}-語」，是源自閩南語泉漳片、通行於臺灣及澎【湖】群島的語言，為閩
+  - 0.63｜之一。⏎⏎上海交通大學是中华人民共和国最頂尖的高校之一，現時屬於「QS世界百強大學」、「泰晤【士】高等教育世界百強大學」、「美國
+  - 0.62｜；⏎ 因“光荣革命”而逃离英国的詹姆斯二世被宣布退位；⏎ 罗马天主教徒不【具有】繼承王位的資格；⏎
+  - 0.60｜的主体之外。它说:“人皆欲知﹐而莫索其所以知﹐其所知﹐彼也【﹔其所以知】﹐此也”。又认为�
+  - 0.60｜提出了精气为万物本原的朴素唯物主义精气说﹐认为万物﹑人都产生于精气【﹔精气是一种】精细的气。说“凡物
+  - 0.60｜十八大所处的特殊历史方位，即它是在全面建成小康社会关键时期和深化改革开放、加快转变经济发展方式攻坚时期召开的【﹔其意义之】重就在于党的十八大所承担重要的
+  - 0.59｜, is largely due to human activities, and poses significant risks for people and the ecosystems on which we depend. Moreover, climate change is not【 just】 an environmental problem; it is a sustainability
+  - 0.59｜少海、北海⏎ 北冰洋，中國元代時稱為北海⏎ 北海 (澎湖)，指台灣澎【湖】本島以北的澎湖群
+  - 0.57｜评价等。投标报价评分标准一般包括评标基准价的计算方法、投标报价<|endoftext|>哈尔滨工业大学教授唐魁玉表示�【�当前﹐简约适度�】�绿色低碳的生活方式注重生活形式
+  - 0.57｜5工程”、原“211工程”重点建设大学，現時屬於「QS世界百強大學」、「泰晤【士】高等教育世界百強大學」、「美國
+  - 0.56｜比如說，如何既切實發揮市場在資源配置中的決定性作用，又與政府的有效宏觀調控統一起來【﹔怎樣既】堅持黨的全面領導，又保
+  - 0.55｜inations, and the whirly, spirally, tunnel-vision-like patterns of psychedelic imagery immediately spring to mind. But it's not【 just】 hallucinogenic drugs like LSD, cannabis
+  - 0.55｜現在法國大革命時期，顔色取自當時法國國徽（紅和藍），再加上法國王室的【顔色白色。】其中藍色是聖馬丁長
+  - 0.55｜ smaller features are less perilous, even on an equally large fish. Accordingly, vulnerable fry show less fear of the latter.⏎It is not【 just】 the looks of a novel fish that can
+  - 0.55｜國家工作中心轉移到經濟建設上來、實行改革開放的歷史性決策，開啟我國發展的歷史新時期【﹔沒有解放思想，】我們黨就不可能在實踐
+  - 0.54｜，英國學者將經濟史從歷史學分離出來，但仍保持著歷史主義特點，因此仍然屬於歷史學範【疇，屬人文】科學。當時西方大部分大學也將
+  - 0.54｜ as Americans washed their bodies more often, they also became concerned with washing their clothes.⏎Every part of the body was eventually scrutinized, not【 just】 the skin. Early on, poor dental
+
+## N093（第 31 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 19.7
+- 直接读出推高：幌 | 折腾 | odia |  exter | 移植 | ści | isia | makt | 叶 | phia
+- 直接读出压低： break | break |  Break |  breaks |  breaking | Break |  broken | -break | 破 | breaking
+- 正极片段：
+  - 1.00｜ It is similar to inserting a tampon into your vagina. After 3 weeks, the Ring is removed to allow for a “period.”⏎【Dep】o Provera is commonly known as
+  - 0.99｜ wisdom and cunning, a trickster on the throne or a kind of comic Egyptian Solomon'.⏎⏎Gallery of images⏎⏎References⏎⏎Further reading ⏎ ⏎ Leo【 Dep】uydt: Saite and Persian Egypt
+  - 0.88｜ant medicines, such as⏎carbamazepine (for example, Tegretol) and valproate (for example,【 Dep】akote).⏎- Antidepressant medicines
+  - 0.83｜ised the "Rape of Belgium".⏎⏎Popularity ⏎⏎Poirot first appeared in The Mysterious Affair at Styles (published in 【1】920) and exited in Curtain
+  - 0.80｜ questions have been raised about possible links to cancer, as well as concern about certain side effects, including weight gain, depression, and headaches.⏎【Dep】o-Provera, produced by the
+  - 0.79｜ others were castrated, many were just beaten to death.⏎Never again ...⏎|©Christopher Furlong/Getty Images|<|endoftext|>By Maria【 Dep】enweiller, P.H.Ec
+  - 0.78｜ Mood stabilizers, such as:⏎- Lithium (for example, Eskalith or Lithobid).⏎- Divalproex (【Dep】akote).⏎- Carbamazep
+  - 0.77｜) into your shoulder or buttock that prevents pregnancy for 12 weeks. Only one shot is needed every three months to prevent pregnancy.⏎【Dep】o Provera prevents ovulation,
+  - 0.76｜ This hand was called a "blackjack", and the name stuck even after the ten-to-one bonus was withdrawn.⏎⏎French card historian Thierry【 Dep】aulis debunks this story, showing
+  - 0.75｜epine (for example, Tegretol).⏎- Lamotrigine (Lamictal).⏎- Reference Valproate (【Dep】acon).⏎Reference Antipsychotics,
+  - 0.75｜oirot first appeared in The Mysterious Affair at Styles (published in 1920) and exited in Curtain (published in【 】1975). Following the latter
+  - 0.75｜ 巴马科⏎马其顿 - 斯科普里⏎马绍尔群岛 - 马朱罗⏎马提尼克【 -】 法兰西堡⏎马约
+  - 0.75｜ membership of both Guernsey and Jersey might in fact be from one bailiwick only. For instance, The International Stock Exchange is in【 Saint】 Peter Port and therefore is in Guern
+  - 0.72｜ lasted only two years and failed in its main objective to find gold deposits. Colonies on the Caribbean islands of St Lucia (16【0】5) and Grenada (1
+  - 0.72｜) days prior to onset of a period flow. You will need to record several months of periods to determine the regular length of your cycle.⏎【Dep】ression and high levels of stress hormones can
+  - 0.72｜00⏎8 – Roman Empire general Tiberius defeats the Dalmatae on the river Bosna.⏎ 435 –【 Dep】osed Ecumenical Patriarch of Constantin
+  - 0.72｜ to control wash temperature, rinse temperature, agitation speed and spin speed.⏎Not bad progress for a household chore, don’t you think?⏎Maria【 Dep】enweiller is the owner of The
+  - 0.69｜1/4 means.⏎- Graphing and Understanding Conic Equations [12/11/1995]⏎How can【 I】 sketch and find the vertices of this con
+  - 0.69｜Discoveries and inventions⏎⏎Archimedes' principle⏎⏎The most widely known anecdote about Archimedes tells of how he invented a method【 for】 determining the volume of an object with an
+  - 0.67｜ stay away from power lines and objects that can fall, such as streetlights, buildings, and trees.⏎- If you are in a vehicle【,】 pull off the road but do not stop
+
+## N094（第 30 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 30.7
+- 直接读出推高：еча | cerpt |  stub | stub | Ptr | ][_ | 婆婆 | ago | .setdefault | 过渡
+- 直接读出压低： heart | 心 |  Heart | heart |  hearts | -heart | Heart | 的心 | ⼼ | 心脏
+- 正极片段：
+  - 1.00｜ is Xerxes constantly overlooking? Why?⏎6. The Delphic oracle predicted for the Spartans that “either their city must be【 laid】 waste by the foreigner or a Spartan
+  - 1.00｜.⏎Torah calls "evil language" anything negative, even if it's true.⏎The Hebrew term for speaking badly of others is called lash【on】 hara, literally "evil language."
+  - 0.99｜irs up conflict,⏎and a gossip separates close friends.⏎29A violent person entices their neighbor⏎and leads them down a path that【 is】 not good.⏎30Whoever w
+  - 0.97｜ur. He instructed her to return to Abram's camp and that her son would be "a wild ass of a man; his hand shall【 be】 against every man, and every man's
+  - 0.94｜ perversity, why do you tolerate those who deal treacherously, and keep silent when the wicked swallows up the man who is【 more】 righteous<|endoftext|>Backward compatibility (sometimes known
+  - 0.92｜ would show him, and promised to make of him a great nation, bless him, make his name great, bless them that bless him,【 and】 curse them who may curse him. Abram
+  - 0.87｜ on perversity, why do you tolerate those who deal treacherously, and keep silent when the wicked swallows up the man who【 is】 more righteous<|endoftext|>Backward compatibility (sometimes
+  - 0.86｜ morning and is immediately confronted unawares by Esav:⏎"And Jacob lifted up his eyes and looked, and, behold, Esau came【,】 and with him four hundred men. And
+  - 0.85｜ balances belong to the Lord;⏎all the weights in the bag are of his making.⏎12Kings detest wrongdoing,⏎for a throne【 is】 established through righteousness.⏎13Kings
+  - 0.84｜. Though vindicated, she did not gloat or take glory to herself; instead she glorified and praised the God who "raiseth【 the】 poor out of the dust" in a
+  - 0.80｜ the saint. The abbey attempted to relate the story as an "appropriate holy sacrilege", which gave her honour, as she was being【 laid】 to rest close to the remains of her
+  - 0.79｜uitable. Or when a child has information that will prevent harm from occurring.⏎Beware of the excuses children and adults often use for speaking lash【on】 hara:⏎- "But it's
+  - 0.79｜ Torah calls "evil language" anything negative, even if it's true. (Slander -- malicious, false information is called motzi sh【em】 ra, literally "giving another a
+  - 0.79｜)⏎And the messengers returned to Jacob, saying: 'We came to thy brother Esau, and moreover he cometh to meet thee【,】 and four hundred men with him.' 
+  - 0.78｜ a person’s ways seem pure to them,⏎but motives are weighed by the Lord.⏎3Commit to the Lord whatever you do,⏎and he【 will】 establish your plans.⏎4The Lord works
+  - 0.78｜ seen an enormous statue with a head of gold, breast and arms of silver, belly and thighs of bronze, legs of iron, and feet【 of】 mixed iron and clay, then saw the
+  - 0.77｜ story of the end of Nineveh. Nabopolassar of Babylon joined forces with Cyaxares, king of the Medes, and【 laid】 siege for three months.⏎⏎Assyria
+  - 0.77｜ statue with a head of gold, breast and arms of silver, belly and thighs of bronze, legs of iron, and feet of mixed iron【 and】 clay, then saw the statue destroyed by
+  - 0.77｜ darker side to Christmas. Simeon warned Mary that her son would cause the rise and fall of many in Israel, and that a sword【 would】 pierce her soul. Joseph and Mary
+  - 0.77｜，胸膛和膀臂是銀的，肚腹和腰是銅的，腿是鐵的，腳是半鐵【半】泥的。有一塊石頭撞
+
+## N095（第 31 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 24.9
+- 直接读出推高：ADX | adx | из | .Pow | 诗 | 承 | 教 | 联 | adic | 慢
+- 直接读出压低：text | {text |  text | -text | .text |  textual | \ttext |  Text | Text | datas
+- 正极片段：
+  - 1.00｜ the system call number was placed in the EAX register before interrupt 0x80 was executed.⏎An older x86 mechanism is【 called】 a call gate and is a way for
+  - 0.94｜ grandson of Miran Shah, who was himself son of Timur) and his wife Qutlugh Nigar Khanum, daughter of【 Yun】us Khan, the ruler of Mogh
+  - 0.88｜ RISC processors this is the only feasible implementation, but CISC architectures such as x86 support additional techniques. One example is SYSCALL【/S】YSRET which is very similar to SY
+  - 0.87｜5 began using this on the x86, where available; formerly it used the INT instruction, where the system call number was placed in【 the】 EAX register before interrupt 0x
+  - 0.83｜和进程管理的高级访问，以及对文件系统的访问。 由KRNL386.EXE、KERNEL32.DLL【和】VWIN32.VXD组成。⏎
+  - 0.82｜ system call number was placed in the EAX register before interrupt 0x80 was executed.⏎An older x86 mechanism is called【 a】 call gate and is a way for a
+  - 0.82｜一旦有军役水旱，人民就不困乏，天下得以安宁。文帝也采纳这个意见，下诏赐民十二【年】租税之半，次年，
+  - 0.81｜井間所印《百家姓》，（王）明清嘗詳考之，以是兩浙錢氏有國時小【民】所著，何則？其首
+  - 0.80｜ -w it displays only the number of the section where a given command is described.⏎$ man -w open /usr/share/man/cat2【/open】.0 /usr/share/man/cat3
+  - 0.77｜送往夏县时，“民哭公甚哀，如哭其私亲。四方来会葬者盖数万人”，“家【家】挂象，饭食必祝”。
+  - 0.75｜δ1（该细菌属于δ變形菌）中存在着高含量的硒代半胱氨酸，由原本为终止密码子【的】UGA编码，和吡咯赖
+  - 0.74｜ />*)szDLLFilePath, dwSizeOfFilePath,NULL);⏎CreateRemoteThread API to create thread in the remote process passing in the address of【⏎】LoadLibary API and also the memory
+  - 0.74｜。⏎五是安帝元初三年(116)十一月诏，“初听大臣、二千石、刺史行【三年】丧”。⏎嘞桓帝永兴
+  - 0.74｜2) and was adopted by Trinidad and Tobago when it became independent in 1962.⏎⏎"Esta É a Nossa P【á】tria Bem Amada" is
+  - 0.72｜illin resistance in this species. ESBLs in this family also have amino acid changes around the active site, most commonly at positions 2【3】8 or 238 and 
+  - 0.71｜ing system calls requires a control transfer which involves some sort of architecture specific feature. A typical way to implement this is to use a software interrupt【 or】 trap. Interrupts transfer control to the
+  - 0.71｜是：（1）以《法经》为蓝本，结合秦国的具体情况加以修订、扩充，制定了秦律，并制定了【连】坐法，颁行秦国，励
+  - 0.71｜raphs to the language⏎ Specification of standard macros for the alternative specification of operators, e.g. and for &&⏎ Specification of the standard macro【 __】STDC_VERSION__⏎⏎In addition to the
+  - 0.71｜子于考试前将平日所作诗文交纳给主考官，以供核实并知其所长，这种形式【叫做】纳“省卷”。唐诗中
+  - 0.70｜ that are updated and will be used as replacement for the flawed functions. This also has the hooking logic to hook to⏎GetProcAddress API exported【 by】 Kernel32.DLL.⏎- Up
+
+## N096（第 28 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 15.8
+- 直接读出推高： you | 你 | you |  You | You | 你需要 |  bạn | 你可以 | 你就 | 您
+- 直接读出压低：踊跃 | &s | ôi | arme | arna | 我都 | locs |  함 |  @( | 我能
+- 正极片段：
+  - 1.00｜avichords to practice⏎at home, and organists often practiced on clavichords as well, since⏎an organ is not【 something】 you could play outside of a church.
+  - 0.89｜ measures and integrals.⏎So infinity might arise in statements like these:⏎- NO! This isn't allowed! Infinity is not a number,【 and】 division by zero is illegal!⏎- Yes
+  - 0.84｜ them than they initially thought.⏎One example: searing a steak. One of the common myths in many cooking books and taught in cooking school【 is】 that searing seals in juices.⏎"It
+  - 0.80｜ circle. This assumes the temperature varies continuously in space, which is, however, not always the case.⏎⏎The case  is often illustrated by【 saying】 that at any moment, there is always
+  - 0.79｜ jumping from fixed objects, using a parachute to descend safely to the ground. "BASE" is an acronym that stands for four categories of fixed【 objects】 from which one can jump: buildings,
+  - 0.76｜.” This is because the universe appeared out of absolutely nothing, and unless one succumbs to the supernatural, she would have to violate the principle【 that】 underlies the entire scientific enterprise, out
+  - 0.75｜ idea that quantum mechanics is intrinsically indeterministic, with probabilities calculated using the Born rule, and the principle of complementarity, which【 states】 that objects have certain pairs of complementary properties
+  - 0.75｜ that stadium would have cancer.⏎Doctors aren't sure why some people get cancer and others don't. They do know that cancer is not contagious【.】 You can't catch it from someone else
+  - 0.75｜_line("Hello World");⏎See examples/demo.pl for a more comprehensive example.⏎The Arduino is an open-source physical computing platform. Among the many【 things】 one might want to do with such a
+  - 0.74｜ metalogical symbol representing "can be replaced in a proof with".⏎⏎Truth functional connectives ⏎Associativity is a property of some logical connect【ives】 of truth-functional propositional logic. The
+  - 0.74｜ their back, which is what always happens. They think that they can stay out in the sun because they’re using sunscreen, and the truth【 is】 it doesn’t really cover stuff that well
+  - 0.74｜Ainissa G. Ramirez is passionate about shattering stereotypes of scientists as serious and dull. Ramirez wants to show kids what she knows firsthand【:】 Science can be fun.⏎Ramirez,
+  - 0.73｜ not attached to) the top of the fork column. Von Drais's laufmaschine used the same principle. 'They hadn't【 realised】 at the time that you could steer from
+  - 0.73｜ therapies.⏎At a stroke, the investigators converted a research technology whose practical benefits may have been years away to one with more immediate impact.⏎"We【 realized】, in principle, that we could adapt
+  - 0.72｜ and their amazing use of “kite sails” to reduce fuel costs and help the environment. Who knew that in the 21st【 century】, GE’s advanced engines would literally be
+  - 0.71｜ balancing these characteristics, we create a dynamic that stimulates new ideas to germinate and blossom.⏎Animate and Watch it Grow⏎Finally, we have【 learned】 that some gentle animation can do wonders.
+  - 0.70｜ Newspaper Letters & Envelopes Road Map Radio⏎As the children arrive, give them a sheet of paper and ask them to list what they【 think】 the items on the table have in common
+  - 0.69｜ are the cause of getting these conditions and being outside in the cold whether without a jacket doesn`t cause someone to get them. But someone told【 me】 that if you are exposed to a cold
+  - 0.68｜ house arrest. But he was right.⏎Ignaz Semmelweis’s most important scientific contribution is better known under the name of the man who【 proved】 Semmelweis correct, Louis Pasteur
+  - 0.68｜475m) is the highest of Nepal's trekking peaks. By its standard route, it is also the highest peak in Nepal【 that】 can be climbed without prior mountaineering
+
+## N097（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 4.27
+- 直接读出推高： Alb | mute | 地下 | 刻 | 辖 |  Thurs | =form | (Return | utedString | 跳
+- 直接读出压低：费用 | 费 | 費 | 代价 |  costs | 費用 |  fees |  fee | 收费标准 |  expenses
+- 正极片段：
+  - 1.00｜aid (unless the commitment aforesaid were for treason or felony, plainly and specially expressed in the warrant of commitment) upon payment or【 tender】 of the charges of bringing the said prisoner
+  - 0.79｜-{醫生}-」的「生」指先生，為敬称。⏎⏎中國三国東吳名医董奉晚年为百姓治病不【收】诊费和药钱，但要求
+  - 0.76｜20。如上所说，由于土地私有权的存在，农产品必须按照以价值为基础的市场价格出售，农业资本家则除了【收回】100资本并获得20
+  - 0.75｜支持。但特殊情况下，对于尚未实际支出但根据合同约定必然发生的律师费，且律师确已付出相应劳动并符合【付款】条件的，可以予以支持。例如
+  - 0.74｜繁琐事务，投入到更有创造力的工作中。个体因此拥有更愉悦的工作感受，更高的工作效率；公司和机关因此能够降低行政和【经济】成本。⏎数字化劳动力基于先进的机器人流程
+  - 0.74｜合致及现物之交付才能成立的契约。⏎使用借贷、消费借贷等。⏎有偿契约为当事人之一方为给【付】，并约定他方须为对价
+  - 0.73｜ Caesar⏎B. Benjamin Franklin⏎C. Uncle Sam⏎D. Alexander the Great⏎5. If you receive an IRS notice that you【 owe】 money, you should:⏎A. Write
+  - 0.72｜贷款基本资料、贷款抵押品估价等办理贷款相关手续的咨询服务，使甲方融资成功；融资成功后，甲方同意【在】贷款期内向乙方缴纳服务费总额
+  - 0.72｜保全担保费（即向法院申请财产保全时担保公司出具保函的费用）的，则建议单列一项诉讼【请求】。D.事实与理由部分2
+  - 0.70｜的，则应尊重其程序选择权，允许其申请劳动仲裁来认定劳动关系。<|endoftext|>民间借贷本息到期后以房【抵】债，据此签订的卖⏎赠
+  - 0.70｜供应，稳定粮食价格。要认真落实中央关于鼓励粮食生产的各项政策，确保对农民的直接补贴、良种补贴、农资【价格】管理、农业税减免等政策措施真正
+  - 0.70｜问题。⏎6.让税包括企业和个人在所得税前交纳社会保险费，对社保基金的投资收益免税，对受保人【享用】的社会保险待遇免税等等。⏎7.
+  - 0.70｜「生」指先生，為敬称。⏎⏎中國三国東吳名医董奉晚年为百姓治病不收诊费和药【钱】，但要求病人痊愈后必须
+  - 0.70｜陈述载卷为凭，并经当庭质证，足以认定。经营者的行为已构成欺诈，应当按照消费者的要求增加赔偿其【受到】的损失，增加赔偿的金额为
+  - 0.69｜的节约。因为在市场经济中，生产要素被看作是商品，买入生产要素都必须按照市场购买价格支付一定的报酬和【代价】，这样，就可以形成投入和产生的
+  - 0.69｜ in unique ways.⏎Help keep these daily articles coming. Support AiG.⏎If you decide you want to keep Answers coming, simply pay your【 invoice】 for just $24 and receive four
+  - 0.69｜。此外部名称解析解决方案利用全球AzureDNS基础结构。它允许使用与其他Azure服务相同的凭据、API、工具和计【费】模式，将域托管在Azure中
+  - 0.69｜，则应尊重其程序选择权，允许其申请劳动仲裁来认定劳动关系。<|endoftext|>民间借贷本息到期后以房抵【债】，据此签订的卖⏎赠与
+  - 0.69｜、数量、规格、技术性能、检验方法，租赁期限，租金构成及其支付期限和方式、币种，租赁期限届【满】租赁物的归属等条款。十二
+  - 0.68｜ or service, but because each player in the transaction wants what is offered by the other.⏎⏎Advantages⏎Since direct barter does not require【 payment】 in money, it can be utilized when
+
+## N098（第 1 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 2.2 次；语料最大激活 0.723
+- 直接读出推高：�性 | 朝着 | 种子 |  seed | 向着 | [ | unders | iap |  seeds |  sesame
+- 直接读出压低：mast |  enthusiast | came | 酣 | hil | brook | commercial | 鉴别 | Gram | alus
+- 正极片段：
+  - 1.00｜ overhead at local noon on the day of the December solstice.⏎⏎The planet Neptune was discovered by German astronomer Johann Galle, near D【ene】b Algedi (δ Cap
+  - 0.98｜他在第一圈即退出比赛，但是他在F1出道戰的出色表現使他受到不少車隊的矚目。⏎⏎贝【纳】通车队時代⏎⏎1991
+  - 0.96｜的出色表現使他受到不少車隊的矚目。⏎⏎贝纳通车队時代⏎⏎1991年 ⏎由於贝【纳】通车队(Benetton F1 Team
+  - 0.95｜结束统治告终。1826年，布宜诺斯艾利斯制定了另一部中央集权宪法，并任命贝【纳】迪诺·里瓦达维亚
+  - 0.92｜ days to draw the 3 mile pattern. Although their art is as temporary as the winds or tides, for both Amador and D【ene】van it is this fleeting moment that motiv
+  - 0.91｜，1992），S．P．利特（S．P．Leite，1992），A．贝【纳】特与S．施克特拉
+  - 0.91｜ a magnitude of only 3.6.⏎⏎The brightest star in Capricornus is δ Capricorni, also called D【ene】b Algedi, with a magnitude
+  - 0.90｜排擠非共產黨的警界高層。⏎ 2月25日——捷克總統愛德華·貝奈【斯】同意內閣請辭，並由
+  - 0.90｜克林顿成功连任美国总统。⏎ 1996年：巴基斯坦总统法鲁克·莱加里撤去总理贝【娜】齐尔·布托的职务，并
+  - 0.90｜最大的百分比跌幅。同日香港爆發八七股災。⏎ 1993年：巴基斯坦人民黨領導人貝【娜】齊爾·布托再任總
+  - 0.90｜，廢除總統制，任古巴國務委員會主席。⏎ 1988年：-{zh-cn:贝【娜】齐尔·布托;zh-tw
+  - 0.89｜, "Arc to Arcturus, then spike (or speed on) to Spica". Together with the bright stars Spica and D【ene】bola (or Regulus, depending
+  - 0.89｜他最初提议为新元素命名为muride，但法兰西学术院将该元素改名为bromine（溴）。⏎⏎贝尔【纳】·库尔图瓦发现了碘。
+  - 0.88｜400萬噸高品位鈾礦石。⏎⏎據美國情報官員稱，據稱巴基斯坦總理貝【娜】齊爾·布託在19
+  - 0.87｜進而可以透过X射线晶体学的方法来得到其结构细节。第一张病毒的X射线衍射照片是由貝【納】（Bernal）和范库肯
+  - 0.87｜ since the 1890s, by the electrophilic aromatic substitution reaction of chlorine with benzene or chlorobenzen【es】. Large-scale manufacture for use as a
+  - 0.87｜ins elevated. Offspring of mothers with three decades of HCB-induced porphyria appear normal.⏎⏎See also⏎Chlorobenzen【es】—different numbers of chlorine substituents
+  - 0.87｜es combust to give carbon dioxide and water.⏎⏎The combustion of alkenes release less energy than burning same m<|endoftext|>In organic chemistry, all【enes】 are organic compounds in which one carbon atom
+  - 0.86｜ few hours, but that's exactly what happens when you create art on the beach. And we're not talking sandcastles.⏎Jim D【ene】van and Andres Amador are just two
+  - 0.86｜ group of a terminal allene resonate at around 4.5 ppm — somewhat upfield of a typical vinylic proton. ⏎⏎All【enes】 possess a rich cycloaddition chemistry
+
+## N099（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 4.62
+- 直接读出推高：lig |  cub | 編 | TagName | 特別 |  volta | 辫 | gence | 以为 | pection
+- 直接读出压低：.).\n\n |  Pompe | olin | ENSE |  MOR |  Peg | _IOC | .setter |  bowed | FOX
+- 正极片段：
+  - 1.00｜常在、绿水常在，建设美丽中国有了纲领性文件。《关于加快生态文明建设的意见》(以下简称《意见》【)】对生态文明建设作出顶层设计和总体部署
+  - 0.88｜过程，确保了程序能够正确地使用所需要的类和资源。⏎类加载器（Class Loader）是Java虚拟机（JVM【）】的一个子系统，负责将Java类
+  - 0.82｜ methods. In the Yellow Emperor’s Inner Classic (written around 100 B.C.), the condition known as xiao ke is mentioned【,】 and is translated today as diabetes or diabetic
+  - 0.77｜, intellectualism and its pursuits will always command respect.⏎Nothing is free. Everything has a cost. While technology, as we have just seen【,】 can have very positive effects it can also
+  - 0.73｜. Box 152350⏎Irving, TX 75015-2350⏎Web site【:】 http://www.boyslife.org⏎
+  - 0.69｜宽松政策将导致美元贬值，经由国际市场初级产品价格上涨和美国债务价值缩水。而对于汇市的最直接影响，以美国【为例】，假如量化宽松政策施行过当
+  - 0.69｜" style="text-align:center;"⏎|-style="background:aqua;font-weight:bold;"⏎⏎已停辦或停招的大專院校⏎⏎【<center】>⏎{|class="wikitable" style
+  - 0.67｜ into alleviating the various symptoms of diabetes by natural methods. In the Yellow Emperor’s Inner Classic (written around 100 B.C【.),】 the condition known as xiao ke is
+  - 0.63｜信号，但无法阻止或逆转大脑萎缩。⏎进行性多灶白质脑多发生于严重的免疫缺陷者，如HIV【、】血液肿瘤患者或长期服用免疫抑制
+  - 0.63｜并不陌生：多通风、多休息、少去公共场所、注射疫苗……不过．以下几点是在预防流感中人们常会忽视【的】细节——⏎人们在紧张的生活中
+  - 0.63｜机制的完整过程，确保了程序能够正确地使用所需要的类和资源。⏎类加载器（Class Loader）是Java虚拟机【（】JVM）的一个子系统，负责
+  - 0.61｜ secretary who records it. Continue until one group is finished (but check that they got it right!). CP⏎Think —- Write⏎1【.】 Graphic Organizers⏎These you can make
+  - 0.61｜晶? 非晶材料? 与采用新材料紧密相关的传感器开发工作，可以归纳为下述三个方向：? (【1】)在已知的材料中探索
+  - 0.60｜赞誉。⏎做好联系人大代表工作是人大工作永恒的主题，在新形势下，要不断总结经验，进一步提高联系代表工作的质量和水平。⏎（【一】）做好联系代表工作的根本目的是为了
+  - 0.59｜之间。⏎经常运行Web服务的组织想要在这些Web服务之前使用HTTP负载均衡器，帮助确保提供足够的性能和高可用【性】级别。与传统的基于网络的负载
+  - 0.59｜，更要成为社会治理现代化的集成体。对社会治理的内涵外延要准确的理解，从政法系统来说，可以从三个方面理解。【第一】，社会治理落脚点是平安。
+  - 0.58｜。⏎可操作性差是资源基础理论的一大难题，难以区分哪种资源是最重要的。⏎企业成长与竞争理论的变革⏎1【 )】企业成长理论⏎企业成长理论的
+  - 0.56｜外来细菌和病毒。⏎很多人对如何预防流感并不陌生：多通风、多休息、少去公共场所、注射疫苗……不过．【以下】几点是在预防流感中人们常会
+  - 0.55｜ from clients, but what if a client said, “I’d like to grow some more brain cells”?⏎This may seem outlandish【,】 but studies have demonstrated that vigorous exercise fuels
+  - 0.55｜一个法人股东的有限责任公司。一人有限责任公司的股东原则上不以个人财产对公司的债务承担责任，但是《公司法》第六十三【条规定】了例外情形。江苏南通二建

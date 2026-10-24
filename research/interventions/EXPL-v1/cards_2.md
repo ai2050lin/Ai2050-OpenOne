@@ -1,0 +1,525 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## N040（第 29 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 17 页一次；语料最大激活 18.7
+- 直接读出推高：耻 |  tend |  Ledger | 厌 | >* | ToOne | UME | "* | yles | /he
+- 直接读出压低： $( |  `( | $( |  ``( |  -( | *( | {( | ,( | :( |  !(
+- 正极片段：
+  - 1.00｜，所以整數加法的確是個二元运算。⏎對于任何整數a, b和c，(a +【 b】) + c = a +（b
+  - 0.83｜ Sold⏎Gross Profit is the numerator in the calculation of Gross Margin:⏎= Gross Profit / Revenue⏎= (Revenue - Cost of Goods【 Sold】) / Revenue⏎A positive Gross Profit
+  - 0.82｜ percentage point, going from 10 percent to 11 percent, or a 10 percent increase ((11 – 1【0】)/10). However, the amount
+  - 0.81｜2]*[D(Y)+(EY)^2]-(EX)^2*(EY)^2=(2+1^2)*(3【+】3^2)-1^2*
+  - 0.80｜示例:⏎/// Iteration using a 'for' loop⏎let printList lst = ⏎    for x in lst do⏎        printf【n】 "%d" x⏎⏎/// Iteration
+  - 0.75｜ degrees Celsius to T[F] in degrees Fahrenheit, this formula may be used:⏎⏎T[F] = (T[C] × 9/【5】) + 32.⏎⏎Example⏎
+  - 0.73｜ =⏎    match lst with⏎    | [] -> ()⏎    | h :: t ->⏎        printfn "%d" h⏎        printList【3】 t⏎斐波那契数列
+  - 0.70｜ with⏎        | 0 -> f0⏎        | 1 -> f1⏎        | _ -> g (n - 1【)】 f1 (f0 + f1
+  - 0.67｜ non-zero) is a bijection. Each real number y is obtained from (or paired with) the real number x = (y −【 b】)/a.⏎ The function f: R
+  - 0.67｜ f(x) = 2x + 1 is bijective, since for each y there is a unique x = (y − 【1】)/2 such that f(x) =
+  - 0.67｜=[D(X)+(EX)^2]*[D(Y)+(EY)^2]-(EX)^2*(EY)^2=(2【+】1^2)*(3+3^
+  - 0.65｜/// Iteration using a 'for' loop⏎let printList lst = ⏎    for x in lst do⏎        printfn "%d【"】 x⏎⏎/// Iteration using a higher
+  - 0.62｜ need to remember to define down (like gravity) as negative.⏎a = (vf - vi) / t⏎t = (vf -【 vi】) / a⏎= (0 -
+  - 0.61｜迭代示例:⏎/// Iteration using a 'for' loop⏎let printList lst = ⏎    for x in lst do⏎       【 printf】n "%d" x⏎⏎/// Iter
+  - 0.60｜ (translational) + KE (rotational)⏎m•g•h = m•v²/2 + I•ω²【/】2 = m•v²/2
+  - 0.59｜⏎let label =⏎    let x = 3 + (4 * 5)⏎    new Label(Text = sprintf "x = %d【"】 x)⏎⏎// Add the label to the
+  - 0.59｜•R²/3 , ω=v/R⏎m•g•h = m•v²/2 + I•ω²【/】2 = m•v²/2
+  - 0.57｜> printList⏎⏎// Same thing, using a list expression⏎[ for i in 1..10 do⏎    let r =【 fib】 i⏎    if r % 2
+  - 0.57｜冰的热导率为0.023 J/s·cm·K，在雪的密度为0.1×103【 kg】/m3时，雪的热导
+  - 0.57｜ents⏎⏎In mammals⏎⏎Blood accounts for 7% of the human body weight, with an average density around 1060 【kg】/m3, very close to pure water
+
+## N041（第 12 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.8 次；语料最大激活 5.09
+- 直接读出推高：ağı | ].[ | atus | nty | linger |  İ | fm |  cid | еле | 泡
+- 直接读出压低：记忆 | 诰 | 的记忆 | 纠错 | 昼 |  mnemonic | 耻 | 报表 | ileo | 的支持
+- 正极片段：
+  - 1.00｜3種，分為“卵生”、“化生”和“濕生”三類。對動植物分類學的【發展】有很大意義。⏎⏎《本草綱
+  - 0.98｜12期) 2017-04-18 志书图片的放置原则黑龙江史志(20【1】7年2期) 20
+  - 0.89｜与公司正常经营业务无直接关系，以及虽与正常经营业务相关，但由于其性质特殊与偶发性，影响报表【使用】人对公司经营业绩和盈利能力做出正常
+  - 0.83｜思想与行为所遗留之陈迹。⏎舱庑┒际谴邮妨系耐部特征上来界定的。⏎如果从史料的【用途】上来说,史料,也称历史
+  - 0.81｜方法常仰賴醫療病史，且結合或是抽血來檢查是否含有特定IgE抗體。不過這些測試【有】時會呈現偽陽性。
+  - 0.81｜急需统筹和改进。体现在行业数据（决策支撑数据）、生产支撑数据两个方面。设施装备存量数据和产能数据统计口径【不】一，五花八门。如
+  - 0.80｜ifax credit reports in one easy-to-read format. Includes a FREE PLUS Credit ScoreSM from Experian. See them online for only $【3】9.95!⏎What Is Credit
+  - 0.71｜ means that a special radio receiver is necessary to pick up the broadcast. These radios are sold by many retail outlets and can cost less than $【2】0 in their basic form. Some CB
+  - 0.71｜要的信息⏎1.4 表面灵敏度⏎1.5 辐射效应与表面损伤⏎1.6 数据【的】复杂性⏎第2章 俄
+  - 0.70｜8, Lomborg published four essays about the state of the environment in the leading Danish newspaper Politiken, which according to him "resulted【 in】 a firestorm debate spanning over 4
+  - 0.70｜ in reality. Given that most disciplines have modeling systems and equations that apply very well over some scales but not others, this is a limitation to【 the】german models, but is likely not
+  - 0.69｜<|endoftext|>方言（），為某種語言的變體。然而，在對「語言」和「方言」定義時，無論採【用】社會語言學者「相互理解性
+  - 0.69｜次评估报告（AR6）的结果保持一致，且以gCO₂eq/kWh为单位进行报告。--数据库及数据【质量】要求欧盟官方开发了强制使用的L
+  - 0.68｜越来越多的实验数据表明LDL及胆固醇是关键的斑块炎性调节因子。同时得益于当今成像技术的飞速【发展】，脱氧葡萄糖正电子发射
+  - 0.67｜3 直流数字电压表 1 4 直流数字毫安表 1⏎3、 直流仪表的【接入】应注意急性与量程。⏎六、
+  - 0.67｜中国以环境目标为核心的实践有助于激励地方官员严格执行环境保护规定，但在具体执法过程中产生了目标僵化、周期性行为、数据【质量】差等问题，加之缺乏独立的监测
+  - 0.67｜. Personal privacy issues touch everyone at virtually every stage of life, and even into death (e.g., access to the Social Security Death Index【 online】), raising a universe of hard questions to
+  - 0.67｜和间接测定(雷达、卫星云图估算)两种。⏎①雨量器测量⏎根据降雨类型以及降雨资料的预期【用途】，用雨量器测量降水，
+  - 0.67｜仰賴醫療病史，且結合或是抽血來檢查是否含有特定IgE抗體。不過這些測試有時【會】呈現偽陽性。過敏
+  - 0.66｜ is in a building. If you live in an area that has severe winters, your house should be prepared. Start with an outdoor thermometer that【 is】 easily readable from inside the house. As
+
+## N042（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 8 页一次；语料最大激活 12
+- 直接读出推高： Stock | /Resources | (begin | нят | [list |  stock | shadow | sic |  парти |  Sahara
+- 直接读出压低：plex | atem |  Moral | deal | metry | 去过 | 筏 | 世家 | 这只 | _Construct
+- 正极片段：
+  - 1.00｜1875 Noble Avenue⏎Bridgeport, CT 06610⏎Main Number: (203) 3【9】4-6565<|endoftext|>Web
+  - 0.90｜ tournament organization guidance.⏎For information contact: Dan Michaelson Virginia Department of Game and Inland Fisheries Fisheries Biologist 434-3【9】2-9645⏎«
+  - 0.84｜ it’s an absolute marvel, a national treasure,” said museum curator Stephen Crowell.⏎For information, call (360) 3【9】6-4148.<|endoftext|>
+  - 0.84｜ographica-The Complete Illustrated World Reference (1999), Random House Australia/Periplus, ISBN 962-5【9】3-622-X⏎ Financial
+  - 0.81｜氏合葬於昭陵。⏎⏎生平⏎⏎早年经历 ⏎隋文帝開皇十七年十二月戊午日（5【9】8年1月28日），
+  - 0.80｜（540年）置桂州于湘州始安郡，受湘州督。⏎⏎隋朝开皇十年（5【9】0年）置桂州总管
+  - 0.79｜府集中在关中一带，使朝廷拥有雄厚的军事力量，巩固了国家的统一。⏎唐太宗李世民(5【9】9年-649年)⏎
+  - 0.78｜參考文獻⏎⏎外部連結⏎⏎ 羅馬數字換算程式（設有javascript源碼）由1至3,【9】99,999 ⏎ �
+  - 0.77｜隶属广州，治所晋兴县（今南宁市），晋兴县成为南宁的第一个地名。⏎⏎隋开皇十八年（5【9】8年），改晋兴县为
+  - 0.74｜ most likely 26 May 604) was a Christian monk who became the first archbishop of Canterbury in the year 5【9】7. He is considered the "A
+  - 0.73｜ capabilities.<|endoftext|>Origin Of Species 2E Abridged Pa, by Darwin,Charles⏎- ISBN: 97803【9】3978674 |
+  - 0.73｜、《秘史》⏎法兰克，都尔主教格雷戈里（Gregory）（539年—5【9】4年），《法兰克人史
+  - 0.72｜意三昧》等，並撰有〈立誓願文〉。⏎天台智顗（538年－5【9】7年），天台宗（或
+  - 0.72｜ archbishop of Canterbury was Saint Augustine of Canterbury (not to be confused with Saint Augustine of Hippo), who arrived in Kent in 5【9】7 AD, having been sent by Pope
+  - 0.72｜ number of other factors. Kent was the dominant power in southeastern Britain. Since the eclipse of King Ceawlin of Wessex in 5【9】2, Æthelberht
+  - 0.71｜ , 德伊勒王 (589–604)⏎韦塞克斯 - , 韦塞克斯王 (5【9】7–611)⏎苏格
+  - 0.71｜602-664)回洛阳着《大唐西域记》⏎ 645					颜师古(5【8】1-645)逝⏎
+  - 0.71｜试药，止疫安民，深得岭南民众敬仰，又受到朝廷赞扬。隋朝开皇十八年（5【9】8年），为表彰潘茂名的
+  - 0.69｜1 S., 2700 W., Aberdeen, ID 83210; phone (208) 3【9】7-4162, fax
+  - 0.69｜汾流域迁移并定居，在这个时期，畜牧业逐渐发展，由原始群进入了氏族社会。⏎⏎隋，开皇十年（5【9】0年）始名为文水县
+
+## N043（第 7 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 6.1
+- 直接读出推高：lename | unction | 镪 |  narzędzi | ariate |  subscript | 文献 | 聃 |  hồi |  formally
+- 直接读出压低：笑脸 | ordo | 跟我 | 沛 | ees |  Underground |  ap |  MP | antis | mp
+- 正极片段：
+  - 1.00｜主要樂器；在古典音樂的領域裡，結他常以独奏或二重奏的型式演出；在室内【乐】和管弦乐中，吉他亦
+  - 1.00｜为庆祝以色列建国50周年，1999年）⏎变奏曲（Partita，2001年）⏎⏎室内【乐】⏎两个世界之间（Between Two Worlds
+  - 0.90｜，格奥尔格·菲利普·泰勒曼、和卡尔·斯塔米茨也创作过类似的音乐。⏎⏎在室内【乐】中，中提琴是一个重要的角色
+  - 0.89｜加爾各答的天使—德蘭修女>>(1997年)<|endoftext|>长笛是现代管弦乐和室内【乐】中主要的高音旋律乐器，
+  - 0.88｜意識到要在官方的「意識框架」及「創作自由」中找出平衡點，這因而造就了他開始創作室内【樂】作品。他寫成了第一首�
+  - 0.88｜，一般小提琴奏鸣曲以这形式演奏；小提琴还可以和中提琴、大提琴一起演奏室内【乐】，称之为弦乐三重奏、
+  - 0.87｜媒介(对商品和劳务的购买力)--角度出发研究汇率的决定问题，抓住了汇率决定的主要方面，为纸币【制度】下的汇率决定提供了理论依据，为
+  - 0.87｜，国际金融危机尚未完全结束，国内通胀没有起来，但通胀预期已经有所抬头。⏎对通胀预期的基本理解⏎在纸币【制度】下，一个果断的政府总是能够
+  - 0.86｜電視公司連續劇《赛金花》1991年 香港女演員陳玉蓮飾演⏎⏎舞台【劇】⏎ 中國大陸導演田沁
+  - 0.85｜是2等等；公理5保证了数学归纳法的正确性，从而被称为归纳法原理。⏎⏎基于基数理论 ⏎在基数【理论】中，集合论的一般做法是
+  - 0.84｜手册并不能全面深入考察学生德育实践全过程，德育评价基本流于表面。⏎虽然一些学校制定了相关的德育量化手册，采取积分【制】形式督促学生遵守德育规范，也
+  - 0.83｜的后继数是2等等；公理5保证了数学归纳法的正确性，从而被称为归纳法原理。⏎⏎基于基数【理论】 ⏎在基数理论中，集合论
+  - 0.82｜日⏎全日本忍者選手權大賽⏎忍者亂太郎⏎⏎外部連結⏎忍者中國會員區⏎时代【剧】复兴计划国际宣传组:忍者
+  - 0.76｜616)創作了不少十四行詩，在他的戲劇中也有不少詩歌。之後產生了抒情詩、田園【詩】等類型，直到二十世紀
+  - 0.76｜被凝固了的感觉，那也许正是人物的内心活动达到顶峰的一瞬间。蒙克所画的人物犹如一出舞台【剧】的各个角色，很可能每一种特定
+  - 0.76｜當中包括令他耿耿於懷，未能首演的《第4號交響曲》總譜，一些室内【樂】作品樂章等。另一方面，蕭
+  - 0.76｜ about 4 inches long. Flower:⏎Flowers up to 3 inches across. Petals yellow. Stamens⏎Fruit: Size【 Class】:⏎Bloom InformationBloom Color:
+  - 0.75｜》，《第一奏鸣曲》，《第二奏鸣曲》，《第三奏鸣曲》，《童年即景》等⏎⏎室內【樂】⏎弦樂四重奏（作品
+  - 0.73｜活動，其在美國演藝業界地位与针对流行音乐格莱美奖、针对电视艾美奖、针对舞台【劇】托尼奖相当，而这些奖
+  - 0.71｜采用“少数服从多数”原则作为裁定。⏎　　④国家公职选举任期原则：雅典的公职选举任期【制】 ,经历了不断的发展演变过程,成为
+
+## N044（第 4 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 2.65
+- 直接读出推高： colored |  nearest |  det | bast | 雷斯 | 腺 | .ver |  peel |  Anat |  holders
+- 直接读出压低：]=- | 留下 | 잔 | ibal |  emerging | hall | ithe | ạt | 只见 | 留下了
+- 正极片段：
+  - 1.00｜arts of water. With this he plunged into the forest in the direction of the pond, handing Worth the hatchet as he passed, and【 bidding】 him be spry with his palmet
+  - 0.99｜ thou hast allotted will be employed." Penn stuck to his decision, and, for that matter, Fenwick likewise maintained his grievance. He【 sailed】 for the Delaware at the head of a
+  - 0.94｜ are working on them in the basement.” Biggs said. “Didn’t you see the notice?”⏎He pointed, and Freda saw【 that】 a notice clear enough for anyone to see
+  - 0.86｜ sow eventually decided to saunter off downriver. The cubs bounded off behind her, and I breathed a heavy sigh of relief. I【 had】 emerged unscathed and transformed after my
+  - 0.80｜ of Mahagonny: Fatty the Bookkeeper, Trinity Moses, and Leocadia Begbick. Because the federal agents pursuing them【 will】 not search this far north, and they
+  - 0.78｜'s because we are both Welsh and grew up near the same town. For the record, I didn't really know him at all." He【 enrolled】 at the Royal Welsh College of Music &
+  - 0.75｜.”⏎“She needs to spend any money she may have left in packing up her campaign.”⏎“The senator that was sent packing from the Senate?”⏎【These】 user-created lists contain the word ‘packing
+  - 0.74｜旧的拖拉机。拖拉机撞倒我女儿后，司机并没有停留，而是直接逃跑了。”杨吉说。⏎【还好】，事发时有一辆51路
+  - 0.73｜ were safely afloat and ready to land, the second officer opened his hatch cover, climbed out, and passed a line ashore.⏎She【 could】 go four miles an hour in smooth water
+  - 0.73｜27 vanished from sight in a vortex of giant rumbling bubbles, leaving a pall of smoke over the spot where she had been. It【 had】 taken only a few minutes to fire the
+  - 0.72｜ older two children are certified divers and Michael says each child will take their deep water dive with dad when the time is right.⏎A caring friend【 will】 be there to pray with you in your
+  - 0.71｜ a great hoot owl in the forest behind them.⏎“’Now for a fire and some supper,” cried Sumner, cheerily.【 You】’ve got some matches, haven’t you
+  - 0.70｜ air as his throat continued to swell, and there was a shiver and a gurgle and his body shuddered, before he【 died】 from asphyxia. He died two
+  - 0.70｜ sandwiches, which Kathleen hated. “I can’t believe you can eat those things. They taste disgusting,” she said. Mark was just about【 to】 tell her how great they were, when
+  - 0.67｜ Methodist founder John Wesley is critical of David: "He can almost find in his heart to receive into favour the murderer of his brother. How【 can】 we excuse David from the sin of Eli
+  - 0.66｜ palmetto leaves you possibly can, and carry them to the place where we landed.”⏎“The bucket?” repeated Worth, looming about him in【quiring】ly. “Where are you going to
+  - 0.66｜社联？哪有什么王主席？”“对不起，找错了地方。”那人一边哈了哈腰，一边匆匆后退出去。【当时】出席中共一大的代表后来在各自的
+  - 0.63｜ there.⏎⏎Scene 5⏎⏎The four friends arrive in Mahagonny, only to find other disappointed travelers already leaving. Begbick,【 well】-informed about their personal tastes, marks
+  - 0.63｜. Now give me the hatchet, and then pick up all the driftwood you can find, while I build a house.”⏎Worth【 would】 gladly have helped erect the house, as
+  - 0.61｜float and ready to land, the second officer opened his hatch cover, climbed out, and passed a line ashore.⏎She could go four【 miles】 an hour in smooth water and remain submerged
+
+## N045（第 15 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 4.41
+- 直接读出推高：ught | 紀 | 贯 |  offend | Comparator |  retrospect |  achievements | 孰 | 霄 | 弹
+- 直接读出压低：根本 | DISABLE | 底部 | -Key | 殖 | ilage | 发展壮大 | Fran |  underlying | 失业
+- 正极片段：
+  - 1.00｜失去受供养条件时不再享受此项抚恤金。失业人员在领取失业保险金期间死亡的，家属可以领取一次性丧【葬】补助金和抚恤金。劳动者
+  - 0.94｜失业人员在领取失业保险金期间死亡等情况下，其家属获得的物质帮助。它包括两项内容：一是死亡者丧【葬】费；二是死亡者家属的抚
+  - 0.92｜材⏎儒林外史中有不少是史實，部分人物真實存在于歷史。如寫「王冕畫荷賣錢養【母】」，其中主角王冕是真
+  - 0.86｜. He hoped the job would earn him enough money to support his parents, "to make their cares, and burdens less ... and get【 them】 free from debt", though he soon spent
+  - 0.85｜ of death or the deceased's address of record either. "Last Benefit" only refers to the payment of the lump sum death benefit (a【 burial】 allowance of about $250 that
+  - 0.82｜過著正直的生活，原因是他不希望讓天真的新歡海蒂·默頓（Hetty Merton）的心靈【受到】傷害。道林·格雷
+  - 0.81｜上》记载："谨庠序之教，申之以孝悌之义，颁白者不负戴于道路矣。老【者】衣帛食肉，黎民不
+  - 0.77｜，自己是家中独子，包拯坚持“父母在，不远游”，如果自己到外地做官，势必无法孝敬【父母】。为了照顾父母，放弃高官
+  - 0.75｜人遗产的制度。代位继承对于保障遗产在家族各支系中合理分配、实现财产的传承、发挥遗产育【幼】功能等方面具有重大作用。《民
+  - 0.75｜岁，其父死亡或完全丧失劳动力，母未从事有报酬的工作的。因工死亡的遗属津贴包括：丧【葬】补助金，一次性工亡补助金
+  - 0.72｜ was nearby, observed Lucina's behaviour and quickly deduced that it was Juno's doing. To put an end to her mistress's【 suffering】, she announced that Alcmene had
+  - 0.70｜。叔祖蒲生汶中了進士，選河北玉田知縣，是個有名的孝子，聽說老母【患病】，哭得湯水不進，
+  - 0.69｜ 20s, and as a bookkeeper and a caretaker of sheep and horses, using the proceeds to give his mother a proper【 burial】. When his mother died, Confuc
+  - 0.67｜. Following Alexander's death in 323 BC, his general Ptolemy Lagides took possession of Egypt and brought Alexander's【 body】 to Egypt with him. Ptole
+  - 0.64｜罚本质与正当化依据，刑罚目的只能在于预防，如果犯罪分子无法通过刑罚改恶从善，就意味着特殊【预防】彻底失效。对事务型帮助犯
+  - 0.64｜后，子女无论由父或者母直接抚养，仍是父母双方的子女。离婚后，父母对于子女仍有抚养、教育、【保护】的权利和义务。离婚后，不满
+  - 0.63｜得宋之问故居蓝田辋川（今西安）别业。五年转库部员外郎。九年春，丁【母】忧，离朝屏居辋川
+  - 0.63｜为：⏎⏎其意義為，包含的多少資訊。在尚未得到之前，對的不確定性是，得到後，不確定【性】是。所以一旦得到，就消
+  - 0.62｜ create children, independently of any government. The duty of caring for those children exists even without a government or any political order.⏎Marriage protects【 children】 as well as the interests of each parent
+  - 0.62｜ Through prayer, intercessions, alms and visits to cemeteries, people commemorate the poor souls in purgatory and gain【 them】 indulgences.⏎⏎In Western Christianity,
+
+## N046（第 4 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 34 页一次；语料最大激活 3.75
+- 直接读出推高： Petr |  Barnett | zer |  redistribute |  reserve | 备 |  battery | .plist |  promotions | 雄
+- 直接读出压低：民族 | iring | ancial | isible | 一点 | 沸 | _| | � | 开来 | }//
+- 正极片段：
+  - 1.00｜空，删除Q的队头元素，用e返回其值，并返回OK，否则返回ERROR */⏎	QueuePtr p;⏎	if【((*】Q).front==(*Q).rear
+  - 0.92｜=NULL;⏎}⏎⏎void DestroyQueue(LinkQueue *Q)⏎{	/* 销毁队列Q(无论空否均可) */⏎	while【((*】Q).front)⏎	{⏎		
+  - 0.88｜q,*p;⏎	if(i<1||i>(*L).length+1) /* i值不合法 */⏎		return ERROR;⏎	if【((*】L).length>=(*L).list
+  - 0.81｜;⏎	p=(*Q).front->next;⏎	*e=p->data;⏎	(*Q).front->next=p->next;⏎	if【((*】Q).rear==p)⏎		
+  - 0.75｜ISO C++标准库的一部分和ISO C的标准库的API完全相同，另有很小一部分和C标准库略有差异（例如，【str】cat等函数提供对const类型的重
+  - 0.68｜ wind up with:⏎unsigned count; // set externally double data; // set externally unsigned i; double avg=0.0; for (【i】=0;i<count;i++) avg+=
+  - 0.63｜L)⏎{	/* 初始条件：顺序线性表L已存在。操作结果：销毁顺序线性表L */⏎	free【((*】L).elem);⏎	(*L).
+  - 0.63｜size) /* 当前存储空间已满,增加分配 */⏎	{⏎		newbase=(ElemType *)realloc((*L).elem,【((*】L).listsize+LIST_INCREMENT)*
+  - 0.62｜的基本操作(9个) */⏎void InitQueue(LinkQueue *Q)⏎{	/* 构造一个空队列Q */⏎	【(*】Q).front=(*Q).rear
+  - 0.62｜ Manual TMPFILE(3) NAME tmpfile - create a temporary file SYNOPSIS #include <stdio.h> FILE *tmpfile(void);【 DESCRIPTION】 The tmpfile() function opens a unique
+  - 0.60｜了程序开始执行的位置。其主体由一条语句组成，即对函数的调用，意思是“打印格式化”（【print】 formatted）。这个函数将使程序输出
+  - 0.59｜否均可) */⏎	while((*Q).front)⏎	{⏎		(*Q).rear=(*Q).front->next;⏎		free【((*】Q).front);⏎		(*Q
+  - 0.58｜ component, SLinkList[MAX_SIZE];⏎⏎// 一个数组只生成一个静态链表的基本操作(11个)⏎#define DestroyList【 Clear】List // DestroyList()和ClearList
+  - 0.58｜>=(*L).listsize) /* 当前存储空间已满,增加分配 */⏎	{⏎		newbase=(ElemType *)realloc【((*】L).elem,((*L).list
+  - 0.57｜了。引入了多重繼承、抽象類別、靜態成員函式、常數成員函式，以及成【員】保護。1990年，
+  - 0.57｜ multi-byte I/O⏎ Addition of digraphs to the language⏎ Specification of standard macros for the alternative specification of operators, e.g.【 and】 for &&⏎ Specification of the standard macro __
+  - 0.56｜Q)⏎{	/* 销毁队列Q(无论空否均可) */⏎	while((*Q).front)⏎	{⏎		【(*】Q).rear=(*Q).front
+  - 0.56｜0 ，就会造成⏎buffer⏎的溢出，使程序运行出错。存在象⏎strcpy⏎这样的问题的标准函数还有⏎【str】cat()，sprintf()，vsprintf
+  - 0.56｜商業化發佈。⏎⏎1989年，發佈了。引入了多重繼承、抽象類別、靜態成【員】函式、常數成員函
+  - 0.55｜ following are simple declarations of the four tree containers:⏎- tree<std::string> my_tree;⏎- multitree<int> my_tree⏎-【 unique】_tree<CMyClass> my_tree;⏎
+
+## N047（第 29 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 2.1 次；语料最大激活 24.4
+- 直接读出推高：thon |  Romero |  liberal | ht | 队 | 呼 |  cohorts | ick | airo | ort
+- 直接读出压低：经济 | 科学研究 | 经济发展 | 經濟 | 经济技术 | vier |  Economic | achts |  economic | Sink
+- 正极片段：
+  - 1.00｜这么大规模、这么大力度的改革，这是中国特色社会主义制度的鲜明特征和显著优势。以往的中央深改组、深【改】委会议多次强调改革的科学方法
+  - 0.94｜来源，为我国社会主义市场经济发展、政府职能转变、农村富余劳动力转移、国际市场开拓等发挥了重要作用。二十届中央深【改】委首次会议直接抓关系全局的重大
+  - 0.90｜影响效率的担忧。⏎从这个角度而言， 3 个执法部门合而为一也许是个更好的选择。⏎国家发展改革委【价格】监督检查与反垄断局组织召开筹备
+  - 0.85｜科技、文化、教育中心及交通、通信枢纽，也是中国人民解放军西部战区联合作战指挥部所在地，国家统筹城乡综合【配套】改革试验区。成都为首批国家历史文化
+  - 0.84｜和监管执法不断收紧，绿色发展的政策、环境产生了巨大的变化，各类主体形成了关注生态环境的内在动力。⏎8月底，深【改】组第二次会议审议通过了《关于构建
+  - 0.82｜李委员说，从供给基本面看，我国粮食生产连续丰收，生猪产能合理充裕，工业和服务业市场供给充足，物价【不存在】大幅上涨的基础。但针对可能出现的
+  - 0.82｜推动这么大范围、这么大规模、这么大力度的改革，这是中国特色社会主义制度的鲜明特征和显著优势。以往的中央深【改】组、深改委会议多次强调
+  - 0.82｜，如何理解中国式现代化打破了“现代化=西方化”的迷思？解读：冯俏彬 国务院发展研究中心宏观经济【研究】部副部长近代以来，现代化成为世界发展的
+  - 0.82｜提高清算效率等方面发挥积极作用，进一步推动非银行支付行业健康稳健发展，更好地服务实体经济和社会大众。(作者系中国人民大学重【阳】金融研究院高级研究员)⏎·“网
+  - 0.79｜歷史性任务。我们要按照中央农村工作会议提出的实施乡村振兴战略的目标任务和基本原则，科学规划、注重质量、从容建设，防止【追求】速度、防止搞运动。要把党中央
+  - 0.79｜并转让”的<|endoftext|>美国经济超中国那么多，为什么现在说的美国很衰弱一样？ ⏎作者刘英系中国人民大学重【阳】金融研究院院务委员兼合作研究
+  - 0.78｜从技术创新主体转变为科技创新主体意味着什么⏎4月21日召开的二十届中央全面深化改革委员会第一次会议，审议通过了7【份】文件，其中之一是：《关于强化
+  - 0.78｜、集体收益分配权，引导进城落户农民依法自愿有偿转让上述权益。⏎中央农村工作领导小组办公室主任、中央财经工作【领导小组】办公室副主任韩俊第一时间接受采访，全面
+  - 0.78｜、办公室代理主任、农牧组组长。1980年3月起，历任中共内蒙古自治区委办公厅秘书、政策【研究】室副主任，自治区党委研究室副主任
+  - 0.77｜56个行业规划，省、地(市)、县三级地方政府编制的"十五"规划纲要、重点专项规划【、】行业规划等有7300
+  - 0.77｜证明行之有效的，要及时上升为法律。实践条件还不成熟、需要先行先试的，要按照法定程序作出授权。【对】不适应改革要求的法律法规，要及时
+  - 0.76｜中央首度提出的国家战略，将成为今后解决“三农”问题、全面激活农村发展新活力的重大行动。⏎国务院发展研究中心农村经济【研究】部部长叶兴庆日前接受第一财经
+  - 0.76｜取得的成就是历史性、革命性、开创性的。党的十八届三中全会提出的改革目标任务总体如期完成，各方面共推出【2】000多个改革方案，许多
+  - 0.76｜，国务院印发“深化科技体制改革实施方案”，针对改革困难，提出了10个方面，32项改革举措和143【项】具体任务;2016年
+  - 0.76｜银行、国务院金融管理部门、发展改革部门、财政部门等有关部门和地方政府等各部门应按照职责分工和国家金融稳定发展统筹【协调】机制要求，依法履行金融风险防范
+
+## N048（第 31 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.6 次；语料最大激活 50.3
+- 直接读出推高： Occup |  figure | occup |  figures |  ocup |  occupation | occupied |  occupied | Occup | occupation
+- 直接读出压低：|array | _definition | ertools |  erm | 曙 | orative | /vnd | reon |  PowerPoint | itioner
+- 正极片段：
+  - 1.00｜ral transcriptions of some of Enrique Granados' piano Goyescas (1918, now lost). Other themes that were【 to】 recur in his later work include the anguish
+  - 0.98｜ that government is not only unnecessary, but extremely harmful, and then the word anarchy, just because it means absence of government, will come【 to】 mean for everybody: natural order, unity
+  - 0.94｜ written: "Augustine's impact on Western Christian thought can hardly be overstated; only his beloved example, Paul of Tarsus,【 has】 been more influential, and Westerners have
+  - 0.93｜ by Hosius of Córdoba. From this time to the end of the Arian controversies, the word "consubstantial" continued【 to】 be the test of orthodoxy. The
+  - 0.88｜ city in Europe during the 4th–13th centuries and a center of culture and education of the Mediterranean basin, Constantinople came【 to】 be known by prestigious titles such as Bas
+  - 0.87｜ Marcionites (Marcion was a 2nd-century heretic who wished to cut Christianity off entirely from the Jews); Baur continues【 to】 have enormous influence, but today there is
+  - 0.87｜ revival⏎⏎In the 16th-century emergence of a popular foundation story and origin myth for the Dutch people, the Batavians came【 to】 be regarded as their ancestors during their national
+  - 0.86｜ pseudoscientific speculation. As a consequence, Atlantis has become a byword for any and all supposed advanced prehistoric lost civilizations and continues【 to】 inspire contemporary fiction, from comic books to
+  - 0.85｜ the public that government is not only unnecessary, but extremely harmful, and then the word anarchy, just because it means absence of government,【 will】 come to mean for everybody: natural order
+  - 0.83｜ae, is an ingenious satire on the vices of humanity. He created the allegory of grammatical "conjugation" which was【 to】 have its successors throughout the Middle Ages.
+  - 0.82｜ get this wine than I took, because I satisfy a want that has become greater, of higher value, etc.⏎This is the question that【 must】 always be considered.⏎There are a thousand
+  - 0.81｜ drawn up by Hosius of Córdoba. From this time to the end of the Arian controversies, the word "consubstantial【"】 continued to be the test of orthodoxy
+  - 0.81｜ figures evoke lone trees in winter that have lost their foliage. Within this style, Giacometti would rarely deviate from the three themes【 that】 preoccupied him—the walking man; the
+  - 0.80｜ President Boris N. Yeltsin jets from Moscow to Rome to the Central Asian city of Alma Ata this weekend, one question is certain【 to】 dominate their conversations: Just what is a
+  - 0.80｜ a brief summary, often in prose, of a poem or section of a poem or other work⏎Argument (linguistics), a phrase【 that】 appears in a syntactic relationship with the
+  - 0.79｜ life. The clock, which Karl Marx describes in a letter to Friedrich Engels as "the first automatic machine applied to practical purposes," began【 to】 subject individuals to its unwavering order
+  - 0.78｜ story is meant to bear witness to the superiority of his concept of a state.⏎⏎Despite its minor importance in Plato's work, the Atlantis story【 has】 had a considerable impact on literature. The
+  - 0.78｜ Ambrose, but in 1527, Erasmus threw doubt on the accuracy of this ascription, and the anonymous author came【 to】 be known as "Ambrosiaster
+  - 0.77｜道德存在著巨大缺陷”。⏎(The question "Why is there anything at all?", or, "Why is there something rather than nothing?"【 has】 been raised or commented on by philosophers including
+  - 0.76｜7<|endoftext|>From Classic Encyclopedia 1911⏎SANGALLO, the surname of a Florentine family, several members of【 which】 became distinguished in the fine arts. I
+
+## N049（第 33 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 22.1
+- 直接读出推高： no | no | 不管 | _no |  No | -no | \tno | No | .no | /no
+- 直接读出压低：没 | ông | enburg | uve |  représ | -widgets | 淡 | .enumer | EqualityComparer | rix
+- 正极片段：
+  - 1.00｜ in tolerance for everyone else, and an expansion of the power of the state.⏎Jennifer Roback Morse is the senior fellow in economics at the【 Act】on Institute and the author of Love and
+  - 0.98｜ Battle of Tertry, the Merovingians declined into powerlessness, for which they have been dubbed the rois fainéants ("【do】-nothing kings"). Almost all government powers
+  - 0.97｜ relativism.” In 2006, I spent a memorable evening discussing this unhappy situation with the Archduke Otto, at an【 Act】on Institute dinner in Rome at which we
+  - 0.97｜ programs and has a crisis support line.⏎Edmund Burke once said, "All that is required for evil to triumph is for good people to【 do】 nothing." The converse is also true,
+  - 0.93｜自己早年在南京亲历的繁华旧梦而写作此书。因流落北京西郊，碌碌无为，【一事】无成，猛然回忆起年少
+  - 0.92｜指事造形，非其常也，故不可道，不可名也。凡有皆始于无，故未形、【无】名之时，则为万物之始，
+  - 0.91｜可能会有很大的差异。一个工人可能在同样的时间内生产出更多的商品，或者生产出更高质量的商品。⏎- 对资本的贡献视【而】不见：劳动价值论主要强调劳动
+  - 0.89｜ tell the editor that when he gets over his⏎drunk I will lwt him have another, and not before. They⏎don't【 cost】 the paper anything snd the trouble to keep
+  - 0.89｜ "Love envieth not, love vaunteth not itself, is not puffed up, doth not behave herself rudely, seek【eth】 not her own, is not provoked,
+  - 0.89｜）能在溶剂1000~不到10000ml中溶解；38. 几乎不溶（【almost】 insoluble）或不溶（ins
+  - 0.87｜1g（ml）能在溶剂1000~不到10000ml中溶解；38. 几【乎】不溶（almost insoluble）或
+  - 0.86｜如霹雳，谓之爆仗……烟火大起”⏎ 《梦梁录》、《武林旧事》、《都【城】记胜》都有关于“爆
+  - 0.84｜关心自己的人。如此，当孩子感觉受到侵犯的时候，就会勇敢地告诉父母。⏎不批评原则，不是对孩子的错误视【而】不见，而是不把批评当成家庭教育
+  - 0.83｜先贤的所思所为，对经典之外的那些历史遗迹，以及古人们无法见到的那些新的文物成果更是视【而】不见。今天的印刷、传播早已令
+  - 0.83｜与黄磊关系不一般，演过夫妻，还是师生关系！⏎地摊经济，为啥有人月赚两万，有些人【却】颗粒无收，一地鸡毛
+  - 0.82｜哈馬斯恐怖分子袭击以色列平民的事件很快便作出反应，但却常常对以色列军队攻击巴勒斯坦平民的事件视【而】不见，并拒绝谴责以色列。这个问题在
+  - 0.82｜enumerable), and therefore its Lebesgue measure as a subset of the complex numbers is 0 (essentially, the algebraic numbers【 take】 up no space in the complex numbers).
+  - 0.82｜处决农民，他们经常将他们砍死。政府极不愿意干涉农奴阶层的生活，对贵族的滔天罪行视【而】不见，这也是因为地主本质上是
+  - 0.82｜ to Christ's demurral in the Garden of Gethsemane ("My Father, if it be possible, let this chalice【 pass】 from me") and the Gospel of Matthew
+  - 0.82｜具体的工作实践中，才能发挥其强大的思想威力。⏎古人说“学而不思则罔”，讲的是只学习不思考就会迷惑【而】无所得，强调了不仅要学习还要
+
+## N050（第 8 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 10.1
+- 直接读出推高： baptized |  slump | 裔 |  splitted | perate | 那些 | 抽出 | 的就是 | 均匀 | 有这样的
+- 直接读出压低：俱 | 地 | 畋 | Nature |  Pret | 受限 | 姿 | 过 |  sû |  tol
+- 正极片段：
+  - 1.00｜负担昂贵的学费外，学生也必须在学术方面表现优异。此外拥有良好的社会关系也是很重要的：公学一般会优先【录取】那些父母或亲属曾经就读过这些
+  - 0.98｜实施正面清单与负面清单相结合的项目导入机制：对于能源转换效率高、污染物排放少、代表未来发展方向的先进技术应【优先】导入，形成技术储备或促进技术
+  - 0.97｜经理层依法履职。健全市场化经营机制，围绕激发活力、提高效率，着力深化劳动、人事、分配三项制度改革，优先【支持】商业类子企业加快推行职业经理
+  - 0.94｜经向劳动行政部门报告后，可以裁减人员。用人单位依据本条规定裁减人员，在6个月内录用人员的，应当优先【录用】被裁减的人员。⏎第二十八条
+  - 0.90｜购买服务、政府与社会资本合作、贷款贴息等方式，引导工商资本、金融资本和社会力量广泛参与数字乡村建设。优先【安排】数字农业农村重大基础设施建设项目用地，符合条件
+  - 0.84｜、经理层依法履职。健全市场化经营机制，围绕激发活力、提高效率，着力深化劳动、人事、分配三项制度改革，【优先】支持商业类子企业加快推行职业
+  - 0.84｜乡村治理体系和治理能力现代化，加快推进农业农村现代化，走中国特色社会主义乡村振兴道路。在干部配备上优先考虑，在要素配置上优先【满足】，在资金投入上优先保障，在公共服务
+  - 0.83｜、具体，避免空泛或范围太大，选题的难度、工作量、创新与特色要反映培养目标的要求。⏎优先【选择】来源于实际科研项目以及企业实际工程技术
+  - 0.83｜ been used successfully to protect against glycation (Guillausseau 1994). Compounds produced through metabolism of sugars bind prefer【entially】 to aminoguanidine rather than
+  - 0.82｜。金李委员表示，各地要严格落实“资金跟着项目走”的原则，宁缺毋滥；进一步提高项目储备质量，【优先】支持成熟度高的项目和在建
+  - 0.82｜示范性研制中医预防保健(治未病)服务标准。⏎在公共卫生服务中开展有关中医预防保健服务项目的研究，优先【在】慢性非传染性疾病防控、健康保险
+  - 0.81｜建设、生态文明建设和党的建设。加快推进乡村治理体系和治理能力现代化，加快推进农业农村现代化，走中国特色社会主义乡村振兴道路。在干部配备上【优先】考虑，在要素配置上优先满足，在
+  - 0.80｜走中国特色社会主义乡村振兴道路。在干部配备上优先考虑，在要素配置上优先满足，在资金投入上优先保障，在公共服务上优先【安排】，以补齐农业农村发展的短板，缩小
+  - 0.80｜未到量和已分配但还沒有提走的数量。制定物料需求计划有一个指导思想，就是要尽可能减少库存。产品优先【从】库存物资中供应，仓库中有的
+  - 0.79｜活动，包括生态修复工程，根据其减排量，一视同仁地给予相应的财政补贴和奖励，优先批准其投资项目，【优先】提供建设用地和资金支持
+  - 0.79｜及毕业要求，使学生在所学专业知识的基础上，能够综合运用所学的知识和技能，独立开展工作；⏎2．优先【选择】与实际科研项目、企业技术问题
+  - 0.78｜金李委员表示，各地要严格落实“资金跟着项目走”的原则，宁缺毋滥；进一步提高项目储备质量，优先【支持】成熟度高的项目和在建项目
+  - 0.76｜、减少污染的经济活动，包括生态修复工程，根据其减排量，一视同仁地给予相应的财政补贴和奖励，【优先】批准其投资项目，优先提供建
+  - 0.75｜，使制定的法律法规更加符合社会管理客观实际，顺应人民群众的要求，更具针对性、实用性和创新性。⏎地方人大应优先【安排】社会管理立法项目，逐步建立起本
+  - 0.74｜资源条件外，我们也有政策支撑，市上把发展食用菌产业纳入我市农村特色产业发展规划，作为一个主导产业之一优先【扶持】。”塔湾村党支部书记张基伟
+
+## N051（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 11.3
+- 直接读出推高： Synopsis | -exec | icode |  nature | Synopsis | otic |  synopsis | iği | ppy | hton
+- 直接读出压低：犁 | !=- | vell | 谵 |  trí |  Shall | ording |  |-- |  SHALL |  "::
+- 正极片段：
+  - 1.00｜ impact of your facility on the environment as well as potentially reduce operating costs.⏎Identify and Use Less Hazardous Paints and CoatingsWHO【 TO】 CALL FOR HELP⏎Less toxic paints and
+  - 0.98｜ website, use the navigation bar at the top or<|endoftext|>Converse (shoe company)⏎|Type||Subsidiary of Nike|⏎【|】Founded||Malden, Massachusetts (
+  - 0.96｜)⏎|Type||Subsidiary of Nike|⏎|Founded||Malden, Massachusetts (February 1908)|⏎【|】Headquarters||North Andover, Massachusetts
+  - 0.94｜ unit can be adapted to younger grades and different courses of study in various Canadian provinces and territories.⏎Content Areas History Geography Citizenship Social Studies Media Studies【⏎】Material Required Access to Internet connection, data
+  - 0.90｜2th|⏎Inferring How and Why Characters Change⏎|Grades||3 – 5|⏎|Lesson Plan Type||Standard Lesson|⏎【|】Estimated Time||Three 50-minute
+  - 0.89｜Cover of first edition (hardcover)⏎|Genre(s)||Science fiction novel|⏎|Media type||Print (Hardback & Paperback)|⏎【|】Dewey Decimal||813
+  - 0.88｜ Space & Security⏎|First flight||27 July 1972|⏎|Introduction||9 January 1976|⏎【|】Primary users||United States Air Force⏎
+  - 0.87｜。[3] 中文名 劳动关系 外文名 Labor Relation 别称 劳资关系 劳工关系【 】产业关系学等 表达式
+  - 0.86｜th||11th - 12th|⏎Inferring How and Why Characters Change⏎|Grades||3 – 5|⏎【|】Lesson Plan Type||Standard Lesson|⏎|
+  - 0.84｜ for tests, and earning good grades.⏎back to top<|endoftext|>|Type||Main battle tank|⏎|Place of origin||USSR|⏎【|】In service||1963 –
+  - 0.84｜76|⏎|Primary users||United States Air Force⏎Japan Air Self-Defense Force⏎Royal Saudi Air Force⏎Israeli Air Force⏎【|】Number built||F-15A
+  - 0.83｜ 12th|⏎Reading and Writing About Whales Using Fiction and Nonfiction Texts⏎|Grades||K – 2|⏎【|】Lesson Plan Type||Unit|⏎|Estimated
+  - 0.83｜ urea synthesis and prevents Prevention of restenosis after coronary angioplasty⏎Alternate TitleL- arginine⏎CategoryHerbs & Supplements【⏎】2- amino- 5- gu
+  - 0.80｜ Writing About Whales Using Fiction and Nonfiction Texts⏎|Grades||K – 2|⏎|Lesson Plan Type||Unit|⏎【|】Estimated Time||Eight 30-minute
+  - 0.80｜Language: English Grade/level: Grade 3 School subject: English as a Second Language (ESL) Age: 7-1【0】⏎Main content: Easter Other contents:⏎
+  - 0.76｜ assassination.⏎|Date||November 22, 1963⏎12:30 p.m. (Central Time)⏎【|】Target||John F. Kennedy|⏎|
+  - 0.76｜|Role||Air superiority fighter|⏎Boeing Defense, Space & Security⏎|First flight||27 July 1972|⏎【|】Introduction||9 January 197
+  - 0.75｜: Rosemary Wells⏎Last updated Sunday, October 23, 2005⏎Illustrator: Rosemary Wells⏎Date【 of】 Publication: 1999⏎
+  - 0.75｜ seconds.<|endoftext|>The Integral Trees⏎|The Integral Trees|⏎Cover of first edition (hardcover)⏎|Genre(s)||Science fiction novel|⏎【|】Media type||Print (Hardback &
+  - 0.74｜<|endoftext|>|Type||Main battle tank|⏎|Place of origin||USSR|⏎|In service||1963 – present|⏎【|】Used by||Soviet Union,
+
+## N052（第 28 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 14.4
+- 直接读出推高：援 | 帮他 | pool | zilla | 党组成员 | 帮助 | blings |  prise | 愿 | 탈
+- 直接读出压低：若干 | 无数 | 适量 |  若 | 一批 |  countless | kie |  several |  numerous |  quelques
+- 正极片段：
+  - 1.00｜强国，实现中华民族伟大复兴的历史伟业奠定坚实基础。  （作者：程建平 系北京师范大学党委书记，原载《【人民】政协报》，有删改）<|endoftext|>
+  - 0.94｜023-wifi.pdf原文来源：GoUpSec“投稿联系方式：孙中豪010-82992【2】51  sunzhonghao
+  - 0.93｜声明中说，可口可乐公司每年要卖出1000亿瓶以上塑料瓶装饮料，⏎中国的反腐电视剧《【人民】的名义》正在热播，圈粉
+  - 0.93｜平台产品质量高，针对性强，受关注度较好。并在中央相关宣传网信部门的关心支持下，相继同步入驻人民日报、【人民】政协报、北京日报、新华网、
+  - 0.91｜相信这种新的学习范式未来可以应用于药物发现领域。五、致谢：感谢国家自然科学基金项目的支持。点击文末【「】阅读原文」，直达文献。Authors
+  - 0.85｜解释论研究.东方法学.[3] 王欣新：“预重整的制度建设与实务辨析”，载《【人民】司法》2012 年
+  - 0.84｜. 德国如何抓住改革的“时机之窗”——“2010议程”的理念、影响与反思.【人民】论坛·学术前沿，11：
+  - 0.83｜之下，这种固有的秩序终于被打破了。⏎这就如同秋菊（陈源斌《万家诉讼》，后被改编成电影《【秋】菊打官司》）一样，她
+  - 0.81｜行动的良好环境和浓厚氛围。官方微信：西南林业大学投稿邮箱:swfutg@163.com西南林业大学融媒体【中心】打造最具影响力的校园媒体传播平台<|endoftext|>
+  - 0.79｜季风」、「马来西亚」等词语，以及「全面来袭」、「」之类四字熟语，都不是成语。又如「【见】怪不怪」是成语，但
+  - 0.77｜*SmallDOI: 10.1002/smll.202300688点击左下角【「】阅读原文」，查看该论文原文
+  - 0.77｜人民政府行政赔偿案”，见李健、任夏青：《擅自处置强制拆除的违法建筑材料的赔偿》，载最高人民法院《【人民】司法·案例》2010
+  - 0.76｜战阴霾下的“驱汉事件”⏎丛书: 云南文库·学术名家文丛⏎好书抢鲜读：http【://】t.cn/A6t8Jd
+  - 0.75｜服务和支撑中国式现代化建设的“火车头”，为全面建设社会主义现代化国家、全面推进中华民族伟大复兴贡献铁路力量。来源：【人民】铁道<|endoftext|>对现行会计盈余
+  - 0.73｜改革与行政法治创新的重要方面。随着国务院制定的《行政执法机关移送涉嫌犯罪案件的规定》和最高人民检察院制定的《【人民】检察院办理行政执法机关移送涉嫌犯罪案件
+  - 0.73｜ （新浪微博 ）／台灣代理商⏎⏎参考文献⏎⏎美国食品公司⏎湯⏎罐裝食品<|endoftext|>联想集团有限公司（；；（【人民】幣結算）；）是中国的一
+  - 0.72｜傷，降落后需专人清理仪容才出舱被传媒拍照。此被改編為《太空一日》收錄於【人民】教育出版社2018年七年
+  - 0.72｜向人民法院提起诉讼。”最高法、最高检新修订的《关于检察公益诉讼案件适用法律若干问题的解释》与《【人民】检察院公益诉讼办案规则》中也有
+  - 0.72｜0市治水办：0571-88156865来源|临安生态环境审核 | 方少【慧】<|endoftext|>新常态下山东省深化预算管理 和
+  - 0.71｜科学研究院”微信公众号策划：陈 龙 王立刚 董丽娟采编：于婧华点击【“】阅读原文”，跳转至原文链接
+
+## N053（第 23 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 25 页一次；语料最大激活 68.1
+- 直接读出推高：在内的 |  included | included |  Included | Included |  inclusion |  INCLUDED |  include | include |  excluded
+- 直接读出压低：比较好 | 又好又 | rels | oting |  ER | ald | ERC | \\: | erc |  ula
+- 正极片段：
+  - 1.00｜732-18-5），在常温常压下为无色无味的透明液体。⏎⏎水是包括人类【在】内所有生命生存的重要资源，在生命
+  - 0.95｜年：一名19歲槍手在美国内布拉斯加州奥马哈西路商场開槍掃射，包含兇手【在】內共計9人死亡。⏎ 2
+  - 0.94｜湯公司以48.7億美元收購美國第五大健康風味零食生產商Snyder's-Lance，包括債務【在】內，交易價格為61億
+  - 0.84｜為第一次深入地探討此問題的研究。美国疾病控制与预防中心於2009年指出：「研究表明包括青少年【在】內，性活躍的同性和
+  - 0.84｜: 【“对于文学艺术工作，党只有一个要求，就是‘为工农兵服务’，今天来说，也就是为包括知识分子【在】内的一切劳动人民服务。”因此，“百花
+  - 0.78｜輸出並停止於一個終態。一個狀態到另一個狀態的轉移不一定是確定的。包括隨機化算法【在】内的一些算法，都包含了一些隨
+  - 0.77｜林鄉清水隧道時撞擊入侵軌道的工程車而出軌，造成包括司機員與助理司機員【在】內計49人死亡、21
+  - 0.76｜務總監中文秘書兼傳譯員）及金尼（首席裁判司），因此定例局最初連總督【在】內，只有四名成員。
+  - 0.74｜的锡根-维特根施泰因县。 1808年7月，拿破仑下令包括犹太【人在】内的所有居民都需要选择一个家族姓
+  - 0.73｜，由楊鍾健等共同領導。⏎⏎1966年至1976年的文化大革命期間，包括科學家【在】內的所有知識分子都受到了大量整
+  - 0.73｜7732-18-5），在常温常压下为无色无味的透明液体。⏎⏎水是包括【人类】在内所有生命生存的重要资源，在
+  - 0.72｜奖颁发给奥巴马。⏎⏎2010年，劉曉波獲獎。劉曉波獲獎後，包括妻子刘霞【在】內的親人皆被中國大陸
+  - 0.72｜发展。赵佗是北方的华夏族将领，但是，创造了南越文明的人民，却毫无疑问是包括壮族先民【在】内各个部族的民众，南
+  - 0.72｜，用以科學計算體重和繩索間的關係。現今，雖然英國已經廢除死刑，但在包括新加坡【在】內的未廢除死刑的英
+  - 0.68｜底比斯在371年的留克特拉戰役中擊敗了斯巴達。然而此後包括雅典【在】內的其他希臘城邦
+  - 0.67｜戰役夺回1099年失陷的耶路撒冷，包括醫院騎士團及聖殿騎士團【在】內的基督教軍隊幾乎全軍
+  - 0.66｜主義的誕生。然而希特勒從政後與私人企業積極往來，許多武器生產也委託包含美國企業【在】內的私人企業負責並未收
+  - 0.65｜成为中国家喻户晓的英雄。⏎⏎20日 ⏎⏎東線美軍第7师首次於19日晚成功地守住了包括主峰【在】內的大部份表面陣地，而
+  - 0.65｜安迪后安排他到监狱图书馆协助老犯人布鲁克斯·哈特伦（）工作，以此为安迪给包括【他在】内的监狱工作人员处理经济税务，甚至
+  - 0.64｜枪。⏎⏎不過，由于國內需求萎縮和自身經營狀況不佳，製造商的前景並不被包括俄軍方官員【在】內的業內人士看好。2
+
+## N054（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 34 页一次；语料最大激活 6.94
+- 直接读出推高：vers | unami | contre |  versatility | venir | /OR | estar | parency | Vs |  Vers
+- 直接读出压低：兒 |  zn | 仑 | 既有 | 出入 | .repeat | *num | 号线 | 轮 | lli
+- 正极片段：
+  - 1.00｜d.) Regel⏎ subsp. laciniata (Willd.) Regel⏎ Alnus hirsuta (Spach) Rup【r】. – Manchurian alder
+  - 0.75｜ Airmen.<|endoftext|>versión impresa ISSN 1870-3453⏎Rev. Mex. Biodiv【.】 vol.82 no.4 México
+  - 0.73｜ this expression, which is used in the constitution of the United States, is meant a legal and not merely a moral duty. 4 Wheat【.】 107. The obligation of
+  - 0.71｜to diffuse among his countrymen a knowledge of the progress which science had been making abroad." (Chrystal in Grant's Story of Edin【.】 Univ. Vol. 2, p
+  - 0.68｜h.) K.Koch⏎ subsp. crispa (Aiton) Raus⏎ subsp. fruticosa (Rup【r】.) Raus⏎ subsp. sin
+  - 0.67｜ But whence is added⏎MShChITh, Meshachith, perdition?⏎667. Because it is written, Gen【.】 xiii. 10:⏎"
+  - 0.67｜ NC) 233-236 (WV) 520 (WY) 580 (Vir【.】 Is.; PR) 586
+  - 0.67｜ C., and R. O. de Sa. 1993. Xenopus laevis as a model organism. Syst【.】 Biol. 42(4):
+  - 0.65｜ lower presidency disappeared. Of the Tribunal of Correctors, a substitute-corrector alone remains. Bouix (Curia Romana, edit【.】 1859) chronicled
+  - 0.61｜irmen.<|endoftext|>versión impresa ISSN 1870-3453⏎Rev. Mex. Biodiv.【 vol】.82 no.4 México dic
+  - 0.61｜ 1957.⏎⏎External links⏎ Almeida DF. Carlos Chagas Filho, Scientist and Citizen. An Acad Bras Ci【enc】. 2000 Sep;
+  - 0.60｜onz. & Sánchez Mata⏎Allium schoenoprasum subsp. latiorifolium (Pau) Rivas【 Mart】., Fern.Gonz. & Sánchez
+  - 0.60｜ epidemiological surveillance in the state of Paraná, Brazil. Rev Panam Salud Publica [online]. 2001,【 vol】.9, n.6, pp
+  - 0.59｜ Reverchon 1618. Isotype: US!⏎F. nutans var. johnsonii Vasey, Contrib【.】 U.S. Natl. Herb.
+  - 0.55｜ bag lunch. Kings Landing Park, Huntingtown: 410/535-5327.⏎Musical Minds Wed【.】 Oct. 13 (4-
+  - 0.55｜ e a doença de Chagas. Alguns traços à luz de confidências e inconfidências . Rev. Soc. Bras【.】 Med. Trop. 20
+  - 0.54｜ the posterior ones, which are often larger than the rest, and different in structure, and are used chiefly in locomotion. See Illust【.】 of Crustacea, and Stomap
+  - 0.54｜. Agaropectin is a heterogeneous mixture of smaller molecules that occur in lesser amounts, and is made up of alternating units of D-g【al】actose and L-galactose
+  - 0.53｜ (567) 429-3029 or 1-800-GO-OWENS, Ext【.】 3029.<|endoftext|>Her
+  - 0.52｜同物異名⏎⏎同模異名 ⏎⏎ Hydnum erinaceus Bull., Herbier de la France 1: t【.】 34 (1781
+
+## N055（第 26 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 67 页一次；语料最大激活 27.6
+- 直接读出推高： _, | 材 | mania |  (_, | ijke | (_, | 系统的 |  materia |  [~, | 信
+- 直接读出压低：ive | 不忘 | чат | ích | holm |  empt | ฉบ |  met | fung | fo
+- 正极片段：
+  - 1.00｜()        empty.release()if __name__ == '__main__':    buffer = []    N = 5    items = [i【 for】 i in range(1, N+
+  - 0.86｜:")⏎for i in range(A.shape[0]):⏎    row = [f"{A[i, j]}*x{j + 1}"【 for】 j in range(A.shape[1])]⏎
+  - 0.85｜:")⏎for i in range(A.shape[0]):⏎    row = [f"{A[i,j]:3g}*x{j+1}"【 for】 j in range(A.shape[1])]⏎
+  - 0.45｜for i in range(A.shape[0]):⏎    row = [f"{A[i, j]}*x{j + 1}" for【 j】 in range(A.shape[1])]⏎   
+  - 0.44｜for i in range(A.shape[0]):⏎    row = [f"{A[i,j]:3g}*x{j+1}" for【 j】 in range(A.shape[1])]⏎   
+  - 0.42｜示例代码：pythonfrom multiprocessing import Process, Semaphore, Lockimport timedef producer(items, buffer, empty, full, lock):   【 for】 item in items:        empty.acquire()
+  - 0.37｜ the unit of electric current in the International System of Units (SI).  One ampere is equal to 1 coulomb moving past【 a】 point in 1 second, or 
+  - 0.35｜ sums of the constituent states. For example, an electron in the state  is in a quantum superposition of the states  and .⏎Measure【ments】 are associated with linear operators (called observ
+  - 0.35｜ = np.array([6., 25., -11., 15.])⏎⏎# prints the system⏎print("System:")⏎【for】 i in range(A.shape[0]):⏎
+  - 0.34｜ specified task, such as calculating employees' paychecks or printing students' report cards. Thus, an algorithm can be considered to be any sequence【 of】 operations that can be simulated by a Turing
+  - 0.34｜ized in reference to the acceleration due to change in speed.⏎⏎Definition and properties⏎⏎Average acceleration⏎⏎An object's average acceleration over a period of【 time】 is its change in velocity, , divided
+  - 0.34｜        empty.release()if __name__ == '__main__':    buffer = []    N = 5    items = [i for【 i】 in range(1, N+1
+  - 0.32｜1 second by a current of 1 ampere". Conversely, a current of one ampere is one coulomb of charge going past【 a】 given point per second:⏎⏎In general,
+  - 0.31｜ electron in the state  is in a quantum superposition of the states  and .⏎Measurements are associated with linear operators (called observables【)】 on the Hilbert space of quantum<|endoftext|>
+  - 0.31｜Second law of motion⏎The force of an object equals its mass times its acceleration.⏎Third law of motion⏎Law of action and reaction⏎【For】 every action there is an equal and opposite
+  - 0.30｜fun n -> (n % 2) = 0)⏎|> printList⏎⏎// Same thing, using a list expression⏎[【 for】 i in 1..10 do
+  - 0.30｜[1])]⏎    print(f'{" + ".join(row)} = {b[i]}')⏎print()⏎⏎x = np.zeros_like(b)⏎【for】 it_count in range(ITERATION_LIMIT
+  - 0.29｜ machines of 1936–37 and 1939.⏎⏎Informal definition ⏎⏎One informal definition is "a set【 of】 rules that precisely defines a sequence of operations
+  - 0.29｜家投票通过新的定义，新定义就是以公尺(米)为单位的数值：149,597,【8】70,700米。⏎⏎
+  - 0.29｜ = [{1:3g}]".format(" + ".join(row), b[i]))⏎⏎x = np.zeros_like(b, np.float_)⏎【for】 it_count in range(1, ITER
+
+## N056（第 9 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 3.0 次；语料最大激活 4.01
+- 直接读出推高：(New | .setResult | ulton | 抗战 | 以此 |  colle | holm | 偏低 | illus | Concept
+- 直接读出压低：坊 | registers | amins | 明智 |  unlikely | 触及 | .forChild |  Plumbing | 教训 | aku
+- 正极片段：
+  - 1.00｜ could develop. Unfortunately, a then growing concern about our environment caused otherwise reasonable restrictions to be enacted against burning. Exceptions should have been granted to【 allow】 the burning of elm wood which could not
+  - 0.98｜ there are some men who ride aside, either for the challenge, for a display of some kind, or due to disability. Riding aside is【 perfect】 for people who have lost part of a
+  - 0.96｜setto-like upper register above that.⏎⏎Castrati were rarely referred to as such: in the 18th century, the eup【hem】ism musico (pl musici)
+  - 0.91｜ warm and kindly feelings, honest, outspoken and benevolent. Many anecdotes are told of his frankness of speech at court, and of his【 generous】 actions. He holds a well-defined place
+  - 0.89｜ water,⏎But nothing for to eat.⏎At length each man face crackers got,⏎All counted our with care,⏎And this they thought a liberal【 thing】,⏎Considering who we were.⏎Again we
+  - 0.88｜ was not obscene, asking: "Would there be any freedom of press or speech if one must reduce his vocabulary to vapid innocuous eup【hem】isms?"⏎⏎Ginsberg was a Buddhist
+  - 0.88｜ the legislative drawing boards are measures encouraging stem cell research using embryonic stems cells and creating a right to "death with dignity,” the clever eup【hem】ism for assisted suicide.⏎In a practical
+  - 0.87｜ glimpse of what exists outside their perceived reality. He emphasized the point by stating in the opening sentence of the story that "The most merciful【 thing】 in the world, I think, is
+  - 0.86｜ the abolition of slavery by the federal government as a war measure, but reserved the right of its citizens to appeal to "the justice and magn【anim】ity of that government" for compensation for
+  - 0.86｜ continued to whine and cry most piteously, while his grandmother, having finished her lecture, proceeded to bind up his wounds. Great【 virtue】 is supposed to be added to all medical
+  - 0.85｜ would have").⏎⏎History ⏎⏎Abbreviations have a long history. They were created to avoid spelling out whole words. This might be done to【 save】 time and space (given that many ins
+  - 0.85｜ attention to those human beings, either. “The way stores like to put up pictures of happy farmers these days — that’s in some ways【 great】, in that it’s identifying that there
+  - 0.84｜用语采用的文字字形怪異，稱為火星文。⏎⏎使用互联网用语除了可以表达幽默以外，有時亦是为了【逃避】如防火长城的关键词过滤系统的审查
+  - 0.84｜ the early 19th century “delicate” German word Mutterweh ‘mother's affliction.’ This was not a eup【hem】ism for menstruation but for hysterics
+  - 0.84｜ people say about me being in their office all day long…⏎Ok, half kidding.⏎But while “painful and inconvenient” may be eup【hem】istic when it comes to Irukand
+  - 0.84｜. Do not give honey to a child younger than 1 year old. It may have bacteria that are harmful to babies.⏎- Be careful【 with】 cough and cold medicines, including any products
+  - 0.83｜rophe.” That holds true today and those at Copenhagen should paste that sub-headline to their foreheads. So, those who act like fac【ists】 and call anyone who even raises a question
+  - 0.83｜“Excuse me, ma’am, but this is by no means my intention; I make no inquiry myself, and should be sorry to【 have】 any made by my friends. When I
+  - 0.83｜.g., some people believe in an afterlife; some do not. By indicating our acceptance and respect for others beliefs, we may make it【 easier】 for our children to choose beliefs different from
+  - 0.83｜2. While an odd integer are those numbers that cannot be divided into 2 groups. With this definition, the use of modulo operator is【 perfect】. If¬†it evaluates to¬
+
+## N057（第 25 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 2.3 次；语料最大激活 9.5
+- 直接读出推高：比我 | 拿出来 | 拿来 | 将成为 | 交给 | 当之 | arem | 属于自己 | 用来 | 评为
+- 直接读出压低： we |  there | 我们 |  мы |  let | 将 | 我们将 |  đồng | 建立了 | WE
+- 正极片段：
+  - 1.00｜特定研究提供11亿美元，比2022年的资金增长26.4%。Perrault说，这些数字【很难】得到。AI指数团队采用了几种
+  - 0.98｜ Archimedes noticed while taking a bath that the level of the water in the tub rose as he got in, and realized that this effect【 could】 be used to determine the golden crown's
+  - 0.93｜ how that entity is to be governed.⏎⏎When these principles are written down into a single document or set of legal documents, those documents may be【 said】 to embody a written constitution; if they
+  - 0.90｜-half mixture of matter and antimatter. The discovery of charge parity violation helped to shed light on this problem by showing that this symmetry, originally【 thought】 to be perfect, was only approximate.⏎⏎
+  - 0.85｜erm like ancestors, while acanthodians represent a paraphyletic assemblage leading to Chondrichthyes. Some characteristics previously【 thought】 to be exclusive to acanthodians
+  - 0.83｜国。两国的人文交流也日益密切，2005年建立塔什干孔子学院。第二家“孔子学院”【亦】將開设。烏國研究學
+  - 0.79｜学者视为哲学之起点。數學最早用於人們計數、天文、度量甚至是貿易的需要。這些需要【可以】簡單地被概括為數學對
+  - 0.77｜相等的（目前实验证实，在的精确度范围内，仍没有看到引力质量与惯性质量的差别）。这一事实【也可以】理解为，当除了引力之外不受
+  - 0.77｜年首先描述了原子的受激辐射與自發輻射的關係。在此之后人们很长时间都在猜测，这个现象可【否】被用来加强光场，因为前提是
+  - 0.77｜ians who wish to legislate over speculative matters, and so turn disagreements into crimes (TTP, pref. 3), should not be【 allowed】 to overshadow his conviction that much good has
+  - 0.76｜写成列向量形式： 其中，  为复数，且满足归一化条件： 这个性质【可以】推广到多个量子比特：在经典
+  - 0.76｜的。为了干扰近视的发展，研究人员认为这种抑制信号需要更多的研究，因为它可能是导致近视发展的关键因素。这【不能】通过研究剥夺性近视或负透
+  - 0.76｜15 became the first of three extended missions, known as J missions, and the landing site was moved to Hadley Rille, originally【 planned】 for Apollo 19.⏎⏎Crew
+  - 0.74｜ then the height of the subtree increases by one and the retracing needs to continue.⏎⏎If the balance factor temporarily becomes ±2, this has【 to】 be repaired by an appropriate rotation after which
+  - 0.74｜ years after the Big Bang. Thatís about 13 billion years ago. It lets us see back to that era. Earlier times have【 to】 be inferred from less direct measurements, since
+  - 0.74｜，假如某个量子比特经过量子门的一系列变换后，变为： 那么在这个态上计算某个函数  （这【也可以】利用量子门实现，今后会讨论
+  - 0.73｜，社稷次之，君为轻”(《孟子•尽心下》)。⏎“民贵君轻”似乎【不能】说是一种社会现实，因而不是一个
+  - 0.73｜我们对于传统法律解释方法的基本认知。⏎如上文所述，合宪性解释在中国所引发的关注以及有关论辩的性质【必须】放在中国当前的解释与 监
+  - 0.73｜aldstad) and Hellhammer (Jan Axel Blomberg). Even still, authenticity is still prioritized over technique. "This professionalism has【 to】 go," insists well-respected drummer and
+  - 0.73｜areus and mother of Idas and Lynceus in Greek mythology⏎ Arene, Elis, an ancient town in Elis, Greece,【 also】 known as Samiko⏎ Jean Arè
+
+## N058（第 6 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.8 次；语料最大激活 4
+- 直接读出推高：业 |  lương | dos | 目 | amas | -eyed |  AMS | �数 |  ongoing | ders
+- 直接读出压低：wig | 肯 | 鳞 | 焕发 | nze | 在北京 | 的品牌 | 的年轻人 | _below | 二者
+- 正极片段：
+  - 1.00｜38 cancer survivors.⏎To learn more about the resources offered by NCCS, visit www.theNCCS.org<|endoftext|>CURRENT CZE【CH】 NAME: Ostroh⏎Ostro
+  - 0.93｜3, respectively. Social democracy gained in strength and, in 1891, the "Sozialdemokratische Partei【 Deutsch】lands" (SPD) was founded
+  - 0.84｜里玉會反轉升起，形成像巴黎鐵塔一樣的畫面（期間雙方一直在接吻）。⏎⏎你又去【邊】啊？你又貴姓啊？
+  - 0.84｜⏎2012  Ruhpolding, Germany⏎2013  Nové Město na Moravě,【 Czech】 Republic⏎2015  Kont
+  - 0.83｜油和药丸来治疗。⏎⏎波斯医学 ⏎波斯的医学的学习与实施有一个长且成果丰硕的历史。波斯在【东西】方的交叉处的位置使它成为
+  - 0.82｜和东欧共产主义国家对此的积极回应，在当时都共同促成一种关于穿越铁幕、乃至超越冷战本身和在【东西】德之间形成重新整合（reun
+  - 0.82｜外长莫洛托夫商谈时，莫洛托夫提出这种逃亡现象是“不可容忍的”并且说“【东西】德之间的界限应被认作是
+  - 0.81｜кий музей имени Л.Р. Кызласова (Khakasskiy Natsional'nyy Kray【e】vedcheskiy Muzey Im
+  - 0.81｜Iran) and some ancient sites in China, Luristan (Iran), Tepe Sialk (Iran), Mundigak (Af【ghan】istan), and Mesopotamia (
+  - 0.80｜ means of production, and with repressive secret police institutions, under party dictatorship of the SED (Sozialistische Einheitspartei【 Deutsch】lands; Socialist Unity Party of Germany)
+  - 0.80｜s, the province was in a crisis, with the Muslim community torn by tribal dissensions among the Arabs (the Qays–Yemen【i】 feud) and racial tensions between the Arabs
+  - 0.79｜，就可以看見許多的細節。這使得在明亮的都市或郊區很難看見銀河，但當月球在【地】平線下時，在沒有光�
+  - 0.79｜ Brooklyn since 1889.⏎2008 – A EuroCity express train en route from Kraków, Poland to Prague,【 Czech】 Republic strikes a part of a motorway
+  - 0.78｜ cave in Europe (with guided tours since 1633)⏎- The Valley of Our Lady of Lourdes (Sloven【e】: Dolina Lurške Mat
+  - 0.78｜ member of the Fihrid family and a favorite of the old Arab settlers (baladiyun), mostly of south Arabian or "Yemen【i】" tribal stock—was locked in a
+  - 0.77｜⏎- with The Connection at St Martin's Day . the UK.⏎Suggested Web Resources⏎- St. Martin's Day | UK-G【erman】 Connection - voyage kids - UK⏎-
+  - 0.77｜006 Winter Olympics⏎Cyclists at the 1996 Summer Olympics⏎Czech female cross-country skiers⏎C【zech】 female cyclists⏎Czech mountain bikers
+  - 0.76｜透過设立一个区域的标准时间部分地解决了这个问題。⏎⏎世界各國位於地球不同位置上，因此不同國家，特別是【東西】跨度大的國家日出、日落
+  - 0.76｜⏎Cyclists at the 1996 Summer Olympics⏎Czech female cross-country skiers⏎Czech female cyclists⏎C【zech】 mountain bikers⏎Olympic cross
+  - 0.76｜ Note: Please click on country links to be directed to the relevant text of their respective constitutions, for example, if you click “Af【ghan】istan” you shall be directed to the
+
+## N059（第 27 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 6 页一次；语料最大激活 13.8
+- 直接读出推高：usters | 于此 | 五星 | wüns | 世界上最 | oure | 牢牢 | 有效 | Chunk | stor
+- 直接读出压低：为主要 |  incumb | 冲洗 | 商报 | oglob | cba | thesized | 吃亏 | 第一书记 | agento
+- 正极片段：
+  - 1.00｜, is .⏎⏎Biggest seas in Atlantic Ocean⏎Top large seas:⏎⏎ Sargasso Sea3.5 million km2⏎ Caribbean Sea2【.】754 million km2⏎ Mediterranean
+  - 0.99｜ large seas:⏎⏎ Sargasso Sea3.5 million km2⏎ Caribbean Sea2.754 million km2⏎ Mediterranean Sea2【.】510 million km2⏎ Gulf
+  - 0.98｜ India, and on the southeast by the Laccadive Sea and the Maldives, on the southwest by Somalia. Its total area is【 】3,862,00
+  - 0.82｜ Rawalakot as well as the rest of Poonch Division. It<|endoftext|>The Arabian Sea () is a region of sea in the【 northern】 Indian Ocean, bounded on the west by
+  - 0.82｜ officially the Union of the Comoros, is an archipelagic country made up of three islands in Southeastern Africa, located at the【 northern】 end of the Mozambique Channel in the
+  - 0.79｜oll in the Maldives.⏎⏎Border and basin countries⏎Border and basin countries:⏎ - 2,500 km coastline⏎ -【 】1,050 km coastline
+  - 0.77｜ of peoples of North Africa coalesced eventually into a distinct native population that came to be called Berbers, who are the indigenous peoples of【 northern】 Africa.⏎⏎From their principal center of power
+  - 0.77｜ Aminidivi Islands) is a group of islands in the Laccadive Sea region of Arabian Sea, 200 to【 】440 km (12
+  - 0.73｜5: , Arabic pronunciation: ), also known as the Arab people (), are an ethnic group mainly inhabiting the Arab world in Western Asia and【 Northern】 Africa, which formally denotes the "Ar
+  - 0.73｜ Unver, who coordinated the report, pointing as examples to the Middle East, South Asia and the southwestern United States.⏎– About 2【.】5 billion people have no access to decent
+  - 0.72｜ and on the southeast by the Laccadive Sea and the Maldives, on the southwest by Somalia. Its total area is 3【,】862,000 
+  - 0.70｜2,000 km2 (1,491,000 sq mi) and its maximum depth is【 】4,652 meters (1
+  - 0.70｜, also spelled Soqotra, is the largest island, being part of a small archipelago of four islands. It lies some【 】 east of the Horn of Africa and 
+  - 0.70｜ Minicoy, and Aminidivi Islands) is a group of islands in the Laccadive Sea region of Arabian Sea,【 】200 to 440
+  - 0.68｜ipsoid. Corolla red, slightly curved and inflated, tomentose, lobes lanceolate, ca. 5 mm, reflexed【.】 Style red; stigma subcapitate.
+  - 0.66｜假小叶形成、肝内外血管增殖为特征的病理阶段，代偿期无明显临床症状，失代偿期【以】门静脉高压和肝功能严重损伤
+  - 0.64｜ joined to Asia at its northeast extremity by the Isthmus of Suez (which is transected by the Suez Canal),【 】 wide. For geopolitical purposes, the Sinai
+  - 0.64｜ constant.⏎Can you decide whether two lines are perpendicular or not? Can you⏎do this without drawing them?⏎The centre of the larger circle【 is】 at the midpoint of one side of an
+  - 0.64｜发展可引起肝小叶结构紊乱，肝细胞结节性再生，形成假小叶结构即肝硬化，临床上出现【肝】功能减退和门静脉高压症
+  - 0.63｜ origin, and widely separated from any adjacent continent. The Hawaiian Islands and Galapagos Islands in the Pacific, and Mascarene Islands in【 the】 south Indian Ocean are examples.⏎⏎Continental
