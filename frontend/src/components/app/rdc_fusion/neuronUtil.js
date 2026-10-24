@@ -41,7 +41,7 @@ export function fmtRate(r) {
 /* 证据轴状态 → 视觉档：established / partial / none */
 export function axisTone(text) {
   if (!text || text === '未检验') return 'none';
-  if (/未通过|未达|未运行/.test(text)) return 'partial';
+  if (/未通过|未达|未运行|未解释/.test(text)) return 'partial';
   return 'established';
 }
 
@@ -50,3 +50,11 @@ export function histColumns(hist) {
   const n = hist.bin_lower.length;
   return hist.bin_lower.map((lo, i) => ({ i, lo, x: i / n, w: 1 / n }));
 }
+
+/* 解释检验等级（EXPL-v1 / v2）：顺序量，单一色相由深到浅；未解释用灰色并附原因。 */
+export const GRADES = ['文本可复现', '只在语料中可识别', '未解释'];
+export const GRADE_META = {
+  '文本可复现': { color: '#1d4f86', bg: '#dbe8f6', mark: '●' },
+  '只在语料中可识别': { color: '#2f6fb3', bg: '#eaf2fb', mark: '◐' },
+  '未解释': { color: '#6b7480', bg: '#f1f3f5', mark: '○' },
+};

@@ -237,6 +237,68 @@ def unit_interventions(model_key: str, block: int, unit: int) -> List[Dict[str, 
     return out
 
 
+# ---------------- 解释检验（EXPL-v1 / EXPL-v2） ----------------
+
+EXPL_RUNS = (('EXPL-v1', 'EXPL-v1-results.json'), ('EXPL-v2', 'EXPL-v2-results.json'))
+GRADES = ('文本可复现', '只在语料中可识别', '未解释')
+
+
+def _expl_record(run_id: str, pre: Dict[str, Any], r: Dict[str, Any]) -> Dict[str, Any]:
+    """一条解释检验记录 → 统一格式与等级（文本可复现 / 只在语料中可识别 / 未解释）。"""
+    text_out = r.get('text_outcome') or r.get('outcome')
+    retrieval = r.get('retrieval')                       # EXPL-v1 没有语料检索
+    if text_out == 'win':
+        grade = '文本可复现'
+    elif retrieval == '通过':
+        grade = '只在语料中可识别'
+    else:
+        grade = '未解释'
+    rec = {'run': run_id, 'prereg_sha256': pre.get('_sha'), 'code': r.get('code'), 'explanation': r.get('explanation'),
+           'confidence': r.get('confidence'), 'text_outcome': text_out, 'retrieval': retrieval if retrieval else '未做',
+           'recall': r.get('recall'), 'fpr': r.get('fpr'), 'grade': grade,
+           'cause': r.get('cause'), 'cause_source': r.get('cause_source'), 'cause_reason': r.get('cause_reason'),
+           'reason': r.get('reason')}
+    if r.get('strong_rate'):
+        rec['strong_rate'] = {k: r['strong_rate'].get(k) for k in ('new', 'near_miss', 'distant', 'control')}
+    if r.get('median'):
+        rec['median_s'] = {k: r['median'].get(k) for k in ('new', 'near_miss', 'distant', 'control')}
+    return rec
+
+
+@lru_cache(maxsize=1)
+def _expl_index(stamp: tuple) -> Dict[tuple, List[Dict[str, Any]]]:
+    out: Dict[tuple, List[Dict[str, Any]]] = {}
+    for run_id, fname in EXPL_RUNS:
+        rp = research_root() / 'interventions' / fname
+        pp = research_root() / 'interventions' / f'{run_id}.prereg.json'
+        if not rp.is_file() or not pp.is_file():
+            continue
+        pre = json.loads(pp.read_text(encoding='utf-8'))
+        sp = pp.with_suffix('.sha256')
+        pre['_sha'] = sp.read_text(encoding='utf-8').split()[0] if sp.is_file() else None
+        mk = (pre.get('model') or {}).get('model_key')
+        for r in json.loads(rp.read_text(encoding='utf-8')).get('units', []):
+            out.setdefault((mk, int(r['block']), int(r['unit'])), []).append(_expl_record(run_id, pre, r))
+    return out
+
+
+def expl_index() -> Dict[tuple, List[Dict[str, Any]]]:
+    stamp = tuple((research_root() / 'interventions' / f).stat().st_mtime if (research_root() / 'interventions' / f).is_file() else 0
+                  for _, f in EXPL_RUNS)
+    return _expl_index(stamp)
+
+
+def explain_axis(records: List[Dict[str, Any]]) -> str:
+    """以最新一次检验为准（EXPL-v2 晚于 v1）；未解释时附原因。"""
+    if not records:
+        return '未检验'
+    r = records[-1]
+    if r['grade'] != '未解释':
+        return f"{r['grade']}（{r['run']}）"
+    cause = r.get('cause') or ('无法解释' if r.get('reason') == '无法解释' else '未分类')
+    return f"未解释：{cause}（{r['run']}）"
+
+
 # ---------------- 端点 ----------------
 
 @router.get('/index')
@@ -325,7 +387,8 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
     iv = card['interventions']
     control = ('范围内干预（组级，20 单元一起替换）' if any(r.get('causal_use_in_scope') == '是' for r in iv)
                else ('组级干预未通过' if iv else '未检验'))
-    card['evidence_axes'] = {'read': read, 'control': control, 'explain': '未检验'}
+    card['explanations'] = expl_index().get((model_key, block, unit), [])
+    card['evidence_axes'] = {'read': read, 'control': control, 'explain': explain_axis(card['explanations'])}
     return card
 
 
@@ -351,3 +414,23 @@ def search(model_key: str = Query(...), q: str = Query(..., min_length=1, max_le
     res.sort(key=lambda r: -r['max'])
     return {'mode': 'readout', 'query_token_ids': sorted(ids), 'results': res[:limit],
             'note': '按单元直接读出（W_U(γ⊙W_down)）的前 3 个推高 token 检索；结果按普查最大激活排序'}
+
+
+@router.get('/explained')
+def explained(model_key: str = Query(...), grade: Optional[str] = Query(None)):
+    """做过解释检验的单元列表（EXPL-v1 / v2），按层排序；grade 可选 文本可复现 / 只在语料中可识别 / 未解释。"""
+    if grade is not None and grade not in GRADES:
+        raise HTTPException(400, f'grade 只能是 {GRADES}')
+    rows = []
+    for (mk, b, u), recs in sorted(expl_index().items(), key=lambda kv: (kv[0][1], kv[0][2])):
+        if mk != model_key:
+            continue
+        r = recs[-1]
+        if grade and r['grade'] != grade:
+            continue
+        rows.append({'block': b, 'unit': u, 'grade': r['grade'], 'run': r['run'], 'explanation': r['explanation'],
+                     'confidence': r['confidence'], 'cause': r.get('cause'), 'axis': explain_axis(recs)})
+    counts = {g: sum(1 for (mk, _, _), recs in expl_index().items() if mk == model_key and recs[-1]['grade'] == g) for g in GRADES}
+    return {'model_key': model_key, 'counts': counts, 'results': rows,
+            'note': '等级以最新一次检验为准：文本可复现 = 文本测试 win；只在语料中可识别 = 文本测试未 win 但语料检索验证通过（仅 EXPL-v2）；'
+                    '未解释附失败原因（工具 / 解释 / 训练 / 递归泛化 / 叠加，或无法解释）。解释由子代理生成，证据等级见对应预注册。'}

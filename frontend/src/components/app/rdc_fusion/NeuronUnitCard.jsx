@@ -2,7 +2,7 @@
    纪律：文本与标签全部来自服务端（普查片段、读出 token、选择性与干预记录），前端不生成任何描述；
    读出 / 控制 / 解释三条证据轴分开显示；没有数据时显示空态，不用其他单元代替。 */
 import { useApi } from './api.js';
-import { AXIS_META, REGIMES, REGIME_META, axisTone, fmtNum, fmtRate, histColumns } from './neuronUtil.js';
+import { AXIS_META, GRADE_META, REGIMES, REGIME_META, axisTone, fmtNum, fmtRate, histColumns } from './neuronUtil.js';
 import './neuron_units.css';
 
 function Histogram({ hist }) {
@@ -110,6 +110,37 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
         <div className="nu-tokens"><span className="nu-tl">推高</span>{c.readout.promotes.map((t, i) => <code key={i}>{t}</code>)}</div>
         <div className="nu-tokens"><span className="nu-tl">压低</span>{c.readout.suppresses.map((t, i) => <code key={i}>{t}</code>)}</div>
         <div className="nu-note">{c.readout.note}</div>
+      </section>
+
+      <section className="nu-sec">
+        <h4>解释检验（解释轴）</h4>
+        {(data.explanations || []).length === 0 ? <div className="nu-note">未检验：该单元不在 EXPL-v1 / v2 的抽样中。</div> : (
+          <div className="nu-expl-list">
+            {data.explanations.slice().reverse().map((r, i) => (
+              <div key={i} className={'nu-expl' + (i > 0 ? ' nu-expl-old' : '')}>
+                <div className="nu-expl-head">
+                  <span className="nu-grade" style={{ color: GRADE_META[r.grade].color, background: GRADE_META[r.grade].bg }}>
+                    {GRADE_META[r.grade].mark} {r.grade}
+                  </span>
+                  <span className="nu-mono" title={r.prereg_sha256 || ''}>{r.run}{i > 0 ? '（较早一次）' : ''}</span>
+                  <span className="nu-note">置信度 {r.confidence}</span>
+                </div>
+                <div className="nu-expl-text">{r.explanation}</div>
+                <div className="nu-note">
+                  文本测试：{r.text_outcome}
+                  {r.strong_rate && <> · 强激活比例 new {fmtRate(r.strong_rate.new)} / 近似反例 {fmtRate(r.strong_rate.near_miss)} / 远距 {fmtRate(r.strong_rate.distant)} / 对照 {fmtRate(r.strong_rate.control)}</>}
+                </div>
+                <div className="nu-note">
+                  语料检索：{r.retrieval}{r.recall != null && <> · 正例召回 {fmtRate(r.recall)} · 负例误报 {fmtRate(r.fpr)}</>}
+                </div>
+                {(r.cause || r.reason === '无法解释') && (
+                  <div className="nu-note">失败原因：{r.cause || '无法解释'}{r.cause_source && `（${r.cause_source}）`}{r.cause_reason && ` · ${r.cause_reason}`}</div>
+                )}
+              </div>
+            ))}
+            <div className="nu-note">解释、测试文本与原因分类均由 Claude 子代理在隔离上下文中生成，判据见对应预注册；等级以最新一次检验为准。</div>
+          </div>
+        )}
       </section>
 
       <section className="nu-sec">

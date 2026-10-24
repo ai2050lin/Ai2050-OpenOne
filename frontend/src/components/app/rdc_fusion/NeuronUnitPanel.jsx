@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { useApi } from './api.js';
 import NeuronUnitCard from './NeuronUnitCard.jsx';
-import { REGIME_META, fmtNum, parseUnitKey, unitKey } from './neuronUtil.js';
+import { GRADES, GRADE_META, REGIME_META, fmtNum, parseUnitKey, unitKey } from './neuronUtil.js';
 import './neuron_units.css';
 
 function readUnitParam() {
@@ -39,8 +39,10 @@ export default function NeuronUnitPanel() {
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [sel, setSel] = useState(readUnitParam);
+  const [grade, setGrade] = useState('');
 
   const search = useApi(run && query ? `/api/neurons/search?model_key=${encodeURIComponent(run.model_key)}&run=${encodeURIComponent(run.run)}&q=${encodeURIComponent(query)}` : null);
+  const explained = useApi(run ? `/api/neurons/explained?model_key=${encodeURIComponent(run.model_key)}${grade ? `&grade=${encodeURIComponent(grade)}` : ''}` : null);
   const selectivity = useApi(selRun ? `/api/neurons/selectivity?run=${encodeURIComponent(selRun.file)}&top=20` : null);
   const tag = selectivity.data?.tags.find(t => t.readout === readout && t.block === layer);
   const list = tag ? (rank === 'contrib' && selectivity.data.contribution ? tag.top_by_contrib : tag.top_by_d) : [];
@@ -82,6 +84,27 @@ export default function NeuronUnitPanel() {
               </button>
             ))}
             {search.data && !search.data.results.length && <div className="nu-note">无结果。</div>}
+          </div>
+        )}
+
+        <div className="nu-field">已检验解释（EXPL-v1 / v2）
+          <select value={grade} onChange={e => setGrade(e.target.value)}>
+            <option value="">全部等级</option>
+            {GRADES.map(g => <option key={g} value={g}>{g}{explained.data?.counts ? `（${explained.data.counts[g]}）` : ''}</option>)}
+          </select>
+        </div>
+        {explained.error && <div className="nu-err">{explained.error}</div>}
+        {explained.data && (
+          <div className="nu-list nu-list-scroll">
+            {explained.data.results.length === 0 && <div className="nu-note">无。</div>}
+            {explained.data.results.map(r => (
+              <button key={unitKey(r.block, r.unit)} className={'nu-item' + (sel && sel.block === r.block && sel.unit === r.unit ? ' on' : '')}
+                      onClick={() => choose(r.block, r.unit)} title={r.axis}>
+                <span style={{ color: GRADE_META[r.grade].color }}>{GRADE_META[r.grade].mark}</span>
+                <b>{unitKey(r.block, r.unit)}</b>
+                <span className="nu-note">{r.grade === '未解释' ? (r.cause || '无法解释') : r.explanation}</span>
+              </button>
+            ))}
           </div>
         )}
 

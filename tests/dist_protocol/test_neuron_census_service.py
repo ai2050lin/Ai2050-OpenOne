@@ -55,10 +55,21 @@ class NeuronCensusServiceTests(unittest.TestCase):
             'schema': 'mlp_census.v1', 'model_key': 'mk-synth', 'model_path': str(TOK.parent), 'corpus_fp': fp,
             'n_tokens_counted': T, 'n_layers': 1, 'd_ff': F, 'k': 4, 'skip_head': 0, 'seq_len': 512, 'sources': [],
             'model_snapshot': {'sha256': 'x'}}), encoding='utf-8')
+        iv = cls.tmp / 'research' / 'interventions'
+        iv.mkdir(parents=True)
+        for run, recs in (('EXPL-v1', [{'code': 'N000', 'block': 0, 'unit': 2, 'outcome': 'tie', 'explanation': '旧解释', 'confidence': '中'},
+                                       {'code': 'N001', 'block': 0, 'unit': 3, 'outcome': 'win', 'explanation': '问句末尾', 'confidence': '高'}]),
+                          ('EXPL-v2', [{'code': 'N000', 'block': 0, 'unit': 2, 'text_outcome': 'tie', 'retrieval': '通过', 'recall': 0.6, 'fpr': 0.0,
+                                        'explanation': '旧解释', 'confidence': '中', 'cause': '工具', 'cause_source': '自动规则'},
+                                       {'code': 'M000', 'block': 0, 'unit': 4, 'text_outcome': 'lose', 'retrieval': '未通过',
+                                        'explanation': '某模式', 'confidence': '低', 'cause': '叠加', 'cause_source': '分类子代理'}])):
+            (iv / f'{run}.prereg.json').write_text(json.dumps({'model': {'model_key': 'mk-synth'}}), encoding='utf-8')
+            (iv / f'{run}.prereg.sha256').write_text('abc *x\n', encoding='utf-8')
+            (iv / f'{run}-results.json').write_text(json.dumps({'units': recs}, ensure_ascii=False), encoding='utf-8')
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
         from server import neuron_census_service as S
-        for fn in (S.census_manifest, S.census_layer, S.corpus, S.tokenizer, S.readout_index, S._selectivity_json):
+        for fn in (S.census_manifest, S.census_layer, S.corpus, S.tokenizer, S.readout_index, S._selectivity_json, S._expl_index):
             fn.cache_clear()
         app = FastAPI(); app.include_router(S.router)
         cls.client = TestClient(app)
@@ -83,9 +94,21 @@ class NeuronCensusServiceTests(unittest.TestCase):
         self.assertEqual(top['regime'], '++')
         self.assertTrue(top['left'].endswith('什么是教学逻辑'))
         self.assertEqual(sum(sum(v) for v in card['census']['hist']['by_regime'].values()), card['census']['n_tokens'])
-        self.assertEqual(card['evidence_axes'], {'read': '未检验', 'control': '未检验', 'explain': '未检验'})
+        self.assertEqual(card['evidence_axes'], {'read': '未检验', 'control': '未检验', 'explain': '只在语料中可识别（EXPL-v2）'})
+        self.assertEqual([r['run'] for r in card['explanations']], ['EXPL-v1', 'EXPL-v2'])   # 以最新一次为准
+        self.assertEqual(card['explanations'][-1]['cause'], '工具')
         self.assertEqual(card['template_selectivity'], [])
         self.assertEqual(card['interventions'], [])
+
+    def test_explained_list_and_grades(self):
+        r = self.client.get('/api/neurons/explained', params={'model_key': 'mk-synth'}).json()
+        self.assertEqual(r['counts'], {'文本可复现': 1, '只在语料中可识别': 1, '未解释': 1})
+        by = {(x['block'], x['unit']): x for x in r['results']}
+        self.assertEqual(by[(0, 3)]['axis'], '文本可复现（EXPL-v1）')
+        self.assertEqual(by[(0, 4)]['axis'], '未解释：叠加（EXPL-v2）')
+        r = self.client.get('/api/neurons/explained', params={'model_key': 'mk-synth', 'grade': '未解释'}).json()
+        self.assertEqual([(x['block'], x['unit']) for x in r['results']], [(0, 4)])
+        self.assertEqual(self.client.get('/api/neurons/explained', params={'model_key': 'mk-synth', 'grade': 'x'}).status_code, 400)
 
     def test_search_and_errors(self):
         r = self.client.get('/api/neurons/search', params={'model_key': 'mk-synth', 'q': 'L0.U2'}).json()
