@@ -1,0 +1,103 @@
+/* 开放平台外壳：浅色，沿用 .fw-root 的 --fw-* 变量；顺序量蓝色单色阶，状态配文字。 */
+.op-root { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--fw-bg-sub); color: var(--fw-text); font-size: 13px; overflow: hidden; }
+.op-top { display: flex; align-items: center; gap: 18px; padding: 10px 20px; background: #fff; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; }
+.op-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.op-brand b { display: block; font-size: 15px; }
+.op-brand small { display: block; font-size: 11px; color: var(--fw-text-3); }
+.op-logo { width: 32px; height: 32px; border-radius: 8px; background: #184f95; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.op-nav { display: flex; gap: 4px; }
+.op-nav button { border: 0; background: none; padding: 7px 14px; border-radius: 7px; font-size: 13.5px; cursor: pointer; color: var(--fw-text-2); }
+.op-nav button:hover { background: var(--fw-bg-panel); }
+.op-nav button.on { background: #e3eef9; color: #184f95; font-weight: 600; }
+.op-top-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.op-link { color: var(--fw-text-2); text-decoration: none; font-size: 12px; }
+.op-link:hover { color: #184f95; }
+.op-sandbox { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #fff1ec; color: #c2410c; border: 1px solid #fed7aa; }
+.op-banner { padding: 8px 20px; background: #fff1ec; color: #9a3412; font-size: 12px; }
+.op-main { flex: 1; overflow: auto; min-height: 0; }
+.op-foot { display: flex; gap: 16px; flex-wrap: wrap; padding: 8px 20px; font-size: 11px; color: var(--fw-text-3); background: #fff; border-top: 1px solid var(--fw-border); flex-shrink: 0; }
+.op-foot a { color: inherit; }
+
+.op-page { max-width: 1180px; margin: 0 auto; padding: 22px 20px 40px; display: flex; flex-direction: column; gap: 18px; }
+.op-hero { padding: 26px 28px; border-radius: 14px; background: linear-gradient(135deg, #0d366b, #256abf); color: #fff; }
+.op-hero h1 { font-size: 24px; margin: 0 0 6px; }
+.op-hero p { font-size: 14px; opacity: .9; margin: 0 0 16px; max-width: 760px; line-height: 1.6; }
+.op-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.op-hero .op-btn { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.35); }
+.op-hero .op-btn.primary { background: #fff; color: #0d366b; border-color: #fff; }
+.op-btn { border: 1px solid var(--fw-border-strong); background: #fff; color: var(--fw-text); border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+.op-btn:hover:not(:disabled) { border-color: #256abf; color: #184f95; }
+.op-btn.primary { background: #184f95; color: #fff; border-color: #184f95; }
+.op-btn.primary:hover:not(:disabled) { background: #0d366b; color: #fff; }
+.op-btn:disabled { opacity: .55; cursor: default; }
+.op-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+.op-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.op-stat { text-align: left; background: #fff; border: 1px solid var(--fw-border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; cursor: pointer; font: inherit; color: inherit; }
+.op-stat:disabled { cursor: default; }
+.op-stat:hover:not(:disabled) { border-color: #9ec5f4; }
+.op-stat b { font-size: 24px; color: #0d366b; font-variant-numeric: tabular-nums; }
+.op-stat span { font-size: 12.5px; font-weight: 600; }
+.op-stat small { font-size: 11px; color: var(--fw-text-3); line-height: 1.5; }
+
+.op-section { background: #fff; border: 1px solid var(--fw-border); border-radius: 12px; padding: 18px 20px; }
+.op-section h2 { font-size: 15px; margin: 0 0 8px; }
+.op-section h3 { font-size: 13px; margin: 14px 0 6px; }
+.op-lead { font-size: 13px; line-height: 1.75; color: var(--fw-text-2); margin: 0 0 10px; }
+.op-note { font-size: 11px; color: var(--fw-text-3); margin-top: 8px; line-height: 1.6; }
+.op-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.op-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; line-height: 1.65; color: var(--fw-text-2); }
+.op-list li { list-style: disc; }
+.op-muted { color: var(--fw-text-3); }
+.op-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--fw-text-3); }
+.op-tag { font-size: 11px; padding: 1px 8px; border-radius: 99px; background: #e3eef9; color: #184f95; }
+.op-err { margin-top: 8px; color: #b3261e; font-size: 12px; }
+.op-ok { margin-top: 8px; color: #047857; font-size: 12px; }
+.op-root code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: var(--fw-bg-panel); padding: 1px 5px; border-radius: 4px; }
+
+.op-job { padding: 10px 0; border-top: 1px solid var(--fw-border); }
+.op-job:first-of-type { border-top: 0; }
+.op-job-hd { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+.op-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: #f1f5f9; }
+.op-bar i { display: block; height: 100%; }
+.op-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; margin-top: 6px; color: var(--fw-text-2); }
+.op-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+.op-steps { margin: 6px 0 0; padding-left: 0; counter-reset: step; display: flex; flex-direction: column; gap: 12px; }
+.op-steps li { list-style: none; counter-increment: step; display: flex; flex-direction: column; gap: 3px; padding-left: 38px; position: relative; line-height: 1.65; color: var(--fw-text-2); }
+.op-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: #184f95; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+.op-steps li > b { color: var(--fw-text); font-size: 13.5px; }
+
+.op-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.op-table th, .op-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--fw-border); vertical-align: top; }
+.op-table th { color: var(--fw-text-3); font-weight: 600; font-size: 11px; }
+.op-dl { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.op-dl > div { display: grid; grid-template-columns: 140px 1fr; gap: 10px; font-size: 12.5px; }
+.op-dl dt { font-weight: 600; }
+.op-dl dd { margin: 0; color: var(--fw-text-2); line-height: 1.6; }
+.op-pre { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12px; overflow: auto; }
+.op-adv summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.op-adv[open] summary { margin-bottom: 10px; }
+
+.op-learn { flex-direction: row; align-items: flex-start; }
+.op-toc { position: sticky; top: 16px; width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+.op-toc a { color: var(--fw-text-2); text-decoration: none; font-size: 12.5px; padding: 6px 10px; border-radius: 6px; }
+.op-toc a:hover { background: #fff; color: #184f95; }
+.op-learn-body { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.op-atlas { max-width: none; height: 100%; padding-bottom: 12px; }
+.op-subtabs { display: flex; gap: 8px; flex-shrink: 0; }
+.op-subtabs button { text-align: left; border: 1px solid var(--fw-border); background: #fff; border-radius: 10px; padding: 8px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; font: inherit; color: inherit; }
+.op-subtabs button small { font-size: 11px; color: var(--fw-text-3); }
+.op-subtabs button.on { border-color: #256abf; background: #eaf2fb; }
+.op-atlas-body { flex: 1; min-height: 640px; background: #fff; border: 1px solid var(--fw-border); border-radius: 12px; padding: 12px; overflow: auto; }
+
+@media (max-width: 860px) {
+  .op-top { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .op-nav { order: 3; width: 100%; overflow-x: auto; }
+  .op-page { padding: 14px 12px 30px; }
+  .op-grid2 { grid-template-columns: 1fr; }
+  .op-learn { flex-direction: column; }
+  .op-toc { position: static; width: 100%; flex-direction: row; flex-wrap: wrap; }
+  .op-dl > div { grid-template-columns: 1fr; gap: 2px; }
+}

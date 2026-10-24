@@ -1,0 +1,24 @@
+[Unit]
+Description=AI2050 Distributed Research Platform (center node)
+After=network.target
+
+[Service]
+Type=simple
+User=ai2050
+Group=ai2050
+WorkingDirectory=/opt/ai2050/Ai2050-OpenOne/deploy
+# 数据目录独立于代码目录（内容寻址对象库 + sqlite + 模板包 + 新闻缓存）
+Environment=AI2050_DIST_DIR=/var/lib/ai2050/distributed
+# 管理令牌（注册模板用）——务必替换为随机值: python3 -c "import secrets;print(secrets.token_hex(24))"
+Environment=AI2050_DIST_ADMIN_TOKEN=change-me-to-random-hex
+ExecStart=/opt/ai2050/venv/bin/python -m distributed_service --host 0.0.0.0 --port 5010
+Restart=always
+RestartSec=3
+# 硬化
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/ai2050/distributed
+
+[Install]
+WantedBy=multi-user.target

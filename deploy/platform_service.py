@@ -1,0 +1,369 @@
+# -*- coding: utf-8 -*-
+"""中心服务 · 开放平台路由（platform.v1）：公开配置、研究进展快照、贡献榜与参与者一键包。
+
+  GET /api/platform/config          公开：站点配置（标题、注册方式、开放的任务类型、所需模型、数据许可）
+  GET /api/platform/overview        公开：研究进展快照（模式族、谱图、神经元普查与解释、节点、贡献者），后台定时刷新
+  GET /api/platform/snapshot/{name} 公开：重计算端点的缓存副本（pipeline_overview / atlas / coverage / catalog）
+  GET /api/platform/contributors    公开：按账号统计的贡献（只显示显示名）
+  GET /api/platform/kit             参与者一键包（zip）：节点程序、启动脚本、配置（不带绑定码）
+  GET /api/auth/kit                 登录用户的一键包：内嵌一次性节点绑定码（7 天），节点自动归属该账号
+  GET /api/auth/my-contributions    登录用户：我的节点与贡献
+
+公开范围：模式族合并结果、谱图、神经元卡、干预与解释检验结果、预注册文件。研究记录（AGI_CLAUDE_MEMO 等）与原生全场不经本服务公开。
+"""
+from __future__ import annotations
+
+import io
+import json
+import os
+import threading
+import time
+import zipfile
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
+
+from fastapi import APIRouter, Header, HTTPException, Request, Response
+
+import distributed_service as D
+
+router = APIRouter(prefix='/api/platform', tags=['platform'])
+# 需要会话令牌的两个端点放在 /api/auth 下：客户端只给 /api/auth/* 请求带 Authorization 头
+auth_router = APIRouter(prefix='/api/auth', tags=['platform'])
+
+_REPO = Path(__file__).resolve().parent.parent
+PLATFORM_VERSION = '1.0.0'
+REFRESH_SECONDS = float(os.environ.get('AI2050_SNAPSHOT_SECONDS', '300'))
+KIT_BIND_TTL = 7 * 86400
+
+_snap: Dict[str, Dict[str, Any]] = {}
+_snap_lock = threading.Lock()
+_refresher: Optional[threading.Thread] = None
+
+
+def _builders() -> Dict[str, Callable[[], Any]]:
+    return {
+        'pipeline_overview': D.pipeline_overview,
+        'coverage': D.coverage_matrix,
+        'catalog': D.api_catalog,
+        'atlas': lambda: D.api_atlas(model='', gate=True),
+        'overview': build_overview,
+    }
+
+
+def _refresh_one(name: str) -> None:
+    t0 = time.time()
+    try:
+        data, err = _builders()[name](), None
+    except Exception as exc:  # 快照失败时保留上一次结果并记录错误
+        data, err = None, f'{type(exc).__name__}: {exc}'[:300]
+    with _snap_lock:
+        prev = _snap.get(name) or {}
+        _snap[name] = {'data': data if data is not None else prev.get('data'), 'computed_at': time.time() if data is not None else prev.get('computed_at'),
+                       'seconds': round(time.time() - t0, 1), 'error': err}
+
+
+def _loop() -> None:
+    while True:
+        try:
+            import census_service as CS
+            CS.auto_merge()                              # 普查：新完成的切片并入单元卡
+        except Exception as exc:
+            print(f'[platform] census auto merge: {exc}', flush=True)
+        for name in ('overview', 'catalog', 'coverage', 'pipeline_overview', 'atlas'):
+            _refresh_one(name)
+        time.sleep(REFRESH_SECONDS)
+
+
+def start_refresher() -> None:
+    """后台刷新重计算端点（冷启动时合并全部模板可能要几分钟；公开页面只读快照，不阻塞请求）。"""
+    global _refresher
+    if _refresher is None and os.environ.get('AI2050_SNAPSHOT_DISABLE') != '1':
+        _refresher = threading.Thread(target=_loop, name='platform-snapshots', daemon=True)
+        _refresher.start()
+
+
+def snapshot(name: str) -> Dict[str, Any]:
+    if name not in _builders():
+        raise HTTPException(404, f'unknown snapshot {name}')
+    with _snap_lock:
+        s = _snap.get(name)
+    if s is None or s.get('data') is None:
+        if name in ('overview', 'catalog', 'coverage'):      # 轻量项：首次请求同步计算
+            _refresh_one(name)
+            with _snap_lock:
+                s = _snap.get(name)
+        else:
+            start_refresher()
+            return {'pending': True, 'note': '快照正在后台计算（首次启动可能需要几分钟），请稍后刷新。', 'data': None}
+    return {'pending': False, 'computed_at': s.get('computed_at'), 'seconds': s.get('seconds'), 'error': s.get('error'), 'data': s.get('data')}
+
+
+# ---------- 配置 ----------
+
+def _config_file() -> Dict[str, Any]:
+    p = Path(os.environ.get('AI2050_PLATFORM_CONFIG', str(D._DATA_DIR / 'platform_config.json')))
+    try:
+        return json.loads(p.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+
+
+def public_url(request: Optional[Request] = None) -> str:
+    env = os.environ.get('AI2050_PUBLIC_URL', '').rstrip('/')
+    if env:
+        return env
+    if request is not None:
+        return str(request.base_url).rstrip('/')
+    return ''
+
+
+def census_open_jobs() -> list:
+    try:
+        import census_service as CS
+        out = []
+        for r in CS.db().execute("SELECT job_id FROM census_jobs WHERE status='open' ORDER BY created_at").fetchall():
+            p = CS.job_progress(r['job_id'])
+            out.append({k: p[k] for k in ('job_id', 'model', 'n_shards', 'counts', 'tokens_per_slice')})
+        return out
+    except Exception:
+        return []
+
+
+@router.get('/config')
+def config(request: Request) -> dict:
+    from shared.dist_protocol import accounts as A
+    cfg = _config_file()
+    jobs = census_open_jobs()
+    models, seen = [], set()
+    for m in list(cfg.get('models') or []) + [j['model'] for j in jobs]:   # 参与所需模型：配置文件登记 + 开放的普查作业
+        snap = str(m.get('snapshot_sha256') or '')
+        if len(snap) == 64 and all(ch in '0123456789abcdef' for ch in snap) and snap not in seen:   # 占位值不下发
+            seen.add(m['snapshot_sha256'])
+            models.append({k: m.get(k) for k in ('name', 'hf_repo', 'hf_revision', 'snapshot_sha256', 'min_vram_gib')})
+    return {
+        'schema': 'platform_config.v1', 'version': PLATFORM_VERSION,
+        'title': cfg.get('title', 'AI2050 · 开源 LLM 逆向研究平台'),
+        'tagline': cfg.get('tagline', '一起绘制大语言模型的语言编码图谱：看进展、学方法、用自己的 GPU 跑一个分片。'),
+        'public_url': public_url(request),
+        'registration': A.registration_policy(),
+        'task_kinds': cfg.get('task_kinds', ['family_test', 'census_shard']),
+        'contact': cfg.get('contact', ''),
+        'repo_url': cfg.get('repo_url', 'https://github.com/ai2050lin/Ai2050-OpenOne'),
+        'license': {'code': 'Apache-2.0', 'data': 'CC BY 4.0'},
+        'census_jobs': jobs,
+        'models': models,
+        'sandbox_synthetic': os.environ.get('AI2050_DIST_ALLOW_SYNTHETIC') == '1',
+        'public_scope': ['模式族合并结果', '语言谱图', '神经元单元卡（普查摘要、两极片段、解释等级）', '干预与解释检验结果', '预注册文件'],
+        'not_public': ['研究记录（memo）', '节点本地原生全场'],
+    }
+
+
+# ---------- 进展快照 ----------
+
+def _families() -> Dict[str, Any]:
+    db = D._db()
+    tpl = db.execute("SELECT COUNT(*) AS n FROM templates WHERE status='open'").fetchone()['n']
+    res = {r['kind']: r['n'] for r in db.execute('SELECT kind,COUNT(*) AS n FROM results GROUP BY kind')}
+    models = [r['m'] for r in db.execute("SELECT DISTINCT model_id AS m FROM results WHERE kind='real' AND model_id<>''")]
+    return {'templates_open': tpl, 'results_real': res.get('real', 0), 'results_synthetic': res.get('synthetic', 0), 'models': models}
+
+
+def _neurons() -> Dict[str, Any]:
+    try:
+        from server import neuron_census_service as NS
+        runs = NS.census_runs()
+        explained: Dict[str, int] = {}
+        for recs in NS.expl_index().values():
+            g = NS.explain_axis(recs).split('（')[0].split('：')[0]
+            explained[g] = explained.get(g, 0) + 1
+        return {'census_runs': [{k: r.get(k) for k in ('model_key', 'run', 'n_tokens', 'n_layers')} for r in runs],
+                'explanation_grades': explained}
+    except Exception as exc:
+        return {'census_runs': [], 'explanation_grades': {}, 'error': f'{type(exc).__name__}: {exc}'[:200]}
+
+
+def contributors() -> list:
+    db = D._db()
+    rows = db.execute('SELECT user_id, COALESCE(NULLIF(display_name,\'\'), username) AS name, created_at FROM users WHERE disabled=0').fetchall()
+    out = []
+    for u in rows:
+        nodes = [r['node_id'] for r in db.execute('SELECT node_id FROM nodes WHERE owner_user_id=?', (u['user_id'],))]
+        fam = census = tokens = 0
+        if nodes:
+            q = ','.join('?' * len(nodes))
+            fam = db.execute(f"SELECT COUNT(*) FROM results WHERE kind='real' AND node_id IN ({q})", nodes).fetchone()[0]
+            try:
+                r = db.execute(f"SELECT COUNT(*) AS c, COALESCE(SUM(n_tokens),0) AS t FROM census_results "
+                               f"WHERE status='accepted' AND kind='real' AND node_id IN ({q})", nodes).fetchone()
+                census, tokens = r['c'], r['t']
+            except Exception:
+                pass
+        if fam or census:
+            out.append({'name': u['name'], 'nodes': len(nodes), 'family_results': fam, 'census_shards': census, 'census_tokens': tokens})
+    return sorted(out, key=lambda x: (-(x['family_results'] + x['census_shards']), x['name']))
+
+
+def build_overview() -> Dict[str, Any]:
+    db = D._db()
+    now = time.time()
+    online = db.execute('SELECT COUNT(*) AS n FROM nodes WHERE last_seen>=?', (now - D.NODE_ONLINE_WINDOW,)).fetchone()['n']
+    total = db.execute('SELECT COUNT(*) AS n FROM nodes').fetchone()['n']
+    users = db.execute('SELECT COUNT(*) AS n FROM users WHERE disabled=0').fetchone()['n']
+    census = []
+    try:
+        import census_service as CS
+        census = [CS.job_progress(r['job_id']) for r in CS.db().execute('SELECT job_id FROM census_jobs ORDER BY created_at DESC')]
+    except Exception:
+        pass
+    with _snap_lock:
+        atlas = (_snap.get('atlas') or {}).get('data')
+    atlas_sum = None
+    if atlas:
+        atlas_sum = {'models': atlas.get('models', []),
+                     'n_nodes': sum(len(g.get('nodes', [])) for g in atlas.get('graphs', [])),
+                     'n_edges': sum(len(g.get('edges', [])) for g in atlas.get('graphs', [])),
+                     'n_axes': sum(len(g.get('axes', g.get('shared_axes', []))) for g in atlas.get('graphs', []))}
+    return {'schema': 'platform_overview.v1', 'server_time': now, 'families': _families(), 'atlas': atlas_sum,
+            'neurons': _neurons(), 'census_jobs': census,
+            'people': {'users': users, 'nodes_total': total, 'nodes_online': online, 'contributors': len(contributors())},
+            'note': '各项计数来自不同数据表，彼此独立，不构成「测试 → 特征 → 机制」的转化率；任务完成与审计通过都不表示证据晋级。'}
+
+
+@router.get('/overview')
+def overview() -> dict:
+    s = snapshot('overview')
+    if s['computed_at'] and time.time() - s['computed_at'] > 60:
+        _refresh_one('overview')
+        s = snapshot('overview')
+    return {**(s['data'] or {}), 'computed_at': s['computed_at']}
+
+
+@router.get('/snapshot/{name}')
+def snapshot_ep(name: str) -> dict:
+    if name == 'overview':
+        raise HTTPException(404, 'use /api/platform/overview')
+    return snapshot(name)
+
+
+@router.get('/contributors')
+def contributors_ep() -> dict:
+    return {'schema': 'contributors.v1', 'items': contributors(),
+            'note': '只统计已绑定账号的节点；模式族结果按 real 计数，普查分片按通过校验的计数。'}
+
+
+@auth_router.get('/my-contributions')
+def my(authorization: str = Header(default='')) -> dict:
+    from shared.dist_protocol import accounts as A
+    u = D._auth_call(A.require_user, authorization)
+    db = D._db()
+    nodes = [dict(r) for r in db.execute('SELECT node_id,name,gpu,model,created_at,last_seen FROM nodes WHERE owner_user_id=? '
+                                         'ORDER BY created_at DESC', (u['user_id'],))]
+    for n in nodes:
+        n['online'] = bool(n['last_seen'] and n['last_seen'] >= time.time() - D.NODE_ONLINE_WINDOW)
+        n['family_results'] = db.execute("SELECT COUNT(*) FROM results WHERE node_id=?", (n['node_id'],)).fetchone()[0]
+        try:
+            n['census'] = [dict(r) for r in db.execute(
+                'SELECT job_id,shard,status,n_tokens,created_at FROM census_results WHERE node_id=? ORDER BY created_at DESC LIMIT 50',
+                (n['node_id'],))]
+        except Exception:
+            n['census'] = []
+    return {'user': {k: u.get(k) for k in ('username', 'display_name', 'role')}, 'nodes': nodes}
+
+
+# ---------- 参与者一键包 ----------
+
+KIT_README = '''AI2050 参与者一键包
+====================
+
+这个包让你的电脑成为 AI2050 开放研究平台的一个计算节点：从中心领取冻结的测试任务，在本机 GPU 上运行，上传可合并的统计结果。
+
+1. Windows：双击 start_windows.bat；Linux / macOS：在终端运行 bash start_linux.sh
+2. 第一次运行会创建 Python 虚拟环境并安装 torch、transformers 等依赖（约 3 GB，需要网络）。
+3. 程序会检查 GPU 与显存，询问本机模型目录；没有模型时可以按提示从 Hugging Face 下载作业指定的版本。
+4. 之后程序自动循环：领取任务 → 核对任务包 sha256 → 运行 → 上传 → 中心校验。关掉窗口即可停止，未完成的任务会在租约到期后重新派发。
+
+请不要修改任务包或节点程序：任务包按 sha256 核对；中心逐项校验结果，并把一部分分片派给另一个账号的节点复算比较。
+被修改过的结果会被拒收，不会进入合并。
+
+隐私：上传的只有统计量（直方图、均值、极值位置等），不包含你电脑上的任何其他文件。原生全场只保存在本机（~/.ai2050）。
+配置：config.json（中心地址、绑定码、任务类型、显卡编号）。绑定码一次性有效，节点注册后即失效。
+'''
+
+START_BAT = r'''@echo off
+setlocal
+cd /d "%~dp0"
+chcp 65001 >nul
+where py >nul 2>nul && (set PY=py -3) || (set PY=python)
+if not exist .venv\Scripts\python.exe (
+  echo [AI2050] 创建 Python 虚拟环境 ...
+  %PY% -m venv .venv || (echo 需要 Python 3.10 以上：https://www.python.org/downloads/ & pause & exit /b 1)
+  .venv\Scripts\python.exe -m pip install --upgrade pip
+  .venv\Scripts\python.exe -m pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128 || (echo 依赖安装失败 & pause & exit /b 1)
+)
+.venv\Scripts\python.exe node_agent.py participate --config config.json
+pause
+'''
+
+START_SH = '''#!/usr/bin/env bash
+set -e
+cd "$(dirname "$0")"
+PY=${PYTHON:-python3}
+if [ ! -x .venv/bin/python ]; then
+  echo "[AI2050] 创建 Python 虚拟环境 ..."
+  $PY -m venv .venv
+  .venv/bin/python -m pip install --upgrade pip
+  .venv/bin/python -m pip install -r requirements.txt
+fi
+exec .venv/bin/python node_agent.py participate --config config.json
+'''
+
+KIT_REQUIREMENTS = '''numpy>=1.26
+torch>=2.6
+transformers>=4.56
+safetensors>=0.4
+accelerate>=1.0
+huggingface_hub>=0.34
+'''
+
+
+def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
+    cfg = {'schema': 'participant_config.v1', 'server': server, 'bind_code': bind_code, 'account': user,
+           'task_kinds': _config_file().get('task_kinds', ['family_test', 'census_shard']),
+           'device': 'cuda', 'model_dirs': {}, 'models_root': '', 'node_name': '',
+           'created_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+           'note': 'bind_code 一次性有效（7 天内）；model_dirs 按作业的模型快照填写本机目录，留空时程序会询问。'}
+    agent = (Path(D.__file__).resolve().parent / 'node_agent.py').read_bytes()
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
+        def add(name: str, data, mode: int = 0o644):
+            info = zipfile.ZipInfo(f'ai2050-node/{name}', date_time=time.localtime()[:6])
+            info.external_attr = (mode & 0xFFFF) << 16
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, data if isinstance(data, bytes) else data.encode('utf-8'))
+        add('node_agent.py', agent)
+        add('config.json', json.dumps(cfg, ensure_ascii=False, indent=1))
+        add('requirements.txt', KIT_REQUIREMENTS)
+        add('README.txt', KIT_README)
+        add('start_windows.bat', START_BAT.replace('\n', '\r\n'))
+        add('start_linux.sh', START_SH, 0o755)
+    return buf.getvalue()
+
+
+def _kit_response(data: bytes) -> Response:
+    return Response(data, media_type='application/zip',
+                    headers={'Content-Disposition': 'attachment; filename="ai2050-node.zip"', 'Cache-Control': 'no-store'})
+
+
+@router.get('/kit')
+def kit(request: Request) -> Response:
+    """匿名一键包：不带绑定码，节点的贡献不署名（之后也可以在 config.json 填绑定码重新注册）。"""
+    return _kit_response(build_kit(public_url(request)))
+
+
+@auth_router.get('/kit')
+def kit_bound(request: Request, authorization: str = Header(default='')) -> Response:
+    """登录用户的一键包：内嵌一次性绑定码，节点注册后自动归属该账号（令牌只走请求头，不放进 URL）。"""
+    from shared.dist_protocol import accounts as A
+    u = D._auth_call(A.require_user, authorization)
+    bind = D._auth_call(A.new_bind_code, u['user_id'], ttl=KIT_BIND_TTL)['code']
+    return _kit_response(build_kit(public_url(request), bind, u.get('display_name') or u.get('username') or ''))

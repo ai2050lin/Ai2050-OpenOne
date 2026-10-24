@@ -1,0 +1,50 @@
+[Unit]
+Description=AI2050 Center Service (FastAPI :5001 — client data source)
+Documentation=file:///opt/ai2050/Ai2050-OpenOne/deploy/README_CENTOS_SERVER.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ai2050
+Group=ai2050
+WorkingDirectory=/opt/ai2050/Ai2050-OpenOne
+
+# ── 运行参数 ─────────────────────────────────────────────────
+# 无 GPU / 不加载本地模型即可提供全部图谱·注册表·新闻·分布式接口
+# （2026-10-14 实测：import 5.0s，362 路由，7/7 端点 200）
+Environment=AI2050_SKIP_MODEL_LOAD=1
+Environment=AI2050_HOST=0.0.0.0
+Environment=AI2050_PORT=5001
+# 数据目录独立于代码目录（可写：ledger/sqlite/模板包/新闻缓存）
+Environment=AI2050_DIST_DIR=/var/lib/ai2050/distributed
+# 分布式平台管理令牌（注册模板用）—— 务必替换为随机值：
+#   python3 -c "import secrets;print(secrets.token_hex(24))"
+Environment=AI2050_DIST_ADMIN_TOKEN=change-me-to-random-hex
+# 可选：允许从 HF 远端拉模型（默认关闭，避免服务器意外下载权重）
+Environment=AI2050_ALLOW_REMOTE_MODEL_LOAD=0
+
+ExecStart=/opt/ai2050/venv/bin/python server/server.py
+Restart=always
+RestartSec=3
+TimeoutStartSec=180
+TimeoutStopSec=30
+
+# ── 硬化 ─────────────────────────────────────────────────────
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+# 可写目录（ProtectSystem=full 下 /opt 只读，必须显式放行）：
+#   /var/lib/ai2050/distributed      —— 分布式平台数据（sqlite + 内容寻址对象库）
+#   /opt/.../ai2050_research_os/generated —— research_workspace sqlite（research_workspace_service.py:313 mkdir）
+ReadWritePaths=/var/lib/ai2050/distributed /opt/ai2050/Ai2050-OpenOne/ai2050_research_os/generated
+# 允许绑定低位端口以外的一切；本服务只监听 5001
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai2050-server
+
+[Install]
+WantedBy=multi-user.target

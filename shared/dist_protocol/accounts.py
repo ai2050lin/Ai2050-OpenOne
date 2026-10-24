@@ -24,6 +24,7 @@ SCHEMA = 'accounts.v1'
 PBKDF2_ITER = 200_000
 SESSION_TTL = 30 * 24 * 3600
 BIND_TTL = 30 * 60
+KIT_BIND_TTL_MAX = 7 * 86400
 MAX_FAILS = 5
 LOCK_SECONDS = 300
 USERNAME_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.-]{2,31}$')
@@ -271,14 +272,16 @@ def update_user(db, actor: Dict[str, Any], user_id: str, *, role: Optional[str] 
 
 # ---------------- 节点绑定码 ----------------
 
-def new_bind_code(db, user_id: str) -> Dict[str, Any]:
+def new_bind_code(db, user_id: str, ttl: int = BIND_TTL) -> Dict[str, Any]:
+    """一次性节点绑定码。缺省 30 分钟；参与者一键包内嵌的码用 7 天（下载后不一定立即运行），仍是一次性。"""
+    ttl = int(min(max(ttl, 60), KIT_BIND_TTL_MAX))
     code = 'B-' + secrets.token_hex(4).upper() + '-' + secrets.token_hex(4).upper()
     now = time.time()
     db.execute('INSERT INTO node_bind_codes(code_hash,user_id,created_at,expires_at,used_by) VALUES(?,?,?,?,NULL)',
-               (_sha(code), user_id, now, now + BIND_TTL))
+               (_sha(code), user_id, now, now + ttl))
     db.execute('DELETE FROM node_bind_codes WHERE expires_at < ?', (now - 86400,))
     db.commit()
-    return {'code': code, 'expires_in': BIND_TTL}
+    return {'code': code, 'expires_in': ttl}
 
 
 def consume_bind_code(db, code: str, node_id: str) -> Optional[str]:

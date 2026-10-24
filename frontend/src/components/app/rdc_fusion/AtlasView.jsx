@@ -124,9 +124,10 @@ function AiPanel({ model, local }) {
   );
 }
 
-export default function AtlasView({ localAtlas, localName, onOpenFamily }) {
-  const remote = useApi(localAtlas ? null : '/api/atlas', { interval: 60000 });
-  const atlas = localAtlas || remote.data;
+export default function AtlasView({ localAtlas, localName, onOpenFamily, snapshot = false }) {
+  // snapshot：读中心后台定时计算的快照（开放平台公开页；谱图全量计算要十几秒）
+  const remote = useApi(localAtlas ? null : (snapshot ? '/api/platform/snapshot/atlas' : '/api/atlas'), { interval: 60000 });
+  const atlas = localAtlas || (snapshot ? remote.data?.data : remote.data);
   const [modelPick, setModel] = useState('');
   const [layerPick, setLayer] = useState('');
   const [axisId, setAxisId] = useState('');
@@ -140,7 +141,10 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily }) {
   const node = g?.nodes.find(n => n.id === nodeId && n.layer === layer);
   const axesShown = (g?.axes || []).filter(a => allLayers || a.layer === layer);
 
-  if (!atlas) return <Empty>{remote.error ? `中心服务未接入（${remote.error}）。可以打开本地谱图包。` : '读取语言谱图…'}</Empty>;
+  if (!atlas) {
+    if (snapshot && remote.data?.pending) return <Empty>{remote.data.note}</Empty>;
+    return <Empty>{remote.error ? `中心服务未接入（${remote.error}）。可以打开本地谱图包。` : '读取语言谱图…'}</Empty>;
+  }
   if (!g) {
     const unused = (atlas.sources || []).filter(s => !s.used);
     return (

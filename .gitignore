@@ -191,9 +191,11 @@ node_modules
 /distributed_data/
 /tests/dist_test_data/
 
-# Distributed platform server package (center node service, seed templates,
-# runner, node agent, deployment units) stays local-only — not in the public repo
-/deploy/
+# 开放平台 v1：中心服务、节点程序与部署单元随仓库开源（deploy/）；只排除运行缓存与本机脚本
+/deploy/__pycache__/
+/deploy/start_distributed_dev.bat
+# 中心部署包输出（scripts/build_center_release.py）
+/release/
 
 # vendored lib source (obfuscation experiment tree) - never commit
 tests/gpt5_temp/tf457/

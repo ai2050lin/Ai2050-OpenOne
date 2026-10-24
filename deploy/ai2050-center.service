@@ -1,0 +1,27 @@
+# AI2050 开放平台中心服务（API + 客户端静态页，单进程）
+# 安装：deploy/install_center.sh 会把 change-me-to-random-hex 换成 /etc/ai2050/admin_token 中的随机令牌
+[Unit]
+Description=AI2050 open platform center (API + client)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ai2050
+Group=ai2050
+WorkingDirectory=/opt/ai2050/app
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONIOENCODING=utf-8
+Environment=AI2050_DIST_DIR=/var/lib/ai2050/center
+Environment=AI2050_NATIVE_DIR=/var/lib/ai2050/native
+Environment=AI2050_PLATFORM_CONFIG=/etc/ai2050/platform_config.json
+Environment=AI2050_PUBLIC_URL=https://platform.example.org
+Environment=AI2050_REGISTRATION=open
+Environment=AI2050_DIST_ADMIN_TOKEN=change-me-to-random-hex
+ExecStart=/opt/ai2050/venv/bin/python deploy/center_app.py --host 127.0.0.1 --port 5010
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

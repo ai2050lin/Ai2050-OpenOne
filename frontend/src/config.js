@@ -50,10 +50,13 @@ function isDesktop() {
  * 那会让客户端静默请求用户本机的 5001 端口，装在别人机器上必然连不通。
  * 此时返回空串（同源语义），请求打不上会明确失败并由界面显示「未接入」空态。
  */
+/* 生产构建（vite build）缺省同源：中心服务（deploy/center_app.py 或 nginx）同时托管客户端，
+   fetch('/api/...') 走相对路径；需要指向别的中心时在构建前设置 VITE_API_BASE。开发模式缺省本机 5001。 */
+const ENV_API_BASE = import.meta.env.VITE_API_BASE;
 const API_BASE_RAW = isDesktop()
   ? stripTrailingSlash(readRuntime('apiBase'))
   : stripTrailingSlash(
-      readRuntime('apiBase') || import.meta.env.VITE_API_BASE || 'http://localhost:5001'
+      readRuntime('apiBase') || ENV_API_BASE || (import.meta.env.PROD ? '' : 'http://localhost:5001')
     );
 
 export const API_BASE = stripTrailingSlash(API_BASE_RAW);
