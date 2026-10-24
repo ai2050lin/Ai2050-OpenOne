@@ -9,10 +9,11 @@
    诚实口径：派生示意布局；LIVE/DEMO 不伪造。相机/交互态走 ref（防 effect 重建渲染循环）。 */
 import { API_BASE } from '../../../config.js';
 import { useEffect, useRef, useState } from 'react';
+import { colorOf, labelOf } from '../../../core/evidence.js';
 
 
-const E_COLOR = { E3_causal_scoped: '#b45309', E2_predictive: '#1e5c22', E2_held_out: '#177a53', E1_repeatable: '#24558a' };
-const E_LABEL = { E3_causal_scoped: 'E3 因果', E2_predictive: 'E2 可预测', E2_held_out: 'E2h 留出/行为', E1_repeatable: 'E1 可重复' };
+/* 证据等级配色/文案统一来自 core/evidence.js（唯一派生物，见 v2 审计 A1）——
+   本文件不再自建 E_COLOR/E_LABEL，避免同一等级在两处出现两种颜色。 */
 const ST_COLOR = { measured: '#1e5c22', done: '#1e5c22', collecting: '#24558a', demo: '#64748b', pending: '#9aa4b1' };
 const ST_LABEL = { measured: '实测', done: '完成', collecting: '采集中', demo: '演示', pending: '待立项' };
 const MOD_NAME = { KN: '知识网络', AR: '推理功能', GR: '语法机制' };
@@ -119,7 +120,7 @@ export default function AtlasModuleSpace({ sel, onPickFeature }) {
       if (uiRef.current.colorMode === 'module') return (ms.modules[n.mod] || {}).color || '#8a93a3';
       return n.kind === 'tpl'
         ? (ST_COLOR[(joins.tpl[n.ref] || {}).st] || '#8a93a3')
-        : (E_COLOR[n.band] || '#8a93a3');
+        : colorOf(n.band);
     };
 
     const draw = () => {
@@ -395,10 +396,10 @@ export default function AtlasModuleSpace({ sel, onPickFeature }) {
           </div>
           <b>图例</b>
           <div className="atms-legend">
-            <span><i style={{ background: E_COLOR.E2_predictive }}/>E2</span>
-            <span><i style={{ background: E_COLOR.E2_held_out }}/>E2h</span>
-            <span><i style={{ background: E_COLOR.E1_repeatable }}/>E1</span>
-            <span><i style={{ background: E_COLOR.E3_causal_scoped }}/>E3</span>
+            <span><i style={{ background: colorOf('E2_predictive') }}/>E2</span>
+            <span><i style={{ background: colorOf('E2_held_out') }}/>E2 · held-out</span>
+            <span><i style={{ background: colorOf('E1_repeatable') }}/>E1</span>
+            <span><i style={{ background: colorOf('E3_causal_scoped') }}/>E3</span>
             <span><span className="atms-ln" style={{ borderTop: '2px solid #7c3aed' }}/>桥（粗=弱混合）</span>
             <span><span className="atms-ln" style={{ borderTop: '2px dashed #d97706' }}/>x 跨模块</span>
             <span><i style={{ border: '1.4px dashed #b91c1c', background: '#fff' }}/>缺口模板</span>
@@ -429,7 +430,7 @@ export default function AtlasModuleSpace({ sel, onPickFeature }) {
                     {lks.length ? lks.map((l, i) => {
                       const f = joins.ftr[l.ftr];
                       return <span key={i} className={'chip' + (l.kind === 'x' ? ' atms-chip-x' : '')}>
-                        {kindCn[l.kind]} → {l.ftr}（{f ? E_LABEL[f.evidence_level] : ''}）</span>;
+                        {kindCn[l.kind]} → {l.ftr}（{f ? labelOf(f.evidence_level) : ''}）</span>;
                     }) : <span className="dim2">无锚定特征——缺口</span>}
                   </div>
                 </div>
@@ -473,7 +474,7 @@ export default function AtlasModuleSpace({ sel, onPickFeature }) {
             <div className="atms-dgrid">
               <div className="amv-dsec"><div className="amv-dsec-h">成员特征</div>
                 <div className="atms-chips">{mecD.features.map(f => (
-                  <span key={f.id} className="chip">{f.id}（{E_LABEL[f.evidence_level]}）</span>))}</div>
+                  <span key={f.id} className="chip">{f.id}（{labelOf(f.evidence_level)}）</span>))}</div>
               </div>
               <div className="amv-dsec"><div className="amv-dsec-h">跨模块服务</div>
                 <div className="atms-stmt"> {(tree.module_space.mech_beams.find(b => b.mec === mecD.id) || { mods: null }).mods
@@ -485,7 +486,7 @@ export default function AtlasModuleSpace({ sel, onPickFeature }) {
         ))()}
         {ftrD && (
           <div className="atms-dh">
-            <b className="mono">{ftrD.id}</b><span className="amv-st mono">{E_LABEL[ftrD.evidence_level]}</span>
+            <b className="mono">{ftrD.id}</b><span className="amv-st mono">{labelOf(ftrD.evidence_level)}</span>
             <span className="dim2">完整 statement 与证据链见全景底部特征抽屉（共用 FeatureDetail）</span>
             <button type="button" className="amv-close" onClick={() => setLocalSel(null)}>×</button>
           </div>

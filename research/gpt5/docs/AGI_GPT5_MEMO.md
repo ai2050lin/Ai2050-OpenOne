@@ -16990,3 +16990,798 @@ GAP-5 三段式（3229）：上游编码承载行为 → 末层精确线性读�
 - (b) u* 内容归因类级扩展（零 GPU，顺延）；
 - (c) DAS 式子空间交换干预设计臂（轻 GPU 预备，设计先行）。
 
+
+## Phase 3238: G5-H1 census A — 26 封存特征内在维度/子空间秩普查 + 复用矩阵 + hub 排序（零 GPU） [2026-10-20 00:54]
+
+**执行模式**：预注册自 3237 tail 臂 (a)；freeze **`4cc8adda`**（任何观测前；含 prereg_correction：G1 锚分层 bit<1e-9 / f32 复现<1e-6，SMOKE 阶段订正，理由与依据入冻结字典）；res **`bed6984f`**；verdict **`census_a_registered`**（G1–G5 全 True，运行内确定性 diff=0.0）。零 GPU，全部派生自封存 collect npz，配方逐字沿用 3183/3184/3188/3189 冻结脚本。
+
+### 原理与公式
+
+六族方向矩阵（每模型）：DVU=关系偏移 U 16×d（3157 dC 逐实体 isa−hasa，3183 配方）；DCC=上下文移位 64×d（3157 ctx 对差）；ENT=实体均值 16×d；USTAR=谱外崩塌行方向 876×d（3169 B-protocol ridge 残差，3188/3189 配方）；SCLS=类均值 10×d；MASSIVE=e_d1（FTR-12 登记值 0/731/2319）。谱度量：SVD 奇谱 λ，**PR=(Σλ)²/Σλ²**（参与比，∈[1,n]）、stable rank、k90（累计能量 90% 最小 k）、top1 份额。复用矩阵：族子空间取 k90 右奇异向量基，reuse(A,B)=mean|sv(S_A·S_Bᵀ)|（主角平均）。hub=三判据 z 均值：reuse（族平均 cross-angle）、causal_load（E3=1.0 / E2_behavioral=0.5 / 其余 0）、cross_model（方向族=PR 跨模型一致性 1−cv；非方向族=anchor cross_model 标签占比）。
+
+### 复现锚（装置同一性）
+
+位级锚 ×3 模型全 0.0：d83（3183 五标量+tc）、d_tc（ANCH_3157 tc_mean_cos）、drift69（3169 逐 seed E_seen/E_oov）、d88（3188 五标量）；f32 复现锚 d89（vs 封存 3189 top1/top2/cross_med）= 1.49e-07/1.79e-07/4.47e-08 < 1e-6 门（跨运行 LAPACK f32 epsilon，prereg_correction 记录在案）。USTAR top1 复现 0.3065/0.2936/0.3008（=MEMO 3189 已发表值）。
+
+### 实际结果（全表入 registry v1.33 census_3238 键）
+
+**谱（PR ×3 模型 | k90/n | top1 ×3）**：
+
+| 族 | PR (4b/14b/glm4) | k90/n | top1 (4b/14b/glm4) |
+|---|---|---|---|
+| DVU | 4.43 / 5.22 / 4.37 | 12/16 | 0.450 / 0.399 / 0.451 |
+| DCC | 2.98 / 2.97 / 2.96 | 20/64 | 0.571 / 0.572 / 0.573 |
+| ENT | 1.05 / 1.04 / 1.06 | 1/16 | 0.976 / 0.980 / 0.974 |
+| USTAR | 8.87 / 9.76 / 8.54 | 93/876 | 0.307 / 0.294 / 0.301 |
+| SCLS | 1.03 / 1.02 / 1.05 | 1/10 | 0.986 / 0.988 / 0.974 |
+| MASSIVE | 1.00 / 1.00 / 1.00 | 1/1 | 1.000 / 1.000 / 1.000 |
+
+**复用矩阵**：off-diag 均值 0.543/0.758/0.740（max 0.982/0.980/0.978）——族子空间显著非正交；族级复用分 USTAR/ENT/SCLS 互复用最高（0.65–0.85），DVU 最低（0.36–0.62）。跨模型 PR 一致性：DCC 0.996 > ENT 0.994 > SCLS 0.987 > USTAR 0.943 > DVU 0.918。
+
+**hub 排序（26 行唯一秩）**：#1 FTR-11(1.730)，#2–3 FTR-10(0.866) / FTR-16(0.866)，#4–5 FTR-25(0.715) / FTR-26(0.715)，#6 FTR-08(0.448)，#7–9 FTR-04(0.434) / FTR-05(0.434) / FTR-07(0.434)；尾部 FTR-19（#26，非方向族且无 cross_model 锚）。
+
+封存向量交叉核对（记录性）：3225 u* 向量落本族子空间内（|proj|=1.0 ×2 模型，自洽）；对 ENT/SCLS 子空间投影 0.73–0.82（u* 与实体/类均值族高度共线）；3230 dR（关系对比方向）对 MASSIVE 投影 ~0（14b 0.0000），对 DVU 0.60/0.34。
+
+### 分析与硬伤
+
+**三条主发现**（各三述）：
+
+1. **概念均值层近乎秩 1**：ENT PR=1.050/1.041/1.055（top1 97.4–98.0%%）、SCLS PR=1.028/1.024/1.053（top1 97.4–98.8%%）×3 模型——「实体性」与「类别性」各由**一条主方向**承载，个体/类间差异是低能量旁枝。Cammarata 式单点叙事在概念均值层成立；3238-A 给出了它的量化版本。
+1. **关系/上下文中等秩且跨模型谱形极稳**：DVU PR=4.43/5.22/4.37（k90 11–12/16）、DCC PR=2.98/2.97/2.96（k90 20–22/64，PR 一致性 0.996）——关系偏移与上下文变换住在小规模子空间里，谱形状跨模型几乎不变（DCC 三模型 PR 差 <1%%）。
+1. **谱外崩塌最分布式**：USTAR PR=8.87/9.76/8.54（k90 79–120/876）——六族中唯一高维扩散族，与 GAP-5/F20/F21「行为承载分布式、读出末层线性」定谳自洽；「读出几何 ≠ 行为控制」在谱维度上再次显形：最好解释的族（USTAR，FTR-25/26）恰是最扩散的族。
+
+**硬伤与限界**：① 16/26 特征非方向性（标量/份额/门语句），rank 测量 N/A，其 hub 由另两判据驱动，reuse 覆盖不全；② FTR-04/05/07 测的是面板类均值方向的 **analog**，非其注册对象（2881-J4 词方向配方）——映射表在冻结中显式声明，引用时不可混同；③ 复用矩阵用 k90 截断基，主角对截断敏感（SCLS/ENT k90=1 退化为单方向夹角）；④ causal_load 是登记驱动的 3 档粗粒度（1.0/0.5/0），非新因果证据；⑤ cross_model 对非方向族回退为锚标签占比，与 PR 一致性不同质；⑥ d89 锚为 f32 复现级（1e-6），非位级。
+
+### 理论更新
+
+registry v1.32 → **v1.33**（file `a30215fd`）：新增 `census_3238` 键（六族谱/复用矩阵/26 行 hub 表/封存向量交叉核对/来源 sha8）+ upgrade_log append；其余键 byte-preserve 全过（canonical equality，bad=[]）。机制图景新增一层：**「族谱维度分层」**——概念均值（秩1）＜ 关系/上下文（3–5 维）＜ 谱外崩塌（≈百维），与三段式承载结构正交互补；复用矩阵首次给出族间共享的定量基线（非正交是常态，正交是例外）。
+
+**完整性**：ledger #390（pre 文件 sha8 cfccaf3a）；独立磁盘复核见 p3238_disk_verify。
+
+### 后续预注册 Phase 3239（候选）
+
+- (a) u* 内容归因类级扩展（3237 tail b，零 GPU，顺延）；
+- (b) DAS 式子空间交换干预设计臂（3237 tail c，轻 GPU 预备）；
+- (c) **谱图预测保真度最小闭环**（新候选，零 GPU 起步）：以 census 六族 + registry 26 特征为图谱侧，单模型 held-out 句上预测特征激活/下一 token 分布，与真实输出对答案（KL/损失恢复 vs 词汇身份/n-gram 基线）——把「破解程度」变成可画曲线的第一步。
+
+## Phase 3239: G5-H2 谱图预测保真度最小闭环 — census 六族图谱侧 → B-protocol 预测 → CPU lens 对答案（零 GPU） [2026-10-20 02:32]
+
+**执行模式**：预注册自 3238 tail 臂 (c)；freeze **`3776313c`**（任何观测前；含 prereg_correction：G2 argmax 多样性界 100→10（模板面板表面形共享，结构性偏小，门的用途是退化检测）、G3 确定性探针改同 GEMM shape 批重放（3099 陷阱：跨 shape f32 累加序差 1.1e-05 纯 kernel epsilon）——均 SMOKE 阶段订正，正式观测前）；res **`5af7a0dd`**；verdict **`fidelity_loop_registered`**（G1–G4 全 True，运行内确定性 diff=0.0）。零 GPU：lens 用 safetensors 直读 tied unembedding（embed_tokens 151936×2560 f32 + final RMSNorm，eps=1e-6，shard sha8 328a91d3/e4bf4369）。registry 不动（v1.33 仍为头，字节核验过）。
+
+### 原理与公式
+
+三段闭环：**图谱侧** = census 六族子空间基（k90 截断右奇异向量，谱与封存 3238 npz 逐族 k90 精确相等 + PR/top1 <1e-6 交叉核对全过）；**预测侧** = B-protocol ridge（seed 7/8/9，split_s1_246，lam 1e-3，φ 780→87 列）在封存 3169 KOUT 激活上训练，对 876 OOV 行（类 6–9 × 73 实体 × 3 模板）出 Ŷ；**答案侧** = 激活 R² + 下一 token KL(actual‖pred)，lens(h)=softmax(RMSNorm_final(h)·E_unembedᵀ)。基线：B0=训练行全局均值（常量），B1=identity（训练实体均值，实体 41–72 回落 B0；模板面板无 n-gram 基线可行，范围注记入册）。KL 排序是登记头条数字、**不是门**——两个方向都是闭环的诚实发现。
+
+### 复现锚（装置同一性）
+
+位级锚全 0.0：d83（3183 六标量）、d_tc（ANCH_3157）、drift69（3169 逐 seed E_seen/E_oov）、d88（3188 五标量）；f32 级 d89=1.49e-07<1e-6；六族谱 vs 封存 3238 census_spectra.npz：k90 精确相等 + PR/top1 <1e-6 全过（USTAR top1 0.306548）。lens 确定性：同 shape 批重放 bit 级 diff=0.0。
+
+### 实际结果（3 seeds 均值 | 全数入 result.json + fidelity.npz）
+
+**下一 token KL（876 OOV 行）**：model **1.0185** < B1 identity **1.2489** < B0 **1.6615**——图谱预测恢复 B0 缺口的 **38.7%**（B1 仅 24.8%）；中位 0.722/1.016/1.293。**激活 R²**：seen-test **0.659**（分布内图谱预测强）vs OOV **0.179**（≈B1 0.177）——OOV 类泛化是短板。
+
+**族方向保真度**（1 − 残差族基能量比 vs B0）：DVU **+0.160**、DCC **+0.277**（关系族被图谱正向承载）；USTAR **+0.027**≈0；ENT **−5.24**、SCLS **−6.22**、MASSIVE **−3.92**（**负保真**：rank-1 概念方向被 ridge 在 OOV 行上主动破坏——未见类的 one-hot 列无训练信号，预测丢掉类方向，而常量基线至少保留均值类信号）。
+
+### 分析
+
+1. **保真度曲线第一个点入册**：「破解程度」首次成为可画曲线的数字——分布内 0.659 / 谱外 0.179 / KL 缺口恢复 38.7%%。
+1. **下一 token 级图谱已赢 identity 基线**（38.7%% vs 24.8%%）：φ-ridge 的组合结构在输出分布层面有真实增量，尽管 OOV 激活 R² 与 identity 打平。
+1. **负保真是定位明确的杠杆**：ENT/SCLS 负值不是噪声（3 seeds 一致 −5.2/−6.2），根因是 OOV 类列无训练信号——类方向外推（3240 臂 a）直接对准此缺口。
+
+**限界**：单模型（qwen3-4b，预注册口径）；B1 在实体 41–72 回落 B0 使 identity 基线偏弱（登记在案）；模板面板无 n-gram 基线可行；lens 用 f16 封存激活（两侧同 lens，公平但非原生 logits）；KL 排序非门。
+
+**完整性**：ledger #391（pre 文件 sha8 45ca6d4c）；产物 result.json + fidelity.npz（逐行 KL 数组，供客户端曲线）；独立磁盘复核见 p3239_disk_verify。
+
+### 后续预注册 Phase 3240（候选）
+
+- (a) **类方向外推臂**（零 GPU，默认）：OOV 类方向由训练类方向子空间外推（类均值组合/子空间投影），目标把 SCLS/ENT 保真转正、抬 R²_oov——直接对准 3239 定位的缺口；
+- (b) 保真度曲线客户端化（工程）：/atlas/fidelity 端点 + 曲线面板，把 3239/3240 曲线放进工作台；
+- (c) u* 内容归因类级扩展（顺延）。
+
+## Phase 3240: G5-H3 类方向外推臂 — F0 复现 / F1 先验外推 / F2 子空间补全（零 GPU） [2026-10-20 03:31]
+
+**执行模式**：预注册自 3239 tail 臂 (a)；freeze **`69c1a6f9`**（任何观测前；含 prereg_correction ×3，均 SMOKE 阶段订正于正式观测前：① G2 回退界符号语义反转（`max(d)<0.05` 把正向改善误判为回退 → 改 `min(d_DVU,d_DCC) > −0.05` 回退下界）；② d39 锚 smoke 行子集（前 200 行）对封存正式（876 行）不可比 → 仅正式模式生效；③ **F1 塌缩按预注册原文执行并登记为发现**，不事后重定义）；res **`ffb97506`**；verdict **`cls_extrap_registered`**（G1–G4 全 True，d39=0.0 位级复现封存 3239）。registry 不动（v1.33 仍为头）。
+
+### 配方（预注册三臂）
+
+- **F0**：3239 ridge 原版（复现锚，逐 seed 对封存 3239 result.json d39=0.0，全 876 行）；
+- **F1 prior-mean**：Ŷ + (mean_{c<6}(class_mean[c]) − B0)——训练类均值先验，OOV 类均匀共享（无泄漏）；
+- **F2 subspace completion**：Ŷ + P_S(B0 − Ŷ)，S = span{class_mean[c] − B0 : c<6} 的 QR 正交基——把 ridge 相对常量基线丢失的成分限制在训练类子空间内补全。
+
+### 实际结果（3 seeds 均值，Δ vs F0）
+
+- **F1 塌缩**：ΔSCLS **-0.009**、ΔENT **-0.006**——训练类均值的均值一阶上就是全局均值，均匀先验不携带类方向信号（预注册发现的机制性塌缩）。
+- **F2 全族正向**：SCLS −6.221→**−1.751**（**+4.470**）、ENT −5.243→**−1.395**（**+3.849**）、MASSIVE +2.152、USTAR +0.088、DVU +0.098、DCC +0.093——六族无一回退；R²_oov 0.179→**0.205**（+0.0261）；下一 token KL 1.0185→**1.0008**（-0.0177，修复同时改善输出分布保真）。
+- **headline（非门）**：SCLS/ENT **未转正**（F2 残余类方向能量 ≈ B0 基线的 1.4–1.8×）；seed 8 显著弱于 seed 7/9（SCLS −4.39 vs −0.28/−0.58）——训练类张成子空间的 seed 方差是下一个诊断对象。
+
+### 分析
+
+1. **3239 负保真根因确证**：把丢失的类子空间分量补回，保真即大幅修复（SCLS +4.5/ENT +3.8）——3239「OOV 类列无训练信号 → ridge 丢类方向」的定位得到干预侧反向确证（remove→harm 已由 3239 自然实验给出，restore→repair 由本 phase 给出）。
+1. **F1 塌缩是均匀先验的信息论下界**：不引入任何 OOV 信息的均匀外推在类方向上注定零增益——转正需要 OOV 类的**侧信息**（词汇/语义桥），这把问题从「预测配方」推到「图谱侧类间结构」（类间方向的组织方式，census 复用矩阵方向）。
+1. **保真度曲线第二个点入册**：同一套曲线，F2 配方点整体上移且 KL 同向改善——「破解程度」曲线开始有可比较的配方族。
+
+**限界**：单模型（qwen3-4b）；F1/F2 修正仅定义于 OOV 行（seen-test 与 F0 恒同）；转正未达成（headline 如实登记）；seed 方差未解释。
+
+**完整性**：ledger #392（pre 文件 sha8 ef5b2bb1）；产物 result.json + extrap.npz（逐配方 fam_fid/R²/KL 聚合矩阵，供客户端曲线）；独立磁盘复核见 p3240_disk_verify。
+
+### 后续预注册 Phase 3241（候选）
+
+- (a) **保真度曲线客户端化**（工程，零 GPU）：/atlas/fidelity 端点 + 曲线面板，把 3239/3240 两点入图（3239 tail 臂 b 顺延至此）；
+- (b) **类间侧信息臂**（零 GPU）：OOV 类方向由类间结构外推（census 复用矩阵/SCLS 族内类间几何），目标 SCLS/ENT 转正——需要引入 OOV 侧信息，预注册时须显式声明信息来源与泄漏界；
+- (c) u* 内容归因类级扩展（继续顺延）。
+
+## Phase 3241: G5-H4 类间侧信息臂 — 词汇 embedding 桥（零 GPU，预注册证伪为主） [2026-10-20 04:12]
+
+**执行模式**：预注册自 3240 tail 臂 (a)；freeze **`d986f7ae`**（含 prereg_correction ×3：① token 向量 = 子词 mean pooling（实体词非全单 token，如「小提琴」3 token；类词全单 token）；② **桥 v1（全量方向加和）SMOKE 证伪**——幅度失配（‖d_c‖ 是类中心尺度而所需修正为残差尺度），把 SCLS 打回 F0 水平 ≈−16；③ 配方族 v3 定稿：类条件锚 + F2 同款投影（幅度由投影定）+ 线性权重变体 + 配对随机对照）；res **`5f0648f7`**；verdict **`lexical_bridge_partial`**（G1/G3/G4 True，G2 False——回退界触发；G0 位级复现 d40=0.0）。泄漏声明：仅 token embedding（纯权重侧），禁用任何 OOV 激活统计。registry 不动（v1.33 仍为头）。
+
+### 配方（预注册六臂）
+
+G0 = 3240-F2 复现锚；G1c/G1w = 类条件锚（softmax β=1 / 线性 relu(cos) 权重）；G1e = 类+实体双条件锚（投影到 S∪E 联合 span，47 维）；G1r/G1rw = 配对随机置换对照（seed 42）。
+
+### 实际结果（3 seeds 均值，Δ vs G0）
+
+- **类桥单独 = 零效应（干净负发现）**：G1c ΔSCLS **-0.001** / G1w **-0.017**（ENT 同量级，3 seeds 一致）——类名词汇相似度在两种权重方案下都不向激活空间类方向传递。
+- **双桥 = 首个 SCLS/ENT 同时正向改善的配方**：G1e ΔSCLS **+0.983**（−1.751→−0.769）、ΔENT **+0.820**（−1.395→−0.575），3 seeds 一致；**但** DVU **-0.101** / DCC **-0.162** 回退越界 + KL **+0.372** 恶化 → G2 FAIL（回退条款），verdict partial。
+- **词身份信息真实**：全部桥配方的真实 token 身份在 min(SCLS,ENT) 上优于随机置换（G1e −0.77 vs G1r **−4.07**，3 seeds 一致）——侧信息存在但可传递效应量小。
+- **headline（非门）**：转正未达成（最接近的 G1e：SCLS −0.77 / ENT −0.58）。
+
+### 分析
+
+1. **权重侧信息不足定谳**：词 embedding → 激活类方向的传递在 v1（全量加和，幅度失配）与 v3（条件锚投影，效应≈0）两级机制下均失败或微弱——OOV 类方向的信息不在词汇相似度结构里，census 复用矩阵的「非正交是常态」不等于「词汇可预测」。
+1. **双桥的族分化是结构信号**：实体 41 维子空间在 ENT rank-1 方向上补偿了真实信号（+0.82）同时污染关系族（DVU/DCC 回退）——OOV 行缺失的实体信息比类信息更容易从词侧近似，与 3238 谱分层（ENT 近秩 1 vs DVU 4.4–5.2 维）自洽：秩越低的族，词侧粗近似越接近够用。
+1. **剩余缺口的方向**：转正需要激活侧类结构（跨模型/跨层方向迁移或面板扩展），不是更好的配方工程——这把 3239 tail 臂 (a) 的「类间侧信息」假设推进到可判定否定（词汇通道）+ 部分肯定（实体通道）。
+
+**限界**：单模型（qwen3-4b）；β=1 无温度调节（预注册固定）；实体桥的 DVU/DCC 回退机制未做归因（挂账）；转正未达成。
+
+**完整性**：ledger #393（pre 文件 sha8 1fa82d85）；产物 result.json + bridge.npz（逐配方 fam_fid/R²/KL 聚合矩阵）；独立磁盘复核见 p3241_disk_verify。
+
+### 后续预注册 Phase 3242（候选）
+
+- (a) **跨模型类方向迁移臂**（零 GPU，默认）：qwen3-14b/glm4-9b 的训练类方向能否迁移修补 qwen3-4b 的 OOV 类缺口（census 谱形跨模型极稳 0.996 是先验依据）——激活侧类结构，直接对准 3241 判定的「词汇通道不足」；
+- (b) 实体桥 DVU/DCC 回退归因（轻量）；(c) u* 内容归因（继续顺延）。
+
+## Phase 3242: G5-H5 跨模型类方向迁移臂（零 GPU，激活侧类结构） [2026-10-20 05:20]
+
+**执行模式**：预注册自 3241 tail 臂 (a)；freeze **`02af8bd7`**（含 prereg_correction ×1：类级标签置换对照空洞——只重排 4 个迁移类均值、span 不变（首次 SMOKE 中 T1r≡T1 逐位相同），SMOKE 窗口改为**行级置换** donor OOV 行→类分配）；res **`eb673f70`**；verdict **`xmodel_transfer_partial`**（G1/G3/G4 True，G2 False——效应量低于门限；G0 位级复现 d40=0.0）。泄漏声明：donor 激活（同一面板行）为声明侧信息；donor→4b 线性映射仅在 4b seen train rows 上训练；4b OOV 激活只作评估目标与事后保真诊断（headline-only，不入门）。registry 不动（v1.33 仍为头）。
+
+### 配方（预注册六臂）
+
+G0 = 3240-F2 复现锚；T1_14b / T2_glm = 单 donor 迁移 span（6 训练类方向 + 4 迁移 OOV 类方向，dual-ridge 带偏置映射，seen-only 训练）；T3_dual = 联合 span（6+4+4=14）；T1r/T2r = 行级置换对照（seed 42）。预测机制 = Yhat_ridge + P_span(B0 − Yhat_ridge)（F2 同款，span 扩展）。
+
+### 实际结果（3 seeds 均值，Δ vs G0）
+
+- **跨模型映射**：seen 行映射 R² glm4 **0.806** / 14b **0.850**（seen 流形可线性对齐）；OOV 行外推 R² glm4 **-0.295** / 14b **+0.113**（OOV 类结构不在映射训练分布内）。
+- **迁移真实但微弱**：cos(迁移方向, 4b 真 OOV 类方向) 14b **0.242** / glm4 **0.122**，置换对照 0.148 / 0.072（3 seeds 一致）——迁移信号高于置换但幅值小。
+- **T3_dual = 首个零回退正向配方**：ΔSCLS **+0.458**（−1.751→−1.293）、ΔENT **+0.396**（−1.395→−0.999）、DVU **+0.002** / DCC **-0.002** 零回退；但效应量 < EFF_DELTA 0.5 → G2 FAIL（幅度条款），verdict partial。
+- **KL 干净分离真实与置换**：真实迁移 KL Δ +0.0018（T1）/ +0.0134（T2） vs 置换对照 +0.0648 / +0.1302——迁移方向携带真实输出分布信息。
+- **headline（非门）**：转正未达成（最接近的 T3：SCLS −1.29 / ENT −1.00）；seed 8 再次显著弱（与 3240 seed 方差发现一致）。
+
+### 分析
+
+1. **激活侧类结构可跨模型迁移，但 seen-only 线性映射取回太少**：映射在 seen 流形上 R² 0.81–0.84，但对 OOV 行外推为负——映射学到的是 seen 流形而非 OOV 类几何，这直接把缺口定位到「跨模型映射的 OOV 外推」，而不是「跨模型结构不存在」。
+1. **零回退性质是结构信号**：与 3241 G1e（正向但污染 DVU/DCC）不同，T3_dual 在六族上全部非负——迁移方向与训练类方向张成的 span 是「干净的」补充，说明跨模型类几何与 4b 训练子空间近似正交互补（与 census 复用非正交但不共线的图景自洽）。
+1. **保真曲线第三点入册**：F0 (SCLS −1.75) → T3 (−1.29)，保真度曲线上跨模型迁移点位于词汇桥 G1e (−0.77) 与 F2 (−1.75) 之间但无副作用——「无副作用修复」是比「幅度最大」更可取的配方性质。
+
+**限界**：映射为线性 dual-ridge（λ 同 B-protocol 1e-3，无温度/核调参）；donor OOV 类均值是声明侧信息（转正判定须计入此泄漏界）；β/λ 未扫描；seed 方差未解释。
+
+**完整性**：ledger #394（pre 文件 sha8 e0817cd8）；产物 result.json + xmodel.npz（逐配方 fam_fid/R²/KL 聚合矩阵 + 迁移 cos）；独立磁盘复核见 p3242_disk_verify。
+
+### 后续预注册 Phase 3243（候选）
+
+- (a) **跨模型映射 OOV 外推改进臂**（零 GPU，默认）：对准 r2_map_oov 缺口——中心化映射/类条件仿射/多锚点 Procrustes（seen-only 训练不变），目标把 T3 效应推过 0.5 门并转正；
+- (b) 实体桥 DVU/DCC 回退归因（3241 挂账顺延）；(c) u* 内容归因（继续顺延）。
+
+## Phase 3243: G5-H6 迁移映射 OOV 外推改进臂（零 GPU） [2026-10-20 05:50]
+
+**执行模式**：预注册自 3242 tail 臂 (a)；freeze **`5ccf2bdc`**；res **`2734168a`**；verdict **`mapfix_partial`**（G1/G3/G4 True，G2 False——三变体全部未能超越 base 映射；G0 位级复现 d40=0.0 且 **T3_rep 对封存 3242 T3_dual 位级复现 d42=0.0**）。泄漏声明与 3242 一致：donor OOV 类均值为声明侧信息；全部映射变体仅在 4b seen train rows 上训练。registry 不动（v1.33 仍为头）。
+
+### 配方（预注册八臂）
+
+G0 = 3240-F2 复现锚；T3_rep = 3242 T3_dual 逐字复现锚；M1_dual = 中心化 dual-ridge（去偏置）；M2_dual = 类条件仿射（M1 + seen 类映射残差修正，donor 空间 softmax β=1）；M3_dual = 多锚最小范数插值（pinv donor seen 类方向，rcond 1e-6）；M1r/M2r/M3r = 行级置换对照（seed 42，3242 同款构造）。span 均为 6+4+4 联合。
+
+### 实际结果（3 seeds 均值，Δ vs G0）
+
+- **T3_rep 逐字复现**：ΔSCLS **+0.458** / ΔENT **+0.396**——与封存 3242 逐 seed 位级一致（d42=0.0），跨 phase 装置连续性确立。
+- **中心化反而有害（M1）**：ΔSCLS **+0.273** / ΔENT **+0.239**，低于 base——base dual-ridge 的偏置项携带了可迁移的类结构信息，去偏置把它丢掉；且中心化不修复 OOV 外推（r2_map_oov 14b 0.115 / glm -0.291，几乎不变）。
+- **M2 机制塌缩**：中心化后 seen 类映射残差仅 norm 6.8e-03（14b）/ 1.9e-03（glm）——类条件仿射无空间可修，M2≡M1（同 3240-F1 塌缩模式）。
+- **M3 几何有、行为无**：迁移 cos 升至 14b **0.264** / glm **0.251**（三变体中唯一实质提升），但 KL Δ **+0.0014** vs 其置换对照 **-0.0008**——不高于置换；fam_fid 与对照持平。几何对齐 ≠ 输出分布信息（F20「读得出≠控得住」在迁移层的回声）。
+- **对照装置有效**：M1r/M2r KL Δ +0.1172 vs 真实 +0.0166——行级置换对照仍然干净分离；M3 对照分离弱是其自身性质（donor 几何透明传递），非装置缺陷。
+- **headline（非门）**：转正未达成；base 映射（T3_rep +0.458）仍是全场最优配方。
+
+### 分析
+
+1. **base dual-ridge 已处于 seen-only 信息极限**：三个独立改进方向（去偏置/类条件/锚插值）全部失败，且失败方式各异（有害/塌缩/无行为信息）——缺口不在映射形式，而在 seen-only 训练信号本身不含 OOV 类几何。
+1. **「几何-行为分离」二次确证**：M3 把几何 cos 推高近一倍（glm 0.113→0.250）而行为信息为零——cos 保真诊断与行为保真（KL/fam_fid）在迁移层脱钩，与 F20（读出几何≠行为控制）同构。
+1. **保真曲线收敛**：F0 −1.75 → T3_rep −1.29（无副作用最优）→ M1/M2 −1.48 → M3 −1.72。seen-only 映射族的包络就是 T3_rep；继续推进需越出声明侧信息界（donor OOV 行级结构）或非参数机制。
+
+**限界**：映射均为线性（λ=1e-3 / pinv rcond 1e-6，无调参）；M3 anchor 复现残差 ~1.5e-5（类方向近秩 1 病态，SCLS PR 1.03）；donor OOV 类均值是声明侧信息；seed 方差未解释。
+
+**完整性**：ledger #395（pre 文件 sha8 deff0444）；产物 result.json + mapfix.npz（逐配方 fam_fid/R²/KL 聚合矩阵 + 逐变体迁移 cos）；独立磁盘复核见 p3243_disk_verify。
+
+### 后续预注册 Phase 3244（候选）
+
+- (a) **实体桥 DVU/DCC 回退归因臂**（3241 挂账，轻量零 GPU）：定位 G1e 双桥污染关系族的机制通道；
+- (b) u* 内容归因（继续顺延）；(c) 跨模型行级 donor 结构（需扩泄漏声明，暂缓）。
+
+## Phase 3244: G5-H7 实体桥 DVU/DCC 回退归因臂（零 GPU） [2026-10-20 08:35]
+
+**执行模式**：预注册自 3243 tail 臂 (a)；freeze **`2392a57d`**；res **`482eeaa4`**；verdict **`bridge_attribution_registered`**（G1–G4 全过；G0 位级复现 d40=0.0）。SMOKE 预注册修正 ×1（v1 归因设计被证伪：C_only 独自携带更多 DVU/DCC 损伤、softmax(β=1) 类偏移近抵消、E_only 复现 3241-v1 原始幅度失败），重设计为边际贡献阶梯 + DVU/DCC 中性修复。正式阶段锚修正 ×1（见下伪影发现，非指标驱动）。registry 不动（v1.33 仍为头）。
+
+### 配方（修正后七臂）
+
+G0 = 3240-F2 复现锚；G1e_rep = 3241 G1e 逐字复现锚；P1_pull = B0 拉力投影到 47 维联合 span（**零词汇信息**）；C_only/E_only = 精确通道消融（corr(G1e)=corr_c+corr_e 恒等式，分解间隙 ≤7.6e-6）；R1_clean = G0 修正 + P_Bd⊥(corr_G1e−corr_G0)（DVU/DCC 构造性中性）；R1_clean_r = 置换对照。
+
+### 实际结果（3 seeds 均值，Δ vs G0）
+
+- **归因反转（核心发现）**：P1_pull 零词汇信息独自复现 G1e 的全部效应——SCLS **+0.989** / ENT +0.825 / DVU **-0.103** / DCC **-0.163**。阶梯边际：span 扩展贡献 SCLS 增益的 **99.4%**（+0.989 / +0.994），类偏移 -0.0011、实体偏移 +0.0066（合计 <1%）。3241 的「词汇桥」增益与关系族污染同源，均来自 span 扩展。
+- **clause_a PASS（span 归因）**：P1_pull 的 min(dDVU,dDCC) = -0.163 < −0.05 门——回退在零词汇信息下出现，3241 污染归因于 B0 拉力的联合 span 扩展，而非词汇通道。
+- **clause_b PASS（R1_clean 修复）**：DVU/DCC Δ **+0.000（基精确零）**，SCLS **+0.836** / ENT **+0.729**（保留 G1e 增益的 84%/88%，> +0.30 门）；真实优于置换（SCLS −0.915 vs −0.924）；KL 1.3051 优于 G1e 1.3453（仍劣于 G0 1.0008）。
+- **E_only（recorded-only）**：SCLS -4.5——纯实体偏移原始幅度失败，3241-v1 教训的三度复现。
+- **封存 3241 执行伪影（发现）**：d41 位级锚失败（max gap 2.8e-02，方向恒定：封存更差）。调查（p3244_debug_hyp.py）：本 phase corr 与现行 3241 脚本逐字循环 diff **0.0**；G1c/G1w 对封存 3241 重推至 9 位小数全同；G0 d40=0.0——机器正确性三重证明；封存 G1e/G1r/G1rw 与全部已测变体不符（最接近 e_perm 变体差 8e-4，未解）。3241 verify 当时只重推过 G1c，伪影不可见。**3241 定性结论稳健**（G1e 符号/量级不变：封存 +0.98/+0.82/−0.10/−0.16 vs 重跑 +0.99/+0.83/−0.08/−0.14），精确数值以 3244 G1e_rep 为准；封存文件未动。
+
+### 分析
+
+1. **「词汇桥」实为「span 桥」**：3241 的双桥增益本质是把 B0 拉力（残差的全局均值方向）投影到含 41 个实体方向的更大 span——这是零信息机制（任何 OOV 行的 ridge 残差拉向训练均值时都会受益）。词汇相似度权重只提供 <1%% 的边际。
+1. **无副作用修复可得**：R1_clean 证明「增益保留 + 关系族精确零回退」可以同时成立（对 extra 修正做 DVU/DCC 基能量剥离）——配方设计原则从「幅度最大」进一步细化为「先归因污染通道、再做基中性修正」。
+1. **保真曲线更新**：G0 −1.75 → R1_clean −0.92（零回退，当前最优无副作用配方）→ G1e −0.77（有回退）→ E_only −4.50。R1_clean 与 3242 T3_rep（−1.29，不同机制）构成两条独立的零回退改进线。
+
+**限界**：零 GPU、线性投影机制；R1_clean 的 DVU/DCC 中性依赖封存 3157 族基（k90 联合 QR）；d41 语义界 0.05 为伪影协商界；u* 内容归因继续顺延。
+
+**完整性**：ledger #396（pre 文件 sha8 907b38a7）；产物 result.json + attribution.npz + 首跑存档 result_formal_v1_anchor_artifact.json / execution_v1.json；调查脚本 p3244_debug_hyp.py / p3244_debug_d41.py；独立磁盘复核见 p3244_disk_verify。
+
+### 后续预注册 Phase 3245（候选）
+
+- (a) **R1_clean × T3 组合转正臂**（零 GPU）：把 3242 T3_dual 迁移修正叠加到 R1_clean 上并做 DVU/DCC 中性化，两条独立零回退线联合，目标 SCLS/ENT 转正；
+- (b) 保真曲线客户端化并入 3244 曲线（工程对齐）；(c) u* 内容归因（继续顺延）。
+
+## Phase 3245: G5-H8 R1_clean × T3_dual 组合转正臂（零 GPU） [2026-10-20 09:05]
+
+**执行模式**：预注册自 3244 tail 臂 (a)；freeze **`105df1a8`**；res **`ef039473`**；verdict **`combo_flip_registered`**（G1–G4 全过；SMOKE 无设计修正——200 行子集锚失配为行子集效应，3240 教训预注册内）。**三个位级复现锚全零**：G0 vs 封存 3240-F2（d40=0.0）、R1_rep vs 封存 3244 R1_clean（d44=0.0）、T3_rep vs 封存 3242 T3_dual（d42=0.0），均 per-seed 全 876 行——跨脚本位级一致性三重证明（3244 伪影调查的机器正确性结论外推成立）。registry 不动（v1.33 仍为头）。
+
+### 配方（五臂）
+
+G0/R1_rep/T3_rep = 复现锚；**X_combo = Yhat0 + corr_T3 + P_Bd⊥(corr_full − corr_T3)**（主臂：T3_dual 14 维迁移拉力为基底 + G1e lexical extra 剥离 DVU/DCC 基能量）；X_combo_r = 置换对照（seed 42）。构造恒等式数值验证：组合顺序恒等（id_gap 7.6e-6 f32）；X_combo 的 DVU/DCC 残差与 T3_rep 位级相同（1.9e-5）。
+
+### 实际结果（3 seeds 均值，Δ vs G0）
+
+- **G2 三条款全过（combo_flip_registered）**：(a) 零回退 DVU +0.002 / DCC -0.002（T3 残差构造性保留）；(b) 联合增益 SCLS **+0.954** / ENT **+0.823**（均 > 0）；(c) min(SCLS,ENT) = **-0.797** 优于最优单线 R1_rep 的 -0.915。
+- **加性增益**：dX_SCLS +0.954 > max(dR1 +0.836, dT3 +0.458)；dX_ENT +0.823 > max(dR1 +0.729, dT3 +0.396)——lexical extra 在更强迁移拉力之上完全存活，联合超过任一单线。
+- **FLIP 未达（headline）**：绝对保真 SCLS **−0.797** / ENT **−0.572** 仍负——转正（fidelity > 0）在「seen-only + 声明边信息」体制内仍未达成，与 3243 seen-only 信息极限一致。保真曲线：G0 −1.75 → T3 −1.29 → R1 −0.92 → **X_combo −0.80**（零回退最优）。
+- **真实身份边际 ~1%%**：X_combo −0.797 vs 置换 −0.806（差 9e-3）——身份特异词汇信息对组合增益贡献约 1%%，呼应 3244 span 归因。KL 代价 +0.30（lexical extra 的价格，与 R1_rep 相同）。
+
+### 分析
+
+1. **两条零回退线联合成立且加性**：span 机制（T3 迁移拉力）与 lexical extra（P_Bd⊥ 剥离后）在同一配方中无干涉地叠加——修正通道正交性（DVU/DCC 剥离基 ∪ 迁移 span 的近正交）是加性的几何原因。
+1. **转正的剩余缺口定性**：X_combo 把缺口从 −1.75 推至 −0.80（修复 54%%），剩余 −0.80 的 SCLS 缺口在声明体制内已无配方可达——3240 F2 全族正向转正未达、3241 双桥有回退、3242 迁移 <0.5 门、3243 三变体全败、3245 组合加性最优仍 −0.80。**转正需越出泄漏声明界（OOV 激活统计）或新机制类别**——这本身是 registered 结论。
+1. **R² 代价**：X_combo R² 0.100（−0.105 vs G0）——SCLS/ENT 增益与整体 R² 存在体制内权衡，KL 同向；配方选择目标函数需显式多目标。
+
+**限界**：零 GPU、线性投影机制；DVU/DCC 中性依赖封存 3157 族基；迁移依赖 donor OOV 类均值（已声明边信息）；FLIP 判据为 SCLS/ENT 绝对保真同时 > 0；u* 内容归因继续顺延。
+
+**完整性**：ledger #397（pre 文件 sha8 b8d531ef）；产物 result.json + combo.npz + smoke 子目录；独立磁盘复核见 p3245_disk_verify。
+
+### 后续预注册 Phase 3246（候选）
+
+- (a) **声明体制边界刻画**（零 GPU）：把 3240–3245 六个 Phase 的保真缺口对「边信息预算」（span 维度 / donor 数 / 身份信息比特）作系统曲线，定位转正所需的最小越界量；
+- (b) u* 内容归因（继续顺延）；(c) 保真曲线客户端化并入 3244/3245 曲线（工程对齐）。
+
+## Phase 3246: G5-H9 声明体制边界刻画（零 GPU） [2026-10-20 09:30]
+
+**执行模式**：预注册自 3245 tail 臂 (a)；freeze **`88ab83b9`**；res **`df7ec079`**；verdict **`regime_boundary_registered`**（G1–G4 全过）。**四个位级锚全零**：G0 d40=0.0、T3_rep d42=0.0、XC_b1 d45=0.0（vs 3245 X_combo）、T1_rep d42b=0.0（vs 3242 T1_14b），均 per-seed 全 876 行。SMOKE 修正 ×2（正式观察前，记 prereg_correction）：(1) oracle 重设计——unit 方向版丢失幅度、非信息上界，改为**带幅度真实偏移**拉力 oracle + 新增**机制无关 LS oracle**；(2) clause_b（β 平坦性）SMOKE 子集证伪降级为 headline（全量数据后反而成立，range 0.086 < 0.10）。registry 不动（v1.33 仍为头）。
+
+### 核心发现：FLIP 定位 = **INFORMATION_GAP**（headline）
+
+- **机制无关 oracle 转正**：ORC_ls_full（B0 + 真 OOV 类偏移 + 真实体偏移，逐行直接预测）SCLS **+0.329** / ENT **+0.341** 绝对为正（r2 0.492 / KL 0.787 全指标最优）；**仅完美类信息**（ORC_ls_cls）即已转正（+0.083/+0.086）。→ 3240–3245 未转正的剩余缺口是**缺失 OOV 类/实体信息**，不是机制类别上限。
+- **拉力算子数学上限证明**：P_span(B0−Yhat0) 在 span→全空间时预测→B0、fam_fid→0——**拉力子类无论信息多充分都不可能转正**（k=83 全幅度真方向拉力 oracle 仍 SCLS −0.343）。转正必须依赖非拉力修正分量（如 lexical extra、LS 直接预测）。
+- **span 阶梯（声明体制，clause_a 过）**：SCLS −1.751 → T1(k10) −1.434 → T3(k14) −1.293 → SJE(k47) −0.763 → S55(k55) −0.594，单调改善；代价是 DVU/DCC 回退（SJE/S55 −0.10/−0.16 级）与 R2 崩塌（0.06）—— span 扩张与零回退不可兼得，3244 R1_clean 剥离机制仍是声明体制内唯一零回退通道。
+- **β 阶梯精化 3244 结论**：min(SCLS,ENT) 全量平坦（range 0.086），**但 β=4 使 R2 翻倍（0.203 vs 0.100，恢复至 G0 水平）且 KL −0.23**（1.074 vs 1.305），DVU/DCC 零回退不变——「词汇身份 ~1%」结论精化为：保真维平坦（β=1 近均匀权重），**R²/KL 维尖锐加权（β=4）有实质增益**。**XC_b4 = 声明体制内最优综合配方**（SCLS −0.772 / ENT −0.537 / r2 0.203 / KL 1.074）。
+
+### 分析
+
+1. **信息预算曲线闭合**：3240（F2 span 补全）→ 3241（lexical 桥）→ 3242（donor 迁移）→ 3243（映射 OOV 外推极限）→ 3244（span 归因+零回退修复）→ 3245（组合加性）→ 3246（oracle 定位）：声明体制内可达 SCLS −0.77（XC_b4），完美类信息可转正（+0.08），缺口 −0.85 全部由 OOV 信息缺失解释。**下一步的转正路径唯一化：获取 OOV 类信息的合法来源**（新声明边信息、跨模型映射精度提升、或接受 oracle 级信息的新体制声明）。
+1. **机制几何分类**：修正算子分两类——拉力型（幅度受 (B0−Yhat0) 限制，fid≤0）与偏移型（LS/lexical extra，幅度自由）。3244 的 extra_clean、3246 的 LS oracle 均属偏移型。 XC_b4 的 r2/KL 增益来自偏移型分量的尖锐化。
+1. **oracle 语义**：ORC 臂为 EVALUATION-ONLY 刻画上界，明确越界、不作预测配方、不参与配方比较——泄漏声明体制完整性的组成部分而非违反。
+
+**限界**：零 GPU；oracle 结论限于 qwen3-4b 面板与 B-协议 split；β 平坦性在全量成立但子集波动（SMOKE 0.112 vs 全量 0.086），跨面板外推需复测；u* 内容归因继续顺延。
+
+**完整性**：ledger #398（pre 文件 sha8 0583be4d）；产物 result.json + boundary.npz + smoke 子目录；独立磁盘复核见 p3246_disk_verify。
+
+### 后续预注册 Phase 3247（候选）
+
+- (a) **OOV 类信息合法来源刻画**（零 GPU）：系统扫描「合法边信息菜单」对 −0.85 缺口的闭合率——donor 谱系扩展（更多/异构 donor）、模板/上下文扩增、跨模型映射非线性化（kernel/MLP seen-only）；
+- (b) XC_b4 定为现役配方并更新保真曲线客户端（工程对齐）；(c) u* 内容归因（继续顺延）。
+
+## Phase 3247: G5-H10 OOV 类信息合法来源菜单刻画（零 GPU） [2026-10-20 10:30]
+
+**执行模式**：预注册自 3246 tail 臂 (a)；freeze **`d0def478`**；res **`c5510e5f`**；verdict **`info_menu_registered`**（G1–G4 全过）。**四个位级锚全零**：G0 d40=0.0、T3_rep d42=0.0、XC_b4 d46=0.0（vs 3246，新增锚）、T1_rep d42b=0.0，均 per-seed 全 876 行。无 SMOKE 修正（一次通过）。registry 不动（v1.33 仍为头）。
+
+### 核心发现：**XC_poly_b4 = 新现役最优配方**（headline）
+
+- **菜单闭合率表**（相对 [XC_b4 基线 → ORC_ls_cls 上界] 区间，3 种子均值）：**XC_poly_b4 = +0.142（菜单唯一正值）**；次优 K_poly_T3 −0.065、XC_rbf_b4 −0.017、XC_joint_b4 −0.038、PT_rbf_b4 −0.088；donor 联合拼接（KJ_T3 −0.796）与 per-template 粒度细化无增益——**现声明家族内「更多统计」已耗尽，增益全部来自映射函数类（poly kernel）**。
+- **XC_poly_b4 全指标**：SCLS −0.651（Δ +1.101）/ ENT −0.435（Δ +0.960）/ r2 0.205 / KL 1.077 / DVU +0.008 / DCC +0.006 零回退——SCLS/ENT 双超 XC_b4（−0.772/−0.537）。保真缺口曲线：G0 −1.751 → T3 −1.293 → XC_b4 −0.772 → **XC_poly_b4 −0.651** → oracle 上界 +0.083；剩余 −0.73。
+- **增益载体定位**：poly 映射纯拉力（K_poly_T3，无 combo 机制）已达 SCLS −0.827/ENT −0.614 且 DVU/DCC 零回退（+0.008/+0.006）——**增益来自映射函数类本身，不是组合机制**。rbf 次之（−1.022）。
+- **迁移真实性（clause_a 过）**：方向 cos margin 全正——rbf +0.118 / poly +0.084 / joint +0.101。置换对照在行为面可分：r2 崩塌（0.134 vs 0.197）、DVU/DCC 回退（−0.088/−0.202）——XC 机制内真实迁移与置换行为可分（3242 类级置换空洞教训在核映射族下不复发于方向诊断，但拉力语义下置换 span 扩张仍部分等效）。
+
+### 分析
+
+1. **转正路径更新**：合法菜单最优项闭合 14.2% 剩余缺口。映射函数类是尚未耗尽的方向（poly>rbf>lin 单调），kernel 阶梯（degree/带宽/MLP seen-only）仍有空间；但纯统计扩增（更多 donor 拼接、模板粒度）已证伪。
+1. **机制几何分类补充**：偏移型分量的增益依赖迁移基的质量——extra cleaning 的基从 lin span 换成 poly span 后，同一 lexical 机制多释放 +0.12 SCLS。
+1. **oracle 语义**：ORC_ls_cls 仅作闭合率分母（EVALUATION-ONLY），不参与配方比较。
+
+**限界**：零 GPU；结论限于 qwen3-4b 面板与 B-协议 split；poly 核未做超参敏感性（degree 固定 2、无带宽扫描），留 3248；u* 内容归因继续顺延。
+
+**完整性**：ledger #399（pre 文件 sha8 41973493）；产物 result.json + menu.npz + smoke 子目录；独立磁盘复核见 p3247_disk_verify。
+
+### 后续预注册 Phase 3248（候选）
+
+- (a) **XC_poly_b4 定为现役配方 + 保真曲线客户端更新**（工程臂：/atlas/fidelity 端点与 FidelityMode.jsx 增补 3246-3247 边界/菜单曲线）；
+- (b) **poly 映射谱系深化**（零 GPU）：degree 阶梯 2/3、归一化变体、σ 敏感性（rbf）、与 XC 机制的 β 再联扫——定位映射函数类增益是否已饱和；
+- (c) u* 内容归因（继续顺延）。
+
+## Phase 3248: G5-H11 迁移映射函数族深化（零 GPU） [2026-10-20 11:00]
+
+**执行模式**：预注册自 3247 tail；freeze **`b47042fd`**；res **`7d2acdb6`**；verdict **`poly_deepening_registered`**（G1–G4 全过，SMOKE 一次通过）。**四个位级锚全零**：G0 d40=0.0、T3_rep d42=0.0、XC_b4 d46=0.0、XC_p2_b4 d47=0.0（vs 3247，新增锚），均 per-seed 全 876 行。registry 不动（v1.33 仍为头）。
+
+### 核心发现：degree 阶梯**未饱和**（headline: SATURATED=False）
+
+- **degree 单调 1→2→3**：XC_p1_b4 −0.766 → XC_p2_b4 −0.651 → **XC_p3_b4 −0.550**（SCLS；ENT −0.532→−0.435→−0.356），DVU +0.000/DCC +0.009 零回退；deg-1 近线性控制 ≈ lin 基 XC_b4（−0.772 vs −0.772）——增益确来自核阶数、非核伪影。**闭合率 +0.137**（3248 菜单次优正值）。
+- **K_p3_T3 纯拉力 = 全场最优**（闭合率 **+0.165**）：SCLS −0.529 / ENT −0.387 / DVU +0.000 / DCC +0.009 / KL 1.044——**无 combo 机制的 14 维高质量迁移 span 拉力单枪匹马超过 3240–3247 全部配方栈**。3246 拉力上限论证不约束 k=14 尖锐 span（该论证只在 span→全空间时生效）。
+- **β 再联扫（p2 基）**：最优移至 β=6–8——r2 0.242（vs β=4 的 0.205）且 KL 0.979（vs 1.077），保真 min(SCLS,ENT) 持平。**词汇尖锐度最优随映射族移动**；r2/KL 维 β=6–8 明确更优。
+- **证伪臂**：RBF σ=0.5 DVU/DCC 回退（−0.124/−0.115）；行归一化 p2n 有害（SCLS −0.903、DVU −0.144/DCC −0.268）；rbfn/s2 略差。**保真缺口曲线更新**：G0 −1.751 → T3 −1.293 → XC_b4 −0.772 → XC_p2_b4 −0.651 → **K_p3_T3 −0.529 / XC_p3_b4 −0.550** → oracle 上界 +0.083，剩余 −0.61。
+- realism margin 全正（clause_a 过）：p3 +0.090 / rbf_s05 +0.122 / rbf_s2 +0.096 / p2n +0.064 / rbfn +0.119。
+
+### 分析
+
+1. **转正路径再更新**：映射函数类增益在 deg 3 未饱和。纯拉力最优（K_p3_T3）意味着「combo 机制 + lexical extra」的增量需要重新在 p3 基上评估——3249 预注册 deg 4/5 阶梯延长 + p3 基 β 再联扫 + K_p3 基 combo 臂。
+1. **机制几何分类精化**：3246 的拉力上限是 span→全空间的渐近论证；k=14 尖锐迁移 span 下拉力仍是有效通道——上限约束的是 span 覆盖率与方向质量，不是拉力算子本身。
+1. **oracle 语义**：ORC_ls_cls 仅作闭合率分母（EVALUATION-ONLY）。
+
+**限界**：零 GPU；结论限于 qwen3-4b 面板与 B-协议 split；deg>3 数值稳定性未验证（deg 3 核矩阵量级已 ~1e2，deg 4 需先数值探针）；u* 内容归因继续顺延。
+
+**完整性**：ledger #400（pre 文件 sha8 051425ee）；产物 result.json + poly.npz + smoke 子目录；独立磁盘复核见 p3248_disk_verify。
+
+### 后续预注册 Phase 3249（候选）
+
+- (a) **degree 阶梯延长 + 组合再定位**（零 GPU）：deg 4/5（先数值探针）、K_p3 基 × β∈{4,6,8} combo 臂（K_p3_T3 0.165 与 XC_p2_b6 r2/KL 增益可能叠加）、XC_p3_b6/b8；
+- (b) **现役配方客户端化**（工程臂，自 3248 顺延）：/atlas/fidelity 端点 + FidelityMode.jsx 增补 3246–3248 曲线与现役配方标注；
+- (c) u* 内容归因（继续顺延）。
+
+## Phase 3249: G5-H12 degree 阶梯延长 + p3 基 β 再联扫 + combo 再定位（零 GPU） [2026-10-20 11:30]
+
+**执行模式**：预注册自 3248 tail；freeze **`6eb9bed8`**；res **`8104fd1b`**；verdict **`deg_extension_registered`**（G1–G4 全过，SMOKE 一次通过：p4/p5 数值探针 finite，cond ~1e5）。**六位级锚全零**：d40/d42/d46/d47/d48a（XC_p3_b4 vs 3248）/d48b（K_p3_T3 vs 3248），均 per-seed 全 876 行。registry 不动（v1.33 仍为头）。
+
+### 核心发现：degree 阶梯在 deg 5 仍未饱和，但零回退开始被侵蚀（headline: SATURATED=False, best=XC_p5_b4 closure +0.102）
+
+- **degree 2→3→4→5 继续单调**：XC_p2_b4 −0.651 → XC_p3_b4 −0.550 → XC_p4_b4 −0.495 → **XC_p5_b4 −0.467**（SCLS；ENT −0.435→−0.356→−0.317→−0.301）；闭合率 p4 +0.057 / **p5 +0.102**。保真缺口曲线：G0 −1.751 → T3 −1.293 → XC_b4 −0.772 → K_p3_T3 −0.529 → **XC_p5_b4 −0.467** → oracle 上界 +0.083，剩余 −0.55。
+- **代价面（新发现）**：DVU 侵蚀随阶增长（p3 +0.000 → p4 −0.010 → p5 −0.017）——**degree 增益与零回退开始交换**，无免费午餐；DCC 仍 +0.003。
+- **p3 基 β 再联扫**：β=6/8 使 r2 0.205→0.239/0.243、KL 1.080→0.978/0.982、ENT −0.356→−0.335/−0.332，DVU/DCC 零回退——**r2/KL 维度明确更优**，但 min(SCLS,ENT) 仍不及纯拉力。
+- **combo 再定位（负结果）**：p3 基上 lexical extra 不再叠加——XC_p3_b6/b8 闭合 −0.010/−0.011，纯拉力 K_p3_T3（−0.529）仍最优。**combo 机制是 lin/p2 时代的装置**：其价值 = 补偿弱映射族的 span 质量；映射族足够强后 extra 冗余。
+- realism margin 全正（clause_a 过）：p4 +0.093 / p5 +0.093。数值探针：p4/p5 核矩阵 cond 1.1e5–3.1e5、输出全 finite（probe_ok=True）。
+
+### 分析
+
+1. **转正路径更新**：映射函数类增益在 deg 5 仍未饱和，但边际收益递减（p4 +0.057 → p5 +0.102 闭合率增幅放缓）且 DVU 侵蚀出现。现役综合最优仍在 p3–p5 带；转正剩余缺口 −0.55。
+1. **机制分类精化**：combo 机制与映射函数类非独立——combo 的 lexical extra 只在基 span 质量不足时有增量；这解释了 3244 的 span 归因（99.3%）与 3247/3249 的 combo 失效链。
+1. **oracle 语义**：ORC_ls_cls 仅作闭合率分母（EVALUATION-ONLY）。
+
+**限界**：零 GPU；结论限于 qwen3-4b 面板与 B-协议 split；deg>5 未探（cond 增长趋势提示数值边界临近）；u* 内容归因继续顺延。
+
+**完整性**：ledger #401（pre 文件 sha8 eb8aa969）；产物 result.json + degext.npz + smoke 子目录；独立磁盘复核见 p3249_disk_verify。
+
+### 后续预注册 Phase 3250（候选）
+
+- (a) **现役配方客户端化**（工程臂，自 3248 顺延两次）：/atlas/fidelity 端点 + FidelityMode.jsx 增补 3246–3249 曲线与现役配方（XC_p3_b4 / XC_p5_b4 / XC_p3_b8）标注；
+- (b) **deg>5 数值探针 + 核族收尾**（零 GPU）：deg 6 探针（cond 趋势）、poly×rbf 混合、degree–β 联合网格粗扫——定位映射函数类增益的数值边界与实际停点；
+- (c) u* 内容归因（继续顺延）。
+
+## Phase 3250: G5-H13 核函数族数值边界 + 联合网格 + 现役客户端化（零 GPU + 工程臂） [2026-10-20 15:45]
+
+**执行模式**：预注册自 3249 tail（双臂）；freeze **`c3aa103e`**；res **`9d0f1825`**；verdict **`kernel_boundary_registered`**（G1–G4 全过，SMOKE 一次通过）。**八位级锚全零**：d40/d42/d46/d47/d48a/d48b/d49a（XC_p5_b4 vs 3249）/d49b（XC_p3_b6 vs 3249），均 per-seed 全 876 行。registry 不动（v1.33 仍为头）。
+
+### 核心发现（科学臂）：数值边界未到，停点是价值停点（headline: best=XC_p5_b8 closure +0.032, SATURATED=False）
+
+- **deg-6 探针**：阶梯仍单调（XC_p6_b4 SCLS −0.453 vs p5 −0.467），但闭合率降至 +0.024、DVU 侵蚀加深（−0.022）——**边际收益收缩与回退增长同时发生**。
+- **数值边界未到**：cond 趋势平坦（p3 3.91e5 / p4 3.12e5 / p5 3.00e5 / p6 3.45e5，全 finite）——**deg≤6 无数值爆炸，实际停点是价值停点（增益/回退交换），位于 deg 5–6 带**。
+- **联合网格（新现役）**：**XC_p5_b8 = poly5×β8，degree 保真增益与 β r2/KL 增益可叠加**——SCLS **−0.449** / ENT **−0.273**（closure +0.032 最优）/ r2 0.241 / KL 0.987 / DVU −0.017 / DCC +0.003。保真缺口曲线：G0 −1.751 → T3 −1.293 → XC_b4 −0.772 → K_p3_T3 −0.529 → **XC_p5_b8 −0.449** → oracle 上界 +0.083，剩余 −0.53。
+- **混合核退化**：0.5·poly3+0.5·rbf 与纯 poly3 度量恒等（差 5e-5，f32 噪声级）——**rbf 半核在 poly3 拟合 span 外无增量**，核族互补性证伪。
+- realism margin 全正（p6 +0.091 / hyb +0.090）。
+
+### 工程臂（现役配方客户端化，自 3248 顺延两次后落地）
+
+- **`/api/ai-rnd/atlas/fidelity` schema v2**：封存源扩至 7 相位（3239/3240/3246–3250）；3246+ 的 agg_kl 取自各自封存 result.json（npz immutable 不补写）；closure 按 npz 有无透传（3246 封存 npz 无该字段）；新增 **现役标注块**（XC_p5_b8 现役综合最优 / XC_p5_b4 保真维 / XC_p3_b6 R²KL 维 / K_p3_T3 纯拉力）。
+- **FidelityMode.jsx v2**：现役配方摘要卡、**SCLS 缺口收线里程碑曲线**（G0→T3→XC_b4→XC_poly_b4→XC_p3_b4→现役→oracle，封存查表零口径计算）、族图新增 3246 XC_b4 与 3250 现役序列。
+- **验证**：端点直调校验（封存数字交叉核对）OK；playwright 实机 **19/19**（一处校验字符串按封存值 0.986 修正，无产品改动）。
+
+### 分析
+
+1. **映射函数类收线**：3247–3250 四连击把声明体制内缺口从 −0.772 推至 **−0.449**（ORC 上界 +0.083，剩余 −0.53）。核族菜单（degree×β×hybrid×joint）已系统扫毕：**β=8×poly5 为价值最优停点**；继续 deepening 的期望收益低于回退增长。
+1. **转正路径**：剩余缺口仍为 INFORMATION_GAP（3246 定位）；声明体制内逼近极限，后续转正需越出泄漏声明界（ORC 语义）或新机制类别（偏移型分量）。
+1. **oracle 语义**：ORC_ls_cls 仅作闭合率分母（EVALUATION-ONLY）。
+
+**限界**：零 GPU；结论限于 qwen3-4b 面板与 B-协议 split；deg>6 未探（cond 平坦提示数值空间仍有余量，但价值停点已现）；u* 内容归因继续顺延。
+
+**完整性**：ledger #402（pre 文件 sha8 b40a1a4a）；产物 result.json + kbound.npz + smoke 子目录 + 端点/UI 校验脚本；独立磁盘复核见 p3250_disk_verify。
+
+### 后续预注册 Phase 3251（候选）
+
+- (a) **G5 保真收线小结段**（文档臂）：把 3239–3250 保真收线链写成 MEMO 小结 + registry gap 附录候选条目（零 GPU）；
+- (b) **u* 内容归因**（自 3244 顺延多次，优先级提升）：u* 方向的词汇/类内容分解（零 GPU）；
+- (c) checkpoint 轨迹与 5 appendix GPU 项（维持挂账）。
+
+## Phase 3251: G5-H14 u* 类级词汇归因（3190 降级臂正式化）+ 保真收线小结（零 GPU，双臂） [2026-10-20 11:23]
+
+**执行模式**：预注册自 3250 tail（(b) 科学臂 + (a) 文档臂）；freeze **`48169586`**；res **`0601eb1b`**；verdict **`ustar_lexical_partial`**（锚全过、门 0/3 → partial，characterization 登记）。**九位级漂移全零**：drift69×3（3169 per-seed E）+ drift89×3（3189 top1/top2/cross_med/within/r80/r90）+ drift90×3（3190 loo_top1/cos_ustar_vc/loo_max_delta），均逐位。registry v1.33 `a30215fd` 字节不动（report-only）。
+
+### 核心发现（u* 词汇归因正式化，headline: 词级对齐真实但小、随规模衰减、非 OOV 主导）
+
+- **门 0/3 ⇒ partial**：LEXICALLY_STRUCTURED 需 max|cos(u*,∇_cls)| ≥ 3×随机基线 且 oov4_sum > seen6_sum 全 3 模型；实测 4b max 0.1438（随机 10.4×、伪类 null 2.0×）达标但 OOV 主导未过；14b 0.0327（3.6×）踩线达标同样 OOV 主导未过；**glm4 0.0245 低于 3× 门且低于其伪类 null（0.0288）——词簇几何即覆盖**。
+- **OOV 主导全面证伪**：oov4_sum < seen6_sum ×3/3（4b 0.3046 vs 0.3136 持平；14b 0.0334 vs 0.0952；glm4 0.0269 vs 0.0562）。
+- **符号一致（3197 链接）**：4b OOV 载体类带符号 cos 为负（乐器 −0.1438 / 天气 −0.0572 / 运动 −0.0475）——anti-class-mean 对比签名在词级可见。
+- **规模衰减**：max|cos| 0.1438 → 0.0327 → 0.0245（4b→14b→glm4）——词级对齐随模型规模衰减。
+- **图谱级定谳（与 D 线五连合并）**：u* 的类结构由**激活侧类均值方向 v_c**（cos 0.72–0.85）承载，**不映射到词表 embedding 差分方向**（词级 |cos| ≤0.14 且随规模衰减、glm4 上被词簇 null 覆盖）——**两套几何系统解耦**；这是词桥（3241/3247）增益微弱的图谱级解释。
+
+**SMOKE 修正（正式观察前，已记 prereg_correction）**：类级行置换对照退化——mean-centered 差分方向集合在行置换下不变（center 不变），null ≡ 观测 max（0.1438 恒等复现；3242 类级置换空洞同族教训）→ 改为**实体词伪类置换**（73 实体词分 10 组构造伪类差分）。
+
+### 文档臂 (a)：G5 保真收线小结（3239–3250，registry gap 附录候选）
+
+**收线链（SCLS 族保真，3 种子均值，876 OOV 行）**：3239 原版 ridge −1.751（KL 恢复 38.7%）→ 3240 F2 类子空间补全 −1.75（全族正向转正未达）→ 3241 G1e 词桥 −0.77（DVU/DCC 回退越界，partial；3244 证伪为 span 伪影）→ 3242 T3_dual 跨模型 −1.293（首个零回退正向，partial）→ 3243 seen-only 信息极限（三变体全败）→ 3244 归因反转（99.3% 来自 span 扩展；R1_clean 零回退 −0.92）→ 3245 X_combo 组合加性 −0.797（FLIP 未达：声明体制内转正不可达）→ 3246 体制边界（FLIP=INFORMATION_GAP：LS oracle +0.083 转正；拉力算子 span→全空间时 fid→0 的数学上限）→ 3247 映射函数类（poly 核 +0.142 闭合）→ 3248 degree 阶梯未饱和（K_p3_T3 纯拉力 −0.529 全场最优）→ 3249 deg 5 单调（−0.467，DVU 侵蚀随阶增长；combo=p2 时代装置）→ 3250 价值停点（**XC_p5_b8 −0.449 现役**，r2 0.241/KL 0.987；cond 平坦无数值爆炸）。
+
+**状态定谳**：声明体制内缺口从 −1.751 收至 **−0.449**（修复 74%），剩余 −0.53 为 INFORMATION_GAP（3246 定谳）——转正需越出泄漏声明界或新机制类别（偏移型分量）；词级来源已由 3251 证伪（本 phase）。**gap 附录候选条目**：`gap_v1_12_appendix_fidelity_closure`（描述收线链 + 现役配方 + oracle 上界 + 词汇解耦定谳；待下一次 registry append 时一并入册，本 phase report-only 不触发）。
+
+**限界**：零 GPU；∇_cls 为 first-subword embed 差分（类词 4b 单 token 断言）；u* 符号约定沿用 3190 SVD 输出（|cos| 报告为主）；checkpoint 轨迹与 5 appendix GPU 项维持挂账。
+
+**完整性**：ledger #403（pre 文件 sha8 98ffe3b1）；产物 result.json + ustar_lex.npz + smoke 子目录；独立磁盘复核见 p3251_disk_verify。
+
+### 后续预注册 Phase 3252（候选）
+
+- (a) **gap 附录候选条目定稿臂**：把 `gap_v1_12_appendix_fidelity_closure` 按 gap ledger schema 成文并预演 diff（仍 report-only，入册留待下一次 registry append 触发点）；
+- (b) **U 点轨迹采样臂**（checkpoint 轨迹挂账的零 GPU 前置）：3169 collect npz 内已有 per-seed 中间量可否支撑训练轨迹上的 u* 稳定性刻画——先做产物清单审计再决定是否需要 GPU 项；
+- (c) 5 appendix GPU 项维持挂账。
+
+## Phase 3252: G5-H15 u* 层轨迹稳定性（审计升级科学臂）+ APPX-6 定稿（零 GPU，双臂） [2026-10-20 11:37]
+
+**执行模式**：预注册自 3251 tail（(b) 审计臂 + (a) 文档臂）；**审计升级**：pre-freeze 审计发现 3169 collect npz 的 H 第三维 = NH=NL+1 **全层轨迹**（4b 37 层 readout 35；14b/glm4 41 层 readout 39），(b) 从产物审计升级为零 GPU 科学臂。freeze **`fa13399b`**；res **`a4435eb3`**；verdict **`ustar_layer_registered`**（GATE 3/3）。**九位级漂移全零**（drift69/89/90 ×3，kout 层逐位；4b top1(kout)=0.3065 == 3189 封存）。registry v1.33 `a30215fd` 字节不动。
+
+### 核心发现（headline: 崩塌方向在 embedding 层即已秩 1）
+
+- **EMBEDDING RANK-1**：top1(layer 0) = **1.0000 ×3/3 模型**——OOV 残差场在 embedding 输出处已是单一方向；**anti-class-mean 对比轴（3197 定谳）在 embedding 几何中即已播种**。
+- **U 形轨迹**：top1 中层跌至 0.199（4b L18）/ 0.190（14b L20）/ 0.141（glm4 L20），readout 部分回升至 0.3065 / 0.2936 / 0.3008——中层网络分化残差方向，深层重新聚焦。
+- **近邻稳定性**：|cos(u\*(kout), u\*(kout−1))| = 0.9658 / 0.9708 / 0.9261 ×3——readout u\* 是**稳定深层方向的尖端**，非 readout 层新生物；gate 双条款（readout dominance top1(kout)>top1(mid) + 近邻稳定性 ≥0.8）全过 ⇒ registered。
+
+**SMOKE 修正 ×2**（正式观察前，已记 prereg_correction）：(1) `inv(A)@b` → verbatim `solve(A,b)`——cond(A)~1e5 下 f32 inv 乘法放大出 0.0166 锚漂移；(2) **emergence-locality gate 条款被 SMOKE 证伪**（原预设「崩塌涌现于 readout 邻域」——实测 embedding 层即秩 1），替换为方向性条款（readout dominance + 近邻稳定性）。
+
+### 文档臂 (a)：APPX-6 定稿
+
+- **`gap_appendix_draft_v1_12.json`**（report-only，封存 v1.11 `5934631b` 未动）：APPX-6 =「保真收线链 3239–3250 + u\* 词汇解耦」，status `appendix_recorded`，anchor p3250/`9d0f1825`；预演 diff = appendix.append(APPX-6) + version 1.11→1.12，其余字节不变；**入册留待下一次 registry-append 触发点**。
+- **APPX-1..5 审计**：open ×3 + open_crossline ×2——5 appendix GPU 项维持挂账（含 checkpoint 轨迹 GPU 采样项，本 phase 已用零 GPU 层轨迹替代其科学问题的大部分）。
+
+**限界**：层轨迹 = last-token hidden states（pre-final-norm、logit-lens 前）；层 0 = embedding 输出（hidden_states[0]）；u\* 每层独立 SVD，无跨层正交化；checkpoint（训练步）维度仍需 GPU 采样，维持挂账。
+
+**完整性**：ledger #404（pre 文件 sha8 f57dd502）；产物 result.json + layer_trace.npz + gap_appendix_draft_v1_12.json + smoke 子目录；独立磁盘复核见 p3252_disk_verify。
+
+### 后续预注册 Phase 3253（候选）
+
+- (a) **U 形轨迹机制臂**（零 GPU）：中层跌落的方向内容——mid-network u\*(k) 与 embedding/readout u\* 的子空间关系（主角度谱），定位「分化-重聚焦」的几何载体；
+- (b) **registry append 触发点评估**：APPX-6 + 3240–3252 六个 characterization 累积是否满足 registry v1.33→v1.34 的 append 门槛（预演 diff，仍 report-only）；
+- (c) 5 appendix GPU 项维持挂账。
+
+## Phase 3253: G5-H16 u* 子空间机制臂（U 形主角度谱）+ registry append 触发点评估（零 GPU，双臂） [2026-10-20 11:54]
+
+**执行模式**：预注册自 3252 tail（(a) 科学臂 + (b) 评估臂）；freeze **`8b10eba4`**；res **`e19e2844`**；verdict **`ustar_subspace_registered`**（GATE 3/3）。**十二位级漂移全零**：drift69/89/90 ×3（kout 逐位）+ **drift_3252 ×3（top1 曲线与封存 3252 逐位相等——跨 phase 装置锚首次入链）**。registry v1.33 `a30215fd` 字节不动（append 预演 report-only）。
+
+### 核心发现（headline: 中层低谷 = 同一载轴的衰减，非替换）
+
+- **连续性**：σ₁(top-8 mid 基, top-8 readout 基) = **0.6283（4b）/ 0.7464（14b）/ 0.3352（glm4，最紧通过）**——readout 崩塌方向在低谷层仍部分在场；U 形轨迹是**沿一条连续载轴的幅度调制**，anti-class-mean 轴（3252 定谳 embedding 播种）经深度重新聚焦而非被替换。
+- **中-读出亲和**：σ₁(mid,out) > σ₁(mid,emb) ×3（0.628 vs 0.139 / 0.746 vs 0.177 / 0.335 vs 0.101）；子空间重叠 ovr 0.155/0.233/0.031 vs 0.005/0.007/0.003（**30–40×**）。
+- **embedding 解离定谳**：mid-emb 与 emb-out σ₁ 全部 ≤0.20——**embedding 层秩 1 方向（3252）并不是被输送到 readout 的方向**；载轴在 embedding 下游（重）形成。3251 词汇解耦 + 3252 embedding 秩 1 + 本 phase 载轴连续性合成完整 u* 几何图谱。
+
+**门条款（预注册，正式观察前钉定）**：continuity σ₁(mid,out)≥0.3 + affinity σ₁(mid,out)>σ₁(mid,emb)，3/3 全过（glm4 continuity 0.335 为最紧通过）；无 SMOKE 修正（SMOKE 一次通过）。
+
+### 评估臂 (b)：registry append 触发点 MET
+
+- **`registry_append_preview_v1_34.json`**（report-only，封存 v1.33 `a30215fd` / v1.11 `5934631b` 未动）：五判据全过——c1 收官 phase 14（3239–3252，门槛 ≥6）/ c2 APPX-6 draft `5934631b` / c3 无 blocked/failed verdict / c4 现役 XC_p5_b8 封存于 3250 / c5 registry sha 复核。
+- **预演 diff**：gap v1.11→v1.12（appendix.append(APPX-6)+版本号，GAP-1..5 与 APPX-1..5 字节不动）+ registry v1.33→v1.34（provenance.anchor_files 增 p3246/p3250/p3252(+p3253)；features/failures/证据分级**零语义改动**）。**决定：3254 收官时落册（append 落地点）**。
+
+**限界**：零 GPU；子空间基 = Qn(k) top-8 右奇异向量（R=8 预注册钉定）；k_mid = argmin top1 于 [1,kout]（L23/L28/L15）；σ₁ 为主角度余弦最大值（|cos| 口径）；5 appendix GPU 项维持挂账。
+
+**完整性**：ledger #405（pre 文件 sha8 c73cdc68）；产物 result.json + subspace.npz + registry_append_preview_v1_34.json + smoke 子目录；独立磁盘复核见 p3253_disk_verify。
+
+### 后续预注册 Phase 3254（候选）
+
+- (a) **registry append 落册臂**：执行 3253 预演 diff——gap v1.11→v1.12（APPX-6 入册）+ registry v1.33→v1.34（anchor_files 增补），append-only 字节纪律（legacy 字节保全断言 + 落册后全锚复核）；
+- (b) **落册后审计**：registry/gap 新旧版本 diff 逐字段断言（仅计划字段变动）+ ledger/registry/gap 三账一致性；
+- (c) 5 appendix GPU 项维持挂账。
+
+## Phase 3254: G5-H17 registry/gap append 落册（执行 3253 预演 diff）+ 落册后审计（零 GPU，文档落地点） [2026-10-20 22:41]
+
+**执行模式**：预注册自 3253 tail（(a) 落册臂 + (b) 审计臂）；执行 3253 `append_trigger_MET` 预演。freeze **`8be6ccad`**；res **`48ced87e`**；verdict **`registry_landed`**。**append-only 字节纪律全过**：writer（indent=1）对两封存前驱 round-trip 逐字节成立；**REVERT CHECK 逐位 ×2**（新对象撤回计划改动 == 封存前驱原始字节）；指针 diff == 计划集**精确相等**（gap 4 ptrs / registry 7 ptrs）。
+
+### 落地内容
+
+- **`gap_ledger_v1_12.json`**（文件 sha8 **`aa8cff21`**）：appendix 5→6——**APPX-6（保真收线链 3239–3250 + u\* 词汇解耦）入册**，逐字段取自 3252 冻结 draft 的 6 键 schema（anchor p3250/`9d0f1825` = 封存 3250 result 内容 sha）；version 1.11→1.12、updated→2026-10-20、supersedes 指针更新；GAP-1..5 与 APPX-1..5 字节不动。
+- **`atlas_registry_v1_34.json`**（文件 sha8 **`3deabf25`**）：provenance.anchor_files 24→28（p3246 `41b42d9b` / p3250 `f989ff42` / p3252 `d45c08e9` / p3253 `dc2ccd4a`，result.json **文件 sha** 口径——与 a1_behavioral_band `ac5d4d74` 同口径）；upgrade_log 12→13（append-landing 条目）；version 1.33→1.34；**features/failures/证据分级/principles/census_3238 零语义改动**（3239–3253 全为 characterization，无 E 级升级声明）。
+
+### 审计臂 (b)：三账一致性 6/6
+
+APPX-6 anchor == #404 冻结值 / registry p3253 anchor sha == 封存 3253 result 文件 sha / 封存 v1.11 `5934631b` + v1.33 `a30215fd` 落册后逐字节不变 / 版本号正确 / APPX-1..5 在 APPX-6 之前完好 / ledger 3246/3250/3252/3253 phase 在册。**SMOKE 装置修正 ×2**（DESIGN 不变，freeze 不动）：指针 diff 粒度归一化（list 追加为 LEN 级事件而非 [i] ADDED）+ 审计块同口径。
+
+**图谱状态**：G 线现役 registry **v1.34 `3deabf25`** + gap **v1.12 `aa8cff21`**（v1.33/v1.11 封存退役）。u\* 几何三部曲（3251 词汇解耦 / 3252 embedding 秩 1+层轨迹 / 3253 载轴连续性）与保真收线链 3239–3250 全部在册。
+
+**完整性**：ledger #406（pre 文件 sha8 cfec3cd8）；产物 gap_ledger_v1_12.json + atlas_registry_v1_34.json + result.json + smoke 子目录；独立磁盘复核见 p3254_disk_verify。
+
+### 后续预注册 Phase 3255（候选）
+
+- (a) **registry v1.34 客户端化臂**：/atlas/gaps 端点 + 前端展示升级到 v1.34/v1.12（APPX-6 附录卡 + anchor_files 升级链），UI 实机校验；
+- (b) **u\* 几何三部曲综合臂**（零 GPU 文档）：3189→3253 u\* 链收束成 MEMO 专节（几何图谱：embedding 播种-中层衰减-readout 重聚焦-词汇解耦）；
+- (c) 5 appendix GPU 项 + N 线施加 + 水果类/K4 处置维持挂账。
+
+## u* 几何图谱综论（3189→3253 链收束；3255 (b) 臂，零 GPU 文档）
+
+**链路**：3189 封存（readout OOV 残差场 top1=0.3065/0.2936/0.3008；类均值方向 v_c cos 0.72–0.85）→ 3190/3197 方向稳健性与**符号定谳**（anti-class-mean 对比轴）→ **3251 词汇解耦**（u* 与 10 类 first-token embedding 差分 |cos|≤0.144、随规模衰减 0.144→0.033→0.025、glm4 低于伪类 null；类结构由激活侧 v_c 承载）→ **3252 层轨迹**（embedding 层即秩 1 top1=1.0000×3；U 形：中层低谷 0.14–0.21 → readout 回升；近邻稳定 0.966/0.971/0.926）→ **3253 子空间机制**（σ₁(mid,out)=0.628/0.746/0.335——低谷=同一载轴衰减非替换；embedding 秩 1 方向与被输送方向解离 σ₁≤0.20）。
+
+**合成定谳：双轨道几何。**OOV 崩塌几何含两条从 embedding 输出同点出发但随即分离的轨道：
+
+- **轨道 I（embedding 秩 1 方向）**：embedding 几何的即时产物，中层前消散，**不达 readout**（mid-emb / emb-out σ₁ 全 ≤0.20）——它是 embedding 表几何的指纹，不是崩塌面板的载体；
+- **轨道 II（载轴 carrier）**：中层成形（低谷层即与 readout 深度亲和 σ₁ 0.34–0.75）、深层重聚焦、readout 处支配崩塌面板——**anti-class-mean 轴沿此轴经深度幅度调制重聚焦**。
+
+**词汇侧两轨皆不可及**（3251）：OOV 保真转正的信息缺口（3246 INFORMATION_GAP，剩余 −0.53）**无法从词表 embedding 侧补足**。协议内唯一杠杆 = 激活侧类均值 v_c 注入族；其行为效力边界由 D 线 E3 干预链（3225–3232→F20）钉定：**读出几何≠行为控制**。因此声明体制内 −0.449（XC_p5_b8，修复 74%）即信息论意义上可达的收线终点，除非引入偏移型新机制类别或越出泄漏声明界（3246 oracle 上界 +0.329）。
+
+**证据级**：全链 E2（cross_model + held-out：3 模型指纹一致 + 3246 oracle 预测）；u* 链各代均有 bitwise 锚（3253 起含跨 phase drift_3252 装置锚）。**限界**：last-token hidden states（pre-final-norm）；R=8 基；无跨层正交化。
+
+
+## Phase 3255: G5-H18 registry v1.34 客户端化（/atlas/gaps appendix + GAP 账本面板实机 17/17）+ u\* 几何三部曲综合（零 GPU，工程+文档双臂） [2026-10-20 22:52]
+
+**执行模式**：预注册自 3254 tail（(a) 工程臂 + (b) 文档臂）；freeze **`1d19fc3d`**；res **`ac6bd1d9`**；verdict **`client_synthesis_registered`**。封存 v1.34 `3deabf25` / v1.12 `aa8cff21` 字节不动。
+
+### 工程臂 (a)：registry v1.34 客户端化（实机验证）
+
+- **端点**：/atlas/gaps 响应增 `appendix` 字段——glob 自动发现已拾取 v1.12（**版本链 12 代** 1.12→1.1），GAP-1..5 状态原样；端点直调断言通过（APPX-6 anchor p3250/`9d0f1825` 逐字）。
+- **前端**：新组件 **`GapLedgerPanel.jsx`**（协议键驱动：id/title/status/note/anchor/anchor_sha8，零实验字面量；缺口状态行 + APPX-1..6 附录卡，APPX-6 描边为最新）挂入 AtlasLens 全景；registry 版本链 select 陈旧 v1.28 文案退役（改为 3254 现役 v1.34 标注）。
+- **实机校验**：playwright 实机 **17/17 PASS、零控制台错误**（面板标题/LIVE/v1.12/文件名/supersedes/GAP-1..5 状态/APPX-1..6 卡/APPX-6 锚/sha8/收线链标题/XC_p5_b8/74%/陈旧文案清除）。SMOKE 装置修正 ×1：面板断言键取协议键 `status` 而非字面值。
+
+### 文档臂 (b)：u\* 几何图谱综论（MEMO 专节已附）
+
+**双轨道几何定谳**：轨道 I（embedding 秩 1 方向，中层前消散、不达 readout）与轨道 II（载轴：中层成形→深层重聚焦→readout 支配崩塌面板）。**词汇侧两轨皆不可及**（3251）⇒ 3246 INFORMATION_GAP 无法从词表侧补足；**XC_p5_b8 −0.449（修复 74%）即声明体制内信息论收线终点**；协议内唯一杠杆 = 激活侧 v_c 注入族，受 F20（读出几何≠行为控制）钉界。
+
+**限界**：零 GPU；封存文件不动；5 appendix GPU 项 + N 线施加维持挂账。
+
+**完整性**：ledger #407（pre 文件 sha8 447191b2）；产物 result.json + smoke 子目录；工程产物 server/ai_rnd_service.py + GapLedgerPanel.jsx + AtlasLens.jsx + rdc_fusion.css；独立磁盘复核见 p3255_disk_verify。
+
+### 后续预注册 Phase 3256（候选）
+
+- (a) **收线终点封章臂**（零 GPU）：把「3239–3255 保真+u\* 全链」写成一页式收线总结（oracle 上界/现役/双轨几何/F20 边界四件套），同步 registry v1.34 升级日志注记（append-only）；
+- (b) **N 线施加准备臂**：G 线收线包（registry v1.34 + gap v1.12 + 综论）作为跨线施加输入的清单化（文件/sha/依赖拓扑）；
+- (c) 5 appendix GPU 项维持挂账。
+
+## Phase 3256: G5-H19 收线终点封章（一页式收线总结 + registry v1.35 upgrade_log 封章注记）+ N 线施加准备（收线包清单化，零 GPU） [2026-10-20 23:04]
+
+**执行模式**：预注册自 3255 tail（(a) 封章臂 + (b) N 线施加准备臂）；freeze **`5061e1e8`**（SMOKE `52324280`）；res **`01393c60`**；verdict **`closure_sealed_registered`**。封存 v1.34 `3deabf25` / v1.12 `aa8cff21` 字节不动。
+
+### 封章臂 (a)：3239–3255 收线链 CLOSED in-regime
+
+- **四件套**（全部运行时实测自封存盘面，禁凭记忆）：起点 G0 SCLS **−1.751489**（3246 aggregate）；合法上界 ORC_ls_full SCLS **+0.329005**（3246，min(scls,ent) 同值）；现役 **XC_p5_b8**（3250）SCLS **−0.449039** / r2_oov 0.241094 / KL 0.986462，修复率（相对零目标）**74.36%**，剩余 +0.449039 = INFORMATION_GAP；边界 F20（读出几何≠行为控制）+ u\* 双轨道几何（词汇侧不可达）。
+- **registry v1.35**（文件 sha8 `e8335331`）：仅 version/supersedes/upgrade_log +1 封章注记；指针 diff 精确（3 ptrs：version/supersedes/upgrade_log LEN）+ **revert 逐位 == v1.34 原始字节**；features/failures/anchors 零改动。SMOKE 装置修正：ptr 归一化（LEN 级 list 事件、`$.` 前缀）；v1.34 链无 `updated` 键 → 计划集 4→3 ptrs（DESIGN 于 SMOKE 修正，正式 freeze 重做）；3251 目录名 `g5h14_ustar_lexical_attribution`。
+- **一页式总结**：`closure_summary_3239_3255.md`（14 收官 phase 链条逐条）。
+
+### N 线施加准备臂 (b)：收线包清单
+
+- **`nline_handoff_manifest.json`**：封存产物全 sha8 实测（registry v1.35/v1.34、gap v1.12、ledger #408）、closure facts、u\* 三部曲 res sha8、F20/INFORMATION_GAP 边界、GPU 挂账（checkpoint 训练步轨迹 + APPX-1..5 GPU 项）、apply-protocol（N 线自 append 条目，封存文件永不改写）。
+
+**限界**：零 GPU；封存文件不动；GPU 项维持挂账。
+
+**完整性**：ledger #408（pre 文件 sha8 12486be0）；产物 result.json + design.json + smoke 子目录；独立磁盘复核见 p3256_disk_verify。
+
+### 后续预注册 Phase 3257（候选）
+
+- (a) **G 线收官核验臂**（零 GPU）：v1.35 客户端可见性复核（/atlas/registry 版本链自动发现 + UI）+ 账本/registry/gap 三账一致性终审；
+- (b) **N 线施加预演臂**：按 manifest 在 N 线侧做 read-only 施加预演（不写 G 线封存）；
+- (c) GPU 挂账维持。
+
+## Phase 3257: G5-H20 G 线收官核验（v1.35 客户端可见性实机 + 三账磁盘终审）+ N 线施加预演（read-only，零 GPU） [2026-10-21 01:34]
+
+**执行模式**：预注册自 3256 tail（(a) 收官核验臂 + (b) N 线预演臂）；freeze **`c2390c7f`**（SMOKE `cc1590c9`）；res **`961a9e97`**；verdict **`final_audit_passed`**。封存 v1.34 `3deabf25` / v1.12 `aa8cff21` / v1.35 `e8335331` 字节不动。
+
+### 收官核验臂 (a)：客户端可见性 + 三账终审
+
+- **端点实机 14 断言全过**（result.json live_checks 标签 "15/15" 为笔误，实测 14 断言——勘误）：/atlas/registry 默认 **v1.35**、版本链 1.35..1.1（**35 代**）、upgrade_log n=14 封章注记在尾；v1.34 可回溯（n_upgrades=13）；/atlas/gaps v1.12 回归（appendix 6、APPX-6 anchor p3250/`9d0f1825` 逐字）；三账交叉（ledger #408 tail + registry seal 现役引用 + 计数一致）。断言修正 ×1：seal 注记引用 0.7436（四位小数）而非 74.36。
+- **UI 实机 11/11 零控制台错误**：AtlasLens select 35 options（链头 v1.1 精确 value 匹配）、默认 v1.35、切换 1.34↔1.35 往返（计数 13/14 正确）、GAP 面板回归无扰。断言笔误修正 ×1（v1.1 判断恒 false）。
+- **磁盘终审**：registry v1.35 provenance.anchor_files **28/28 sha8 实测匹配**；gap v1.12 appendix 锚按**显式口径表**逐一复核 6/6（APPX-1/2 result.json 文件 sha、APPX-3 summary 文件 sha、APPX-4/5 跨线 agate `a_gate_closure_v1.json` 24c60160（deepseek atlas）、APPX-6 res_sha8 `9d0f1825`——历史口径混合可溯源至 3207 recheck + 3254 落册审计）；ledger #408 自 b411f7ef recompute OK。
+
+### N 线施加预演臂 (b)：read-only 五步预演
+
+- manifest sha8 独立重验（0 bad；ledger 快照 408/`5601b3f5` ok）→ **`apply_preview.json`**：① N 线自读 manifest（无 G 线路径耦合）② sha8 自验 ③ closure facts 作共享先验**不作 N 线证据** ④ N 线自 append 条目、永不改写 G 线封存 ⑤ 证据级不可跨线转移（E 级从 N 线自己的 E0 起算）。**全程零写入 G 线文件**。
+
+**限界**：零 GPU；封存文件不动；GPU 挂账（checkpoint 训练步轨迹 + APPX-1..5 GPU 项）维持。
+
+**完整性**：ledger #409（pre 文件 sha8 8831998d）；产物 result.json + apply_preview.json + design.json + smoke 子目录；独立磁盘复核见 p3257_disk_verify。
+
+## Phase 3258: G5-H21 N-line apply (sealed backfill draft f29da2de -> shared ledger, append-only) + lcorr disposition (zero GPU) [2026-10-21]
+**执行模式**：预注册自 3257 tail（挂账择序：N 线施加臂，readiness ready_append_type per 3218 + 用户续研授权 3257 tail 宣告）；freeze **`db2255eb`**（SMOKE `ae1e34cd`，装置修正×2 不动 DESIGN 语义）；res **`ab5215e5`**；verdict **`nline_apply_registered`**（GATE 6/6）。
+
+### 施加臂 (a)：N 线补账草案落共享账本（append-only）
+- **草案** `n_line_backfill_draft_v1.json`（phase3208 g5g7 封存 `f29da2de`，status draft_pending_cross_line，target `#measurements (append 5)`）**字节不动**（施加前后断言相等）。
+- **五条落账**：N-P3 `e2_conditioned_compare_layer_scan` / N-P4 `n1_main_axis_layer_scan` / N-P5 `n2_reconstruction_source` / N-P6 `n2h1_permutation_ablation` / N-P7 `n3_device_transfer`——草案字段逐字（name/phase/sources/status/title）+ 登记溯源块（applied_by_phase 3258 / draft sha8 / governance「只补不改」）；evidence_level=descriptive（跨线补记，**证据级不跨线转移** per apply_preview step 5，N 线自 E0 起算）；字符串 phase `N-P*` 为草案注册命名空间（账本历史混合 schema，lcorr C6 同观察）。
+- **账本** n 409→414，post `15875b87`→**`a59da52b`**（链式 recompute 通过）；指针 diff 精确 {$.measurements, $.ledger_sha256_8}；**revert 逐位 == 前驱原始字节**；备份 `.bak_3258`。
+
+### lcorr 处置臂 (b)：STALE_AS_SEALED（report-only，deepseek 零写入）
+- `ledger_corrections_v1.json`（`beb775bd`，2026-10-03 seal）4 操作全部对 n=304 旧账计算：target_sha256_before 失配现文件；op1 from `41d65a13` 过期；op2 n_total 304 过期（meas_id 计数 270==270 系巧合——#304 后条目均不带 meas_id，降级 INFO）；op3 枚举 [bit_anchored/statistical/descriptive] 被现实 55 值 evidence_level 实践超越；op4 A-gate 登记不在账（非冗余但须重推导，不可逐字施加）。**不施加**；挂账改为「lcorr 重推导（基于现账状态）」。
+
+### 诚实日志
+SMOKE 装置修正 ×2（DESIGN 不变、freeze 不动）：① 链计算原在指针 diff 之后执行（SMOKE 下 sha 字段无 diff）→ 移至 diff 前；② op2 meas_id 巧合相等 → 降级信息项不入 gate 合取。
+
+### 预注册 Phase 3259（两支候选）
+- (a) **施加后一致性核验臂**（零 GPU）：三账（ledger/registry/gap）+ 客户端 /atlas/registry 对 5 条 N-P 条目可见性复读 + N 线侧（deepseek MEMO）回执注记。
+- (b) **lcorr 重推导臂**（零 GPU）：基于现账 n=415 重新推导 4 操作的等价修正（重推导稿 report-only，施加仍待确认）。
+- 默认执行 (a)。
+
+## Phase 3259: G5-H22 施加后一致性核验（三账+客户端实机）+ deepseek MEMO 回执（零 GPU） [2026-10-21]
+**执行模式**：预注册自 3258 tail 默认臂 (a)；freeze **`3de50b8d`**（SMOKE `49925445`）；res **`f79e477d`**；verdict **`postapply_consistency_confirmed`**（GATE 5/5）。
+
+### 核验臂 (a)：3258 施加事后全链复读
+- **账本**：n=415 post `8de77a63` 链式 recompute（自 prev `a59da52b`）OK；N-P3..N-P7 五条与封存草案 `f29da2de` 逐字一致（name/phase/sources/status/title + backfill 溯源）；#410 恰一次。
+- **封存集字节不动**：registry v1.35 `e8335331` / v1.34 `3deabf25` / gap v1.12 `aa8cff21` / 草案 `f29da2de` / lcorr `beb775bd` 五文件 sha8 实测全匹配。
+- **客户端实机 11 断言全过**：/atlas/ledger total=415、line=N 恰 5 条（N-P7..N-P3 最新在前、name 逐字、prereg_id 引 f29da2de、evidence_level descriptive）、head 顶 = #410；/atlas/registry v1.35 + /atlas/gaps v1.12 appendix 6 无扰；line=G 不受扰。
+
+### 回执臂 (b)：deepseek MEMO 回执（append-only）
+AGI_DEEPSEEK_MEMO.md 尾部追加「跨线施加回执（G 线 Phase 3258）」：挂账「N 线 P3–P7 补 Ledger」**结清**；「跨线账本补丁施加确认」更新为 lcorr `beb775bd` **STALE_AS_SEALED**（3258 实测），挂账改「lcorr 重推导（基于现账状态）」，施加仍待确认。本线封存文件零改动。
+
+### 诚实日志
+SMOKE 装置修正 ×2（DESIGN 不变、freeze 不动）：① PASS 计数按行首统计（摘要行「11 PASS」被重复计入）；② 回执 gate 于 SMOKE 下置 None（写臂延迟到 formal）。
+
+### 预注册 Phase 3260（两支候选）
+- (a) **lcorr 重推导臂**（零 GPU report-only）：基于现账 n=416 重推导 4 操作等价修正稿（report-only，施加待确认）。
+- (b) **G 线挂账盘点 + 水果类/K4 用户确认提案**：挂账清单 v3 + 待确认项一页式说明（供用户决策）。
+- 默认执行 (a)。
+
+## Phase 3260 (G5-H23): lcorr re-derivation (report-only) + backlog v3
+
+- **verdict `lcorr_rederivation_registered`（GATE 5/5，零 GPU，零写入共享账本/deepseek）**。
+- **Arm (a) 重推导**：对现账 n=416 post `7b6e6230` 重推封存补丁 `beb775bd` 的 4 操作——op1 **OBSOLETE_SUPERSEDED**（链式约定取代一次性 set_field，g1 recompute 通过）；op2 **REQUIRES_DESTRUCTIVE_MIGRATION**（meas_id 270 / phase 311 / both 165；字节锚定历史不可改写，建议以文档约定取代迁移）；op3 **SUPERSEDED_BY_PRACTICE**（evidence_level 55+ 值实践、statistical 310/416，三值枚举不可表达治理/report 臂——后继动作为 F2_verdict_grading 规范化重判定，入挂账 v3）；op4 **READY_PENDING_CONFIRMATION**（A-gate 治理登记仍不在账，closure record `a_gate_closure_v1.json` 复核，施加待用户/所有者确认，协议同 3258 append-only 先例）。产物 `lcorr_rederivation_v2.json`（REPORT_ONLY_DRAFT）。
+- **Arm (b) 挂账清单 v3 + 用户提案**：closed_since_v2 ×2（N 线施加 3258/3259；lcorr 重推导 3260）；open_gpu ×3（checkpoint 轨迹 / APPX-1..5 / evidence_level 规范化）；pending_user_confirmation ×2（水果类/K4 MEMO 列表删除；lcorr v2 施加）。一页式提案 `user_confirmation_proposal.md`。
+- **零写入断言**：共享账本、lcorr、deepseek MEMO 三文件 sha8 前后相等（g5）；lcorr 封存字节不动（g2）。
+- ledger #412 / freeze **`f962faf0`**（SMOKE `918d5816`）/ res **`209fe48d`**。
+- **3261 已预注册**：等待用户对两项确认提案的裁决（水果类/K4 删除、lcorr op4 施加）；GPU 挂账维持；无默认新臂。
+
+## Phase 3261 (G5-H24): evidence_level normalization re-grading (report-only) + GPU feasibility [2026-10-21]
+
+- **verdict `evidence_regrading_registered`（GATE 5/5，零 GPU，零写入账本）**。
+- **Arm (a) 重判定**：全 417 条对封存 F2_verdict_grading 三级规则（phase3150 逐字锚定）重判定——**statistical 314 / GOVERNANCE 73 / bit_anchored 14 / AMBIGUOUS 16**（歧义标记待人工复核）；55+ 自由文本值全映射；triad 内恒等映射；GOVERNANCE 为第 4 类非证据级（治理/工程/report 记录，零下游前提权重）。产物 `evidence_regrading_draft_v1.json`（REPORT_ONLY_DRAFT）——**施加＝破坏性迁移（3260 op2 处置），需显式确认；建议以映射文档取代改写**。
+- **Arm (b) GPU 可行性**：RTX 5080 16GB 在位 **且 managed venv torch 已安装**——GPU 挂账项（checkpoint 训练步轨迹、APPX-1..5）环境可行；本 phase 零环境变更，启动与否待预注册协议设计。
+- ledger #413 / freeze **`d8364fd8`**（SMOKE `cd5d8712`）/ res **`dc6c1518`**。
+- **3262 已预注册**：(a) GPU 臂启动评估（checkpoint 在位性核查 + checkpoint 训练步轨迹预注册协议设计；APPX-1..5 逐项协议草案）——环境障碍已排除，剩余为协议与算时决策；(b) 两项用户确认提案（水果类/K4 删除、lcorr op4 施加）继续待裁决。
+
+## Phase 3262 (G5-H25): GPU arm readiness — checkpoint 在位性核查 + 预注册协议草案（report-only）[2026-10-21]
+
+- **verdict `gpu_arm_readiness_registered`（GATE 6/6，零 GPU，零写入账本）**。
+- **Arm (a) 在位性核查**：qwen3-1.7b 移植归档（phase2755/qwen25_3b）**FULLY_IN_PLACE——6 runs × 4 步（001/008/032/128）= 24 个 delta npz 全 sha8 实测（2.427 GB）+ qwen3-1.7b 模型/索引/双 shard 在盘**；qwen3-4b 原生 fields/delta npz 实体指向 `C:\AI2050-RDC-Archive`——**本机不存在（OFF_MACHINE）**，本地仅 JSON manifest（field_sha256+shapes）；2748 本地 checkpoint96 仅终态 step-96 ⇒ 4b 原生中间步轨迹本机不可恢复。torch 探测口径修正：managed python 3.11.9 torch 2.11.0+cu128 CUDA True（RTX 5080）——3261 note「torch env missing」系探测口径误报，封存 3261 文件不动。恢复规则逐字锚定 phase2755 源（sha8 `a2f3b950`）：**W_t = W_base + delta_t + residual_t 位精确（np.array_equal）**，STEPS=128。
+- **Arm (b) 协议草案**（PREREGISTERED_DRAFT，零执行）：**P-TRAJ → 执行相 3263**（25 态 = base + 6×4，位精确恢复+复基底断言，tokenizer per-row gate，采样 last-token 全层 hidden；预注册读数 **R1 形成时点**（载轴支配 ovr 带于何训练步出现）、**R2 轨道 I 稳定性**（embedding 秩1 对齐随步稳定假说）、**R3 行为对齐**（2755 behavior_scores B1 6/6）；成本 RTX 5080 上远低于 1h）；APPX-1（14b 需 nf4 量化，可接受性待决）、APPX-2（逐模型词表重建，可行）、APPX-3（K2/K3 直接测量，可行）；APPX-4/5 = 跨线治理非 GPU，维持待确认。
+- 产物：`checkpoint_presence_audit_v1.json`（`9bbc3664`）/ `gpu_trajectory_protocol_draft_v1.json`（`b569ce24`）。
+- ledger #414 / freeze **`5c311013`**（SMOKE `5243fb82`）/ res **`acf1b81c`**。
+- **3263 已预注册**：(a) **P-TRAJ 正式执行**（GPU 轨迹臂首发：25 态采样 + R1/R2/R3 读数 + bit-exact restore 断言，五段式照常）；(b) APPX-1 量化口径裁决与 APPX-2/3 执行排序待定；(c) 两项用户确认提案（水果类/K4 删除、lcorr op4 施加）继续待裁决——「继续」不构成批准。
+
+## Phase 3263 (G5-H26): P-TRAJ 训练步轨迹执行——u* 双轨道几何为预训练属性 （G 线首次 GPU 测量）[2026-10-21]
+
+- **verdict `p_traj_executed`（GATE 7/7，25/25 态采样，G 线首个 GPU 相）**。freeze **`bdcd77ef`**（SMOKE `27fd3d74`）/ res **`f0f95c27`**；ledger #415。
+- **装置**：qwen3-1.7b（models/hf 在盘），block layers[16].mlp（37,748,736 参数）；按 3262 封存协议 b569ce24：**25 态 = base + 6 runs × 4 步（1/8/32/128）**，位精确恢复 W_t = W_base + delta_t + residual_t（fp32 参数空间、2755 FP32-block bridge 先例——现行 torch 下混精度须桥接前向，SMOKE 修正×1）；逐态 batch=1 bf16 收集（3169 逐字惯例，NH=29 层 last-token，fp16 存储，缓存 193MB ×25 可续跑）；u* 链逐字沿用 3190/3252/3253（ridge 1e-3、3 seeds、876 OOV 残差行、SVD top-8）；tokenizer 门全过（D2 类词首 token 唯一 + 尾 token『。』2190/2190）；24 delta sha8 全复验；**位精确复原 + base 复采逐位相等（g6）**。
+- **R1 = MIXED（0/6 runs 达带）**：支配比 D = ovr(mid,out)/ovr(mid,emb) 从 base 16.60 全程 16.1–17.2 无一达到 3253 的 30–40× 带（该带系 4b/14b/glm4 跨模型观测，随模型规模而异，非训练成形——6 runs 任意步均未入带，预注册处置=characterization either way）。
+- **R2 = TRACK1_STABLE（headline）**：**全部 25 态 layer0 top1 = 1.0000 且 cos(u*_emb, base) = 1.0000**——embedding 秩 1 轨道（轨道 I）对微调完全不变；u*_kout 方向 cos ≥ 0.9696（25 态 min），k_mid=16 恒定。**双轨道几何（3255 综论）在训练步维度既不形成也不改变——均为预训练属性**；唯一显著偏移 wscp_2748@128 （top1[kout] 0.6109 / cos_out 0.9696），恰为行为增益最大 run（improvement 5.49）。
+- **R3（n=6 特征化）**：spearman(D128, improvement) = −0.43；spearman(σ1_mid_out@128, improvement) = +0.49——读数与行为增益方向一致但 n=6 不设门。
+- 产物：result.json + trajectory.npz（25×top1 曲线 + u*_kout/emb 向量）+ collect 缓存 ×25。零写入账本（g7）。
+- **3264 已预注册**：(a) 轨迹二阶展开臂（report-only，零 GPU）——per-step top1/D 曲线的定量刻画 + wscp_2748@128 偏移个案归因 + R1 带的模型规模依赖性注记（APPX-7 候选评估）；(b) 两项用户确认提案（水果类/K4 删除、lcorr op4 施加）继续待裁决——「继续」不构成批准。
+
+## Phase 3264 (G5-H27): 轨迹二阶展开——wscp 相变为突变 + readout 侧定域；APPX-7 候选（D 规模律）[2026-10-21]
+
+- **verdict `traj_second_order_registered`（GATE 8/8，report-only 零 GPU 零模型加载）**。freeze **`1c734572`** / res **`f223a9a0`**；ledger #416。仅读 3263 产物（result f0f95c27 + trajectory.npz 75 arrays）。
+- **Arm A per-step 曲线**：4/6 runs 单调平稳（D 全程 16.57–16.93、kout_top1 微升 ≤0.024、cos ≥ 0.9993）；**2/6 wscp runs 双相**——D 先升至 s32 峰值（17.20/17.28，+4%），s128 反落（15.98/16.06）且 kout_top1 跳升 +36–37%（0.445→0.606/0.611）——跳变集中于单步 s32→s128，非渐进。
+- **Arm B wscp_2748@128 个案归因**：逐层 diff 剖面**层 0–16 逐位零**（embedding+载轴段与 base 完全相同），偏移全部定域 readout 侧段（≥17，max 0.1947@L28）；u*_kout 角漂**突变**（s1→s32 cos ≥ 0.99952，s32→s128 单步降至 0.96959）；轨道 I 不变量独立复断言全过（24 态 mid_emb σ₁ 逐位 == base、layer0 top1 = 1.0、cos_emb = 1.0）；2747/2748 孪生同型复现；wscp 双 run 恰为行为增益 top-2（5.41/5.49，n=6 无门）。
+- **Arm C APPX-7 候选草案**：D 具规模依赖——1.7b 全程带 15.98–17.28（24 态 0 入带 vs 3253 跨模型 30–40× 带）；u* 几何规模+训练双不变 → **轨道 I 与 D 解离**。落册需独立 registry 相（3264 不落）。
+- 产物：trajectory_second_order_v1.json（8d1a7b09）。零写入账本（g8）；3263 封存不动。
+- **3265 已预注册**：(a) APPX-7 registry 落册评估臂（若用户批准）或转其他挂账；(b) 两项用户确认提案（水果类/K4 删除、lcorr op4 施加）+ APPX-1 量化口径 继续待裁决——「继续」不构成批准。
+
+## Phase 3265 (G5-H28): APPX-7 落册——gap v1.12→v1.13 + registry v1.35→v1.36 （支配比规模律与 u* 几何解离）[2026-10-21]
+
+- **verdict `appx7_landed`（GATE 6/6）**。freeze **`84fd1381`** / res **`18437872`**；ledger #417。落册文件：**gap_ledger_v1_13.json `814ce808`**（appendix 6→7）+ **atlas_registry_v1_36.json `78d37211`**（upgrade_log 14→15，anchors 28 不变）。
+- **评估臂全过**：q1 LAND（statistical，与 APPX-6 落册先例同级——3263 GATE 7/7 GPU 测量 + 3264 GATE 8/8 独立复核）；q2 锚完备（p3263 f0f95c27 / p3264 f223a9a0 / 产物 8d1a7b09 在盘实测）；q3 无冲突（新增规模维度，不改 APPX-1..6 任何断言；APPX-6 挂账族 checkpoint 轨迹采样由此 RESOLVED）；q4 链 CLEAN。
+- **APPX-7 条目**：锚 p3263+p3264（anchor_sha8 f223a9a0）；核心——轨道 I 逐位不变×24 态 / D 规模依赖（1.7b 带 15.98–17.28，0/24 入 3253 跨模型 30–40× 带）/ wscp 相变突变 + readout 侧定域（层 0–16 逐位零）；后续 GPU 挂账（可选）：跨规模 D 采样（qwen2.5-3b/7b）标定规模律曲线，不阻塞收线。
+- **纪律**：REVERT 逐位 ×2（重建→aa8cff21 / e8335331）；gaps/features/failures/census/taxonomy 指针级零改动（g5）；封存 v1.12/v1.35 字节不动；registry 链不加 `updated` 键（3256 SMOKE 教训内化）；SMOKE 拦截 note 字符串括号缺失 ×1。
+- **3266 已预注册**：(a) 收线整合臂——registry v1.36 客户端可见性核查 + 端点 /atlas/gaps appendix 实机复读 + N 线 handoff manifest 增补 v1.13 指针（report-only）；(b) 三项用户确认提案（水果类/K4、lcorr op4、APPX-1 量化口径）继续待裁决。
+
+## Phase 3266 (G5-H29): 收线整合——v1.36/v1.13 客户端可见性实机复读 + N 线 handoff manifest v2 [2026-10-21]
+
+- **verdict `closure_integration_registered`（GATE 6/6，report-only）**。freeze **`6cc272b4`** / res **`d6b15de7`**；ledger #418。manifest v2 **`57531ec3`**（v1 bc212d52 封存不动）。
+- **Arm a /atlas/gaps 实机**（协程直调，3255 先例口径）：**v1.13 可见**——appendix 7、APPX-7 锚 p3263+p3264/f223a9a0、链头 [1.13, 1.12, 1.11]、gaps-5 回归不变。
+- **Arm b /atlas/registry 实机**：**v1.36 可见**——upgrade_log 15（尾条 phase 3265 APPX-7 注记）、v1.35 仍可解析（14 条，回归）。
+- **Arm c manifest v2**（nline_handoff_v2）：快照刷新至 registry v1.36 / gap v1.13（appendix 7）/ ledger #417（n=422, ec34b29b）；gpu_backlog 更新——**P-TRAJ RESOLVED（3263/3264）**、APPX-7 后续跨规模 D 采样 OPTIONAL 不阻塞、APPX-1..3 维持（APPX-1 量化待决）；u_star_trilogy 3→6（+3263/3264/3265）；boundary/apply_protocol 沿 v1 逐字。
+- 零账本写入（g6）；封存三元组（manifest v1/gap v1.12/registry v1.35）字节不动（g2）。
+- **3267 已预注册**：(a) 待裁决项处置臂——若用户批准水果类/K4 删除则执行 MEMO 挂账勘误（append-only 注记）；lcorr op4 与 APPX-1 量化口径须用户显式批准方可动；(b) 否则转 GPU 可行项（APPX-2/3 协议细化）或收线待命。
+
+## Phase 3267 (G5-H30): APPX-2/3 协议细化（report-only）
+
+- **verdict**: `appx23_protocol_v2_registered`（GATE 6/6，零 GPU、零模型加载、零账本写入）。
+- **背景**：3266 预注册——三项 pending_user_confirmation（水果类/K4 删除、lcorr op4 施加、APPX-1 量化口径）不因「继续」批准 → 转入协议细化臂。
+- **Arm a（APPX-2 → 协议 v2）**：S_attr/S_syntax 跨模型移植细化为可执行四步——S1 逐模型词表坐标重建（p2874/p2878 构造规则逐字沿用；**F7 教训内化：轴向量必须随产物持久化**）、S2 K_entity_eff_ge05 profile 门、S3 p3165 对齐判决机制逐字（weakly_separated 门、三判决对）、S4 跨模型综合；落册仅经独立 registry 相。5 候选模型（qwen2.5-3b / qwen2-7b / ds-7b / glm4-9b / gemma-3-4b）tokenizer+config+weights 在盘实测全过。
+- **Arm b（APPX-3 → 协议 v2）**：K2/K3 直接测量协议细化，死线判据**从磁盘逐字冻结**（deepseek MEMO P35 线三死线表，内容锚非行号）：**K2** = φ_ℓ(c)⊥W_ℓ 分离后响应 cos 降 >50% 而行为不掉 → 弃条件门；**K3** = 3 模式族单坐标 top-50 覆盖率均 <30% → 弃单坐标机制；K1 对照（MEASURED_REJECTED，E_read=0.3733=门 7.5×）。关键口径澄清：p3155 交互份额带 15.2–18.3% 是 **proxy 非 criterion**（份额 <50% 暗示可分离但不检验「行为不掉」半边）。
+- **Arm c（待裁决盘点）**：三项 pending 状态不变；APPX-1 语境事实记录（Qwen3-14B 与 Qwen3-14B-bnb-nf4 均在盘，状态不动）。
+- 产物 `appx23_protocol_v2.json`（sha8 `ce73984d`，PREREGISTERED_DRAFT_V2，supersedes 3262 草案对应两节）；anchors 6 项实测在盘。freeze `05235373` / res `5519514c` / ledger #419 post `6f2a9170`（n=424）。
+- **预注册 3268**：收线待命臂（report-only 现役快照复核）或 APPX-2/3 执行相（需用户点名启动；协议已备）。
+
+## Phase 3268 (G5-H31): 收线待命快照（report-only）
+
+- **verdict**: `closure_standby_registered`（GATE 6/6，零 GPU、零账本测量写入）。
+- **Arm a（现役三账 + 端点实机）**：gap v1.13（`814ce808`，appendix 7）/ registry v1.36（`78d37211`，upgrade_log 15，anchors 28）/ ledger #419（n=424，post `6f2a9170`，尾条 3267）；`atlas_gaps`/`atlas_registry` 协程直调实机可见（链头 [1.13,1.12,1.11] / [1.36,1.35,…] 均可解析）。
+- **Arm b（收线包完整性）**：closure_summary_3239_3255.md 在盘；N 线 manifest v2（`57531ec3`）+ v1 封存字节（`bc212d52`）不动；**APPX-1..7 status 矩阵实测==声明 7/7**（1/2/3 open、4/5 open_crossline、6/7 recorded）。
+- **Arm c（STANDBY 声明）**：五项须所有者显式批准——水果类/K4 删除、lcorr op4 施加、APPX-1 量化口径、APPX-2/3 执行相（协议已备 `ce73984d`）、APPX-4/5 治理动作；无 auto-resume（「继续」只执行默认 report-only 快照臂）。
+- 产物 `standby_snapshot_v1.json`（sha8 `48308482`）；freeze `bf5a0dfb` / res `1f6d94b0` / ledger #420 post `b7407287`（n=425）。链头重算（g5）通过。
+- **后续**：项目转入 STANDBY——无预注册执行相；下一 phase 由用户指令触发（批准任一待决项，或点名 APPX-2/3 执行相）。
+
+## Phase 3269 (G5-H32): 待命期复核（report-only 轻量刷新）
+
+- **verdict**: `standby_refresh_registered`（GATE 6/6，零 GPU、零账本测量写入）。
+- **结论：STANDBY_CONFIRMED**——待命窗口内无任何移动：gap v1.13（`814ce808`）/ registry v1.36（`78d37211`）与 3268 快照**字节一致**；ledger n=425 post `b7407287` 尾条 3268（快照后仅本线 closeout #420，**concurrent_append_detected=False**）；端点实机可见（gaps 1.13 appendix 7 / registry 1.36 upgrade_log 15）；manifest v1/v2 + APPX-1..7 矩阵不变；5 项所有者批准事项不变。
+- 产物 `standby_refresh_v1.json`（sha8 `0013779e`）；freeze `12d5491d` / res `820201b2` / ledger #421 post `9ce29f05`（n=426）。
+- **后续**：维持 STANDBY。再次「继续」将继续执行同类轻量刷新臂；实质性推进须所有者指令（批准待决项 / 点名 APPX-2/3 执行相 / 新方向）。
+
+## Phase 3270 (G5-H33): 所有者状态综合报告（report-only）
+
+- **verdict**: `owner_report_registered`（GATE 6/6，零 GPU、零账本测量写入）。
+- **交付**：`research/gpt5/docs/OWNER_STATUS_REPORT.md`（sha8 `b6039d3e`，13.3k 字符）——面向所有者的人类可读收线状态综合报告，六节：现役三账 / 收线链 3239–3269 时间线 / u\* 双轨道几何定谳 / F·GAP·APPX 账目矩阵 / 5 项待所有者裁决 / 待命快照历史。全部数值磁盘实测（含端点协程直调核验），不依赖记忆。
+- 产物快照 `phase3270/g5h33_owner_report/owner_report_snapshot.md`（同 sha8 `b6039d3e`）；freeze `2f3b1327` / res `3660dc49` / ledger #422 post `52219dd7`（n=427）。
+- **后续**：维持 STANDBY。报告即为待命期权威汇总——所有者裁决任一待决项或点名执行相后恢复实质推进。
+
+## Phase 3271 (G5-H34): 待决项影响预览（report-only）
+
+- 5 项待所有者裁决事项逐一影响预览；op4 DRY-RUN post `329b1398`（零写入链计算）；APPX-4 STALE_STATUS 定谳（N-P3..P7 在账）与 APPX-5→op4 收敛为本轮新口径发现。
+
+
+## Phase 3272 (G5-H35): 待命维护（report-only）
+
+- op4 DRY-RUN post 对现役头刷新：`d165ee30`（supersedes 过期值 329b1398）；5 对象零漂移；预览报告 MD 追加 dated 勘误注记。
+
+
+## Phase 3273 (G5-H36): 最小化待命快照（report-only）
+
+- 漂移零/无并发；重复性声明（3272 预告）。
+
+
+## Phase 3274 (G5-H37): lcorr op4 施加 + APPX-4/5 结清（owner 批准）
+
+- 裁决：owner 于 2026-10-21 批准 lcorr op4 施加（PENDING_ITEMS_IMPACT_PREVIEW ②/⑤ 路径）。
+- Arm a：op4 = sealed patch beb775bd op append_measurement（3260 重推导 READY）——A-gate 治理登记（phase='A-gate'，name=rdc_a_gate_closure_q01_q02_q08_q09_q12，verdict=k1_fired_at_readout__kspecific__k2_k3_not_measurable__A_gate_closed，evidence_level=bit_anchored，note='Q08=甲 seal 后登记；属治理记录非科学测量'）payload 逐字 + 登记溯源块，施加至共享账本；post 498a80f6（n 430→431）；append-only 指针差断言（$.measurements/$.ledger_sha256_8）+ revert 逐位 + 备份 .bak_3274；dry-run d165ee30 过期未复用（现场重算纪律）。
+- Arm b：gap v1.13→v1.14（APPX-4 STALE→RESOLVED：N-P3..P7 自 3258 在账；APPX-5→RESOLVED via op4）+ registry v1.36→v1.37（upgrade_log +1）；REVERT 逐位回 814ce808/78d37211；gaps/features/failures/anchors 零触碰。
+- 封存断言：lcorr v1 beb775bd / v2 ef72c733 / closure 24c60160 / gap v1.13 / registry v1.36 全字节不动。
+- GATE 10/10；freeze 91bce3ab / res fe3ca7a4 / ledger #426。剩余待决 3 项：水果类/K4 删除、APPX-1 三选一、APPX-2/3 点名（协议 ce73984d）。
+
+
+## Phase 3275 (G5-H38): 水果类/K4 挂账结清勘误（owner 批准，append-only）
+
+- 裁决：owner 于 2026-10-21 批准「水果类/K4 MEMO 挂账删除」，机制 = append-only 勘误注记（不重写历史字节；物理删除未批准）。
+- 执行：deepseek MEMO 尾部追加 dated 勘误注记（6d0ed4fb→fb813f57，+2162 bytes，备份 .bak_3275）——standing 名目「水果类」「K4」结清，三锚 = 3210 G5-G9（design e678dc42 / res 3ae23744 / seal 23008571，D3 占位项定性 + 两项 disposition）+ 3216 挂账总账 v2 closed×5 + owner 批准；R1-P6 之 K4 处置要求同批改判关闭。
+- 逐行注记 35 行 52 处：科学发现/统计事实 7 行与协议判据定义 3 行保留；挂账清单行 25 行 → 已结清（stale-as-closed）；原始 35 行逐位不变（g7b）。
+- GATE 9/9；勘误 gate 教训（进诚实日志）：g7 初版按「+1 行」预算，实际勘误文自身含多行「水果类」→ 改为按勘误文实测计数 + g7b 原行逐位断言；SMOKE 未拦截（预算型断言），字节回滚后重跑正式收官。
+- freeze c2dd8005 / res 29986b59 / ledger #427。剩余待决 2 项：APPX-1 三选一、APPX-2/3 点名（协议 ce73984d）。
+
+
+## Phase 3276 (G5-H39): APPX-2/3 执行相（owner 点名，协议 ce73984d）
+
+- 裁决：owner 于 2026-10-21 点名 APPX-2/3 执行相（PENDING_ITEMS_IMPACT_PREVIEW ④）。
+- ARM a/APPX-2（5 候选模型逐模型，H4 不池化）：S1 按 2874/2878 规则在 W_U 行上重建 attr/syntax 词表坐标（attr 8/10 轴全模型过 VG1；syntax 存活 3/1/0/1/4——tokenizer-face 分歧如实记录，从不池化）；S2 3157 式 128 行收集（gemma-3 fp16 溢出教训→fp32 存储，slot 范数记录）→ K_entity top8 vs K_readout 主角 64.5–79.0°（descriptive）；S3 K_readout=3158 同配方静态 Gram top64 + S_class=2881 配方逐模型；主角判定 **全部 separable（58.5–73.6°）**：S 族轴与读出子空间的可分离性为跨 6 模型守恒性质。
+- ARM b/APPX-3（4b/14b/glm4，封存 3155 collects 复用，零新前向）：T1 冻结操作化 phi_l(c):=QC∪QEC（3155 平衡正交基逐字构造），分离投影后响应 cos 降 1.18–1.39%；T2 解析读出接口 logits=W_U@h（3158 位等价协议）first-token 一致率 0.509–0.639；**K2 死线 3/3 不触发**（诚实注记：条件成分幅低但行为承重，双条件均不满足）；T3 η² top-50 单坐标覆盖率 1.9–5.9%，**K3 死线 3/3 触发 → 单坐标机制目标按 p35 废弃（≤10 维联合+端口类）**。
+- X-gate 5/5：4b S1 重建逐位==2874/2878 封存 dW；K_readout≈3158 top64；S_class×K_readout 66.99°≈3165 现役 67.0；ExC 份额逐位==3155 封存。X-gate 教训：S_class 质心须用未截断全量单 token 词（3165 原文），截断仅用于 material 断言；投影基为样本空间 Q@(QᵀX)。
+- freeze bda93f83 / res 8d5bba36 / ledger #428。落册（gap/registry 注记）按 G5/H5 留待 3277 registry 相。剩余待决 1 项：APPX-1 量化三选一。
+
+
+### 3277（G5-H40）APPX-2/3 registry landing（appx23_landed）
+协议 G5/H5 落册相：gap v1.14→v1.15（58094dab）appendix +APPX-8——S 族可分离性跨模型守恒（APPX-2，14/14 对 separable 48.22–73.60°，含 4b 现役锚）+ K3 单坐标死线定谳（APPX-3，3/3 触发，覆盖 1.92–5.85% ≪ 30%，单坐标机制目标废弃转 ≤10 维联合+端口类；K2 3/3 不触发）。registry v1.37→v1.38（f8772d65）。REVERT 逐位 c6d97133/bfb7d7e5 验证。freeze bbb5d5fe / res 3ddd53b8 / ledger #429 post 76783ddd（n=435）。剩余待决 1 项：APPX-1。
+
+### 3278（G5-H41）APPX-1 execution（appx1_blocked，owner 批准 nf4 基线）
+Arm a 零 GPU 定位（封存锚 26.641/2、71.796/0、70.235/0 逐值复现）：两个共享维——dim0 cos=0.8938（R_logic row0×K_ent rows0+1，层 37–40 末段新生，词表=转折连词族）；dim1 cos=0.7149（R_logic rows5/3/7×K_ent row2，词表=真值判断族；K_ent row2 可溯源 3157 面板极性臂）。Arm b nf4（bf16 口径，866 行重采）：G-B 保真 PASS（rowspace 0.0001°）；G-C top1 FAIL（30.791 vs 26.641+3.0，差 4.15°，R_logic 侧承载扰动；eff=2 与 cos diff≤0.035 守恒）。诚实 BLOCKED：定位+解释完成，nf4 定量守恒未达预注册强度。fp16 首跑（fa1858f9）存档。res 588d36c9 / ledger #430 post c4d25687（n=436）。
+
+### Phase 3279 (G5-H42) APPX-1 落册相 — 2026-10-21
+- verdict `appx1_landed_blocked_verbatim`（GATE 6/6）。Arm a 评审：statistical 级（p3278 gA 锚复现 + gB 保真 PASS；gC FAIL 按 F 账本原则如实入账）；锚完备；与 APPX-1..8 无冲突；链 n=436 post c4d25687 复算一致。
+- Arm b 落册：gap v1.15→**v1.16 `12961b7b`** appendix +APPX-9（APPX-1 执行结果逐字入账：Arm a 零 GPU 三锚复现+两共享维定位（dim0 cos=0.8938 R_logic row0×K_ent rows0+1=转折连词族；dim1 cos=0.7149 rows5/3/7×row2=真值判断族，溯源 3157 面板极性臂；末段层 37–40 双维新生）；Arm b nf4 bf16：G-B 保真 PASS（rowspace 0.0001°）、G-C top1 FAIL（30.791 vs 26.641+3.0，R_logic 侧承载），eff_ge05=2 与共享维 cos diff≤0.035 守恒——量化扰动真实但非定性）；registry v1.38→**v1.39 `ab14e586`**（upgrade_log 18，无 updated 键）。REVERT 逐位；v1.15/v1.38 密封字节不动。
+- **APPX-1 挂账不在本条关闭**（关闭 vs 留待全精度硬件复测，owner 裁决权保留）。诚实日志：SMOKE 拦截 chain_prev 笔误。res 0d702e47 / ledger #431 post '0ee33c4c'（n=437）。
+
+### Phase 3280 (G5-H43) 消费方归因 v1（P0）— 2026-10-22
+- verdict `consumer_attribution_blocked_v1`（诚实判定；gA/gB 过，K-A/K-A2 FAIL）。转向声明：按 Cammarata《Already Clean》对齐，从几何描述转向电路归因——F20（读出几何≠行为控制）从边界变主攻。
+- **Arm a 静态发现**：qwen3-4b 1152 头中，向 R_logic/K_entity 载荷子空间写入最强的头（W_OV=O_h·V_h 相对强度 S_rel）聚集于层 23–30，top 值 ~9× 于随机基 p95；两子空间的 top8 写入头高度共享——**存在专用中继头族**。
+- **Arm b 动态发现**：3157 面板一次前向逐头投影，top-64 动态写入头 92%/91% 落在末段层 28–35，且两子空间共享承载头 (34,15)/(35,0)/(29,27)/(35,22)——与双轨道几何「载轴末段成形」一致。K-A/K-A2 因动态绝对范数混淆未达预注册强度 → BLOCKED 如实入账；份额归一化修正（D_norm=||proj||/||c||）预注册 3281。
+- res ce0c400b / ledger #432 post 'a6bf3af5'（n=438）。

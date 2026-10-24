@@ -7,7 +7,10 @@
   "author": "AI2050 Research Platform",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "node ../scripts/dev_server.mjs --foreground",
+    "dev:bg": "node ../scripts/dev_server.mjs --detach",
+    "dev:status": "node ../scripts/dev_server.mjs --status",
+    "dev:stop": "node ../scripts/dev_server.mjs --stop",
     "build:atlas-manifest": "node scripts/build_atlas_manifest.mjs",
     "sync:pattern-atlas": "node scripts/sync_pattern_atlas.mjs",
     "sync:pattern-atlas:v2": "node scripts/sync_pattern_atlas_v2.mjs",

@@ -6,16 +6,19 @@
       ④ 参数热图——单层权重分块统计（demo）
       语言模板选择器（M5-P0）：神经元级 / 特征点云两模式叙事由 LANG_TEMPLATES 驱动。
    ── 实时分析：连接本机 HF 模型目录（服务端 /api/live/* 读 config + safetensors 权重头，
-      不加载权重、秒级完成）。3D 舞台与数据分析共用（middle 插槽：连接栏/统计 → 3D → 参数浏览器）；
-      激活级实时 forward 流属 P2。离线回退 LIVE_MODEL_DEMO（协议结构 demo，显式标注）。
-   零依赖 canvas 伪 3D；接入点在各模式组件内注释 */
+      不加载权重、秒级完成）。舞台 = LiveStage「参数星河 · 36 层光塔」（live_stage.v1，
+      竖塔 + 逐层运行/单步 + 真实权重数值着色），与数据分析的 StackMode 分工：
+      结构视角 vs 运行视角。激活级实时 forward 流属 P2。未连接不绘制任何数值。 */
 import { API_BASE } from '../../../config.js';
 import { useEffect, useState } from 'react';
 import StackMode from './StackMode.jsx';
 import NeuronMode from './NeuronMode.jsx';
 import CloudMode from './CloudMode.jsx';
 import ParamMode from './ParamMode.jsx';
+import NeuronSpace from './NeuronSpace.jsx';
 import NeuronUnitPanel from './NeuronUnitPanel.jsx';
+import FidelityMode from './FidelityMode.jsx';
+import LiveStage from './LiveStage.jsx';
 import { LANG_TEMPLATES, LIVE_MODEL_DEMO, PROJECTIONS, TECH_CATEGORIES } from './distributedData.js';
 import ModelManager from './ModelManager.jsx';
 
@@ -31,15 +34,16 @@ const TOP_MODES = [
 
 const MODES = [
   { k: 'stack', t: '层平铺', d: '36 层平放' },
-  { k: 'neuron', t: '神经元级', d: '单神经元' },
+  { k: 'neuron', t: '神经元级', d: '演示种子·非实测' },
+  { k: 'sealed', t: '封存激活3D', d: 'neuron3d · 点击看特征' },
+  { k: 'units', t: '原生神经元', d: 'MLP 单元 · 自然语料普查 · 实测' },
   { k: 'cloud', t: '特征点云', d: 'L6 族' },
   { k: 'param', t: '参数热图', d: '单层 W' },
-  { k: 'units', t: '原生神经元', d: 'MLP 单元 · 自然语料普查 · 实测' },
+  { k: 'fidelity', t: '保真度曲线', d: '3239/3240 破解程度' },
 ];
 
 /* 参数量/字节格式化：1.04M / 388.96M / 4.02B */
 const fmtP = (n) => n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
-const fmtB = (n) => n >= (1 << 30) ? (n / (1 << 30)).toFixed(2) + ' GB' : n >= (1 << 20) ? (n / (1 << 20)).toFixed(1) + ' MB' : (n / 1024).toFixed(1) + ' KB';
 /* 权重标量数值显示（「全部参数」隐藏后暂无引用；恢复参数表数值列时取消注释）
 const fmtW = (v) => v == null ? '—' : (v !== 0 && Math.abs(v) < 0.001 ? v.toExponential(2) : String(+v.toFixed(4)));
 */
@@ -216,23 +220,12 @@ export default function LensSpatial({ on, onGo }) {
     return () => { stop = true; };
   }, [conn]);
 
-  /* 实时模型信息包 → StackMode 右侧「模型总览」整合（模型名/参数量/config/数据类型/权重文件） */
-  const liveData = top === 'live' ? (conn || LIVE_MODEL_DEMO) : null;
-  const liveCfg = liveData ? (liveData.config || {}) : {};
-  const liveBytes = liveData ? (liveData.files || []).reduce((a, f) => a + (f.bytes || 0), 0) : 0;
-  const liveInfo = liveData && {
-    head: (liveData.arch || '—') + ' · ' + fmtP(liveData.total_params || 0),
-    cfg: [
-      ['layers', liveCfg.layers ?? '—'],
-      ['d_model', liveCfg.hidden ?? '—'],
-      ['attention', (liveCfg.heads ?? '—') + ' Q / ' + (liveCfg.kv_heads ?? '—') + ' KV'],
-      ['vocab', liveCfg.vocab != null ? liveCfg.vocab.toLocaleString() : '—'],
-      ['tie_emb', liveCfg.tie_word_embeddings ? 'true' : 'false'],
-      ['safetensors', (liveData.files || []).length + ' 个 · ' + fmtB(liveBytes)],
-    ],
-    dtypes: Object.entries(liveData.dtypes || {}).map(([k, v]) => [k, fmtP(v) + ' tensors']),
-    meta: liveData.model_path || '',
-  };
+  /* 实时舞台的工具条摘要：live 模式显示**真实连接模型**的层数/d_model（不写死 36/2560）；
+     未连接时显示占位，不借用 demo 配置冒充。 */
+  const liveCfg = (conn && conn.config) || {};
+  const liveArch = conn
+    ? `${liveCfg.layers ?? '—'}L · d_model ${liveCfg.hidden ?? '—'} · ${fmtP(conn.total_params || 0)}`
+    : '未连接模型';
 
   /* 3D 舞台（数据分析/实时分析共用）：模式工具条 + 投影层 + 视口。live 模式以 middle 插入连接栏与参数表之间 */
   const stage = (
@@ -272,20 +265,30 @@ export default function LensSpatial({ on, onGo }) {
             <label className="fw-chk"><input type="checkbox"/> 14B/9B 叠加</label>
           </>
         )}
-        {mode === 'stack' && (
+        {mode === 'stack' && (top === 'live' ? (
+          <span style={{ color: 'var(--fw-text-3)' }}>
+            参数星河 · 实时权重（自底向上 L0 → 顶层）· <b>左键=旋转 · 右键=平移 · 滚轮缩放</b> ·
+            <b> 运行</b>=逐层读取真实权重数值 · <b>下一步</b>=单层步进 · 点击层盘看该层参数表
+          </span>
+        ) : (
           <span style={{ color: 'var(--fw-text-3)' }}>全部 36 层平放（L0 → L35）· 玻璃盒=层结构 · <b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放 · 点击层盒 → 右侧全部参数 → 可下钻神经元级</span>
-        )}
+        ))}
         {mode === 'neuron' && (
           <span style={{ color: 'var(--fw-text-3)' }}><b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放 · L{neuronLayer} 层内部 16,384 点独立选中 · 底部时间轴播放 token 步（激活/变化/写入）· 选中单元看 t 轴曲线 + ℓ 轴跨层基座</span>
         )}
         {mode === 'cloud' && (
           <span style={{ color: 'var(--fw-text-3)' }}><b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放</span>
         )}
+        {mode === 'sealed' && (
+          <span style={{ color: 'var(--fw-text-3)' }}>封存全场激活（phase3169 npz 实测，非 demo）· 层滑块/搜索跳转 · <b>点击神经元 → 正/负极 + registry 回链</b> · 前端零标签生成（未入册点只显示数字）</span>
+        )}
         {mode === 'param' && (
           <span style={{ color: 'var(--fw-text-3)' }}>当前层 L{paramLayer} · 在层栈/神经元模式选中后可切换</span>
         )}
         <span style={{ marginLeft: 'auto', fontFamily: 'var(--fw-mono)', color: 'var(--fw-text-3)' }}>
-          {mode === 'stack' ? '36L · 公开架构数字' : 'd_model 2560 · d_ff 9728 · 32h×128'} · 数据源={top === 'live' ? (scan ? '本地模型权重数值' : '本地模型权重头') : '研究包/结果'}
+          {top === 'live'
+            ? <>{liveArch} · 数据源={conn ? (scan ? '本地模型真实权重数值' : '本地模型权重头') : '未连接'}</>
+            : <>{mode === 'stack' ? '36L · 公开架构数字' : 'd_model 2560 · d_ff 9728 · 32h×128'} · 数据源=研究包/结果</>}
         </span>
       </div>
       {mode === 'cloud' && (
@@ -316,10 +319,19 @@ export default function LensSpatial({ on, onGo }) {
         </div>
       )}
       <div className="fw-sp-wrap">
-        {mode === 'stack' && <StackMode live={top === 'live' ? liveInfo : null} scan={top === 'live' && conn ? scan : null} scanState={top === 'live' && conn ? scanState : null} modelSlot={top === 'live' ? <ModelManager conn={conn} onConn={setConn}/> : null} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>}
+        {mode === 'stack' && (top === 'live'
+          ? <LiveStage conn={conn} scan={scan} scanState={scanState}
+                       modelSlot={<ModelManager conn={conn} onConn={setConn}/>}
+                       onOpenParam={l => { setParamLayer(l); setMode('param'); }}
+                       onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>
+          : <StackMode live={null} scan={null} scanState={null} modelSlot={null}
+                       onOpenParam={l => { setParamLayer(l); setMode('param'); }}
+                       onOpenNeuron={l => { setNeuronLayer(l); setMode('neuron'); }}/>)}
         {mode === 'neuron' && <NeuronMode layer={neuronLayer} onLayer={setNeuronLayer} onOpenParam={l => { setParamLayer(l); setMode('param'); }} onBack={() => setMode('stack')} tpl={tpl}/>}
         {mode === 'cloud' && <CloudMode tpl={tpl}/>}
+        {mode === 'sealed' && <NeuronSpace/>}
         {mode === 'units' && <NeuronUnitPanel/>}
+        {mode === 'fidelity' && <FidelityMode/>}
         {mode === 'param' && <ParamMode layer={paramLayer} live={top === 'live' && conn ? conn : null} scan={scan}/>}
       </div>
     </>

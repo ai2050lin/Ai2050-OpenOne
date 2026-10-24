@@ -6,10 +6,10 @@
       "type": "node-terminal",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ${workspaceFolder}/scripts/start_visualization.ps1",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ${workspaceFolder}/scripts/start_visualization.ps1 -Detach",
       "serverReadyAction": {
         "action": "openExternally",
-        "pattern": "http://localhost:(\\d+)",
+        "pattern": "Local:\\s+http://localhost:(\\d+)",
         "uriFormat": "http://localhost:%s/"
       }
     },

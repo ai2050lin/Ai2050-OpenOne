@@ -7409,3 +7409,26 @@ Qwen 系是**绑定**的（一个词向量既当输入又当输出），所以"�
 - 队列 Q06 -> sealed（sealed_at 2026-10-07 08:05）；挂账不变：N 线 P3–P7 补 Ledger、跨线账本补丁施加确认、N2h1-α-1 权重级、水果类、K4。
 
 锚：result sha8=5f88ed7e，design sha8=7130906b（formal）/6d98d580（smoke），prereg=ebf960cf，panel=be17ef8a，vhat=d0c6eb7b，ledger n=306。
+
+---
+
+## 跨线施加回执（G 线 Phase 3258） [2026-10-21]
+
+- **施加对象**：本线封存草案 `n_line_backfill_draft_v1.json`（phase3208 g5g7，seal `f29da2de`，status draft_pending_cross_line，N-P3..N-P7 五条）已由 G 线 Phase 3258（G5-H21，verdict `nline_apply_registered`）按其 target 「#measurements (append 5)」施加至共享账本 `research/gpt5/atlas/atlas_ledger.json`。
+- **施加方式**：草案字段逐字（name/phase/sources/status/title）+ 登记溯源块；evidence_level=descriptive（跨线证据级不转移，N 线自 E0 起算 per G5-H20 apply_preview step 5）；草案文件字节不动；账本 n 409→414 post `a59da52b`，closeout 后 #410 post `8de77a63`；施加后一致性核验 Phase 3259 复读通过（链式 recompute / 逐字比对 / 客户端 /atlas/ledger?line=N 实机 11 断言）。
+- **挂账结转**：本 MEMO 挂账「N 线 P3–P7 补 Ledger」**已结清**；「跨线账本补丁施加确认」更新为——`ledger_corrections_v1.json`（`beb775bd`，4 操作对 n=304 旧账计算）经 G 线 3258 实测**STALE_AS_SEALED 不施加**（target sha 失配 / op3 枚举被 55 值 evidence_level 实践超越 / op4 A-gate 须重推导），挂账改为「lcorr 重推导（基于现账状态）」，施加仍待确认。
+- **纪律**：本回执为 append-only 注记，本线封存文件（草案/lcorr/账目）零改动。
+
+
+- **2026-10-21 G 线 3274 回执（append-only 注记）**：lcorr `ledger_corrections_v1.json`（beb775bd）op4（A-gate 治理登记，closure 24c60160）经 owner 裁决批准（2026-10-21），由 G 线 Phase 3274 施加至共享账本 `research/gpt5/atlas/atlas_ledger.json`（post 498a80f6，n 430→431，payload 逐字 + 登记溯源块，revert-proof）；op1/op2/op3 以 3260 重推导 v2 稿（ef72c733）结论归档（作废/不迁移/被实践超越），不再执行。挂账「lcorr 重推导施加确认」**结清**（APPX-4/5 同步于 gap v1.14 注记 RESOLVED）。本线封存文件（lcorr/草案/账目）字节不动。
+
+## 勘误注记：挂账「水果类」「K4」结清（2026-10-21，G 线 Phase 3275，append-only 勘误）
+
+- **裁决**：owner 于 2026-10-21 批准「水果类/K4 MEMO 挂账删除」，机制 = append-only 勘误注记（即本节），不重写历史字节；物理删除属破坏性操作须二次确认，未批准、未执行。
+- **结清锚（item+closed_at+evidence 三锚）**：3210 G5-G9 盘点臂（design e678dc42 / res 3ae23744 / seal 23008571，verdict standing_items_audit_registered）——「水果类、K4」首现于 3177 尾挂账列表，系继承占位项、无 G 线未结工作产物；水果类 = LPF 线历史研究主题（2767/2800/2802 MEMO 锚定，若未来恢复水果类协议工作可转 appendix）；K4 = P-K4 判据 2810 FALSE（func 1.400 > content 1.269）+ 2833 与 P-K2 双否证，被 Δ_specific(cond) 通道分离线取代。3216 挂账总账 v2：closed ×5（含水果类/K4）。R1-P6 之「K4 执行或正式改判挂起」处置要求，经 owner 批准按上述三锚改判关闭，不再排期。
+- **处置**：全 MEMO 挂账清单行中的 standing 名目「水果类」「K4」自本注记起视为已结清（stale-as-closed）；历史行字节不动，本注记为唯一权威处置记录。行内其他名目（N2h1-α-1、N3 链、跨线项等）处置不变。
+- **逐行注记（35 行 52 处；行号按现役基线 6d0ed4fb）**：
+  - 保留-科学发现/统计事实（水果类崩塌 0.04/0.05 等，不在勘误范围）：1106, 1160, 1318, 3097, 6678, 7396, 7399
+  - 保留-协议判据定义（死线 K4 定义行，非挂账状态行）：311, 386, 432
+  - 挂账清单行（standing 名目 → 已结清；N2h1-β 任务行之挂账状态随名目「水果类」一并结清，其科学事实保留）：1478, 1486, 1509, 1561, 1766, 1769, 2003, 2005, 2279, 2530, 2834, 3124, 3406, 3657, 3824, 4077, 4340, 4480, 4667, 4768, 4826, 7153, 7257, 7360, 7409
+- **状态更新**：本注记后 pending_user_confirmation「MEMO 挂账列表删除水果类/K4」结清；跨线剩余待决项见 research/gpt5/docs/PENDING_ITEMS_IMPACT_PREVIEW.md（APPX-1 三选一、APPX-2/3 点名）。

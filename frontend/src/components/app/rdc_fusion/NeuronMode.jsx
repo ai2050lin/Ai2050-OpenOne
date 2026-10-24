@@ -371,6 +371,13 @@ export default function NeuronMode({layer,onLayer,onOpenParam,onBack,tpl}){
     <div className="fw-sp-row">
       <div className="fw-sp-canvasbox">
         <canvas ref={cvRef} className="fw-sp-canvas"/>
+        {/* 数据性质常驻标识：本视图的布局与激活为演示种子（mulberry32 合成），不是实测。
+            实测的残差坐标视图在「封存激活 3D」（phase3169 封存 npz，带正负极与因子构成）。 */}
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 14, zIndex: 21,
+          background: 'rgba(254,243,199,.94)', border: '1px solid #fcd34d', borderRadius: 8,
+          padding: '3px 9px', fontSize: 10.5, color: '#92400e', lineHeight: 1.35, maxWidth: 460 }}>
+          <b>DEMO 数据</b> · 布局与逐 unit 激活为演示种子（合成），非模型实测 · 实测视图见「封存激活 3D」
+        </div>
         <div ref={tipRef} className="fw-neu-tip" style={{display:'none'}}/>
         <div className="fw-neu-nav">
           <button className="fw-tbtn" onClick={onBack}>← 层平铺</button>

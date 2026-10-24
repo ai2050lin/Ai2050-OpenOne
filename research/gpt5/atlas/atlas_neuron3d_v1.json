@@ -1,0 +1,479 @@
+{
+ "coords_meaning": "X/Z=原生坐标索引（不重排），Y=层号；位置=坐标索引，非模型真实几何",
+ "created_by": "server/derive_neuron3d.py",
+ "design": "design/atlas_neuron3d_scheme_v1.md",
+ "grid": {
+  "glm4-9b": {
+   "axis_semantics": "H[template,row,layer,dim]；第 0 维=句式模板(3)，非 seed",
+   "d_model": 4096,
+   "n_layers": 41,
+   "n_rows": 730,
+   "n_templates": 3,
+   "origin": "sealed_collect_npz_H_shape"
+  },
+  "qwen3-14b": {
+   "axis_semantics": "H[template,row,layer,dim]；第 0 维=句式模板(3)，非 seed",
+   "d_model": 5120,
+   "n_layers": 41,
+   "n_rows": 730,
+   "n_templates": 3,
+   "origin": "sealed_collect_npz_H_shape"
+  },
+  "qwen3-4b": {
+   "axis_semantics": "H[template,row,layer,dim]；第 0 维=句式模板(3)，非 seed",
+   "d_model": 2560,
+   "n_layers": 37,
+   "n_rows": 730,
+   "n_templates": 3,
+   "origin": "sealed_collect_npz_H_shape"
+  }
+ },
+ "labels": {
+  "forbidden": "frontend_generated",
+  "note": "前端零标签生成：未入册点只显示数字证据；特征标签回链 registry 条目（phase+sha8）",
+  "policy": "registry_only"
+ },
+ "models_mainline": [
+  "qwen3-4b",
+  "qwen3-14b",
+  "glm4-9b"
+ ],
+ "npz": {
+  "glm4-9b": {
+   "bytes": 564377828,
+   "dtype": "<f2",
+   "file_sha256_8": "9cc3f8b4",
+   "note": "封存全场激活 H[template,row,layer,dim]（float16 原生精度）；row = 73 实体 × 10 类别 的完全交叉面板，行语义见 server/neuron_panel.py；sha8 仅对 <2GB 文件计算",
+   "rel_path": "tests/glm5/result/rdc_query_construction_20260913/phase3169/g5a6_oov_panel/collect_glm4-9b.npz",
+   "shape": [
+    3,
+    730,
+    41,
+    4096
+   ],
+   "source_name": "g5a6_oov_panel",
+   "source_phase": 3169
+  },
+  "qwen3-14b": {
+   "bytes": 707977438,
+   "dtype": "<f2",
+   "file_sha256_8": "97f98575",
+   "note": "封存全场激活 H[template,row,layer,dim]（float16 原生精度）；row = 73 实体 × 10 类别 的完全交叉面板，行语义见 server/neuron_panel.py；sha8 仅对 <2GB 文件计算",
+   "rel_path": "tests/glm5/result/rdc_query_construction_20260913/phase3169/g5a6_oov_panel/collect_qwen3-14b.npz",
+   "shape": [
+    3,
+    730,
+    41,
+    5120
+   ],
+   "source_name": "g5a6_oov_panel",
+   "source_phase": 3169
+  },
+  "qwen3-4b": {
+   "bytes": 321497185,
+   "dtype": "<f2",
+   "file_sha256_8": "36eb4ff0",
+   "note": "封存全场激活 H[template,row,layer,dim]（float16 原生精度）；row = 73 实体 × 10 类别 的完全交叉面板，行语义见 server/neuron_panel.py；sha8 仅对 <2GB 文件计算",
+   "rel_path": "tests/glm5/result/rdc_query_construction_20260913/phase3169/g5a6_oov_panel/collect_qwen3-4b.npz",
+   "shape": [
+    3,
+    730,
+    37,
+    2560
+   ],
+   "source_name": "g5a6_oov_panel",
+   "source_phase": 3169
+  }
+ },
+ "npz_errors": [],
+ "points": [
+  {
+   "e_level": "E2_predictive",
+   "family": "K",
+   "id": "FTR-01",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "K",
+   "id": "FTR-02",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "R",
+   "id": "FTR-03",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E1_repeatable",
+   "family": "S",
+   "id": "FTR-04",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "SxK",
+   "id": "FTR-05",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "S",
+   "id": "FTR-06",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "RxS",
+   "id": "FTR-07",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "RxK",
+   "id": "FTR-08",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "mech",
+   "id": "FTR-09",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E3_causal_scoped",
+   "family": "mech",
+   "id": "FTR-10",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E3_causal_scoped",
+   "family": "mech",
+   "id": "FTR-11",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "context",
+   "id": "FTR-12",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "context",
+   "id": "FTR-13",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E1_repeatable",
+   "family": "context",
+   "id": "FTR-14",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "mech",
+   "id": "FTR-15",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E3_causal_scoped",
+   "family": "control",
+   "id": "FTR-16",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "readout",
+   "id": "FTR-17",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "readout",
+   "id": "FTR-18",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "gate",
+   "id": "FTR-19",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "limit",
+   "id": "FTR-20",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 2,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "limit",
+   "id": "FTR-21",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_predictive",
+   "family": "limit",
+   "id": "FTR-22",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 3,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_held_out",
+   "family": "context",
+   "id": "FTR-23",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 4,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E1_repeatable",
+   "family": "context",
+   "id": "FTR-24",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 1,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_behavioral",
+   "family": "context",
+   "id": "FTR-25",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 4,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "e_level": "E2_behavioral",
+   "family": "context",
+   "id": "FTR-26",
+   "kind": "feature",
+   "model_scope": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "n_anchors": 4,
+   "note": "特征级标记：registry 未登记原生 (layer,dim)（v1.33 内在维度普查为挂账 3238-A）；在场景中显示为族属标记点，不声称占据任何神经元坐标",
+   "origin": "feature_level_no_native_coord"
+  },
+  {
+   "kind": "readout_layer",
+   "layer": 39,
+   "model": "glm4-9b",
+   "note": "读出层标记（logit 读出位口径，phase3188 per_model.kout 实测）",
+   "origin": "phase3188_kout_measured"
+  },
+  {
+   "kind": "readout_layer",
+   "layer": 39,
+   "model": "qwen3-14b",
+   "note": "读出层标记（logit 读出位口径，phase3188 per_model.kout 实测）",
+   "origin": "phase3188_kout_measured"
+  },
+  {
+   "kind": "readout_layer",
+   "layer": 35,
+   "model": "qwen3-4b",
+   "note": "读出层标记（logit 读出位口径，phase3188 per_model.kout 实测）",
+   "origin": "phase3188_kout_measured"
+  }
+ ],
+ "registry_source": "atlas_registry_v1_33.json",
+ "registry_version": "1.33",
+ "schema": "neuron3d.v1"
+}

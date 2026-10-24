@@ -1861,7 +1861,9 @@ async def atlas_ledger(offset: int = 0, limit: int = 30, line: Optional[str] = N
 @router.get("/atlas/gaps")
 async def atlas_gaps():
     """G 线 GAP 账本最新版（glob gap_ledger_v1_N.json 自动发现，取最大 N）。
-    含 GAP-5 final_verdict（三段式收官 UPSTREAM_ABSENT，3237 入册）。缺失 404，不现算。"""
+    含 GAP-5 final_verdict（三段式收官 UPSTREAM_ABSENT，3237 入册）；
+    v1.12 起含 appendix（APPX-1..6，3254 落册：APPX-6=保真收线链+u* 词汇解耦）。
+    缺失 404，不现算。"""
     cands = _discover_gap_versions()
     if not cands:
         raise HTTPException(status_code=404, detail="gap ledger not found")
@@ -1876,7 +1878,8 @@ async def atlas_gaps():
             "file": p.name, "versions": versions,
             "updated": data.get("updated"),
             "supersedes": data.get("supersedes"),
-            "gaps": data.get("gaps", [])}
+            "gaps": data.get("gaps", []),
+            "appendix": data.get("appendix", [])}
 
 
 @router.get("/atlas/tree")
@@ -1893,6 +1896,278 @@ async def atlas_tree(schema: str = None):
     except Exception as e:
         raise HTTPException(status_code=500, detail="atlas tree parse error: %s" % e)
     return data
+
+
+# ------------------------------------------------------------
+# 神经元 3D（neuron3d.v1，design/atlas_neuron3d_scheme_v1.md §4–5）
+# 数据 = 封存 collect npz（phase3169 g5a6_oov_panel）实测全场激活 H[template,row,layer,dim]；
+# 注意第 0 维是 **模板轴**（3 个句式），不是 seed 轴（collect 写法 H16=zeros((NT,NP_,NH,D)) 已核）；
+# 行语义 = 73 实体 × 10 类别，还原见 server/neuron_panel.py。
+# 标签纪律 = registry_only：端点只回数字证据与 registry 回链，不生成自然语言标签。
+# ------------------------------------------------------------
+_NEURON3D_PATH = _ATLAS_DIR / "atlas_neuron3d_v1.json"
+_NPZ_CACHE: Dict[str, Any] = {}   # model -> {"H": ndarray float16, "grid": {...}}（单槽，换模型即换出）
+
+
+def _neuron3d_doc() -> Dict[str, Any]:
+    if not _NEURON3D_PATH.is_file():
+        raise HTTPException(status_code=404,
+                            detail="atlas_neuron3d_v1.json not found (run server/derive_neuron3d.py)")
+    try:
+        return json.loads(_NEURON3D_PATH.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="neuron3d parse error: %s" % e)
+
+
+def _neuron3d_H(model: str):
+    """懒加载封存 npz 的 H（float16 原样缓存；统计在切片上转 float32），单模型槽位。
+    H[t, row, layer, dim]：t=模板（3），row=实体×类别（730）。"""
+    import numpy as np
+    if model in _NPZ_CACHE:
+        return _NPZ_CACHE[model]
+    doc = _neuron3d_doc()
+    ent = (doc.get("npz") or {}).get(model)
+    if not ent:
+        raise HTTPException(status_code=404, detail="no sealed npz manifest for model %s" % model)
+    p = Path(__file__).parent.parent / ent["rel_path"]
+    if not p.is_file():
+        raise HTTPException(status_code=404, detail="sealed npz missing: %s" % ent["rel_path"])
+    try:
+        z = np.load(str(p), allow_pickle=False)
+        H = z["H"]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="npz load error: %s" % e)
+    _NPZ_CACHE.clear()          # 单槽：内存友好（14b float16 ≈ 0.9GB）
+    _NPZ_CACHE[model] = {"H": H, "grid": (doc.get("grid") or {}).get(model) or {}}
+    return _NPZ_CACHE[model]
+
+
+@router.get("/atlas/neuron3d/{model}")
+async def atlas_neuron3d(model: str):
+    """neuron3d.v1 派生段（按模型过滤）：grid 实测形状 + registered 白名单 + npz 清单。
+    派生器=server/derive_neuron3d.py（--check 幂等）；缺失 404，不现算。"""
+    doc = _neuron3d_doc()
+    if model not in (doc.get("grid") or {}):
+        raise HTTPException(status_code=404, detail="model %s not in neuron3d grid" % model)
+    return {"schema": doc.get("schema"), "design": doc.get("design"),
+            "registry_version": doc.get("registry_version"),
+            "model": model, "grid": doc["grid"][model],
+            "points": doc.get("points", []),
+            "npz": (doc.get("npz") or {}).get(model),
+            "labels": doc.get("labels"), "coords_meaning": doc.get("coords_meaning")}
+
+
+@router.get("/atlas/neuron/{model}/{layer}/slice")
+async def atlas_neuron_slice(model: str, layer: int):
+    """单层激活切片：每维中位数（对 template×row 池化）+ 分位带，供 3D 点云着色。
+    2560/4096/5120 维，JSON 约 40–80KB；层越界 404。
+
+    附带 factor_mean：本层全部坐标的因子构成均值（模板/实体/类别 + 交互）。
+    面板是 73 实体 × 10 类别 × 3 模板 的完全交叉设计，因此分解精确闭合（份额和=1）。"""
+    import numpy as np
+    ent = _neuron3d_H(model)
+    g = ent["grid"] or {}
+    n_layers = int(g.get("n_layers") or 0)
+    if not (0 <= layer < n_layers):
+        raise HTTPException(status_code=404, detail="layer %s out of range [0,%s)" % (layer, n_layers))
+    H = ent["H"]
+    col = H[:, :, layer, :]                      # (template,row,dim) float16 视图
+    med = np.median(col, axis=(0, 1)).astype(np.float32)   # (dim,)
+    p90 = np.percentile(col, 90, axis=(0, 1)).astype(np.float32)
+    p10 = np.percentile(col, 10, axis=(0, 1)).astype(np.float32)
+    factor_mean = None
+    try:
+        from server import neuron_panel as _panel
+    except Exception:
+        try:
+            import neuron_panel as _panel
+        except Exception:
+            _panel = None
+    if _panel is not None:
+        try:
+            factor_mean = _panel.layer_factor_means(col)
+        except Exception:
+            factor_mean = None
+    return {"schema": "neuron3d_slice_v1", "model": model, "layer": layer,
+            "n_dims": int(med.shape[0]), "pool": "median_over_template_row",
+            "axis_semantics": "H[template,row,layer,dim]；第 0 维是模板轴（3 句式），不是 seed 轴",
+            "values": [round(float(v), 4) for v in med],
+            "p10": [round(float(v), 4) for v in p10],
+            "p90": [round(float(v), 4) for v in p90],
+            "factor_mean": factor_mean,
+            "note": "封存 npz（phase3169）实测；values=原生坐标索引顺序，不重排"}
+
+
+@router.get("/atlas/neuron/{model}/{layer}/{dim}")
+async def atlas_neuron(model: str, layer: int, dim: int):
+    """单神经元详情：激活统计 + 正/负极（极点分析口径）+ registered 回链（registry_only）。
+    无入册依据时不返回任何文字解释，只回数字与回链。"""
+    import numpy as np
+    doc = _neuron3d_doc()
+    ent = _neuron3d_H(model)
+    g = ent["grid"] or {}
+    n_layers = int(g.get("n_layers") or 0)
+    d_model = int(g.get("d_model") or 0)
+    if not (0 <= layer < n_layers and 0 <= dim < d_model):
+        raise HTTPException(status_code=404,
+                            detail="(%s,%s) out of range layers[0,%s) dims[0,%s)" % (layer, dim, n_layers, d_model))
+    H = ent["H"]
+    col = H[:, :, layer, dim].astype(np.float32)          # (template,row)
+    flat = col.reshape(-1)
+    n_templates, n_rows = col.shape
+    k = min(12, flat.shape[0])
+
+    try:
+        from server import neuron_panel as _panel
+    except Exception:
+        try:
+            import neuron_panel as _panel
+        except Exception:
+            _panel = None
+
+    # 正/负极 = 真实片段（模板与实体表封存在同一 phase 的 execution.json，确定性还原）
+    poles_payload = None
+    factor = None
+    if _panel is not None:
+        try:
+            pr = _panel.poles(H, layer, dim, k=6)
+            poles_payload = {"positive": pr["positive"], "negative": pr["negative"],
+                             "method": pr["method"], "axis_semantics": pr["axis_semantics"],
+                             "text_source": "封存 execution.json：text = TPL[t].format(e=实体, c=类别)"}
+            factor = _panel.factor_of_column(H[:, :, layer, dim])
+        except Exception:
+            poles_payload, factor = None, None
+    if poles_payload is None:      # 面板索引缺失时退化到数值极点，并如实标注无文本
+        order = np.argsort(flat)
+        def _pole(items):
+            return [{"template": int(i // n_rows), "row": int(i % n_rows),
+                     "value": round(float(flat[i]), 4)} for i in items]
+        poles_payload = {"positive": _pole(order[::-1][:k]), "negative": _pole(order[:k]),
+                         "method": "argtop/argbottom over template×row；样例文本不可还原（面板索引缺失）"}
+
+    # registered 回链：readout_layer 标记按层匹配；feature 标记为特征级（无原生坐标），仅列全体
+    reg_readout = [p for p in doc.get("points", [])
+                   if p.get("kind") == "readout_layer" and p.get("model") == model and p.get("layer") == layer]
+    reg_features = [p for p in doc.get("points", []) if p.get("kind") == "feature"]
+    return {
+        "schema": "neuron3d_point_v1", "model": model, "layer": layer, "dim": dim,
+        "coords_meaning": doc.get("coords_meaning"),
+        "stats": {"n_templates": n_templates, "n_rows": n_rows,
+                  "min": round(float(flat.min()), 4), "p10": round(float(np.percentile(flat, 10)), 4),
+                  "median": round(float(np.median(flat)), 4), "mean": round(float(flat.mean()), 4),
+                  "p90": round(float(np.percentile(flat, 90)), 4), "max": round(float(flat.max()), 4)},
+        "poles": poles_payload,
+        "factor": factor,
+        "registered": {"readout_layer": reg_readout,
+                       "features_here": [],
+                       "note": "registry v%s 未登记原生 (layer,dim) 特征（内在维度普查=挂账 3238-A）；"
+                               "本点当前无特征标签回链" % doc.get("registry_version")},
+        "registered_features_index": [{"id": p.get("id"), "family": p.get("family"),
+                                       "e_level": p.get("e_level")} for p in reg_features],
+        "labels": doc.get("labels"),
+    }
+
+
+# ------------------------------------------------------------
+# 谱图预测保真度曲线（fidelity.v2；Phase 3239/3240/3246-3250 封存产物只读）
+# 数据 = phase3239 fidelity.npz（逐行 KL×3 基线）+ phase3240 extrap.npz（F0/F1/F2 逐配方
+# fam_fid / R² / KL 聚合矩阵）+ phase3246-3250 各 npz（逐配方 fam_fid / R² 聚合矩阵，
+# agg_kl 取自各自封存 result.json）+ 现役配方标注（3250 XC_p5_b8，服务端只读封存数字）。
+# 只读；缺失 404，不现算。
+# ------------------------------------------------------------
+_FIDELITY_SOURCES = [
+    ("3239", "phase3239/g5h2_fidelity_minloop", "fidelity.npz"),
+    ("3240", "phase3240/g5h3_cls_extrapolation", "extrap.npz"),
+    ("3246", "phase3246/g5h9_regime_boundary", "boundary.npz"),
+    ("3247", "phase3247/g5h10_oov_info_menu", "menu.npz"),
+    ("3248", "phase3248/g5h11_poly_deepening", "poly.npz"),
+    ("3249", "phase3249/g5h12_deg_extension", "degext.npz"),
+    ("3250", "phase3250/g5h13_kernel_boundary", "kbound.npz"),
+]
+# 现役配方（G5 保真缺口收线的当前最优声明配方；数字全部取自封存 result.json）
+_FIDELITY_INCUMBENT = [
+    {"phase": "3250", "recipe": "XC_p5_b8", "tag": "现役综合最优"},
+    {"phase": "3250", "recipe": "XC_p5_b4", "tag": "保真维现役"},
+    {"phase": "3250", "recipe": "XC_p3_b6", "tag": "R²/KL 维现役"},
+    {"phase": "3248", "recipe": "K_p3_T3", "tag": "纯拉力最优"},
+]
+_FIDELITY_FAMS = ["DVU", "DCC", "ENT", "USTAR", "SCLS", "MASSIVE"]
+
+
+@router.get("/atlas/fidelity")
+async def atlas_fidelity(model: str = "qwen3-4b"):
+    """保真度曲线（「破解程度」可画曲线的数字）：census 六族族方向保真 + 逐行下一 token
+    KL + R²。数据全部来自封存 phase 产物（零 GPU 复算）；缺失 404。"""
+    import numpy as np
+    base = Path(__file__).parent.parent / "tests" / "glm5" / "result" / "rdc_query_construction_20260913"
+    out = {"schema": "atlas_fidelity_v2", "model": model, "fam_order": _FIDELITY_FAMS,
+           "phases": [], "incumbent": []}
+    for ph, rel, npz_name in _FIDELITY_SOURCES:
+        pdir = base / rel
+        rp = pdir / "result.json"
+        if not rp.is_file():
+            continue
+        try:
+            rj = json.loads(rp.read_text(encoding="utf-8"))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="phase%s result parse error: %s" % (ph, e))
+        if rj.get("model") != model:
+            continue
+        entry = {"phase": ph, "name": rj.get("name"), "verdict": rj.get("verdict"),
+                 "design_sha8": rj.get("design_sha8"), "res_sha8": rj.get("res_sha8"),
+                 "kl_rows": rj.get("kl_rows"),
+                 "aggregate": rj.get("aggregate")}
+        npz_p = pdir / npz_name
+        if npz_p.is_file():
+            try:
+                z = np.load(str(npz_p), allow_pickle=False)
+                if ph == "3239":
+                    # 逐行 KL（seed 7 全量 + 3 seed 均值），round 6 位控体积
+                    kl = {}
+                    for k3 in ("model", "B0", "B1"):
+                        arrs = [z["seed%d_kl_%s" % (s, k3)] for s in (7, 8, 9)]
+                        kl[k3] = [round(float(v), 6) for v in np.mean(arrs, axis=0)]
+                    entry["kl_per_row_mean3seed"] = kl
+                    entry["fam_fid_per_seed"] = z["fam_fid"].tolist()
+                else:
+                    entry["recipes"] = [str(x) for x in z["recipes"]]
+                    entry["agg_fid_matrix"] = [[round(float(v), 6) for v in row]
+                                               for row in z["agg_fid_matrix"]]
+                    entry["agg_r2"] = [round(float(v), 6) for v in z["agg_r2"]]
+                    if ph == "3240":
+                        entry["agg_kl"] = [round(float(v), 6) for v in z["agg_kl"]]
+                    else:
+                        # 3246+ 的 npz 不含 agg_kl：从封存 result.json aggregate 读取
+                        agg = rj.get("aggregate") or {}
+                        entry["agg_kl"] = [round(float(agg.get(rn, {}).get("kl_mean", 0.0)), 6)
+                                           for rn in entry["recipes"]]
+                    if "closure" in z:
+                        entry["closure"] = [round(float(v), 6) for v in z["closure"]]
+                    entry["fam_per_seed"] = {rn: z["seed%d_fid_%s" % (s, rn)].tolist()
+                                             for s in (7, 8, 9) for rn in
+                                             [str(x) for x in z["recipes"]]}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail="phase%s npz parse error: %s" % (ph, e))
+        out["phases"].append(entry)
+    # 现役配方标注（只读封存 aggregate 数字；缺失阶段跳过）
+    by_phase = {p["phase"]: p for p in out["phases"]}
+    for inc in _FIDELITY_INCUMBENT:
+        p = by_phase.get(inc["phase"])
+        if not p or "recipes" not in p:
+            continue
+        i = p["recipes"].index(inc["recipe"]) if inc["recipe"] in p["recipes"] else -1
+        if i < 0:
+            continue
+        fid = p["agg_fid_matrix"][i]
+        out["incumbent"].append({
+            "phase": inc["phase"], "recipe": inc["recipe"], "tag": inc["tag"],
+            "fam_fid": dict(zip(_FIDELITY_FAMS, [round(float(v), 6) for v in fid])),
+            "r2_oov": p["agg_r2"][i], "kl_mean": p["agg_kl"][i],
+        })
+    if not out["phases"]:
+        raise HTTPException(status_code=404,
+                            detail="no sealed fidelity artifacts for model %s (run phase 3239/3240)" % model)
+    return out
 
 
 @router.get("/queue/gline")

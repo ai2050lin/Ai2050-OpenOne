@@ -18,13 +18,24 @@ OpenOne 是一个面向语言机制、神经网络原理与通用智能的逆向
 ## 快速启动
 
 最简方式：双击仓库根目录的 `start_client.bat`（关闭窗口即停止客户端）。
+在 VSCode 里打开本工程即会**自动确保客户端在跑**（终端任务 `AI2050: Frontend`，
+幂等：已在运行就复用，3 秒内打印地址）。
 
 ```powershell
 # ── 前端 ── 默认 http://localhost:5173（5001 是后端 API，勿混淆）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start_visualization.ps1
 .\scripts\start_visualization.ps1 -Install          # 首次安装依赖
 .\scripts\start_visualization.ps1 -Port 5174        # 更换端口
+.\scripts\start_visualization.ps1 -Stop             # 停止并确认端口释放
+.\scripts\start_visualization.ps1 -Status           # 查端口 / 守护进程 / 日志
+.\scripts\start_visualization.ps1 -Foreground       # 前台守护（Ctrl+C 停止）
+```
 
+前端启动由 `scripts/dev_server.mjs` 托管：幂等复用、僵死端口回收、等到 HTTP 200
+才打印地址、vite 异常退出自动退避重启；全部输出带时间戳写入 `.run/devserver.log`。
+**客户端打不开时先看 `-Status`，再看该日志**——不再需要靠重开碰运气。
+
+```powershell
 # ── 后端 ── 默认 http://localhost:5001
 .\.venv\Scripts\python.exe .\server\install_deps.py      # 首次安装依赖
 .\.venv\Scripts\python.exe -m server.server              # 启动后端

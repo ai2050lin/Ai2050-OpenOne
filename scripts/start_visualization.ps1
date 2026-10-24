@@ -1,11 +1,33 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet('dev', 'build', 'preview', 'lint')]
     [string]$Mode = 'dev',
     [ValidateRange(1, 65535)]
     [int]$Port = 5173,
-    [switch]$Install
+    [switch]$Install,
+    # 守护方式（默认：VSCode 终端里自动脱管，普通终端里前台守护）
+    #   -Detach     强制脱管：守护进程独立于本终端，VSCode reload / 关终端都不影响服务
+    #   -Foreground 前台守护：Ctrl+C 停止，便于现场观察
+    [switch]$Detach,
+    [switch]$Foreground,
+    # 停止 / 查看状态
+    [switch]$Stop,
+    [switch]$Status
 )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2026-10-19 重构：启动链路改为「守护进程托管」，解决反复出现的
+# 「VSCode 里启动客户端，访问不了」。
+#
+# 旧实现的三个硬伤：
+#   ① vite 是一次性前台进程，挂了没人管 → 端口空着，浏览器 ERR_CONNECTION_REFUSED；
+#   ② 进程随 VSCode 调试会话/终端消失，且不留日志 → 故障无法定位，只能靠重开碰运气；
+#   ③ 浏览器在 vite 真正 bind 前就被打开（脚本先打印 URL）→ 必然撞空端口。
+#
+# 现在 dev / preview 一律交给 scripts/dev_server.mjs（幂等复用 + 僵死回收 + 就绪门 +
+# 退避重启 + 日志落盘）。本脚本只保留它不可替代的部分：Node.js 运行时发现与版本校验。
+# 注意：dev/preview 不再经过 npm.cmd（历史上 VSCode 集成终端里 npm 包装层会挂起）。
+# ─────────────────────────────────────────────────────────────────────────────
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -48,15 +70,13 @@ function Get-NodeRuntimeHome {
     foreach ($candidate in $candidates | Select-Object -Unique) {
         if (-not $candidate) { continue }
         $node = Join-Path $candidate 'node.exe'
-        $npm = Join-Path $candidate 'npm.cmd'
-        if ((Test-Path -LiteralPath $node) -and (Test-Path -LiteralPath $npm)) {
-            try {
-                [void](Test-SupportedNodeVersion $node)
-                return $candidate
-            }
-            catch {
-                Write-Verbose "Skipping unsupported Node.js runtime at ${candidate}: $($_.Exception.Message)"
-            }
+        if (-not (Test-Path -LiteralPath $node)) { continue }
+        try {
+            [void](Test-SupportedNodeVersion $node)
+            return $candidate
+        }
+        catch {
+            Write-Verbose "Skipping unsupported Node.js runtime at ${candidate}: $($_.Exception.Message)"
         }
     }
 
@@ -82,45 +102,6 @@ function Test-SupportedNodeVersion([string]$NodeExecutable) {
     return $versionText
 }
 
-function Get-PortListener([int]$ListenerPort) {
-    try {
-        $connection = Get-NetTCPConnection -State Listen -LocalPort $ListenerPort -ErrorAction Stop |
-            Select-Object -First 1
-        if (-not $connection) { return $null }
-
-        $process = Get-CimInstance Win32_Process -Filter "ProcessId = $($connection.OwningProcess)" -ErrorAction SilentlyContinue
-        return [pscustomobject]@{
-            ProcessId = [int]$connection.OwningProcess
-            Name = if ($process) { [string]$process.Name } else { 'unknown' }
-            ExecutablePath = if ($process) { [string]$process.ExecutablePath } else { '' }
-            CommandLine = if ($process) { [string]$process.CommandLine } else { '' }
-        }
-    }
-    catch [Microsoft.PowerShell.Cmdletization.Cim.CimJobException] {
-        return $null
-    }
-    catch {
-        if ($_.Exception.Message -match 'No matching') { return $null }
-        throw
-    }
-}
-
-function Test-AI2050VisualizationListener(
-    [object]$Listener,
-    [string]$ExpectedFrontendRoot
-) {
-    if (-not $Listener -or -not $Listener.CommandLine) { return $false }
-
-        $expectedViteScript = Join-Path $ExpectedFrontendRoot 'node_modules\vite\bin\vite.js'
-        $normalizedCommand = $Listener.CommandLine.Replace('/', '\')
-        $normalizedViteScript = $expectedViteScript.Replace('/', '\')
-        # npm shim invokes vite via "node_modules\.bin\..\vite\bin\vite.js";
-        # collapse the "\..\" segment before matching, otherwise our own vite
-        # process is misdetected as a foreign listener and the script throws.
-        $collapsedCommand = (($normalizedCommand -replace '\\{2,}', '\') -replace '\\\.bin\\\.\.\\', '\')
-        return $collapsedCommand.IndexOf($normalizedViteScript, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
-}
-
 if (-not (Test-Path -LiteralPath $frontendRoot)) {
     throw "Frontend directory not found: $frontendRoot"
 }
@@ -128,7 +109,7 @@ if (-not (Test-Path -LiteralPath $frontendRoot)) {
 $nodeHome = Get-NodeRuntimeHome
 if (-not $nodeHome) {
     throw @"
-No Node.js runtime containing both node.exe and npm.cmd was found.
+No Node.js runtime containing node.exe was found.
 Install Node.js >=20.19 or >=22.12, or point AI2050_NODE_HOME to a Node.js directory:
   `$env:AI2050_NODE_HOME = 'C:\path\to\nodejs'
 "@
@@ -143,23 +124,19 @@ Write-Host "[AI2050] Node.js v$nodeVersion" -ForegroundColor Green
 Write-Host "[AI2050] Node home: $nodeHome" -ForegroundColor DarkGray
 Write-Host "[AI2050] Frontend: $frontendRoot" -ForegroundColor DarkGray
 
-if ($Mode -in @('dev', 'preview')) {
-    $listener = Get-PortListener $Port
-    if ($listener) {
-        if (Test-AI2050VisualizationListener $listener $frontendRoot) {
-            Write-Host "[AI2050] Visualization is already running (PID $($listener.ProcessId)); reusing it." -ForegroundColor Green
-            Write-Host "  Local:   http://localhost:$Port/" -ForegroundColor Cyan
-            exit 0
-        }
+$devServer = Join-Path $PSScriptRoot 'dev_server.mjs'
+if (-not (Test-Path -LiteralPath $devServer)) {
+    throw "Launcher not found: $devServer"
+}
 
-        $listenerCommand = if ($listener.CommandLine) { $listener.CommandLine } else { "$($listener.Name) (command line unavailable)" }
-        throw @"
-Port $Port is already used by another process (PID $($listener.ProcessId)).
-Command: $listenerCommand
-Choose another port, for example:
-  .\scripts\start_visualization.ps1 -Port 5174
-"@
-    }
+# 停止 / 状态：直接转给守护器（它会核对 PID、等端口真正释放，不谎报成功）
+if ($Stop) {
+    & $nodeExecutable $devServer --stop --port $Port
+    exit $LASTEXITCODE
+}
+if ($Status) {
+    & $nodeExecutable $devServer --status --port $Port
+    exit $LASTEXITCODE
 }
 
 Push-Location $frontendRoot
@@ -177,27 +154,32 @@ try {
 
     switch ($Mode) {
         'dev' {
-            Write-Host "[AI2050] Starting visualization at http://localhost:$Port" -ForegroundColor Cyan
-            & $nodeExecutable $viteScript --port $Port --strictPort
+            $launcherArgs = @($devServer, '--port', "$Port")
+            if ($Foreground) { $launcherArgs += '--foreground' }
+            if ($Detach) { $launcherArgs += '--detach' }
+            & $nodeExecutable @launcherArgs
+            exit $LASTEXITCODE
         }
         'preview' {
             if (-not (Test-Path -LiteralPath (Join-Path $frontendRoot 'dist\index.html'))) {
                 & $nodeExecutable $viteScript build
                 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             }
-            Write-Host "[AI2050] Previewing visualization at http://localhost:$Port" -ForegroundColor Cyan
-            & $nodeExecutable $viteScript preview --port $Port --strictPort
+            $previewArgs = @($devServer, '--port', "$Port", '--mode', 'preview')
+            if ($Foreground) { $previewArgs += '--foreground' }
+            if ($Detach) { $previewArgs += '--detach' }
+            & $nodeExecutable @previewArgs
+            exit $LASTEXITCODE
         }
-        'build' { & $nodeExecutable $viteScript build }
+        'build' { & $nodeExecutable $viteScript build; exit $LASTEXITCODE }
         'lint' {
             if (-not (Test-Path -LiteralPath $eslintScript)) {
                 throw "ESLint entry point not found: $eslintScript"
             }
             & $nodeExecutable $eslintScript .
+            exit $LASTEXITCODE
         }
     }
-
-    exit $LASTEXITCODE
 }
 finally {
     Pop-Location

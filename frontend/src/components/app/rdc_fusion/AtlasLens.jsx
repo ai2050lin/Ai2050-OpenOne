@@ -17,21 +17,23 @@
    - 队列/闭环不再在此重复：特征详情「→ 研发透镜」跳转（onGo('process')）。
    LIVE/DEMO 范式：服务未启动时显示空态提示，不伪造数据。 */
 import { API_BASE } from '../../../config.js';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { createEvidenceModel, classOf, labelOf } from '../../../core/evidence.js';
 import ResultsExplorer from './ResultsExplorer.jsx';
 import RegistryPanel from './RegistryPanel.jsx';
 import AtlasModuleView from './AtlasModuleView.jsx';
 import AtlasModuleSpace from './AtlasModuleSpace.jsx';
 import AtlasTemplateSpace from './AtlasTemplateSpace.jsx';
+import GapLedgerPanel from './GapLedgerPanel.jsx';
 
 
 const FAM_NAME = {
   read: '知识读出', syntax: '语法轴', mech: '机制', context: '条件化',
   limit: '边界', spatial: '空间', logic: '逻辑',
 };
-const ECLASS = {
-  E2_predictive: 'at-e2', E1_repeatable: 'at-e1', E3_causal_scoped: 'at-e3',
-};
+/* 证据等级的样式与文案统一由 core/evidence.js 派生（v2 审计 A1）：
+   分类法来自 registry.evidence_level_taxonomy，子档（E2_held_out / E2_behavioral）
+   继承父级色调，不再回落成 E1，也不会从分布条上消失。 */
 
 /* 专项视图目录（P2 收敛）：10 个 /rdc-* 独立页面按研究主题分三组。
    页面名称/路径为 UI 导航词表（非实验字面量）；每页已挂 RdcPageShell 统一壳。 */
@@ -66,7 +68,7 @@ function FeatureDetail({ f, onGo, onClose }) {
     <div className="at-detail">
       <div className="at-detail-head">
         <span className="mono at-fid">{f.id}</span>
-        <span className={'at-badge ' + (ECLASS[f.evidence_level] || 'at-e1')}>{f.evidence_level}</span>
+        <span className={'at-badge ' + classOf(f.evidence_level)} title={f.evidence_level}>{labelOf(f.evidence_level)}</span>
         <span className="at-fam">{f.model_scope.join(' · ')}</span>
         {onGo && <button className="at-link" onClick={() => onGo('process')}
           title="队列与五段式闭环在研发透镜（唯一归属）">→ 研发透镜</button>}
@@ -151,16 +153,25 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
   useEffect(() => { if (on) loadRegistry(); }, [on, loadRegistry]);
   useEffect(() => { if (on && !ledger) loadLedger(); }, [on, ledger, loadLedger]);   // 总览与账本共用
 
+  /* 证据等级聚合：唯一派生（分类法来自 registry.evidence_level_taxonomy）
+     summary.total 必须等于 features.length——不等就是又有等级被漏算（旧实现漏了 3 条）。
+     Hooks 必须在早退之前调用，故放在 if (!on) 之前。 */
+  const evidence = useMemo(
+    () => createEvidenceModel(data && data.evidence_level_taxonomy),
+    [data],
+  );
+  const evSummary = useMemo(
+    () => evidence.summarize(data ? data.features : []),
+    [evidence, data],
+  );
+
   if (!on) return null;
-  const counts = data ? data.features.reduce((m, f) => {
-    m[f.evidence_level] = (m[f.evidence_level] || 0) + 1; return m;
-  }, {}) : {};
   /* 总览聚合（协议键驱动，零实验字面量：一切数字来自 registry / ledger 端点） */
   /* 账本跨线交错（非按 phase 排序）：最新闭环按 phase 最大值取，保证「最新」语义 */
   const maxPhaseM = ledger && ledger.measurements.length
     ? ledger.measurements.reduce((a, m) => (m.phase > a.phase ? m : a))
     : null;
-  const e2plus = (counts.E2_predictive || 0) + (counts.E3_causal_scoped || 0);
+  const e2plus = evSummary.atLeastE2;
 
   return (
     <div className="atlas-lens">
@@ -190,14 +201,23 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
             <div className="at-ov-stat"><div className="n">{data.failures.length}</div><div className="l">失败账本 F</div></div>
           </div>
 
-          <div className="at-ov-bar" title="特征证据级分布（E2 可预测 / E3 协议内因果 / E1 可重复）">
-            {['E2_predictive', 'E3_causal_scoped', 'E1_repeatable'].map(k => counts[k] ? (
-              <span key={k} className={'at-ov-seg ' + (ECLASS[k] || 'at-e1')}
-                style={{ width: (100 * counts[k] / data.features.length) + '%' }}>
-                {k.split('_')[0]} · {counts[k]}
+          <div className="at-ov-bar"
+            title={`特征证据级分布（按父级聚合；子档在各档内细分）。分类法来源 registry v${data.version} evidence_level_taxonomy`}>
+            {evSummary.tones.map(t => (
+              <span key={t.tone} className={'at-ov-seg ' + t.cls}
+                style={{ width: t.width + '%' }}
+                title={`${t.label} · ${t.count} 条${Object.keys(t.subs).length ? '（' + Object.entries(t.subs).map(([k, v]) => k + ' ' + v).join(' / ') + '）' : ''}`}>
+                {t.tone} · {t.count}
               </span>
-            ) : null)}
+            ))}
           </div>
+          {(evSummary.unknown > 0 || !evSummary.ok) && (
+            <div className="at-err" style={{ marginTop: 4 }}>
+              证据等级对账失败：分布合计 {evSummary.tones.reduce((n, t) => n + t.count, 0)} / 特征 {evSummary.total}
+              {evSummary.unknown ? `，其中 ${evSummary.unknown} 条为未知等级（灰色虚线）` : ''}
+              —— 分类法与数据不一致，需检查 registry 而非改界面。
+            </div>
+          )}
 
           {/* ===== 图谱全景：三模一态（图形/列表/卡片共享选中态 + 详情抽屉）；版本链 select 归此 ===== */}
           <div className="at-pan-head">
@@ -205,7 +225,7 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
             <span className="dim2">知识网络 / 分析推理 / 语法系统 → 语言族 → 特征（E 级着色 · 机制横切 · 交叉边）</span>
             {versions.length > 1 && (
               <select className="at-ver" value={version || ''} onChange={e => loadRegistry(e.target.value)}
-                title="特征 registry 版本链（客户端已登记版本；研究侧最新为 v1.28，跨线施加挂账中）">
+                title="特征 registry 版本链（glob 自动发现全代；3254 落册后现役 v1.34）">
                 {versions.map(v => <option key={v.version} value={v.version}>registry v{v.version}</option>)}
               </select>
             )}
@@ -230,7 +250,7 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
                   <div className="at-card-head">
                     <span className="mono at-fid">{f.id}</span>
                     <span className="at-fam">{FAM_NAME[f.family] || f.family}</span>
-                    <span className={'at-badge ' + (ECLASS[f.evidence_level] || 'at-e1')}>{f.evidence_level}</span>
+                    <span className={'at-badge ' + classOf(f.evidence_level)} title={f.evidence_level}>{labelOf(f.evidence_level)}</span>
                   </div>
                   <div className="at-stmt">{f.statement}</div>
                   <ValueChips values={f.values} />
@@ -260,6 +280,9 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
               ))}
             </div>
           </details>
+
+          {/* ===== GAP 账本 · 附录（3255 工程臂挂载：/atlas/gaps 自动发现最新版，APPX-1..6 附录卡） ===== */}
+          <GapLedgerPanel />
         </div>
       )}
 

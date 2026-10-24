@@ -754,6 +754,9 @@
 .at-e2{background:#e3f0e3;border-color:#9fcaa0;color:#1e5c22}
 .at-e1{background:#e5eefa;border-color:#a8c4e4;color:#24558a}
 .at-e3{background:#f7e8dd;border-color:#ddb28f;color:#8a4b16}
+.at-e0{background:#eef1f5;border-color:#c3ccd8;color:#4b5563}
+/* 未知等级：灰色虚线——显式区别于任何已知等级，绝不回落到 E1 的观感 */
+.at-ex{background:#f1f5f9;border-color:#94a3b8;border-style:dashed;color:#64748b}
 .at-live{background:#e3f0e3;border-color:#9fcaa0;color:#1e5c22}
 .at-dead{background:#fbe9e7;border-color:#e0a89f;color:#93321f}
 .at-err{border:1px solid #e0a89f;background:#fbe9e7;color:#93321f;border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12.5px}
@@ -804,6 +807,8 @@
 .at-ov-bar{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--line,#d9dee6);background:#fff}
 .at-ov-seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#fff;white-space:nowrap;overflow:hidden}
 .at-ov-seg.at-e2{background:#1e5c22}.at-ov-seg.at-e3{background:#8a4b16}.at-ov-seg.at-e1{background:#24558a}
+.at-ov-seg.at-e0{background:#64748b}
+.at-ov-seg.at-ex{background:repeating-linear-gradient(45deg,#94a3b8 0 4px,#cbd5e1 4px 8px);color:#334155}
 
 
 /* ---- 图谱全景（AtlasPanorama，总览 home 首屏主体 + AtlasLens 全景头/切换条共用；三域泳道可视化） ---- */
@@ -981,7 +986,7 @@
 .fw-domain .fw-rg-note{font-size:12px;padding:4px 0 4px 14px;margin-top:14px}
 
 
-/* （v1.10 去重：图谱 3D 立体馆 AtlasGallery 已退役——at-space-*/at-gal-* 样式段随组件删除，
+/* （v1.10 去重：图谱 3D 立体馆 AtlasGallery 已退役——at-space-X / at-gal-X 样式段随组件删除，
    gallery3d 派生数据段按 append-only 纪律保留；模板 3D 关系空间使用独立 ats-* 前缀，见文末） */
 
 /* ===== 行业进展 v5：阶段目标 / 关键成果 改为上下两行 ===== */
@@ -1168,3 +1173,148 @@
 .atms-angle{text-align:center}
 .atms-angle b{display:block;font-size:15px;font-weight:700;color:#1a1d23}
 .atms-angle span{font-size:9.5px;color:#7a8494}
+
+/* ============================================================
+   LiveStage · 空间·实时分析「参数星河 · 36 层光塔」（lvs-*）
+   live_stage.v1 —— 真实 safetensors 权重数值驱动
+   ============================================================ */
+.lvs-root{position:absolute;inset:0;display:flex}
+.lvs-stage{flex:1;position:relative;min-width:0;overflow:hidden;
+  background:
+    radial-gradient(1200px 620px at 50% 12%, rgba(224,242,254,.85), rgba(248,250,252,0) 62%),
+    radial-gradient(900px 520px at 22% 88%, rgba(237,233,254,.75), rgba(248,250,252,0) 60%),
+    linear-gradient(180deg,#fdfefe 0%,#f6f9fc 58%,#eef2f7 100%)}
+.lvs-cv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.lvs-cv:active{cursor:grabbing}
+
+/* ── HUD ── */
+.lvs-hud{position:absolute;background:rgba(255,255,255,.82);border:1px solid rgba(148,163,184,.34);
+  border-radius:10px;padding:8px 11px;backdrop-filter:blur(9px);pointer-events:none;
+  box-shadow:0 6px 22px rgba(15,23,42,.07)}
+.lvs-hud-tl{left:12px;top:10px;min-width:238px}
+.lvs-hud-tr{right:12px;top:10px;width:236px}
+.lvs-hud-title{font:700 11.5px/1.3 var(--fw-mono);color:#0f172a;display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.lvs-hud-title.small{font-size:10.5px;color:#475569;margin-bottom:6px}
+.lvs-tag{font:600 8.5px/1 var(--fw-mono);letter-spacing:.4px;padding:2.5px 5px;border-radius:4px;text-transform:uppercase}
+.lvs-tag.live{background:rgba(16,185,129,.14);color:#047857;border:1px solid rgba(16,185,129,.42)}
+.lvs-tag.warn{background:rgba(245,158,11,.14);color:#b45309;border:1px solid rgba(245,158,11,.42)}
+.lvs-tag.tiny{font-size:8px;padding:1px 4px;background:rgba(148,163,184,.16);color:#64748b;border:1px solid rgba(148,163,184,.32)}
+.lvs-hud-row{display:flex;gap:8px;font-size:10px;line-height:1.65}
+.lvs-hud-row .k{color:#94a3b8;flex:0 0 34px}
+.lvs-hud-row .v{color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvs-hud-note{font-size:9px;color:#94a3b8;margin-top:4px;line-height:1.45}
+.lvs-hud-view{color:#7c8ba1;margin-top:2px}
+.lvs-progress{height:3px;border-radius:2px;background:rgba(148,163,184,.22);margin:6px 0 4px;overflow:hidden}
+.lvs-progress i{display:block;height:100%;border-radius:2px;
+  background:linear-gradient(90deg,#0ea5e9,#6366f1,#d946ef);transition:width .28s ease}
+.lvs-read{display:flex;flex-direction:column;gap:1px;padding:4px 0;border-top:1px dashed rgba(148,163,184,.28)}
+.lvs-read:first-of-type{border-top:0}
+.lvs-read b{font-size:9.5px;color:#334155;font-weight:600}
+.lvs-read .rms{font-size:14px;font-weight:700;color:#0369a1;letter-spacing:-.2px}
+.lvs-read .dim2{font-size:8.5px;color:#94a3b8}
+
+/* ── 控制条 ── */
+.lvs-ctrl{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:12px;max-width:calc(100% - 16px);
+  background:rgba(255,255,255,.9);border:1px solid rgba(148,163,184,.36);backdrop-filter:blur(11px);
+  box-shadow:0 10px 30px rgba(15,23,42,.11);font-size:10.5px;white-space:nowrap;
+  overflow-x:auto;scrollbar-width:none}
+.lvs-ctrl::-webkit-scrollbar{height:0}
+.lvs-btn{border:1px solid rgba(148,163,184,.5);background:#fff;color:#334155;border-radius:7px;
+  padding:5px 12px;font:600 10.5px/1.2 inherit;cursor:pointer;transition:all .14s}
+.lvs-btn:hover:not(:disabled){border-color:#0ea5e9;color:#0369a1;background:#f0f9ff}
+.lvs-btn:disabled{opacity:.42;cursor:not-allowed}
+.lvs-btn.primary{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-color:#0284c7;color:#fff;
+  box-shadow:0 2px 10px rgba(2,132,199,.32)}
+.lvs-btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#38bdf8,#0ea5e9);color:#fff}
+.lvs-btn.primary.on{background:linear-gradient(180deg,#6366f1,#4f46e5);border-color:#4f46e5;
+  box-shadow:0 2px 12px rgba(99,102,241,.4)}
+.lvs-sep{width:1px;height:16px;background:rgba(148,163,184,.34)}
+.lvs-chk{display:inline-flex;align-items:center;gap:4px;color:#475569;cursor:pointer;font-size:10px}
+.lvs-chk input{accent-color:#0ea5e9;width:12px;height:12px;cursor:pointer}
+.lvs-dim{color:#94a3b8;font-size:10px}
+/* 视图下拉：与按钮同高，箭头用内联 SVG（避免依赖字体符号） */
+.lvs-sel{appearance:none;-webkit-appearance:none;border:1px solid rgba(148,163,184,.5);border-radius:7px;
+  background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' fill='none' stroke='%2364748b' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 7px center;
+  color:#334155;font-family:inherit;font-size:10.5px;font-weight:600;line-height:1.2;
+  padding:5px 22px 5px 9px;cursor:pointer;outline:none;transition:border-color .14s,box-shadow .14s}
+.lvs-sel:hover{border-color:#0ea5e9;color:#0369a1}
+.lvs-sel:focus{border-color:#0ea5e9;box-shadow:0 0 0 2px rgba(14,165,233,.18)}
+.lvs-range{width:74px;accent-color:#0ea5e9;cursor:pointer}
+.lvs-mono{font-family:var(--fw-mono);color:#475569;font-size:10px;min-width:34px}
+.lvs-loading{color:#0f766e;font-size:10px;animation:lvs-pulse 1.1s ease-in-out infinite}
+.lvs-err{color:#b91c1c;font-size:10px;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+@keyframes lvs-pulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* ── 图例 ── */
+.lvs-legend{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:3px;
+  font-size:9px;color:#94a3b8;pointer-events:none}
+.lvs-legend span{display:inline-flex;align-items:center;gap:5px}
+.lvs-legend i{display:inline-block;width:26px;height:5px;border-radius:2px}
+.lvs-legend i.ramp{background:linear-gradient(90deg,#94a3b8,#0ea5e9,#6366f1,#d946ef,#f59e0b)}
+.lvs-legend i.flat{background:#cbd5e1}
+.lvs-legend i.line{height:2px;background:linear-gradient(90deg,#0ea5e9,#d946ef)}
+.lvs-legend i.dot{width:6px;height:6px;border-radius:50%;background:#94a3b8}
+.lvs-legend i.ring{border-radius:50%;width:9px;height:9px;border:2px solid #0ea5e9;background:transparent}
+
+/* ── 右侧面板 ── */
+.lvs-side{width:352px;flex-shrink:0;background:rgba(255,255,255,.97);border-left:1px solid var(--fw-border);
+  overflow-y:auto;padding:12px 14px 18px;font-size:11px;backdrop-filter:blur(4px)}
+.lvs-side-hd{display:flex;align-items:center;gap:8px;font:700 11.5px var(--fw-mono);color:#0f172a;
+  padding:10px 0 6px;border-bottom:1px solid rgba(148,163,184,.24);margin-bottom:7px}
+.lvs-side-hd span{color:#94a3b8;font-weight:400;font-size:9.5px;margin-left:auto}
+.lvs-x{margin-left:auto;border:0;background:none;font-size:15px;line-height:1;color:#94a3b8;cursor:pointer;padding:0 2px}
+.lvs-x:hover{color:#0f172a}
+.lvs-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:10px;line-height:1.5}
+.lvs-kv .k{color:#94a3b8}
+.lvs-kv .v{color:#1e293b;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvs-steps{margin:4px 0 0;padding-left:16px;font-size:10px;line-height:1.62;color:#475569}
+.lvs-steps li{margin-bottom:5px}
+.lvs-steps b{color:#0369a1}
+.lvs-side-note{font-size:9px;line-height:1.58;color:#94a3b8;margin-top:9px;
+  padding-top:8px;border-top:1px dashed rgba(148,163,184,.28)}
+.lvs-side-note code{background:rgba(148,163,184,.13);padding:1px 4px;border-radius:3px;font-size:8.5px;color:#475569}
+.lvs-empty{margin-top:10px;padding:11px 12px;border:1px dashed rgba(245,158,11,.55);border-radius:9px;
+  background:rgba(255,251,235,.7)}
+.lvs-empty b{color:#b45309;font-size:11px}
+.lvs-empty p{margin:5px 0 0;font-size:10px;line-height:1.6;color:#78350f}
+.lvs-empty p.dim2{color:#a16207}
+.lvs-side-actions{display:flex;gap:6px;margin-top:9px}
+.lvs-side-actions .lvs-btn{flex:1}
+
+/* 层基线柱状 */
+.lvs-bars{display:flex;align-items:flex-end;gap:1.5px;height:56px;padding:2px 0;margin-top:3px}
+.lvs-bars .b{flex:1;display:flex;align-items:flex-end;justify-content:center;height:100%}
+.lvs-bars .b i{display:block;width:100%;min-width:2px;border-radius:1px 1px 0 0;
+  background:linear-gradient(180deg,#0ea5e9,#6366f1);opacity:.82}
+
+/* 参数表 */
+.lvs-table{margin-top:4px;border:1px solid rgba(148,163,184,.3);border-radius:7px;overflow:hidden}
+.lvs-table .hd,.lvs-table .row{display:grid;grid-template-columns:1fr 62px 56px 58px;gap:4px;
+  padding:4px 7px;font-size:9px;align-items:center}
+.lvs-table .hd{background:rgba(148,163,184,.13);color:#64748b;font-weight:600}
+.lvs-table .row{border-top:1px solid rgba(148,163,184,.16);color:#334155}
+.lvs-table .row:nth-child(even){background:rgba(248,250,252,.72)}
+.lvs-table .row.pend{color:#cbd5e1}
+.lvs-table .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvs-table .sh{color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lvs-table .rms{color:#0369a1;text-align:right;font-weight:600}
+.lvs-table .row.pend .rms{color:#cbd5e1;font-weight:400}
+.lvs-table .ma{color:#64748b;text-align:right}
+
+/* ── live 舞台高度修正（live_stage.v1）：参数星河需要整屏高度，
+      原 460px 固定值是为旧「全部参数」长表设计的，已不适用 ── */
+.fw-live{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.fw-live > .fw-sp-wrap{flex:1 1 auto;height:auto;min-height:440px}
+.fw-live > .lvs-root{flex:1 1 auto;min-height:440px}
+
+/* ---- GapLedgerPanel（3255 工程臂）---- */
+.glp-gaps{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.glp-gap{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--line,#ddd);border-radius:12px;font-size:12px}
+.glp-gap .glp-status{opacity:.75}
+.glp-closed{border-color:#3d9a50;color:#2c7a3e}
+.glp-closed_v{border-color:#3d9a50;color:#2c7a3e}
+.glp-quantified{border-color:#b8860b;color:#8a6508}
+.glp-localized{border-color:#b8860b;color:#8a6508}
+.glp-appx.glp-newest{outline:2px solid #3d9a50;outline-offset:1px}
+.glp-note{font-size:12px;opacity:.8;max-height:120px;overflow:auto;margin:4px 0}
