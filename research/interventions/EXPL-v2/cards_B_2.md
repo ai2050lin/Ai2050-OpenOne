@@ -1,0 +1,421 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## M033（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 5.6
+- 直接读出推高：on |  Comm | ’s | 's | 性的 | TestingModule | 详细的 | ı | 辅 | 详细
+- 直接读出压低：verte | dff | ennie |  OTA | 熬 | -haired | 挖 | 枉 |  Horde | 一夜
+- 正极片段：
+  - 1.00｜0313014918⏎Holidays - Kids InfoBits http://0-galenet.galegroup.com.ilsweb.lvccld.org/servlet/KidsInfoBits?subTopic=Social%2BStudies&locID=lvccld_main&failover【=】0&topic=History%252C
+  - 0.97｜00, i = 0, j, N;⏎  cout << "請輸入黃金分割數位數\n";⏎  cin >> N;⏎  N = N * 3 / 2 + 6;⏎  long* a = new long[N + 1];⏎  while【 (】i <= N) a[i++] = 1
+  - 0.96｜Tree(T); /* 構造[空二元樹]T */⏎  printf("請按層序輸入節點的值(整型)，0表示空節點，輸999結束。節點數≦%d:\n",MAX_TREE_SIZE);⏎  while【(】1)⏎  {⏎    scanf("%d",&T
+  - 0.91｜ by Jake Conroy⏎Subscribe to RSS feed for this article!⏎Warning: include(0php’): failed to open stream: No such file or directory in /sites/polishlinux.org/wp-content/themes/jakilinuxorg/page.php on line 70⏎Warning: include(): Failed opening【 '】0php’' for inclusion (include_path='.
+  - 0.91｜ an object, the smaller the numerical value of its absolute magnitude. A difference of 5 magnitudes between the absolute magnitudes of two objects corresponds to a ratio of 100 in their luminosities, and a difference of n magnitudes in absolute magnitude corresponds to a luminosity ratio of【 】100n/5. For example,
+  - 0.89｜ laser beam welding , electron beam welding, electromagnetic pulse welding and friction stir welding in the latter half of the century. Today, the science continues to advance. Robot welding is commonplace in industrial settings, and researchers continue to develop new welding methods and gain greater understanding of weld quality.⏎<div id="index_ignore【">】Description above from the Wikipedia article Welding⏎,
+  - 0.86｜2%E5%A1%A2%CE%A8%D0%C4%D6%F7%D2%E5%B5%C4%C7%F8%B1%F0%CA%C7?&ct=17&pn=0&tn=ikaslist&rn【=】10&fr=qrl4⏎要把握
+  - 0.86｜ positive integers is 1, so each of them contains almost all positive integers.⏎ Almost all positive integers are composite.⏎ Almost all even positive numbers can be expressed as the sum of two primes.⏎ Almost all primes are isolated. Moreover, for every positive integer , almost all primes have prime gaps of more than【 】 both to their left and to their right; that
+  - 0.86｜word=%CE%A8%CE%EF%D6%F7%D2%E5%A1%A2%CE%A8%D0%C4%D6%F7%D2%E5%B5%C4%C7%F8%B1%F0%CA%C7?&ct【=】17&pn=0&tn=ik
+  - 0.85｜ {⏎    return (Q.rear - Q.front + MAX_QSIZE) % MAX_QSIZE;⏎}⏎⏎// 若队列不空，则用e返回Q的队头元素，并返回OK；否则返回ERROR⏎int Q_GetHead(SqQueue Q, int &e) {⏎    if【 (】Q.front == Q.rear) // �
+  - 0.84｜ integer (or, equivalently, rational) coefficients.  For example, the golden ratio, , is an algebraic number, because it is a root of the polynomial . That is, it is a value for x for which the polynomial evaluates to zero.  As another example, the complex number【 】 is algebraic because it is a root of .⏎⏎
+  - 0.83｜ an adjective or shows the relativity, can also indicate a person, thus, "Bönpo" means a person, or people, who follow(s) the path of Bön. The transcription of the Tibetan spelling is actually just "Bon", but the diaresis is sometimes added above the【 "】o" to prompt the reader to a more nearly
+  - 0.82｜>⏎			<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>⏎		</wsa:ReplyTo>⏎		<wsa:From>⏎			<wsa:Address【>】http://localhost:8080/axis
+  - 0.81｜ which may be in some other target alphabet. An extension of the code for representing sequences of symbols over the source alphabet is obtained by concatenating the encoded strings.⏎⏎Before giving a mathematically precise definition, this is a brief example. The mapping⏎⏎is a code, whose source alphabet is the set【 】 and whose target alphabet is the set . Using the
+  - 0.81｜w", and "x." The file's owner and group are also displayed. Here's an example:⏎The file above belongs to the user "john" and the group "staff." The first character of the permissions string indicates the file type. It is "-" for normal files (as shown above),【 "】d" for directories, "l" for symbolic
+  - 0.81｜ calculate, as well as to think".⏎⏎The word "accountant" is derived from the French word , which is also derived from the Italian and Latin word . The word was formerly written in English as "accomptant", but in process of time the word, which was always pronounced by dropping the【 "】p", became gradually changed both in pronunciation and in
+  - 0.80｜ƒ(x) may or may not be defined at a, and its precise value at the point x = a does not affect the asymptote.  For example, for the function⏎⏎has a limit of +∞ as , ƒ(x) has the vertical asymptote  , even though ƒ【(】0) = 5. The graph of
+  - 0.80｜ 1999 by the International Electrotechnical Commission (IEC), in the IEC 60027-2 standard (Amendment 2).  They were meant to replace the metric (SI) decimal power prefixes, such as "kilo" ("k",【 】103 = 1000),
+  - 0.80｜It follows from the last three pairs of axioms above (identity, distributivity and complements), or from the absorption axiom, that⏎⏎The relation ≤ defined by a ≤ b if these equivalent conditions hold, is a partial order with least element 0 and greatest element 1. The meet【 】 and the join  of two elements coincide with their
+  - 0.79｜面|-{zh-tw:隨機頁面;zh-cn:随机页面}-}-」爲例，其中：⏎ https，是協定；⏎ zh.wikipedia.org，是伺服器；⏎ 443，是服务器上的网络端口号；⏎ /w/index.php，是路径；⏎ ?title【=】Special:-{隨機頁面|-{zh
+
+## M034（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 9 页一次；语料最大激活 6.93
+- 直接读出推高：sı | -avatar | IMITIVE | (nt | eed | 低头 |  flutter | audi | eid |  UB
+- 直接读出压低：风雨 | StateManager | /exec | utta | alist | bus | arda | enia | mate | 昌
+- 正极片段：
+  - 1.00｜ often happily sit down at the piano and entertain his colleagues with a few old standards, starting with "On the Sunny Side of the Street" and ending with "As Time Goes By." But his knowledge went much deeper. On one visit<|endoftext|>GEOG 1000 World Regional Geography (【3】L,3CR)[E][CS][G
+  - 0.91｜ down at the piano and entertain his colleagues with a few old standards, starting with "On the Sunny Side of the Street" and ending with "As Time Goes By." But his knowledge went much deeper. On one visit<|endoftext|>GEOG 1000 World Regional Geography (3L,【3】CR)[E][CS][G]:⏎An overview
+  - 0.91｜排放”指的是RCF8.5，“快速减排”“排放快速减少”，指的是RCF2.6。为了对未来气候作出评估，IPCC第五次评估报告采用了四个温室气体浓度情景，按低至高浓度排列分别为RCP2.6（低）、RCP【4】.5（中低）、RCP6.
+  - 0.83｜开学。⏎ 1994年：第十二届亚洲运动会在日本广岛开幕。⏎ 1996年：秘魯航空603號班機空難。⏎⏎21世紀 ⏎ 2005年：墨西哥在世少盃決賽以【3】-0擊敗上屆冠軍巴西首次
+  - 0.82｜、阿爾巴尼亞社會主義人民共和國領導人恩維爾·霍查過世。⏎⏎5月 ⏎5月19日——香港隊在北京工人體育場舉行的1986年世界盃外圍賽亞洲區小組賽中以【2】:1擊敗中國隊，賽後支持
+  - 0.79｜001年：香港警務處偵緝訓練學校解散及改組，改革為香港警察學院偵輯訓練科。號稱臺灣第一家合法直播衛星電視業者的太平洋衛視結束營業。⏎ 2002年：巴西在決賽中以【2】比0擊敗德國贏得第十七
+  - 0.77｜保祿二世事敗。⏎1月6日至1月13日——第二届法赫德国王杯足球赛在沙特阿拉伯利雅得举行。一共有五大洲国家杯冠军联同东道主沙特队，总共六支队伍参赛。决赛中，丹麦以【2】比0战胜阿根廷，赢得了冠军。本届比赛
+  - 0.75｜-H键包括芳烃和烷烃高效高选择性氧化至醛等含氧化合物，具有优异的底物普适性。相关结果发表在ACS Appl. Mater. Interfaces 2021.DOI: 10.1021/acsami.【1】c06367。http://t
+  - 0.75｜的计划。⏎报告提到的“高排放”指的是RCF8.5，“快速减排”“排放快速减少”，指的是RCF2.6。为了对未来气候作出评估，IPCC第五次评估报告采用了四个温室气体浓度情景，按低至高浓度排列分别为RCP【2】.6（低）、RCP4.5
+  - 0.73｜ and to Electrocoin Automatics for Europe.⏎⏎Ports⏎Bubble Bobble was ported to many home video game consoles and computers, including the Amstrad CPC, ZX Spectrum, Commodore 64, Apple II, Amiga, Famicom Disk System, Nintendo Entertainment System, MSX【2】, and Master System—the last of these has two
+  - 0.70｜交換。⏎⏎晶体结构中有许多空腔（笼）和连接空腔的通道，水分子位于其中，可由通道运输。晶体和集合体形态及解理随着晶体结构的不同而异，一般呈浅色，玻璃光泽，硬度3－3.5，比重【2】.0－2.4。⏎⏎沸石族
+  - 0.68｜citons via virtual single-exciton states; Richard D. Schaller, Vladimir M. Agranovich and Victor I. Klimov; Nature Physics 1, 189-194 (2005) doi:10.1038/nphys【1】51⏎"Effect of electronic structure on carrier
+  - 0.67｜ ignites spontaneously in air when finely divided. Strontium is used in pyrotechnic compounds and various alloys. Atomic number 38; atomic weight 87.62; melting point 769°C; boiling point 1,384°C; specific gravity 【2】.54; valence 2. See
+  - 0.67｜快速减排”“排放快速减少”，指的是RCF2.6。为了对未来气候作出评估，IPCC第五次评估报告采用了四个温室气体浓度情景，按低至高浓度排列分别为RCP2.6（低）、RCP4.5（中低）、RCP【6】.0（中高）和RCP8
+  - 0.67｜ that contain no water vapor feedback. The water vapor feedback issue is a crucial one since without the feedback, not only are the models wrong, there can be no significant warming.⏎Problems With IPCC Models⏎According to the IPCC [http://www.ipcc.ch/pdf/assessment-report/ar4/wg【1】/ar4-wg1-chapter3.pdf]
+  - 0.65｜ title, winning the best of five series, three games to one. Alaska import Sean Chambers got the better of his counterpart, Ginebra import Wes Matthews, in the four-game series.⏎⏎In 1992, Alaska owned the second pick in the draft and they choose the burly 【6】'4" Stevenson Solomon, who had been in
+  - 0.65｜魯門右眼視力為20/50，而左眼是20/40，但由於他在體能測試前秘密地記誦了視力檢查表，所以他仍可以通過測試從征。杜鲁门被描述为5英尺【1】0英寸高（178厘米）、灰色
+  - 0.65｜ the ESS 101 optional weekend field trip program. PLUS: check out an awesome video about ESS 101! http://www.youtube.com/watch?v=IkO5qzuizM8&feature=youtu.be⏎ESS 102 Space and Space Travel (【5】) NW⏎Explores powering the sun,
+  - 0.64｜):⏎This course addresses strategies for successful GIS management and implementation in an organization-wide context and is organized around three primary issues: implementation planning, data management, and GIS problem solving in the workforce. Prerequisite: GEOG 1100.⏎GEOG 2100 Advanced GIS (【2】L,4LB,4CR):⏎An advanced
+  - 0.63｜Fried and other scientists discussed the latest research on fat cells here at the annual meeting of the Obesity Society. Fried talks about the relationship between obesity and fat cells.⏎Q: Do people have different numbers of fat cells?⏎A: A person at a healthy weight might have 10 billion to 【2】0 billion, and an obese person can have up
+
+## M035（第 19 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 7.94
+- 直接读出推高：一部分 | 笔 | Descriptor | 弹 | Descriptors | 而出 | 雅 |  parte | 描 | 翼
+- 直接读出压低：ssi | 髹 | Si | wich |  Lol |  Lun | cer |  Si |  solids | 邯
+- 正极片段：
+  - 1.00｜ additive formula⏎ for all integers  such that ⏎⏎with boundary values⏎ for all integers ⏎⏎The formula follows from considering the set  and counting separately (a) the k-element groupings that include a particular set element, say "i", in every group (since "i" is already chosen to【 fill】 one spot in every group, we need only choose
+  - 0.96｜ the 17th century, Christian families living under the Ottoman rule began to submit their sons into the Kapikulu system willingly, as they saw this as a potentially invaluable career opportunity for their children. Eventually the Sultan turned to foreign volunteers from the warrior clans of Circassians in southern Russia to【 fill】 his Janissary armies. As a whole the
+  - 0.92｜ GIS) is designed to highlight GIS concepts that may be added to many geoscience topics and exercises. In particular, we focus on using GIS at the level of introductory geoscience; however, many of the exercises and concepts may be applied in upper level courses as well. We will attempt to【 answer】 the following questions:⏎Do I need to be a
+  - 0.87｜学会了解他人的感受和需求，懂得与人相处所需的宽容、谦让、共享与合作，同情、抚慰、关心和帮助他人。⏎6、鼓励儿童仔细观察周围事物及其相互关系，促进有意注意的发展。多与儿童交流幼儿园及周围发生的事情，积极【回答】儿童提出的问题。⏎人之初，性本善
+  - 0.85｜ merits of extending and strengthening school choice. In England, the controversial Education and Inspections Bill, published on the 28 February 2006, contains a prominent role for ‘school choice’. But the debate lacks some basic information on these issues, and this paper provides some background facts to【 fill】 this gap. We first consider the transport issue and
+  - 0.84｜ A National Perspective 8 A Strategic Research Agenda for Desalination As noted in Chapter 3, desalination is likely to have a niche in the water management portfolio of the future, although the significance of this niche cannot be definitively determined at this time. The potential for desalination to【 meet】 anticipated water demands in the United States is not constrained
+  - 0.84｜ Porter. / Indianapolis Recorder Collection, Indiana Historic⏎Originally published in The Indianapolis Star in February 1990⏎Excluded from white society and suffering under the restraints of second-class citizenship, black Americans once lacked the voice whites enjoyed in the form of newspapers and magazines.⏎Black newspapers sought to【 fill】 that void beginning in the 1820
+  - 0.83｜ rapidly growing economies of emerging nations like India and China, and yet answer questions of sustainability, energy security, geopolitics and the global environment.⏎The major issue facing United States and most other countries in the world is how to supply transportation fuel. Hydrogen, as part of a sustainable energy supply, can【 meet】 the challenge of a domestically produced energy carrier that can
+  - 0.81｜every 4 th person has a common quality).⏎Who carried out the survey? What was the population? How was the sample selected? How large was the sample?⏎What was the response rate? How were the subjects contacted? When was the survey conducted? What were the exact questions?⏎Government statistical offices【 answer】 these questions when they announce results; national opinion polls
+  - 0.80｜ many “teachable moments” in the stories coming to us from Japan. But what are they? What are the lessons we might be learning alongside our students?⏎Many teachers contributed their thoughts and links in the chat (see below), and four guest joined us in the Skype conversation:⏎- To help us【 answer】 some of our questions, we invited Dave Mammen
+  - 0.79｜ the alternative energy system other than solar energy. As a result, almost everyone will be able to install their own personal wind energy system in the backyard to help being more energy conservative and saving a lot of money in the energy bills.⏎Indeed a small wind energy system can be installed in your house to help【 fulfilling】 your electrical energy need. The wind energy system works
+  - 0.78｜ving.⏎Most systems are popular with cardio equipment, but many also work with resistance equipment as well. Recording free-weight activity is usually a fairly straightforward (manual) task, which adds value to the overall workout data set.<|endoftext|>Nuclear Power Is the Future⏎Nuclear power alone is positioned to help【 meet】 the world's burgeoning energy demand and supply electricity to
+  - 0.75｜ serves as a foundation that legitimizes a student's request for appropriate accommodations. Documentation must include very specific information regarding the individual's actual current functional limitations. DSSC does not base eligibility on what could/might occur or often occurs with those that have been given this diagnosis. Documentation should be current and【 answer】 the following the questions:⏎Does the individual have a
+  - 0.75｜ Smithsonian's National Postal Museum, it’s exciting to see people energized about postage stamps. People online and in the museum debate the merit of honoring one American figure over another and discuss what it actually means to have one’s face on a stamp. I’ll have to un-memorize my answer【 to】 frequently asked questions such as, “Why isn’t
+  - 0.74｜ of municipal tap water to the role that the U.S. Environmental Protection Agency plays in determining water-quality standards. To support the latter group, Curry arranged an after-school meeting between its four students and a water-district biologist at nearby Lake Mead National Recreation Area.⏎The entire class hoped the biologist would【 answer】 several questions they'd prepared about the prevention of threats
+  - 0.74｜ through which Rome mustered forces until the end of the Republic. The army eventually became a professional organization largely of citizens, who would served continuously for 25 years before being discharged.⏎⏎The Romans were also noted for making use of auxiliary troops, non-Romans who served with the legions and【 filled】 roles that the traditional Roman military could not fill effectively
+  - 0.73｜ittent Electricity Sources⏎by John Blackburn, Ph.D.⏎Professor of Economics Emeritus, Duke University⏎with a Foreword by Arjun Makhijani⏎GROUNDBREAKING STUDY FINDS SOLAR, WIND, OTHER RENEWABLE POWER SOURCES COULD ME【ET】 NEARLY ALL NORTH CAROLINA ELECTRIC
+  - 0.72｜ mammoth’s tusk⏎- The smallest boomerang to travel over 20m was weeny s a teeny-48mm<|endoftext|>Restrictive immigration policies have long been associated with a variety of economic problems including the diminished availability of foreign business and scientific talent, the inability to【 fill】 low-skilled agricultural and service jobs typically scorned
+  - 0.72｜ books, archival holdings, electronic resources (including CD-ROMs and web pages), and even novels and movies are included in this section. >From this vantagepoint one can appreciate the wide array of work that has already been done and note what areas still need fleshing out.⏎The book capably【 meets】 its goal of providing a readable overview of nineteenth century
+  - 0.70｜ a transition) to a lower state. In a neutral atom, the system will emit a photon of the difference in energy, since energy is conserved.⏎⏎If an inner electron has absorbed more than the binding energy (so that the atom ionizes), then a more outer electron may undergo a transition to【 fill】 the inner orbital. In this case, a visible
+
+## M036（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 6.95
+- 直接读出推高：verts | TXT |  Convert | StateManager |  Bas |  Infrastructure |  Handling | 不来 |  infrastructure | TRANSFER
+- 直接读出压低：大于 | 高于 | greater | Greater |  greater | 小于 | 低于 | 优于 | 偏向 |  >=
+- 正极片段：
+  - 1.00｜ number is f(n + 1), where⏎⏎Politeness⏎The politeness of a positive number is defined as the number of ways it can be expressed as the sum of consecutive integers. For every x, the politeness of x equals the number of odd divisors of x that【 are】 greater than one. ⏎The politeness of the
+  - 0.87｜的情形系经保险人说明并经投保人同意的，以投保人签收的保险单或者其他保险凭证载明的内容为准；⏎（二）非格式条款与格式条款不一致的，以非格式条款为准；⏎（三）保险凭证记载的时间不同的，以形成时间【在】后的为准；⏎（四）保险凭证存在手
+  - 0.81｜物品在世界市场上流行的价格，而价格代表机会成本。因此，比较贸易前一种物品的世界价格和国内价格就可以表明，是国生产的机会成本低，从而生产该种物品有比较优势，还是其他国家在该物品的生产上具有比较优势⏎⏎如果一种物品的世界【价格】高于国内价格，该国在生产这种物品
+  - 0.80｜ prime and let r(x) be their greatest common divisor. Then, since r(x) is not constant, it will have some root a, which will be then a common root of p(x) and q(x).⏎⏎If F is not algebraically closed, let p(x) be a polynomial whose【 degree】 is at least 1 without roots. Then p
+  - 0.77｜ tree and B-tree data structures are based on binary search.⏎⏎Algorithm ⏎Binary search works on sorted arrays. Binary search begins by comparing an element in the middle of the array with the target value. If the target value matches the element, its position in the array is returned. If the target value is【 less】 than the element, the search continues in the lower
+  - 0.76｜Calculation" there).⏎⏎The arithmetic–geometric mean can be used to compute – among others – logarithms,  complete and incomplete elliptic integrals of the first and second kind, and Jacobi elliptic functions.⏎⏎Proof of existence⏎From the inequality of arithmetic and geometric means we can conclude【 that】:⏎⏎and thus⏎⏎that is, the sequence 
+  - 0.74｜ the message parameter was used<|endoftext|>In computability theory, the Ackermann function, named after Wilhelm Ackermann, is one of the simplest and earliest-discovered examples of a total computable function that is not primitive recursive. All primitive recursive functions are total and computable, but the Ackermann function illustrates【 that】 not all total computable functions are primitive recursive.⏎⏎
+  - 0.73｜ and B-tree data structures are based on binary search.⏎⏎Algorithm ⏎Binary search works on sorted arrays. Binary search begins by comparing an element in the middle of the array with the target value. If the target value matches the element, its position in the array is returned. If the target value is less【 than】 the element, the search continues in the lower half
+  - 0.73｜磁性是超导体的两个重要特性。超导体电阻转变为零的温度，称为超导临界温度，据此超导材料可以分为低温超导體和高温超导體。這裡的「高溫」是相对于绝对零度而言的，其實遠低【於】冰點攝氏0℃。科学家一直在寻求
+  - 0.69｜ less than .⏎⏎Where floor is the floor function, the pseudocode for this version is:⏎⏎ function binary_search_leftmost(A, n, T):⏎     L := 0⏎     R := n⏎     while L < R:⏎         m := floor((L + R) / 2)⏎        【 if】 A[m] < T:⏎             L := m
+  - 0.67｜In computability theory, the Ackermann function, named after Wilhelm Ackermann, is one of the simplest and earliest-discovered examples of a total computable function that is not primitive recursive. All primitive recursive functions are total and computable, but the Ackermann function illustrates that not all total computable【 functions】 are primitive recursive.⏎⏎After Ackermann's publication of
+  - 0.67｜ the human vocal tract. It is often measured as an amplitude peak in the frequency spectrum of the sound, using a spectrogram (in the figure) or a spectrum analyzer, though in vowels spoken with a high fundamental frequency, as in a female or child voice, the frequency of the resonance may lie【 between】 the widely-spread harmonics and hence no peak
+  - 0.67｜保证人不再承担保证责任。连带责任保证的债权人未在保证期间内请求保证人承担保证责任的，保证人不再承担保证责任。《民法典》第六百九十二条第二款规定：债权人与保证人可以约定保证期间，但是约定的保证期间【早】于主债务履行期限或者与主债务履行
+  - 0.66｜ as bounds for the upper tail of the cumulative distribution function for k ≥ np.⏎⏎Hoeffding's inequality yields the simple bound⏎⏎which is however not very tight. In particular, for p = 1, we have that F(k;n,p) = 0 (for fixed k, n with【 k】 < n), but Hoeffding's
+  - 0.65｜ made. For some applications this definition is preferable since it does not mention probabilistic Turing machines.⏎⏎In practice, an error probability of 1/3 might not be acceptable, however, the choice of 1/3 in the definition is arbitrary. Modifying the definition to use any constant between 【0】 and 1/2 (exclusive) in place
+  - 0.64｜ predicted to be on the hydrogen atom, implying that this compound could be referred to as astatine hydride according to certain nomenclatures. That would be consistent with the electronegativity of astatine on the Allred–Rochow scale (1.9) being less【 than】 that of hydrogen (2.2). However,
+  - 0.63｜ was far from obvious from known chemistry at that time.⏎⏎Missing elements ⏎After Moseley's death in 1915, the atomic numbers of all known elements from hydrogen to uranium (Z = 92) were examined by his method. There were seven elements (with Z 【<】 92) which were not found and therefore
+  - 0.62｜BS (Ref. 93245⏎Trophic Level (Ref. 69278⏎): 2.0 ±0.0 se; Based on diet studies.⏎Resilience (Ref. 69278⏎): High, minimum population doubling time【 less】 than 15 months (tm<1).⏎
+  - 0.62｜ (i.e., a solution) if most other orbits that pass close to it at some point do not remain close to it as time advances.⏎⏎If M is the state space for the map , then  displays sensitive dependence to initial conditions if for any x in M and any δ > 0【,】 there are y in M, with distance  such
+  - 0.60｜。⏎智能卡安全体系包括3部分：安全状态、安全属性以及安全机制。安全状态是指智能卡当前所处的安全级別，即当前安全状态寄存器的值。安全属性又称为访问权限，即在进行某种操作时要求安全状态寄存器的【值】是什么。安全机制从广义上说是卡片
+
+## M037（第 14 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 3.22
+- 直接读出推高：身心健康 |  underlying | )+( | رز |  ================================================================= | .tight | \tctrl | 硬 | ,+ | 解释
+- 直接读出压低：fabric | 日报社 | 所需 | 醯 | 俳 | 所需要 | 佯 | 箕 | _printf | 鸠
+- 正极片段：
+  - 1.00｜, the 12th‑century Archbishop of Armagh. He explained that the prophecies had not, to his knowledge, ever been printed before, but that many were eager to see them. Wion includes both the alleged original prophecies, consisting of short, cryptic Latin【 phrases】, as well as an interpretation applying the statements to
+  - 0.86｜ take action but then are too busy to do anything about it." (See http://ed.voicethread.com/share/62276 for the complete discussion.) Another interesting conversation was built around a series of quotes and pictures connected to the concept of hatred. (See http://ed.vo【ic】ethread.com/share/88781
+  - 0.84｜的格式⏎运输层用户数据报UDP包括两个字段：数据字段和首部字段。首部字段有8个字节，4个字段组成，每个字段两个字节。源端口字段： 源端口号；目的端口字段：目的端口号；【长度】字段：UDP数据报的长度；检验和
+  - 0.81｜007 Commencement Address at Stanford University, he used the occasion to deliver an impassioned argument for the value of the arts and arts education.⏎“Art is an irreplaceable way of understanding and expressing the world,” said Gioia. “There are some truths about life that can be【 expressed】 only as stories, or songs, or images.
+  - 0.80｜传达,有的则是部分被传达,由此可看出,主导话语者在交流 中占据着"spokesman"的角色,他或她有很大的自由来歪曲或者忠实地传达原文,他能够确定言语 行为的本质。⏎二、言语后评价 言语后【评价】有几种功能,如:主导话语者能够
+  - 0.78｜个人因素有密切的关系。说服者的专家资格、可信度、受欢迎程度(说服者的外表、是否可爱、与被说服者的相似性)都会影响说服效果说服信息中所提倡的态度与被说服者原来持有的态度之间的差距、说服信息唤醒的恐惧感、信息的【呈现】方式等都会影响说服效果。3、被
+  - 0.78｜ ⏎⏎Authored by Darius the Great sometime between his coronation as king of the Persian Empire in the summer of 522 BC and his death in autumn of 486 BC, the inscription begins with a brief autobiography of Darius, including his ancestry and lineage. Later in the【 inscription】, Darius provides a lengthy sequence of events following
+  - 0.77｜ aphasia can range from occasional trouble finding words, to losing the ability to speak, read, or write; intelligence, however, is unaffected. Expressive language and receptive language can both be affected as well. Aphasia also affects visual language such as sign language. In contrast, the use of formula【ic】 expressions in everyday communication is often preserved. For example
+  - 0.77｜姓，可用名章，款无姓，或不落款者，应用姓名章，以利辨识作者。&nbsp;闲章&nbsp;闲章亦称布局章，包括引首章、拦边章、压角章和腰章。&nbsp;引【首】章&nbsp;盖在书法作品右上的章
+  - 0.76｜ have moved on. I went to the church to fill out the papers for the Spiritual Court and sat with my priest. He said that we had to contact my ex to get his signature. He is a very vindictive person and will likely not cooperate. What can I do?” (watch your【 spacing】 here)⏎Answer: It is my understanding that it
+  - 0.75｜ to serve God in the poor and needy. So the life of comfort is not for me. The life of selfless service, the life of dedicated, devoted service, is for me. Service is my goal, service is my perfection in life.”⏎from Garden of the Soul⏎by Sri Chinm【oy】⏎Published by Health Communications<|endoftext|>Administratrium,
+  - 0.75｜。每类题目都有各自基本的答题模式。（2）横向分类。据解答方式不同，可把简答题分为：直接叙述题、用数学语言帮助解答题、需用图帮助解答的问题。对于此类题目学生要认真体会答题的顺序，理解每条答【语】与题目的联系，多做几道题目
+  - 0.74｜ August Kekulé, the theory of the asymmetric carbon atom by J.H. van't Hoff, and the reform of chemical nomenclature by Adolf von Baeyer, was expressed in his vituperative articles in the Journal für Praktische Chemie. Some translated quotes illustrate his manner of【 artic】ulating the deep conflict between his interpretation of chemistry and
+  - 0.74｜kHz interrupter, over a distance of one mile (1.6 km) at Cobb Island, Maryland, US. His first transmitted words were, "Hello. One, two, three, four. Is it snowing where you are, Mr. Thiessen?". The words were barely【 intellig】ible above the background buzz of the spark.⏎⏎F
+  - 0.74｜en)认为，人们习得语言的唯一方式是通过接受和理解输入信息，从目前的i水平提高至“i+1”水平，以此遵循自然习得的顺序。⏎朗格(Long)认为，说话人是通过修饰交际模式，如解释、重复、【减速】或与第二语言说话人合作来保证思想
+  - 0.74｜林格的写作能力感到十分惊奇，他表示塞林格拥有惊人的天赋。 两人就此开始通信；塞林格在1946年7月写给海明威的信中说，他们间的谈话是他在战争中为数不多的美好回忆，然后他又【补充】说自己正在创作一部关于“考尔菲德
+  - 0.73｜绘画中有15张遗留了下来，之所以数量这么少，是因为他持续不断地，频繁地用新技术进行灾难性的试验以及他作画时一贯的拖延。不论如何，他的作品，连同他那包含了速寫、科学图解和关于绘图本质思想的笔记【手】稿，使他成为了同时代中只有米
+  - 0.73｜上忽视了文艺发展的自身规律以及对文艺艺术性的追求。<|endoftext|>护理心理学⏎心理动力学：由奥地利精神科医生弗洛伊德在19世纪末20世纪初所创立。⏎强调幼年心理创伤影响和潜意识冲突对心理障碍形成的作用。⏎采用【自由】联想、释梦、催眠等治疗技术
+  - 0.72｜。他说：“广东作为一个省，等于人家一个或几个国家，但现在全省的地方机动权力太小，中央统得过死，不利于国民经济的发展。我们的要求是在全国集中统一领导下，放手一点，搞活一点。这样做，对地方有利，对国家也有利。”然后他又【补充】说：“如果给广东一个特殊政策，经济
+  - 0.72｜ that he would use complex sentences and it would take time for Ganapati to understand them, and in the meantime he would be able to get more inspiration and get ready for dictation.⏎Thus the Mahabharata was composed.⏎from Tales of the Mahabharata⏎by Sri Chinm【oy】⏎Published by Citadel Books<|endoftext|>The ice birds of
+
+## M038（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 2.35
+- 直接读出推高：eted | 不成 |  veteran | 讼 | enus | 决不 | 一面 | ersions |  distr | phalt
+- 直接读出压低：forge | dz |  Craft |  Display |  allowance | جيب | Campo | 菉 | space |  display
+- 正极片段：
+  - 1.00｜要约后想撤销该要约，其是否能行使撤销权⏎1．乙公司不能行使撤销权。⏎1．该合同关于王某保留所有权的约定是否有效⏎1．约定有效。⏎1．彩电受损造成的损失应由谁承担⏎1．彩电受损【造成的】损失应由乙家电厂承担。⏎本案中
+  - 0.92｜而变得污浊了的空气；但他并没有发现光的重要性。普里斯特利还发现置於密封玻璃罩內的老鼠極易窒息，但是如果加入一片新鮮薄荷葉，老鼠就可以甦醒。⏎ 1773年，荷兰的英格豪斯证明只有【植物】的绿色部分在光下才能起使空气
+  - 0.88｜Naughton's team might often interpret a certain symbol in a way that Bliss would later criticize as a "misinterpretation". For example, they might interpret a tomato as a vegetable —according to the English definition of tomato— even though the ideal Blissymbol of vegetable was restricted by Bliss to just【 vegetables】 growing underground. Eventually the OCCC staff modified and
+  - 0.88｜ Books. This particular book with its wonderful and funny pictures, Little Peewee or, Now Open The Box was written by Dorothy Kunhardt in 1934, but illustrated by Miller as a Little Golden Book in 1948.⏎why that image inspired you⏎only i can【 say】 the reason i choose this artist work, it is
+  - 0.86｜ A bar chart, on the other hand, conveys numerical information; the proper text description of a bar chart is a tabular data table, probably with some additional summary information, so that speech reader users can access the numerical relationships and trends visually represented in the chart. In cases of mathematical equations,【 text】 equivalents should be available as MathML.⏎Text equivalents
+  - 0.78｜包括遺傳密碼（DNA和RNA）、 蛋白質生物合成、跨膜運輸(Membrane Transport)以及细胞信號轉導。⏎⏎历史 ⏎⏎在尿素被人工合成之前，人们普遍认为非生命物质的科学法则不适用于生命体，并认为只有生命【体】能够产生构成生命体的分子（即有机
+  - 0.76｜屬形成合金。那些製成的合金可以增加硬度或製造奇特的顏色（見下）。金是熱和電的良導體，亦不受地球大氣層及大部分反應物影響。熱、濕氣、氧及大部分侵蝕劑只對金【有】少量化學影響，令金適合作為
+  - 0.76｜经度在20度和160度之间，东经度在东半球，西经度在西半球。南北半球的判断：北纬在北半球，南纬在南半球。答案：A、B、C、D四点【中】，位于北半球的是A、B、
+  - 0.75｜國際法的鼻祖，但他的著作是建基於前人所發展的自然法理論。他继续维持万民法和市民法的区别。而他所称的万民法是指其拘束效力来自所有国家或许多国家的意志的法律，因而他指的是【万】国法，也就是。继他之后，英国
+  - 0.73｜能量-强度曲线的峰宽度（在固定动量下）来提供有关电子（或准粒子）寿命的信息。然而，在实际应用中，尽管现代实验中的分辨率影响较小，峰值宽度还受到矩阵元效应和分辨率的影响。因此，ARPES主要提供关于电子寿命【的】定性信息。研究人员常常采用一种分析方法
+  - 0.71｜ mid-forties. In Party propaganda, Big Brother is presented as one of the founders of the Party.⏎⏎At one point, Winston Smith, the protagonist of Orwell's novel, tries "to remember in what year he had first heard mention of Big Brother. He thought it must have been at some【 time】 in the sixties, but it was impossible to
+  - 0.69｜细胞中共表达20Q-GFP、97Q-GFP及二者相互之间的polyQ-Opto蛋白的吸附能力进行测试。结果显示，mCherry-Opto的光诱导凝聚体未能吸附20Q-GFP或97Q-GFP。然而，2【0】Q-GFP、97Q-GFP均
+  - 0.68｜ercosis, this syndrome can be acquired by ingesting eggs passed in human faeces.⏎Humans get infected with Echinococcus granulosus only by accident. Normally the worm’s lifecycle involves a larvae stage in sheep, goats, cattle or horses and an adult phase in dogs. Generally only【 humans】 who work closely with sheep and dogs, such as
+  - 0.67｜统一的命名接口，它们无法向全球转信，所以它们并不存在于Usenet上，性质上更接近于采用NNTP协议的论坛或者BBS。⏎⏎在台灣的發展及現狀⏎在台灣，網際網路開始發展時，新聞群組主要存在於【台灣】學術網路上為數不少的BBS
+  - 0.64｜克定律的中心内容。⏎⏎胡克定律仅适用于特定负载条件下的部分材料。钢材在多数工程应用中都可视为线弹性材料，在其弹性范围内（即应力低于屈服强度时）胡克定律都适用。另外一些材料（如铝材）则只在【弹性】范围内的一部分区域行为符合胡克定律。对于
+  - 0.62｜ synthesized entirely by cosmic ray spallation and supernovae and not by stellar nucleosynthesis, so it is a low-abundance element in the Solar System and in the Earth's crust. It constitutes about 0.001 percent by weight of Earth's crust. It is concentrated on【 Earth】 by the water-solubility of its more
+  - 0.62｜ against young people dropped by 68% from 1994 to 2010, while robbery declined 77% and aggravated assault by 80%. Overall, most of the drop in the rate serious violent crimes against young people took place from 1994【 to】 2002, falling by 6
+  - 0.62｜上下标字母。而USLC转写在梵文转写可以和国际流行的梵文转写IAST通用，能准确地标示梵文字母。⏎⏎拼音有藏語拼音、《藏文拼音教材（拉薩音）》拼音方案、及THL拼音等羅【馬】化方案。藏語拼音是中華人民
+  - 0.61｜交流进一步体会旋转的数学内涵，获得知识，体验成功，享受学习乐趣.让学生从事应用所学的知识进行图案设计的活动，享受成功的喜悦，激发学习热情。⏎2 2 、 探索交流 归纳总结 主要采取:小组合作的形式，以【学】具和多媒体辅助的手段进行。⏎(2
+  - 0.61｜爾蘭⏎|國家通稱 = 愛爾蘭共和國⏎|國家外文全名 = （英語） Éire（愛爾蘭語）⏎|國家外文語言 = ⏎|國旗文件名 = Flag of Ireland.svg⏎|國徽文件名 =【 Coat】 of arms of Ireland.svg⏎|國歌名
+
+## M039（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 2.0 次；语料最大激活 4.5
+- 直接读出推高：带来的 | 形成的 | 为代表的 | 工作的 | 发生的 | 造成的 | 产生的 | 提出的 |  ability |  vs
+- 直接读出压低：竿 |  MASK | CLA |  Bord |  intox | venes | cae | 这里有 |  potent | #aa
+- 正极片段：
+  - 1.00｜邑、州治（州府）、道廳等，都是對首府的不同稱呼方式。如中文稱美國或澳大利亚的州政府駐地為“州府”（首府）。⏎ 自治區或屬地的行政中心，例如各國海外屬地的行政【中心】，或是國際上享有高度自治權的政治實
+  - 0.99｜行、各保险公司总公司集中交纳的部分)，房产税，车船使用税，印花税，耕地占用税，契税，土地增值税等。⏎(3)中央与地方共享税:⏎②营业税:铁道部、各银行总行、各保险总公司集中缴纳【的部分】归中央政府，其余部分归地方政府。⏎�
+  - 0.98｜机关核定其销售额。⏎  第八条 纳税人购进货物或者接受应税劳务（以下简称购进货物或者应税劳务）支付或者负担的增值税额，为进项税额。⏎  （一）从销售方取得的增值税专用发票上注明的增值税【额】。⏎  （二）从海关取得的海关
+  - 0.93｜（六）其他妨害司法秩序或者严重侵害他人合法权益的情形。⏎第三条以捏造的事实提起民事诉讼，有下列情形之一的，应当认定为刑法第三百零七条之一第一款规定的“情节严重”：⏎（一）有本解释第二条第一项情形【，】造成他人经济损失一百万元以上的；⏎（二）
+  - 0.92｜ the power of a particular computing platform or system software to a particular purpose. Some apps, such as Microsoft Office, are developed in multiple versions for several different platforms; others have narrower requirements and are generally referred to by the platform they run on. For example, a geography application for Windows or an Android【 application】 for education or Linux gaming. Applications that run only
+  - 0.91｜古代医家先后采用直接观察法和整体观察法对人体生命现象和自然现象进行观察，以探求人体生命的奥秘及生命活动与外界环境的关系;(2)精气、阴阳、五行学说等中国古代哲学中朴素的唯物辩证法思想对医学的【渗透】。⏎(三)中医学理论体系的发展⏎
+  - 0.91｜所得税收入是有差异的。⏎02⏎财产转让收入⏎财产转让所得，与会计上销售方以代理人身份销售商品税会差异类似。⏎《企业所得税法实施条例》明确，财产收入，是指企业转让固定资产、生物资产、无形资产、股权、债权等财产【取得】的收入。⏎而会计上，财产转让，
+  - 0.90｜、改造和维护安全防护设备、设施，包括：防尘、地质监控、防灭火、防治水监测及防治边帮滑坡，设备、机电设备、供配电系统、运输系统等；⏎2）配备必要的应急救援器材、设备和现场作业人员安全防护物品【支出】；⏎3）安全生产检查与评价支出；⏎4
+  - 0.89｜规定不作为收益，不计入当期损益，但按税法规定在计算应纳税所得额时应作为收益调增应纳税所得额 1.无法支付的应付款项。⏎企业取得的捐赠收入金额较大，并入一个纳税年度缴税确有困难【的】， 经主管税务机关审核确定，可在
+  - 0.82｜欲谋取的利益，而为请托人谋取了其他利益的，则不影响行为人受贿罪的成立。⏎（３）行为人与请托人之间的承诺，行为人任职后应主动履行承诺，但因客观原因末能使为请托人谋取的利益实现【的】，亦不影响行为人受贿罪的成立。⏎
+  - 0.82｜或定期对某项工作进行安全分析，识别危害因素，评价风险，并根据评价结果制定和实施相应的控制措施，达到最大限度消除或控制风险的方法。⏎在开展以下工作前应进行JSA：⏎制修订作业指导书、操作程序、操作规程等标准操作文件【前】；新的作业（如果是低风险活动，并由
+  - 0.82｜教育经费、社会保险费和补充养老保险费（年金）、补充医疗保险费及住房公积金以外的福利待遇支出，包括发放给职工或为职工支付的以下各项现金补贴和非货币性集体福利：（一）为职工卫生保健、生活等发放或支付的各项现金【补贴】和非货币性福利，包括职工因公
+  - 0.81｜典》第439条明确最高额质权应当适用最高额抵押权的相关规定，因此，本条关于最高额抵押权所担保债权确定的规则也应适用于最高额质权所担保债权的确定。　　（一）约定的债权确定期间届【满】　　[10]本项中当事人
+  - 0.81｜島（庫里爾群島）；⏎ 地理上屬於東南亞的越南，由於文化上屬於東亞文化圈，也可视為東亞的範圍；⏎ 深受漢字文化影響的菲律宾群岛、華人移民分布較多的马来西亚、新加坡【等地】區。⏎⏎相关概念⏎東洋：现代汉语
+  - 0.81｜、邦邑、州治（州府）、道廳等，都是對首府的不同稱呼方式。如中文稱美國或澳大利亚的州政府駐地為“州府”（首府）。⏎ 自治區或屬地的行政中心，例如各國海外屬地【的】行政中心，或是國際上享有高度自治權
+  - 0.80｜或压力发生突变而形成爆炸的现象称为物理性爆炸.例如容器内液体过热气化引起的爆炸,锅炉的爆炸,压缩气体、液化气体超压引起的爆炸等.物理性爆炸前后物质的性质及化学成分均不改变.比如高压锅使用不当【引起的】爆炸。物理爆炸的定义：这是一种物理过程
+  - 0.80｜、债务重组收入、补贴收入、违约金收入、汇兑收益等。⏎02⏎税会差异分析⏎01⏎销售商品（服务）收入⏎销售货物收入在税法是指企业销售商品、产品、原材料、包装物、低值易耗品以及其他存货【取得】的收入。⏎提供劳务收入，是指企业从事
+  - 0.80｜ because of the reputation the Igbo had throughout plantations in the Americas for their melancholic music and outlook on life when they were enslaved. Other historians have argued that there is little evidence of Sub-Sahelian influence in the blues as "elaborate polyrhythm, percussion on African drums (as【 opposed】 to European drums), [and] collective participation"
+  - 0.79｜同一性，就得使理想的自我和现实的自我达到统一。⏎人际交往又称人际沟通，指个体通过一定的语言 、文字或肢体动作、表情等传递信息、沟通思想<|endoftext|>合伙股份企业监事的职责⏎公司法规定很明确，如下：监事会、不设监事会【的】公司的监事行使下列职权：$P$（
+  - 0.78｜；交通、通讯等技术条件越好、货币支付所需的时间越短，货币周转速度越快，对货币的需要量就越少，等等。⏎（二） 微观角度⏎    1．收入水平。家庭和个人一定时期内的收入水平，机关、团体的收入【水平】、企业的收入水平是决定他们为各种交易
+
+## M040（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.6 次；语料最大激活 3.25
+- 直接读出推高： Capital | Capital |  CAPITAL |  paging |  le | 鼎 | StateManager |  capital |  rings | agger
+- 直接读出压低：MMC | uen | \\Template |  templ | prov | UIViewController | 不开 | uet | atti | 姑
+- 正极片段：
+  - 1.00｜117 migrant bald eagles in Glacier National Park were found to average  but this was mostly (possibly post-dispersal) juvenile eagles, with 6 adults here averaging . Wintering eagles in Arizona (winter weights are usually the highest of the year since, like many raptors【,】 they spend the highest percentage of time foraging during
+  - 0.93｜ite it. (On average, they rated the password’s familiarity as a 6 out of 10, and a random password as a 5 out of 10.)⏎To use the password, the participants played a 5- to 10-minute version of the game. This【 time】, the software compared how accurately they typed the actual
+  - 0.93｜ Webview||http://www.octave.org/hg/octave|⏎|Required to build||GNU make|⏎|Required to build||a recent version of g++|⏎|Required to build||libstdc++|⏎|Required to build||fortran|⏎This entry (in part or in【 whole】) was last reviewed on 4 February 2
+  - 0.93｜ suppress, deny or disavow through the use of our defense mechanisms. The Shadow can consist not only of parts of us that our culture at large would view as shameful or destructive, but may also include a “Golden Shadow” made up of otherwise constructive talents and strengths that, for one reason or【 another】 (ie: they posed a threat to an authority
+  - 0.92｜ it is the smallest algebraically-closed field containing the rationals and so it is called the algebraic closure of the rationals.⏎⏎The set of real algebraic numbers itself forms a field.⏎⏎Related fields⏎⏎Numbers defined by radicals⏎Any number that can be obtained from the integers using a finite number【 of】 additions, subtractions, multiplications, divisions
+  - 0.90｜ arguments and complicated equations. Only after the translation into Latin and the addition of commentary by van Schooten in 1649 (and further work thereafter) did Descartes's masterpiece receive due recognition.⏎⏎Pierre de Fermat also pioneered the development of analytic geometry. Although not published in his【 lifetime】, a manuscript form of Ad locos planos
+  - 0.84｜in the manner of an old steam locomotive--to make a long trip without refueling. In our homes we use electricity for most tasks instead of gasoline-powered engines because electricity is so versatile. It can be used to power vastly different appliances. We also prefer electricity because, at least inside our homes【,】 it gives off no fumes.⏎Perhaps some will
+  - 0.84｜ strain these materials can tolerate while remaining intact.⏎Asphalt has some unique properties that relate to the mechanical properties of an asphalt bound layer of gravel or rock. Asphalt is a liquid, albeit a very stiff liquid under normal ambient temperatures. When an asphalt material is deformed slightly, and for a very short【 period】 of time, it tends to return to its original
+  - 0.83｜10)⏎Talk about tough: These guys throw themselves out of 50-year-old aircraft into burning Siberian forests. (National Geographic Magazine feature, February 2008)⏎Photo by Mark Thiessen⏎Join Nat Geo News Watch community⏎Readers are encouraged to comment on this and【 other】 posts–and to share similar stories, photos and links
+  - 0.83｜ Silly Putty from copying images of comics in most modern publications. Nevertheless, the same substance that was useless as a rubber substitute has found some practical purposes as people use it to plug holes, remove lint and relieve stress. And to cap it off, a physicist used Silly Putty as the【 basis】 of experiment to demonstrate the utility of a microscope in
+  - 0.83｜ formally analogous to that of the derivative of a real function.  However, complex derivatives and differentiable functions behave in significantly different ways compared to their real counterparts.  In particular, for this limit to exist, the value of the difference quotient must approach the same complex number, regardless of the manner in【 which】 we approach  in the complex plane.  Consequently
+  - 0.82｜, a pair of fascinating books on a delightful topic.⏎Related Topics: Egypt | Daniel Pipes | December 1995 MEQ⏎receive the latest by email: subscribe to the free mef mailing list⏎This text may be reposted or forwarded so long as it is presented as an integral【 whole】 with complete and accurate information provided about its author,
+  - 0.81｜ to the military society which was created in Europe during the 9th and 10th centuries AD and which reached its most developed form in Normandy in the 11th century. Very simply put, feudal society resembled a pyramid. At its apex was the king who, in theory at【 least】, owned all the land in his kingdom. Immediately
+  - 0.80｜ slightly different. Their long division algorithm was the same, and the digit-by-digit square root algorithm, popularly used as recently as the 20th century, was known to Archimedes (who may have invented it). He preferred it to Hero's method of successive approximation because, once computed【,】 a digit does not change, and the square roots
+  - 0.80｜ settlement was reached whereby Borg committed to play six or eight WCT events in 1978 which were then part of the Grand Prix circuit.⏎⏎Borg skipped the French Open in 1977 because he was under contract with WTT, but he repeated his Wimbledon triumph, although this【 time】 he was pushed much harder. He defeated his good
+  - 0.79｜ a B-tree.⏎⏎For simplicity, most authors assume there are a fixed number of keys that fit in a node. The basic assumption is the key size is fixed and the node size is fixed. In practice, variable length keys may be employed.⏎⏎Informal description⏎⏎Node structure ⏎As with other trees【,】 B-trees can be represented as a collection of
+  - 0.77｜ domains to almost the entire complex plane.  Sometimes, as in the case of the natural logarithm, it is impossible to analytically continue a holomorphic function to a non-simply connected domain in the complex plane but it is possible to extend it to a holomorphic function on a closely【 related】 surface known as a Riemann surface.⏎⏎All
+  - 0.76｜ had not then been acted upon. Fifty-eight years earlier, in 1636, financier to the king, Philip Burlamachi, had proposed exactly the same idea in a letter addressed to Francis Windebank. He proposed a loan of £1.2 million to the government; in【 return】 the subscribers would be incorporated as The Governor and Company
+  - 0.76｜ then cited by B as the number's source; B is cited by C as the number's source; C is cited by D; and so on, until someone in the loop is cited by A, and few ever check to see if the number has any validity. Still, for a while at【 least】, "everyone knows" it's true.⏎Home
+  - 0.75｜ his pro career, twice. Prior to the initial snap, Patriots linebacker Mike Vrabel called a timeout. Koenen heard the referee's whistle but still kicked the field goal. It landed right of the goalpost. A few moments later, Koenen attempted the kick again, and this【 time】 made an official 58 yard field goal.
+
+## M041（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 4.24
+- 直接读出推高：破裂 | :\n | unn | ottage |  metam | :\n\n |  tolerate | 如意 |  rupt |  sécur
+- 直接读出压低：ucer | ahead |  comput |  [/ | iller | ObjectContext | 投入 | 怀 | ohl |  limit
+- 正极片段：
+  - 1.00｜中，组建一个既懂专业知识又超脱于医疗卫生系统的机构，增加医患纠纷处置的公平性、专业性和规范性，赢得医患双方对处理结果的认可，从而建立起医患纠纷处置的新机制。　3.医疗损害赔偿民事责任的构成要件有【以下】四个：　　(一)必需有损害
+  - 0.82｜ CHECK OUT THE SAVINGS IN THE BUNDLE BELOW⏎Link-LITERARY ELEMENTS BUNDLE⏎IF YOU ARE INTERESTED IN OTHER LITERATURE GRAPHIC ORGANIZERS, VISIT THE CUSTOM CATEGORY BELOW⏎Link-LITERATURE GRAPHIC ORGANIZERS⏎This Lesson Plan【 Includes】:⏎1. Teacher Instructions⏎2. Student Hand
+  - 0.72｜ WMA properties. For example, the Fishing Bay WMA Water Trail is specially designed for kayak and canoe users with an interest in birding and wildlife photography. This water trail offers an outstanding opportunity for paddlers to observe a variety wetland wildlife species in their native habitats.⏎For More Information on the【 Following】:⏎- Wildlife Management Areas⏎- Public Hunting Lands
+  - 0.71｜ and students' interest in texting to reinforce summarizing skills and to increase reading comprehension. This lesson plan is aimed toward high school students.⏎Tips for Using a Smart Board in the Special Education Classroom⏎Smart Boards are fun tools for children with disabilities, working like giant touch screens.⏎IEPgoals.net Is【 a】 New Site Offering Support for Goal Writing⏎IEP
+  - 0.69｜ method utilizes Ilford Multigrade IV RC Deluxe MGD.1M B&W Paper - a chemically developed black and white photographic film - containing a uniform distribution of silver halide retained in a thin surface layer (~0.005mm) of gelatin.⏎Materials - (with links【)⏎】Ilford Multigrade IV RC Deluxe MGD
+  - 0.68｜ ⏎刑事附带民事起诉状，是指被害人或者其法定代理人、近亲属，在刑事诉讼过程中依法要求被告人或其他责任人员承担民事赔偿责任的文书。 　　刑事附带民事起诉状由首部、正文和尾部组成。⏎1．首部应当写明【：⏎】　　1)文书名称，即“刑事
+  - 0.66｜ Arizona, www.AZPBS.org⏎Arizona’s initiative uses broadcast, new media and community outreach to build bridges of communication between Arizona’s diverse populations and to promote Arizona regions, culture and ethnic diversity while particularly empowering Arizona Native people.⏎Also for teachers is the Teach and Learn feature.⏎Here teachers can access【:⏎】- Resources for social studies educators to integrate Native American
+  - 0.63｜ the safety concerns, if any, associated with its use. It is the responsibility of the user of this standard to establish appropriate safety and health practices and determine the applicability of regulatory limitations prior to use. For specific hazard statements, refer to Section 9.⏎2. Referenced Documents (purchase separately【)】 The documents listed below are referenced within the subject standard
+  - 0.61｜results). This method utilizes Ilford Multigrade IV RC Deluxe MGD.1M B&W Paper - a chemically developed black and white photographic film - containing a uniform distribution of silver halide retained in a thin surface layer (~0.005mm) of gelatin.⏎Materials -【 (】with links)⏎Ilford Multigrade IV RC
+  - 0.61｜ their notebooks. I use these math journal pages as one of my daily math centers. Students have 10 minutes to work on these journal pages. It is a quick check of their understanding. The perfect amount of problems/items on a page to see if your students are understanding the topic!⏎Includes The【 Following】 Topics:⏎•Read and write six digit numbers &
+  - 0.60｜ by supplying a public demand. If I break the law, my customers, who number hundreds of the best people in Chicago, are as guilty as I am. Everybody calls me a racketeer. I call myself a businessman.⏎Comment in 1925⏎- - - Books You May Like【 Include】: ----⏎Cicero Revisited by Douglas
+  - 0.60｜ trained Port Meteorological Officer (PMO), who will provide advice on the technique of observing at sea, explain the use of the WMO SHIP code and offer guidance on the transmission of the observations from the ship to shore, using the ship's own satcom or terrestrial communications equipment.⏎THERE【 ARE】 NO CHARGES TO THE SHIP FOR THE
+  - 0.60｜⏎Monthly Activity Calendar⏎Books to Print⏎Parts of Speech⏎The Test of Time⏎TapQuiz Maps - free iPhone Geography Game⏎Biology Label Printouts⏎Physical Sciences: K-12⏎Art and Artists⏎Label Me! Printouts⏎|Search the Enchanted Learning website for【:】|⏎Copyright ©2001-20
+  - 0.60｜危害：是指对从事职业活动的劳动者可能导致职业病的各种危害，职业病危害因素包括：职业活动中存在的各种有害化学、物理、生物因素以及在过程中产生的其他职业有害因素。⏎2）根据矿山经营活动和作业场所的具体情况，确定本单位的职业危害为四大类【：⏎】①生产性粉尘的危害：在矿山采
+  - 0.60｜ create a common vision for how technology is best used to improve learning and teaching.⏎Take the Vision K-20 Survey!⏎Check your organization's progress towards the vision.Click Here⏎Learn more about the⏎7 Educational Goals and⏎5 Technology Measures for achieving the vision for⏎K-20 Education【...】 Read more⏎Need help implementing⏎Vision K-
+  - 0.59｜相对性状的遗传，再研究两对或多对性状的遗传;应用统计学方法对实验结果进行分析;基于对大量数据的分析而提出假说，再设计新的实验来验证。$P$  　　5、孟德尔对分离现象的原因提出【如下】假说：生物的性状是由遗传因子
+  - 0.59｜条件不变的情况下，一国经济增长率相对较高，其国民收入增加相对也会较快，这样会使该国增加对外国商品劳务的需求，结果会使该国对外汇的需求相对于其可得到的外汇供给来说趋于增加，该国货币汇率下跌。⏎⊙ 但要注意两种特殊情况【：⏎】  1．对于出口导向型国家，
+  - 0.59｜ oral cancer screening to detect the early signs of this devastating disease.⏎What are the signs and symptoms of oral cancer?⏎- The most significant sign to look for is an ulcer or sore in the mouth that is not healing Oral Cancer of the lip⏎Oral cancer of the tongue⏎Also look out for【:⏎】- * Unexplained bleeding in the mouth⏎-
+  - 0.59｜ possible suicidal behavior.⏎Be sure to use all medicines exactly as your child's doctor has prescribed them. If your child has intolerable side effects from any medicine, call your doctor immediately.⏎Medicines most often used to treat bipolar disorder in children and teens include:⏎Reference Mood stabilizers, such as【:⏎】- Lithium (for example, Eskalith
+  - 0.58｜ young patients to less than 20% for patients in the forties.⏎Are there always normal embryos for transfer?⏎Not always. In most cases some of the embryos will be normal and available for transfer. In some cases all of the embryos can be abnormal and therefore not suitable for transfer.⏎The【 following】 is a highly detailed article about PGD. It
+
+## M042（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.6 次；语料最大激活 4.97
+- 直接读出推高： appeal | 为广大 | 吸引力 | 引导 |  invitation |  appeals |  guidance | 为大家 |  appealed |  Guidance
+- 直接读出压低： Lia | arch | istique |  Daughter | 裱 | 商报 | ủy | 看不出 | 巾 | .yahoo
+- 正极片段：
+  - 1.00｜ territory, administered by France under League of Nations supervision, pending a plebiscite to be held in 1935 to determine its final status. France also received the right to exploit its coal fields until that time. When more than 90% of the votes cast in the ple【b】iscite favored its reunion with Germany, the Sa
+  - 0.92｜ now. She decides to get some apples and bake an apple pie. She goes to the grocery store and buys some apples, some agave nectar, some cinnamon and a pie crust and goes home and makes a delicious pie. She invites some friends over, serves the pie and proudly tells them that【 they】 are eating a pie made with seasonal fruit. Well
+  - 0.91｜ four different things you could become. You could become a waterfall, a large tree, a river, or a mountain. Which one of these four, would you want to become?⏎Tree – You need freedom, flexibility, and for life to be more simplistic.⏎Waterfall - You need structure, but【 you】 need the tools in order to help you build the
+  - 0.90｜ legal systems that follow the common law, judicial precedent stands in contrast to and on equal footing with statutes. The other major legal system used by countries is the civil law, which codifies its legal principles into legal codes and does not treat judicial opinions as binding.⏎⏎Today, one-third of the world's【 population】 lives in common law jurisdictions or in mixed legal systems
+  - 0.85｜说明义务的除外。⏎第十四条 保险合同中记载的内容不一致的，按照下列规则认定：⏎（一）投保单与保险单或者其他保险凭证不一致的，以投保单为准。但不一致的情形系经保险人说明并经投保人同意的，以投保【人】签收的保险单或者其他保险凭证载明
+  - 0.83｜ to ensure their results pages showed the most relevant search results, rather than unrelated pages stuffed with numerous keywords by unscrupulous webmasters. Since the success and popularity of a search engine is determined by its ability to produce the most relevant results to any given search allowing those results to be false would turn【 users】 to find other search sources. Search engines responded by
+  - 0.82｜2020年的人口普查中，曼谷就有約为1053.9万人，佔泰國總人口的15.3%。2010年人口普查中，超過1400萬人，即約有22.2%【人】居住于曼谷的都市郊区。曼谷
+  - 0.80｜; so much for socialism in this area.⏎The stagnation that the Soviet Union later experienced in its economy, falling far behind the Western world, is obviously parallelled in state child welfare as well. Just as the Soviet state failed when it tried to direct what was going to be produced and who was【 going】 to produce it, the modern welfare state also fails
+  - 0.78｜ Congo to the south. Its coastline lies on the Bight of Biafra, part of the Gulf of Guinea and the Atlantic Ocean. Due to its strategic position at the crossroads between West Africa and Central Africa, it has been categorized as being in both camps. Its nearly 27 million【 people】 speak 250 native languages and English or
+  - 0.73｜ speech addressed to her people. The speech includes a reminder to her allies the Trinovantes about how much better their life was before Roman occupation, stressing that wealth cannot be enjoyed under slavery and placing the blame upon herself for not expelling the Romans as they had done when Julius Caesar had come for【 their】 land. The willingness of the barbarians to sacrifice
+  - 0.73｜ was a real case,” said another. A third student appreciated the one-on-one contact with those who work in the field, saying “My favorite part of the day was talking to Mr. Andy [Public Defender Andrew Rosen]. He told me some important things.” And the professionals involved enjoyed working with the【 students】, as well, according to “Mr. Andy
+  - 0.72｜Levan Horns" (in honor of resident DJ Larry Levan).⏎⏎By the end of the 1970s, subwoofers were used in dance venue sound systems to enable the playing of "[b]ass-heavy dance music" that we "do not 'hear' with【 our】 ears but with our entire body". At the club
+  - 0.72｜So, an illegal act is what gets an overwhelming majority of our elected representatives to our Parliament. The candidates and their political parties believe they must spend in excess of the legal limit to reach the hinterlands, to pay for crowds to come to rally’s, to give sops to prospective voters to lure【 them】 to vote; but most of all - to “
+  - 0.72｜neider.⏎There was an understanding between the Jews and the government, according to which the Jews in Czernowitz West would vote for Hofrat Prof Skedl and in exchange for that, the government would be responsible for seeing that the Germans in the district of the above named 3 cities would【 vote】 for Mahler. On election day, the Z
+  - 0.72｜ their state, where previously they were unknown. Rajamouli's RRR (2021), Telugu film emerged as one of the highest grossing films of Indian cinema. Many Bollywood producers and directors acknowledge the might of regional film industries. Some trade experts and critics believe that audiences eventually【 will】 return to Bollywood. In 2022
+  - 0.71｜r al-Miqbâs min Tafsîr Ibn ‘Abbâs, “Do you not comprehend that this world is evanescent and that the Hereafter is everlasting?”⏎Many do not. In verses 33-73 Allah consoles Muhammad for the unbelievers’ rejection【 of】 his message: “We know indeed the grief which
+  - 0.71｜, they became more content driven, they began exploring various film genres. From 2015 onwards, the position of Bollywood as the top film industry of India waned. Some directors, exhibitors, actors and producers claimed that audiences became smarter, and they wanted movies with good stories, and【 they】 do not accept mediocre films. Instead of understanding it
+  - 0.70｜ now living in Lopez Island, Washington.⏎>>7-9 Due Process Home⏎>>Voir Dire Simulation⏎Law Day For Schools Home | Law Day Lessons Home | 7-9 Lessons Home<|endoftext|>A Cricket Magazine Group magazine⏎Science for grades 5-9⏎Have a young reader who's【 interested】 in everything? MUSE® is for them,
+  - 0.70｜ the sovereign immunity rights of the several states as specified by the Eleventh Amendment to the United States Constitution. The Court determined that state employees cannot sue their employer for violating ADA rules. State employees can, however, file complaints at the Department of Justice or the Equal Employment Opportunity Commission, who can sue on【 their】 behalf.⏎⏎Title II—public entities (and public
+  - 0.70｜和解决的？要把学生之间的沟通方式，解决办法等记录下来。最后， 呈现两个现实的问题情境,供学生选择。（1）环球影城平面导游图（2）动物园平面图。接着布置大任务：同学们，如果你是小导游，能不能为【游客】介绍一条合适的游览路线呢？⏎这样的情境
+
+## M043（第 21 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 10.7
+- 直接读出推高：准备好 | 准备 | -simple |  preparations |  racked | private | 野 | 牯 | 刚刚 | 带来了
+- 直接读出压低：fec | vais | eker |  tun | ophon | agrid | 有一次 |  antiqu | 完整性 | 惑
+- 正极片段：
+  - 1.00｜ Akköy⏎ Altıntaş⏎ Aydınpınar⏎ Bademli⏎ Balabancık⏎ Çağrışan⏎ Çamlık⏎ Çayönü⏎ Çekrice⏎ Çepni⏎ Çınarlı⏎ Dedeköy⏎ Dereköy⏎ Eğ【erce】⏎ Emirleryenicesi⏎ Esence
+  - 0.98｜农业农村工作的优势，以专业的视角、敏锐的眼光，从海量信息中优选、从长篇大论中精摘，呈送最及时的政策、最权威的观点、最精到的信息！欢迎投稿与合作：dynjnc@126.com ; 微信号kat【ier】123456。同时，也
+  - 0.95｜ A joseki file is ordinarily available for 80 years after its expiration.⏎- kaisei genkoseki ~ revised koseki⏎- honseki ~ permanent residence or registered address (i.e. person may move to Tokyo but their records remain in hometown city hall).⏎- g【ense】ki ~ another name for honseki⏎-
+  - 0.89｜ Tianqiang, the spear, was formed from Iota, Kappa and Theta Boötis; Genghe, variously representing a lance or shield, was formed from Epsilon, Rho and Sigma Boötis.⏎⏎There were also two weapons made up of a singular star. Xu【ange】, the halberd, was represented by Lambda
+  - 0.83｜ Ceylanlı⏎ Çiloğlanhüyüğü⏎ Cumhuriyet⏎ Danaahmetli⏎ Dedeçınar⏎ Delibekirli⏎ Demirkonak⏎ Fatih⏎ Gazi⏎ Gölbaşı⏎ Gültepe⏎ Gündüz⏎ Gü【venta】şı⏎ Güzelce⏎ İçada⏎ Ilık
+  - 0.83｜ and subsequent aftershocks.⏎⏎Composition⏎There are 39 neighbourhoods in Hassa District:⏎⏎ 15 Kasım⏎ Akbez⏎ Akkülek⏎ Aktepe⏎ Ardıçlı⏎ Arpalıuşağı⏎ Aşağıkarafakılı⏎ Bademli⏎ B【inta】ş⏎ Buhara⏎ Çay⏎ Ç
+  - 0.82｜ nine countries including further Airbus subsidiaries.⏎⏎Corporate management⏎, the Arianespace management team was:⏎⏎Regional offices⏎⏎Subsidiaries⏎ Arianespace inc. (U.S. Subsidiary)⏎ Arianespace Singapore PTE LTD. (Asian Subsidiary)⏎ St【arse】m S.A. (European-Russian Soyuz commercial
+  - 0.82｜ is an Oocyte-Specific RNA-Binding Protein Indispensable for Maternal mRNA Metabolism and Oocyte Development in MiceHui Li, Hailian Zhao, Chunhui Yang, Ruibao Su, Min Long, Jinliang Liu, Lanying Shi, Yu【anch】ao Xue* and You-Qiang Su*
+  - 0.81｜7 launches over 41 years. The first commercial flight managed by the new entity was Spacenet F1 launched on 23 May 1984. Arianespace uses the Guiana Space Centre in French Guiana as its main launch site. Through shareholding in St【arse】m, it can also offer commercial Soyuz launches
+  - 0.80｜系统，而且安装起来过于麻烦，它的许多功能并不是每个系统都需要的，灵活性不强;VxVM和HP-LVM的问题都是只配置在特定的系统上，可移植性不强，但有些功能，比如它们提供的用于性能保障的vol_ default_ i【odel】ay参数(可以用于扼杀过载的
+  - 0.80｜ the Canadian Institute of Geomatics.⏎Graduate Meghan Miller is featured in a January 2012 article of GoGeomatics with an interview describing her experience in the program and her career path since graduation. Meghan now works for Canadian Cartographic Corporation (CCC) : http://www.g【oge】omatics.ca/magazine/?s=meg
+  - 0.79｜ Soviet Central Asia) kingdoms, she did not accompany her husband but remained in the Former Qin capital Chang'an with his son Lü Shao, who was probably her son as well.  ⏎⏎When Chang'an fell to Western Yan forces in 385, they fled to the semi-independent state Ch【ouch】i, and after Lü Guang established Later Li
+  - 0.78｜cher and Lauteraargletscher come together to form the Unteraargletscher (Lower Aar Glacier), which is the main source of water for the Grimselsee (Lake of Grimsel). The Oberaargletscher (Upper Aar Glacier) feeds the Obera【arse】e, which also flows into the Grimselse
+  - 0.77｜ United States of America⏎The team HOMERUN won the 1st prize in Imagine Cup 2011 for Window Phone held by Microsoft, United States of America⏎ROBIT won the championship of the<|endoftext|>The Little Niangua River is a  tributary of the Ni【angu】a River in the Ozarks region of central Missouri
+  - 0.77｜elievler⏎ Bayır⏎ Beşaslan⏎ Bükülmez⏎ Çakıryiğit⏎ Cilvegözü⏎ Cüdeyde⏎ Cumhuriyet⏎ Davutpaşahüyüğü⏎ Değirmenkaşı⏎ Es【ente】pe⏎ Fevzipaşa⏎ Fidan
+  - 0.77｜5 is only publicly mentioned by Microsoft under Universal Accelerated Graphics Port (UAGP), which specifies mandatory supports of extra registers once marked optional under AGP 3.0. Upgraded registers include PCISTS, CAPPTR, NCAPID, AGPSTAT, AGPCMD, N【IST】AT, NICMD. New required registers include AP
+  - 0.75｜模。該組織以其對國際人權的卓著貢獻而獲頒1977年諾貝爾和平獎 、1978年聯合國人權獎。⏎⏎批評⏎⏎印度學者艾倫·希拉瓦斯特瓦（Arun Sh【ivr】astva）等著《NGO與顏
+  - 0.75｜optera⏎⏎†Eugeroptera ⏎†Eugeropteridae⏎⏎†Kukaloptera ⏎†Kirchneralidae⏎⏎†Argentinoptera ⏎†Argentinalidae⏎⏎†Geroptera ⏎†Geropteridae⏎⏎†E【ome】ganisoptera ⏎†Erasipterida
+  - 0.75｜arian: Imre⏎Latin: Amalricus, Americus, Almericus, Emericus⏎Greek: Emerikos⏎Polish: Amalaryk, Amalryk, Emeryk⏎Dutch: Emmerik, Amerik, Hamelink, Ham【elry】ck⏎Portuguese: Amauri,
+  - 0.74｜ hall was restored until 1902. The lower parts of the eastern tower of the town hall (Granusturm [not depicted on glass no.2181])⏎date from around 770 and are the only remainig part of the Karolingian residence. The Gran【ust】urm thus is the oldest building⏎of Aachen
+
+## M044（第 21 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 5.13
+- 直接读出推高：孤 | 戟 |  Ve |  VE |  swapped | 另一半 |  ve |  oneself | lop | 膠
+- 直接读出压低：地 | 巴斯 | escription |  concussion |  éc | RN | iske | 绝 | iß | 之际
+- 正极片段：
+  - 1.00｜ process pictured above, one would rather say that the α-particle almost slips away unnoticed.⏎⏎The theory supposes that the alpha particle can be considered an independent particle within a nucleus, that is in constant motion but held within the nucleus by strong interaction. At each collision with the repulsive potential barrier of【 the】 electromagnetic force, there is a small non-zero probability
+  - 0.98｜) is composed of constant domains from the heavy chains. Its role is in modulating immune cell activity: it is where effector molecules bind to, triggering various effects after the antibody Fab region binds to an antigen.⏎Effector cells (such as macrophages or natural killer cells) bind via their【 F】c receptors (FcR) to the Fc
+  - 0.81｜ at P0 and P2 intersect at P1. As t increases from 0 to 1, the curve departs from P0 in the direction of P1, then bends to arrive at P2 from the direction of P1.⏎⏎The second derivative of the Bézier curve with respect【 to】 t is⏎⏎Cubic Bézier curves⏎
+  - 0.79｜衝突，他們都被指控侵犯人權，包括綁架，屠殺，強姦和武裝搶劫。⏎⏎重組  ⏎⏎2019年8月5日，印度联邦政府宣佈廢除《印度宪法》第370条，收回查谟【和】克什米尔邦自治權。第37
+  - 0.78｜ typical to use small amounts of assembly language code within larger systems implemented in a higher-level language, for performance reasons or to interact directly with hardware in ways unsupported by the higher-level language.  For instance, just under 2% of version 4.9 of the Linux kernel source code is written【 in】 assembly; more than 97% is written
+  - 0.76｜同构并不是唯一的，因此又说G是F的一个代数闭包。⏎⏎例子⏎ 許多常见的数域都是域。比如说，全体複數的集合與其加法和乘法构成一个域。全体有理数的集合 與其加法和【乘】法也是一个域，它是的子域，并且
+  - 0.76｜ known as an orator of the poem, and recited it more than 10,000 times (by his count—some tabulations are as much as four times higher) before his death.⏎⏎On stage in the early 1890s, baseball star Kelly recited【 the】 original "Casey" a few dozen times and
+  - 0.74｜ Community resources⏎- Basic parenting strategies⏎Encourage all parents to monitor their children's school progress⏎Children's school performance may be affected when then their parents divorce. However, if children continue to achieve in school, they are less likely to develop other problems. Parents may need information about how to help【 their】 children succeed in school. Send home a handout
+  - 0.70｜ definitions of Semiregular polyhedron include one more figure, the Elongated square gyrobicupola or "pseudo-rhombicuboctahedron".⏎⏎Properties ⏎⏎The number of vertices is 720° divided by the vertex angle defect.⏎⏎The cuboctah【ed】ron and icosidodecahedron are
+  - 0.68｜ a[2][3];⏎⏎This means that array a has 2 rows and 3 columns, and the array is of integer type. Here we can store 6 elements they will be stored linearly but starting from first row linear then continuing with second row. The above array will be stored as【 a】11, a12, a13
+  - 0.66｜⏎females age 18–49: 8,794,465 (2005 estimate)⏎Military manpower – reaching military age annually:⏎males age 18–49: 389,735⏎females age 1【8】–49: 383,1
+  - 0.66｜ of the Kingdom of Italy. The Amharic version of the article, however, stated that the Emperor could use the good offices of the Kingdom of Italy in his relations with foreign nations if he wished. However, the Italian diplomats claimed that the original Amharic text included the clause and that Men【el】ik II knowingly signed a modified copy of the Treaty
+  - 0.66｜1,000 live births⏎Male: 12.39 deaths/1,000 live births⏎Female: 8 deaths/1,000 live births (2021 est.)⏎⏎Life expectancy at birth⏎Total population: 75.06【 years】⏎Male: 72.55 years
+  - 0.65｜满,增加分配 */⏎	{⏎		newbase=(ElemType *)realloc((*L).elem,((*L).listsize+LIST_INCREMENT)*sizeof(ElemType));⏎		if(!newbase)⏎			exit(OVERFLOW); /* 存储分配失败 */⏎		(*L).elem=new【base】; /* 新基址 */⏎		(*L
+  - 0.64｜: 23 October – 4 November 1942⏎⏎In addition, the Battle of Alam el Halfa (30 August – 5 September 1942) was fought between both battles and in the same location.⏎⏎ja:エル・アラメインの戦【い】<|endoftext|>The Brezhnev Doctrine was a Soviet foreign
+  - 0.64｜ permutation stage—to produce each block of ciphertext output. The non-linear substitution stage mixes the key bits with those of the plaintext, creating Shannon's confusion. The linear permutation stage then dissipates redundancies, creating diffusion.⏎⏎A substitution box (S-box) substitutes a small block of input bits with another block【 of】 output bits. This substitution must be one-to-one
+  - 0.64｜可以要求参加诉讼主张权利。人民法院也应当追加实际施工人为有独立请求权第三人。经审理查明涉案工程确由实际施工人完成，实际施工人与发包人已形成事实上建设工程施工合同关系的，应当判决发包人直接向实际施工人支付【工程】款，不宜再以合同相对性为由
+  - 0.62｜ likewise, it's true that if I'm alive, I'm breathing. The rules can be stated formally as:⏎⏎and⏎⏎where the rule is that wherever an instance of "" appears on a line of a proof, either "" or "" can be placed on a subsequent line;⏎⏎Formal notation ⏎The【 b】iconditional elimination rule may be written in sequ
+  - 0.61｜<|endoftext|>Amicable numbers are two different natural numbers related in such a way that the sum of the proper divisors of each is equal to the other number. That is, s(a)=b and s(b)=a, where s(n)=σ(n)-n is equal to the sum of positive div【isors】 of n except n itself (see also divisor function
+  - 0.61｜具有显式意义，即可以用来确定系统的输出。如果系统确定，则其单位冲激响应是唯一的。由此，可求系统对任意输入的响应。⏎注意：计算卷积和的关键是求和区间的确定。因此，常常需要绘制序列x(m) 和h【(n】-m)的图形。利用序列x(m)
+
+## M045（第 15 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 1.2 次；语料最大激活 5.09
+- 直接读出推高：手脚 | 毅 | projectId | 实现 | 闹 | ensing |  hạ |  applic | 不上 | ousing
+- 直接读出压低：用量 | сал | stances | (Tile | 宣传活动 |  CONSEQUENTIAL | 族 | represented | agma | sheet
+- 正极片段：
+  - 1.00｜天文定位定向密切相关的基础知识,包括天体的识别、天球上的坐标系、战场天文测量常用的球面三角形、陆军战场天文观测中时间的比对和换算以及陆军战场天文测量时使用的主要观测仪器和计时仪器。⏎最后利用Visual Basic平台【开发】了陆军测绘保障天文定位定向系统,将
+  - 0.99｜32引例——大学水电费管理信息系统⏎33数据库的生命周期与各阶段任务⏎34案例分析——疑难数据库设计⏎35本章小结⏎第四章事件驱动和Windows窗体应用程序⏎4【】��1事件驱动的编程机制⏎4
+  - 0.90｜负责端到端的通信，既是七层模型中负责数据通信的最高层，又是面向网络通信的低三层和面向信息处理的最高三层之间的中间层。运输层位于网络层之上、会话层之下，它利用网络层子系统提供给它的服务去【开发】本层的功能，并实现本层对会话
+  - 0.90｜第三节 实验设计第四节 实验结果第五节 总结性评注参考文献下篇:实验实施指南第七章 如何撰写实验说明第一节 撰写实验说明的基本原则第二节 实验说明的基本结构参考文献第八章 经济实验程序开发方法第一节 Visual【 Basic】的快速入门第二节 Ztree简介参考文献第九
+  - 0.87｜17 数据库原理及应用 12.3 PB 12.3 PB PB是美国PowerSoft公司于1991年推出的一个面向对象的数据库应用系统开发工具，利用它可以开发功能强大的、运行在 多个平台上的、能够操作多个数据库【的应用】系统，还可以开发 C/S、基于组件的
+  - 0.87｜体验效果让普通用户只需通过浏览器就可以体验到了电子地图的魅力，但是googlemap毕竟是一个查询性质的电子地图，人机的交互性不强。此时也让我看到了webGIS的美好未来，刚好最近一个项目中有一个模块是gis，用户要求采用B/S的模式【开发】，正好是一个不错的机会，根据用户的软硬件
+  - 0.87｜扩展，真正成为一种大众使用的工具。 各大地理服务器厂商早看到了这个发展的趋势，纷纷发布自己的地理服务器，国外影响比较大的有ArcGIS、Mapinfo等，国内的有Super Map等，都是相当不错的地理服务器商，都同时提供C/S模式的【开发】插件和B/S模式的地理服务器。
+  - 0.85｜⏎5．3．5系统逻辑方案的建立⏎5．3．6系统分析报告⏎5．4系统设计⏎5．4．1概述⏎5．4．2系统总体设计⏎5．4．3功能模块设计⏎5．4．4代码设计⏎【5】．4．5数据库设计⏎5．4
+  - 0.85｜Hi, welcome to the ranch!⏎This is a big subject area, but fortunately Sun has pretty good tutorials on almost everything Java. See if the Swing Tutorial covers the right kinds of things.⏎For adding functionality to the widgets, what you're looking for is probably in the EventListener and ActionListener family.【 You】 add these objects to your UI components and Swing calls
+  - 0.85｜ a machine that could perform arithmetic calculations. His first machine, the Difference Engine, first described in 1822, used finite differences to compute the values of polynomials. His second machine, the Analytical Engine, first described in 1837, was much more ambitious, consisting【 of】 a control unit, an arithmetic processor, and a
+  - 0.83｜插件和B/S模式的地理服务器。 由于网络的普及和带宽以及GIS在各个行业的应用，webGIS一直没有得到普遍的推广和使用，现在大部分的GIS应用还是C/S模式的。webGIS一般有两个模式，一种是采用胖客户端的模式来【开发】，人机的交互性强，这样会有比较
+  - 0.82｜ crew, having thinly armoured open-topped superstructures. The "open-topped" design format of the Panzerjäger vehicles was succeeded by the Jagdpanzer ("hunting tanks"), which mounted the gun in true casemate-style superstructures, completely enclosing the crew compartment in【 armor】 that was usually integral to the hull. The first
+  - 0.81｜陆军战场天文定位定向密切相关的基础知识,包括天体的识别、天球上的坐标系、战场天文测量常用的球面三角形、陆军战场天文观测中时间的比对和换算以及陆军战场天文测量时使用的主要观测仪器和计时仪器。⏎最后利用Visual【 Basic】平台开发了陆军测绘保障天文定位定向系统
+  - 0.79｜童年　31⏎2.5　导入外部库文件　36⏎2.5.1　知识准备——导入外部库的方法　36⏎2.5.2　典型案例——展开的幸福　36⏎2.6　综合实例——MTV播放器【　】39⏎小结　43⏎思考
+  - 0.78｜ and empirically determined student responses to interviews about geometry, the VIS uses a question-answer approach to respond in real time to prospective teachers’ questions, providing a unique setting for prospective elementary teachers to experiment with different questioning techniques as well as a context for analysis of student thinking.⏎Bringing together the expertise of【 computer】 and information scientists and mathematics teacher educators, this project
+  - 0.78｜Hello from Python."⏎During the rest of this section, we will develop a sample application using PythonWin. This will lead us through many of the important MFC and PythonWin concepts, while also leveraging the dynamic nature of PythonWin.⏎MFC itself has a tutorial/sample called Scribble, which delivers【 a】 basic drawing application. We will develop a version of
+  - 0.77｜ that were very different in spite of being based on the same chassis: Marder was straightforwardly an anti-tank gun on tracks whereas the Jagdpanzer 38 traded some firepower (its 7.5 cm Pak 39, designed to operate within the confines of a fully arm【oured】 fighting compartment, fires the same projectiles from a reduced
+  - 0.77｜强调代码的可读性和简洁的语法，尤其是使用空格缩进来划分代码块。相比於C语言或Java，Python让开发者能够用更少的代码表达想法。⏎⏎Python解释器本身几乎可以在所有的操作系统中运行，它的官方直譯器CPython是用【C】语言编写的。Python是一個由社群驱动的
+  - 0.76｜goe's Physical Computing has a nice layout of a 7805 voltage regulator with a couple decoupling capacitors.⏎For the voltage regulator you will need these parts:⏎Finally you will need something to stick all these parts into. Feel free to use anything you want: plastic, wood【,】 a herring... The easiest method is to just
+  - 0.76｜到来之际引起全球电脑系统的大规模瘫痪。⏎⏎程序问题 ⏎两千年问题始于1960年代，当时计算机内存和外部存储介质的成本很高，大多数数据处理需要借助穿孔卡片。為了節省硬體成本，葛麗絲·霍普在Harvard Mark【 I】上以6位數字來儲存時間
+
+## M046（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 5 页一次；语料最大激活 14.6
+- 直接读出推高：owler | 遺 | 遗迹 | moth | eye | cala | tempts | 生物 | 攀 | 存在
+- 直接读出压低：干部队伍 | teenth |  dec | ذي | 受灾 | <Mesh | 剡 | <Vertex |  Dec | venth
+- 正极片段：
+  - 1.00｜ We entered an era sometimes known as Neo-Darwinism, which combines his theories with modern knowledge of genetics. This has given rise to some extreme views such as evolutionary biologist Richard Dawkins’ belief in the “selfish gene,” which basically says that the purpose of an organism’s behaviors and traits【 is】 geared toward the survival of the gene in order to
+  - 0.98｜ very evident that this theory is a fantasy, so it very soon consumed itself. the model of punctuated equilibrium was never put forward as a consistent model, but rather used as an escape in cases that plainly did not fit the model of gradual evolution. Since evolutionists today realise that complex organs such as【 eyes】, wings, lungs, brain and others explicitly refute
+  - 0.96｜ to the complexity of its nervous system. Generally, organisms with more complex nervous systems have a greater capacity to learn new responses and thus adjust their behavior.⏎⏎Animal behavior⏎⏎Ethology is the scientific and objective study of animal behavior, usually with a focus on behavior under natural conditions, and viewing behavior as an【 evolution】arily adaptive trait. Behaviorism is a term that
+  - 0.89｜ respiratory systems for oxygen and nutrients.⏎Without all of these systems working together the human body would not function properly. The question then arises: from whence did these supportive features originate? And who arranged the seamless connectivity between all of the body’s systems? Evolutionists maintain that the human body is not intelligently【 designed】. However, the inspired psalmist observed:
+  - 0.83｜ slice into me with their comment, their sword actually cuts both ways.⏎The atheist claims that a cause (with a beginning all its own) possessing none of the characteristics of its effects created all that we know. That’s a pretty extraordinary claim.⏎The atheist claims that “Living objects . . . look【 designed】, they look overwhelmingly as though they’re designed.
+  - 0.83｜ (1839-1914), after his careful study of Darwinâ€™s work, envisaged a kind natural selection process acting on ideas.⏎Darwin himself was one of the first to consider the relationship between ethical theory and evolutionary doctrines, as when he argued that altruism might【 have】 had an evolutionary origin. He tried to show how
+  - 0.81｜ the complexity of its nervous system. Generally, organisms with more complex nervous systems have a greater capacity to learn new responses and thus adjust their behavior.⏎⏎Animal behavior⏎⏎Ethology is the scientific and objective study of animal behavior, usually with a focus on behavior under natural conditions, and viewing behavior as an evolution【arily】 adaptive trait. Behaviorism is a term that also
+  - 0.79｜道金斯自私基因理论以及sober和Wilson的多层级选择理论等各种进化和选择理论。二、进化心理学的基本假设进化心理学家采用一套完全不同的理论取代了主流的认知心理学的两种核心假设，即心理机制具有目的一般性并且与加工内容无关以及【功能】不可知论。而且，进化心理学将心理学
+  - 0.78｜ the growing science of play does have much to add to the conversation. Armed with research grounded in evolutionary biology and experimental neuroscience, some scientists have shown themselves eager -- at times perhaps a little too eager -- to promote a scientific argument for play. They have spent the past few decades learning how and why play【 evolved】 in animals, generating insights that can inform our understanding
+  - 0.78｜ Abingdon, 1965), pg. 78.⏎ Bruce Metzger, Historical and Literary Studies: Pagan, Jewish, and Christian (Grand Rapid, MI: Eerdmans Publishing, 1968), 9.⏎ Richard Dawkins, The Blind【 Watch】maker, 1986, Pg.
+  - 0.77｜每一个活着的人都是进化的产物，他们作为“活化石”，能帮助我们了解祖先的过去。2.功能分解是探究心理机制的重要途径进化心理学主张要了解心理首先要弄清这些心理机制是用来解决哪些适应问题的。只有弄清了这些心理现象的 �【 功能，才能对】，才能对它们的机制有清楚的了解
+  - 0.77｜, it was very evident that this theory is a fantasy, so it very soon consumed itself. the model of punctuated equilibrium was never put forward as a consistent model, but rather used as an escape in cases that plainly did not fit the model of gradual evolution. Since evolutionists today realise that complex【 organs】 such as eyes, wings, lungs, brain and
+  - 0.77｜知论。而且，进化心理学将心理学和其他生命科学整合起来，它的基本假设是：1、人类的心理是由一组进化形成的信息加工机制所构成的，这些信息加工机制深植于人类的神经系统当中。2、这些机制以及产生这些机制的发展程序，都是自然【选择】在远古时期进化环境中所产生的适应器。
+  - 0.77｜ his colleagues.⏎⏎While Randy Olson ultimately sides with the scientists who accept evolution, the scientists are criticized for their elitism and inability to efficiently present science to the general public, which ultimately contributes to the spread of misconceptions.⏎⏎The film begins by going over the history of intelligent design thought from Plato and Pale【y】 to the present-day incarnation promoted by the Discovery Institute
+  - 0.76｜sober和Wilson的多层级选择理论等各种进化和选择理论。二、进化心理学的基本假设进化心理学家采用一套完全不同的理论取代了主流的认知心理学的两种核心假设，即心理机制具有目的一般性并且与加工内容无关以及功能不可知论。而且，【进化】心理学将心理学和其他生命科学整合起来，它的
+  - 0.76｜ secretarial work for a time (1898-1908).⏎Source: Columbia Encyclopedia. Photo: Library of Congress.⏎Next: Pearl Buck (1938)<|endoftext|>Locomotion: The Case for a Designer⏎Organs and various systems of the human body demonstrate incredible【 design】 and complexity. However, those organs and bodily systems
+  - 0.75｜ on attempting to derive ethical norms from the evolutionary process.⏎Exclusion of the supernatural⏎Darwinian theory was purely naturalistic; it made no appeal to entities such as God, divine spirits, hypothetical intellects, final causes, souls or Platonic ideas. By providing an alternative naturalistic explanation of【 design】, Darwin made it seem less necessary to construct a
+  - 0.74｜由基因决定的。达尔文进化论，道金斯自私基因理论以及sober和Wilson的多层级选择理论等各种进化和选择理论。二、进化心理学的基本假设进化心理学家采用一套完全不同的理论取代了主流的认知心理学的两种核心假设，即心理机制具有【目】的一般性并且与加工内容无关以及功能
+  - 0.74｜50s seemed to cement the paradigm: we now had the mechanisms by which evolution occurred. We entered an era sometimes known as Neo-Darwinism, which combines his theories with modern knowledge of genetics. This has given rise to some extreme views such as evolutionary biologist Richard Dawkins’ belief in【 the】 “selfish gene,” which basically says that the
+  - 0.74｜ its own) possessing none of the characteristics of its effects created all that we know. That’s a pretty extraordinary claim.⏎The atheist claims that “Living objects . . . look designed, they look overwhelmingly as though they’re designed. Biology is the study of complicated things which give the impression of having been【 designed】 for a purpose”, and that the information (not
+
+## M047（第 17 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 6.94
+- 直接读出推高：anda | bdd | 竦 | лит | 南路 | 北路 | bes | ESA | _TODO | บาย
+- 直接读出压低：说出来 | 明智 | ugal | 蟆 |  charge |  Judy | hue | hesive |  Terry | Effective
+- 正极片段：
+  - 1.00｜重大地区、行业发展战略，重点引导毕业生中西部地区就业。⏎(3)旨在传承、实践先行，携手重点行业单位共塑学生就业价值观，依托“领航计划”促进重点行业单位人才结构和学校人才布局协同发展。⏎二、注重氛围营造，深化创新引领【⏎】1、深化教育改革，打造“四位一体
+  - 0.93｜”。⏎围绕国家重大地区、行业发展战略，重点引导毕业生中西部地区就业。⏎(3)旨在传承、实践先行，携手重点行业单位共塑学生就业价值观，依托“领航计划”促进重点行业单位人才结构和学校人才布局协同发展。⏎二、注重氛围营造【，】深化创新引领⏎1、深化教育改革，
+  - 0.88｜信息数据流通与共享、提高管理效率，为在2025年前完成自然保护地整合归并优化工作，重点解决重叠设置、边界不清、权责不明、保护与发展矛盾突出等问题打下坚实基础。⏎二是加强政策支持，全面提升自然保护地监管检测水平【。⏎】建设自然保护地，离不开政府的大力支持和相关部门
+  - 0.84｜，如蘋果開創的圖形化作業系統，還有電腦輔助設計系統都屬此類型的設計。⏎搜尋瀏覽型（Exploring & Browsing） 使用者依此系統搜尋資訊，如google等搜尋引擎及入口網站。⏎⏎物件【型】概念模型 ⏎物件導向的概念模型將重點
+  - 0.80｜积极主动践行绿色低碳行为，才会形成大生态环境治理格局。党的二十大报告之所以提出“倡导绿色消费”观念，充分说明壮大绿色消费需求是根本导向，通过创新绿色消费模式，加快推动形成绿色低碳的生产方式和生活方式。⏎提出深入推进环境污染防治工作新要求【⏎】党的二十大报告不仅对我国过去的生态文明建设
+  - 0.77｜（二）雷电击伤的预防对策⏎（三）雷电击伤的急救对策⏎第五章 地质灾害的医疗急救⏎一 地震灾害的医疗急救⏎（一）地震灾害对人类健康的威胁⏎（二）震灾的防护对策⏎【（】三）震区现场的医疗救援⏎二
+  - 0.74｜⏎（二）中暑的预防与急救⏎九 雷电灾害的医疗对策⏎（一）雷电灾害对人类健康的威胁⏎（二）雷电击伤的预防对策⏎（三）雷电击伤的急救对策⏎第五章 地质灾害【的】医疗急救⏎一 地震灾害的医疗
+  - 0.70｜好产业招商、项目建设这手"关键棋"，通过高质量项目的落户达产，催生更多新的增长点，为经济发展提供更强支撑、为劳动就业提供更多机会、为财税收入提供更大贡献、为民生福祉提供更好保障。⏎力行:快落实敢落实促落实【⏎】"行动力是最关键的能力，是真正的生产力
+  - 0.68｜的方式，核心逻辑在于以建设用地指标的出让来换取经济发展所需的积累资金。这种方式在经济发展初期是必要的，但随着可支配建设用地指标的减少，必须通过土地复垦或者建设用地指标的购买等来置换抛荒耕地和废弃用地。⏎要素组合方式优化型经济发展模式【主要】依赖于产业的组织和发展、城市的建设和营造
+  - 0.66｜643年建立政权；随后进占陕西，次年在西安正式定国号为大顺。与此同时，张献忠相继攻占湖北、湖南、江西等地，最后进入四川，1644年于成都正式建立政权，国号大西。二【、】明朝灭亡与清军入关164
+  - 0.64｜从本地区的实际出发，充分把握本地区的特点和规律，使地方立法真正符合本地区实际情况。”地方性法规要符合法理、符合客观规律，有效管用，重点要在对上位法的细化、深化、补充和延伸等方面下功夫。⏎破解立法难点【⏎】发挥地方人大立法的主导作用。习近平总书记
+  - 0.63｜The law requires that police have a search warrant, normally issued by a judge, in order to conduct a search. Police may search without warrants when they have strong suspicion that a house shelters criminals or stolen property. However, human rights organizations report that police often conduct routine searches without warrants.⏎Section 2【 Respect】 for Civil Liberties, Including:⏎a. Freedom of
+  - 0.63｜；同时，这项工作还为确定合理的管理幅度和管理层次提供基础性资料，是现代企业组织管理的重要内容。4工作衡量和方法研究。通过这项工作，可以甄选出最有效的工艺流程和操作方法，确定最佳工作负荷等。三做好人员系统研究【，】本着最经济地使用人力的原则，解决人员
+  - 0.63｜情）；意志过程（意）。⏎2、人格--人格倾向性：需要、动机、兴趣；人格心理特征：能力、气质、性格 （三）心理实质 心理是人脑的机能，是脑对客观现实的主观、能动的反映 二【、】护理心理学概述 （一）护理心理学的概念：
+  - 0.62｜应当注意。⏎第四节 其他诉讼参与人⏎其他诉讼参与人包括法定代理人、诉讼代理人、证人、鉴定人、翻译人员。在复习时，应重点掌握：法定代理人和诉讼代理人的区别，证人的资格问题，鉴定人的权利和义务。⏎第二【部分】 制度论⏎第五章 管
+  - 0.61｜涉及内容:高中生物新课程教材中涉及概念的内容非常多，几乎每一章、每一节内容都可以用概念图的形式加以表示，在复习时，还可以将不同章节的相关内容以概念图的形式表现出来，以便同学们形成一定的知识网络，便于对知识的理解和复习。⏎二【、】知识树形式的类型 1.模式图
+  - 0.61｜人体所消化。⏎⏎利用糖类作为能量来源 ⏎⏎葡萄糖是生命体最主要的能量来源。例如，作为能量储存的多聚糖（如糖原和淀粉）和一些二糖（如蔗糖和乳糖）都以葡萄糖为主要组分。⏎⏎氨基酸和多肽【 ⏎⏎】氨基酸是形成蛋白质的基本元件。每一种氨基酸
+  - 0.60｜伤的抢救治疗⏎（一）烧伤的现场救治⏎（二）烧伤的病房治疗⏎四 火灾现场气体中毒的急救⏎（一）气体中毒的分类⏎（二）中毒的预防和抢救治疗⏎第八章 环境污染灾害【的】医疗救援⏎一 环境污染物对人体
+  - 0.60｜的；生活中的人工智能系统是通过对资源的合理调配实现问题解决的。应会： 能描述生活中人工智能产品是如何共同配合完成相应功能的；能描述某一特定人工智能产品都对哪些资源进行了合理调配以实现问题的解决。（2）人工智能应用系统设计【与】开发 应知： 开发一个人工智能
+  - 0.60｜，项目规模偏小、过度分散、总数偏多现象至今并无改观，资金使用“撒胡椒面”现象严重，不利于农业产业集群式发展，也不利于形成规模化、集约化、现代化的农业发展之路。融合发展尚处初级阶段，农民增收遭遇瓶颈【一是】产业融合发展的创收能力低。以往上海
+
+## M048（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 38 页一次；语料最大激活 7.89
+- 直接读出推高：裕 | tons | 狠抓 | 锐 |  Trades | 财 |  trade |  Ital | cargo | urret
+- 直接读出压低：请选择 | (${ | 欢迎大家 | HS |  mad |  please | 相信大家 | ally | .Please | 武林
+- 正极片段：
+  - 1.00｜ 12 2007. 12 2007 <http://www.studymode.com/essays/Gen480-Past-Present-Future-129105.html>.⏎"Gen480 Past Present and Future." Study【Mode】.com. 12, 200
+  - 0.99｜措施，帮助大宗商品进出口贸易企业提升核心竞争力和避险能力，帮助企业在未来的激烈竞争中可持续平稳发展，同时也为其他行业的财务风险管理提供参考价值，提升我国企业财务风险管理水平。⏎杨楠.经济新常态下商贸企业财务风险成因及内控措施.中外【企业家】，2017（09）：
+  - 0.98｜ 05 2012. 05 2012 <http://www.studymode.com/essays/The-Struggle-For-Power-In-The-994323.html>.⏎"The Struggle for Power in the Ussr." Study【Mode】.com. 05, 201
+  - 0.98｜ models were important in why there was a power struggle in those years it is not the most important reason.⏎Secondly, you could say it... [continues]⏎Cite This Essay⏎(2012, 05). The Struggle for Power in the Ussr. Study【Mode】.com. Retrieved 05, 20
+  - 0.95｜. 11 2007 <http://www.studymode.com/essays/Supply-v-Demand-False-Perceptions-Impact-125215.html>.⏎"Supply V. Demand: False Perceptions That Impact Crude Oil Pricing." Study【Mode】.com. 11, 200
+  - 0.91｜ceptions-Impact-125215.html>.⏎"Supply V. Demand: False Perceptions That Impact Crude Oil Pricing." StudyMode.com. 11, 2007. Accessed 11, 2007. http://www.studym【ode】.com/essays/Supply-v-Demand-
+  - 0.91｜ the abilities in writing and reading comprehension. The humanities course I have not took as of yet I think they touch upon history and the people who lived in... [continues]⏎Cite This Essay⏎(2007, 12). Gen480 Past Present and Future. Study【Mode】.com. Retrieved 12, 20
+  - 0.91｜11, 2007, from http://www.studymode.com/essays/Supply-v-Demand-False-Perceptions-Impact-125215.html⏎"Supply V. Demand: False Perceptions That Impact Crude Oil Pricing" Study【Mode】.com. 11 2007
+  - 0.91｜r. StudyMode.com. Retrieved 05, 2012, from http://www.studymode.com/essays/The-Struggle-For-Power-In-The-994323.html⏎"The Struggle for Power in the Ussr" Study【Mode】.com. 05 2012
+  - 0.90｜False-Perceptions-Impact-125215.html⏎"Supply V. Demand: False Perceptions That Impact Crude Oil Pricing" StudyMode.com. 11 2007. 11 2007 <http://www.studym【ode】.com/essays/Supply-v-Demand-
+  - 0.87｜-Struggle-For-Power-In-The-994323.html>.⏎"The Struggle for Power in the Ussr." StudyMode.com. 05, 2012. Accessed 05, 2012. http://www.studym【ode】.com/essays/The-Struggle-For
+  - 0.87｜Gen480-Past-Present-Future-129105.html>.⏎"Gen480 Past Present and Future." StudyMode.com. 12, 2007. Accessed 12, 2007. http://www.studym【ode】.com/essays/Gen480-P
+  - 0.86｜essays/Gen480-Past-Present-Future-129105.html⏎"Gen480 Past Present and Future" StudyMode.com. 12 2007. 12 2007 <http://www.studym【ode】.com/essays/Gen480-P
+  - 0.85｜ Future. StudyMode.com. Retrieved 12, 2007, from http://www.studymode.com/essays/Gen480-Past-Present-Future-129105.html⏎"Gen480 Past Present and Future" Study【Mode】.com. 12 2007
+  - 0.81｜essays/The-Struggle-For-Power-In-The-994323.html⏎"The Struggle for Power in the Ussr" StudyMode.com. 05 2012. 05 2012 <http://www.studym【ode】.com/essays/The-Struggle-For
+  - 0.80｜ touch upon history and the people who lived in... [continues]⏎Cite This Essay⏎(2007, 12). Gen480 Past Present and Future. StudyMode.com. Retrieved 12, 2007, from http://www.studym【ode】.com/essays/Gen480-P
+  - 0.80｜Secondly, you could say it... [continues]⏎Cite This Essay⏎(2012, 05). The Struggle for Power in the Ussr. StudyMode.com. Retrieved 05, 2012, from http://www.studym【ode】.com/essays/The-Struggle-For
+  - 0.78｜ variables which could... [continues]⏎Cite This Essay⏎(2007, 11). Supply V. Demand: False Perceptions That Impact Crude Oil Pricing. StudyMode.com. Retrieved 11, 2007, from http://www.studym【ode】.com/essays/Supply-v-Demand-
+  - 0.75｜1 浅谈续志中“人物”篇的编纂要点环球人文地理·评论版(2016年5期) 2017-01-03 略议年鉴资料在第二轮贵州省《科学技术志》中的重要作用科技视【界】(2016年12期)
+  - 0.73｜技情报开发与经济, 2010,(29)⏎郑寿敏. 中小民营企业薪酬激励制度改革的研究. 科技致富向导, 2011,(02)⏎孟祥勇. 当前建筑施工企业人力资源缺陷及对策. 科技【信息】, 2009,(23)⏎

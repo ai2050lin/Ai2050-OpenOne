@@ -1,0 +1,486 @@
+# 失败原因分类证据
+
+## M005（第 15 层）
+- 解释：在可测量的生理或物理指标名称上激活，尤其“心率/脉率”中的“率”，以及pH、流速、班额、condition number等量名（置信度 中）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.14, 0.02, 0.04, 0.71, 0.17]；near_miss [0.03, 0.03, 0.01, 0.06, 0.0]；distant [0.01, 0.01, 0.03, 0.01, 0.02]；结论 tie
+- 检索验证：未通过（正例 12 个，召回 0.3333333333333333，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜20mmHg是休克存在的表现；血压回升、脉压增大则是休克好转的征象。⏎4）脉【率】：脉率的变化多出现在血压变化
+  - 0.81｜出现以血容量不足为特征的一组临床综合征，如多汗、皮肤湿冷、面色苍白、恶心、头晕、心【率】明显增加、低血压、少尿
+  - 0.79｜ increase.⏎More about the Government of South Korea.⏎Source: U.S. Library of Congress<|endoftext|>Oxygen depletion in ponds⏎Ponds with【 warm】 water and overcrowded fish may be at
+  - 0.79｜：①头晕、头痛、反应减退、注意力不集中、动作不协调；②口渴、心悸、心【率】明显增快、血压下降、晕
+  - 0.71｜ are not treated. Diagnosis is suspected based on the symptoms, and may be verified by testing the vaginal discharge and finding a higher than normal vaginal【 pH】, and large numbers of bacteria. BV
+  - 0.69｜几何形状的金属板制成，叫集尘电极。静电除尘器的性能受粉尘性质、设备构造和烟气流【速】等三个因素的影响。粉尘的比
+  - 0.67｜下降。⏎最大分钟通气量和肺活量降低。⏎②换气能力降低。⏎呼吸膜面积减少，气体弥散【距离】增加，通气/血流比
+  - 0.67｜  is the maximal eigenvalue.⏎⏎The spectral radius can be minimized for a particular choice of  as follows⏎⏎where  is the matrix condition【 number】.⏎⏎See also⏎⏎Gauss–Se
+  - 0.66｜变化：发烧，体温高于 38 ℃，或体温过低，体温低于 36 ℃，成人患者心【率】高于每分钟 90 �
+  - 0.64｜imeter is set to 29.92" Hg or 1013.25 millibars.⏎- Density【 altitude】 is the altitude corrected for non-ISA
+  - 0.62｜ibrator stars close in the sky to the target are favoured (to avoid large differences in the atmospheric paths). If those stars have somewhat different zenith【 angles】 (altitudes) then a correction factor
+  - 0.60｜ and the number of students enrolled in the education system (see Indicator C1). Policies put in place to attract new teachers or to reduce average【 class】 size or staffing patterns (see Indicator D
+  - 0.59｜ (PSU) contains a fan with few exceptions, it is not to be used for case ventilation. The hotter the PSU's intake air【 is】, the hotter the PSU gets. As
+  - 0.59｜主要表现为面色潮红、皮肤灼热、体温升高至38℃以上，也可伴有恶心、呕吐、面色苍白、脉【率】增快、血压下降、皮肤湿
+  - 0.59｜ new Auxiliary gym, and renovated many of its other facilities. Holy Family has 65 faculty members, giving the school a 11【:】1 student/faculty ratio. Over
+  - 0.57｜0%～40%。(4)休克：休克可引起窦性心动过速，在轻度休克时心【率】可达到100次/min以上
+  - 0.57｜ know if you’re hydrated?⏎Probably the easiest and most common way to know if you’re hydrated is to monitor your urine. It should be【 pale】 yellow to clear, and you should be
+  - 0.56｜利用云计算、大数据等新技术，实现对学生日常学习情况的大数据采集和分析，优化教学模式，但解决当前普遍存在的班【额】过大，教师无法满足精准化教学
+  - 0.56｜Hg是休克存在的表现；血压回升、脉压增大则是休克好转的征象。⏎4）脉率：脉【率】的变化多出现在血压变化之前。常用
+  - 0.55｜model for end-stage liver disease, MELD）及MELD-Na评分血清胆红素、肌酐、IN【R】及肝脏病因或血清钠5
+
+## M012（第 18 层）
+- 解释：反复讨论某个名词性论题（如“白马非马”“two envelope problem”）时，在该论题核心名词或多token专名的后续部分激活（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.54, 0.96, 0.06, 0.13, 0.12]；near_miss [0.54, 0.02, 0.05, 0.08, 0.13]；distant [0.05, 0.1, 0.07, 0.01, 0.01]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.5，负例误报 0.05555555555555555）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.0
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜6-03.<|endoftext|>Why is it necessary to say that the two envelopes come from a distribution? Essentially, we can approach the two【 envelope】 problem in one of two ways. Firstly
+  - 0.91｜0. Note that the probabilities in every possible distribution must add up to 1.⏎The general case that we must address while solving the two【 envelope】 paradox is the collection of all possible distributions
+  - 0.86｜論證，在公孫龍之前应该已經存在。《戰國策》中，蘇秦曾提到刑名家以白馬非【馬】立說。《韓非子》
+  - 0.79｜ in one of two ways. Firstly, we can treat it as a fantasy in which anything can happen without any rational rules, ie the two【 envelopes】 appear magically out of nowhere, with no
+  - 0.77｜ analysed using probability theory. If we are to make a probability calculation then we need to make a basic assumption - that our sample (the two【 envelopes】) comes from some kind of distribution,
+  - 0.75｜而建立。现代逻辑学普遍认为此论题是诡辩。⏎⏎歷史⏎白馬非馬，這個論證，在公孫【龍】之前应该已經存在。《戰國
+  - 0.70｜較普遍使用的，因為一語詞所指的事物往往與別的語詞所指的不相同。但當公孫【龍】說「白馬非馬」時
+  - 0.70｜00<|endoftext|>白馬非馬，中國戰國時期由名家提出辯論問題。其中最著名的論據由公孫【龍】提出，根據離堅白的思路
+  - 0.69｜. He had no fossil evidence, of course, for such an evolutionary history. He also apparently was not aware of certain problems peculiar to gir【aff】es which make his easy assumption of gir
+  - 0.69｜, some of which also engage in reproduction.⏎⏎The basic shape of the "crown" is a full circle. Among the freshwater bry【ozo】ans (Phylactolaemata
+  - 0.65｜ Radiometric dating of the layers of volcanic ash encasing the deposits suggest that Ardi lived about 4.3-4.5 million【 years】 ago. This date, however, has
+  - 0.65｜和平奖。有19位女性获诺贝尔和平奖，超过其他任何诺贝尔奖。有两个组织曾多次获得这一奖项：红【十字】国际委员会分别于1917
+  - 0.65｜Set过程(b) Ismail 等人制造了一种 ITO/CeO2/ITO 透明忆阻器。忆【阻】器的工作原理是通过对电极施
+  - 0.64｜ to the first axis of the Barendregt's lambda cube, system Fω combines the first axis (polymorphism) with type【 operators】 (the second axis); it is a
+  - 0.64｜科学执政、民主执政、依法执政”的最好的制度载体。<|endoftext|>#事业单位考试#   脊髓灰质炎又称小儿【麻痹】症，是一类由脊髓灰
+  - 0.64｜ said to have added: "I can formulate this splendid result different, I take a horizontal sheet, and another identical one which I crum【ple】, flatten and place on the other.
+  - 0.64｜馬非馬立說。《韓非子》記載，宋人倪說（-{兒}-說），以白馬非【馬】，辯贏齊國稷下
+  - 0.64｜ have suited his purpose admirably.⏎⏎Sepharad⏎⏎The term "Sepharad" mentioned in the 20th verse of Ob【ad】iah comes from the Hebrew word for Spain
+  - 0.63｜ for fertilized eggs, colonial defence structures, and root-like attachment structures. Cheilostomata is the most diverse order of bry【ozo】an, possibly because its members have the
+  - 0.63｜ of calcium carbide, a reaction discovered by Friedrich Wöhler in 1862 and still familiar to students:⏎⏎Calcium carb【ide】 production requires high temperatures, ~20
+
+## M013（第 13 层）
+- 解释：两类分立模式：年表中年份后的制表符空白处，以及法律文本“一般【保证】”中的“保证”（置信度 中）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.02, 0.03, 0.77, 0.39, 0.02]；near_miss [0.03, 0.03, 0.04, 0.02, 0.03]；distant [0.02, 0.09, 0.0, 0.02, 0.0]；结论 tie
+- 检索验证：通过（正例 11 个，召回 0.5454545454545454，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.16666666666666666
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜	太平兴国⏎ 984 		甲子年⏎ 984		雍熙⏎ 984【					】	王延德(939
+  - 0.92｜1	开皇		文帝(杨坚，541-604)称帝建国⏎ 587【				】	科举开始⏎ 58
+  - 0.86｜		乾德⏎ 964 	甲子年⏎ 968		开宝⏎ 976【			】	太宗(赵匡义，
+  - 0.85｜			孝宗⏎ 1163	隆兴⏎ 1165	乾道⏎ 1165【				】	宋金谈和，维持4
+  - 0.84｜625-705)⏎ 684	光宅⏎ 685	垂拱⏎ 686【				】	神会(686-
+  - 0.84｜《未成年人保护法》、《预防未成年人犯罪法》和《刑事诉讼法》等法律都规定，对犯罪的未成年人实行【教育】、感化、挽救的方针和
+  - 0.84｜证明债务人的财产不足以履行全部债务或者丧失履行债务能力；（四）保证人书面表示放弃本款规定的权利。一般【保证】人的先诉抗辩权，新
+  - 0.83｜担保义务，故保证合同不成立，李某坤不应承担保证责任。《民法典》第六百九十三条规定：一般【保证】的债权人未在保证期间内对
+  - 0.81｜新的保证合同的，人民法院应当认定保证人按照新保证合同承担责任。”《民法典》第六百九十三条规定：“一般【保证】的债权人未在保证期间对债务
+  - 0.80｜、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判
+  - 0.80｜態數組的尺寸默認把原數據清除。如果保留原來的數據，必須加上參數Preserve。⏎                        【       】 '使用Preserve參數時
+  - 0.79｜979)⏎ 	  +-----------------唐朝-------------+      (Tang/T'ang， 618-907)⏎【 					】	+-隋-+ (Sui
+  - 0.79｜ 626			太宗(李世民，599-649)⏎ 627	贞观【			】	玄奘(Hsuan Tsang
+  - 0.77｜、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判
+  - 0.76｜、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判
+  - 0.76｜也发生效力，但保证人对转让后的债务不再承担保证责任。《民法典》第六百九十八条规定：一般【保证】的保证人在主债务履行期限届
+  - 0.75｜ they provide valuable information about a civilization that had grown to a significant size before disappearing. In China, where writing first began, the invention of【 paper】, the processes of replication and printing developed
+  - 0.74｜：当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判
+  - 0.74｜-589)		    +-------南北朝----------->⏎ (Jin/Chin， 265-420)【						】       晋 +-->⏎ ...........
+  - 0.71｜》第十七条、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般【保证】。一般保证的保证人在主合同
+
+## M014（第 19 层）
+- 解释：比较或对照结构的引导处激活，如unlike、like、相较於、与X相比、相对于，在比较介词及其对象位置（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.05, 0.01, 0.18, 0.09, 0.07]；near_miss [0.02, 0.03, 0.04, 0.03, 0.05]；distant [0.02, 0.0, 0.03, 0.02, 0.03]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.8333333333333334，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.4166666666666667
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ not expect to provide<|endoftext|>Using computers is as much a part of our daily activities as driving a car or using a microwave oven. But,【 unlike】 cars or ovens, computers become out
+  - 0.77｜也是極為普遍的酒類飲料。⏎⏎馬奶酒是一種與克非尔相似的乳製品，但相較【於】克非爾是採用固體
+  - 0.74｜ School in Computer Sciences analogous to the creation of Harvard Business School in 1921. Louis justifies the name by arguing that,【 like】 management science, the subject is applied and
+  - 0.69｜设备。家用游戏机是电子游戏机的一种，通常属于私有财产，与公用的街边游戏机相对，但与【街】机不同的是，家机通常使用
+  - 0.66｜整合在同一片硅晶内核之中，而Intel的双核心处理方式则更像是简单的将两个核心做到一起而已。与Intel【的】双核心架构相比，AMD双核心
+  - 0.65｜核心整合在同一片硅晶内核之中，而Intel的双核心处理方式则更像是简单的将两个核心做到一起而已。与【Intel】的双核心架构相比，AMD双
+  - 0.63｜ terrestrial salamanders and frogs lack lungs and rely entirely on their skin. They are superficially similar to reptiles like lizards, but【 unlike】 reptiles and other amniotes,
+  - 0.62｜ the seven Institutions of the European Union (EU) as listed in the Treaty on European Union. It is one of two legislative bodies and together【 with】 the European Parliament serves to amend and approve
+  - 0.61｜守宮砂消失。⏎⏎处女的首次性交 ⏎處男或處女的首次性交皆稱初夜，相对于男性【，在】要求女性守贞社会中，女性
+  - 0.61｜」，握有柏林、維也納兩支頂尖樂團，後者則是纽约爱乐的領導。相較【於】卡拉揚精於控制的指揮
+  - 0.61｜ space group = P63mc) has the same structure as lonsdaleite, a rare hexagonal polymorph of carbon. As【 in】 the cubic form, the boron and
+  - 0.61｜ and distributed by Unilever UK. Its appearance is similar to the British Marmite and its Australian equivalent Vegemite; however,【 unlike】 these products, Bovril is not
+  - 0.60｜，近现代的“国旗”这一概念与国徽一样同属清朝中后期与欧美文化交流接轨后的舶来品。但是【与】国徽的设计与使用的不同之处在于
+  - 0.59｜ distinct from warfare involving other types of weapons of mass destruction (WMD), including nuclear warfare, chemical warfare, and radiological warfare. None【 of】 these are considered conventional weapons, which are
+  - 0.59｜ of the rank 2 tensor as follows:⏎⏎Analogy to linear momentum ⏎Angular momentum can be described as the rotational analog of linear momentum.【 Like】 linear momentum it involves elements of mass and
+  - 0.59｜ replace each other within the same crystal structure.⏎⏎Brass is similar to bronze, another copper alloy that uses tin instead of zinc. Both bronze【 and】 brass may include small proportions of a range
+  - 0.58｜两晋史事，但对十六国史事则无专门记述。可说都非完备的晋史。与唐【之前的】各晋史相比，《晋书》
+  - 0.58｜對以上的光子。⏎⏎由电子與中子、质子所组成的原子，是物质的基本单位。相对于中子和质子【所】組成的原子核，电子的质量
+  - 0.58｜, Trees⏎Conifers ranging from rock garden shrublets to timber trees. Sometimes mistaken for arborvitae (Thuja), but【 ar】borvitae’s leaves are entirely green
+  - 0.57｜歷史上首個年號，與中國歷史上第一個年號一樣（西漢武帝的“建元”）。但【相比】日本和越南，朝鮮自立
+
+## M016（第 16 层）
+- 解释：动词或谓语后紧接的介词/补足成分处激活，如died【of】、caused【by】、according【to】、“【依据】课程标准”（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.21, 0.1, 0.07, 0.13, 0.07]；near_miss [0.04, 0.03, 0.06, 0.03, 0.03]；distant [0.01, 0.02, 0.1, 0.02, 0.04]；结论 tie
+- 检索验证：未通过（正例 12 个，召回 0.4166666666666667，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.08333333333333333
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜时候还要提供典型性的案例供教师参考。⏎教材是教学的材料。狭义的教材又称教科书或课本,是【依据】课程标准编制、系统反映 学
+  - 0.94｜离失所。就是一个极能说明问题的例证。但并非所有的海底地震都会引发海啸，能引发海啸的【必须】是有垂直运动的逆冲构造型
+  - 0.89｜. The couple raised two sons: actor-director Oz Perkins and folk/rock singer-songwriter Elvis Perkins. They remained married until Perkins died【 from】 AIDS-related complications on September 12
+  - 0.87｜ (Ukrainian Spotter's Site)⏎⏎Aviation photography⏎Observation hobbies<|endoftext|>Advertising is the practice and techniques employed to bring attention【 to】 a product or service. Advertising aims to
+  - 0.85｜ on increased health care costs and lost productivity. According to World Health Organization (WHO) estimates, 350 million deaths could be caused【 by】 AMR by 2050
+  - 0.84｜, 1994, he stepped down as Sony chairman. On October 3, 1999, Morita died【 of】 pneumonia at the age of 78
+  - 0.83｜系觀測，都無法達成接軌的目標。更具體而言，只有從慣性參考系才可觀測【到】不受力物体的運動速度不變
+  - 0.82｜ American Chinese establishments cater to non-Chinese customers with menus written in English or containing pictures. If separate Chinese-language menus are available, they typically【 feature】 items such as liver, chicken feet,
+  - 0.81｜ Ain't Wot They Used T'Be had been playing in London's West End for 14 months.⏎⏎Death⏎Frank Norman died【 of】 Hodgkin's lymphoma aged 5
+  - 0.79｜ophanes claimed to be writing for a clever and discerning audience, yet he also declared that "other times" would judge the audience according【 to】 its reception of his plays. He sometimes
+  - 0.79｜ from prenatal exposures to toxicants experienced by the⏎mother, it can also result from paternal exposures. For example, the occupational exposure of men【 to】 vinyl chloride has been associated with increased rates
+  - 0.79｜; take on a black color; blacken.⏎2. black out,⏎a. to lose consciousness: He blacked out at the sight【 of】 blood.⏎b. to erase, obl
+  - 0.78｜ defenses, ships, ground transportation and fuel storage facilities.⏎⏎Development began in 1966 at Hughes Aircraft Company as the first missile to【 use】 an electronic contrast seeker. It entered service
+  - 0.78｜ner lamp.⏎⏎A better standard for luminous intensity was needed. In 1884, Jules Violle had proposed a standard【 based】 on the light emitted by 1 
+  - 0.78｜的结果所报的心理态度。⏎20.犯罪故意:故意犯罪的主观心理态度。⏎22.犯罪目的:行为人希望通过【实施】犯罪行为达到某种危害社会结果的心理
+  - 0.77｜”壁画，描绘了中国古代诗人李白、白居易、陆游、岳飞等人的形像，摘录了他们吟【咏】黄鹤楼的名句。现在的
+  - 0.77｜ elicited emotion⏎- Situation modification – Trying to change the event that elicited the emotion⏎- Distraction – Attempting to distract attention【 from】 the emotional situation⏎- Rumination –
+  - 0.77｜人出于故意实施了在所生产、销售的食品中掺入有毒、有害的非食品原料的行为，或者明知是掺【有】有毒、有害物质的食品仍然予以
+  - 0.77｜鲁道心中的纠结长久未能得到化解，再加上对父亲 (父亲的形象象征着叙事语言开头“过去的人们”，也即过去【没有】被FI本 占领时的
+  - 0.77｜, the Taliban was in support of the vaccinations and allowed health workers to reach children in safety. Now Bahadur is refusing to allow vaccinations【 until】 the U.S. discontinues drone strikes
+
+## M017（第 17 层）
+- 解释：叙述团体与个人或阵营归属的语境（单飞solo career、队伍、联队、冠军、各自为政），在表示所属团体或个人身份的名词或修饰词上激活（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.14, 0.06, 0.09, 0.16, 0.11]；near_miss [0.05, 0.03, 0.02, 0.01, 0.01]；distant [0.02, 0.03, 0.02, 0.02, 0.02]；结论 tie
+- 检索验证：未通过（正例 12 个，召回 0.08333333333333333，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜是一种球類運動，與羽毛球以及網球同為球拍運動的一種，流行於世界各地。⏎⏎雙方球員手持乒乓球【拍】、隔著架有球網的
+  - 0.91｜ Lee's solo album Make It Beautiful on Righteous Babe. In 1998, Stochansky left to pursue a solo【 career】 as a singer-songwriter. A new
+  - 0.74｜. The AFC playoffs culminate in the AFC Championship Game, with the winner receiving the Lamar Hunt Trophy. The AFC champion then plays the NFC【 champion】 in the Super Bowl.⏎⏎History⏎⏎Both
+  - 0.70｜ with the idea of selling seeds in packets.⏎And the Ryder Cup competition germinated from another of his ideas. The Walker Cup, pitting【 teams】 of British and American amateur golfers,
+  - 0.67｜四大汗国，而四大汗国在14世纪初虽然承认了元朝名义上的宗主地位，但从此各自为【政】。⏎⏎14世纪中叶，明朝
+  - 0.67｜劳伦斯年度最佳新秀奖。 ⏎⏎2月，姚明被选为2003年NBA全明星赛西部联【队】首发中锋。尽管在短短的
+  - 0.65｜这三个数量中每两个数量间有着密切的关系，例如：3个苹果和5个梨进行比较。3个苹果和2【个】梨的关系：这2个梨是
+  - 0.64｜2003 album "Italiano medio", the band took a break. Both J-Ax and DJ Jad have been involved with solo【 projects】. In 2006,
+  - 0.63｜20, Plymouth was founded as a haven by Puritan religious separatists, later known as the Pilgrims. Fleeing from【 religious】 persecution would become the motive for many English
+  - 0.62｜這段時期，現在被稱之為「瀏覽器大戰」。當時，網景和微軟為了超越彼此，在它們【的】瀏覽器增加許多功能（雖然未必能
+  - 0.62｜ continued their success writing music for multiple audiences including stage, musicals and movies, while Fältskog and Lyngstad pursued solo【 careers】.⏎⏎Ten years after the group broke up
+  - 0.62｜斯林为主）进行了长达8年的两伊战争。因为此时伊朗经过伊斯兰革命以后，成为敌视美国的政教合一【国家】，美国在两伊战争中军事
+  - 0.61｜ to the International System of Units (SI). This task takes many forms, from direct dissemination of units to coordination through international comparisons of national measurement【 standards】 (as in electricity and ionising radiation
+  - 0.61｜ another school to cooperate with. This school should be as far away from you (to the south or to the north) as possible.⏎The【 classes】 (or even whole schools if the schools
+  - 0.61｜ of 36,000.⏎⏎It was in his auxiliary troops and in particular his cavalry, all of which vastly outnumbered Caesar【's】 own, that Pompey had his greatest
+  - 0.61｜, parallel, or mixed arrangements.⏎⏎In an antiparallel arrangement, the successive β-strands alternate directions so that the N-termin【us】 of one strand is adjacent to the C
+  - 0.60｜30 p.m., which featured the Inns vs. the Outs. The Inns lived in the Forest Hills Inn, and the Outs【 lived】 throughout the Forest Hills Gardens.⏎At 
+  - 0.60｜; but he died suddenly in October 1959, and individual NFL owners soon began a campaign to undermine the new league. AFL【 owners】 were approached with promises of new NFL franchises
+  - 0.59｜ 2003 album "Italiano medio", the band took a break. Both J-Ax and DJ Jad have been involved with【 solo】 projects. In 2006
+  - 0.59｜fuss, whose team ran away with the 1902 National League pennant, was open to a postseason contest and even said【 he】 would allow the American League champion to stock
+
+## M022（第 19 层）
+- 解释：紧跟在both、either（及既）之后的位置，即被「两者都/任一」修饰的名词或词首，如both hipbones、either father（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.21, 0.21, 0.44, 0.21, 0.02]；near_miss [0.03, 0.02, 0.01, 0.02, 0.02]；distant [0.02, 0.01, 0.02, 0.02, 0.01]；结论 tie
+- 检索验证：未通过（正例 11 个，召回 0.45454545454545453，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.4166666666666667
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ removal of bone marrow, blood, and a small piece of bone by inserting a hollow needle into the hipbone. Samples are removed from both【 hip】bones. A pathologist views the bone
+  - 0.83｜11/fonts, and fontconfig gets its config from /etc/fonts/font.conf which points to /usr/share/fonts. By default neither font【 system】 sees the fonts from the other system.⏎
+  - 0.79｜ many, but not all, Micrixalus species and evidence inferred for a few other species as well. Foot flagging is done with either【 hind】limb and also while calling. The
+  - 0.78｜ propitiated by the sacrifice of Agamemnon's daughter Iphigenia.⏎⏎Classical dramatizations differ on how willing either【 father】 or daughter are to this fate; some
+  - 0.75｜ Space Invaders and refined through trial and error.  The game is rendered on a vector display in a two-dimensional view that wraps around both【 screen】 axes.⏎⏎Asteroids was one of
+  - 0.75｜ Representatives began to resemble what the Founding Fathers intended: the popular will.⏎The narrow majority of Republicans and near majority of Democrats also made both【 political】 parties much more sensitive to what the people
+  - 0.74｜ recessive fashion. These disorders manifest in and are passed on by either sex with equal frequency. Autosomal dominant disorders are often present in both【 parent】 and child, as the child needs to
+  - 0.65｜ coal ash recyclers. Common sense and past experience indicate that stricter standards for disposal will work to increase, rather than decrease, recycling. But【 either】 way, the EPA ought not be intimidated
+  - 0.62｜ two new countries were created in these occupied territories: the Federal Republic of Germany in May, and the German Democratic Republic in October.⏎Both German【ies】 were admitted as full members of the United
+  - 0.60｜ to pump blood with increased force in order to move blood through the narrowed or stiff (stenotic) valve(s).⏎Heart valves can have both【 mal】functions at the same time (regurg
+  - 0.59｜ even if naturalised or made a denizen (unless born of English parents), can be a Privy Councillor or a member of【 either】 House of Parliament, or hold "any
+  - 0.59｜ while the foundry put the damage down to Denison's continued use of a 300kg hammer. Two ensuing libel actions【 both】 found in favour of the foundry over
+  - 0.59｜7-⏎A.D.A.M., Inc. Any duplication or distribution of the information contained herein is strictly prohibited.<|endoftext|>CentOS uses both font【 systems】 and they use different folders: http://
+  - 0.57｜xulub impactor.⏎⏎The Cenozoic is also known as the Age of Mammals because the terrestrial animals that dominated both【 hem】ispheres were mammalsthe e
+  - 0.57｜)⏎ <|endoftext|>In a dynamical system, bistability means the system has two stable equilibrium states. A bistable structure can be resting in【 either】 of two states.   An example of
+  - 0.56｜ World War, land or sea battles have come to rely on air support. During the Battle of Midway, five aircraft carriers were sunk without【 either】 fleet coming into direct contact.⏎⏎ A pitched
+  - 0.54｜ builds up over a lifetime" or "something that happens early in life at some critical period and then stays with you," Swing says. "【Either】 way, there are implications that would lead
+  - 0.54｜Com合作完成了一个简单的网络操作系统，也就是后来3Com's的，Microsoft的以及IBM的各家的原型，但这些都没达到【既】定目标。⏎⏎同一时间， Unix工作站
+  - 0.54｜ I think I did right." Corbett maintained that he did not intend to kill Booth, but merely wanted to inflict a disabling wound, but【 either】 his aim slipped or Booth moved at the
+  - 0.53｜ speed of the B-58 Hustler with the range and payload of the B-52, and was meant to ultimately replace both【 bombers】. After a long series of studies,
+
+## M025（第 22 层）
+- 解释：关系从句或状语从句中，指向前文对象的及物动词或介词位置，如when you aren't using them、the LAMBDA that binds it（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.2, 0.34, 0.02, 0.04, 0.1]；near_miss [0.03, 0.02, 0.01, 0.05, 0.06]；distant [0.07, 0.01, 0.0, 0.0, 0.02]；结论 tie
+- 检索验证：通过（正例 11 个，召回 0.5454545454545454，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ devices use "vampire energy" - using electricity even when they are turned off. By unplugging electronics from the wall when you aren't【 using】 them you use even less carbon dioxide and
+  - 0.76｜ Virtual Classroom Tour (or VCT, as the alternative is a bit of a mouthful!) was a complete mystery to me when I first【 encountered】 the concept.⏎I had visions of it
+  - 0.75｜Some people may be surprised at the omission of well known works from our list. They are absent because we were unable to obtain online broadcast rights【 for】 all the films we might have wanted to
+  - 0.68｜ is bound at a higher level and changes value less frequently.In LISP, a variable remains bound within the scope of the LAMBDA that【 binds】 it. When a variable always has a
+  - 0.66｜ holding on to various parts of her body.⏎In other words, at the left you see a dead female frog with several males trying to mate【 with】 various part of her body. How could
+  - 0.66｜ pulley falls into the well, and the dust returns to the earth as it once was, and the life-breath returns to God who【 gave】 it.I observe in myself how difficult it
+  - 0.64｜ be liable for the sexual abuse of a student if the school knew that the offending school official had a history of molesting children but continued to【 employ】 the official.⏎The Meaning of Premises
+  - 0.64｜ 92), have one or more isotopes with half-lives long enough to survive as remnants of the explosive stellar nucleosynthesis that【 produced】 the heavy metals before the formation of our
+  - 0.60｜ onto a single machine. This isn't unlike the benefits of using runtime libraries; except runtimes must be loaded onto each machine where software that【 uses】 them will run.⏎Easier to Debug
+  - 0.59｜secondary sustainability education.⏎Go from Postsecondary Sustainability Education to the Integration Page⏎Return from Postsecondary Sustainability Education<|endoftext|>The olive and the tree on【 which】 it grows have been revered since ancient times
+  - 0.59｜抗原）可經過B細胞上B细胞受体的識別而“直接”活化B細胞；或經【抗】原呈現細胞的處理，並
+  - 0.59｜ weighed.  Above that range of weight, the bird will be unresponsive in the field, lacking in motivation to hunt or return to the【 fal】coner in timely fashion.⏎⏎Gaunt
+  - 0.59｜ling towards him around the edge of the woods, soaring into the enclosure, and stopping dead in mid-air beside him, waiting for him to【 mount】."⏎- —The Firebolt, under
+  - 0.57｜ poet Claudio Achillini dedicated to him an epitaph after his death, later published by Carlo Cesare Malvasia in the life【 of】 the Carracci.⏎⏎Agostino's
+  - 0.57｜, and if so advise the cell to kill itself. If this protein p53 is abnormal or inactive (for example, from a mutation【 in】 the p53 gene,) then old
+  - 0.56｜22. Statements by Persons Expressly Referred to by Party to a Suit.⏎- 23. Proof of Admissions against persons【 making】 them, and by or on their behalf
+  - 0.56｜ ’coon,” answered Sumner, “and he has got away with the best part of our provisions, too; but I’ll get even【 with】 him yet. Now give me the hatch
+  - 0.56｜ John Japil and Julian Herman tracked down a magnificent female whom we named “Brumas” after the plantation where we placed a satellite collar【 on】 her. I am pleased to report that
+  - 0.55｜十美的皇太子，已至在皇族中，在宫廷中没有一个人不称赞他，都相信有朝一日，他像【他】父亲一样，成为中华帝国前所未有的
+  - 0.55｜in the sea. I really am about to swim with these giants.⏎Like all whales, bowheads are sensitive creatures and getting into the water【 with】 one must be done with cautionfrom the
+
+## M029（第 16 层）
+- 解释：无法解释（置信度 无法解释）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.4166666666666667
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ they seek to blacken, by dint of repeated strokes of their brush, becomes a demon in their own eyes, though he might be pure【 and】 bright as an angel but for the da
+  - 0.77｜市场，国际竞争力明显提升，进口量大幅减少；消费者对国产乳制品信心明显提振，奶粉进口步伐放缓。总体看【，】农产品贸易结构优化，向好趋势
+  - 0.76｜ Florida and Canada was the driving force behind the war hawks, the excuse put forth was “impressment and the rights of a neutral【 nation】 to free trade.” These slogans were a
+  - 0.71｜政党。中国共产党对致公黨进行政治领导，但表示保证组织独立和法律地位平等，不会干扰民主党派的独立【性】及日常事务。⏎⏎截至201
+  - 0.71｜是犯罪行为所直接针对的对象，如杀人罪、伤害罪，犯罪对象是具体的被害人，而犯罪客体是指刑法所【保护】的公民人身权利不受非法侵害的
+  - 0.70｜ character encoding for a web page is chosen appropriately, then HTML character references are usually only required for markup delimiting characters as mentioned above,【 and】 for a few special characters (or none
+  - 0.69｜会合并。中国共产党对民革进行政治领导，但表示保证组织独立和法律地位平等，不会干扰民主党派的独立【性】及日常事务。根据中央有关文件
+  - 0.69｜imiting characters as mentioned above, and for a few special characters (or none at all if a native Unicode encoding like UTF-8 is【 used】). Incorrect HTML entity escaping may also open
+  - 0.67｜9 of the last 12 years. Only in years when every area of the budget experienced deep cuts was it shortchanged. To date【,】 districts have received nearly $700
+  - 0.66｜, where ecotourism and forest-dependent butterfly farming are rising in popularity. Nature reserves in Kenya, which ban butterfly harvesting, act as【 ref】uges for the variable eggfly and its
+  - 0.65｜清理。在之后的专项清理工作中，由于各地对清理标准的理解不同，有些地方出现了过度清理的现象，不利于采购工作的顺利【进行】。⏎随后，财政部出台了《政府采购框架协议
+  - 0.63｜ require active conservation measures. The wood bison is on the endangered species list in Canada and is listed as threatened in the United States, though【 numerous】 attempts have been made by beefalo ranch
+  - 0.62｜ seek to blacken, by dint of repeated strokes of their brush, becomes a demon in their own eyes, though he might be pure and【 bright】 as an angel but for the daub
+  - 0.62｜ effects of this excited state of feeling in the public; an excitement which he regarded not only as hostile to the accused, but to the calm【ness】 and the fairness of judicial proceedings, in
+  - 0.62｜共产党对农工党-{}-进行政治领导，但表示保证组织独立和法律地位平等，不会干扰民主党派的独立【性】及日常事务。，被視為衛星
+  - 0.61｜农用地划为三个类别，未污染和轻微污染的划为优先保护类，轻度和中度污染的划为【安全】利用类，重度污染的划为
+  - 0.60｜irac and Le Pen) in the first round of the 2002 French presidential election; it instead would have chosen Chir【ac】 and Jospin as the top two
+  - 0.60｜. w/ Dr. Eddie Moore, Jr.⏎"Your definition sounds like it is not leaving space for white people who don't practice racism【 or】 is working against racism" Dr. Eddie
+  - 0.60｜ Pen) in the first round of the 2002 French presidential election; it instead would have chosen Chirac and Josp【in】 as the top two candidates to proceed to
+  - 0.60｜ six (17.7%) of alcohol dependent adults in the U.S. whose dependence began over one year previously had become "low-risk【 drinkers】" (less than 14 drinks
+
+## M031（第 19 层）
+- 解释：中文年份括注中的清代年号纪年，尤其「光绪」的「绪」及其后年数，兼及文献引用年份后卷号前的空格（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.24, 0.02, 0.36, 0.09, 0.02]；near_miss [0.02, 0.01, 0.01, 0.02, 0.02]；distant [0.01, 0.01, 0.03, 0.03, 0.0]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.6666666666666666，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.16666666666666666
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜1894年10月22日－1961年8月8日），清光绪二十年（1【8】94年）出生于北京，祖
+  - 0.91｜主。1875年（光緒元年）清政府收复新疆后，1880年（光【绪】六年）在迪化城东筑
+  - 0.85｜梅兰芳（1894年10月22日－1961年8月8日），清光【绪】二十年（1894年）
+  - 0.85｜1-38⏎James J. (2008), Digital divide complacency: misconceptions and dangers, The Information Society,【 】24: 54-6
+  - 0.78｜年（1875年）設立臺北府，改隸新成立的淡水縣。11年（1【8】85年）設立福建臺灣
+  - 0.76｜发起的“中国议会”，被选为副会长；创办名学会，讲演名学。⏎⏎1901年（光绪【二】十七年）应开平矿务
+  - 0.74｜焚烧城西、周宅祠巷等处教堂，并捣毁英税务司住所。⏎1896年（清光绪【二】十二年）2月，孙诒
+  - 0.73｜⏎Harbarth S, Samore MH "Clostridium: transmission difficile?" PLoS Med 2012;【 】9: e10011
+  - 0.73｜，焚烧城西、周宅祠巷等处教堂，并捣毁英税务司住所。⏎1896年（清光【绪】二十二年）2月，孙
+  - 0.72｜、经济、军事、文化中心。“扼四达之要冲，为诸城之都会”。⏎⏎1905年（光【绪】三十一年），置黑水厅。⏎⏎
+  - 0.71｜受演化論思想影響，愛讀新思想的書，尤其是翻譯的小說。⏎⏎1892年（光绪【1】8年），10歲就讀
+  - 0.71｜，是一种政教合一的统治方式。那曲还有一部分地区归班禅管辖。⏎ 1907年（光绪【三】十三年），共有八代“霍
+  - 0.71｜100元资助梁启超与汪康年在上海创办的《时务报》。⏎⏎1897年（光【绪】二十三年）和王修植
+  - 0.69｜藏书、管理、阅书规程，并编制《古越藏书楼书目》。⏎1902年（光绪【二】十八年）清朝政府经过调取
+  - 0.68｜民事日繁，遂添设府、厅、州、县建制。⏎ 1907年4月（清光【绪】三十三年三月），清廷
+  - 0.68｜4年冬发生开平矿务局诉讼事件，被邀前往英国伦敦进行交涉。⏎⏎1905年（光【绪】三十一年）孙中山由美洲到达
+  - 0.68｜常发起的“中国议会”，被选为副会长；创办名学会，讲演名学。⏎⏎1901年（光【绪】二十七年）应开平矿
+  - 0.68｜stridium difficile hospital ward–based transmission using extensive epidemiological data and molecular typing" PLoS Med 2012;【 】9: e10011
+  - 0.67｜严重，引起了世人的高度关注。工业发达国家以生态环保为借口，凭借其经济和技术的垄断地位，制定了一系列苛刻【的】环保措施和高于发展中国家技术水平
+  - 0.66｜（光绪十六年）升为北洋水师学堂总办。⏎⏎1891年10月8日（光【绪】十六年）严复获得“候选
+
+## M035（第 19 层）
+- 解释：“to/能/帮助”等之后、以需求或空缺为宾语的满足类动词：fill、meet、answer、fulfill、回答（填补空缺、满足需求、回答问题）（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.36, 0.12, 0.28, 0.09, 0.26]；near_miss [0.15, 0.04, 0.05, 0.01, 0.06]；distant [0.01, 0.01, 0.03, 0.03, 0.01]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.75，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.0
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ the k-element groupings that include a particular set element, say "i", in every group (since "i" is already chosen to【 fill】 one spot in every group, we need
+  - 0.96｜ a potentially invaluable career opportunity for their children. Eventually the Sultan turned to foreign volunteers from the warrior clans of Circassians in southern Russia to【 fill】 his Janissary armies. As a
+  - 0.92｜ of introductory geoscience; however, many of the exercises and concepts may be applied in upper level courses as well. We will attempt to【 answer】 the following questions:⏎Do I need to
+  - 0.87｜6、鼓励儿童仔细观察周围事物及其相互关系，促进有意注意的发展。多与儿童交流幼儿园及周围发生的事情，积极【回答】儿童提出的问题。⏎人之初，性
+  - 0.85｜ contains a prominent role for ‘school choice’. But the debate lacks some basic information on these issues, and this paper provides some background facts to【 fill】 this gap. We first consider the transport
+  - 0.84｜ management portfolio of the future, although the significance of this niche cannot be definitively determined at this time. The potential for desalination to【 meet】 anticipated water demands in the United States is
+  - 0.84｜ the restraints of second-class citizenship, black Americans once lacked the voice whites enjoyed in the form of newspapers and magazines.⏎Black newspapers sought to【 fill】 that void beginning in the 18
+  - 0.83｜ United States and most other countries in the world is how to supply transportation fuel. Hydrogen, as part of a sustainable energy supply, can【 meet】 the challenge of a domestically produced energy carrier
+  - 0.81｜?⏎What was the response rate? How were the subjects contacted? When was the survey conducted? What were the exact questions?⏎Government statistical offices【 answer】 these questions when they announce results; national
+  - 0.80｜Many teachers contributed their thoughts and links in the chat (see below), and four guest joined us in the Skype conversation:⏎- To help us【 answer】 some of our questions, we invited Dave
+  - 0.79｜ more energy conservative and saving a lot of money in the energy bills.⏎Indeed a small wind energy system can be installed in your house to help【 fulfilling】 your electrical energy need. The wind energy
+  - 0.78｜ task, which adds value to the overall workout data set.<|endoftext|>Nuclear Power Is the Future⏎Nuclear power alone is positioned to help【 meet】 the world's burgeoning energy demand and supply
+  - 0.75｜C does not base eligibility on what could/might occur or often occurs with those that have been given this diagnosis. Documentation should be current and【 answer】 the following the questions:⏎Does the individual
+  - 0.75｜ over another and discuss what it actually means to have one’s face on a stamp. I’ll have to un-memorize my answer【 to】 frequently asked questions such as, “Why
+  - 0.74｜-school meeting between its four students and a water-district biologist at nearby Lake Mead National Recreation Area.⏎The entire class hoped the biologist would【 answer】 several questions they'd prepared about the prevention
+  - 0.74｜ years before being discharged.⏎⏎The Romans were also noted for making use of auxiliary troops, non-Romans who served with the legions and【 filled】 roles that the traditional Roman military could not
+  - 0.73｜⏎GROUNDBREAKING STUDY FINDS SOLAR, WIND, OTHER RENEWABLE POWER SOURCES COULD ME【ET】 NEARLY ALL NORTH CAROLINA
+  - 0.72｜ictive immigration policies have long been associated with a variety of economic problems including the diminished availability of foreign business and scientific talent, the inability to【 fill】 low-skilled agricultural and service jobs typically
+  - 0.72｜point one can appreciate the wide array of work that has already been done and note what areas still need fleshing out.⏎The book capably【 meets】 its goal of providing a readable overview of
+  - 0.70｜ an inner electron has absorbed more than the binding energy (so that the atom ionizes), then a more outer electron may undergo a transition to【 fill】 the inner orbital. In this case,
+
+## M039（第 20 层）
+- 解释：中文法律、税务、行政条文里定语从句或“的”字结构末尾的中心名词或“的”位置，如“…取得的收入”“…缴纳的部分”“…的行政中心”（置信度 中）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.09, 0.18, 0.11, 0.17, 0.23]；near_miss [0.13, 0.05, 0.02, 0.06, 0.06]；distant [0.02, 0.07, 0.02, 0.02, 0.12]；结论 tie
+- 检索验证：未通过（正例 10 个，召回 0.4，负例误报 0.05）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜為“州府”（首府）。⏎ 自治區或屬地的行政中心，例如各國海外屬地的行政【中心】，或是國際上享有高度自治權
+  - 0.99｜(3)中央与地方共享税:⏎②营业税:铁道部、各银行总行、各保险总公司集中缴纳【的部分】归中央政府，其余部分归地方政府
+  - 0.98｜支付或者负担的增值税额，为进项税额。⏎  （一）从销售方取得的增值税专用发票上注明的增值税【额】。⏎  （二）从海关取得
+  - 0.93｜认定为刑法第三百零七条之一第一款规定的“情节严重”：⏎（一）有本解释第二条第一项情形【，】造成他人经济损失一百万元以上的；⏎（
+  - 0.92｜; others have narrower requirements and are generally referred to by the platform they run on. For example, a geography application for Windows or an Android【 application】 for education or Linux gaming. Applications that
+  - 0.91｜外界环境的关系;(2)精气、阴阳、五行学说等中国古代哲学中朴素的唯物辩证法思想对医学的【渗透】。⏎(三)中医学理论体系
+  - 0.91｜《企业所得税法实施条例》明确，财产收入，是指企业转让固定资产、生物资产、无形资产、股权、债权等财产【取得】的收入。⏎而会计上，财产
+  - 0.90｜、机电设备、供配电系统、运输系统等；⏎2）配备必要的应急救援器材、设备和现场作业人员安全防护物品【支出】；⏎3）安全生产检查与评价支出
+  - 0.89｜额 1.无法支付的应付款项。⏎企业取得的捐赠收入金额较大，并入一个纳税年度缴税确有困难【的】， 经主管税务机关审核确定
+  - 0.82｜托人之间的承诺，行为人任职后应主动履行承诺，但因客观原因末能使为请托人谋取的利益实现【的】，亦不影响行为人受贿罪的
+  - 0.82｜风险的方法。⏎在开展以下工作前应进行JSA：⏎制修订作业指导书、操作程序、操作规程等标准操作文件【前】；新的作业（如果是低风险活动
+  - 0.82｜支付的以下各项现金补贴和非货币性集体福利：（一）为职工卫生保健、生活等发放或支付的各项现金【补贴】和非货币性福利，包括职工
+  - 0.81｜债权确定的规则也应适用于最高额质权所担保债权的确定。　　（一）约定的债权确定期间届【满】　　[10]本项
+  - 0.81｜東亞的範圍；⏎ 深受漢字文化影響的菲律宾群岛、華人移民分布較多的马来西亚、新加坡【等地】區。⏎⏎相关概念⏎東洋：
+  - 0.81｜駐地為“州府”（首府）。⏎ 自治區或屬地的行政中心，例如各國海外屬地【的】行政中心，或是國際上享有高度
+  - 0.80｜液化气体超压引起的爆炸等.物理性爆炸前后物质的性质及化学成分均不改变.比如高压锅使用不当【引起的】爆炸。物理爆炸的定义：这是一种
+  - 0.80｜）收入⏎销售货物收入在税法是指企业销售商品、产品、原材料、包装物、低值易耗品以及其他存货【取得】的收入。⏎提供劳务收入，是指
+  - 0.80｜ that there is little evidence of Sub-Sahelian influence in the blues as "elaborate polyrhythm, percussion on African drums (as【 opposed】 to European drums), [and] collective
+  - 0.79｜表情等传递信息、沟通思想<|endoftext|>合伙股份企业监事的职责⏎公司法规定很明确，如下：监事会、不设监事会【的】公司的监事行使下列职权：$P
+  - 0.78｜（二） 微观角度⏎    1．收入水平。家庭和个人一定时期内的收入水平，机关、团体的收入【水平】、企业的收入水平是决定他们为
+
+## M040（第 18 层）
+- 解释：英文固定短语中段的功能位置：this time、in whole、for one reason or another、at least、in return，以及句首状语后的逗号（置信度 中）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.16, 0.07, 0.36, 0.05, 0.68]；near_miss [0.04, 0.07, 0.07, 0.05, 0.12]；distant [0.04, 0.04, 0.03, 0.03, 0.05]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.5，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ 6 adults here averaging . Wintering eagles in Arizona (winter weights are usually the highest of the year since, like many raptors【,】 they spend the highest percentage of time for
+  - 0.93｜ of 10.)⏎To use the password, the participants played a 5- to 10-minute version of the game. This【 time】, the software compared how accurately they typed
+  - 0.93｜ g++|⏎|Required to build||libstdc++|⏎|Required to build||fortran|⏎This entry (in part or in【 whole】) was last reviewed on 4 February
+  - 0.93｜ as shameful or destructive, but may also include a “Golden Shadow” made up of otherwise constructive talents and strengths that, for one reason or【 another】 (ie: they posed a threat to
+  - 0.92｜ic numbers itself forms a field.⏎⏎Related fields⏎⏎Numbers defined by radicals⏎Any number that can be obtained from the integers using a finite number【 of】 additions, subtractions, multiplications
+  - 0.90｜ did Descartes's masterpiece receive due recognition.⏎⏎Pierre de Fermat also pioneered the development of analytic geometry. Although not published in his【 lifetime】, a manuscript form of Ad locos
+  - 0.84｜ engines because electricity is so versatile. It can be used to power vastly different appliances. We also prefer electricity because, at least inside our homes【,】 it gives off no fumes.⏎Perhaps
+  - 0.84｜ is a liquid, albeit a very stiff liquid under normal ambient temperatures. When an asphalt material is deformed slightly, and for a very short【 period】 of time, it tends to return to
+  - 0.83｜ 2008)⏎Photo by Mark Thiessen⏎Join Nat Geo News Watch community⏎Readers are encouraged to comment on this and【 other】 posts–and to share similar stories, photos
+  - 0.83｜ people use it to plug holes, remove lint and relieve stress. And to cap it off, a physicist used Silly Putty as the【 basis】 of experiment to demonstrate the utility of a
+  - 0.83｜  In particular, for this limit to exist, the value of the difference quotient must approach the same complex number, regardless of the manner in【 which】 we approach  in the complex plane.
+  - 0.82｜ email: subscribe to the free mef mailing list⏎This text may be reposted or forwarded so long as it is presented as an integral【 whole】 with complete and accurate information provided about its
+  - 0.81｜ the 11th century. Very simply put, feudal society resembled a pyramid. At its apex was the king who, in theory at【 least】, owned all the land in his kingdom
+  - 0.80｜, was known to Archimedes (who may have invented it). He preferred it to Hero's method of successive approximation because, once computed【,】 a digit does not change, and the
+  - 0.80｜ skipped the French Open in 1977 because he was under contract with WTT, but he repeated his Wimbledon triumph, although this【 time】 he was pushed much harder. He defeated
+  - 0.79｜ and the node size is fixed. In practice, variable length keys may be employed.⏎⏎Informal description⏎⏎Node structure ⏎As with other trees【,】 B-trees can be represented as a
+  - 0.77｜ function to a non-simply connected domain in the complex plane but it is possible to extend it to a holomorphic function on a closely【 related】 surface known as a Riemann surface
+  - 0.76｜ the same idea in a letter addressed to Francis Windebank. He proposed a loan of £1.2 million to the government; in【 return】 the subscribers would be incorporated as The Governor
+  - 0.76｜ someone in the loop is cited by A, and few ever check to see if the number has any validity. Still, for a while at【 least】, "everyone knows" it's true
+  - 0.75｜ kicked the field goal. It landed right of the goalpost. A few moments later, Koenen attempted the kick again, and this【 time】 made an official 58 yard field
+
+## M041（第 16 层）
+- 解释：引出列表的提示语末尾：“the following”“includes”“如下”“以下”及其后的冒号换行，即将开始逐项列举之处（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.08, 0.03, 0.06, 0.05, 0.08]；near_miss [0.03, 0.03, 0.02, 0.02, 0.02]；distant [0.04, 0.07, 0.02, 0.04, 0.05]；结论 tie
+- 检索验证：未通过（正例 11 个，召回 0.45454545454545453，负例误报 0.05555555555555555）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜双方对处理结果的认可，从而建立起医患纠纷处置的新机制。　3.医疗损害赔偿民事责任的构成要件有【以下】四个：　　(一)必需
+  - 0.82｜ GRAPHIC ORGANIZERS, VISIT THE CUSTOM CATEGORY BELOW⏎Link-LITERATURE GRAPHIC ORGANIZERS⏎This Lesson Plan【 Includes】:⏎1. Teacher Instructions⏎2.
+  - 0.72｜ This water trail offers an outstanding opportunity for paddlers to observe a variety wetland wildlife species in their native habitats.⏎For More Information on the【 Following】:⏎- Wildlife Management Areas⏎- Public
+  - 0.71｜ Board in the Special Education Classroom⏎Smart Boards are fun tools for children with disabilities, working like giant touch screens.⏎IEPgoals.net Is【 a】 New Site Offering Support for Goal Writing⏎
+  - 0.69｜ distribution of silver halide retained in a thin surface layer (~0.005mm) of gelatin.⏎Materials - (with links【)⏎】Ilford Multigrade IV RC Deluxe
+  - 0.68｜文书。 　　刑事附带民事起诉状由首部、正文和尾部组成。⏎1．首部应当写明【：⏎】　　1)文书名称，即
+  - 0.66｜ Arizona regions, culture and ethnic diversity while particularly empowering Arizona Native people.⏎Also for teachers is the Teach and Learn feature.⏎Here teachers can access【:⏎】- Resources for social studies educators to integrate
+  - 0.63｜ applicability of regulatory limitations prior to use. For specific hazard statements, refer to Section 9.⏎2. Referenced Documents (purchase separately【)】 The documents listed below are referenced within the
+  - 0.61｜ containing a uniform distribution of silver halide retained in a thin surface layer (~0.005mm) of gelatin.⏎Materials -【 (】with links)⏎Ilford Multigrade
+  - 0.61｜ a quick check of their understanding. The perfect amount of problems/items on a page to see if your students are understanding the topic!⏎Includes The【 Following】 Topics:⏎•Read and write six digit
+  - 0.60｜ Everybody calls me a racketeer. I call myself a businessman.⏎Comment in 1925⏎- - - Books You May Like【 Include】: ----⏎Cicero Revisited
+  - 0.60｜ offer guidance on the transmission of the observations from the ship to shore, using the ship's own satcom or terrestrial communications equipment.⏎THERE【 ARE】 NO CHARGES TO THE SHIP
+  - 0.60｜⏎Physical Sciences: K-12⏎Art and Artists⏎Label Me! Printouts⏎|Search the Enchanted Learning website for【:】|⏎Copyright ©2001-
+  - 0.60｜以及在过程中产生的其他职业有害因素。⏎2）根据矿山经营活动和作业场所的具体情况，确定本单位的职业危害为四大类【：⏎】①生产性粉尘的危害：在
+  - 0.60｜ vision.Click Here⏎Learn more about the⏎7 Educational Goals and⏎5 Technology Measures for achieving the vision for⏎K-20 Education【...】 Read more⏎Need help implementing⏎Vision
+  - 0.59｜分析而提出假说，再设计新的实验来验证。$P$  　　5、孟德尔对分离现象的原因提出【如下】假说：生物的性状是由
+  - 0.59｜该国对外汇的需求相对于其可得到的外汇供给来说趋于增加，该国货币汇率下跌。⏎⊙ 但要注意两种特殊情况【：⏎】  1．对于出口导向型
+  - 0.59｜ an ulcer or sore in the mouth that is not healing Oral Cancer of the lip⏎Oral cancer of the tongue⏎Also look out for【:⏎】- * Unexplained bleeding in the mouth
+  - 0.59｜ call your doctor immediately.⏎Medicines most often used to treat bipolar disorder in children and teens include:⏎Reference Mood stabilizers, such as【:⏎】- Lithium (for example, Esk
+  - 0.58｜ the embryos will be normal and available for transfer. In some cases all of the embryos can be abnormal and therefore not suitable for transfer.⏎The【 following】 is a highly detailed article about PGD
+
+## M042（第 20 层）
+- 解释：叙述人群或群体的语境中指代群体的代词或名词，如they、you、their、people、population、users、students（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.05, 0.07, 0.08, 0.05, 0.09]；near_miss [0.06, 0.05, 0.05, 0.05, 0.03]；distant [0.04, 0.03, 0.03, 0.03, 0.03]；结论 tie
+- 检索验证：未通过（正例 12 个，召回 0.4166666666666667，负例误报 0.05555555555555555）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.3333333333333333
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜ France also received the right to exploit its coal fields until that time. When more than 90% of the votes cast in the ple【b】iscite favored its reunion with Germany,
+  - 0.92｜ cinnamon and a pie crust and goes home and makes a delicious pie. She invites some friends over, serves the pie and proudly tells them that【 they】 are eating a pie made with seasonal fruit
+  - 0.91｜ want to become?⏎Tree – You need freedom, flexibility, and for life to be more simplistic.⏎Waterfall - You need structure, but【 you】 need the tools in order to help you
+  - 0.90｜ law, which codifies its legal principles into legal codes and does not treat judicial opinions as binding.⏎⏎Today, one-third of the world's【 population】 lives in common law jurisdictions or in mixed
+  - 0.85｜凭证不一致的，以投保单为准。但不一致的情形系经保险人说明并经投保人同意的，以投保【人】签收的保险单或者其他保险凭证
+  - 0.83｜ popularity of a search engine is determined by its ability to produce the most relevant results to any given search allowing those results to be false would turn【 users】 to find other search sources. Search engines
+  - 0.82｜3%。2010年人口普查中，超過1400萬人，即約有22.2%【人】居住于曼谷的都市郊区。
+  - 0.80｜led in state child welfare as well. Just as the Soviet state failed when it tried to direct what was going to be produced and who was【 going】 to produce it, the modern welfare state
+  - 0.78｜ position at the crossroads between West Africa and Central Africa, it has been categorized as being in both camps. Its nearly 27 million【 people】 speak 250 native languages and
+  - 0.73｜ wealth cannot be enjoyed under slavery and placing the blame upon herself for not expelling the Romans as they had done when Julius Caesar had come for【 their】 land. The willingness of the barbarians
+  - 0.73｜ day was talking to Mr. Andy [Public Defender Andrew Rosen]. He told me some important things.” And the professionals involved enjoyed working with the【 students】, as well, according to “Mr
+  - 0.72｜ used in dance venue sound systems to enable the playing of "[b]ass-heavy dance music" that we "do not 'hear' with【 our】 ears but with our entire body". At
+  - 0.72｜ the legal limit to reach the hinterlands, to pay for crowds to come to rally’s, to give sops to prospective voters to lure【 them】 to vote; but most of all -
+  - 0.72｜l and in exchange for that, the government would be responsible for seeing that the Germans in the district of the above named 3 cities would【 vote】 for Mahler. On election day,
+  - 0.72｜ing films of Indian cinema. Many Bollywood producers and directors acknowledge the might of regional film industries. Some trade experts and critics believe that audiences eventually【 will】 return to Bollywood. In 20
+  - 0.71｜ the Hereafter is everlasting?”⏎Many do not. In verses 33-73 Allah consoles Muhammad for the unbelievers’ rejection【 of】 his message: “We know indeed the
+  - 0.71｜ India waned. Some directors, exhibitors, actors and producers claimed that audiences became smarter, and they wanted movies with good stories, and【 they】 do not accept mediocre films. Instead of
+  - 0.70｜ | 7-9 Lessons Home<|endoftext|>A Cricket Magazine Group magazine⏎Science for grades 5-9⏎Have a young reader who's【 interested】 in everything? MUSE® is for
+  - 0.70｜ violating ADA rules. State employees can, however, file complaints at the Department of Justice or the Equal Employment Opportunity Commission, who can sue on【 their】 behalf.⏎⏎Title II—public entities (
+  - 0.70｜）环球影城平面导游图（2）动物园平面图。接着布置大任务：同学们，如果你是小导游，能不能为【游客】介绍一条合适的游览路线呢？⏎这样
+
+## M049（第 20 层）
+- 解释：公式或比率定义中表示除法的符号/词：“/”“÷”“divided by”“除以”“ratio of A to”，位于分子之后、分母之前（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.13, 0.19, 0.24, 0.08, 0.4]；near_miss [0.01, 0.01, -0.0, 0.03, 0.01]；distant [0.0, 0.01, -0.0, 0.02, 0.0]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.5833333333333334，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜度（公转只绕360度）。所以一恒星月大约为29.53 * 360【 /】 389.11 =
+  - 0.88｜后）人口大幅下滑，对结婚对数产生负面影响。根据结婚率的计算公式，结婚率=某年结婚对数【/】某年的平均总人口数×1
+  - 0.86｜ measurement, or the measure of weight adjusted for height using age and gender specific growth charts. BMI is defined as weight (in kilograms) divided【 by】 the square of height (in meters).
+  - 0.86｜ heart rate, the heart rate reserve during the work can be calculated (heart rate reserve = (heart rate during activities – resting heart rate)【 /】 (maximum heart rate – resting heart rate
+  - 0.81｜2）逾期贷款和不良贷款有较高的重合度，且没有特定的监管标准。其中，逾期90天以上贷款【/】不良贷款≤100%。
+  - 0.80｜ ground balls hit that became double plays⏎ GPA – Gross production average: 1.8 times on-base percentage plus slugging percentage, divided【 by】 four⏎ GS – Grand slam: a
+  - 0.80｜特定的监管标准。其中，正常类贷款迁徙率=期初正常类贷款期末转为后四类贷款的余额【/】期初正常类贷款余额。关注
+  - 0.78｜ any population. The formula is very simple; you add up the number of blood type A and AB individuals in a population and then divide it【 by】 the number of blood type B and AB
+  - 0.75｜ K⏎        Ex2 += (x - K) ** 2⏎    variance = (Ex2 - Ex**2 / n)【 /】 (n - 1)⏎    #
+  - 0.73｜0307 = 32.57 ：在兩個閏月之間的正常月數⏎32.57【 ÷ 12】 = 2.7 在閏
+  - 0.73｜必要的法律程序后，本息仍无法收回，或只能收回很少一部分的贷款。（4）不良贷款率=不良贷款余额【/】各项贷款余额=（次级类
+  - 0.72｜ designed to produce power locally at the least possible cost for a given wind regime, which results in a capacity factor (the ratio of average power【 to】 maximum power) of about 30
+  - 0.71｜ Mean Sea Level (MSL) or local ground level (Above Ground Level, or AGL) as the reference datum.⏎Pressure altitude divided【 by】 100 feet (30
+  - 0.71｜ Development indicates 56.5% of Belarus' population were internet-users.⏎ The International Telecommunication Union showed Internet penetration (Internet users per【 】100 population) in 2
+  - 0.71｜是处理后的结果，如要求输出的颜值在(50, 100)区间内，那么我们通过“除【以】25再减3”将其处理
+  - 0.70｜，所以在25786年（365.2421990741*1440【/】20.4）的时间里退行
+  - 0.69｜ (BMI) is a value derived from the mass (weight) and height of a person. The BMI is defined as the body mass divided【 by】 the square of the body height, and
+  - 0.67｜息不能按时偿还的贷款。正常贷款率没有特定监管标准，一般越高越好，基本上正常贷款率（即正常类贷款【/】全部贷款）均在95%
+  - 0.66｜ positivity. A stepwise backward regression approach was used for multivariate analysis.⏎Body mass index (BMI) was calculated as weight in kilograms divided【 by】 squared height in meters. Underweight was
+  - 0.66｜ set of primes, if A is a subset of S, and if the proportion of elements of S below n that are in A (out【 of】 all elements of S below n) tends
+
+## M052（第 23 层）
+- 解释：网页样板文字中版权/转载/订阅声明的关键名词（distribution、删除、year），另有英文人名中间拆分的子词（Tyl、Ryl）（置信度 低）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.04, 0.03, 0.03, 0.03, 0.67]；near_miss [0.08, 0.08, 0.03, 0.05, 0.05]；distant [0.04, 0.03, 0.05, 0.03, 0.05]；结论 lose
+- 检索验证：未通过（正例 12 个，召回 0.4166666666666667，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜LAS NEEDS YOUR SUPPORT⏎Upgrade to a Plus subscription today, and read the site without ads.⏎It's just US$19 a【 year】.UPGRADE NOW⏎The two stars are
+  - 0.83｜ aloud a short story with a strong main character who changes during the course of the story. "A Bad Road for Cats" by Cynthia R【yl】ant is used as a model throughout the
+  - 0.81｜ -- they do not constitute endorsements of those other sites. © 1997-⏎A.D.A.M., Inc. Any duplication or【 distribution】 of the information contained herein is strictly prohibited
+  - 0.80｜ -- they do not constitute endorsements of those other sites. © 1997-⏎A.D.A.M., Inc. Any duplication or【 distribution】 of the information contained herein is strictly prohibited
+  - 0.77｜ like this one...⏎Or, just get a random brain teaser⏎If you become a registered user you can vote on this brain teaser, keep【 track】 of⏎which ones you have seen,
+  - 0.75｜“ iNature”，文章转载只为学术传播，无商业用途，版权归原作者所有，如涉及侵权问题，请联系我们，我们将及时修改或【删除】。<|endoftext|>中国电信：自研光网络
+  - 0.74｜ -- they do not constitute endorsements of those other sites. © 1997-⏎A.D.A.M., Inc. Any duplication or【 distribution】 of the information contained herein is strictly prohibited
+  - 0.73｜ the above subject, submit it here. If you have a question about another area of astronomy, find the topic you're interested in from the【 archive】 on our site menu, or go here
+  - 0.72｜载荷，”共同第一作者、麻省理工学院博士后研究员 Shiva Razavi 博士表示。共同第一作者 Katherine【 Il】ia 博士表示，通过传感器
+  - 0.72｜ Alex de Waal, Darfur: a Short History of a Long War, Zed Books, 2005; Ruth I【y】ob and Gilbert M. Khadiag
+  - 0.72｜ Sturtevant⏎Niara Sudarkasa⏎⏎T⏎⏎Michael Taussig⏎Sharika Thiranagama⏎Edward Burnett T【yl】or⏎Colin Turnbull⏎Victor
+  - 0.70｜ positive x-axis. Using this notation, points are typically written as an ordered pair (r, θ).  One may transform back and【 forth】 between two-dimensional Cartesian and polar coordinates by
+  - 0.70｜“ iNature”，文章转载只为学术传播，无商业用途，版权归原作者所有，如涉及侵权问题，请联系我们，我们将及时修改或【删除】。<|endoftext|>大湖中心幼儿园防范电信
+  - 0.70｜ endorsements of those other sites. © 1997- 2008 A.D.A.M., Inc. Any duplication or【 distribution】 of the information contained herein is strictly prohibited
+  - 0.68｜ Types". Proceedings of the Second Scandinavian Logic Symposium. Amsterdam. pp. 63–92. doi:10.10【1】6/S0049-2
+  - 0.67｜ or other ideas you'd like to contribute, we'd love to hear from you.⏎Find the latest in professional publications, learn new techniques and【 strategies】, and find out how you can connect
+  - 0.66｜，则不能无求;求而无度量分界，则不能不争;争则乱，乱则穷。先王恶【其】乱也，故制礼义以
+  - 0.64｜ or other ideas you'd like to contribute, we'd love to hear from you.⏎Find the latest in professional publications, learn new techniques and【 strategies】, and find out how you can connect
+  - 0.64｜ised by setting the upper limit of the product above to the smaller of k and .⏎⏎Factorial formula ⏎Finally, though computationally unsuitable【,】 there is the compact form, often used
+  - 0.64｜ and things. Critics of the old animism have accused it of preserving "colonialist and dualistic worldviews and rhetoric."⏎⏎Edward T【yl】or's definition ⏎⏎The idea of anim
+
+## M053（第 23 层）
+- 解释：学科名称词，尤其“mathematics”出现在“pure/applied/modern/areas of”之后；中文“计算机科学技术”“物理化学”等学科或领域名（置信度 高）
+- 文本测试（s = 激活 / 普查最大值；≥0.3 为强）：new [0.04, 0.06, 0.15, 0.19, 0.04]；near_miss [0.02, 0.02, 0.03, 0.01, 0.03]；distant [0.03, 0.01, 0.03, 0.01, 0.04]；结论 tie
+- 检索验证：通过（正例 12 个，召回 0.6666666666666666，负例误报 0.0）
+- 上下文依赖（256 token 下强、28 token 下不强的普查正极比例）：0.25
+- 普查正极片段（相对强度｜上下文）：
+  - 1.00｜subtraction and division are included, since they are the inverse operations of addition and multiplication). Proof by Contrapositive⏎the branch of pure【 mathematics】 dealing with the theory of numerical calculations⏎
+  - 0.86｜disciplines, that continue to increase in number and interrelate to create further interdisciplinary fields of study. The applications of various fields of【 chemistry】 are used frequently for economic purposes in the
+  - 0.72｜省级教学成果二等奖。⏎一、信息管理与信息系统⏎本专业适应国民经济发展需要，培养具备现代管理学理论基础、计算机【科学技术】及应用能力，掌握系统思想和
+  - 0.72｜ absolute value of the difference of two real numbers (their absolute difference) is the distance between them. The notion of an abstract distance function in【 mathematics】 can be seen to be a generalisation
+  - 0.71｜ functions of complex numbers. It is helpful in many branches of mathematics, including algebraic geometry, number theory, analytic combinatorics, applied【 mathematics】; as well as in physics, including
+  - 0.68｜ interdisciplinary field that develops methods and software tools for understanding biological data. As an interdisciplinary field of science, bioinformatics combines computer science, statistics,【 mathematics】, and engineering to analyze and interpret biological
+  - 0.66｜ science.⏎⏎Combinatorics is well known for the breadth of the problems it tackles. Combinatorial problems arise in many areas of pure【 mathematics】, notably in algebra, probability theory,
+  - 0.66｜ by a magnitude and a direction. It is formally defined as a directed line segment, or arrow, in a Euclidean space. In pure【 mathematics】, a vector is defined more generally as
+  - 0.65｜ finite sums, it is not associative inside infinite sums (series). For example,⏎⏎whereas⏎⏎Some non-associative operations are fundamental in【 mathematics】. They appear often as the multiplication in
+  - 0.65｜ of addition and multiplication satisfies these constraints, then one is in a position to instantly know a great deal of extra information about this system.⏎⏎Modern【 mathematics】 formalizes its foundations to such an extent
+  - 0.63｜ the ancient Greeks, but computing the surface area of a more complicated shape usually requires multivariable calculus.⏎⏎Area plays an important role in modern【 mathematics】.  In addition to its obvious importance
+  - 0.62｜查看该论文原文。Advanced Science 是Wiley旗下创刊于2014年的优质开源期刊，发表材料科学、物理【化学】、生物医药、工程等各领域的创新
+  - 0.59｜实践性环节,是课堂教学的必要前提,也是会计专业学生进行实际训练的重要组成部分;毕业设计培养学生综合运用会计专业基础【理论】、基本知识和基本技能分析、
+  - 0.58｜ are conveniently expressed and unified in terms of categories. Examples include quotient spaces, direct products, completion, and duality.⏎⏎Many areas of computer【 science】 also rely on category theory, such as
+  - 0.58｜havn with canals and ramparts. It was initially intended to be a fortified trading centre<|endoftext|>Combinatorics is an area of【 mathematics】 primarily concerned with counting, both as a
+  - 0.57｜map request: From high-school to mid-undergraduate studies 0Learning to Think Categorically 41What should be offered in undergraduate【 mathematics】 that’s currently not (or isn’t
+  - 0.57｜ much later than the Babylonian and Egyptian examples. Prior to the works of Euclid around 300 BC, Greek studies in【 mathematics】 overlapped with philosophical and mystical beliefs.
+  - 0.56｜”的环保法，开启了中国依法治污的新纪元。⏎健全保证宪法实施的法律制度、加快国家安全法治建设、加强社会主义【市场经济】立法、用法律推动社会主义核心价值观
+  - 0.56｜大厦。中国发展脉动愈发强劲，数字新基建支撑经济社会发展的战略性、基础性、先导性作用日益凸显。纵观世界文明【史】，人类先后经历农业革命、工业
+  - 0.55｜报告中指出，“建设全民终身学习的学习型社会、学习型大国”。这一战略部署，对提高人民的思想道德素质、科学【文化】素质和身心健康素质，服务全面建设
+

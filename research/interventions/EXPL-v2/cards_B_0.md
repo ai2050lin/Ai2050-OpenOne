@@ -1,0 +1,447 @@
+# 神经元普查卡片（每个单元只看本单元的信息）
+
+说明：每个单元是 Qwen3-4B 某一层 MLP 中的一个中间单元。下面列出它在约 1900 万 token 中英文网页/百科语料上激活最强的 20 个位置。
+每条片段格式为「相对强度｜左侧上下文【命中 token】右侧上下文」，相对强度 = 该位置激活 / 该单元在整个语料中的最大激活。
+「直接读出」是该单元输出方向在词表上最推高 / 压低的 token（只是直接通路近似）。
+
+## M000（第 14 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 12.5 次；语料最大激活 2.06
+- 直接读出推高：_EXTERNAL | 喇叭 | 挑 |  penc | (IService |  Buy |  primitive | 筹划 | uan | �
+- 直接读出压低：婴 | 继续保持 |  phẩm | rello | eterminate | ipple | rypton | 랫 | 要去 | addock
+- 正极片段：
+  - 1.00｜：漢光武帝率領的部隊成功於昆陽之戰殲滅王莽主力軍隊，成為中國歷史上以少勝多的著名戰役之一。⏎⏎10世紀 ⏎ 917年：清海、建武节度使刘岩【於】番禹即位稱帝，改元乾
+  - 0.91｜ the Media Lab [at MIT] for our corporate sponsors; we had a very small amount of time scheduled and the visitors wanted to see Alex work. So we put a number of differently colored letters on the tray that we use, put the tray in front of Alex, and asked, "Alex,【 what】 sound is blue?" He answers, "Ssss
+  - 0.91｜第六十二条 全国人民代表大会行使下列职权：⏎（一）修改宪法；⏎（二）监督宪法的实施；⏎（三）制定和修改刑事、民事、国家机构的和其他的基本法律；⏎（四）选举中华人民共和国主席、副主席；⏎（五）根据中华人民共和国主席的【提名】，决定国务院总理的人选；根据国务院总理
+  - 0.89｜00 Quapaw in the United States.⏎The Columbia Electronic Encyclopedia, 6th ed. Copyright © 2012, Columbia University Press. All rights reserved.⏎More on Quapaw from Infoplease:⏎See more Encyclopedia articles on: North American indigenous peoples<|endoftext|>Results 1【 to】 3 of 3⏎What is the actual
+  - 0.87｜ roles as ACTU and Labor Party president to announce his intention to enter parliamentary politics, and was subsequently elected to the Australian House of Representatives as a member of parliament (MP) for the division of Wills at the 1980 federal election. Three years later, he was elected unop【posed】 to replace Bill Hayden as leader of the Australian Labor
+  - 0.86｜ at the Media Lab [at MIT] for our corporate sponsors; we had a very small amount of time scheduled and the visitors wanted to see Alex work. So we put a number of differently colored letters on the tray that we use, put the tray in front of Alex, and asked, "Alex【,】 what sound is blue?" He answers, "S
+  - 0.85｜日）⏎ 亨麗埃塔·瑪麗亞·史蒂芬斯（Henrietta Maria Stephens）⏎⏎雜記 ⏎⏎ 耆英在簽訂《南京條約》時猜測砵甸乍多數是英方大員，他遂把握機會與砵甸乍【建立】友誼。例如，有次耆英
+  - 0.85｜ to synthetic polymers, which can present various disadvantages like immunogenic rejection and toxicity after degradation,<|endoftext|>The 2001 United Kingdom general election was held on Thursday 7 June 2001, four years after the previous election on 1 May 1997, to【 elect】 659 members to the House of Commons
+  - 0.83｜a location in a beautiful city of 20,000 on the banks of the Mississippi which offers a peaceful and prosperous home.”⏎The rift in the congregation had not healed and on October 18, 1864, seventeen members held a meeting in their place of worship to【 elect】 officers and establish a new congregation. These “re
+  - 0.82｜7. Chaos ruled the day in early 1787 with Shays's Rebellion in full force and the states refusing to settle land disputes or contribute to the now six-year-old federal government. On February 2, 1787, the delegates finally gathered into a quorum and【 elected】 St. Clair to a one-year term as President
+  - 0.82｜ afraid they will call me "rude"! I have also been accused of being "one-sided". How many sides do Muslim/Arab Israel-bashers have?⏎Welcome to Brotherhood - Jewish Voters Taken for Granted!⏎United States President Barack Hussein Obama has invited his Egyptian counterpart Mohammed Morsi to【 conduct】 an official visit to the US in September. This
+  - 0.82｜的商业名称，该线路网下属各类公交线路超过60条，覆盖了土伦市区的重要街道以及周边市镇。此外土伦开有海上轮渡巴士，连接周边的一些市镇。⏎⏎土伦是法国人口最多的没有任何轨道交通的城市，曾于1886【年至】1955年间运行，而则在
+  - 0.81｜ Postmaster, Jewish men enlisted in the military, and several of Quincy’s Jewish women helped to found and to activate the Needle Pickets to assist families of Union soldiers. However, there were stirrings of secession within the Jewish community. When the congregation met in 1861 to【 elect】 a Chazzan and lecturer, and a Scho
+  - 0.80｜1809年：英國與土耳其簽訂達達尼爾條約，英土戰爭結束。⏎⏎20世紀 ⏎ 1904年：京剧科班“喜连成”成立。⏎ 1912年：中華民國臨時政府【於】南京舉行內閣第一次會議。⏎ 1
+  - 0.80｜ need to survive and where they are vulnerable to attack. To tell us more is David Piwnica-Worms. He is director of the Molecular Imaging Center at the Mallinckrodt Institute of Radiology and the Siteman Cancer Center. Dr. Piwnica-Worms,【 thank】 you for joining us.⏎Piwnica-Worm
+  - 0.79｜ buffer, A, and a two-byte big-endian integer, B.⏎⏎char           A[8] = "";⏎unsigned short B    = 1979;⏎⏎Initially, A contains nothing but zero bytes, and B contains the number 1979.⏎⏎Now, the program attempts to【 store】 the null-terminated string  with ASCII encoding in
+  - 0.79｜；⏎（五）根据中华人民共和国主席的提名，决定国务院总理的人选；根据国务院总理的提名，决定国务院副总理、国务委员、各部部长、各委员会主任、审计长、秘书长的人选；⏎（六）选举中央军事委员会主席；根据中央军事委员会主席的【提名】，决定中央军事委员会其他组成人员的人选
+  - 0.78｜.⏎- Get their school uniform ready, bag packed and lunch box made the night before so that neither of you feel stressed.⏎- When at school, a good tip is to physically hand your child over to their teacher with a clear introduction such as 'Hello Mrs. Smith this is Sophie. Sophie,【 meet】 your new teacher Mrs. Smith, she's here
+  - 0.78｜ classes to suit your individual interests.<|endoftext|>It appears that most of Europe is yet to clock on to what ‘Great Britain’ means or what the ‘UK’ is. If you speak English, people in Europe presume you come from England. If you tell people you’re from Scotland, they ask you【 what】 London is like in the springtime…⏎I blame
+  - 0.78｜, and sentenced to life in prison.⏎⏎Déby lineage & democracy with second Civil War (1990–present) ⏎⏎Déby attempted to reconcile the rebel groups and reintroduced multiparty politics. Chadians approved a new constitution by referendum, and in 1996, Déby【 easily】 won a competitive presidential election. He won a second
+
+## M001（第 21 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 4.7 次；语料最大激活 3.97
+- 直接读出推高：一支 | 之作 | pcodes | 悉 |  bankrupt | Wars | 之家 |  RJ | nice | arks
+- 直接读出压低：字第 | 南路 | óc | 完全没有 | 接近 | binations |  Intelli |  typingsSlinky | -exclusive | 报记者
+- 正极片段：
+  - 1.00｜ denomination and has a significant network of medical and educational institutions.⏎⏎Miller did not join any of the movements, and he spent the last few years of his life working for unity, before dying in 1849.⏎⏎Denominations⏎⏎The Handbook of Denominations in the United States, 【1】2th ed., describes the following churches as "
+  - 0.89｜. If you are not sure what you are looking for, try the Combination Search or our Recommended Species lists.⏎Search native plant database:⏎Marcus, Joseph A.⏎Halesia diptera Ellis⏎Two-wing silverbell, Silver bell, Two-winged silverbell, Snowdrop tree, American snow【drop】 tree⏎USDA Symbol: HADI3⏎
+  - 0.88｜ 2,000 in the Middle Ages – a normal size for a Welsh town in the period. It was the centre of the Norman Marcher Lordship of Glamorgan. By the end of the 13th century, Cardiff was the only town in Wales with a population exceeding 【2】,000, although it remained relatively small
+  - 0.88｜蒋介石拒绝成立任何真正的联合政府，宣布在一九四五年十一月召开国民党一手炮制的国民大会，他现在走的道路是直接导向中国内战和国民党毁灭的道路。和平过渡到宪政的唯一希望就是成立联合政府。⏎1949年3月1【3】日  毛泽东在中共七
+  - 0.84｜.⏎Shamelessly ripped off from this site and others (to be named hereinafter). (Fair warning: for my own edification, I may add definitions/comments from the site, but you might want to just go there ...⏎... as in "by James Joyce"⏎Looking for tweets for pent【ice】.<|endoftext|>What is an Actor?⏎The previous section
+  - 0.83｜ only partially - if at all - with current definitions of either catatonia or schizophrenia, and thus are difficult to classify according to modern diagnostic manuals.⏎ Early childhood catatonias are also a diagnosis exclusive to the Wernicke-Kleist-Leonhard school, and refers to system cataton【ias】 that manifest in young children. Clinically, these
+  - 0.83｜orbishops. Thus, in time, the bishop changed from being the leader of a single church confined to an urban area to being the leader of the churches of a given geographical area.⏎⏎Clement of Alexandria (end of the 2nd century) writes about the ordination of a certain Zachæ【us】 as bishop by the imposition of Simon Peter Bar-J
+  - 0.83｜ removing the sentinels placed by his father on the frontier between Israel and Judah to prevent pilgrimages to Jerusalem. Some assert that he himself undertook a pilgrimage."⏎ This name (possibly) appeared on the Gezer calendar, a Paleo-Hebrew inscription dating to the 9th or 【1】0th century BC, making it one of the
+  - 0.83｜2013)<|endoftext|>Birth: About 1639 in England⏎Death: 10 April 1695 in Massachusetts, America⏎Benedict (or Benedictus) was the first Pulsipher to arrive in America, and possibly the first “Pulsipher【”】 in the world. While it is suspected that his
+  - 0.82｜ the book.⏎JewishGen, Inc. makes no representations regarding the accuracy of the translation.The reader may wish to refer to the original material for verification.⏎JewishGen is not responsible for inaccuracies or omissions in the original work and cannot rewrite or edit the text to correct inaccuracies and/or【 o】missions.⏎Our mission is to produce a translation of
+  - 0.81｜ Exponentiation of real numbers in infix notation⏎⏎ Knuth's up-arrow operators⏎⏎ Taking the cross product of three vectors⏎⏎ Taking the pairwise average of real numbers⏎⏎ Taking the relative complement of sets ⏎.(Compare material nonimplication in logic.)⏎⏎History ⏎⏎William Rowan Hamilton seems to have coined the【 term】 "associative property" around 184
+  - 0.81｜ite, the agora, the city's walls, the basilica and the port have all been excavated.⏎⏎Further archaeological objects found during the excavations are preserved at both the Cyprus Museum in<|endoftext|>Alphons (Latinized Alphonsus, Adelphonsus, or Adefons【us】) is a male given name recorded from the 
+  - 0.79｜“Yes, of course one can find a private tutor in Spanish, even in Tacoma, Washington where Ron Pickering is listed as being.”⏎“Rachel sensed an impending drama in the President's eyes and recalled Pickering's hunch that the White House had something up its sleeve.”⏎“I told Betty to call【 Pick】ering, and when he came in I related my
+  - 0.78｜ restored him on the throne. As for 1180, the young emperor was uninterested in ruling matters, and Andronikos effectively acted as the power behind the throne, not allowing Alexios any voice in public affairs. One after another, Andronikos suppressed most of Alex【ios】' defenders and supporters: his half-sister Maria
+  - 0.78｜ius I Dicorus ( – 518), Roman emperor⏎Anastasius I of Antioch (d. 599), Patriarch of Antioch⏎Pope Anastasius I (died 401), pope of Rome<|endoftext|>Anastas【ius】 II or Anastasios II may refer to:⏎⏎
+  - 0.78｜ Lithuania that provides an excellent context to understand the above article. Click here to see where to obtain the book.⏎JewishGen, Inc. makes no representations regarding the accuracy of the translation.The reader may wish to refer to the original material for verification.⏎JewishGen is not responsible for inaccuracies or【 o】missions in the original work and cannot rewrite or edit
+  - 0.78｜ Aedesius's philosophical doctrine was a mixture between Platonism and eclecticism and, according to Eunapius, he differed from Iamblichus on certain points connected with theurgy and magic. ⏎⏎The school of Syria was dispersed after Iamblichus' death, and A【edes】ius seems to have modified his doctrines out of fear
+  - 0.77｜学之过去与现在》等即其代表。⏎当然，站在笔者的立场上，程憬先生对于学界的最大贡献，终究还在于他对中国古代神话的全面研究。目前，全面论述程憬先生神话研究特色与成就的文章，只有马昌仪先生的《【程】憬及其中国神话研究》，该文发表于
+  - 0.77｜ Pier Antonio Buonaparte and Giovanni Buonaparte, however, took part in the 1527 Medici rebellion, after which they were banished from Florence and later were restored by Alessandro de' Medici, Duke of Florence. Jacopo's brother Benedetto Buon【ap】arte maintained political neutrality. The San Miniato branch
+  - 0.77｜ Aires English High School students.⏎⏎History⏎⏎Background⏎⏎The first club with the name "Alumni" played association football, having been found in 1898 by students of Buenos Aires English High School (BAEHS) along with director Alexander Watson Hutton. Originally under the name "English【 High】 School A.C.", the team would be later obliged
+
+## M002（第 19 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 11 页一次；语料最大激活 15.6
+- 直接读出推高：隐藏 | 藏着 | 深处 | 隐蔽 |  hidden |  concealed |  hiding |  lurking | 死角 | 藏
+- 直接读出压低：粒 | 升级 | 提振 | 释 | 吁 | 的压力 | pagination | cion | 升降 | .listener
+- 正极片段：
+  - 1.00｜7, he described an ingenious experiment, which he was able to conduct as a result of his own glassblowing skills, in which he explained why antiseptics were killing more soldiers than infection itself during the war. Antiseptics worked well on the surface, but deep wounds tended to【 shelter】 anaerobic bacteria from the antiseptic agent
+  - 0.72｜持方便、感觉舒适。⏎刷牙后，牙刷毛间往往粘有食物残渣和细菌，可能导致疾病的传播。刷牙后应用清水冲洗牙刷，并将刷毛上的水分甩干，刷头向上放在口杯中置于通风处。为防止牙刷藏【匿】细菌，一般应每三个月左右更换一把牙
+  - 0.63｜检查可有颅压升高，蛋白质和白细胞数增多，糖和氯化物减低，可发现白血病细胞。中枢神经系统白血病可发生在急性白血病的任何时期，但多数发生在缓解期。由于多种化疗药物不易透过血脑屏障，【隐藏】在中枢神经系统的白血病细胞不能有效
+  - 0.61｜的运行，而乡村的公共服务只能由村庄自己来提供的时候，国家仍然是一种农民社会之外的力量，是农民要逃避的。农耕社会无法像游耕或游牧社会那样通过地理空间的改变来逃避国家征收税赋，就会通过增加基层社会的不【透明】来使国家难以征收税赋。人民公社
+  - 0.60｜ to brush their teeth before toothpaste and toothbrushes were sold. As new dental products were introduced, so were new hair care products and styles. At the end of the 19th century, American men came to view their bushy beards and mutton chops as just another place to【 harbor】 germs. A new business look of less facial
+  - 0.58｜.⏎In general, the WCS findings demonstrate that our intensely observed planet still has its biological secrets, added Richard Bergl, curator of research at the North Carolina Zoo.⏎"It is extraordinary that in this day and age," he said, "there could be a population of a hundred thousand or more gorillas【 that】 were essentially unknown to science."⏎|© 1
+  - 0.57｜每三个月左右更换一把牙刷。若刷毛发生弯曲或倒伏，会对口腔的软硬组织造成损伤，则需立即更换。⏎八、提倡选择牙线或牙间刷辅助清洁牙间隙⏎牙齿与牙齿之间的间隙称为邻间隙或牙间隙，牙间隙最容易【滞】留菌斑和软垢。刷牙时
+  - 0.56｜ left to their own devices. As a result of these events, France has maintained a large military, economic, and social presence in the region ever since. The difficulty is that such areas under weak political control, such as the Malian, Somalian, and Sudanese deserts, have become hav【ens】 for individuals who wish to operate outside international and national
+  - 0.56｜ motorists and rail passengers. Glass elements in noise screens can reduce visual obstruction, but require regular cleaning⏎ Aesthetic impact on land- and townscape⏎ An expanded target for graffiti, unsanctioned guerilla advertising, and vandalism⏎ Creation of spaces hidden from view and social control (e.g【.】 at railway stations)⏎ Possibility of bird–window
+  - 0.56｜ often left to their own devices. As a result of these events, France has maintained a large military, economic, and social presence in the region ever since. The difficulty is that such areas under weak political control, such as the Malian, Somalian, and Sudanese deserts, have become【 hav】ens for individuals who wish to operate outside international and
+  - 0.56｜usk advised President John F. Kennedy that the British had established a precedent for warfare with herbicides in Malaya.⏎⏎Use in the Vietnam War⏎⏎In mid-1961, President Ngo Dinh Diem of South Vietnam asked the United States to help defoliate the lush jungle that was【 providing】 cover to his Communist enemies. In August of that
+  - 0.53｜ persists to this day, despite central government attempts at military and negotiated solutions.⏎The insurgency gathered pace in 2007, and was exacerbated by an influx of arms from the 2011 Libyan civil war.⏎The Saharan branch of al-Qaeda was quick to move into this increasingly law【less】 area, and seized control of the Tuareg
+  - 0.53｜理都察院事，兼翰林院掌院学士。九月，调任户部尚书，上书说：“浙江的衢州，江西的广信、赣州，临近闽、粤等地，那些流离失业没有户籍的人，进入这四地交界的【山】里种植大麻，搭建草棚居住，
+  - 0.53｜已发生CNSL。白血病细胞进入中枢神经系统可由血流播散、颅骨骨髓白血病细胞的浸润或颅内点状出血所致。一般化疗药物很难通过血脑屏障，以至中枢神经系统成为白血病细胞的“庇【护】所”，是白血病复发的原因之一。⏎
+  - 0.52｜ repair windows if they leak.⏎Step 2. Keep it clean⏎A clean house is a healthier house. Clean your home often. Dust provides food for mold, insects, rodents and dust mites. In older homes, the dust may contain lead, which is harmful to your children.⏎Clutter【 makes】 it difficult to clean, and in many cases,
+  - 0.52｜A clean house is a healthier house. Clean your home often. Dust provides food for mold, insects, rodents and dust mites. In older homes, the dust may contain lead, which is harmful to your children.⏎Clutter makes it difficult to clean, and in many cases, it may serve【 as】 food for pests.⏎Keep the clutter down. Store
+  - 0.52｜三个月左右更换一把牙刷。若刷毛发生弯曲或倒伏，会对口腔的软硬组织造成损伤，则需立即更换。⏎八、提倡选择牙线或牙间刷辅助清洁牙间隙⏎牙齿与牙齿之间的间隙称为邻间隙或牙间隙，牙间隙最容易滞【留】菌斑和软垢。刷牙时牙
+  - 0.51｜ on these species. Some species have even become extinct. The two rhinoceros species, the Javan and the Sumatran are now extinct in this ecoregion, as is Schomburgk's deer. The kouprey probably is globally extinct, although intermittent reports from【 remote】 areas of northern and eastern Cambodia keep hopes alive.
+  - 0.51｜ importance of ensuring security.⏎In response to that threat, UNODC has designed the Container Control Pilot Programme Project to assist the Governments of Ecuador, Senegal, Ghana and Pakistan to establish effective controls over the movement of sea containers. The project aims to prevent traffickers and other organized crime syndicates from【 using】 freight containers for drug trafficking and other illicit activities.⏎
+  - 0.51｜. Kubu is a Malay exonym ascribed to them. In the Malay language, the word Kubu can mean defensive fortification, entrenchment, or a place of refuge. It is metaphor for how the majority and dominant Islamic Melayu villagers believe them to use the interior forests as【 a】 means for resisting inclusion in the larger Malay social and
+
+## M003（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 372 页一次；语料最大激活 7.28
+- 直接读出推高：差异 | ucken |  administrations | inia |  searchData | .getAction | Difference |  vòng | 支持力度 |  exit
+- 直接读出压低：isse |  Wich | ths | imps | (`< | ญ | `= | 深厚 | uhl | emento
+- 正极片段：
+  - 1.00｜，要求通过想象与简单计算，确定球面与正方体棱的公共点的个数。又如全国乙卷理科第19题，以几何体为依托，考查空间线面关系。再如新课标Ⅱ卷第9题，以多【选】题的形式考查圆锥的内容，4个选项
+  - 0.87｜于比战略更重要。急于求成，不考虑风险，再好的具体执行，战略就成了误导。精心策划、认真谋略，我们的目标就离我们不远了。<|endoftext|>《供应链管理》总复习⏎1《供应链管理》总复习纲要 题型:多项【选择】、判断、简答、案例分析(结合
+  - 0.72｜股票投资和债券投资⏎C.积极投资和消极投资 D.产权投资和项目投资⏎根据 CAPM 模型，贝塔⏎值为的证券 X 的期望收益率为(⏎)⏎求的，请将正确选项前的字母填在题后的括号内，多【选】、少选、错选均无分)⏎
+  - 0.55｜投资 D.产权投资和项目投资⏎根据 CAPM 模型，贝塔⏎值为的证券 X 的期望收益率为(⏎)⏎求的，请将正确选项前的字母填在题后的括号内，多选、少选、错选均无分)⏎1【、】一个在黄金期货中作⏎头寸的
+  - 0.54｜ homeopathy.<|endoftext|>Quiz: Part 1: Chapter 1 | Part 1: Chapter 2 to Part 2: Chapter 15⏎|Name: _____________________________||Period: ___________________________|⏎This quiz consists of 5 multiple choice and 5 short answer questions.⏎Multiple【 Choice】 Questions⏎Directions: Circle the correct answer.⏎1
+  - 0.49｜投资概述 产业投资的市场分析 产业投资的供给因素分析 产业投资效益分析 不确定条件下的产业投资决策 产业投资的社会评价 投资总量 投资周期 投资结构 投资区域配置 投资的宏观调控⏎(一)单项【选择】题(在每小题列出的 4
+  - 0.47｜ does Beatrice make about her father?⏎3. What is the subject of the phone call that Beatrice receives in Act 1?⏎4. What is Beatrice's final line in the play?⏎5. After the Science Fair, Beatrice's demeanor can best be described as:⏎Short Essay Questions【⏎】Directions: Answer the questions with a short paragraph.⏎
+  - 0.46｜，无处不保暖！$P$<|endoftext|>第二节 古典管理理论⏎古典管理理论是以“假设经纪人”为基础的管理理论，强调运用经济刺激的手段来调动工人积极性，以提高劳动生产率。一、科学管理理论（论述，简答，判断，【选择】）科学管理理论着重研究如何提高单个
+  - 0.40｜ is the subject of the phone call that Beatrice receives in Act 1?⏎4. What is Beatrice's final line in the play?⏎5. After the Science Fair, Beatrice's demeanor can best be described as:⏎Short Essay Questions⏎Directions: Answer the questions with a short paragraph.⏎【1】. Briefly describe Beatrice's recurring nightmare.⏎
+  - 0.36｜ Chapter 1 | Part 1: Chapter 2 to Part 2: Chapter 15⏎|Name: _____________________________||Period: ___________________________|⏎This quiz consists of 5 multiple choice and 5 short answer questions.⏎Multiple Choice Questions⏎Directions: Circle the correct answer.⏎【1】. The Tsar is the ruler of which country
+  - 0.35｜消极投资 D.产权投资和项目投资⏎根据 CAPM 模型，贝塔⏎值为的证券 X 的期望收益率为(⏎)⏎求的，请将正确选项前的字母填在题后的括号内，多选、少选、错选均无分)⏎【1】、一个在黄金期货中作⏎头寸
+  - 0.34｜张吉林因诉河南省周口市川汇区人民政府（以下简称川汇区政府）行政赔偿一案，不服河南省高级人民法院（2019）豫行赔终292号行政赔偿判决，向本院申请再审。本院受理后依法组成合议【庭】进行审查，现已审查终结。张吉林申请
+  - 0.34｜入酸性高锰酸钾溶液中⏎D. 将甲烷与氯气混合后存入阴暗处⏎4. 下列变化属于取代反应的是⏎A. 硝酸银溶液与盐酸的反应⏎B. 甲烷的燃烧⏎5【.】 在光照条件下，将等物质的量的
+  - 0.33｜ in Act 1?⏎4. What is Beatrice's final line in the play?⏎5. After the Science Fair, Beatrice's demeanor can best be described as:⏎Short Essay Questions⏎Directions: Answer the questions with a short paragraph.⏎1. Briefly describe Beatrice's recurring nightmare.⏎【2】. What is the business scheme that Beatrice is
+  - 0.31｜和质变的关系原理告诉我们，量变积累到一定程度必然引起 质变，正确;善与恶是同一事物的两个不同方面，而不是不同质的两个事物，错误;说法正确但与题意无关; 说法正确且符合题意。⏎答案:B 【4】.主要矛盾和矛盾的主要方面的区别在于 �
+  - 0.29｜和消极投资 D.产权投资和项目投资⏎根据 CAPM 模型，贝塔⏎值为的证券 X 的期望收益率为(⏎)⏎求的，请将正确选项前的字母填在题后的括号内，多选、少选、错选均无分【)⏎】1、一个在黄金期货中作⏎头
+  - 0.28｜反应的是⏎A. 将甲烷通入氯水中⏎B. 甲烷跟氧气混合并点燃⏎C. 将甲烷通入酸性高锰酸钾溶液中⏎D. 将甲烷与氯气混合后存入阴暗处⏎4【.】 下列变化属于取代反应的是⏎A.
+  - 0.28｜ good idea to study a ring by studying its modules? 2How are invariants represented in category theory? 1The importance of EGA and SGA for “students of today” 0“A gentleman never chooses a basis.” 20Free, high quality mathematical writing online? 2【7】Best online mathematics videos?<|endoftext|>Science Fair Project Encyclopedia
+  - 0.28｜甚至于比战略更重要。急于求成，不考虑风险，再好的具体执行，战略就成了误导。精心策划、认真谋略，我们的目标就离我们不远了。<|endoftext|>《供应链管理》总复习⏎1《供应链管理》总复习纲要 题型:【多项】选择、判断、简答、案例分析(
+  - 0.27｜ attached to a Java applet. Responsive to selection by a user, listeners are added for each event type produced in the Java applet. Each time a specified event occurs, that event is captured and saved to a data structure. The recording of events is performed until the user stops the process.⏎1【.】 A data processor implemented method of recording events, the
+
+## M004（第 17 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 30.9 次；语料最大激活 1.87
+- 直接读出推高： pass | ensch | 时报 | ('__ |  u |  turnover |  __ | 國內 |  indic |  None
+- 直接读出压低：ndata |  Antar | 纵深 | 但他们 | onium | hread | drs |  Xperia | romium | пон
+- 正极片段：
+  - 1.00｜ characters in it. These are due to a difference in how Unix and Windows systems end lines. You can convert between these formats using unix2dos or todos and dos2unix or fromdos.⏎$ mkdir /tmp/rcfl $ cd /tmp/rcfl $ echo -e "Justa Lonely\n【ASCII】 File" > out $ file out out: ASCII
+  - 0.90｜ pages, then you can set it up with directive AddDefaultCharset⏎Another interesting feature of Apache service is having aliases. This feature allows serving pages from by files that are not in main web folder but are placed anywhere in server. Setting is pretty straight-forward. Place Alias directive like follows.⏎Alias /【test】/ “/var/www/test/”. With this
+  - 0.88｜是情感类别，包括01，用于二分类训练；rate是情感等级，0-8，用于多分类训练这里用伪代码介绍构建的思路：读取数据，取得reveiw和label，构建review列表和label列表；加载预训练word2vec词向【量】1.遍历review中每一个文本的每一个
+  - 0.80｜28BC11433905662036</wsa:MessageID>⏎	</soapenv:Header>⏎	<soapenv:Body>⏎		<req:echo xmlns:req="http://localhost:8080/axis2/services/【My】Service/">⏎			<req:category>
+  - 0.77｜字符串 t 里的字符个数减 1，最后判断每个小写字母的个数是否都为 0。⏎按上述操作，可得出结论：s 和 t 互为字母异位词⏎建议：限于篇幅不对此题进行代码剖析，但是这【道】题非常经典，建议大家到 LeetCode 上
+  - 0.77｜⏎2、全局变量的作用域是整个程序，局部变量作用域就是定义该变量的函数⏎3、当全局变量与局部变量同名时，在定义局部变量的函数内，局部变量起作用，在其他地方则是全局变量起作用⏎print('beore change:',【name】)⏎print('after change:',name)⏎作用域
+  - 0.75｜making our code non-standard). But, just for kicks, let’s see how we can access WinRT types with no help at all – just the raw APIs.⏎We’ll start by opening Visual Studio 2012 and creating a simple Win32 Console application and give it some name (【Test】WinRT in the screenshot):⏎WinRT can be
+  - 0.72｜地完成了这一实验，得出了正确结论。看着他们汗流浃背的身影，我想，此实验定会让他们回味长久，从内心感受成功的快乐，从而培养不屈不挠、求真务实的科学探究精神。⏎尽管“用油膜法估测分子的大小【”】学生分组实验教学已经过去几天了，
+  - 0.69｜ has weird ^M characters in it. These are due to a difference in how Unix and Windows systems end lines. You can convert between these formats using unix2dos or todos and dos2unix or fromdos.⏎$ mkdir /tmp/rcfl $ cd /tmp/rcfl $ echo -e "【Just】a Lonely\nASCII File" > out $ file
+  - 0.69｜iguously define what is the minimal number of symbols required to describe a given string (given a specific description mechanism). In this context, the terms string and number may be used interchangeably, since a number is actually a string of symbols, e.g. an English word (like the word "ele【ven】" used in the paradox) while, on the
+  - 0.68｜ a string⏎Flow documents have a lot of capabilities, with all of the inline elements that are supported. There are a variety of elements, very⏎similar to HTML that provides a lot of functionality in WPF applications. As a sample, I've embedded portions of this article, and some⏎added【 content】, as a sample of flow documents. Resize the
+  - 0.68｜ exercise 2.⏎1. Write a perl program that processes a file and builds an inverted index that tells for each word in the file all of the line numbers where the word can be found in the file.⏎For example, if the input file contains the 5 lines of text...⏎This is a【 sample】 file⏎and the word zebra occurs⏎on
+  - 0.67｜ common-lisp-user package.⏎Let us take a more complex example. We clear the previous errors and then define a function bar which calls cerror. Then we execute bar in a new process using process-run-function:⏎USER(5): (defun bar () (cerror "Just continue" "【A】 cerror break")) BAR USER(6): (
+  - 0.65｜ code non-standard). But, just for kicks, let’s see how we can access WinRT types with no help at all – just the raw APIs.⏎We’ll start by opening Visual Studio 2012 and creating a simple Win32 Console application and give it some name (TestWin【RT】 in the screenshot):⏎WinRT can be viewed as
+  - 0.63｜), for compatibility. So either way⏎~/.bashrc is not read.⏎If you explicitly invoke bash, it will read⏎.bashrc. You'll need to pass the⏎-t flag to⏎ssh to tell it to open a terminal even though you've specified a command.⏎ssh -t【 test】user@nameofhost bash⏎You may want to
+  - 0.63｜数加 1，而出现在字符串 t 里的字符个数减 1，最后判断每个小写字母的个数是否都为 0。⏎按上述操作，可得出结论：s 和 t 互为字母异位词⏎建议：限于篇幅不对此【题】进行代码剖析，但是这道题非常经典
+  - 0.62｜ <message name="TimeService_getDateTime"> <part name="String_1" type="xsd:string"/></message> <message name="TimeService_getDateTimeResponse"> <part name="result" type="xsd:string"/></message> <portType name="TimeService"> <operation name="get【DateTime】" parameterOrder="String_1"> <input
+  - 0.60｜ and⏎inline elements. A block element is an element that can have multiple inline elements. One of the more common block elements is the⏎Paragraph class, which represents a paragraph of text. This can be used to represent text in a flow document. The following is the makeup⏎of some text within【 the】 document:⏎Listing 2: Flow Document Content⏎
+  - 0.59｜ parameterOrder="String_1"> <input message="tns:TimeService_getDateTime"/> <output message="tns:TimeService_getDateTimeResponse"/> </operation> </portType> <binding name="TimeServiceBinding" type="tns:TimeService"> <operation name="get【DateTime】"> <input> <soap:body encodingStyle
+  - 0.59｜⏎If you want to get funky, try adding the following features:⏎- See which pages generate the most searches. It can mean people get lost there.⏎- Drill down on a query to view individual requests, including referring pages and time.⏎- The ability to group queries like "mysql", "my【 sql】" and "MySQL" together for statistics (a
+
+## M005（第 15 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 11 页一次；语料最大激活 8.17
+- 直接读出推高：arty | лё | inc | 辘 |  Hess | cep |  Prof | vel | 展演 | ero
+- 直接读出压低：安全 | 精神 |  lan | 秘密 | anean |  confidentiality | 勃 | =value | =min |  obscured
+- 正极片段：
+  - 1.00｜休克好转；反之则说明休克情况仍存在。 ⏎3）血压：通常认为收缩压＜90mmHg、脉压＜20mmHg是休克存在的表现；血压回升、脉压增大则是休克好转的征象。⏎4）脉【率】：脉率的变化多出现在血压变化之前。
+  - 0.81｜肌肉、咀嚼肌及腹肌，尤以腓肠肌为著，呈对称性。体温一般正常。（2）热衰竭。出现以血容量不足为特征的一组临床综合征，如多汗、皮肤湿冷、面色苍白、恶心、头晕、心【率】明显增加、低血压、少尿，可
+  - 0.79｜ a more muted response, which did not condone the actions in Tiananmen Square, but did not condemn them either. Trade between the two countries continued to increase.⏎More about the Government of South Korea.⏎Source: U.S. Library of Congress<|endoftext|>Oxygen depletion in ponds⏎Ponds with【 warm】 water and overcrowded fish may be at risk for
+  - 0.79｜于高温(高湿)环境和(或)剧烈运动一定时间后，出现下列症状或体征中的至少一项且不能用其他疾病解释：①头晕、头痛、反应减退、注意力不集中、动作不协调；②口渴、心悸、心【率】明显增快、血压下降、晕厥；
+  - 0.71｜uterine device, among others. However, it is not considered a sexually transmitted infection and, unlike gonorrhoea and chlamydia, sexual partners are not treated. Diagnosis is suspected based on the symptoms, and may be verified by testing the vaginal discharge and finding a higher than normal vaginal【 pH】, and large numbers of bacteria. BV is often
+  - 0.69｜电场作用下与气流分离。负极由不同断面形状的金属导线制成，叫放电电极。⏎正极由不同几何形状的金属板制成，叫集尘电极。静电除尘器的性能受粉尘性质、设备构造和烟气流【速】等三个因素的影响。粉尘的比电阻是
+  - 0.67｜和生理变化以及呼吸系统并存疾病所致的病理生理改变均是其诱因。⏎衰老所致呼吸功能变化包括:①通气能力下降。⏎最大分钟通气量和肺活量降低。⏎②换气能力降低。⏎呼吸膜面积减少，气体弥散【距离】增加，通气/血流比值失调
+  - 0.67｜ that the system matrix  is of symmetric positive-definite type one can show convergence.⏎⏎Let  be the iteration matrix.⏎Then, convergence is guaranteed for⏎ ⏎where  is the maximal eigenvalue.⏎⏎The spectral radius can be minimized for a particular choice of  as follows⏎⏎where  is the matrix condition【 number】.⏎⏎See also⏎⏎Gauss–Seidel method
+  - 0.66｜和症状⏎脓毒症被定义为全身炎症反应综合征加上感染源。因此，在脓毒症出现的早期，患者会出现以下生命体征变化：发烧，体温高于 38 ℃，或体温过低，体温低于 36 ℃，成人患者心【率】高于每分钟 90 次或
+  - 0.64｜1013.25 millibars or 29.92" Hg). Pressure altitude and indicated altitude are the same when the altimeter is set to 29.92" Hg or 1013.25 millibars.⏎- Density【 altitude】 is the altitude corrected for non-ISA International Standard
+  - 0.62｜ airmasses of the target and calibration stars must be taken into account. Typically one would observe a few different stars of known magnitude which are sufficiently similar. Calibrator stars close in the sky to the target are favoured (to avoid large differences in the atmospheric paths). If those stars have somewhat different zenith【 angles】 (altitudes) then a correction factor as a
+  - 0.60｜ and teaching hours (see Indicators D1 and D4), teaching materials and facilities, the programme orientation provided to pupils/students (see Indicator C2) and the number of students enrolled in the education system (see Indicator C1). Policies put in place to attract new teachers or to reduce average【 class】 size or staffing patterns (see Indicator D2)
+  - 0.59｜logged up, as the insulating effect of the dust will rapidly degrade the heatsink's ability to dissipate heat.⏎⏎PSU fan ⏎While the power supply (PSU) contains a fan with few exceptions, it is not to be used for case ventilation. The hotter the PSU's intake air【 is】, the hotter the PSU gets. As the PSU
+  - 0.59｜环境中出乏力、大汗、口渴、头痛、头晕、眼花、耳鸣、恶心、胸闷等症状。2.轻度中暑主要表现为面色潮红、皮肤灼热、体温升高至38℃以上，也可伴有恶心、呕吐、面色苍白、脉【率】增快、血压下降、皮肤湿冷等
+  - 0.59｜ Family was dedicated. In 2020 Holy Family added a 34,000 sq ft. addition including Engineering rooms, classrooms, a new Auxiliary gym, and renovated many of its other facilities. Holy Family has 65 faculty members, giving the school a 11【:】1 student/faculty ratio. Over 7
+  - 0.57｜0次/min。(3)急性心肌梗死：在急性心肌梗死病程中，窦性心动过速的发生率可达到30%～40%。(4)休克：休克可引起窦性心动过速，在轻度休克时心【率】可达到100次/min以上;重度
+  - 0.57｜in addition to your regular water intake). The hot water stimulates circulation and vaso dilation (where pores and tissues open up) which increases hydration.⏎How do you know if you’re hydrated?⏎Probably the easiest and most common way to know if you’re hydrated is to monitor your urine. It should be【 pale】 yellow to clear, and you should be urinating
+  - 0.56｜，全国6000万名师生探索了网络条件下的新型教学、学习与教研模式。《教育信息化“十三五”规划》进一步提出了积极利用云计算、大数据等新技术，实现对学生日常学习情况的大数据采集和分析，优化教学模式，但解决当前普遍存在的班【额】过大，教师无法满足精准化教学、学生
+  - 0.56｜；反之则说明休克情况仍存在。 ⏎3）血压：通常认为收缩压＜90mmHg、脉压＜20mmHg是休克存在的表现；血压回升、脉压增大则是休克好转的征象。⏎4）脉率：脉【率】的变化多出现在血压变化之前。常用脉率
+  - 0.55｜评分：肝性脑病、腹水、ALB、胆红素及PT5个指标；⏎（b）终末期肝病模型（model for end-stage liver disease, MELD）及MELD-Na评分血清胆红素、肌酐、IN【R】及肝脏病因或血清钠5个指标
+
+## M006（第 22 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 12.8
+- 直接读出推高： possibly | 可能 |  Possibly | 有可能 |  likely | 也可能 | 很可能 | 可能是 | 可能会 |  Likely
+- 直接读出压低：verty | !/ |  budgets | 把自己 | лав | hausen | [". | 说自己 | .vel | ustral
+- 正极片段：
+  - 1.00｜ and JXTA.⏎⏎In 1986, Joy was awarded a Grace Murray Hopper Award by the ACM for his work on the Berkeley UNIX Operating System.⏎⏎On September 9, 2003, Sun announced Joy was leaving the company and that he "is taking time to【 consider】 his next move and has no definite plans".⏎⏎Post
+  - 0.79｜手中，联想成为老四。联想原想藉由收购荷兰佰德（Packard Bell）来扩大欧洲市场，但在宏碁买下对佰德有优先收购权的捷威后希望破灭，但联想集团首席执行官威廉·阿梅里奥表示【不排除】并购其他电脑公司。⏎ 2008
+  - 0.75｜設立香港特別行政區，由香港當地中國人管理，現行之社會、經濟制度和生活方式不變，等等；撒切爾夫人則堅持三個不平等條約仍然有效，提出如果中國同意英國1997年後繼續管治香港，英國可以【考慮】中國提出之主權要求；針對撒切
+  - 0.75｜ gender. I hope to accomplish the following objectives:⏎Ross, L., & Nisbett, R. E. (1991). The Person and the Situation: Perspectives of Social Psychology. New York: McGraw Hill.⏎Packet of reprints available from Warren Hall Copy Center.⏎Other readings【 may】 be assigned during the semester.⏎Traditional Social Psychology⏎
+  - 0.72｜ established that the convicted person was innocent of the relevant offence, and not to undo the effects of legislation which we now recognise as wrong. Lord Sharkey introduced a Private Member's Bill in the House of Lords on 25 July which would grant a statutory pardon to Dr Turing, and the Government will【 consider】 their response to this Bill in due course.⏎Written
+  - 0.72｜年，且後3年採強迫性入學、免學費、公私立並行及免試為主。⏎ 2020年：Facebook宣布，如果澳大利亞政府如果啟動立法程序，要求該國科技公司向當地新聞機構付款，會【考慮】封鎖在平台上分享地區及國際新聞的
+  - 0.71｜ashenko. Polish Foreign Minister Adam Rotfeld said a clampdown was under way, aimed at destroying "all elements of political pluralism and independence" in Belarus.⏎⏎In August 2005 the EU's executive commission called for human rights to be respected in Belarus. The commission said it was【 considering】 offering support to independent media in the country and had
+  - 0.69｜ letters. (Today I switched cornmeal out for rice - I'm still trying to find the right material for this activity. The cornmeal was dusty, and no one seemed to like it. Our sandbox sand is similarly fine and dusty. The rice was OK today - I'll continue to monitor it【 and】 see what the kids' reaction to it is.)
+  - 0.66｜在15日召开的中国国务院联防联控机制新闻发布会上，中国科学技术部社会发展科技司司长吴远彬表示，此前华南农业大学团队的研究提出穿山甲可能是新冠病毒的中间宿主之一，科技部正组织有关科研团队进行论证，一旦取得新的进展【将】及时公布。⏎病毒溯源对揭示新冠病毒来源及其
+  - 0.66｜ TAI + 32.184 s.⏎⏎The continued existence of TAI was questioned in a 2007 letter from the BIPM to the ITU-R which stated, "In the case of a redefinition of UTC without leap seconds, the CCTF would【 consider】 discussing the possibility of suppressing TAI, as it
+  - 0.65｜. (Today I switched cornmeal out for rice - I'm still trying to find the right material for this activity. The cornmeal was dusty, and no one seemed to like it. Our sandbox sand is similarly fine and dusty. The rice was OK today - I'll continue to monitor it and【 see】 what the kids' reaction to it is.) As
+  - 0.65｜ is some helpful information on this on our Information Sheet at http://museumvictoria.com.au/discoverycentre/infosheets/fossil-collecting---methods/⏎Hope this helps⏎Hello Brett; the Friends day for 2012 has not yet been scheduled, but once it is【 it】 will be posted here or you can simply call us
+  - 0.65｜ rejected by the US in 2001, it had to bring down its emissions to 7 per cent below 1990 emission levels. - "If, however, by 2012, our progress is not sufficient and sound science justifies further action, the US【 will】 respond with additional measures that may include broad-based market
+  - 0.65｜ and 1708.⏎Georgia Gov. Sonny Perdue said this week that he will sue the Army Corps of Engineers unless the federal agency holds back more water in Lake Lanier. The corps, which by law must release water downstream to protect endangered aquatic species, says it is "expl【oring】 possible drought contingency options." By various estimates, the
+  - 0.64｜ from you too. Click on the 'add your story' button at the⏎bottom of the green box on the right and send us an email - you can suggest new forum posts and FAQs too.⏎Note: Unfortunately, Changing Faces is currently unable to continue to provide its discussion forums. We are looking【 into】 alternatives to put in place as quickly as possible.⏎
+  - 0.63｜ JXTA.⏎⏎In 1986, Joy was awarded a Grace Murray Hopper Award by the ACM for his work on the Berkeley UNIX Operating System.⏎⏎On September 9, 2003, Sun announced Joy was leaving the company and that he "is taking time to consider【 his】 next move and has no definite plans".⏎⏎Post-S
+  - 0.62｜ comply.⏎5.11 The Government will continue to consider the scope for voluntary agreements with industry. It has, for example, asked the aggregates industry to deliver an improved package of voluntary measures which address the significant environmental costs of aggregate extraction. If the industry is unable to deliver, then an aggregates tax【 will】 be imposed.⏎5.12 Which instrument is
+  - 0.61｜。⏎ 在瑞士出席国际经济论坛的国际知名基金经理人、亿万富翁乔治·索罗斯再度抨击美国总统布什的外交政策，并说布什政府的经济计划虽然在2004年可能出现繁景，但将在2005年崩盘。索罗斯【计划】捐赠1250万美元用以支援民主党
+  - 0.60｜ Recovery Board.”⏎- The Recovery Board has created a pilot web portal for agencies to access a central repository of forensic and analytic tools to prevent waste, fraud, and abuse – federalaccountability.gov. Initial tests will conclude by February 2012 and at that point a determination will be made as【 to】 its usefulness to a broad range of users, and
+  - 0.60｜ I hope to accomplish the following objectives:⏎Ross, L., & Nisbett, R. E. (1991). The Person and the Situation: Perspectives of Social Psychology. New York: McGraw Hill.⏎Packet of reprints available from Warren Hall Copy Center.⏎Other readings may be【 assigned】 during the semester.⏎Traditional Social Psychology⏎9/
+
+## M007（第 15 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 4 页一次；语料最大激活 12.1
+- 直接读出推高：Own | 茧 | � | kest | 责任感 |  responsibility |  reim | ást |  discovery | OMATIC
+- 直接读出压低：atura | subpackage | iki | 停止 |  mer | 停 |  </ | 落 |  ś |  lag
+- 正极片段：
+  - 1.00｜保留对该动产的占有和使用。权利担保主要是股权担保、保险单担保和应收帐款担保。⏎担保形式⏎保证⏎即保证人与贷款协议中借款人和贷款人之间协商达成的、关于被保证的一方不履行或者不能履行协议时、保证人【代】为履行或者连带承担赔偿损失责任的
+  - 0.97｜保证合同的要求提出索赔要求以后，保证人必须无条件地承担赔付责任。不能以任何原因或任何条件未满足为理由而拒绝支付。⏎债务履行⏎1、保证人向债权人保证债务人履行债务，债务人不履行债务的，按照约定由保证人【履行】或者承担连带责任，担保人履行债务
+  - 0.83｜ is revealed that another man is a closer relative to Elimelech than Boaz and therefore has first claim on Ruth. This conflict is resolved through the custom that required land to stay in the family: a family could mortgage land to ward off poverty, but the law required a kinsman to【 purchase】 it back into the family (Leviticus
+  - 0.82｜对该动产的占有和使用。权利担保主要是股权担保、保险单担保和应收帐款担保。⏎担保形式⏎保证⏎即保证人与贷款协议中借款人和贷款人之间协商达成的、关于被保证的一方不履行或者不能履行协议时、保证人代【为】履行或者连带承担赔偿损失责任的协议
+  - 0.80｜, “Oh, my luve’s like a red, red rose” and Gertrude Stein, “a rose is a rose is a rose”.<|endoftext|>What is a heart-lung machine?⏎A heart-lung machine—also called a cardiopulmonary bypass machine—is a device that takes【 over】 the function of the body’s heart and lungs during
+  - 0.78｜动产的占有和使用。权利担保主要是股权担保、保险单担保和应收帐款担保。⏎担保形式⏎保证⏎即保证人与贷款协议中借款人和贷款人之间协商达成的、关于被保证的一方不履行或者不能履行协议时、保证人代为【履行】或者连带承担赔偿损失责任的协议。
+  - 0.77｜ sat across the table at first, but moved next to the envoys at their insistence. Flushed with wine, they began to fondle the women, but Amyntas remained silent out of fear of Persian power.⏎⏎Alexander, enraged by their actions, asked his father to leave and let him【 handle】 the situation. Amyntas advised caution, but
+  - 0.75｜最早出现在《江苏省高级人民法院关于适用〈中华人民共和国合同法〉若干问题的讨论纪要（一）》第17条。该条规定：“债务加入是指第三人与债权人、债务人达成三方协议或第三人与债权人达成双方协议或第三人向债权人单方承诺由第三人【履行】债务人的债务，但同时不免除债务人
+  - 0.75｜ ward off poverty, but the law required a kinsman to purchase it back into the family (Leviticus 25:25ff). When Boaz meets the near kinsman at the city gate (the place where contracts were settled), the kinsman initially agrees to【 purchase】 Elimelech's (now Naomi's)
+  - 0.75｜ Navajo Mine and layoffs at both the mine and power plant.⏎For a tribe with a roughly 50 percent unemployment rate and more than 50 percent of its members living below the poverty level, the closure will be a painful blow.⏎“One of the reasons we're exploring the possibility of taking【 over】 Navajo Mine is we're looking at saving jobs
+  - 0.72｜。⏎彩虹股份主要从事产业上游原材料液晶基板玻璃的研发、生产和销售。⏎CX01、CX03两生产线在一年一季的财务表现并不令人满意，毛利率较低甚至为负值，存在较大减值压力。⏎这时子公司将该生产线转售于集团，由集团【接手】旧产线，为控股子公司分担产
+  - 0.69｜再做担保人时要慎重。比如，你可以和债务人再单独写一个担保协议，要求他给予一定的财产抵押或保证。这样，对于你，债主都比较稳妥。⏎你作为担保人，必须承担担保责任，现在欠款人跑了，得你来【还】钱。除非你有证据证明实际借款是
+  - 0.69｜缩写的含义被改变为“全球移动通讯系统”，以方便GSM向全世界的推广。⏎⏎1987年5月，GSM成员国达成一致，确定了GSM最重要的几项关键技术。1989年，欧洲电信标准协会〔ETSI〕從CEPT【接手】标准的制定工作。1990年
+  - 0.68｜ came first from the World Bank, but after intense protests and an independent review, the Bank pulled out in 1993. "Resettlement and rehabilitation of all those displaced is not possible. Environmental impacts have not been properly considered or adequately addressed," it concluded. The Indian Government has taken【 over】 funding the dam, the most expensive and second-largest
+  - 0.68｜推開地窖大門，神八井耳命拿舉弓瞄準。可是神八井耳命卻手腳顫抖，遲遲不敢射箭。綏靖天皇見其不妙，連忙撞開其兄，將弓箭一把奪過【，】隨之連發兩箭，分別擊中
+  - 0.67｜ Livy (vi. 42), after the passing of the Licinian rogations in 367 BC, an extra day was added to the Roman games; the plebeian aediles refused to bear the additional expense, whereupon the patricians offered to undertake it【,】 on condition that they were admitted to the aed
+  - 0.65｜ a tactical, air-to-surface anti-radiation missile designed to home in on electronic transmissions coming from surface-to-air radar systems. It was originally developed by Texas Instruments as a replacement for the AGM-45 Shrike and AGM-78 Standard ARM system. Production was later taken【 over】 by Raytheon Corporation when it purchased the defense production
+  - 0.65｜ French nonprofit organization Pharmaciens Sans Frontières – International Committee (PSF-CI), involved in reorganization proceedings since July 2009, wound-up by decision of the court. The French NGO Agency for Technical Cooperation and Development, one of the main charities in France, offered to take【 up】 some of the projects implemented by PSF-CI
+  - 0.65｜ gate to meet with the other male relative before the town elders. (The relative is not named; indeed, Boaz addresses him as ploni almoni "so and so".) The relative, unwilling to jeopardize the inheritance of his own estate by marrying Ruth, relinquishes his right of【 redemption】, thus freeing Boaz to marry Ruth. They
+  - 0.61｜施工合同中仲裁条款的约束。答:建设工程领域的农民工工资纠纷严格意义上属于农民工追索劳动报酬的劳务合同纠纷，不属于建设工程合同纠纷，可以适用《保障农民工工资支付条例》规定。《保障农民工工资支付条例》规定的建设单位对拖欠农民工工资的先行【垫】付和清偿责任、施工总承包单位对
+
+## M008（第 14 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 8 页一次；语料最大激活 4.38
+- 直接读出推高：ivityManager | に乗 | _ports |  nir | 尔 | 统 |  redistributed | 整齐 | ToWorld |  replaces
+- 直接读出压低：东亚 | gebn | idia | 全域 | 嬗 | 信任 | eti | 四个方面 | *******************************************************************************/\n | iddled
+- 正极片段：
+  - 1.00｜和右節點。如果不考慮連通性，允許圖中有多個連通分量，這樣的結構叫做森林。⏎⏎性质 ⏎⏎二元樹是一個有根树，並且每個節點最多有2個子節點。非空的二叉樹，若樹葉總【數】為 n0，分支度為2的總
+  - 1.00｜ be unique, or rather, children which have the same parent node need not be distinguishable.⏎- unique_tree: The unique_tree container is used for tree structures in which every node in the tree is unique. Because every node in the tree is guaranteed to be unique, the unique tree offers a find【_deep】() operation, as well as other operations different from
+  - 0.94｜注过程中及后期对肝脏的保护作用。该研究已申请药物开发和临床应用专利4项，目前正与药物开发公司合作开发相关临床药物。<|endoftext|>4. 设二叉树的存储结构为二叉链表，试写出算法（C函数）：将【所有】结点的左右子树互换。⏎二
+  - 0.89｜ binary tree.) and , so . To make a full binary tree from a perfect binary tree, a pair of two sibling nodes are removed one by one. This results in "two leaf nodes removed" and "one internal node removed" and "the removed internal node becoming a leaf node", so one【 leaf】 node and one internal node is removed per removing two
+  - 0.86｜ you initially follow the same process as inserting into a Binary Search Tree. If the tree is empty, then the node is inserted as the root of the tree. If the tree is not empty, then we go down the root, and recursively go down the tree searching for the location to insert the new【 node】. This traversal is guided by the comparison function.
+  - 0.83｜_tree offers many more features because each node in the tree is unique. For example, the find() operation is available to tree, multitree, and unique_tree, which searches for a matching node contained within a single parent node. The unique_tree offers an additional operation, find_deep(), which not only【 searches】 the parent node's immediate children but also searches its
+  - 0.83｜ nodes  in a perfect binary tree is  (where  is the number of nodes in the tree) because  (by using the above property) and the number of leaves is  so . It also means that . In terms of the tree height , .⏎ For any non-empty binary tree with 【 leaf】 nodes and  nodes of degree 2 (internal
+  - 0.82｜當且僅當其中的每一節點，都可以和深度的滿二元樹，序號1到的節點一對一對應時，稱為完全二元樹。對任何一棵非空的二元樹，如果其葉片（終端節點）【數】為，分支度為2的節點數
+  - 0.80｜);⏎ if(T.data[k].rch!=-1)⏎ Q.push(T.data[k].rch);⏎ }⏎ } ⏎}⏎线索二叉树⏎二叉树的应用⏎二叉排序树⏎平衡二叉树⏎哈夫曼树及哈夫曼编码⏎树的带权路径长度：W【PL】，树中所有叶子结点的带权
+  - 0.77｜树 ⏎ }⏎}⏎中序遍历：左子树--根结点--右子树⏎void InOrder(BiTree T)⏎{//中序遍历二叉树（递归）⏎ if(T!=NULL)//若树非空 ⏎ {⏎ InOrder(T->lchild);//中【序】遍历左子树 ⏎ cout<<T->
+  - 0.76｜ offers many more features because each node in the tree is unique. For example, the find() operation is available to tree, multitree, and unique_tree, which searches for a matching node contained within a single parent node. The unique_tree offers an additional operation, find_deep(), which not only searches【 the】 parent node's immediate children but also searches its descendants
+  - 0.74｜atively.⏎⏎Searching begins by examining the root node. If the tree is , the key being searched for does not exist in the tree. Otherwise, if the key equals that of the root, the search is successful and the node is returned. If the key is less than that of the root, the【 search】 proceeds by examining the left subtree. Similarly, if
+  - 0.74｜節點和右節點。如果不考慮連通性，允許圖中有多個連通分量，這樣的結構叫做森林。⏎⏎性质 ⏎⏎二元樹是一個有根树，並且每個節點最多有2個子節點。非空的二叉樹，若樹【葉】總數為 n0，分支度為2
+  - 0.72｜此二叉树的结果为： a*b-c ⏎proc inorder(bt:bitreprtr)⏎    inorder(bt^.lchild); ⏎    niorder(bt^.rchild);] ⏎5.3.3 后序遍历⏎    后序遍历运算：即先后序遍【历】左子树，然后再后序遍历右
+  - 0.72｜.⏎⏎Operations⏎⏎Searching⏎Searching in a binary search tree for a specific key can be programmed recursively or iteratively.⏎⏎Searching begins by examining the root node. If the tree is , the key being searched for does not exist in the tree. Otherwise, if the key equals that of the root, the【 search】 is successful and the node is returned. If the
+  - 0.72｜節點的二元樹，當且僅當其中的每一節點，都可以和深度的滿二元樹，序號1到的節點一對一對應時，稱為完全二元樹。對任何一棵非空的二元樹，如果其葉【片】（終端節點）數為，分支
+  - 0.71｜ height so  (1 for counting the root node). The maximum number of nodes is obtained by fully filling nodes at each level, i.e., it is a perfect tree. For a perfect tree, the number of nodes is , where the last equality is from the geometric series sum.⏎ The number of【 leaf】 nodes  in a perfect binary tree is  (
+  - 0.69｜. With a given heigh , the number of nodes can't exceed the  as the number of nodes in a perfect tree. Thus .⏎ A binary Tree with  leaves has at least the height . With a given height , the number of leaves at that height can't exceed  as the number of【 leaves】 at the height in a perfect tree. Thus .⏎
+  - 0.69｜].rch!=-1)⏎ Q.push(T.data[k].rch);⏎ }⏎ } ⏎}⏎线索二叉树⏎二叉树的应用⏎二叉排序树⏎平衡二叉树⏎哈夫曼树及哈夫曼编码⏎树的带权路径长度：WPL，树中所有【叶子】结点的带权路径长度之和⏎
+  - 0.68｜有序树/搜索树/查找树：树中任意节点的子节点之间有顺序关系，这种树称为有序树。即树的所有节点按照一定的顺序排列，这样进行插入、删除、查找时效率就会非常高⏎⏎平衡/不平衡：⏎平衡树⏎绝对平衡树：所有【叶】节点在同一层⏎非绝对平衡树⏎不平衡
+
+## M009（第 20 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 16 页一次；语料最大激活 4.81
+- 直接读出推高： after |  fresh | 再度 | 刷新 | After | _after | 再次 |  freshly | 后的 | 重新
+- 直接读出压低：WER | ographies | ordinates | imony | .rollback | extends |  corr | ext | izio | geries
+- 正极片段：
+  - 1.00｜ to /srv/www/foo.com/html/*, so that Apache can serve up those files.⏎This can be done by using semanage to add a new context:⏎# semanage fcontext -a -t httpd_sys_content_t '/srv/www(/.*)?'⏎# semanage f【context】 -l | grep '/srv/www'⏎/srv
+  - 0.92｜讲解，也就是在学生感到困难的地方进行教学。⏎第七步：第二次尝试练习这一步是给学生“再射一箭”的机会。在第一次尝试练习中，有的学生可能会做错，有的虽然做对了但没有弄懂道理。经过学生讨论和教师讲解后【，】得到了反馈矫正，其中大部分人会有所领悟。
+  - 0.77｜ keyboard upgrade kit,<|endoftext|>In computer science, an AVL tree (named after inventors Adelson-Velsky and Landis) is a self-balancing binary search tree. In an AVL tree, the heights of the two child subtrees of any node differ by at most one; if at any【 time】 they differ by more than one, rebalancing
+  - 0.77｜2005;72(2):269-276. PMID: 16050450.<|endoftext|>Going Green: Reusing materials⏎To view our videos, you need to⏎install Adobe Flash 9 or above. Install now.⏎Then come【 back】 here and refresh the page.⏎At a casual glance
+  - 0.76｜acing loop for an insertion⏎The height of the subtree rooted by Z has increased by 1. It is already in AVL shape.⏎⏎for (X = parent(Z); X != null; X = parent(Z)) { // Loop (possibly up to the root)⏎    // BF(X) has to【 be】 updated:⏎    if (Z == right_child(X
+  - 0.72｜ is metre per second squared (, ).⏎⏎For example, when a vehicle starts from a standstill (zero velocity, in an inertial frame of reference) and travels in a straight line at increasing speeds, it is accelerating in the direction of travel. If the vehicle turns, an acceleration occurs toward the【 new】 direction and changes its motion vector.  The acceleration
+  - 0.72｜0% or more of the 1st preferences they are elected. If no candidate has a majority then the candidate with the smallest number of 1st preferences is eliminated and their votes are redistributed according to their 2nd preferences. Everyone else’s votes remain cast for their 1st preference and【 the】 ballots are re-counted in a second round of
+  - 0.67｜ choice can be made about what kinds of questions are appropriate⏎to use for a given assessment.⏎Download the test for this activity by clicking on the link below.⏎2. Take the test, then, identify its errors.⏎3. Read the material presented in this web page. After reading⏎the material【,】 you will be presented with a second activity, that
+  - 0.66｜ants and Children, or WIC. As our Katie Gibas reports, since healthier food packages were introduced in 2009, obesity rates of children in the program have dropped.⏎To view our videos, you need to⏎install Adobe Flash 9 or above. Install now.⏎Then come【 back】 here and refresh the page.⏎NEW YORK -- About
+  - 0.66｜ 1.⏎⏎Invariant of the retracing loop for an insertion⏎The height of the subtree rooted by Z has increased by 1. It is already in AVL shape.⏎⏎for (X = parent(Z); X != null; X = parent(Z)) { // Loop (possibly up to the root)⏎【   】 // BF(X) has to be updated:⏎   
+  - 0.65｜. Once a forage is dried down the potentially harmful nitrate levels change. Levels of 0% - 0.25%, 0 - 2,500ppm, are generally considered safe for all classes of livestock. Levels of 0.26% to 【0】.5% should be used with caution and should
+  - 0.65｜—because under the double-entry rules, whenever there is a posting, the debits of the posting equal the credits of the posting. If the two totals do not agree, an error has been made, either in the journals or during the posting process. The error must be located and rectified,【 and】 the totals of the debit column and the credit column
+  - 0.64｜⏎2）、方差最大法⏎3）、等量最大法⏎2、斜交旋转：（没有因素见相互独立的限制，因素间夹角任意）⏎常见oblimin以及promax⏎解释因素⏎首先估计最初因素载荷矩阵；其次因素旋转；最后【重新】定义和解释因素⏎斜交旋转后一般
+  - 0.64｜|1.||Finish reading the story you started in Session 1, and ask students to once again think about the questions on the chart paper or interactive character map, just like they did for the first part of the story. At the end of the story, ask students to reconsider the same questions【 and】 complete a new chart or character map on the same
+  - 0.64｜ /srv/www/foo.com/html/*, so that Apache can serve up those files.⏎This can be done by using semanage to add a new context:⏎# semanage fcontext -a -t httpd_sys_content_t '/srv/www(/.*)?'⏎# semanage fcontext【 -】l | grep '/srv/www'⏎/srv/www
+  - 0.63｜ and  to .⏎ If , the search terminates as unsuccessful.⏎ Set  (the position of the middle element) to the floor of , which is the greatest integer less than or equal to .⏎ If , set  to  and go to step 2.⏎ If , set  to  and go to【 step】 2.⏎ Now , the search is done;
+  - 0.63｜ the code below shows, the adequate rotation immediately perfectly rebalances the tree.⏎⏎In figure 1, by inserting the new node Z as a child of node X the height of that subtree Z increases from 0 to 1.⏎⏎Invariant of the retracing loop for an insertion⏎The height of【 the】 subtree rooted by Z has increased by 1.
+  - 0.62｜⏎        tree->root = N; // N is the new root of the total tree⏎    break;⏎    // There is no fall thru, only break; or continue;⏎}⏎// Unless loop is left via break, the height of the total tree increases by 1.⏎⏎In order to update【 the】 balance factors of all nodes, first observe that all
+  - 0.60｜ or WIC. As our Katie Gibas reports, since healthier food packages were introduced in 2009, obesity rates of children in the program have dropped.⏎To view our videos, you need to⏎install Adobe Flash 9 or above. Install now.⏎Then come back here and refresh【 the】 page.⏎NEW YORK -- About one out of every
+  - 0.60｜ the instructions for making the soil more neutral. If the soil is hard, compacted fill dirt brought in during construction, you might want to improve it by adding organic matter and work the ground so that it can more easily be planted. If you alter the site, then select plants suited to the new【 conditions】.⏎To find a lab that analyses soil samples,
+
+## M010（第 17 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 5.1 次；语料最大激活 1.67
+- 直接读出推高：izon | 点了 | ipline | 情节 | Lens | MA | jong | 体质 | 全景 |  Hindu
+- 直接读出压低：大爷 | anders | -On |  aster | ATH | 克斯 |  OPP | oose | endor | 遒
+- 正极片段：
+  - 1.00｜王開的先例，一個朝代的第一個及第二個國君的諡號經常使用文、武。如魏武帝和魏文帝、晉文帝和晉武帝、魏道武帝、宋武帝、梁武帝和梁简【文】帝、陈武帝、隋文帝、
+  - 0.84｜ dumps, but is also saving money. The same could be achieved in other African cities.⏎Date published: March 2006⏎To subscribe to regular updates of the latest New Agriculturist articles send us your email address, and choose your preferred language.⏎Lisez les dernières informations【 dans】 l'édition française du New Agriculturist⏎
+  - 0.78｜“是”）⏎ Skuizh e vesan d-{’}-ar gwener 我星期五都很累（“是”）⏎ Naon am-eus fenos 我今天晚上很饿（“有”）⏎ Naon am-bez bemnos 我每天晚上都觉得饿【（】“有”）⏎⏎介词的变位 ⏎
+  - 0.74｜Birmingham Sunday" by Richard and Mimi Fariña, which was used in the opening sequence of the film, as sung by Joan Baez, Mimi's sister. They also inspired the 1963 tune "Alabama" by John Coltrane, which is also included【 in】 the soundtrack.⏎⏎4 Little Girls premiered on June 
+  - 0.71｜iation  by P. C. Sizonenko⏎ Sex Tutorial ⏎ Famous Quotes on Sex⏎ Sex Dictionary ⏎ New Scientist article on Sex chromosomes in the platypus ⏎ 人類有多少種生理性別？你的性別是由什麼決定的？How many biological sexes are there in humans? What【 determines】 your gender  ? ⏎ 孤雌繁殖、
+  - 0.69｜界为髂总血管，内侧为输尿管及其系膜，贴附在阔韧带后叶。向下分离直至到达肛提肌平面，表面被盆腔内筋膜覆盖。分离应该逐步进行，利用腹腔镜放大作用，在疏松组织中进行【。】其前方为宫旁筋膜，后侧
+  - 0.65｜，通过分离阔韧带的外侧叶来进入。其外侧界为髂总血管，内侧为输尿管及其系膜，贴附在阔韧带后叶。向下分离直至到达肛提肌平面，表面被盆腔内筋膜覆盖。分离【应该】逐步进行，利用腹腔镜放大作用，在
+  - 0.64｜认知学习;行为;小群体;边缘化;政治和政策变化;边缘化群体⏎治疗师所需要的技能⏎Dialogue on oppression; Group & clinical skills in all methods; Authentic use of self 针对压抑情绪的对话;小⏎组和临床技能的方法; 自觉【性的】使用⏎44. Training Required 所需要
+  - 0.63｜ko和Schifman描述的直肠侧间隙，通过分离阔韧带的外侧叶来进入。其外侧界为髂总血管，内侧为输尿管及其系膜，贴附在阔韧带后叶。向下分离直至到达肛提肌平面【，】表面被盆腔内筋膜覆盖。分离
+  - 0.62｜: To ravage, to slaughter, to usurp under false titles, they call empire; and where they make a desert, they call it peace. Oxford Revised Translation (at Project Gutenberg) ⏎- Translation: They plunder, they slaughter, and they steal: this they falsely name Empire, and【 where】 they make a wasteland, they call it peace
+  - 0.61｜ nature. Chemistry is the discipline that studies these changes.⏎⏎History of atomic theory⏎⏎In philosophy ⏎⏎The basic idea that matter is made up of tiny indivisible particles is an old idea that appeared in many ancient cultures. The word atom is derived from the ancient Greek word atomos, which means "unc【ut】table". This ancient idea was based in philosophical reasoning
+  - 0.60｜点 167⏎6.3  移动互联安全等级保护应用实践 170⏎6.3.1  移动互联系统定级方法 170⏎6.3.2  移动互联系统建设整改的关注点【 】172⏎6.3.3 
+  - 0.59｜不同种类的信号应采用不同的处理技术。⏎信号的分析和处理是监测系统必不可缺少的步骤。⏎信号分析和处理技术近些年得到了迅速发展。首先，被监测对象越来越复杂，由具有平稳、线性和周期性特征的对象转变为非平稳、非线性和无统计【周期】性的对象；其次，信号分析的理论和
+  - 0.58｜附在阔韧带后叶。向下分离直至到达肛提肌平面，表面被盆腔内筋膜覆盖。分离应该逐步进行，利用腹腔镜放大作用，在疏松组织中进行。其前方为宫旁筋膜，后侧方为盆壁和髂【内】静脉，后内方位骶骨，内侧
+  - 0.56｜ sees the dog). In German, masculine nouns change their definite article from  to  in the accusative case.⏎In Nepali, "Rama sees Shyama." Would be translated as "Rama-le Shyama-lai dekhchha." or "रामले【 श】�्यामलाई द
+  - 0.56｜ 22, 2013, from⏎Munroe, Kirk. "Chapter VII: “Mysterious Disappearance of the Canoes”." Canoemates: A Story of the Florida Reef and Everglades. Lit2Go Edition. 1892.【 Web】. <>. May 22, 2
+  - 0.56｜我（太上）是自然。"⏎⏎“太上，下知有之；其次，親而譽之；其次，畏之；其次，侮之。信不足，焉有不信焉。悠兮，其貴言。功成事遂，百姓皆謂我自然【。”】《老子》第十七章⏎ 太上
+  - 0.56｜Finnish: Tapiola Sinfonietta, Swedish: Tapiola Sinfonietta – Esbo stadsorkester), founded in 1987⏎ Lahti Symphony Orchestra (Finnish: Sinfonia Lahti – Lahden kaupung【in】orkesteri, Swedish: Sinfonia
+  - 0.56｜osing muscles constantly react to each other, even outside of the force of gravity. (Recall how astronauts must exercise vigorously to avoid muscle atrophy when they are in weightless conditions.) Further, the slightest movement changes pressure on golgi receptors in the joints which also contribute to proprioception – again,【 like】 the muscle spindles, the golgi receptors
+  - 0.55｜侧间隙，通过分离阔韧带的外侧叶来进入。其外侧界为髂总血管，内侧为输尿管及其系膜，贴附在阔韧带后叶。向下分离直至到达肛提肌平面，表面被盆腔内筋膜覆盖【。】分离应该逐步进行，利用腹腔镜放大
+
+## M011（第 17 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 7.79
+- 直接读出推高：氡 | terior | 明智 |  bunk | ecret |  tang | oters | 鳕 | ogie | 真假
+- 直接读出压低：直至 | Leod | sal | 直到 |  Fle | стра | getDb | Collection | /copyleft | Gu
+- 正极片段：
+  - 1.00｜ learners' linguistic, cultural, and social backgrounds are taken into account.⏎- Standards and assessment.⏎- Setting appropriately high and challenging standards and assessing the learner as well as learning progress-including diagnostic, process, and outcome assessment-are integral parts of the learning process. (APA, 200【9】)⏎American Psychological Association. (2009
+  - 0.81｜entable higher life form. Consequently, Schmeiser was found to have infringed the patent. However, the Court held that Monsanto was not entitled to damages because Schmeiser earned no profit from the technology - he never sprayed his crop with Roundup to reduce weeds. Monsanto Canada, Inc.【 v】. Schmeiser,  S.C.C.
+  - 0.71｜在4h内出现可见坏死现象，或温度在55℃时，对20号钢的表面均匀年腐蚀率超过 $P$            6.25mm/年的固体或液体。 $P$                对于未列入分类明细表中的危险化学品【，】可以参照已列出的化学性质相似，危险
+  - 0.69｜ most effective when differences in learners' linguistic, cultural, and social backgrounds are taken into account.⏎- Standards and assessment.⏎- Setting appropriately high and challenging standards and assessing the learner as well as learning progress-including diagnostic, process, and outcome assessment-are integral parts of the learning process. (APA【,】 2009)⏎American Psychological Association.
+  - 0.67｜浓度。cAMP能抑制细胞的分裂，促进细胞的分化，cGMP则能抑制细胞分化，促进细胞增殖，在正常生长的细胞中，cAMP和cGMP维持在适当的水平，调节控制细胞周期的运转(BrowneG,201【0】)。<|endoftext|>长期以来，人们对这一问题不断进行
+  - 0.66｜0号钢的表面均匀年腐蚀率超过 $P$            6.25mm/年的固体或液体。 $P$                对于未列入分类明细表中的危险化学品，可以参照已列出的化学性质相似，危险性相似的物品进行分类。$P【$】            4  标志 $P$
+  - 0.65｜ semen thereafter contains no sperm, impregnation cannot occur. A vasectomy is also an outpatient procedure. Some questions have been raised about the procedure's long-term health effects, but the prevailing medical opinion is that vasectomy is unlikely to cause any health problems. Both tubal ligation and vasectomy【 can】 be reversed in some cases but generally are considered permanent
+  - 0.65｜，对20号钢的表面均匀年腐蚀率超过 $P$            6.25mm/年的固体或液体。 $P$                对于未列入分类明细表中的危险化学品，可以参照已列出的化学性质相似，危险性相似的物品进行分类【。】$P$            4  标志
+  - 0.64｜一個普世理念提升為研究這些理念所轉化的特定樣本。亞里士多德的研究方式既是歸納法的也是演繹的，而柏拉圖的研究方式在本質上則是源自於先驗的原則（Jori, 200【3】）。⏎⏎依照亞里士多德的說
+  - 0.63｜英国判例法、习惯法为基础而衍生出来的，主要以判例为主。二者主要是法律传统、法律的表现形式不一样。<|endoftext|>性能测试(一)性能测试是什么⏎一、什么是软件性能⏎三、性能测试的类型⏎四、性能测试的应用场景(领域)⏎【定义】 :软件的性能是软件的一种 非
+  - 0.62｜及特点。⏎2．测验内容和实施方式：包含成人、儿童、学龄前期三个年龄版本。⏎通过提问、操作方式，个别进行。⏎3．测验工具：玩具、画册、指导手册等。⏎进行个案研究时，可采用多种方法并用【，】如使用观察、交谈、测量和实验等
+  - 0.62｜HPV）与子宫颈癌、皮肤癌、肺癌密切相关；EB病毒（Epstein-Barr virus,EBV）感染和Burkitt淋巴瘤、鼻咽癌等密切相关。致癌性RNA病毒：可诱发白血病、肉瘤、淋巴瘤等。[2【][】3]⏎某些细菌、寄生虫也可引起
+  - 0.61｜顿还精通多種語言。除了歐洲語言之外，他還懂得波斯語、希臘語、拉丁語、希伯來文、古代巴勒底的巴比倫文、印度梵語、佛教原典所用的巴利語、義大利【語】、法語、阿拉伯語、孟加拉
+  - 0.61｜大力发展新能源的同时，特别要在需求端做到节约集约，注重“节流”，实施全面节约战略，以缓解能源资源供求缺口的压力，降低进口依赖度和供应保障安全风险，确保经济社会发展进程不会由于能源资源供应跟不上而被打断。按照党的二十大部署【，】推动经济社会发展绿色化、低碳化离不开三大
+  - 0.60｜应用和营运领域，仍可以使企业做大做强。五是环境服务业以可量化的环境产出作为服务成果的衡量标准。这个标准有正标（国家标准、行业标准、地方标准），也有非标（根据需求者的要求，甲、乙双方达成一致的设计）。环境服务业【这些】特点，要求政府部门释放需求，规范市场，
+  - 0.60｜6000 SP2, 11.38 G FLOPS（浮点运算 / 秒），每秒可检查 2 亿步，或 3 分钟运行 5 千万盘棋局（positions）。符号 AI 有坚实的认知心理学基础【，】把符号系统作为人类高级心智活动的模型
+  - 0.59｜地区、边疆地区和贫困地区公共图书馆事业的发展。第八条国家鼓励和支持发挥科技在公共图书馆建设、管理和服务中的作用，推动运用现代信息技术和传播技术，提高公共图书馆的服务效能。第九条国家鼓励和支持在公共图书馆领域开展国际交流与合作。第十条【公共】图书馆应当遵守有关知识产权保护的法律、行政
+  - 0.58｜ocrypha. Augustine defined the word as meaning simply "obscurity of origin", implying that any book of unknown authorship or questionable authenticity would be considered apocryphal. Jerome in Prologus Galeatus declared that all books outside the Hebrew canon were apocryphal. In【 practice】, Jerome treated some books outside the Hebrew canon as
+  - 0.58｜' linguistic, cultural, and social backgrounds are taken into account.⏎- Standards and assessment.⏎- Setting appropriately high and challenging standards and assessing the learner as well as learning progress-including diagnostic, process, and outcome assessment-are integral parts of the learning process. (APA, 2009【)⏎】American Psychological Association. (2009).
+  - 0.58｜ -- 植物界(plant) -- 动物界(animal)⏎⏎Copeland提出过四界说：⏎ 原核生物界 -- 原生生物界 -- 植物界 -- 动物界⏎⏎也有人使用三域系統说。这种分类【方法】是依據细胞是否有核以及细胞膜和细胞
+
+## M012（第 18 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 2 页一次；语料最大激活 4.58
+- 直接读出推高：arb |  midst | 满了 | .deepcopy | 贿 | 衔 | 涡 |  jur | 第二次 | tur
+- 直接读出压低：与时 |  simultaneously | quarter | 有价值的 |  eventually | 的有效 | Morning |  ultimately | //* |  pulse
+- 正极片段：
+  - 1.00｜ Miami". Hasselblad. Archived from the original on 2012-06-02. Retrieved 2012-06-03.<|endoftext|>Why is it necessary to say that the two envelopes come from a distribution? Essentially, we can approach the two【 envelope】 problem in one of two ways. Firstly, we
+  - 0.91｜), ... with the probability of the pair ( 2n, 2n + 1 ) being 2-n -1 for all integers n >= 0. Note that the probabilities in every possible distribution must add up to 1.⏎The general case that we must address while solving the two【 envelope】 paradox is the collection of all possible distributions like the
+  - 0.86｜龍提出，根據離堅白的思路而建立。现代逻辑学普遍认为此论题是诡辩。⏎⏎歷史⏎白馬非馬，這個論證，在公孫龍之前应该已經存在。《戰國策》中，蘇秦曾提到刑名家以白馬非【馬】立說。《韓非子》記載
+  - 0.79｜-06-03.<|endoftext|>Why is it necessary to say that the two envelopes come from a distribution? Essentially, we can approach the two envelope problem in one of two ways. Firstly, we can treat it as a fantasy in which anything can happen without any rational rules, ie the two【 envelopes】 appear magically out of nowhere, with no probabilities attached
+  - 0.77｜ there is no framework within which a probability calculation can be made then we cannot make it.⏎The second choice is to treat the puzzle as a situation that can be analysed using probability theory. If we are to make a probability calculation then we need to make a basic assumption - that our sample (the two【 envelopes】) comes from some kind of distribution, ie it
+  - 0.75｜非馬，中國戰國時期由名家提出辯論問題。其中最著名的論據由公孫龍提出，根據離堅白的思路而建立。现代逻辑学普遍认为此论题是诡辩。⏎⏎歷史⏎白馬非馬，這個論證，在公孫【龍】之前应该已經存在。《戰國策》
+  - 0.70｜非」或「不是」，也主要有二義——不包含及不等同的意義。⏎⏎在二義中，第一義而非第二義是較普遍使用的，因為一語詞所指的事物往往與別的語詞所指的不相同。但當公孫【龍】說「白馬非馬」時，他
+  - 0.70｜天体的运行作了大规模的观测。两河流域居民，最早的处方即出现在乌尔第三王朝( 2112 BCE –  200<|endoftext|>白馬非馬，中國戰國時期由名家提出辯論問題。其中最著名的論據由公孫【龍】提出，根據離堅白的思路而建立
+  - 0.69｜ imagining that a long drought could have caused some hypothetical short-necked ancestors of the giraffe to stretch their necks continually higher to reach the diminishing supply of leaves. He had no fossil evidence, of course, for such an evolutionary history. He also apparently was not aware of certain problems peculiar to gir【aff】es which make his easy assumption of giraffe evolution
+  - 0.69｜ore, which captures food particles from the water. In all colonies a large percentage of zooids are autozooids, and some consist entirely of autozooids, some of which also engage in reproduction.⏎⏎The basic shape of the "crown" is a full circle. Among the freshwater bry【ozo】ans (Phylactolaemata) the
+  - 0.65｜ pelvis, hands, and feet. It was discovered in Ethiopia's harsh Afar desert at a site called Aramis in the Middle Awash region. Radiometric dating of the layers of volcanic ash encasing the deposits suggest that Ardi lived about 4.3-4.5 million【 years】 ago. This date, however, has been questioned
+  - 0.65｜或140萬美元）。⏎⏎得主 ⏎⏎截至2023年，共有111位个人和27个组织被授予诺贝尔和平奖。有19位女性获诺贝尔和平奖，超过其他任何诺贝尔奖。有两个组织曾多次获得这一奖项：红【十字】国际委员会分别于1917、1
+  - 0.65｜断裂，器件处于 HRS 状态。当正向电压达到设定电压时，由于氧离子被驱回 TE，导电丝形成，这就是Set过程(b) Ismail 等人制造了一种 ITO/CeO2/ITO 透明忆阻器。忆【阻】器的工作原理是通过对电极施加正
+  - 0.64｜ compiler, goes beyond HM, and now uses System F extended with non-syntactic type equality, for example.⏎System Fω ⏎Although System F corresponds to the first axis of the Barendregt's lambda cube, system Fω combines the first axis (polymorphism) with type【 operators】 (the second axis); it is a different,
+  - 0.64｜行政问责的手段，而防患、预防才是行政问责的目的。行政问责制的实施，是我们在当今时代，建设中国特色社会主义、实现“科学执政、民主执政、依法执政”的最好的制度载体。<|endoftext|>#事业单位考试#   脊髓灰质炎又称小儿【麻痹】症，是一类由脊髓灰质炎
+  - 0.64｜ of the turbulence moves a little bit.⏎The result is not intuitive, since the original fixed point may become mobile when another fixed point appears.⏎⏎Brouwer is said to have added: "I can formulate this splendid result different, I take a horizontal sheet, and another identical one which I crum【ple】, flatten and place on the other. Then a
+  - 0.64｜白馬非馬，這個論證，在公孫龍之前应该已經存在。《戰國策》中，蘇秦曾提到刑名家以白馬非馬立說。《韓非子》記載，宋人倪說（-{兒}-說），以白馬非【馬】，辯贏齊國稷下學者
+  - 0.64｜iah as his source. There is also much material found in  which Jeremiah does not quote, and which, had he had it laid out before him, would have suited his purpose admirably.⏎⏎Sepharad⏎⏎The term "Sepharad" mentioned in the 20th verse of Ob【ad】iah comes from the Hebrew word for Spain.⏎⏎Script
+  - 0.63｜autozooids", which are responsible for feeding, excretion, and supplying nutrients to the colony through diverse channels. Some classes have specialist zooids like hatcheries for fertilized eggs, colonial defence structures, and root-like attachment structures. Cheilostomata is the most diverse order of bry【ozo】an, possibly because its members have the widest range
+  - 0.63｜ acetylene (and the aromatic fraction from coal tar) was the main source of organic chemicals in the chemical industry. It was prepared by the hydrolysis of calcium carbide, a reaction discovered by Friedrich Wöhler in 1862 and still familiar to students:⏎⏎Calcium carb【ide】 production requires high temperatures, ~2000
+
+## M013（第 13 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 1 页一次；语料最大激活 3.84
+- 直接读出推高：纳 | 毂 | 外来 | 不出来 | 筹 | arer | 娱 | 冲突 | icer | 外
+- 直接读出压低：港区 |  Lar | (compact | locator | 追赶 |  transformed |  envisioned |  Darling | clar | 小小的
+- 正极片段：
+  - 1.00｜8		开宝⏎ 976				太宗(赵匡义，939-997)⏎ 976		太平兴国⏎ 984 		甲子年⏎ 984		雍熙⏎ 984【					】	王延德(939- 
+  - 0.92｜，计37年)⏎ ⏎ 公元	年号		皇帝		备注⏎ ----	----		----		-----⏎ 581	开皇		文帝(杨坚，541-604)称帝建国⏎ 587【				】	科举开始⏎ 589                                    
+  - 0.86｜ 960		建隆		太祖(赵匡胤，927-976)即位⏎ 963		乾德⏎ 964 	甲子年⏎ 968		开宝⏎ 976【			】	太宗(赵匡义，93
+  - 0.85｜照( 1081- 114 1)逝⏎ 1144 甲子年⏎ 1162			孝宗⏎ 1163	隆兴⏎ 1165	乾道⏎ 1165【				】	宋金谈和，维持40年
+  - 0.84｜2-716)⏎ 684	文明		（周）武后(武则天，Wu Tse-t'ien，625-705)⏎ 684	光宅⏎ 685	垂拱⏎ 686【				】	神会(686-76
+  - 0.84｜衔接的一项重要制度。⏎“教育、感化、挽救”既是未成年人刑事司法的目的，也是家庭、学校、政府和整个社会的共同责任。⏎《未成年人保护法》、《预防未成年人犯罪法》和《刑事诉讼法》等法律都规定，对犯罪的未成年人实行【教育】、感化、挽救的方针和坚持教育
+  - 0.84｜（一）债务人下落不明，且无财产可供执行；（二）人民法院已经受理债务人破产案件；（三）债权人有证据证明债务人的财产不足以履行全部债务或者丧失履行债务能力；（四）保证人书面表示放弃本款规定的权利。一般【保证】人的先诉抗辩权，新旧法律
+  - 0.83｜向张某军所借款项，李某坤只是提供口头保证，并未签订书面合同。原告张某军也无证据证明李某坤已经履行了主要担保义务，故保证合同不成立，李某坤不应承担保证责任。《民法典》第六百九十三条规定：一般【保证】的债权人未在保证期间内对债务人
+  - 0.81｜承担保证责任。但是，该催款通知书内容符合合同法和担保法相关担保合同成立的规定，并经保证人签字认可，能够认定成立新的保证合同的，人民法院应当认定保证人按照新保证合同承担责任。”《民法典》第六百九十三条规定：“一般【保证】的债权人未在保证期间对债务人提起
+  - 0.80｜<|endoftext|>欠款人不还钱，担保人怎么办？⏎一般来说，担保人应当在担保范围内承担担保责任。《中华人民共和国担保法》第十七条、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判或者仲裁
+  - 0.80｜Dim dArr() As String '聲明動態數組⏎ReDim dArr(0 To 5, 1 To 2) '改變動態數組的尺寸默認把原數據清除。如果保留原來的數據，必須加上參數Preserve。⏎                        【       】 '使用Preserve參數時只能改變
+  - 0.79｜ (Five Dynasties，907-960)⏎   +-------+ 十国				       (Ten Kingdoms， 902-979)⏎ 	  +-----------------唐朝-------------+      (Tang/T'ang， 618-907)⏎【 					】	+-隋-+ (Sui， 
+  - 0.79｜	----		-----⏎ 618	武德		高祖(李渊，565-635)称帝建国⏎ 626			太宗(李世民，599-649)⏎ 627	贞观【			】	玄奘(Hsuan Tsang，6
+  - 0.77｜。参考资料来源：百度百科-中华人民共和国担保法⏎一般来说，担保人应当在担保范围内承担担保责任。《中华人民共和国担保法》第十七条、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判或者仲裁
+  - 0.76｜参考资料来源：搜狗百科-中华人民共和国担保法⏎一般来说，担保人应当在担保范围内承担担保责任。《中华人民共和国担保法》第十七条、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判或者仲裁
+  - 0.76｜人同意。债权人不同意债务人转让债务的，债务不发生转让。债权人同意债务人转让债务，而未经保证人同意的，债务转移也发生效力，但保证人对转让后的债务不再承担保证责任。《民法典》第六百九十八条规定：一般【保证】的保证人在主债务履行期限届满后
+  - 0.75｜ only four codices of pre-Columbian civilizations have escaped the burnings of the conquistadores. They could not be deciphered until very recently, and they provide valuable information about a civilization that had grown to a significant size before disappearing. In China, where writing first began, the invention of【 paper】, the processes of replication and printing developed very early
+  - 0.74｜没有约定；没有约定或者约定不明确的，保证期间为主债务履行期限届满之日起六个月。《民法典》第六百八十七条规定：当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般保证。一般【保证】的保证人在主合同纠纷未经审判或仲裁
+  - 0.74｜ 						+-隋-+ (Sui， 581-618)⏎ (Southern/Northern Dynasties， 386-589)		    +-------南北朝----------->⏎ (Jin/Chin， 265-420)【						】       晋 +-->⏎ ...........*........
+  - 0.71｜纠纷中的债权。参考资料来源：百度百科-中华人民共和国担保法⏎一般来说，担保人应当在担保范围内承担担保责任。《中华人民共和国担保法》第十七条、当事人在保证合同中约定，债务人不能履行债务时，由保证人承担保证责任的，为一般【保证】。一般保证的保证人在主合同纠纷未经
+
+## M014（第 19 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 3 页一次；语料最大激活 6.05
+- 直接读出推高：esity | embedded | 笙 | ք | eka |  embedded | inery | 控制系统 |  Embedded | 出道
+- 直接读出压低： again |  Daly | 茂 | 住 | %A | antt | itore | .Marker | ari | bol
+- 正极片段：
+  - 1.00｜,000, payable "one-half in one one-half in two years." How did he expect to provide the money to meet this obligation? He did not expect to provide<|endoftext|>Using computers is as much a part of our daily activities as driving a car or using a microwave oven. But,【 unlike】 cars or ovens, computers become out of date
+  - 0.77｜、蒙古人與雅库特人皆擁有製作馬奶酒的漫長歷史。除此之外，馬奶酒在中國华北地区的汉人間，也是極為普遍的酒類飲料。⏎⏎馬奶酒是一種與克非尔相似的乳製品，但相較【於】克非爾是採用固體酸奶酵
+  - 0.74｜ term "computer science" appears in a 1959 article in Communications of the ACM,⏎in which Louis Fein argues for the creation of a Graduate School in Computer Sciences analogous to the creation of Harvard Business School in 1921. Louis justifies the name by arguing that,【 like】 management science, the subject is applied and interdisciplinary in
+  - 0.69｜电视游-{}-戏机、電視遊-{}-樂器、有时也称家用主機或主机，是供居家娛樂的电子游戏设备。家用游戏机是电子游戏机的一种，通常属于私有财产，与公用的街边游戏机相对，但与【街】机不同的是，家机通常使用電視�
+  - 0.66｜送往相应的执行核心，也就是说所有的处理过程都在CPU核心范围之内完成，并不需要借助外部设备。对于双核心架构，AMD的做法是将两个核心整合在同一片硅晶内核之中，而Intel的双核心处理方式则更像是简单的将两个核心做到一起而已。与Intel【的】双核心架构相比，AMD双核心处理器系统
+  - 0.65｜被送往相应的执行核心，也就是说所有的处理过程都在CPU核心范围之内完成，并不需要借助外部设备。对于双核心架构，AMD的做法是将两个核心整合在同一片硅晶内核之中，而Intel的双核心处理方式则更像是简单的将两个核心做到一起而已。与【Intel】的双核心架构相比，AMD双核心处理器
+  - 0.63｜orphosis from larva with gills to an adult air-breathing form with lungs. Amphibians use their skin as a secondary respiratory surface and some small terrestrial salamanders and frogs lack lungs and rely entirely on their skin. They are superficially similar to reptiles like lizards, but【 unlike】 reptiles and other amniotes, require water
+  - 0.62｜ European Union, often referred to in the treaties and other official documents simply as the Council, and informally known as the Council of Ministers, is the third of the seven Institutions of the European Union (EU) as listed in the Treaty on European Union. It is one of two legislative bodies and together【 with】 the European Parliament serves to amend and approve or veto
+  - 0.61｜。守宮砂之说则常見於武俠小說，如《神雕俠侶》的小龍女因失身而造成守宮砂消失。⏎⏎处女的首次性交 ⏎處男或處女的首次性交皆稱初夜，相对于男性【，在】要求女性守贞社会中，女性的初
+  - 0.61｜各異其趣。⏎⏎六〇年代，卡拉揚與伯恩斯坦構成另外一組對比，前者是「歐洲藝術總指導」，握有柏林、維也納兩支頂尖樂團，後者則是纽约爱乐的領導。相較【於】卡拉揚精於控制的指揮風格，
+  - 0.61｜zite form (w-BN) ⏎The wurtzite form of boron nitride (w-BN; point group = C6v; space group = P63mc) has the same structure as lonsdaleite, a rare hexagonal polymorph of carbon. As【 in】 the cubic form, the boron and nitrogen atoms
+  - 0.61｜1870s by John Lawson Johnston. It is sold in a distinctive bulbous jar and as cubes and granules.  Bovril is owned and distributed by Unilever UK. Its appearance is similar to the British Marmite and its Australian equivalent Vegemite; however,【 unlike】 these products, Bovril is not vegetarian.⏎⏎
+  - 0.60｜政府机构悬挂，但通常也可被本国的公民使用。不同的国旗有着不同的样式，包括不同的长宽比例，甚至不同的形状。⏎⏎对于中国而言，近现代的“国旗”这一概念与国徽一样同属清朝中后期与欧美文化交流接轨后的舶来品。但是【与】国徽的设计与使用的不同之处在于，近代
+  - 0.59｜ of biological weapons. In contrast, defensive biological research for prophylactic, protective or other peaceful purposes is not prohibited by the BWC.⏎⏎Biological warfare is distinct from warfare involving other types of weapons of mass destruction (WMD), including nuclear warfare, chemical warfare, and radiological warfare. None【 of】 these are considered conventional weapons, which are deployed primarily
+  - 0.59｜ case it has 3 independent components, which allows us to identify it with a 3 dimensional pseudovector . The components of this vector relate to the components of the rank 2 tensor as follows:⏎⏎Analogy to linear momentum ⏎Angular momentum can be described as the rotational analog of linear momentum.【 Like】 linear momentum it involves elements of mass and displacement.
+  - 0.59｜ and chemical properties, but copper typically has the larger proportion. In use since prehistoric times, it is a substitutional alloy: atoms of the two constituents may replace each other within the same crystal structure.⏎⏎Brass is similar to bronze, another copper alloy that uses tin instead of zinc. Both bronze【 and】 brass may include small proportions of a range of other
+  - 0.58｜行。⏎⏎《晋书》的成就⏎⏎记载完备⏎唐之前的各晋史，或仅记西晋一朝史事，或虽兼记两晋史事，但对十六国史事则无专门记述。可说都非完备的晋史。与唐【之前的】各晋史相比，《晋书》的内容较为
+  - 0.58｜与电子相同，但是电量正負性与电子相反。電子與正电子會因碰撞而互相湮滅，並在這過程中，生成一對以上的光子。⏎⏎由电子與中子、质子所组成的原子，是物质的基本单位。相对于中子和质子【所】組成的原子核，电子的质量显得极
+  - 0.58｜ Potsdamer Platz railway station⏎- (German) Historical infos about Mitte⏎Media related to Mitte at Wikimedia Commons<|endoftext|>Evergreen, Shrubs, Trees⏎Conifers ranging from rock garden shrublets to timber trees. Sometimes mistaken for arborvitae (Thuja), but【 ar】borvitae’s leaves are entirely green, while
+  - 0.57｜紀年。⏎⏎朝鮮 ⏎⏎536年，朝鮮新羅君主法興王設年號“建元”，為朝鮮半島歷史上首個年號，與中國歷史上第一個年號一樣（西漢武帝的“建元”）。但【相比】日本和越南，朝鮮自立的年
+
+## M015（第 12 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每 32 页一次；语料最大激活 18.6
+- 直接读出推高：igma | bru |  Hess | 皇子 | 残 |  quadratic |  pooled | avid |  mal |  residual
+- 直接读出压低：塵 | frau | ->___ | 直升 | eko | emachine | 尘 | 清水 | 镊 |  userModel
+- 正极片段：
+  - 1.00｜可称为负凸性。从数学角度来看，久期可以近似地认为是债券价格/收益率函数的一阶导数，实际上是反映在收益率变化时债券价格变化程度的一阶线性值；债券凸性可以近似地认为是债券价格/收益率函数的二【阶】导数，实际上是反映在收益率变化时债券
+  - 0.69｜称为负凸性。从数学角度来看，久期可以近似地认为是债券价格/收益率函数的一阶导数，实际上是反映在收益率变化时债券价格变化程度的一阶线性值；债券凸性可以近似地认为是债券价格/收益率函数的二阶【导】数，实际上是反映在收益率变化时债券价格
+  - 0.68｜结论，假设某附息债券的总期限为T，每年付息次数为k，到期收益率为y，如果第t年所得的现金流为，则用各期现金流贴现后的现值之和计算出的债券理论价格为：的一阶导为:的二【阶】导为：根据泰勒公式,,若只
+  - 0.59｜的关系可称为负凸性。从数学角度来看，久期可以近似地认为是债券价格/收益率函数的一阶导数，实际上是反映在收益率变化时债券价格变化程度的一阶线性值；债券凸性可以近似地认为是债券价格/收益率函数的【二】阶导数，实际上是反映在收益率变化时
+  - 0.56｜变动时，价格上涨幅度小于下降幅度，这种债券价格与收益率的关系可称为负凸性。从数学角度来看，久期可以近似地认为是债券价格/收益率函数的一阶导数，实际上是反映在收益率变化时债券价格变化程度的一阶线性值；债券【凸】性可以近似地认为是债券价格/
+  - 0.55｜的影响远不及久期。但把久期和债券凸性结合起来，才可以更好地估算债券价格变化对收益率大幅变化的敏感性。在给定收益率变动、久期和债券凸性的情况下，债券价格对收益率变动的敏感性=-久期*Δy+债券【凸】性*（Δy）^2。经济
+  - 0.55｜认为是债券价格/收益率函数的一阶导数，实际上是反映在收益率变化时债券价格变化程度的一阶线性值；债券凸性可以近似地认为是债券价格/收益率函数的二阶导数，实际上是反映在收益率变化时债券价格额外变化的二【阶】抛物线值，这个额外变化是指基于
+  - 0.53｜债券凸性调整的债券价格对收益率变动的敏感性=债券凸性*，即没有被久期说明的债券价格变动幅度。用凸性估计的债券价格对收益率变动的敏感性是收益率变动的二次函数，当收益率上升和下降同一幅度时，【凸】性的调整作用完全相同。与久期类似
+  - 0.53｜，假设某附息债券的总期限为T，每年付息次数为k，到期收益率为y，如果第t年所得的现金流为，则用各期现金流贴现后的现值之和计算出的债券理论价格为：的一阶导为:的二阶【导】为：根据泰勒公式,,若只保留
+  - 0.53｜中国运筹学会; zh-hant:中國運籌學會;}-（ORSC），随后于1982年加入国际运筹学联合会（IFORS）。⏎⏎分支⏎数学规划⏎线性规划⏎非线性规划⏎整数规划⏎二次規劃⏎半【正】定規劃⏎目标规划⏎动态规划⏎参数
+  - 0.53｜回售债券、抵押贷款支持证券）而言，收益率的变化可能会引起预期现金流的改变，用有效久期更为合适。债券凸性能用来近似估计没有被久期反映的那部分价格变化，从经济学意义出发，债券凸性近似估计的方法为：债券【凸】性=，各字符含义与久期一致
+  - 0.52｜zh-hans:中国运筹学会; zh-hant:中國運籌學會;}-（ORSC），随后于1982年加入国际运筹学联合会（IFORS）。⏎⏎分支⏎数学规划⏎线性规划⏎非线性规划⏎整数规划⏎【二次】規劃⏎半正定規劃⏎目标规划⏎
+  - 0.51｜矩陣理論可當作線性代數的一個分支。⏎⏎在圖論，每一個加上標示圖對應唯一的非負矩陣，稱為鄰接矩陣.⏎⏎排列矩陣是排列的矩陣表達式，在組合數學極為重要。⏎⏎正【定】矩陣及半正定矩陣可用來
+  - 0.50｜法不同，在假设收益率曲线水平变动的情况下，久期/凸性法可以直接测量单只债券或投资组合的价值。其中，久期是衡量债券价格对收益率变动敏感性的近似指标，它是对于收益率变动1%时债券价格变化的近似百分比；债券【凸】性可以衡量久期对收益率变动的敏感
+  - 0.50｜式函数表示，则一个连续相位可以表示成一个足够阶数的多项式相位，而在多 时，线性调频信号能够对多项式相位信号进行很好的近似，则信号的相位有下面关系: 个信号分量。⏎利用二阶【导】数的积分可得到相位的估计。⏎
+  - 0.50｜的债券（如可赎回债券、可回售债券、抵押贷款支持证券）而言，收益率的变化可能会引起预期现金流的改变，用有效久期更为合适。债券凸性能用来近似估计没有被久期反映的那部分价格变化，从经济学意义出发，债券【凸】性近似估计的方法为：债券凸性
+  - 0.49｜ size, at some size point. If the order of growth indeed follows the power rule (and so the line on the log–log plot is indeed a straight line), the empirical value of  will  stay constant at different ranges, and if not, it will change (and the line is a【 curved】 line)—but still could serve for comparison of any
+  - 0.48｜从经济学意义出发，债券凸性近似估计的方法为：债券凸性=，各字符含义与久期一致。用债券凸性调整的债券价格对收益率变动的敏感性=债券凸性*，即没有被久期说明的债券价格变动幅度。用【凸】性估计的债券价格对收益率变动的敏感
+  - 0.48｜权债券而言，收益率的变化不会引起预期现金流的改变，修正久期有意义；对于内含选择权的债券（如可赎回债券、可回售债券、抵押贷款支持证券）而言，收益率的变化可能会引起预期现金流的改变，用有效久期更为合适。债券【凸】性能用来近似估计没有被久期反映
+  - 0.47｜运筹学会; zh-hant:中國運籌學會;}-（ORSC），随后于1982年加入国际运筹学联合会（IFORS）。⏎⏎分支⏎数学规划⏎线性规划⏎非线性规划⏎整数规划⏎二次規劃⏎半正【定】規劃⏎目标规划⏎动态规划⏎参数规划
+
+## M016（第 16 层，共 36 层）
+- 强激活频率（>10% 最大值）：约每页 3.4 次；语料最大激活 2.01
+- 直接读出推高：pan | loid | ourses | 况 |  labs | 钙 | binary | job | 竞 |  cab
+- 直接读出压低： thereof | 这两种 | 这一点 | isis | 在这方面 | 这些东西 | 这样的话 | isia | 这种情况 | 也不例外
+- 正极片段：
+  - 1.00｜门类的有关附件,主要是对课程标准中出现的一些重要术语进行解释与 说明,以便于使用者更好地理解与实施课程标准;必要的时候还要提供典型性的案例供教师参考。⏎教材是教学的材料。狭义的教材又称教科书或课本,是【依据】课程标准编制、系统反映 学科内容
+  - 0.94｜板块等三大板块互相碰撞的结果所造成的海啸波，影响到整个印度洋沿海地区目前已造成十五万多人的死亡和数百万人的流离失所。就是一个极能说明问题的例证。但并非所有的海底地震都会引发海啸，能引发海啸的【必须】是有垂直运动的逆冲构造型海底地震
+  - 0.89｜ 9, 1973, in Cape Cod, Massachusetts, Berenson, three months pregnant, married her future Remember My Name co-star Anthony Perkins. The couple raised two sons: actor-director Oz Perkins and folk/rock singer-songwriter Elvis Perkins. They remained married until Perkins died【 from】 AIDS-related complications on September 12, 
+  - 0.87｜ & Resources⏎Spotter Guide⏎JetPhotos (part of the Flightradar24)⏎Planespotters.net⏎Spotters.Aero (Ukrainian Spotter's Site)⏎⏎Aviation photography⏎Observation hobbies<|endoftext|>Advertising is the practice and techniques employed to bring attention【 to】 a product or service. Advertising aims to put a
+  - 0.85｜ million people become infected with bacteria that are resistant to antibiotics and at least 35,000 people die and US$55 billion is spent on increased health care costs and lost productivity. According to World Health Organization (WHO) estimates, 350 million deaths could be caused【 by】 AMR by 2050. By
+  - 0.84｜ suffered a stroke in 1993, during a game of tennis. The stroke weakened him and left him in a wheelchair. On November 25, 1994, he stepped down as Sony chairman. On October 3, 1999, Morita died【 of】 pneumonia at the age of 78 in a
+  - 0.83｜特定的參考系就是慣性參考系，通過做實驗可以找到無限數量的這種慣性參考系。從任何其它種參考系觀測，都無法達成接軌的目標。更具體而言，只有從慣性參考系才可觀測【到】不受力物体的運動速度不變。⏎⏎愛
+  - 0.82｜ "Chinese-American cuisine is 'dumbed-down' Chinese food. It's adapted... to be blander, thicker and sweeter for the American public".⏎⏎Most American Chinese establishments cater to non-Chinese customers with menus written in English or containing pictures. If separate Chinese-language menus are available, they typically【 feature】 items such as liver, chicken feet, or other
+  - 0.81｜ be British long-distance runner Fred Norris. The host, Bud Collyer, acknowledged Norman's writing career by letting the audience know his prize-winning play Fings Ain't Wot They Used T'Be had been playing in London's West End for 14 months.⏎⏎Death⏎Frank Norman died【 of】 Hodgkin's lymphoma aged 50,
+  - 0.79｜ and though this specifically referred to his training of the Chorus in rehearsal, it also covered his relationship with the audience as a commentator on significant issues.⏎⏎Aristophanes claimed to be writing for a clever and discerning audience, yet he also declared that "other times" would judge the audience according【 to】 its reception of his plays. He sometimes boasts of
+  - 0.79｜ even cause the death of the fetus. Exposure of pregnant women to mercury, lowers birth weight and can cause severe brain damage in children. While developmental toxicity usually results from prenatal exposures to toxicants experienced by the⏎mother, it can also result from paternal exposures. For example, the occupational exposure of men【 to】 vinyl chloride has been associated with increased rates of spontaneous
+  - 0.79｜ blacken.⏎2. Brit.to boycott or ban.⏎3. to polish (shoes, boots, etc.) with blacking.⏎1. to become black; take on a black color; blacken.⏎2. black out,⏎a. to lose consciousness: He blacked out at the sight【 of】 blood.⏎b. to erase, obliterate,
+  - 0.78｜ support. It is the most widely produced precision-guided missile in the Western world, and is effective against a wide range of tactical targets, including armor, air defenses, ships, ground transportation and fuel storage facilities.⏎⏎Development began in 1966 at Hughes Aircraft Company as the first missile to【 use】 an electronic contrast seeker. It entered service with the
+  - 0.78｜20 grains per hour. Germany, Austria and Scandinavia used the Hefnerkerze, a unit based on the output of a Hefner lamp.⏎⏎A better standard for luminous intensity was needed. In 1884, Jules Violle had proposed a standard【 based】 on the light emitted by 1 cm2
+  - 0.78｜:是实施危害社会的行为，依法应当负刑事责任的自然人和单位。⏎19.犯罪主观方面:是指犯罪主体对自己的行为及其危害社会的结果所报的心理态度。⏎20.犯罪故意:故意犯罪的主观心理态度。⏎22.犯罪目的:行为人希望通过【实施】犯罪行为达到某种危害社会结果的心理态度。⏎
+  - 0.77｜革和名人軼事。此外还有“孙权筑城”、“周瑜设宴”等壁画。第三层大厅内是“绣画像”壁画，描绘了中国古代诗人李白、白居易、陆游、岳飞等人的形像，摘录了他们吟【咏】黄鹤楼的名句。现在的黄鹤
+  - 0.77｜ to a model of emotional regulation developed by Stanford’s James Gross and Ross A. Thompson of University of California Davis:⏎- Situation selection – Entering the situation that elicited emotion⏎- Situation modification – Trying to change the event that elicited the emotion⏎- Distraction – Attempting to distract attention【 from】 the emotional situation⏎- Rumination – Continued thinking
+  - 0.77｜、有害的非食品原料的食品的行为。《刑法》规定，该罪为行为犯，在主观方面只能由故意构成。也就是说，只要行为人出于故意实施了在所生产、销售的食品中掺入有毒、有害的非食品原料的行为，或者明知是掺【有】有毒、有害物质的食品仍然予以销售的行为
+  - 0.77｜德 克巴莱吧，我会在彩虹桥的另一端“祖灵之家”等着你们凯旋团聚。⏎无论这一段是因为莫那鲁道心中的纠结长久未能得到化解，再加上对父亲 (父亲的形象象征着叙事语言开头“过去的人们”，也即过去【没有】被FI本 占领时的马赫
+  - 0.77｜1 U.S. vaccination campaign that also covertly collected DNA in order to try to locate Osama Bin Laden.⏎Before the C.I.A.’s involvement was discovered, the Taliban was in support of the vaccinations and allowed health workers to reach children in safety. Now Bahadur is refusing to allow vaccinations【 until】 the U.S. discontinues drone strikes in Pakistan
