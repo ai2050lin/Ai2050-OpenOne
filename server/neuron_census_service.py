@@ -281,6 +281,33 @@ def unit_attribution(model_key: str, block: int, unit: int) -> List[Dict[str, An
     return out
 
 
+@lru_cache(maxsize=4)
+def _layer_trigger(path: str, stamp: float) -> Dict[str, Any]:
+    d = json.loads(Path(path).read_text(encoding='utf-8'))
+    return {'d': d, 'rows': {r['unit']: r for r in d.get('rows', [])}}
+
+
+def unit_trigger(model_key: str, block: int, unit: int) -> List[Dict[str, Any]]:
+    """触发点消融（L<b>-v*-trigger.json，layer_trigger.v1）：单元在命中众数 token 且前 1% 激活的位置被换成均值。"""
+    out = []
+    for f in sorted((research_root() / 'neurons').glob(f'L{block}-v*-trigger.json'), reverse=True):
+        t = _layer_trigger(str(f), f.stat().st_mtime)
+        r = t['rows'].get(unit)
+        if not r:
+            continue
+        d = t['d']
+        rec = {'prereg': d.get('prereg'), 'prereg_sha256': d.get('prereg_sha256'), 'n_trigger': r.get('n_trigger'), 'n_R': r.get('n_R'),
+               'q99': r.get('q99'), 'dlogp_promote': r.get('dlogp_promote'),
+               'primary_verdict': d['primary']['verdict'], 'secondary_verdict': d['secondary']['verdict'],
+               'note': '触发点 = 命中正极众数 token 且激活位于本单元前 1%；R = 其中下一个 token 属于读出前 10 的位置'}
+        for k in ('d_R', 'p_R', 'sig_p_R', 'ctrl_d_R', 'd_T', 'p_T', 'sig_p_T', 'ctrl_d_T'):
+            if k in r:
+                rec[k] = r[k]
+        out.append(rec)
+        break
+    return out
+
+
 # ---------------- 解释检验（EXPL-v1 / EXPL-v2） ----------------
 
 EXPL_RUNS = (('EXPL-v1', 'EXPL-v1-results.json'), ('EXPL-v2', 'EXPL-v2-results.json'))
@@ -423,6 +450,7 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
         'template_selectivity': [rec for r in selectivity_runs(model_key) for rec in unit_selectivity(r, block, unit)],
         'interventions': unit_interventions(model_key, block, unit),
         'attribution': unit_attribution(model_key, block, unit),
+        'trigger': unit_trigger(model_key, block, unit),
         'caveats': ['极值片段天然有选择偏差：它们是 top / bottom-k，不代表典型激活',
                     '语料以教育筛选网页与百科为主（中英），不含对话、代码与广告页',
                     '读出 token 只是直接通路近似'],
@@ -433,7 +461,10 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
     control = ('范围内干预（组级，20 单元一起替换）' if any(r.get('causal_use_in_scope') == '是' for r in iv)
                else ('组级干预未通过' if iv else '未检验'))
     att = card['attribution']
-    if control == '未检验' and att:
+    trg = card['trigger']
+    if control == '未检验' and trg and trg[0].get('sig_p_R') and trg[0]['primary_verdict'] == '支持':
+        control = f"触发点均值消融（{trg[0]['prereg']}：读出为答案的位置损失 +{trg[0]['d_R']:.3f} nats）"
+    elif control == '未检验' and att:
         ta = att[0].get('true_ablation')
         control = (f"单元级均值消融（{att[0]['prereg']}，|z|>2）" if ta and abs(ta.get('z') or 0) > 2
                    else f"一阶归因排序 #{att[0]['rank']}（{att[0]['prereg']}）")

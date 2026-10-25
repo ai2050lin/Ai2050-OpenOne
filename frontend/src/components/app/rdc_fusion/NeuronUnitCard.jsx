@@ -205,6 +205,22 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
               <div className="nu-note">{r.note}</div>
             </div>
           ))}
+          {(data.trigger || []).map((r, i) => (
+            <div key={`t${i}`} className="nu-expl">
+              <div className="nu-expl-head">
+                <span className="nu-mono" title={r.prereg_sha256}>{r.prereg}</span>
+                <span>触发点消融：{r.n_trigger} 个触发位置，其中 {r.n_R} 个的下一 token 属于读出</span>
+                <span className="nu-note">主检验（整体）{r.primary_verdict} · 第二检验 {r.secondary_verdict}</span>
+              </div>
+              <div className="nu-stats">
+                {r.d_R != null && <span>读出为答案的位置：损失 <b>{r.d_R > 0 ? '+' : ''}{fmtNum(r.d_R, 3)}</b> nats（p = {fmtNum(r.p_R, 4)}{r.sig_p_R ? '，BH 显著' : ''}；替换单元对照 {fmtNum(r.ctrl_d_R, 4)}）</span>}
+                {r.d_T != null && <span>全部触发位置：{fmtNum(r.d_T, 4)}（p = {fmtNum(r.p_T, 3)}）</span>}
+                {r.dlogp_promote != null && <span>读出 token 对数概率 {fmtNum(r.dlogp_promote, 3)}</span>}
+                {r.d_R == null && r.d_T == null && <span className="nu-note">样本不足，未检验</span>}
+              </div>
+              <div className="nu-note">{r.note}</div>
+            </div>
+          ))}
         </section>
       )}
 
