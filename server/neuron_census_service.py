@@ -237,6 +237,50 @@ def unit_interventions(model_key: str, block: int, unit: int) -> List[Dict[str, 
     return out
 
 
+# ---------------- 单层因果归因（L<b>-v*：fp32 一阶归因 + 真实消融 + 条件化消融） ----------------
+
+@lru_cache(maxsize=4)
+def _layer_attr(path: str, stamp: float) -> Dict[str, Any]:
+    d = json.loads(Path(path).read_text(encoding='utf-8'))
+    tot = np.array([u['total'] for u in d['units']])
+    rank = np.empty(len(tot), dtype=np.int64)
+    rank[np.argsort(-np.abs(tot))] = np.arange(1, len(tot) + 1)
+    rows = {r['unit']: r for r in d['validation']['rows']}
+    cond = {}
+    cp = Path(path).with_name(Path(path).name.replace('-attribution.json', '-conditional.json'))
+    if cp.is_file():
+        c = json.loads(cp.read_text(encoding='utf-8'))
+        cond = {'verdict': c.get('verdict'), 'rows': {r['unit']: r for r in c.get('rows', [])}}
+    return {'d': d, 'rank': rank, 'rows': rows, 'cond': cond}
+
+
+def unit_attribution(model_key: str, block: int, unit: int) -> List[Dict[str, Any]]:
+    """只读通过预注册验证、可公开排序的运行（publish_ranking = true）；同一层取版本最高者。"""
+    out = []
+    files = sorted((research_root() / 'neurons').glob(f'L{block}-v*-attribution.json'),
+                   key=lambda q: int(q.name.split('-v')[1].split('-')[0]))
+    for f in reversed(files):
+        a = _layer_attr(str(f), f.stat().st_mtime)
+        d = a['d']
+        if d.get('model_key') != model_key or not d.get('publish_ranking') or unit >= len(d['units']):
+            continue
+        u = d['units'][unit]
+        rec = {'prereg': d.get('prereg'), 'prereg_sha256': d.get('prereg_sha256'), 'total': u['total'], 'direct': u['direct'],
+               'indirect': u['indirect'], 'magnitude': u['magnitude'], 'rank': int(a['rank'][unit]), 'n_units': len(d['units']),
+               'validation_verdict': d['validation']['verdict'],
+               'note': '均值消融的一阶估计（fp32，普查语料）：正值 = 把该单元换成均值会使下一 token 损失上升'}
+        r = a['rows'].get(unit)
+        if r:
+            rec['true_ablation'] = {'delta': r['true_delta'], 'z': r.get('z'), 'set': r['set']}
+        c = a['cond'].get('rows', {}).get(unit) if a['cond'] else None
+        if c:
+            rec['conditional'] = {k: c.get(k) for k in ('n_fire', 'local_mean', 'p_local', 'sig_local', 'dlogp_promote', 'global')}
+            rec['conditional']['run_verdict'] = a['cond'].get('verdict')
+        out.append(rec)
+        break
+    return out
+
+
 # ---------------- 解释检验（EXPL-v1 / EXPL-v2） ----------------
 
 EXPL_RUNS = (('EXPL-v1', 'EXPL-v1-results.json'), ('EXPL-v2', 'EXPL-v2-results.json'))
@@ -378,6 +422,7 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
                    'excluded': f"每个 {man['seq_len']} token 窗口的前 {man['skip_head']} 个位置与文档分隔符不计入"},
         'template_selectivity': [rec for r in selectivity_runs(model_key) for rec in unit_selectivity(r, block, unit)],
         'interventions': unit_interventions(model_key, block, unit),
+        'attribution': unit_attribution(model_key, block, unit),
         'caveats': ['极值片段天然有选择偏差：它们是 top / bottom-k，不代表典型激活',
                     '语料以教育筛选网页与百科为主（中英），不含对话、代码与广告页',
                     '读出 token 只是直接通路近似'],
@@ -387,6 +432,11 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
     iv = card['interventions']
     control = ('范围内干预（组级，20 单元一起替换）' if any(r.get('causal_use_in_scope') == '是' for r in iv)
                else ('组级干预未通过' if iv else '未检验'))
+    att = card['attribution']
+    if control == '未检验' and att:
+        ta = att[0].get('true_ablation')
+        control = (f"单元级均值消融（{att[0]['prereg']}，|z|>2）" if ta and abs(ta.get('z') or 0) > 2
+                   else f"一阶归因排序 #{att[0]['rank']}（{att[0]['prereg']}）")
     card['explanations'] = expl_index().get((model_key, block, unit), [])
     card['evidence_axes'] = {'read': read, 'control': control, 'explain': explain_axis(card['explanations'])}
     return card

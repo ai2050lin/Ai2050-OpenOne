@@ -177,6 +177,37 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
         )}
       </section>
 
+      {(data.attribution || []).length > 0 && (
+        <section className="nu-sec">
+          <h4>因果归因（控制轴 · 自然语料）</h4>
+          {data.attribution.map((r, i) => (
+            <div key={i} className="nu-expl">
+              <div className="nu-expl-head">
+                <span className="nu-mono" title={r.prereg_sha256}>{r.prereg}</span>
+                <span>本层排序 <b>#{r.rank}</b> / {r.n_units}（按 |ΔL̂|）</span>
+                <span className="nu-note">{r.validation_verdict}</span>
+              </div>
+              <div className="nu-stats">
+                <span>ΔL̂ 总 <b>{fmtNum(r.total * 1e4)}</b>×10⁻⁴</span>
+                <span>直接 {fmtNum(r.direct * 1e4)}×10⁻⁴</span>
+                <span>经后续层 {fmtNum(r.indirect * 1e4)}×10⁻⁴</span>
+                <span>逐位置幅度 {fmtNum(r.magnitude * 1e4)}×10⁻⁴</span>
+              </div>
+              {r.true_ablation && (
+                <div className="nu-note">真实均值消融：ΔL = {fmtNum(r.true_ablation.delta * 1e4)}×10⁻⁴ nats（噪声底 z = {fmtNum(r.true_ablation.z, 1)}）</div>
+              )}
+              {r.conditional && (
+                <div className="nu-note">
+                  触发位置消融（{r.conditional.n_fire} 个位置）：局部损失变化均值 {fmtNum(r.conditional.local_mean * 1e3)}×10⁻³，
+                  读出 token 对数概率变化 {fmtNum(r.conditional.dlogp_promote, 3)}，局部检验{r.conditional.sig_local ? '显著' : '不显著'}（整体判定：{r.conditional.run_verdict}）
+                </div>
+              )}
+              <div className="nu-note">{r.note}</div>
+            </div>
+          ))}
+        </section>
+      )}
+
       <footer className="nu-sec nu-caveats">
         {data.caveats.map((t, i) => <div key={i}>· {t}</div>)}
       </footer>
