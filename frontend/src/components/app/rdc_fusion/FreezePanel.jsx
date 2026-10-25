@@ -2,7 +2,7 @@
    看逐格 top-1 准确率；达标后冻结「正式模板」（完整语料 + 分片）。冻结需管理令牌。
    冻结 = 语料与 runner 写入 design_sha，之后不可变；文法改动后重新冻结会升 version。 */
 import { useState } from 'react';
-import { postJson, useAdminToken, useApi } from './api.js';
+import { API_BASE, postJson, useAdminToken, useApi } from './api.js';
 import { AdminTokenField, Card, Empty, GateChain, StatusPill } from './ui.jsx';
 
 function CopyCommand({ cmd }) {
@@ -19,10 +19,11 @@ function CopyCommand({ cmd }) {
 }
 
 export function NodeCommand() {
-  const cmd = 'python deploy/node_agent.py --server http://<center>:5010 run --once --model-path <HF模型目录> --model-id <model_id> --model-rev <快照> --dtype bf16';
+  const center = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
+  const cmd = `python node_agent.py --server ${center} run --once --tm-id <题目 tm_id> --model-path <HF模型目录> --model-id <model_id> --dtype bf16`;
   return (
     <div className="v6-node-cmd">
-      <small>在 GPU 节点执行（先 register 一次）；中心按「最少完成次数」分配分片，节点把 runner 的 suffstats / behavior / canary 回传：</small>
+      <small>一般用一键包（首页「参与」）自动领取；只跑某个模板时，在一键包解压目录执行。中心按「最少完成次数」分配分片，节点回传 suffstats / behavior / canary：</small>
       <CopyCommand cmd={cmd} />
     </div>
   );

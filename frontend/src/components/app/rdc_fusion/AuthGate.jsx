@@ -58,7 +58,7 @@ function AuthScreen({ info, offlineError, onRetry, onDone }) {
         {offlineError && (
           <div className="v6-auth-offline" role="alert">
             <b>连不上中心服务</b>
-            <span>{API_BASE} · {offlineError}。确认后端（server.server，默认 :5001）已启动后重试。</span>
+            <span>{API_BASE} · {offlineError}。请检查网络或稍后重试。</span>
             <button type="button" className="fw-tbtn" onClick={onRetry}>重试连接</button>
           </div>
         )}

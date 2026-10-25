@@ -40,7 +40,7 @@ function Shell() {
         </nav>
         <div className="op-top-right">
           {config?.sandbox_synthetic && <span className="op-sandbox" title="该中心允许合成数据，只用于流程验证">合成·沙盒</span>}
-          <a className="op-link" href="/workbench" title="完整研究工作台：模板工作室、实验响应、审计、自动测试（含开发中的示意视图）">研究工作台 ↗</a>
+          <a className="op-link" href="/workbench" title="研究工作台：题库、模板工作室、试跑与冻结、实验响应、审计、普查作业、证据门链">研究工作台 ↗</a>
           <AccountMenu />
         </div>
       </header>

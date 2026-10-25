@@ -13,6 +13,7 @@
   AI2050_PUBLIC_URL          对外地址（写进参与者一键包）
   AI2050_REGISTRATION        open / closed
   AI2050_FRONTEND_DIST       客户端构建目录（缺省 <repo>/frontend/dist）
+  AI2050_LOCAL_TOOLS         1 = 本机中心，开放读取本机模型权重与下载模型的工具端点（公开中心不要设置）
 """
 from __future__ import annotations
 
@@ -22,6 +23,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# 只适合在研究者自己机器上用的端点：读取本机模型权重、下载模型
+LOCAL_TOOL_PREFIXES = ('/api/live/', '/api/models/')
 REPO = HERE.parent
 for p in (str(REPO), str(HERE)):
     if p not in sys.path:
@@ -41,6 +44,20 @@ def create_app():
     app = FastAPI(title='AI2050 Open LLM Reverse-Engineering Platform', version=platform_service.PLATFORM_VERSION)
     origins = [o.strip() for o in os.environ.get('AI2050_CORS_ORIGINS', '*').split(',') if o.strip()]
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=['*'], allow_headers=['*'])
+    local_tools = os.environ.get('AI2050_LOCAL_TOOLS') == '1'
+
+    @app.middleware('http')
+    async def guard_local_tools(request, call_next):
+        """本机工具（读取服务器上的模型权重、让服务器下载模型）只在本机中心（AI2050_LOCAL_TOOLS=1）开放；
+        公开中心上需要管理令牌，避免任何访客读取服务器目录或触发大文件下载。"""
+        path = request.url.path
+        if not local_tools and request.method != 'OPTIONS' and path.startswith(LOCAL_TOOL_PREFIXES):
+            try:
+                distributed_service._auth_admin(request.headers.get('x-admin-token', ''))
+            except Exception:
+                return JSONResponse({'detail': '本机工具：公开中心未开放（需要管理令牌）'}, status_code=403)
+        return await call_next(request)
+
     app.include_router(distributed_service.router)
     app.include_router(census_service.router)
     app.include_router(platform_service.router)

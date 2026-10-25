@@ -12,7 +12,7 @@ export async function getJson(path, { signal } = {}) {
     response = await fetch(`${API_BASE}${path}`, { signal, cache: 'no-store' });
   } catch (reason) {
     if (reason?.name === 'AbortError') throw reason;
-    throw new Error('中心服务不可达（后端未启动？）');
+    throw new Error('中心服务暂时无法连接，请稍后重试');
   }
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(detailText(body.detail) || `HTTP ${response.status}`);
@@ -26,7 +26,7 @@ export async function postJson(path, payload, { adminToken, method = 'POST' } = 
   try {
     response = await fetch(`${API_BASE}${path}`, { method, headers, body: JSON.stringify(payload ?? {}) });
   } catch {
-    throw new Error('中心服务不可达（后端未启动？）');
+    throw new Error('中心服务暂时无法连接，请稍后重试');
   }
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -73,6 +73,15 @@ export function useApi(path, { interval = 0 } = {}) {
   };
 }
 
+/* 中心后台快照（/api/platform/snapshot/<name>）：合并全部模板、谱图等重计算端点由中心定时算好，公开页面只读快照。
+   返回与 useApi 相同的形状；快照尚未算完时 loading 为 true。 */
+export function useSnapshot(name, { interval = 0 } = {}) {
+  const r = useApi(name ? `/api/platform/snapshot/${name}` : null, { interval: interval || 0 });
+  const pending = Boolean(r.data?.pending);
+  return { data: pending ? null : (r.data?.data ?? null), error: r.error || r.data?.error || '', loading: r.loading || pending,
+           computedAt: r.data?.computed_at, reload: r.reload };
+}
+
 /* 账号会话（accounts.v1）：登录后令牌存在 localStorage，再次打开客户端直接进入主界面；退出登录即清除。
    令牌只随 /api/auth/* 请求以 Authorization 头发送（普通读取不带，避免每个 GET 都触发预检）；
    管理员账号的会话同时可作为写操作的管理令牌。 */
@@ -111,7 +120,7 @@ export async function authJson(path, { method = 'GET', body } = {}) {
   try {
     response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', body: body === undefined ? undefined : JSON.stringify(body) });
   } catch {
-    const error = new Error('中心服务不可达（后端未启动？）');
+    const error = new Error('中心服务暂时无法连接，请稍后重试');
     error.offline = true;
     throw error;
   }

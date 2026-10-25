@@ -1,11 +1,39 @@
-/* 研发 · ③ 分发与节点：生成式模板的分片覆盖 + 节点命令 + 平台执行监控（PlatformOps）
-   + Research OS Work Unit 执行链（DistributedPuzzlePipeline，原在路线页）。 */
+/* 研发 · ③ 分发与节点：生成式模板的分片覆盖 + 节点命令 + 节点与租约（/api/distributed/summary、/api/tasks，只显示实时数据）。 */
 import { useState } from 'react';
-import { useApi } from './api.js';
+import { fmtAgoTs, useApi } from './api.js';
 import { Card, Empty, StatusPill } from './ui.jsx';
-import PlatformOps from './PlatformOps.jsx';
-import DistributedPuzzlePipeline from './DistributedPuzzlePipeline.jsx';
 import { NodeCommand } from './FreezePanel.jsx';
+
+function NodesAndLeases() {
+  const summary = useApi('/api/distributed/summary', { interval: 30000 });
+  const tasks = useApi('/api/tasks', { interval: 30000 });
+  const s = summary.data;
+  const t = tasks.data;
+  return (
+    <>
+      <Card title="节点" sub={s ? `在线 ${s.nodes_online} / 全部 ${s.nodes_total}（10 分钟内有心跳算在线）` : ''}>
+        {!s && <Empty>{summary.error ? `节点信息不可用（${summary.error}）` : '读取…'}</Empty>}
+        {s && !s.nodes.length && <Empty>当前没有在线节点。</Empty>}
+        {s?.nodes.map(n => (
+          <div key={n.node_id} className="v6-node-row">
+            <b>{n.name}</b><span className="mono">{n.node_id}</span><span>{n.gpu || '—'}</span><span>{fmtAgoTs(n.last_seen)}</span>
+          </div>
+        ))}
+      </Card>
+      <Card title="租约" sub={t ? `单个租约 ${t.lease_hours} 小时；过期未完成的分片会重新派发` : ''}>
+        {!t && <Empty>{tasks.error ? `调度信息不可用（${tasks.error}）` : '读取…'}</Empty>}
+        {t && (
+          <ul className="v6-health">
+            {Object.entries(t.stats).map(([k, v]) => <li key={k}><span>{{ done: '完成', failed: '失败', expired: '过期', claimed: '执行中' }[k] || k}</span><b>{v}</b></li>)}
+          </ul>
+        )}
+        {t?.active?.length > 0 && t.active.map(a => (
+          <div key={a.task_id} className="v6-node-row"><span className="mono">{a.task_id}</span><span>{a.tm_id}</span><span>{a.node_name || '?'}</span></div>
+        ))}
+      </Card>
+    </>
+  );
+}
 
 function ShardCoverage({ tm }) {
   const report = useApi(tm ? `/api/grammar/${encodeURIComponent(tm)}/report` : null, { interval: 20000 });
@@ -51,12 +79,9 @@ export default function DispatchPanel({ onGo }) {
           {tm && <ShardCoverage tm={tm} />}
           <NodeCommand />
         </Card>
-        <Card title="Research OS 执行链" sub="合同 → Work Unit → Worker → 产物审计">
-          <DistributedPuzzlePipeline onShowResults={() => onGo('audit')} />
-        </Card>
       </div>
       <aside className="v6-dispatch-side">
-        <PlatformOps onOpenDist={() => onGo('audit')} />
+        <NodesAndLeases />
       </aside>
     </div>
   );

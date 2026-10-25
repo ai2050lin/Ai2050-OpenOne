@@ -3,7 +3,7 @@
 
   GET /api/platform/config          公开：站点配置（标题、注册方式、开放的任务类型、所需模型、数据许可）
   GET /api/platform/overview        公开：研究进展快照（模式族、谱图、神经元普查与解释、节点、贡献者），后台定时刷新
-  GET /api/platform/snapshot/{name} 公开：重计算端点的缓存副本（pipeline_overview / atlas / coverage / catalog）
+  GET /api/platform/snapshot/{name} 公开：重计算端点的缓存副本（pipeline_overview / scoreboard / atlas / coverage / catalog）
   GET /api/platform/contributors    公开：按账号统计的贡献（只显示显示名）
   GET /api/platform/kit             参与者一键包（zip）：节点程序、启动脚本、配置（不带绑定码）
   GET /api/auth/kit                 登录用户的一键包：内嵌一次性节点绑定码（7 天），节点自动归属该账号
@@ -46,6 +46,7 @@ def _builders() -> Dict[str, Callable[[], Any]]:
         'coverage': D.coverage_matrix,
         'catalog': D.api_catalog,
         'atlas': lambda: D.api_atlas(model='', gate=True),
+        'scoreboard': D.scoreboard,
         'overview': build_overview,
     }
 
@@ -69,7 +70,7 @@ def _loop() -> None:
             CS.auto_merge()                              # 普查：新完成的切片并入单元卡
         except Exception as exc:
             print(f'[platform] census auto merge: {exc}', flush=True)
-        for name in ('overview', 'catalog', 'coverage', 'pipeline_overview', 'atlas'):
+        for name in ('overview', 'catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
             _refresh_one(name)
         time.sleep(REFRESH_SECONDS)
 
@@ -88,7 +89,7 @@ def snapshot(name: str) -> Dict[str, Any]:
     with _snap_lock:
         s = _snap.get(name)
     if s is None or s.get('data') is None:
-        if name in ('overview', 'catalog', 'coverage'):      # 轻量项：首次请求同步计算
+        if name in ('overview', 'catalog'):                  # 轻量项：首次请求同步计算（coverage 要合并模板，走后台）
             _refresh_one(name)
             with _snap_lock:
                 s = _snap.get(name)
@@ -153,6 +154,7 @@ def config(request: Request) -> dict:
         'census_jobs': jobs,
         'models': models,
         'sandbox_synthetic': os.environ.get('AI2050_DIST_ALLOW_SYNTHETIC') == '1',
+        'local_tools': os.environ.get('AI2050_LOCAL_TOOLS') == '1',   # 本机中心：工作台显示自动测试与模型资产
         'public_scope': ['模式族合并结果', '语言谱图', '神经元单元卡（普查摘要、两极片段、解释等级）', '干预与解释检验结果', '预注册文件'],
         'not_public': ['研究记录（memo）', '节点本地原生全场'],
     }

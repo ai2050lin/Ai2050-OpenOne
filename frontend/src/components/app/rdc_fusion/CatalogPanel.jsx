@@ -3,7 +3,8 @@
    动作：复制领题命令（本地 GPU 测试后回传）、加入自动测试、在空间查看、下载研究包（respack.v1）。
    「已完成」只描述数据（至少一个模型桶分片齐全可合并），不是证据等级。 */
 import { useMemo, useState } from 'react';
-import { API_BASE, authJson, fmtAgoTs, useApi } from './api.js';
+import { API_BASE, fmtAgoTs, useApi } from './api.js';
+import { downloadKit } from '../../open/openUtil.js';
 import { useAuth } from './authContext.js';
 import { STATUS_META, STATUS_ORDER, claimCommand, packFile, packUrl } from './catalogUtil.js';
 import { Card, Empty, SourceTag, StatusPill } from './ui.jsx';
@@ -77,30 +78,33 @@ function ItemCard({ item, onGo, onAutotest, onStudio }) {
 }
 
 export function ParticipateSteps({ compact = false }) {
-  const { user, guest } = useAuth();
-  const canBind = Boolean(user) && !guest;   // 访客没有会话，生成绑定码会 401，先隐藏入口
-  const [code, setCode] = useState(null);
+  const { user, guest, enterAuth } = useAuth();
+  const loggedIn = Boolean(user) && !guest;
   const [err, setErr] = useState('');
-  const makeCode = async () => {
-    setErr('');
-    try { setCode(await authJson('/api/auth/node-code', { method: 'POST' })); } catch (e) { setErr(e.message); }
+  const [busy, setBusy] = useState(false);
+  const center = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
+  const get = async () => {
+    setErr(''); setBusy(true);
+    try { await downloadKit(loggedIn); } catch (e) { setErr(e.message); }
+    setBusy(false);
   };
-  const bind = code ? ` --bind-code ${code.code}` : '';
-  const reg = `python deploy/node_agent.py --server ${API_BASE} register --name <你的节点名> --gpu "<显卡>"${bind}`;
-  const run = `python deploy/node_agent.py --server ${API_BASE} run --once --tm-id <题目 tm_id> --model-path <本机HF模型目录> --model-id <model_id> --dtype bf16`;
+  const run = `python node_agent.py participate --config config.json --once`;
+  const one = `python node_agent.py --server ${center} run --once --tm-id <题目 tm_id> --model-path <本机HF模型目录> --model-id <model_id> --dtype bf16`;
   return (
     <ol className={'v6-steps-list' + (compact ? ' compact' : '')}>
-      <li><b>注册节点</b>
-        <span>一次即可，节点令牌保存在本机。{canBind ? '先生成绑定码，节点会归属你的账号（贡献者署名、在账号菜单「我的节点」查看）。' : '登录后可生成绑定码，节点会归属你的账号。'}</span>
-        {canBind && (
-          <span className="v6-bind">
-            <button type="button" className="fw-tbtn" onClick={makeCode}>{code ? '重新生成绑定码' : '生成绑定码'}</button>
-            {code && <small>绑定码 <b className="mono">{code.code}</b> · {Math.round(code.expires_in / 60)} 分钟内有效 · 只能用一次</small>}
-            {err && <small className="warn">{err}</small>}
-          </span>
-        )}
-        <div className="v6-cmd"><code>{reg}</code><CopyButton text={reg} /></div></li>
-      <li><b>领题并在本地运行</b><span>在题库中选一个题目的 tm_id；节点领取一个分片，在本机 GPU 上跑 runner，自动回传充分统计量。</span><div className="v6-cmd"><code>{run}</code><CopyButton text={run} /></div></li>
+      <li><b>下载一键包</b>
+        <span>{loggedIn ? '包里内嵌一次性绑定码，节点注册后自动署名到你的账号。' : '登录后下载，贡献会署名到你的账号；也可以匿名下载。'}</span>
+        <span className="v6-bind">
+          <button type="button" className="fw-tbtn primary" disabled={busy} onClick={get}>{busy ? '准备中…' : loggedIn ? '下载一键包（绑定我的账号）' : '匿名下载一键包'}</button>
+          {!loggedIn && enterAuth && <button type="button" className="fw-tbtn" onClick={enterAuth}>登录 / 注册</button>}
+          {err && <small className="warn">{err}</small>}
+        </span></li>
+      <li><b>解压并运行</b><span>Windows 双击 start_windows.bat，Linux 运行 bash start_linux.sh；程序核对模型快照后自动领取「普查分片 / 模式族测试」、运行并上传。只跑一轮：</span>
+        <div className="v6-cmd"><code>{run}</code><CopyButton text={run} /></div></li>
+      {!compact && (
+        <li><b>只跑指定题目（高级）</b><span>在解压目录中用节点程序领取某个题目的分片：</span>
+          <div className="v6-cmd"><code>{one}</code><CopyButton text={one} /></div></li>
+      )}
       <li><b>回传后</b><span>结果经自动检查与审计后进入合并；分片齐全即可在 空间 · 实验响应 查看 3D，或下载研究包到本地。</span></li>
     </ol>
   );

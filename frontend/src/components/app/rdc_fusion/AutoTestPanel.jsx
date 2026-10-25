@@ -199,7 +199,7 @@ export default function AutoTestPanel({ onGo, onStation, presetFamilies }) {
   const viewResult = job => onGo && onGo('spatial', null, undefined, { tm: job.tm_id, bucket: job.bucket });
 
   if (!st) {
-    return <Empty>{state.error ? `中心服务未接入（${state.error}）。自动测试需要后端 server.server（:5001）或独立中心服务。` : '读取自动测试状态…'}</Empty>;
+    return <Empty>{state.error ? `中心服务未接入（${state.error}）。自动测试只在研究者本机的中心上可用。` : '读取自动测试状态…'}</Empty>;
   }
 
   return (

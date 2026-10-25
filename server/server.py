@@ -61,6 +61,7 @@ from server.object_card_service import router as object_card_router
 from server.neuron_census_service import router as neuron_census_router
 # 分布式平台中心节点路由：本体在 deploy/distributed_service.py（deploy/ 不入 git）。
 # deploy/ 存在则挂载（本机/部署机）；公开仓库 fresh clone 无 deploy/ 时自动跳过，主后端照常启动。
+os.environ.setdefault("AI2050_LOCAL_TOOLS", "1")   # 本机研究后端：开放读取本机模型与下载模型的工具
 _deploy_dir = os.path.join(root_dir, "deploy")
 if _deploy_dir not in sys.path:
     sys.path.insert(1, _deploy_dir)

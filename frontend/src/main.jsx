@@ -10,8 +10,8 @@ import AuthGate from './components/app/rdc_fusion/AuthGate.jsx'
 /* 其余入口按需加载：新人打开首页不下载工作台、旧版 3D 界面与专项页的代码。 */
 // 旧版 3D 主界面 —— 归档为 /legacy（原样保留、无入口链接）
 const App = lazy(() => import('./App.jsx'))
-// 研究工作台（/workbench，旧入口 /rdc-fusion 等价；URL 即状态 ?lens ?obj ?atlasTab）
-const RdcFusionWorkspace = lazy(() => import('./components/app/RdcFusionWorkspace.jsx'))
+// 研究工作台 v6（/workbench，旧入口 /rdc-fusion 等价；URL 即状态 ?lens ?view ?station ?tm）
+const Workbench = lazy(() => import('./components/app/Workbench.jsx'))
 // rdc-* 专项页统一壳（P2 收敛：页头含返回工作台；目录见图谱透镜「专项视图」tab）
 const RdcPageShell = lazy(() => import('./components/app/RdcPageShell.jsx'))
 
@@ -30,7 +30,9 @@ const RDC_ROUTES = [
 ];
 
 const path = typeof window !== 'undefined' ? window.location.pathname : '/';
-const hit = RDC_ROUTES.find(([p]) => p === path);
+/* 旧版 3D 界面与 rdc-* 专项页依赖研究者本机的分片研究服务，只在开发模式（vite dev）可达；公开构建回到首页 */
+const devOnly = import.meta.env.DEV;
+const hit = devOnly ? RDC_ROUTES.find(([p]) => p === path) : null;
 const LegacyPage = hit ? lazy(hit[1]) : null;
 const legacyTitle = hit ? hit[2] : '';
 const loading = <div style={{ padding: 24, color: '#64748b', fontSize: 13 }}>加载中…</div>;
@@ -39,12 +41,12 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
       <Suspense fallback={loading}>
-        {path === '/legacy'
+        {devOnly && path === '/legacy'
           ? <><App /><a href="/" style={{position:'fixed',right:18,bottom:18,zIndex:10000,background:'#173347',color:'#b8e5ee',border:'1px solid #4b718a',borderRadius:7,padding:'10px 16px',fontSize:12}}>返回首页 ↗</a></>
           : hit
             ? <RdcPageShell title={legacyTitle}><LegacyPage /></RdcPageShell>
             : (path === '/workbench' || path === '/rdc-fusion')
-              ? <AuthGate><RdcFusionWorkspace /></AuthGate>
+              ? <AuthGate><Workbench /></AuthGate>
               : <OpenPlatform />}
       </Suspense>
     </ErrorBoundary>

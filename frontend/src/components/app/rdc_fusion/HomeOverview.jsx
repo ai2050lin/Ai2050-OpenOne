@@ -1,7 +1,8 @@
 /* 总览 v6：闭环漏斗 + 题库概览 + 谱图进展 + 覆盖矩阵 + 数据健康 + 待我决策 + 贡献者 + 参与测试。
    数据：/api/pipeline/overview · /api/coverage · /api/catalog · /api/atlas · /api/atlas/hypotheses（中心服务）+ 研究账本。
    纪律：各阶段计数来自独立数据表，不连成转化率；服务未接入显示空态，不填演示数字。 */
-import { fmtAgoTs, fmtNum, useApi } from './api.js';
+import { fmtAgoTs, fmtNum, useApi, useSnapshot } from './api.js';
+import { CensusJobBar } from '../../open/OpenHome.jsx';
 import { Card, Empty, SourceTag, StatusPill } from './ui.jsx';
 import { MISSION } from './distributedData.js';
 import { STATUS_META, STATUS_ORDER } from './catalogUtil.js';
@@ -92,7 +93,7 @@ const CELL_LABEL = { done: '完成', partial: '部分', fail: '未通过', empty
 
 function Funnel({ data, error, loading }) {
   if (!data) {
-    return <Empty>{loading ? '读取中心服务…' : `闭环漏斗未接入${error ? `（${error}）` : ''}。启动后端（:5001，挂载 deploy/distributed_service.py）后显示。`}</Empty>;
+    return <Empty>{loading ? '总览快照计算中（中心刚启动时需要几分钟）…' : `闭环漏斗暂不可用${error ? `（${error}）` : ''}。`}</Empty>;
   }
   return (
     <ol className="v6-funnel" aria-label="研究闭环各阶段">
@@ -147,13 +148,13 @@ function CoverageMatrix({ data, error, loading, onGo }) {
   );
 }
 
-export default function HomeOverview({ onGo, ledger }) {
-  const overview = useApi('/api/pipeline/overview', { interval: 30000 });
-  const coverage = useApi('/api/coverage', { interval: 60000 });
+export default function HomeOverview({ onGo }) {
+  const overview = useSnapshot('pipeline_overview', { interval: 60000 });
+  const coverage = useSnapshot('coverage', { interval: 60000 });
   const catalog = useApi('/api/catalog', { interval: 60000 });
-  const atlas = useApi('/api/atlas', { interval: 120000 });
+  const atlas = useSnapshot('atlas', { interval: 120000 });
+  const census = useApi('/api/census/jobs', { interval: 60000 });
   const hyps = useApi('/api/atlas/hypotheses?limit=5', { interval: 120000 });
-  const rows = ledger?.measurements || [];
   const live = overview.data ? 'live' : overview.loading ? 'loading' : 'none';
   return (
     <div className="fw-view on v6-home">
@@ -195,7 +196,7 @@ export default function HomeOverview({ onGo, ledger }) {
 
         <div className="v6-home-side">
           <Card title="待我决策" sub="需要人工处理的事项">
-            {!overview.data && <Empty>中心服务未接入。</Empty>}
+            {!overview.data && <Empty>{overview.loading ? '总览快照计算中（中心刚启动时需要几分钟）…' : `中心服务未接入${overview.error ? `（${overview.error}）` : ''}。`}</Empty>}
             {overview.data && !overview.data.decisions.length && <Empty>当前没有待处理事项。</Empty>}
             {overview.data?.decisions.map(item => (
               <button key={item.id} type="button" className="v6-decision" onClick={() => onGo(item.go, item.tab)}>
@@ -205,7 +206,7 @@ export default function HomeOverview({ onGo, ledger }) {
           </Card>
 
           <Card title="数据健康">
-            {!overview.data && <Empty>中心服务未接入。</Empty>}
+            {!overview.data && <Empty>{overview.loading ? '总览快照计算中（中心刚启动时需要几分钟）…' : `中心服务未接入${overview.error ? `（${overview.error}）` : ''}。`}</Empty>}
             {overview.data && (
               <ul className="v6-health">
                 {overview.data.health.map(item => (
@@ -228,14 +229,10 @@ export default function HomeOverview({ onGo, ledger }) {
             <ParticipateSteps compact />
           </Card>
 
-          <Card title="最近研究裁决" extra={<button type="button" className="fw-home-mini-link" onClick={() => onGo('atlas', 'ledger')}>研究记录 →</button>}>
-            {!ledger && <Empty>研究账本未接入；不以演示记录填充。</Empty>}
-            {ledger && !rows.length && <Empty>账本当前没有返回记录。</Empty>}
-            {rows.slice(0, 4).map(item => (
-              <button key={item.phase} type="button" className="fw-ledger-row" onClick={() => onGo('atlas', 'ledger')} title={item.verdict || ''}>
-                <span className="mono">P{item.phase}</span><span className="t">{item.name}</span><span className="ln">{item.line}</span>
-              </button>
-            ))}
+          <Card title="神经元普查" sub="分片状态：完成 / 等复算 / 运行中 / 待领取" extra={<button type="button" className="fw-home-mini-link" onClick={() => onGo('census')}>普查作业 →</button>}>
+            {census.error && <Empty>{census.error}</Empty>}
+            {census.data && !census.data.jobs.length && <Empty>还没有开放的普查作业。</Empty>}
+            {census.data?.jobs.map(j => <CensusJobBar key={j.job_id} job={j} />)}
           </Card>
         </div>
       </div>
