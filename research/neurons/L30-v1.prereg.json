@@ -1,0 +1,93 @@
+{
+ "schema": "neuron_layer_prereg.v1",
+ "id": "L30-v1",
+ "phase": "Phase 258（拟）",
+ "created": "2026-10-25",
+ "question": "Qwen3-4B 第 30 层（共 36 层，0 起编号）的 9728 个 MLP 中间单元：(1) 在自然语料上分成哪些类型、它们直接推高哪些类别的输出 token；(2) 哪些单元在自然语料的下一 token 预测中有因果作用，一阶归因估计在这一层是否可信，作用中有多少走直接读出通路、多少经过后续 31–35 层。",
+ "model": {
+  "name": "qwen3-4b",
+  "model_key": "6be1034f0b55a6df-bf16",
+  "snapshot_sha256": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "hf": "Qwen/Qwen3-4B@1cfa9a7208912126459214e8b04321603b3df60c",
+  "dtype": "bf16",
+  "layer": 30,
+  "d_ff": 9728,
+  "unit_definition": "A = silu(G) ⊙ V（G = gate_proj 输出，V = up_proj 输出），即 L30 down_proj 的输入"
+ },
+ "data": {
+  "census": "<AI2050_NATIVE_DIR>/_census/6be1034f0b55a6df-bf16/2ca5f0a756d36c8a-20000000/L30.npz（mlp_census.v1，19,042,014 计入 token）",
+  "corpus": "census_corpus.v1 指纹 2ca5f0a756d36c8a（fineweb-edu-en / wikipedia-en / fineweb-edu-zh / wikipedia-zh 各约 500 万 token；普查用尽全部 token）",
+  "note": "全部材料都来自普查语料；归因样本与验证样本取自互不重叠的窗口。结论只适用于这一语料分布，不声称跨分布推广。"
+ },
+ "part1_panorama": {
+  "kind": "描述统计（不做假设检验，不产生证据等级）",
+  "inputs": "只用 L30.npz、语料 token 流与模型权重（W_down、最终 RMSNorm 增益 γ、W_U）；不做新的前向计算",
+  "per_unit_measures": {
+   "strong_rate": "P(A > 10^-0.5 ≈ 0.316)，由普查直方图计算",
+   "pos_rate": "P(A > 0.001)",
+   "neg_strong_rate": "P(A < −0.316)",
+   "regime_share": "四个符号区（G>0,V>0 / G<0,V<0 / G>0,V<0 / G<0,V>0）的 token 占比",
+   "tail_ratio": "amax / (std(A) + 1e-6)；std 由 s1、s2 计算",
+   "pos_token_concentration": "正极 32 个最强片段中，命中 token 的 id 众数所占比例（由 top_idx 还原语料 token）",
+   "neg_token_concentration": "负极 32 个片段的同一指标",
+   "pos_context_concentration": "正极 32 个片段中，命中 token 前一个 token 的 id 众数所占比例",
+   "readout_vector": "r_j = W_U (γ ⊙ W_down[:, j])，只取前 / 后 10 个 token；类别按规则分为：中文字词 / 英文整词（带前导空格）/ 英文子词片段 / 数字 / 标点与空白 / 代码符号 / 其他文字 / 特殊 token"
+  },
+  "types": {
+   "rule_order": "按下列顺序判定，命中第一条即归类；阈值在看到数据前固定",
+   "T1_单token检测器": "pos_token_concentration ≥ 0.75",
+   "T2_上下文token检测器": "未命中 T1 且 pos_context_concentration ≥ 0.75（命中 token 不同但前一个 token 相同）",
+   "T3_稀疏强激活": "strong_rate < 0.001 且 tail_ratio ≥ 20",
+   "T4_稠密": "strong_rate ≥ 0.10",
+   "T5_负极主导": "neg_strong_rate > strong_rate",
+   "T6_其他": "以上都不满足"
+  },
+  "readout_clusters": {
+   "method": "对单位化的 W_down 列（2560 维）做球面 k-means，k ∈ {16, 32, 64}，每个 k 用 5 个固定种子（0–4）取簇内余弦和最大者",
+   "report": "每个 k 的平均轮廓系数；每簇的单元数、类型构成、读出 token 类别构成与代表单元（簇心最近的 5 个）",
+   "boundary": "聚类只描述输出方向的相似性，不说明这些单元共同计算或共享机制"
+  },
+  "outputs": "research/neurons/L30-v1-panorama.json（逐单元指标、类型、簇号）；单元卡端点按类型与簇筛选"
+ },
+ "part3_attribution": {
+  "kind": "因果估计与预注册验证",
+  "loss": "下一 token 交叉熵 L_t = −log p(x_{t+1} | x_≤t)，使用真实的下一个 token",
+  "positions": "与普查同一口径：窗口长 512、不重叠、独立前向（无 padding、无 KV 缓存）；只计窗口内位置 t ≥ 16，且 x_t 与 x_{t+1} 都不是文档分隔符，t ≤ 510",
+  "samples": {
+   "attribution_set": "按 (来源, 窗口序号) 枚举全部 38,424 个窗口，取窗口序号 w 满足 w mod 47 == 0 的窗口，四个来源轮流取，直到 400 个窗口（约 19.6 万个计入位置）",
+   "validation_set": "取 w mod 47 == 23 的窗口，同样轮流取到 40 个窗口（约 2 万个计入位置）；与归因样本不重叠"
+  },
+  "ablation_baseline": "均值消融：把 A_j 换成该单元在普查中的均值 μ_j = s1/n（主口径）；零消融（A_j → 0）作为次口径同时报告",
+  "estimators": {
+   "total": "ΔL̂_j = E_t[(μ_j − A_j(t)) · ∂L_t/∂A_j(t)]（一阶 attribution patching，梯度经过 31–35 层）",
+   "direct": "D̂_j = E_t[(μ_j − A_j(t)) · ⟨W_down[:, j], ∂L_t/∂x_t^final⟩]，x^final 为第 35 层之后、最终 RMSNorm 之前的残差流；只包含 L30 MLP 输出直接写入残差流再经 unembedding 的通路",
+   "indirect": "Î_j = ΔL̂_j − D̂_j（经过 31–35 层的部分）",
+   "magnitude": "M̂_j = E_t[|(μ_j − A_j(t)) · ∂L_t/∂A_j(t)|]（不论正负的作用大小）",
+   "computation": "第 0–29 层在 no_grad 下前向，把第 30 层的残差输入作为叶子张量，只对 30–35 层与 lm_head 反向传播；一次前向加一次反向即得到全部 9728 个单元的估计"
+  },
+  "validation": {
+   "units": "按 |ΔL̂_j| 排名前 50 的单元 + 从其余单元中以种子 0 均匀抽取的 50 个随机单元",
+   "true_effect": "在验证样本上逐个做真实均值消融：ΔL_j = mean_t[L_t(A_j ← μ_j)] − mean_t[L_t]；从缓存的第 30 层残差输入只重算 30–35 层",
+   "group": "前 50 个单元同时消融的 ΔL_group，与 Σ ΔL_j（逐个之和）比较",
+   "pass_if": [
+    "100 个单元上 ΔL̂_j 与 ΔL_j 的 Spearman 相关 ≥ 0.6",
+    "前 50 个单元中 ΔL̂_j 与 ΔL_j 符号一致的比例 ≥ 0.8"
+   ],
+   "verdict": "两条都满足 → 「一阶归因在 L30 可用于排序」，全部 9728 个单元的归因作为候选排序公开；任一不满足 → 只公开 100 个真实消融结果，归因估计标为「未通过验证」，不作为排序依据",
+   "direct_vs_total": "描述性报告：前 50 个单元中 |D̂_j| / (|D̂_j| + |Î_j|) 的分布；不设判据"
+  },
+  "outputs": "research/neurons/L30-v1-attribution.json（逐单元 ΔL̂、D̂、Î、M̂，零消融次口径，验证表与判定）；单元卡新增「控制」证据项：L30-v1 归因与真实消融",
+  "evidence_boundary": "均值消融的效应只说明该单元在这个语料分布上参与下一 token 预测；不说明它表达哪一个语言变量（那需要模板选择性），也不说明作用是否必要于某种能力。真实消融通过只针对被验证的 100 个单元。"
+ },
+ "cross_part_report": "按第 1 部分的类型与簇汇总第 3 部分的 M̂ 与 ΔL̂ 分布（描述性），例如单 token 检测器的因果作用是否集中在直接通路",
+ "self_checks": [
+  "钩子取得的 A 与 down_proj 实际输入的相对误差 < 0.02",
+  "从缓存残差只重算 30–35 层得到的 L_t 与完整前向的 L_t：平均绝对差 < 0.01 nats（bf16）",
+  "归因样本上 μ_j 与该样本自身均值的差，报告分布（检查均值口径是否合适），不作为判据"
+ ],
+ "budget": {
+  "gpu": "RTX 5080 16 GB；归因约 400 个窗口的前向 + 6 层反向，验证约 100 × 40 个窗口的 6 层前向；预计合计 < 1 小时，显存峰值 < 12 GB",
+  "disk": "结果 JSON 约 10 MB；不保存逐 token 梯度"
+ },
+ "frozen_before_running": "本文件与其 sha256 在运行前提交；判据与阈值看到结果后不修改。修改需新建 L30-v2 并说明原因。"
+}
