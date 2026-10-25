@@ -2,7 +2,7 @@
  * AI2050 客户端 Electron 主进程
  * ────────────────────────────────────────────────────────────────
  * 职责：
- *   1) 读取用户配置的服务器地址（默认 https://platform.ai2050.com）
+ *   1) 读取用户配置的服务器地址（默认 https://server.ai2050.com）
  *   2) 在页面加载前把地址注入 window.__AI2050__（前端 src/config.js 的唯一读取入口）
  *   3) 首启（无配置）询问服务器地址，持久化到 userData/config.json
  *
@@ -16,7 +16,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
-const DEFAULT_SERVER = 'https://platform.ai2050.com';
+const DEFAULT_SERVER = 'https://server.ai2050.com';
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
 
 /* ── 配置读写 ─────────────────────────────────────────────── */
@@ -42,7 +42,7 @@ function normalizeServer(input) {
   return s.replace(/\/+$/, '');
 }
 
-/** 探测可达性：GET {server}/health，8s 超时。返回 {ok, status} */
+/** 探测可达性：GET {server}/api/health（开放平台中心）或旧版 /health，8s 超时。返回 {ok, status} */
 function probe(server, timeoutMs = 8000) {
   return new Promise(resolve => {
     let settled = false;
@@ -53,9 +53,15 @@ function probe(server, timeoutMs = 8000) {
     };
     try {
       const mod = server.startsWith('https://') ? https : http;
-      const req = mod.get(server + '/health', { timeout: timeoutMs }, res => {
+      const req = mod.get(server + '/api/health', { timeout: timeoutMs }, res => {
         res.resume();
-        done({ ok: res.statusCode === 200, status: res.statusCode });
+        if (res.statusCode === 200) { done({ ok: true, status: 200 }); return; }
+        const legacy = mod.get(server + '/health', { timeout: timeoutMs }, r2 => {
+          r2.resume();
+          done({ ok: r2.statusCode === 200, status: r2.statusCode });
+        });
+        legacy.on('timeout', () => { legacy.destroy(); done({ ok: false, status: 0 }); });
+        legacy.on('error', () => done({ ok: false, status: res.statusCode }));
       });
       req.on('timeout', () => { req.destroy(); done({ ok: false, status: 0 }); });
       req.on('error', () => done({ ok: false, status: 0 }));
