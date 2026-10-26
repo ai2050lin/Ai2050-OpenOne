@@ -31,7 +31,15 @@ router = APIRouter(prefix='/api/platform', tags=['platform'])
 auth_router = APIRouter(prefix='/api/auth', tags=['platform'])
 
 _REPO = Path(__file__).resolve().parent.parent
-PLATFORM_VERSION = '1.0.0'
+def _read_version() -> str:
+    """版本号的唯一来源：仓库 / 发布包根目录的 VERSION 文件（scripts/build_center_release.py 每次打包时递增）。"""
+    try:
+        return (_REPO / 'VERSION').read_text(encoding='utf-8').strip() or '0.0.0'
+    except OSError:
+        return '0.0.0'
+
+
+PLATFORM_VERSION = _read_version()
 REFRESH_SECONDS = float(os.environ.get('AI2050_SNAPSHOT_SECONDS', '300'))
 KIT_BIND_TTL = 7 * 86400
 

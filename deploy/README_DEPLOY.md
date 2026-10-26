@@ -12,7 +12,7 @@
 
 ```bash
 cd frontend && npx vite build && cd ..
-python scripts/build_center_release.py          # → release/ai2050-center-<版本>.tar.gz 与 .sha256
+python scripts/build_center_release.py          # 递增 VERSION → release/ai2050-center-<新版本>.tar.gz 与 .sha256
 ```
 
 发布包包含：中心与节点程序、协议代码、客户端构建，以及公开研究数据（`research/interventions`、`research/neurons`）。研究记录、模型权重、普查语料和原生全场都不在包里。
@@ -29,6 +29,39 @@ DOMAIN=platform.example.org bash deploy/install_center.sh --yes --https
 安装脚本会创建系统用户 `ai2050`、Python 环境（依赖见 `deploy/requirements-center.txt`）、systemd 服务 `ai2050-center` 和 nginx 站点，并生成随机管理令牌 `/etc/ai2050/admin_token`。脚本可以重复运行：升级时覆盖程序，保留数据、令牌和站点配置。
 
 安装后先在浏览器打开站点并注册**第一个账号**，它会自动成为管理员。之后的注册方式由 `AI2050_REGISTRATION` 控制：`open` 表示任何人都能注册，`closed` 表示只能由管理员创建账号。修改位置是 `/etc/systemd/system/ai2050-center.service`。
+
+## 2.1 版本与升级
+
+- 每次打包都会递增版本号：仓库根目录 `VERSION`，缺省递增补丁号。发布包和解压目录都带版本号，如 `ai2050-center-1.0.1/`。
+- 版本号可以在三处核对：站点页脚、`/api/health` 和 `/api/platform/config` 的 `version` 字段；包内的 `RELEASE_MANIFEST.json` 还记录了对应的 git 提交。
+- **数据不要放在带版本号的目录里。** 中心数据由 `AI2050_DIST_DIR` 决定；没有设置时会落在程序目录下的 `distributed_data/`，换用新版本目录时就「丢」了。`/api/health` 的 `data_dir_in_release` 为 `true` 时，说明当前就是这种情况。
+
+**推荐的服务器布局（以 `/data` 为例）：**
+
+```
+/data/ai2050-center-1.0.0/      旧版本程序（解压目录，可保留以便回退）
+/data/ai2050-center-1.0.1/      新版本程序
+/data/ai2050-data/center/       中心数据：dist.sqlite3、结果对象、普查作业
+/data/ai2050-data/native/       普查语料与合并后的普查结果
+/etc/ai2050/                    admin_token、platform_config.json
+```
+
+用安装脚本部署时，程序会复制到 `/opt/ai2050/app`，数据默认在 `/var/lib/ai2050/`，两者都与解压目录无关。直接在解压目录里运行 `center_app.py` 时，必须在 systemd 里设置 `AI2050_DIST_DIR` 与 `AI2050_NATIVE_DIR`，让它们指向版本目录之外。
+
+**升级步骤（直接从解压目录运行的情况）：**
+
+```bash
+# 1. 备份数据库
+sqlite3 /data/ai2050-data/center/dist.sqlite3 ".backup /root/dist-$(date +%Y%m%d).sqlite3"
+# 2. 解压新版本，与旧版本并排存放
+cd /data && tar xzf ai2050-center-1.0.1.tar.gz
+# 3. 把 systemd 中的 WorkingDirectory / ExecStart 改到新目录，数据环境变量保持不变
+sudo systemctl edit --full ai2050-center
+sudo systemctl daemon-reload && sudo systemctl restart ai2050-center
+curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_dir_in_release 应为 false
+```
+
+需要回退时，把 systemd 指回旧目录后重启即可；数据库没有被改动过。
 
 ## 3. 站点配置
 

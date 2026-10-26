@@ -66,10 +66,16 @@ def create_app():
     app.include_router(platform_service.auth_router)
     app.include_router(neuron_census_service.router)
 
+    data_dir = Path(distributed_service._DATA_DIR).resolve()
+    in_release = REPO.resolve() in data_dir.parents          # 数据目录在带版本号的程序目录里：换新版本目录时会「丢」数据
+    if in_release:
+        print(f'[center] 警告：数据目录 {data_dir} 位于程序目录 {REPO} 之内。升级到新版本目录前，'
+              '请设置 AI2050_DIST_DIR 指向程序目录之外（如 /data/ai2050-data/center），并把现有数据移过去。', flush=True)
+
     @app.get('/api/health')
     def health() -> dict:
         return {'service': 'ai2050-center', 'version': platform_service.PLATFORM_VERSION,
-                'protocol': distributed_service.ROUTER_VERSION}
+                'protocol': distributed_service.ROUTER_VERSION, 'data_dir_in_release': in_release}
 
     dist = Path(os.environ.get('AI2050_FRONTEND_DIST', str(REPO / 'frontend' / 'dist'))).resolve()
     if (dist / 'index.html').is_file():
