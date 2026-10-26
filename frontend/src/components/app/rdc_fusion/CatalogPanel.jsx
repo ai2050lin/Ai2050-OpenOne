@@ -63,9 +63,9 @@ function ItemCard({ item, onGo, onAutotest, onStudio }) {
         </table>
       )}
       <footer>
-        {item.protocol === 'v3' && item.in_library && <button type="button" className="fw-tbtn primary" onClick={() => onAutotest?.(item.id)}>加入自动测试 →</button>}
+        {onAutotest && item.protocol === 'v3' && item.in_library && <button type="button" className="fw-tbtn primary" onClick={() => onAutotest(item.id)}>加入自动测试 →</button>}
         {item.claim_command && <button type="button" className="fw-tbtn" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? '收起命令' : '本地领题命令'}</button>}
-        {item.status === 'draft' && <button type="button" className="fw-tbtn" onClick={() => onStudio?.()}>去模板工作室冻结 →</button>}
+        {onStudio && item.status === 'draft' && <button type="button" className="fw-tbtn" onClick={() => onStudio()}>去模板工作室冻结 →</button>}
       </footer>
       {open && item.claim_command && (
         <div className="v6-cmd">

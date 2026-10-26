@@ -3,7 +3,7 @@
    数据：GET /api/atlas（或本地谱图包 atlaspack.v1）；AI：POST /api/atlas/interpret（管理令牌），历史 GET /api/atlas/hypotheses。
    纪律：共享方向不等于共享机制；AI 假设一律「未检验」。 */
 import { useMemo, useState } from 'react';
-import { API_BASE, fmtAgoTs, fmtNum, postJson, useAdminToken, useApi } from './api.js';
+import { API_BASE, OFFLINE_CLIENT, WEB_URL, fmtAgoTs, fmtNum, postJson, useAdminToken, useApi } from './api.js';
 import { AdminTokenField, Empty, SourceTag, StatusPill, Tabs } from './ui.jsx';
 import AtlasSpace3D from './AtlasSpace3D.jsx';
 import { HYP_STATUS } from './atlasUtil.js';
@@ -90,6 +90,7 @@ function AiPanel({ model, local }) {
     setBusy(false);
   };
   if (local) return <Empty>本地谱图包不连接服务器；包里的 prompt.md 是现成的 AI 提示词，可复制到任何 AI 使用。</Empty>;
+  if (OFFLINE_CLIENT) return <Empty>离线客户端不调用 AI。AI 解读需要管理权限，请在网页版（{WEB_URL}）操作；产生的假设一律记为「未检验」。</Empty>;
   return (
     <div className="v6-ai">
       <p className="v6-note">主模型（研发 · Agent 工作流里配置）读取当前模型的谱图摘要，提出 ≤ 5 个可检验假设。假设一律记为「未检验」：只有写成新模式族（concepts 预注册）并运行通过后才有结论。</p>

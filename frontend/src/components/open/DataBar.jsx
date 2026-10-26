@@ -2,9 +2,9 @@
    数据包内容见 deploy/datapack.py；本地存储与读取见 rdc_fusion/dataStore.js。 */
 import { useState, useSyncExternalStore } from 'react';
 
-import { API_BASE, useApi } from '../app/rdc_fusion/api.js';
+import { API_BASE, OFFLINE_CLIENT, useApi } from '../app/rdc_fusion/api.js';
 import './databar.css';
-import { downloadDataPack, packInfo, storeTick, subscribe } from '../app/rdc_fusion/dataStore.js';
+import { downloadDataPack, downloadExtra, packInfo, storeTick, subscribe } from '../app/rdc_fusion/dataStore.js';
 
 function fmtTime(ts) {
   if (!ts) return '—';
@@ -38,10 +38,11 @@ export default function DataBar({ remote }) {
       : `更新数据${remote?.bytes ? `（${fmtMB(remote.bytes)}）` : ''}`;
   return (
     <div className={'op-databar' + (!info.version ? ' none' : fresh ? ' fresh' : ' stale')}
-         title="页面优先读取本机保存的数据包，不会定时访问服务器；单元卡与管理类页面打开时在线读取">
+         title={OFFLINE_CLIENT ? '离线客户端：只读取本机保存的数据包；服务器有新数据时手动更新'
+           : '页面优先读取本机保存的数据包，不会定时访问服务器；单元卡与管理类页面打开时在线读取'}>
       <span className="op-databar-dot" aria-hidden="true" />
       <span className="op-databar-text">
-        {!info.version ? '未下载本地数据（页面临时在线读取）'
+        {!info.version ? (OFFLINE_CLIENT ? '还没有本地数据，下载后各页面显示内容' : '未下载本地数据（页面临时在线读取）')
           : fresh ? `本地数据 · ${fmtTime(info.createdAt)}`
             : remote?.version ? `本地数据 ${fmtTime(info.createdAt)} · 服务器有新数据` : `本地数据 · ${fmtTime(info.createdAt)}`}
       </span>
@@ -59,6 +60,38 @@ export function DataBarHost() {
   return (
     <div className="op-databar-host">
       <DataBar remote={cfg.data?.datapack} />
+    </div>
+  );
+}
+
+/* 附加包下载提示：离线客户端在缺少某个附加包（模式族实验响应、单元卡）时显示，下载后页面自动重读。 */
+export function ExtraPackPrompt({ pack }) {
+  useSyncExternalStore(subscribe, storeTick);
+  const cfg = useApi('/api/platform/config');
+  const [busy, setBusy] = useState(null);
+  const [err, setErr] = useState('');
+  if (!pack) return null;
+  const meta = (cfg.data?.datapack?.extras || []).find(e => e.id === pack);
+  const have = packInfo().extras[pack];
+  const get = async () => {
+    setErr(''); setBusy({ got: 0, total: meta?.bytes || 0 });
+    try {
+      await downloadExtra(API_BASE, pack, (got, total) => setBusy({ got, total: total || meta?.bytes || 0 }));
+    } catch (e) {
+      setErr(e.message);
+    }
+    setBusy(null);
+  };
+  if (have && !busy) return null;
+  return (
+    <div className="op-extra">
+      <span>{meta ? `需要附加包「${meta.label}」（${fmtMB(meta.bytes)}）` : cfg.data ? '服务器还没有生成这个附加包，稍后再试' : '读取附加包清单…'}</span>
+      {meta && (
+        <button type="button" className="op-databar-btn" onClick={get} disabled={Boolean(busy)}>
+          {busy ? `下载中 ${busy.total ? Math.round((100 * busy.got) / busy.total) : 0}%` : '下载'}
+        </button>
+      )}
+      {err && <span className="op-databar-err" role="alert">{err}</span>}
     </div>
   );
 }

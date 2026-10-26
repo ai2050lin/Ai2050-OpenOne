@@ -1,7 +1,8 @@
 /* 原生 MLP 神经元单元卡（C1）：GET /api/neurons/unit 的只读展示。
    纪律：文本与标签全部来自服务端（普查片段、读出 token、选择性与干预记录），前端不生成任何描述；
    读出 / 控制 / 解释三条证据轴分开显示；没有数据时显示空态，不用其他单元代替。 */
-import { useApi } from './api.js';
+import { OFFLINE_CLIENT, useApi } from './api.js';
+import { ExtraPackPrompt } from '../../open/DataBar.jsx';
 import { AXIS_META, GRADE_META, REGIMES, REGIME_META, axisTone, fmtNum, fmtRate, histColumns } from './neuronUtil.js';
 import './neuron_units.css';
 
@@ -53,9 +54,16 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
   const qs = modelKey != null && block != null && unit != null
     ? `/api/neurons/unit?model_key=${encodeURIComponent(modelKey)}&block=${block}&unit=${unit}${run ? `&run=${encodeURIComponent(run)}` : ''}`
     : null;
-  const { data, error, loading } = useApi(qs);
+  const { data, error, loading, missingPack } = useApi(qs);
   if (!qs) return <div className="nu-empty">选择一个单元（左侧检索或按层浏览）。</div>;
-  if (error) return <div className="nu-empty nu-err">单元卡不可用：{error}</div>;
+  if (error) {
+    return (
+      <div className="nu-empty nu-err">单元卡不可用：{error}
+        {OFFLINE_CLIENT && !missingPack && <div className="nu-note">离线单元卡包只含已解释、模板选择性前列与经过检验的单元。</div>}
+        <ExtraPackPrompt pack={missingPack} />
+      </div>
+    );
+  }
   if (loading || !data) return <div className="nu-empty">读取中…</div>;
   const c = data.census;
   return (

@@ -1,6 +1,6 @@
 /* 顶栏账号菜单：当前账号、修改密码、我的节点、退出登录；管理员另有「账号管理」（角色、停用、创建账号）。 */
 import { useEffect, useRef, useState } from 'react';
-import { authJson, fmtAgoTs } from './api.js';
+import { OFFLINE_CLIENT, WEB_URL, authJson, fmtAgoTs } from './api.js';
 import { useAuth } from './authContext.js';
 import { Empty, StatusPill } from './ui.jsx';
 
@@ -123,7 +123,18 @@ function UserAdmin({ me, onClose }) {
   );
 }
 
+/* 离线客户端没有账号功能：只显示「离线版」标记与网页版入口。 */
 export default function AccountMenu() {
+  if (OFFLINE_CLIENT) {
+    return (
+      <a className="fw-tbtn ghost" href={WEB_URL} target="_blank" rel="noreferrer"
+        title="离线客户端只读取本机数据包；登录、审计、冻结、分发等写操作请在网页版进行">离线版 · 网页版 ↗</a>
+    );
+  }
+  return <OnlineAccountMenu />;
+}
+
+function OnlineAccountMenu() {
   const { user, offline, guest, logout, enterAuth } = useAuth();
   const [open, setOpen] = useState(false);
   const [panel, setPanel] = useState('');

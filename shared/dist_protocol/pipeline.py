@@ -128,11 +128,13 @@ def result_files(data_dir: Path, sha: str, summary: dict, only=None) -> Dict[str
 
 
 def _code_hash() -> str:
-    """合并与汇总代码的内容哈希：代码改动后磁盘缓存自动失效。"""
+    """合并与汇总代码的内容哈希：只含单桶合并函数与 suffstats.py，二者改动后磁盘缓存自动失效
+    （本文件其他部分的改动不影响合并结果，不让缓存失效）。"""
+    import inspect
     from . import suffstats as _ss
     h = hashlib.sha256()
-    for f in (__file__, _ss.__file__):
-        h.update(Path(f).read_bytes())
+    h.update(inspect.getsource(_aggregate_bucket).encode('utf-8'))
+    h.update(Path(_ss.__file__).read_bytes())
     return h.hexdigest()[:16]
 
 
@@ -701,6 +703,17 @@ def _analysis_disk_path(data_dir: Path, key: Tuple) -> Path:
     return Path(data_dir) / 'analysis_cache' / (hashlib.sha256(raw.encode('utf-8')).hexdigest() + '.json')
 
 
+def analysis_cached_path(db: sqlite3.Connection, data_dir: Path, tm_id: str, bucket: str, gate: bool) -> Optional[Path]:
+    """已缓存的规律分析文件（与 analyze_bucket 同一键）；没有缓存时返回 None，不触发计算。"""
+    agg = aggregate(db, data_dir, tm_id, bucket=bucket, gate=gate)
+    chosen = next((b for b in agg['buckets'] if b.get('agg') and b['bucket'] == bucket), None)
+    if chosen is None:
+        return None
+    key = (tm_id, chosen['bucket'], gate, tuple(chosen['primary_shas']), tuple(chosen['gate_excluded_cells']), None)
+    disk = _analysis_disk_path(data_dir, key)
+    return disk if disk.is_file() else None
+
+
 def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Optional[str] = None,
                    gate: bool = True, n_perm: Optional[int] = None, background: bool = False,
                    as_path: bool = False):
@@ -787,27 +800,28 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
 
 
 def warm_analyses(db: sqlite3.Connection, data_dir: Path, skip=None, on_start=None) -> List[str]:
-    """后台预热：为每个 v3 模板的每个有合并结果的模型桶算好规律分析（已缓存的跳过）。返回本次新算的。
+    """后台预热：为每个 v3 模板的每个有合并结果的模型桶算好规律分析（行为门过滤开 / 关两种，已缓存的跳过）。返回本次新算的。
     skip(name) 为真的步骤不算（后台进程记录的崩溃步骤）；on_start(name) 在每一步开始前调用。name = 'analysis:<tm>/<bucket>'。"""
     done = []
     for t, corpus in templates_v3(db):
         if not is_v3(corpus):
             continue
-        agg = aggregate(db, data_dir, t['tm_id'])
-        for b in agg['buckets']:
-            if not b.get('agg'):
-                continue
-            key = (t['tm_id'], b['bucket'], True, tuple(b['primary_shas']), tuple(b['gate_excluded_cells']), None)
-            if _analysis_disk_path(data_dir, key).is_file():
-                continue
-            name = f"analysis:{t['tm_id']}/{b['bucket']}"
-            if skip and skip(name):
-                continue
-            if on_start:
-                on_start(name)
-            out = analyze_bucket(db, data_dir, t['tm_id'], bucket=b['bucket'], gate=True)
-            if not out.get('pending'):
-                done.append(f"{t['tm_id']}/{b['bucket']}")
+        for gate in (True, False):
+            agg = aggregate(db, data_dir, t['tm_id'], gate=gate)
+            for b in agg['buckets']:
+                if not b.get('agg'):
+                    continue
+                key = (t['tm_id'], b['bucket'], gate, tuple(b['primary_shas']), tuple(b['gate_excluded_cells']), None)
+                if _analysis_disk_path(data_dir, key).is_file():
+                    continue
+                name = f"analysis:{t['tm_id']}/{b['bucket']}" + ('' if gate else '/nogate')
+                if skip and skip(name):
+                    continue
+                if on_start:
+                    on_start(name)
+                out = analyze_bucket(db, data_dir, t['tm_id'], bucket=b['bucket'], gate=gate)
+                if not out.get('pending'):
+                    done.append(f"{t['tm_id']}/{b['bucket']}" + ('' if gate else ' (gate=off)'))
     return done
 
 

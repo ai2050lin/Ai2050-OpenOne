@@ -168,7 +168,7 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
 
 中心启动时会拉起一个低优先级的后台计算子进程（`deploy/snapshot_worker.py`），负责计算总览、谱图与记分板的快照，并预热实验响应页的规律分析；结果写到 `<AI2050_DIST_DIR>/snapshots/`，网站进程只读这些文件，计算再久也不影响访问。每份快照都带数据指纹，重启后直接可用，只有数据变化时才重算。数据包里已有缓存的模板，打开即时显示；没有缓存的大模板首次需要较长时间，页面会提示「后台计算中」，算完自动刷新。
 
-同一个子进程还会在数据变化时生成**客户端离线数据包**（`<AI2050_DIST_DIR>/datapack/datapack.json.gz`，约 1–2 MB）。客户端平时只读取站点配置；页面左下角显示本地数据时间，服务器有新数据时出现「更新数据」按钮，由用户手动下载，不会定时访问服务器。单元卡与管理类页面（审计、分发、普查作业、自动测试）打开时在线读取，用页面上的「刷新」按钮更新。
+同一个子进程还会在数据变化时生成**客户端离线数据包**：主数据包（`<AI2050_DIST_DIR>/datapack/datapack.json.gz`，约 1–2 MB）与附加包（`datapack/extra/`：每个模式族一个实验响应包，0.3–30 MB；每个有普查的模型一个单元卡包，约 10 MB）。本地客户端（连接本中心的 vite dev 或安装包）是**离线客户端**：只读取站点配置、下载数据包，不实时访问其他接口；页面左下角显示本地数据时间，服务器有新数据时出现「更新数据」按钮，打开实验响应或单元卡时提示下载对应的附加包。离线客户端没有登录与写操作；审计、冻结、分发、普查管理在浏览器打开中心网址的网页版进行（网页版在线读取，管理类页面用「刷新」按钮更新）。第一次生成单元卡包约需 20 分钟，之后只在研究文件或普查结果变化时重建；缓存包里带了预先生成的数据包（见 6.1）。
 
 ### 6.1 小内存服务器（2 GB 及以下）
 
@@ -184,7 +184,7 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
    ```bash
    sudo fallocate -l 4G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
    ```
-2. 在开发机上用同一份数据算好缓存，打成缓存包上传（`ai2050-cache-<版本>.tar`，只含 `agg_cache/` 与 `analysis_cache/`），服务器上直接解开，不用在服务器上合并：
+2. 在开发机上用同一份数据算好缓存，打成缓存包上传（`ai2050-cache-<版本>.tar`，含 `agg_cache/`、`analysis_cache/` 与 `datapack/`），服务器上直接解开，不用在服务器上合并：
    ```bash
    sudo tar -xf ai2050-cache-<版本>.tar -C /var/lib/ai2050/center && sudo chown -R ai2050:ai2050 /var/lib/ai2050/center && sudo systemctl restart ai2050-center
    ```

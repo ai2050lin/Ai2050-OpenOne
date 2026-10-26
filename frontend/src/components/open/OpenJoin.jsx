@@ -84,7 +84,7 @@ export default function OpenJoin({ config }) {
                 <button type="button" className="op-btn primary" disabled={busy} onClick={() => get(true)}>{busy ? '准备中…' : '下载一键包（绑定我的账号）'}</button>
               ) : (
                 <>
-                  <button type="button" className="op-btn primary" onClick={enterAuth}>登录 / 注册</button>
+                  {enterAuth && <button type="button" className="op-btn primary" onClick={enterAuth}>登录 / 注册</button>}
                   <button type="button" className="op-btn" disabled={busy} onClick={() => get(false)}>匿名下载</button>
                 </>
               )}

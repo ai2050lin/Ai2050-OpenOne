@@ -5,6 +5,7 @@
    legacy 模板 → GET /api/results 摘要 + /api/results/{sha} 的 cos 矩阵（单节点，不可精确合并）。 */
 import { useMemo, useState } from 'react';
 import { getJson, useApi, fmtNum } from './api.js';
+import { ExtraPackPrompt } from '../../open/DataBar.jsx';
 import { Card, Empty, SourceTag, StatusPill, Tabs, divColor, inkOn, seqColor } from './ui.jsx';
 import Space3D from './Space3D.jsx';
 import FindingsView from './FindingsView.jsx';
@@ -497,12 +498,16 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
         <>
           <Tabs tabs={VIEWS} value={view} onChange={setView} label="实验响应视图" />
           {!agg.data && <Empty>{agg.error ? `合并统计读取失败（${agg.error}）` : '合并统计计算中…'}</Empty>}
+          {!agg.data && <ExtraPackPrompt pack={agg.missingPack} />}
           {agg.data && !bucket && <Empty>该模板还没有 real 结果。去「研发 · 分发」领取分片任务后，这里显示跨节点合并统计。</Empty>}
           {bucket && !bucket.agg && <Empty>该桶的结果全部被排除（{bucket.excluded.map(e => e.reason).join('、') || '无可合并统计'}）。</Empty>}
           {bucket?.agg && (
             <Card>
               {(view === 'space3d' || view === 'findings') && !an && (
-                <Empty>{analysis.loading ? '规律分析计算中（置换检验约需数秒）…' : (analysis.data?.reason || analysis.error || '规律分析不可用')}</Empty>
+                <>
+                  <Empty>{analysis.loading ? '规律分析计算中（置换检验约需数秒）…' : (analysis.data?.reason || analysis.error || '规律分析不可用')}</Empty>
+                  <ExtraPackPrompt pack={analysis.missingPack} />
+                </>
               )}
               {view === 'space3d' && an && (
                 <>

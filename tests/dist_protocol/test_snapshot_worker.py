@@ -16,8 +16,9 @@ sys.path[:0] = [str(ROOT), str(ROOT / 'deploy')]
 class SnapshotWorkerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.env = {k: os.environ.get(k) for k in ('AI2050_SNAPSHOT_DISABLE',)}
+        cls.env = {k: os.environ.get(k) for k in ('AI2050_SNAPSHOT_DISABLE', 'AI2050_NATIVE_DIR')}
         os.environ['AI2050_SNAPSHOT_DISABLE'] = '1'          # 测试里不拉起子进程，直接调用 run_once
+        os.environ['AI2050_NATIVE_DIR'] = tempfile.mkdtemp()  # 不读本机真实普查（否则会生成单元卡附加包）
         import distributed_service as D
         import platform_service as PS
         import snapshot_worker as W
@@ -82,6 +83,48 @@ class SnapshotWorkerTests(unittest.TestCase):
                        (time.time(), time.time()))
             db.commit()
         self.assertIn('catalog', self.W.run_once(log=lambda *_: None)['computed'])
+
+    def test_extra_packs_build_skip_and_serve(self):
+        import gzip
+        import json
+        import datapack as DP
+        self.assertEqual(DP.pack_hint('/api/agg/TG-GR-Q/v2?gate=true'), 'tm:TG-GR-Q')
+        self.assertEqual(DP.pack_hint('/api/analysis/TG-GR-Q?bucket=b&gate=false'), 'tm:TG-GR-Q')
+        self.assertEqual(DP.pack_hint('/api/neurons/unit?model_key=mk&block=3&unit=7&run=r'), 'cards:mk')
+        self.assertIsNone(DP.pack_hint('/api/catalog'))
+        plan = [{'id': 'tm:TM-X', 'kind': 'template', 'tm_id': 'TM-X', 'label': '实验响应 · TM-X'}]
+        calls = []
+
+        raw = self.tmp / 'analysis.json'
+        raw.write_text('{"available": true, "n": 3}', encoding='utf-8')
+
+        def fake_entries(tm):
+            calls.append(tm)
+            return {DP.canonical(f'/api/agg/{tm}/v2?gate=true'): {'tm_id': tm},
+                    DP.canonical(f'/api/analysis/{tm}?gate=true&bucket=b'): DP.RawFile(raw)}, []
+        version = {'v': 'v1'}
+        orig = DP.extras_plan, DP.template_entries, DP.template_version
+        DP.extras_plan, DP.template_entries, DP.template_version = (lambda: plan), fake_entries, (lambda tm: version['v'])
+        try:
+            DP.build_extras(self.tmp, 'c1', log=lambda *_: None)
+            DP.build_extras(self.tmp, 'c1', log=lambda *_: None)                              # 同版本：跳过
+            self.assertEqual(calls, ['TM-X'])
+            version['v'] = 'v2'
+            DP.build_extras(self.tmp, 'c1', log=lambda *_: None)                              # 数据变了：重建
+            self.assertEqual(calls, ['TM-X', 'TM-X'])
+            meta = {e['id']: e for e in DP.extras_meta(self.tmp)}
+            self.assertEqual(meta['tm:TM-X']['version'], 'v2')
+            resp = self.PS.datapack_extra_download('tm:TM-X')
+            doc = json.loads(gzip.decompress(Path(resp.path).read_bytes()))
+            self.assertEqual(doc['schema'], 'datapack_extra.v1')
+            self.assertIn('/api/agg/TM-X/v2?gate=true', doc['entries'])
+            self.assertEqual(doc['entries']['/api/analysis/TM-X?bucket=b&gate=true'], {'available': True, 'n': 3})   # 原样拷贝
+            plan.clear()                                                # 模式族下线：附加包随之删除
+            DP.build_extras(self.tmp, 'c1', log=lambda *_: None)
+            self.assertEqual(DP.extras_meta(self.tmp), [])
+            self.assertFalse(Path(resp.path).exists())
+        finally:
+            DP.extras_plan, DP.template_entries, DP.template_version = orig
 
     def test_datapack_build_skip_and_serve(self):
         import gzip

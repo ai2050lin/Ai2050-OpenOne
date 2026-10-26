@@ -3,7 +3,7 @@
    无会话或已过期 → 以「访客」身份进入主界面（浏览不受影响，写操作/账号功能在
    右上角账号菜单「登录 / 注册」后可用）；中心服务不可达 → 同样直接进入主界面。 */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { API_BASE, authJson, clearSession, getCachedUser, getLastUsername, getSession, setSession } from './api.js';
+import { API_BASE, OFFLINE_CLIENT, authJson, clearSession, getCachedUser, getLastUsername, getSession, setSession } from './api.js';
 import { AuthContext } from './authContext.js';
 
 export const GUEST_USER = { user_id: 'guest', username: 'guest', display_name: '访客', role: 'guest' };
@@ -97,10 +97,13 @@ function AuthScreen({ info, offlineError, onRetry, onDone }) {
 }
 
 export default function AuthGate({ children }) {
-  const [state, setState] = useState(() => ({ phase: 'checking', user: getCachedUser(), info: null, offline: '' }));
+  // 离线客户端不连接账号服务：直接以访客进入（只读）
+  const [state, setState] = useState(() => (OFFLINE_CLIENT ? { phase: 'in', user: GUEST_USER, info: null, offline: '' }
+    : { phase: 'checking', user: getCachedUser(), info: null, offline: '' }));
   const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
+    if (OFFLINE_CLIENT) return undefined;
     let dead = false;
     authJson('/api/auth/status').then(info => {
       if (dead) return;
@@ -128,7 +131,8 @@ export default function AuthGate({ children }) {
   }, []);
   const refresh = useCallback(() => setNonce(n => n + 1), []);
   const enterAuth = useCallback(() => setState(s => ({ ...s, phase: 'auth' })), []);   // 访客 → 登录/注册页
-  const ctx = useMemo(() => ({ user: state.user, offline: Boolean(state.offline), guest: state.user?.role === 'guest', logout, refresh, enterAuth }), [state.user, state.offline, logout, refresh, enterAuth]);
+  const ctx = useMemo(() => ({ user: state.user, offline: Boolean(state.offline), guest: state.user?.role === 'guest', logout, refresh,
+    enterAuth: OFFLINE_CLIENT ? null : enterAuth }), [state.user, state.offline, logout, refresh, enterAuth]);
 
   if (state.phase === 'checking') {
     return <div className="v6-auth v6-auth-checking" aria-busy="true"><span className="v6-auth-logo" aria-hidden="true">A2</span><span>正在连接中心服务…</span></div>;

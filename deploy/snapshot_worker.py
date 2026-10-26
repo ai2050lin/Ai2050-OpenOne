@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、客户端离线数据包、规律分析预热与普查自动合并。
+"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、客户端离线数据包与附加包、规律分析预热与普查自动合并。
 
 与网站进程分开运行（低优先级），结果写到 <AI2050_DIST_DIR>/snapshots/<name>.json，网站进程只读文件，
 计算再久也不会拖慢页面。每个快照记录数据指纹（结果、审计、模板、普查的计数与最新时间）；
@@ -171,20 +171,30 @@ def run_once(force: bool = False, log=print) -> dict:
         log(f'[snapshots] datapack: {type(exc).__name__}: {exc}')
     guard.done()
     marker = snapshot_dir() / '_analyses.fingerprint'
-    if not force and marker.is_file() and marker.read_text(encoding='utf-8').strip() == fp:
+    stamp = f'{fp}-warm2'                              # warm2：行为门开 / 关两种都预热（预热范围改变时升这个标记）
+    if not force and marker.is_file() and marker.read_text(encoding='utf-8').strip() == stamp:
         out['analyses'] = 'skipped'                    # 数据没变：规律分析缓存已齐，不必逐模板检查
-        return out
-    try:
-        from shared.dist_protocol import pipeline as P
-        fresh = P.warm_analyses(D._db(), D._DATA_DIR,  # 实验响应页的规律分析：逐个模板 × 模型桶落盘
-                                skip=guard.skip, on_start=guard.start)
-        guard.done()
-        if fresh:
-            log(f'[snapshots] 规律分析预热：{fresh}')
-        out['analyses'] = fresh
-        marker.write_text(fp, encoding='utf-8')
+    else:
+        try:
+            from shared.dist_protocol import pipeline as P
+            fresh = P.warm_analyses(D._db(), D._DATA_DIR,  # 实验响应页的规律分析：逐个模板 × 模型桶落盘
+                                    skip=guard.skip, on_start=guard.start)
+            guard.done()
+            if fresh:
+                log(f'[snapshots] 规律分析预热：{fresh}')
+            out['analyses'] = fresh
+            marker.write_text(stamp, encoding='utf-8')
+        except Exception as exc:
+            log(f'[snapshots] analysis warm-up: {exc}')
+    try:                                               # 离线客户端的附加包：模式族实验响应、单元卡
+        import datapack as DP
+        from server import neuron_census_service as NS
+        runs = [(r['model_key'], r['run'], hashlib.sha256((NS.native_root() / '_census' / r['model_key'] / r['run'] / 'manifest.json')
+                                                          .read_bytes()).hexdigest()[:12]) for r in NS.census_runs()]
+        cards = f"{DP.research_stamp(NS.research_root())}-{hashlib.sha256(json.dumps(runs).encode('utf-8')).hexdigest()[:8]}"
+        out['extras'] = DP.build_extras(D._DATA_DIR, cards, force=force, log=log, guard=guard)
     except Exception as exc:
-        log(f'[snapshots] analysis warm-up: {exc}')
+        log(f'[snapshots] extras: {type(exc).__name__}: {exc}')
     return out
 
 

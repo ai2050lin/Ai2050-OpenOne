@@ -1,14 +1,45 @@
 /* 客户端 API 公共层（v6）：统一 API_BASE、读取（本地数据包优先，不轮询）、写操作与管理令牌。
+   离线客户端（config.js 的 OFFLINE_CLIENT）只在线读取站点配置，其余读取一律来自本机数据包与附加包，写操作不可用。
    纪律：读取失败只返回 error，组件显示「未接入」空态，不回退演示数据。 */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
-import { getLocal, getOnDemand, isOnDemand, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
+import { getExtraEntry, getLocal, getOnDemand, isOnDemand, packHint, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
 
-import { API_BASE } from '../../../config.js';
+import { API_BASE, OFFLINE_CLIENT, WEB_URL } from '../../../config.js';
 
-export { API_BASE };
+export { API_BASE, OFFLINE_CLIENT, WEB_URL };
+
+/* 离线客户端唯一在线读取的接口。 */
+const ONLINE_PATHS = new Set(['/api/platform/config']);
+
+/* 离线客户端：从本机数据包取一条；没有时抛出带 pack（应下载的附加包 id）的错误。 */
+async function offlineJson(path) {
+  const local = getLocal(path);
+  if (local !== undefined) return local;
+  const extra = await getExtraEntry(path);
+  if (extra !== undefined) return extra;
+  const pack = packHint(path);
+  const info = packInfo();
+  const error = new Error(!info.version ? '离线客户端：还没有下载数据（页面左下角「下载数据」）'
+    : pack && !info.extras[pack] ? '离线客户端：这项数据在附加包里，下载后显示'
+      : '离线客户端：已下载的数据包里没有这项数据（可在网页版查看）');
+  error.pack = pack && !info.extras[pack] ? pack : null;
+  error.offline = true;
+  throw error;
+}
+
+let configOnce = null;             // 离线客户端：站点配置每次打开页面只读一次，各组件共用
 
 export async function getJson(path, { signal } = {}) {
+  if (OFFLINE_CLIENT && !ONLINE_PATHS.has(path.split('?')[0])) return offlineJson(path);
+  if (OFFLINE_CLIENT) {
+    if (!configOnce) configOnce = fetchJson(path).catch(reason => { configOnce = null; throw reason; });
+    return configOnce;
+  }
+  return fetchJson(path, { signal });
+}
+
+async function fetchJson(path, { signal } = {}) {
   let response;
   try {
     response = await fetch(`${API_BASE}${path}`, { signal, cache: 'no-store' });
@@ -22,6 +53,7 @@ export async function getJson(path, { signal } = {}) {
 }
 
 export async function postJson(path, payload, { adminToken, method = 'POST' } = {}) {
+  if (OFFLINE_CLIENT) throw new Error(`离线客户端不能写入；请在网页版操作：${WEB_URL}`);
   const headers = { 'Content-Type': 'application/json' };
   if (adminToken) headers['X-Admin-Token'] = adminToken;
   let response;
@@ -52,15 +84,18 @@ export function detailText(detail) {
    reload 之后改为在线读取，不再用本地数据包里的旧值。online：管理类页面始终在线读取（冻结、派发后要马上看到变化）。
    实验响应的合并统计与规律分析体积大、不进数据包：第一次在线读取后存进本地，之后直接读本地。
    pollWhilePending：服务端返回 pending（后台计算中）时 15 秒后自动复查，直到出结果。
-   返回 {data, error, loading, reload, local}；setState 只在异步回调中调用；切换 path 时旧数据不串用。 */
+   离线客户端：只读本机数据包与附加包（getJson 内处理），error 时 missingPack 给出应下载的附加包 id；下载后自动重读。
+   返回 {data, error, loading, reload, local, missingPack}；setState 只在异步回调中调用；切换 path 时旧数据不串用。 */
 export function useApi(path, { pollWhilePending = false, online = false } = {}) {
   useSyncExternalStore(subscribe, storeTick);              // 数据包载入 / 更新后重新渲染
   const ready = packInfo().ready;
   const local = path ? getLocal(path) : undefined;
-  const [state, setState] = useState({ key: null, data: null, error: '' });
+  const [state, setState] = useState({ key: null, data: null, error: '', pack: null });
   const [nonce, setNonce] = useState(0);
-  const useLocal = !online && nonce === 0 && local !== undefined;
-  const needFetch = Boolean(path) && (online || ready) && !useLocal;
+  const useLocal = (!online || OFFLINE_CLIENT) && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
+  const needFetch = Boolean(path) && ((online && !OFFLINE_CLIENT) || ready) && !useLocal;
+  const extrasKey = OFFLINE_CLIENT && path && !ONLINE_PATHS.has(path.split('?')[0])
+    ? JSON.stringify(packInfo().extras) : '';                // 附加包下载后重读（站点配置不受影响）
   useEffect(() => {
     if (!needFetch) return undefined;
     const controller = new AbortController();
@@ -69,28 +104,29 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     const run = () => getJson(path, { signal: controller.signal })
       .then(data => {
         if (dead) return;
-        setState({ key: path, data, error: '' });
-        if (isOnDemand(path)) putOnDemand(path, data);
+        setState({ key: path, data, error: '', pack: null });
+        if (!OFFLINE_CLIENT && isOnDemand(path)) putOnDemand(path, data);
         // 服务端后台计算中（data.pending）：15 秒后自动复查，直到出结果
         if (pollWhilePending && data?.pending) retry = window.setTimeout(run, 15000);
       })
       .catch(reason => {
         if (reason?.name === 'AbortError' || dead) return;
-        setState(previous => ({ key: path, data: previous.key === path ? previous.data : null, error: String(reason.message || reason) }));
+        setState(previous => ({ key: path, data: previous.key === path ? previous.data : null, error: String(reason.message || reason),
+                                pack: reason?.pack || null }));
       });
-    if (isOnDemand(path) && nonce === 0) {
+    if (!OFFLINE_CLIENT && isOnDemand(path) && nonce === 0) {
       getOnDemand(path).then(cached => {
         if (dead) return;
-        if (cached !== undefined) setState({ key: path, data: cached, error: '' });
+        if (cached !== undefined) setState({ key: path, data: cached, error: '', pack: null });
         else run();
       });
     } else {
       run();
     }
     return () => { dead = true; controller.abort(); if (retry) window.clearTimeout(retry); };
-  }, [path, nonce, pollWhilePending, needFetch]);
+  }, [path, nonce, pollWhilePending, needFetch, extrasKey]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
-  if (useLocal) return { data: local, error: '', loading: false, reload, local: true };
+  if (useLocal) return { data: local, error: '', loading: false, reload, local: true, missingPack: null };
   const current = state.key === path;
   return {
     data: current ? state.data : null,
@@ -98,6 +134,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     loading: Boolean(path) && !current,
     reload,
     local: false,
+    missingPack: current ? state.pack : null,
   };
 }
 
@@ -141,6 +178,11 @@ export function clearSession() { store('del', SESSION_KEY); store('del', USER_KE
 
 /* /api/auth/* 调用：自动带会话令牌 */
 export async function authJson(path, { method = 'GET', body } = {}) {
+  if (OFFLINE_CLIENT) {
+    const error = new Error('离线客户端不连接账号服务');
+    error.offline = true;
+    throw error;
+  }
   const headers = { 'Content-Type': 'application/json' };
   const token = getSession();
   if (token) headers.Authorization = `Bearer ${token}`;

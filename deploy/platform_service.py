@@ -6,6 +6,7 @@
   GET /api/platform/snapshot/{name} 公开：重计算端点的缓存副本（pipeline_overview / scoreboard / atlas / coverage / catalog）
   GET /api/platform/contributors    公开：按账号统计的贡献（只显示显示名）
   GET /api/platform/datapack        公开：客户端离线数据包（deploy/datapack.py，后台子进程生成）
+  GET /api/platform/datapack/extra/{id}  公开：附加包（模式族实验响应、单元卡）
   GET /api/platform/kit             参与者一键包（zip）：节点程序、启动脚本、配置（不带绑定码）
   GET /api/auth/kit                 登录用户的一键包：内嵌一次性节点绑定码（7 天），节点自动归属该账号
   GET /api/auth/my-contributions    登录用户：我的节点与贡献
@@ -273,7 +274,10 @@ def overview() -> dict:
 def _datapack_meta():
     import datapack as DP
     m = DP.read_meta(D._DATA_DIR)
-    return {k: m.get(k) for k in ('version', 'created_at', 'bytes', 'raw_bytes', 'n_entries')} if m else None
+    if not m:
+        return None
+    return {**{k: m.get(k) for k in ('version', 'created_at', 'bytes', 'raw_bytes', 'n_entries')},
+            'extras': DP.extras_meta(D._DATA_DIR)}         # 附加包（模式族实验响应、单元卡）：按需手动下载
 
 
 @router.get('/datapack')
@@ -286,6 +290,20 @@ def datapack_download():
     meta = _datapack_meta() or {}
     return FileResponse(p, media_type='application/octet-stream', filename='ai2050-datapack.json.gz',
                         headers={'Content-Encoding': 'identity', 'X-Datapack-Version': str(meta.get('version') or ''),
+                                 'Cache-Control': 'no-cache'})
+
+
+@router.get('/datapack/extra/{extra_id}')
+def datapack_extra_download(extra_id: str):
+    """附加包（gzip JSON，datapack_extra.v1）：tm:<模式族> 或 cards:<模型>。清单见站点配置 datapack.extras。"""
+    from fastapi.responses import FileResponse
+    import datapack as DP
+    info = DP.read_extras(D._DATA_DIR).get(extra_id)
+    p = DP.extra_file(D._DATA_DIR, extra_id)
+    if not info or not p.is_file():
+        raise HTTPException(404, '没有这个附加包，或还在后台生成')
+    return FileResponse(p, media_type='application/octet-stream', filename=p.name,
+                        headers={'Content-Encoding': 'identity', 'X-Datapack-Version': str(info.get('version') or ''),
                                  'Cache-Control': 'no-cache'})
 
 

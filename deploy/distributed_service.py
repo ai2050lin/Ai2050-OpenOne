@@ -1323,6 +1323,11 @@ def results_list(tm_id: str = '', model_id: str = '', kind: str = '', limit: int
 
 @router.get('/results/{sha}')
 def result_download(sha: str) -> dict:
+    return result_detail(sha)
+
+
+def result_detail(sha: str, count: bool = True) -> dict:
+    """单个结果的摘要、文件（base64）与 cos 矩阵；count=False 时不计下载次数（离线数据包生成用）。"""
     db = _db()
     row = db.execute('SELECT * FROM results WHERE sha=?', (sha,)).fetchone()
     if not row:
@@ -1331,9 +1336,10 @@ def result_download(sha: str) -> dict:
     if not p.is_file():
         raise HTTPException(410, 'object missing')
     blob = p.read_bytes()
-    with _db_lock:
-        db.execute('UPDATE results SET downloads=downloads+1 WHERE sha=?', (sha,))
-        db.commit()
+    if count:
+        with _db_lock:
+            db.execute('UPDATE results SET downloads=downloads+1 WHERE sha=?', (sha,))
+            db.commit()
     cursor = 4 + int.from_bytes(blob[:4], 'big')
     paths = json.loads(blob[4:cursor].decode('utf-8'))
     rest = blob[cursor:]

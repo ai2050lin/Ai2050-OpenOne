@@ -17,7 +17,7 @@ import NeuronUnitPanel from './rdc_fusion/NeuronUnitPanel.jsx';
 import ResponseExplorer from './rdc_fusion/ResponseExplorer.jsx';
 import RouteBoard from './rdc_fusion/RouteBoard.jsx';
 import TemplateStudio from './rdc_fusion/TemplateStudio.jsx';
-import { API_BASE, useApi } from './rdc_fusion/api.js';
+import { API_BASE, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
 import { loadLocalPack } from './rdc_fusion/localPack.js';
 import { Empty } from './rdc_fusion/ui.jsx';
 import { LENSES, SPATIAL_VIEWS, STATIONS, readState, resolveGo, writeState } from './workbenchUtil.js';
@@ -80,8 +80,12 @@ export default function Workbench() {
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
   const [draft, setDraft] = useState(null);
-  const stations = STATIONS.filter(s => !s.localOnly || localTools);
-  const lenses = localTools ? [...LENSES, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : LENSES;
+  // 离线客户端只保留只读的题库；模板、冻结、分发、审计、普查、自动测试在网页版操作
+  const stations = STATIONS.filter(s => (OFFLINE_CLIENT ? s.id === 'catalog' : !s.localOnly || localTools));
+  const baseLenses = OFFLINE_CLIENT
+    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '题库（离线版只读；模板、冻结、分发、审计在网页版操作）' } : l))
+    : LENSES;
+  const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'home';
   const station = stations.some(s => s.id === st.station) ? st.station : 'catalog';
   const view = SPATIAL_VIEWS.some(v => v.id === st.view) ? st.view : 'response';
@@ -129,7 +133,7 @@ export default function Workbench() {
               {lens === 'spatial' && view === 'atlas' && <AtlasView snapshot onOpenFamily={({ tm }) => go('spatial', null, null, { tm })} />}
               {lens === 'spatial' && view === 'units' && <NeuronUnitPanel />}
               {lens === 'spatial' && view === 'local' && <LocalPack />}
-              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={() => go(localTools ? 'autotest' : 'dispatch')} onStudio={() => go('studio')} />}
+              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={OFFLINE_CLIENT ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={OFFLINE_CLIENT ? null : () => go('studio')} />}
               {lens === 'process' && station === 'studio' && <TemplateStudio draft={draft} onDraft={setDraft} onNext={() => go('freeze')} />}
               {lens === 'process' && station === 'freeze' && <FreezePanel draft={draft} onDraft={setDraft} onGo={go} />}
               {lens === 'process' && station === 'dispatch' && <DispatchPanel onGo={go} />}

@@ -94,6 +94,16 @@ export const FRONTEND_BASE = stripTrailingSlash(
 /** 运行形态标记，供界面显示「本机 / 服务器」等口径（不参与数据判定）。 */
 export const RUNTIME_MODE = detectMode(API_BASE);
 
+/** 离线客户端：只在线读取站点配置、下载数据包；其余接口一律从本机数据包读取，不实时访问服务器。
+ *  连接远端中心的客户端（vite dev 指向线上、Electron 安装包）默认离线；中心同源托管的网页版与本机开发保持在线
+ *  （管理员在网页版做审计、冻结、分发等写操作）。VITE_CLIENT_MODE=online|offline 可显式指定。 */
+const CLIENT_MODE = import.meta.env.VITE_CLIENT_MODE;
+export const OFFLINE_CLIENT = CLIENT_MODE === 'offline'
+  || (CLIENT_MODE !== 'online' && (RUNTIME_MODE === 'remote' || RUNTIME_MODE === 'electron'));
+
+/** 网页版地址（离线客户端里「去网页版操作」的链接）。 */
+export const WEB_URL = API_BASE || (typeof window !== 'undefined' && window.location ? window.location.origin : '');
+
 /** 把相对路径拼成完整 URL（下载链接用；同源托管下返回站点绝对地址）。 */
 export function apiUrl(path) {
   return `${API_BASE}${path}`;
