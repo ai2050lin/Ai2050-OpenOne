@@ -40,6 +40,8 @@ GATE_CHAIN = [
 _GATE_LABEL = {g['id']: '最远到「' + g['label'] + '」' for g in GATE_CHAIN}
 _CACHE: Dict[Tuple, Any] = {}
 _CACHE_LOCK = threading.Lock()
+# 重计算（读取并合并分片统计量、规律分析）同一进程内一次只做一个：多个页面请求同时到达时不叠加内存
+_HEAVY_LOCK = threading.RLock()
 
 
 # ---------------- 基础读取 ----------------
@@ -108,11 +110,52 @@ def paired_behavior(corpus_items: List[dict], behavior_items: List[dict], factor
     return out
 
 
-def result_files(data_dir: Path, sha: str, summary: dict) -> Dict[str, bytes]:
+def result_files(data_dir: Path, sha: str, summary: dict, only=None) -> Dict[str, bytes]:
+    """从对象文件中按清单取出各文件。only 给定时只读这些文件（按偏移跳读，不把整个对象读进内存）。"""
     p = Path(data_dir) / 'objects' / sha[:2] / sha
     if not p.is_file():
         return {}
-    return parse_blob(p.read_bytes(), summary.get('_manifest') or [])
+    files = {}
+    with p.open('rb') as fh:
+        off = 4 + int.from_bytes(fh.read(4), 'big')
+        for f in summary.get('_manifest') or []:
+            size, name = int(f['size']), str(f['path'])
+            if only is None or name in only:
+                fh.seek(off)
+                files[name] = fh.read(size)
+            off += size
+    return files
+
+
+def _code_hash() -> str:
+    """合并与汇总代码的内容哈希：代码改动后磁盘缓存自动失效。"""
+    from . import suffstats as _ss
+    h = hashlib.sha256()
+    for f in (__file__, _ss.__file__):
+        h.update(Path(f).read_bytes())
+    return h.hexdigest()[:16]
+
+
+def _agg_disk_path(data_dir: Path, key: Tuple) -> Path:
+    raw = json.dumps([_code_hash(), *key], ensure_ascii=False, default=list)
+    return Path(data_dir) / 'agg_cache' / (hashlib.sha256(raw.encode('utf-8')).hexdigest() + '.json')
+
+
+def _agg_disk_get(path: Path):
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return None
+
+
+def _agg_disk_put(path: Path, entry) -> None:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(f'.{os.getpid()}.tmp')
+        tmp.write_text(json.dumps(entry, ensure_ascii=False), encoding='utf-8')
+        tmp.replace(path)
+    except (OSError, TypeError, ValueError):
+        pass
 
 
 def template_corpus(db: sqlite3.Connection, tm_id: str) -> dict:
@@ -156,6 +199,108 @@ def audit_status_map(db: sqlite3.Connection) -> Dict[str, dict]:
 
 # ---------------- 合并（AGG-v2） ----------------
 
+def _aggregate_bucket(db, data_dir, b, members, corpus, prereg, tpl, audits, gate, full, shards_expected):
+    """一个模型桶的精确合并（读取分片统计量、行为门、独立重跑一致性）。"""
+    excluded, primaries, replicas = [], {}, []
+    for r, s in members:
+        reason = None
+        if tpl and r['design_sha'] != tpl['design_sha']:
+            reason = 'design_sha 与当前模板不符'
+        elif (s.get('_canary') or {}).get('status') == 'drift':
+            reason = '金丝雀漂移'
+        elif (audits.get(r['sha']) or {}).get('status') in ('rejected', 'needs_rerun'):
+            reason = '审计未通过'
+        if reason:
+            excluded.append({'sha': r['sha'], 'reason': reason,
+                             'audit_status': (audits.get(r['sha']) or {}).get('status')}); continue
+        shard = str(s.get('shard') or '0/1')
+        if shard in primaries:
+            replicas.append((shard, r, s))
+        else:
+            primaries[shard] = (r, s)
+    merged: Optional[SuffStats] = None
+    behavior: Dict[str, Dict[str, int]] = {}
+    gate_mode = prereg.get('gate_mode', 'absolute')
+    beh_items: List[dict] = []
+    loaded: Dict[str, Any] = {}                    # 分片 → 统计量；只为有独立重跑的分片保留（一致性比较用）
+    replica_shards = {sh for sh, _, _ in replicas}
+    for shard, (r, s) in sorted(primaries.items()):
+        files = result_files(data_dir, r['sha'], s, only=('suffstats.npz', 'behavior.json'))
+        if 'suffstats.npz' not in files:
+            excluded.append({'sha': r['sha'], 'reason': '对象缺失'}); continue
+        try:
+            raw = files.pop('suffstats.npz')
+            ss = SuffStats.from_npz_bytes(raw)
+            if shard in replica_shards:            # 合并会改写 merged 本身：保留一份独立副本
+                loaded[shard] = ss
+                merged = SuffStats.from_npz_bytes(raw) if merged is None else merged.merge_inplace(ss)
+            else:
+                merged = ss if merged is None else merged.merge_inplace(ss)
+                loaded[shard] = None
+        except ValueError as exc:
+            excluded.append({'sha': r['sha'], 'reason': f'统计量不可合并：{exc}'}); continue
+        for cell, rec in (s.get('behavior_by_cell') or {}).items():
+            agg = behavior.setdefault(cell, {'n': 0, 'correct': 0})
+            agg['n'] += int(rec.get('n', 0)); agg['correct'] += int(rec.get('correct', 0))
+        if gate_mode == 'paired' and 'behavior.json' in files:
+            try:
+                beh_items.extend(json.loads(files['behavior.json'].decode('utf-8')).get('items') or [])
+            except (ValueError, UnicodeDecodeError):
+                pass
+    rep = []
+    try:
+        byte_reps = db.execute(
+            'SELECT sha,node_id,model_id,model_rev,precision,uploaded_at FROM result_replicas WHERE sha IN (%s)'
+            % ','.join('?' for _ in primaries), [r['sha'] for r, _ in primaries.values()]).fetchall() if primaries else []
+    except sqlite3.OperationalError:
+        byte_reps = []
+    sha_shard = {r['sha']: sh for sh, (r, _) in primaries.items()}
+    for br in byte_reps:
+        rep.append({'shard': sha_shard.get(br['sha']), 'sha': br['sha'], 'node_id': br['node_id'],
+                    'rel_diff': 0.0, 'byte_identical': True})
+    for shard, r, s in replicas:
+        if loaded.get(shard) is None:
+            continue
+        files = result_files(data_dir, r['sha'], s, only=('suffstats.npz',))
+        try:
+            other = SuffStats.from_npz_bytes(files['suffstats.npz'])
+            rep.append({'shard': shard, 'sha': r['sha'], 'node_id': r['node_id'],
+                        'rel_diff': replicate_consistency(loaded[shard], other)})
+        except (KeyError, ValueError):
+            rep.append({'shard': shard, 'sha': r['sha'], 'node_id': r['node_id'], 'rel_diff': None})
+    min_acc = float(prereg.get('min_behavior_acc', 0.8))
+    min_n = int(prereg.get('min_probe_n', 3))
+    beh = {}
+    failing = set()
+    # 成对口径（prereg.gate_mode=paired）：按句子对判定；逐条绝对准确率仍记录为 absolute_acc
+    paired = (paired_behavior(corpus.get('items') or [], beh_items, str(prereg.get('gate_factor')))
+              if gate_mode == 'paired' else None)
+    for cell, rec in sorted(behavior.items()):
+        abs_acc = rec['correct'] / rec['n'] if rec['n'] else None
+        if paired is not None:
+            pr = paired.get(cell) or {'n': 0, 'correct': 0, 'invalid': 0}
+            acc = pr['correct'] / pr['n'] if pr['n'] else None
+            ok = acc is not None and pr['n'] >= min_n and acc >= min_acc
+            beh[cell] = {'n': rec['n'], 'acc': acc, 'pass': ok, 'mode': 'paired', 'n_pairs': pr['n'],
+                         'invalid_pairs': pr['invalid'], 'absolute_acc': abs_acc}
+        else:
+            ok = abs_acc is not None and rec['n'] >= min_n and abs_acc >= min_acc
+            beh[cell] = {'n': rec['n'], 'acc': abs_acc, 'pass': ok}
+        if not ok:
+            failing.add(cell)
+    payload = summarize(merged, exclude_conds=failing if gate else None, include_full=full) if merged else None
+    entry = {
+        'bucket': b, 'n_results': len(members), 'shards_expected': shards_expected,
+        'shards_present': sorted(primaries), 'complete': len(primaries) >= shards_expected,
+        'replicates': rep, 'excluded': excluded, 'behavior': beh,
+        'primary_shas': [primaries[sh][0]['sha'] for sh in sorted(loaded)],
+        'behavior_threshold': min_acc, 'gate_mode': gate_mode, 'gate_applied': gate, 'gate_excluded_cells': sorted(failing) if gate else [],
+        'agg': payload,
+        'synthetic': any(r['kind'] == 'synthetic' for r, _ in members),
+    }
+    return entry
+
+
 def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Optional[str] = None,
               gate: bool = True, full: Optional[Tuple[str, str]] = None) -> Dict[str, Any]:
     corpus = template_corpus(db, tm_id)
@@ -187,99 +332,19 @@ def aggregate(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Opt
         if cached is not None:
             out_buckets.append(cached)
             continue
-        excluded, primaries, replicas = [], {}, []
-        for r, s in members:
-            reason = None
-            if tpl and r['design_sha'] != tpl['design_sha']:
-                reason = 'design_sha 与当前模板不符'
-            elif (s.get('_canary') or {}).get('status') == 'drift':
-                reason = '金丝雀漂移'
-            elif (audits.get(r['sha']) or {}).get('status') in ('rejected', 'needs_rerun'):
-                reason = '审计未通过'
-            if reason:
-                excluded.append({'sha': r['sha'], 'reason': reason,
-                                 'audit_status': (audits.get(r['sha']) or {}).get('status')}); continue
-            shard = str(s.get('shard') or '0/1')
-            if shard in primaries:
-                replicas.append((shard, r, s))
-            else:
-                primaries[shard] = (r, s)
-        merged: Optional[SuffStats] = None
-        behavior: Dict[str, Dict[str, int]] = {}
-        gate_mode = prereg.get('gate_mode', 'absolute')
-        beh_items: List[dict] = []
-        loaded: Dict[str, SuffStats] = {}
-        for shard, (r, s) in sorted(primaries.items()):
-            files = result_files(data_dir, r['sha'], s)
-            if 'suffstats.npz' not in files:
-                excluded.append({'sha': r['sha'], 'reason': '对象缺失'}); continue
-            try:
-                ss = SuffStats.from_npz_bytes(files['suffstats.npz'])
-                merged = ss if merged is None else merged.merge(ss)
-                loaded[shard] = ss
-            except ValueError as exc:
-                excluded.append({'sha': r['sha'], 'reason': f'统计量不可合并：{exc}'}); continue
-            for cell, rec in (s.get('behavior_by_cell') or {}).items():
-                agg = behavior.setdefault(cell, {'n': 0, 'correct': 0})
-                agg['n'] += int(rec.get('n', 0)); agg['correct'] += int(rec.get('correct', 0))
-            if gate_mode == 'paired' and 'behavior.json' in files:
-                try:
-                    beh_items.extend(json.loads(files['behavior.json'].decode('utf-8')).get('items') or [])
-                except (ValueError, UnicodeDecodeError):
-                    pass
-        rep = []
-        try:
-            byte_reps = db.execute(
-                'SELECT sha,node_id,model_id,model_rev,precision,uploaded_at FROM result_replicas WHERE sha IN (%s)'
-                % ','.join('?' for _ in primaries), [r['sha'] for r, _ in primaries.values()]).fetchall() if primaries else []
-        except sqlite3.OperationalError:
-            byte_reps = []
-        sha_shard = {r['sha']: sh for sh, (r, _) in primaries.items()}
-        for br in byte_reps:
-            rep.append({'shard': sha_shard.get(br['sha']), 'sha': br['sha'], 'node_id': br['node_id'],
-                        'rel_diff': 0.0, 'byte_identical': True})
-        for shard, r, s in replicas:
-            if shard not in loaded:
-                continue
-            files = result_files(data_dir, r['sha'], s)
-            try:
-                other = SuffStats.from_npz_bytes(files['suffstats.npz'])
-                rep.append({'shard': shard, 'sha': r['sha'], 'node_id': r['node_id'],
-                            'rel_diff': replicate_consistency(loaded[shard], other)})
-            except (KeyError, ValueError):
-                rep.append({'shard': shard, 'sha': r['sha'], 'node_id': r['node_id'], 'rel_diff': None})
-        min_acc = float(prereg.get('min_behavior_acc', 0.8))
-        min_n = int(prereg.get('min_probe_n', 3))
-        beh = {}
-        failing = set()
-        # 成对口径（prereg.gate_mode=paired）：按句子对判定；逐条绝对准确率仍记录为 absolute_acc
-        paired = (paired_behavior(corpus.get('items') or [], beh_items, str(prereg.get('gate_factor')))
-                  if gate_mode == 'paired' else None)
-        for cell, rec in sorted(behavior.items()):
-            abs_acc = rec['correct'] / rec['n'] if rec['n'] else None
-            if paired is not None:
-                pr = paired.get(cell) or {'n': 0, 'correct': 0, 'invalid': 0}
-                acc = pr['correct'] / pr['n'] if pr['n'] else None
-                ok = acc is not None and pr['n'] >= min_n and acc >= min_acc
-                beh[cell] = {'n': rec['n'], 'acc': acc, 'pass': ok, 'mode': 'paired', 'n_pairs': pr['n'],
-                             'invalid_pairs': pr['invalid'], 'absolute_acc': abs_acc}
-            else:
-                ok = abs_acc is not None and rec['n'] >= min_n and abs_acc >= min_acc
-                beh[cell] = {'n': rec['n'], 'acc': abs_acc, 'pass': ok}
-            if not ok:
-                failing.add(cell)
-        payload = summarize(merged, exclude_conds=failing if gate else None, include_full=full) if merged else None
-        entry = {
-            'bucket': b, 'n_results': len(members), 'shards_expected': shards_expected,
-            'shards_present': sorted(primaries), 'complete': len(primaries) >= shards_expected,
-            'replicates': rep, 'excluded': excluded, 'behavior': beh,
-            'primary_shas': [primaries[sh][0]['sha'] for sh in sorted(loaded)],
-            'behavior_threshold': min_acc, 'gate_mode': gate_mode, 'gate_applied': gate, 'gate_excluded_cells': sorted(failing) if gate else [],
-            'agg': payload,
-            'synthetic': any(r['kind'] == 'synthetic' for r, _ in members),
-        }
+        # 合并结果按键落盘（<data_dir>/agg_cache）：进程重启后不必重新读取、合并全部分片；
+        # 同一进程内一次只合并一个桶（多个请求同时到达时不叠加内存）
+        disk = _agg_disk_path(data_dir, key)
+        entry = _agg_disk_get(disk)
+        if entry is None:
+            with _HEAVY_LOCK:
+                entry = _agg_disk_get(disk)
+                if entry is None:
+                    entry = _aggregate_bucket(db, data_dir, b, members, corpus, prereg, tpl, audits, gate, full,
+                                              shards_expected)
+                    _agg_disk_put(disk, entry)
         with _CACHE_LOCK:
-            if len(_CACHE) > 64:
+            if len(_CACHE) > 8:                        # 合并结果已落盘；内存里只留少量，避免常驻占用
                 _CACHE.clear()
             _CACHE[key] = entry
         out_buckets.append(entry)
@@ -623,7 +688,6 @@ def overview(db: sqlite3.Connection, data_dir: Path, *, node_online_window: floa
 
 # ---------------- 模式族规律分析（analysis.v1） ----------------
 
-_ANALYSIS_CACHE: Dict[Tuple, Any] = {}
 _ANALYSIS_RUNNING: Dict[str, float] = {}
 
 
@@ -638,10 +702,13 @@ def _analysis_disk_path(data_dir: Path, key: Tuple) -> Path:
 
 
 def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Optional[str] = None,
-                   gate: bool = True, n_perm: Optional[int] = None, background: bool = False) -> Dict[str, Any]:
+                   gate: bool = True, n_perm: Optional[int] = None, background: bool = False,
+                   as_path: bool = False):
     """在一个模型桶的已合并分片上运行 analysis.v1（逐条向量 items.npz）。没有逐条向量时返回 available=False。
     结果写入 <data_dir>/analysis_cache/（键含分片 sha、门控与 analysis.py 内容哈希），结果不可变，所以只算一次。
-    background=True 时，未命中缓存就在后台线程计算并立即返回 pending（大模板首次可能要十几分钟）。"""
+    background=True 时，未命中缓存就在后台线程计算并立即返回 pending（大模板首次可能要十几分钟）。
+    as_path=True 且已有缓存时直接返回缓存文件路径（网站进程原样发送文件，不解析几十 MB 的 JSON）。
+    结果只存磁盘、不在内存里常驻（单个结果解析后可达数百 MB）。"""
     agg = aggregate(db, data_dir, tm_id, bucket=bucket, gate=gate)
     buckets = [b for b in agg['buckets'] if b.get('agg')]
     if not buckets:
@@ -652,17 +719,12 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
         return {'tm_id': tm_id, 'available': False, 'reason': f'模型桶 {bucket} 没有可合并结果',
                 'buckets': [b['bucket'] for b in buckets]}
     key = (tm_id, chosen['bucket'], gate, tuple(chosen['primary_shas']), tuple(chosen['gate_excluded_cells']), n_perm)
-    with _CACHE_LOCK:
-        hit = _ANALYSIS_CACHE.get(key)
-    if hit is not None:
-        return hit
     disk = _analysis_disk_path(data_dir, key)
     if disk.is_file():
+        if as_path:
+            return disk
         try:
-            out = json.loads(disk.read_text(encoding='utf-8'))
-            with _CACHE_LOCK:
-                _ANALYSIS_CACHE[key] = out
-            return out
+            return json.loads(disk.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             pass
     base = {'tm_id': tm_id, 'bucket': chosen['bucket'], 'buckets': [b['bucket'] for b in buckets],
@@ -693,7 +755,7 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
         blobs = []
         for sha in chosen['primary_shas']:
             row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
-            files = result_files(data_dir, sha, summary_of(row)) if row else {}
+            files = result_files(data_dir, sha, summary_of(row), only=('items.npz',)) if row else {}
             if 'items.npz' in files:
                 blobs.append(files['items.npz'])
         if not blobs:
@@ -718,18 +780,15 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
             tmp.replace(disk)
         except OSError:
             pass
-        with _CACHE_LOCK:
-            if len(_ANALYSIS_CACHE) > 16:
-                _ANALYSIS_CACHE.clear()
-            _ANALYSIS_CACHE[key] = out
         return out
     finally:
         with _CACHE_LOCK:
             _ANALYSIS_RUNNING.pop(disk.name, None)
 
 
-def warm_analyses(db: sqlite3.Connection, data_dir: Path) -> List[str]:
-    """后台预热：为每个 v3 模板的每个有合并结果的模型桶算好规律分析（已缓存的跳过）。返回本次新算的。"""
+def warm_analyses(db: sqlite3.Connection, data_dir: Path, skip=None, on_start=None) -> List[str]:
+    """后台预热：为每个 v3 模板的每个有合并结果的模型桶算好规律分析（已缓存的跳过）。返回本次新算的。
+    skip(name) 为真的步骤不算（后台进程记录的崩溃步骤）；on_start(name) 在每一步开始前调用。name = 'analysis:<tm>/<bucket>'。"""
     done = []
     for t, corpus in templates_v3(db):
         if not is_v3(corpus):
@@ -741,6 +800,11 @@ def warm_analyses(db: sqlite3.Connection, data_dir: Path) -> List[str]:
             key = (t['tm_id'], b['bucket'], True, tuple(b['primary_shas']), tuple(b['gate_excluded_cells']), None)
             if _analysis_disk_path(data_dir, key).is_file():
                 continue
+            name = f"analysis:{t['tm_id']}/{b['bucket']}"
+            if skip and skip(name):
+                continue
+            if on_start:
+                on_start(name)
             out = analyze_bucket(db, data_dir, t['tm_id'], bucket=b['bucket'], gate=True)
             if not out.get('pending'):
                 done.append(f"{t['tm_id']}/{b['bucket']}")
@@ -758,10 +822,10 @@ def _merge_shas(db: sqlite3.Connection, data_dir: Path, shas: List[str]) -> Opti
     merged = None
     for sha in shas:
         row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
-        files = result_files(data_dir, sha, summary_of(row)) if row else {}
+        files = result_files(data_dir, sha, summary_of(row), only=('suffstats.npz',)) if row else {}
         if 'suffstats.npz' in files:
             ss = SuffStats.from_npz_bytes(files['suffstats.npz'])
-            merged = ss if merged is None else merged.merge(ss)
+            merged = ss if merged is None else merged.merge_inplace(ss)
     return merged
 
 
@@ -942,7 +1006,7 @@ def export_pack(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: O
         for sha in chosen['primary_shas']:
             row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
             s = summary_of(row) if row else {}
-            got = result_files(data_dir, sha, s)
+            got = result_files(data_dir, sha, s, only=('items.npz',))
             if 'items.npz' in got:
                 files[f'items/{str(s.get("shard") or "0/1").replace("/", "of")}.npz'] = got['items.npz']
     manifest = {'schema': 'respack.v1', 'tm_id': tm_id, 'family_id': corpus.get('family_id'),

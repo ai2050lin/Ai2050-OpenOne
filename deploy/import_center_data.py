@@ -132,9 +132,9 @@ def main() -> int:
                         q.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copyfile(p, q)
                         n_bdl += 1
-        if (pack / 'analysis_cache').is_dir():
-            for p in (pack / 'analysis_cache').glob('*.json'):
-                q = data / 'analysis_cache' / p.name
+        for sub in ('analysis_cache', 'agg_cache'):
+            for p in sorted((pack / sub).glob('*.json')) if (pack / sub).is_dir() else []:
+                q = data / sub / p.name
                 if not q.exists():
                     q.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(p, q)

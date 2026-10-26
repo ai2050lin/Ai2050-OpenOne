@@ -1782,11 +1782,15 @@ def agg_v2(tm_id: str, bucket: str = '', gate: bool = True, layer: str = '', fac
 
 
 @router.get('/analysis/{tm_id}')
-def family_analysis(tm_id: str, bucket: str = '', gate: bool = True) -> dict:
+def family_analysis(tm_id: str, bucket: str = '', gate: bool = True):
     """模式族规律分析（analysis.v1）：置换零分布、留出探针、白化方向、句式不变性、组合可加性、
     词身份与长度对照、3D 响应空间坐标与规律陈述。需要结果附带 items.npz。"""
     _proto()
-    return _pipeline.analyze_bucket(_db(), _DATA_DIR, tm_id, bucket=bucket or None, gate=gate, background=True)
+    out = _pipeline.analyze_bucket(_db(), _DATA_DIR, tm_id, bucket=bucket or None, gate=gate, background=True, as_path=True)
+    if isinstance(out, Path):                           # 已缓存：原样发送文件，不在网站进程里解析与重新编码
+        from fastapi.responses import FileResponse
+        return FileResponse(out, media_type='application/json')
+    return out
 
 
 @router.get('/coverage')

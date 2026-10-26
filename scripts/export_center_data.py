@@ -86,8 +86,9 @@ def main() -> int:
             shutil.copytree(bd, work / rel, dirs_exist_ok=True)
 
     # 规律分析缓存（键含分片 sha 与 analysis.py 哈希；目标中心同版本代码可直接命中，免去大模板的首次计算）
-    if (DIST / 'analysis_cache').is_dir():
-        shutil.copytree(DIST / 'analysis_cache', work / 'analysis_cache', ignore=shutil.ignore_patterns('*.tmp'))
+    for sub in ('analysis_cache', 'agg_cache'):         # 合并统计缓存同理（键含结果 sha 与审计状态）
+        if (DIST / sub).is_dir():
+            shutil.copytree(DIST / sub, work / sub, ignore=shutil.ignore_patterns('*.tmp'))
 
     # 普查
     runs = []

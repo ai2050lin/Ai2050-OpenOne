@@ -170,6 +170,26 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
 
 同一个子进程还会在数据变化时生成**客户端离线数据包**（`<AI2050_DIST_DIR>/datapack/datapack.json.gz`，约 1–2 MB）。客户端平时只读取站点配置；页面左下角显示本地数据时间，服务器有新数据时出现「更新数据」按钮，由用户手动下载，不会定时访问服务器。单元卡与管理类页面（审计、分发、普查作业、自动测试）打开时在线读取，用页面上的「刷新」按钮更新。
 
+### 6.1 小内存服务器（2 GB 及以下）
+
+一个大模式族的分片统计量展开后要占 0.5–0.9 GB 内存，第一次合并时小内存、无 swap 的服务器会被系统强制结束进程（`journalctl` 里出现 `code=killed, status=9/KILL`）。中心为此做了三层保护：
+
+- 合并统计（`agg_cache/`）与规律分析（`analysis_cache/`）都落盘，算过一次之后网站进程只读文件；规律分析结果原样发送文件，不在网站进程里解析。
+- 重计算只在后台子进程里做，且同一进程一次只合并一个桶；子进程把自己的 OOM 优先级调到最高，内存耗尽时系统先结束它，网站不受影响。
+- 某一步计算中被结束后，同一数据版本下不再自动重试（记录在 `snapshots/_skipped.json`），不会每次重启都把机器拖垮；数据变化后会再试一次。
+
+建议：
+
+1. 加 2–4 GB swap（只需一次）：
+   ```bash
+   sudo fallocate -l 4G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+   ```
+2. 在开发机上用同一份数据算好缓存，打成缓存包上传（`ai2050-cache-<版本>.tar`，只含 `agg_cache/` 与 `analysis_cache/`），服务器上直接解开，不用在服务器上合并：
+   ```bash
+   sudo tar -xf ai2050-cache-<版本>.tar -C /var/lib/ai2050/center && sudo chown -R ai2050:ai2050 /var/lib/ai2050/center && sudo systemctl restart ai2050-center
+   ```
+   缓存键含结果 sha、审计状态与代码哈希，只有与服务器数据、代码版本一致时才命中；不一致的部分由后台子进程照常补算。
+
 ## 7. 运维
 
 | 事项 | 命令 |

@@ -78,6 +78,21 @@ class SuffStats:
             self.q[l, i] += v * v
 
     # ---- 合并 ----
+    def merge_inplace(self, other: 'SuffStats') -> 'SuffStats':
+        """与 merge 结果相同，但累加到自身（不复制 s / q）：合并多个分片时内存只占一份。"""
+        if list(other.layer_tags) != list(self.layer_tags) or other.dim != self.dim:
+            raise ValueError('layer_tags/dim 不一致，不能合并（不同模型或不同采集口径）')
+        if list(other.factors) != list(self.factors):
+            raise ValueError('factors 不一致，不能合并')
+        self.tag_readout = self.tag_readout or other.tag_readout
+        self.tag_layer = self.tag_layer or other.tag_layer
+        for j, key in enumerate(other.cells):
+            i = self._cell(key[0], json.loads(key[1]))
+            self.n[i] += other.n[j]
+            self.s[:, i] += other.s[:, j]
+            self.q[:, i] += other.q[:, j]
+        return self
+
     def merge(self, other: 'SuffStats') -> 'SuffStats':
         if list(other.layer_tags) != list(self.layer_tags) or other.dim != self.dim:
             raise ValueError('layer_tags/dim 不一致，不能合并（不同模型或不同采集口径）')

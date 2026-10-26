@@ -63,6 +63,26 @@ class SnapshotWorkerTests(unittest.TestCase):
         third = self.W.run_once(log=lambda *_: None)                   # 数据变化：重算
         self.assertEqual(sorted(third['computed']), sorted(self.W.NAMES))
 
+    def test_step_killed_last_time_is_skipped(self):
+        import json
+        self.W.run_once(log=lambda *_: None)
+        fp = self.W.fingerprint()
+        (self.tmp / 'snapshots' / 'catalog.json').unlink()
+        (self.tmp / 'snapshots' / '_running.json').write_text(       # 模拟上次在 catalog 中被系统杀掉
+            json.dumps({'stage': 'catalog', 'fingerprint': fp}), encoding='utf-8')
+        out = self.W.run_once(log=lambda *_: None)
+        self.assertNotIn('catalog', out['computed'])                   # 同一数据指纹下不再重试
+        self.assertFalse((self.tmp / 'snapshots' / 'catalog.json').exists())
+        self.assertFalse((self.tmp / 'snapshots' / '_running.json').exists())
+        skipped = json.loads((self.tmp / 'snapshots' / '_skipped.json').read_text(encoding='utf-8'))
+        self.assertIn('catalog', skipped['stages'])
+        db = self.D._db()                                              # 数据变化：再试一次
+        with self.D._db_lock:
+            db.execute("INSERT INTO nodes(node_id,token_hash,name,created_at,last_seen) VALUES('NODE-K','x','k',?,?)",
+                       (time.time(), time.time()))
+            db.commit()
+        self.assertIn('catalog', self.W.run_once(log=lambda *_: None)['computed'])
+
     def test_datapack_build_skip_and_serve(self):
         import gzip
         import json
