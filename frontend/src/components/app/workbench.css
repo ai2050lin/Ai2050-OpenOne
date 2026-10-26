@@ -5,10 +5,13 @@
 .wb-brand b { display: block; font-size: 14px; }
 .wb-brand small { display: block; font-size: 11px; color: var(--fw-text-3); }
 .wb-root .op-logo { width: 30px; height: 30px; border-radius: 8px; background: #184f95; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
-.wb-lenses { display: flex; gap: 4px; }
-.wb-lenses button { border: 0; background: none; padding: 6px 14px; border-radius: 7px; cursor: pointer; font-size: 13.5px; color: var(--fw-text-2); }
-.wb-lenses button:hover { background: var(--fw-bg-panel); }
-.wb-lenses button.on { background: #e3eef9; color: #184f95; font-weight: 600; }
+.wb-lens-title { font-size: 14px; font-weight: 600; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.wb-lens-title small { font-weight: 400; font-size: 11.5px; color: var(--fw-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wb-frame { flex: 1; display: flex; min-height: 0; }
+.wb-frame .fw-rail { width: 60px; }
+.wb-frame .fw-rbtn { width: 48px; height: 48px; font-size: 10.5px; }
+.wb-frame .fw-rbtn svg { width: 18px; height: 18px; }
+.wb-body { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .wb-top-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .wb-center { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--fw-text-3); }
 .wb-root .op-sandbox { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #fff1ec; color: #c2410c; border: 1px solid #fed7aa; }
@@ -37,3 +40,8 @@
 .v6-table th, .v6-table td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--fw-border); }
 .v6-table th { color: var(--fw-text-3); font-weight: 600; font-size: 11px; }
 .v6-node-row { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--fw-border); font-size: 12px; flex-wrap: wrap; }
+@media (max-width: 760px) {
+  .wb-lens-title small, .wb-center { display: none; }
+  .wb-frame .fw-rail { width: 52px; }
+  .wb-frame .fw-rbtn { width: 44px; }
+}
