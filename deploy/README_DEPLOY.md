@@ -26,6 +26,8 @@ tar xzf ai2050-center-1.0.0.tar.gz && cd ai2050-center-1.0.0
 DOMAIN=platform.example.org bash deploy/install_center.sh --yes --https
 ```
 
+安装脚本重复运行时会保留已有的 nginx HTTPS 配置（certbot 写入的 443 段）；`--reset-nginx` 按模板重写，服务器上已有证书时会自动装回。客户端默认连接 `https://`，HTTPS 不通时客户端会显示「连不上中心服务」。
+
 安装脚本会创建系统用户 `ai2050`、Python 环境（依赖见 `deploy/requirements-center.txt`）、systemd 服务 `ai2050-center` 和 nginx 站点，并生成随机管理令牌 `/etc/ai2050/admin_token`。脚本可以重复运行：升级时覆盖程序，保留数据、令牌和站点配置。
 
 安装后先在浏览器打开站点并注册**第一个账号**，它会自动成为管理员。之后的注册方式由 `AI2050_REGISTRATION` 控制：`open` 表示任何人都能注册，`closed` 表示只能由管理员创建账号。修改位置是 `/etc/systemd/system/ai2050-center.service`。

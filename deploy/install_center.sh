@@ -6,6 +6,7 @@
 #     sudo DOMAIN=platform.example.org bash deploy/install_center.sh            # 交互确认
 #     sudo DOMAIN=platform.example.org bash deploy/install_center.sh --yes      # 无人值守
 #     sudo DOMAIN=platform.example.org bash deploy/install_center.sh --yes --https   # 另用 certbot 申请证书
+#     升级时保留已有的 nginx HTTPS 配置；--reset-nginx 按模板重写（已有证书会自动装回）
 #
 #  结果：
 #     /opt/ai2050/app            程序（发布包内容）       /opt/ai2050/venv   Python 环境
@@ -29,10 +30,12 @@ USER_NAME=ai2050
 PORT=5010
 ASSUME_YES=0
 DO_HTTPS=0
+RESET_NGINX=0
 for arg in "$@"; do
   case "$arg" in
     --yes|-y) ASSUME_YES=1 ;;
     --https) DO_HTTPS=1 ;;
+    --reset-nginx) RESET_NGINX=1 ;;
     --help|-h) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "未知参数：$arg"; exit 2 ;;
   esac
@@ -100,11 +103,24 @@ systemctl restart ai2050-center
 ok "ai2050-center 已启动（127.0.0.1:$PORT）"
 
 step "nginx"
-sed -e "s#platform.example.org#${DOMAIN}#" "$APP/deploy/nginx-ai2050-center.conf" > /etc/nginx/conf.d/ai2050-center.conf
+CONF=/etc/nginx/conf.d/ai2050-center.conf
+CERT_DIR="/etc/letsencrypt/live/${DOMAIN}"
+if [ -f "$CONF" ] && grep -q "ssl_certificate" "$CONF" && [ "$RESET_NGINX" != 1 ]; then
+  # 升级时保留已有的 HTTPS 配置（certbot 写入的 443 段）；--reset-nginx 才按模板重写
+  ok "保留现有 nginx 配置（含 HTTPS）：$CONF"
+else
+  [ -f "$CONF" ] && cp "$CONF" "$CONF.bak.$(date +%Y%m%d%H%M%S)"
+  sed -e "s#platform.example.org#${DOMAIN}#" "$APP/deploy/nginx-ai2050-center.conf" > "$CONF"
+  if [ -d "$CERT_DIR" ] && command -v certbot >/dev/null; then
+    DO_HTTPS=1                                     # 已有证书：重写后立即装回 HTTPS
+  fi
+fi
 if command -v setsebool >/dev/null; then setsebool -P httpd_can_network_connect 1 || true; fi
 nginx -t && systemctl enable --now nginx >/dev/null && systemctl reload nginx
 ok "nginx → $DOMAIN"
-if [ "$DO_HTTPS" = 1 ]; then
+if [ "$DO_HTTPS" = 1 ] && [ -d "$CERT_DIR" ] && ! grep -q "ssl_certificate" "$CONF"; then
+  certbot install --nginx --cert-name "$DOMAIN" --non-interactive --redirect && systemctl reload nginx && ok "已用现有证书恢复 HTTPS"     || echo "  恢复 HTTPS 失败：手动运行 certbot install --nginx --cert-name $DOMAIN"
+elif [ "$DO_HTTPS" = 1 ] && [ ! -d "$CERT_DIR" ]; then
   command -v certbot >/dev/null || { command -v dnf >/dev/null && dnf install -y certbot python3-certbot-nginx >/dev/null || apt-get install -y -qq certbot python3-certbot-nginx >/dev/null; }
   certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect || echo "  证书申请失败：确认域名已解析到本机后重跑 certbot --nginx -d $DOMAIN"
 fi
@@ -114,6 +130,11 @@ step "自检"
 for i in $(seq 1 30); do curl -sf "http://127.0.0.1:$PORT/api/health" >/dev/null && break; sleep 1; done
 curl -sf "http://127.0.0.1:$PORT/api/health" && echo || die "中心服务未响应：journalctl -u ai2050-center -n 100"
 curl -sf -o /dev/null "http://127.0.0.1/" -H "Host: $DOMAIN" && ok "客户端首页 200" || echo "  ! nginx 未通：检查 /var/log/nginx/ai2050-center.error.log"
+if grep -q "ssl_certificate" "$CONF"; then
+  curl -sf -o /dev/null --resolve "${DOMAIN}:443:127.0.0.1" "https://${DOMAIN}/api/health" && ok "HTTPS 正常"     || echo "  ! HTTPS 自检失败：检查证书与 nginx 443 段（nginx -T | grep -n ssl）"
+else
+  echo "  ! 当前没有 HTTPS 配置：客户端默认连接 https://，请加 --https 或运行 certbot --nginx -d $DOMAIN"
+fi
 cat <<EOF
 
 完成。下一步：
