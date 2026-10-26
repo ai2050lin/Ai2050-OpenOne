@@ -679,7 +679,8 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
                 analyze_bucket(conn, data_dir, tm_id, bucket=chosen['bucket'], gate=gate, n_perm=n_perm)
             finally:
                 conn.close()
-        if started is None:
+        # 门控结果由后台计算子进程（warm_analyses）预热；只有不开门控的少数请求在本进程里补算
+        if started is None and not gate:
             threading.Thread(target=job, name=f'analysis-{tm_id}', daemon=True).start()
         return {**base, 'available': False, 'pending': True, 'started_at': started or time.time(),
                 'reason': '规律分析正在后台计算（大模板首次可能需要十几分钟），完成后自动显示；结果会缓存，之后打开即时显示。'}

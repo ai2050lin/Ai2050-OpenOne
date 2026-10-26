@@ -166,7 +166,7 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
    sudo python3 /data/ai2050-center-<版本>/deploy/admin_tool.py census-create --job-id CJ-qwen3-4b-pilot        --model-dir <AI2050_NATIVE_DIR>/_census/6be1034f0b55a6df-bf16/2ca5f0a756d36c8a-20000000/tokenizer        --snapshot-file <AI2050_NATIVE_DIR>/_census/snapshots/6be1034f0b55a6df-bf16.json        --corpus-fp 2ca5f0a756d36c8a --tokens-per-slice 2000000 --max-slices 2        --model-name qwen3-4b --hf-repo Qwen/Qwen3-4B --hf-revision 1cfa9a7208912126459214e8b04321603b3df60c
    ```
 
-中心启动后会在后台计算总览、谱图与记分板的快照，并预热实验响应页的规律分析。数据包里已有缓存的模板，打开即时显示；没有缓存的大模板首次需要较长时间，页面会提示「后台计算中」，算完自动刷新。
+中心启动时会拉起一个低优先级的后台计算子进程（`deploy/snapshot_worker.py`），负责计算总览、谱图与记分板的快照，并预热实验响应页的规律分析；结果写到 `<AI2050_DIST_DIR>/snapshots/`，网站进程只读这些文件，计算再久也不影响访问。每份快照都带数据指纹，重启后直接可用，只有数据变化时才重算。数据包里已有缓存的模板，打开即时显示；没有缓存的大模板首次需要较长时间，页面会提示「后台计算中」，算完自动刷新。
 
 ## 7. 运维
 

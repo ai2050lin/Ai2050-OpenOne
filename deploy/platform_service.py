@@ -40,15 +40,15 @@ def _read_version() -> str:
 
 
 PLATFORM_VERSION = _read_version()
-REFRESH_SECONDS = float(os.environ.get('AI2050_SNAPSHOT_SECONDS', '300'))
 KIT_BIND_TTL = 7 * 86400
 # 站点配置没有登记有效模型时的缺省参与模型（快照与 Hugging Face 版本已逐文件核对一致，见 Phase 255 / 1.0.x 部署记录）
 DEFAULT_MODELS = [{'name': 'qwen3-4b', 'hf_repo': 'Qwen/Qwen3-4B', 'hf_revision': '1cfa9a7208912126459214e8b04321603b3df60c',
                    'snapshot_sha256': '6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad', 'min_vram_gib': 12}]
 
-_snap: Dict[str, Dict[str, Any]] = {}
+_snap: Dict[str, Dict[str, Any]] = {}          # 只放网站进程里算的轻量快照（overview）；重计算快照由子进程写文件
 _snap_lock = threading.Lock()
-_refresher: Optional[threading.Thread] = None
+_worker = None
+_file_cache: Dict[str, Any] = {}
 
 
 def _builders() -> Dict[str, Callable[[], Any]]:
@@ -74,47 +74,60 @@ def _refresh_one(name: str) -> None:
                        'seconds': round(time.time() - t0, 1), 'error': err}
 
 
-def _loop() -> None:
-    while True:
-        try:
-            import census_service as CS
-            CS.auto_merge()                              # 普查：新完成的切片并入单元卡
-        except Exception as exc:
-            print(f'[platform] census auto merge: {exc}', flush=True)
-        for name in ('overview', 'catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
-            _refresh_one(name)
-        try:                                             # 实验响应页的规律分析：逐个模板 × 模型桶预算并落盘
-            from shared.dist_protocol import pipeline as P
-            fresh = P.warm_analyses(D._db(), D._DATA_DIR)
-            if fresh:
-                print(f'[platform] 规律分析预热完成：{fresh}', flush=True)
-        except Exception as exc:
-            print(f'[platform] analysis warm-up: {exc}', flush=True)
-        time.sleep(REFRESH_SECONDS)
+def _read_file_snapshot(name: str):
+    """读后台子进程写好的快照文件（按修改时间缓存解析结果）。"""
+    path = Path(D._DATA_DIR) / 'snapshots' / f'{name}.json'
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        return None
+    hit = _file_cache.get(name)
+    if hit and hit[0] == mtime:
+        return hit[1]
+    try:
+        doc = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return hit[1] if hit else None
+    _file_cache[name] = (mtime, doc)
+    return doc
 
 
 def start_refresher() -> None:
-    """后台刷新重计算端点（冷启动时合并全部模板可能要几分钟；公开页面只读快照，不阻塞请求）。"""
-    global _refresher
-    if _refresher is None and os.environ.get('AI2050_SNAPSHOT_DISABLE') != '1':
-        _refresher = threading.Thread(target=_loop, name='platform-snapshots', daemon=True)
-        _refresher.start()
+    """拉起后台计算子进程（deploy/snapshot_worker.py，低优先级）：快照、规律分析预热、普查自动合并。
+    计算放在独立进程里，网站进程不会被拖慢；结果写文件并带数据指纹，重启后直接可用。"""
+    global _worker
+    if os.environ.get('AI2050_SNAPSHOT_DISABLE') == '1':
+        return
+    if _worker is not None and _worker.poll() is None:
+        return
+    import subprocess
+    import sys
+    env = dict(os.environ, AI2050_DIST_DIR=str(D._DATA_DIR), PYTHONIOENCODING='utf-8')
+    _worker = subprocess.Popen([sys.executable, str(Path(__file__).resolve().parent / 'snapshot_worker.py')], env=env)
+
+
+def stop_refresher() -> None:
+    if _worker is not None and _worker.poll() is None:
+        _worker.terminate()
 
 
 def snapshot(name: str) -> Dict[str, Any]:
     if name not in _builders():
         raise HTTPException(404, f'unknown snapshot {name}')
-    with _snap_lock:
-        s = _snap.get(name)
-    if s is None or s.get('data') is None:
-        if name in ('overview', 'catalog'):                  # 轻量项：首次请求同步计算（coverage 要合并模板，走后台）
+    if name == 'overview':                               # 轻量：网站进程内计算，60 秒有效
+        with _snap_lock:
+            s = _snap.get(name)
+        if s is None or s.get('data') is None or time.time() - (s.get('computed_at') or 0) > 60:
             _refresh_one(name)
             with _snap_lock:
                 s = _snap.get(name)
-        else:
-            start_refresher()
-            return {'pending': True, 'note': '快照正在后台计算（首次启动可能需要几分钟），请稍后刷新。', 'data': None}
-    return {'pending': False, 'computed_at': s.get('computed_at'), 'seconds': s.get('seconds'), 'error': s.get('error'), 'data': s.get('data')}
+        return {'pending': False, 'computed_at': s.get('computed_at'), 'seconds': s.get('seconds'), 'error': s.get('error'), 'data': s.get('data')}
+    doc = _read_file_snapshot(name)
+    if doc is None or doc.get('data') is None:
+        start_refresher()
+        return {'pending': True, 'note': '快照正在后台计算（首次启动可能需要几分钟），请稍后刷新。', 'data': None}
+    return {'pending': False, 'computed_at': doc.get('computed_at'), 'seconds': doc.get('seconds'), 'error': doc.get('error'),
+            'fingerprint': doc.get('fingerprint'), 'data': doc.get('data')}
 
 
 # ---------- 配置 ----------
@@ -236,8 +249,7 @@ def build_overview() -> Dict[str, Any]:
         census = [CS.job_progress(r['job_id']) for r in CS.db().execute('SELECT job_id FROM census_jobs ORDER BY created_at DESC')]
     except Exception:
         pass
-    with _snap_lock:
-        atlas = (_snap.get('atlas') or {}).get('data')
+    atlas = (_read_file_snapshot('atlas') or {}).get('data')
     atlas_sum = None
     if atlas:
         atlas_sum = {'models': atlas.get('models', []),
@@ -253,9 +265,6 @@ def build_overview() -> Dict[str, Any]:
 @router.get('/overview')
 def overview() -> dict:
     s = snapshot('overview')
-    if s['computed_at'] and time.time() - s['computed_at'] > 60:
-        _refresh_one('overview')
-        s = snapshot('overview')
     return {**(s['data'] or {}), 'computed_at': s['computed_at']}
 
 

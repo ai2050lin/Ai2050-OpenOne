@@ -66,13 +66,28 @@ def pick_census(model_key: str, run: Optional[str]) -> Dict[str, Any]:
     return max(runs, key=lambda r: r['n_tokens'] or 0)
 
 
+def _run_stamp(model_key: str, run: str) -> float:
+    """普查运行的版本戳（manifest 修改时间）：后台子进程重新合并后，缓存随之失效。"""
+    try:
+        return (native_root() / '_census' / model_key / run / 'manifest.json').stat().st_mtime
+    except OSError:
+        return 0.0
+
+
 @lru_cache(maxsize=4)
-def census_manifest(model_key: str, run: str) -> Dict[str, Any]:
+def _census_manifest(model_key: str, run: str, stamp: float) -> Dict[str, Any]:
     return json.loads((native_root() / '_census' / model_key / run / 'manifest.json').read_text(encoding='utf-8'))
 
 
+def census_manifest(model_key: str, run: str) -> Dict[str, Any]:
+    return _census_manifest(model_key, run, _run_stamp(model_key, run))
+
+
+census_manifest.cache_clear = _census_manifest.cache_clear
+
+
 @lru_cache(maxsize=8)
-def census_layer(model_key: str, run: str, block: int) -> Dict[str, np.ndarray]:
+def _census_layer(model_key: str, run: str, block: int, stamp: float) -> Dict[str, np.ndarray]:
     p = native_root() / '_census' / model_key / run / f'L{block}.npz'
     if not p.is_file():
         raise HTTPException(404, f'普查没有第 {block} 块')
@@ -80,14 +95,28 @@ def census_layer(model_key: str, run: str, block: int) -> Dict[str, np.ndarray]:
         return {k: z[k] for k in z.files}
 
 
+def census_layer(model_key: str, run: str, block: int) -> Dict[str, np.ndarray]:
+    return _census_layer(model_key, run, block, _run_stamp(model_key, run))
+
+
+census_layer.cache_clear = _census_layer.cache_clear
+
+
 @lru_cache(maxsize=2)
-def readout_index(model_key: str, run: str, n_layers: int):
+def _readout_index(model_key: str, run: str, n_layers: int, stamp: float):
     """各层的直接读出 token 与最大激活（只读这两个数组），供检索使用。"""
     out = []
     for b in range(n_layers):
         with np.load(native_root() / '_census' / model_key / run / f'L{b}.npz') as z:
             out.append((z['readout_top'], z['amax']))
     return out
+
+
+def readout_index(model_key: str, run: str, n_layers: int):
+    return _readout_index(model_key, run, n_layers, _run_stamp(model_key, run))
+
+
+readout_index.cache_clear = _readout_index.cache_clear
 
 
 @lru_cache(maxsize=2)

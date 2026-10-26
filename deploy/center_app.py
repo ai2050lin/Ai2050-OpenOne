@@ -90,7 +90,11 @@ def create_app():
 
     @app.on_event('startup')
     def _warm() -> None:
-        platform_service.start_refresher()
+        platform_service.start_refresher()          # 后台计算子进程（快照、规律分析、普查合并）
+
+    @app.on_event('shutdown')
+    def _stop() -> None:
+        platform_service.stop_refresher()
 
     return app
 
