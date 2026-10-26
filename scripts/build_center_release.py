@@ -68,7 +68,8 @@ def main() -> int:
         newest_src = max(p.stat().st_mtime for p in (ROOT / 'frontend' / 'src').rglob('*') if p.is_file())
         if (dist / 'index.html').stat().st_mtime < newest_src:
             raise SystemExit('frontend/dist 比源码旧：先重新 vite build（或 --skip-frontend-check）')
-    vfile.write_text(PLATFORM_VERSION + chr(10), encoding='utf-8')
+    if PLATFORM_VERSION != cur:                            # 只在递增时改写；固定 LF，避免 Windows 换行让工作区显示为已修改
+        vfile.write_bytes((PLATFORM_VERSION + chr(10)).encode('utf-8'))
     import subprocess
     try:
         commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True, timeout=60).stdout.strip()
