@@ -6,6 +6,10 @@ import ErrorBoundary from './ErrorBoundary.jsx'
 // 开放平台外壳（默认入口 /）：首页 / 学习 / 图谱 / 参与
 import OpenPlatform from './components/open/OpenPlatform.jsx'
 import AuthGate from './components/app/rdc_fusion/AuthGate.jsx'
+import { DataBarHost } from './components/open/DataBar.jsx'
+import { initDataStore } from './components/app/rdc_fusion/dataStore.js'
+
+initDataStore()          // 启动时载入本机保存的数据包（IndexedDB）；页面优先读本地，不定时访问服务器
 
 /* 其余入口按需加载：新人打开首页不下载工作台、旧版 3D 界面与专项页的代码。 */
 // 旧版 3D 主界面 —— 归档为 /legacy（原样保留、无入口链接）
@@ -48,6 +52,7 @@ createRoot(document.getElementById('root')).render(
             : (path === '/workbench' || path === '/rdc-fusion')
               ? <AuthGate><Workbench /></AuthGate>
               : <OpenPlatform />}
+        {!hit && !(devOnly && path === '/legacy') && <DataBarHost />}
       </Suspense>
     </ErrorBoundary>
   </StrictMode>,

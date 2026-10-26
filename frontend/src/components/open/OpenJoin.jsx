@@ -56,8 +56,8 @@ export default function OpenJoin({ config }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [done, setDone] = useState(false);
-  const contrib = useApi('/api/platform/contributors', { interval: 120000 });
-  const jobs = useApi('/api/census/jobs', { interval: 60000 });
+  const contrib = useApi('/api/platform/contributors');
+  const jobs = useApi('/api/census/jobs');
   const models = config?.models || [];
 
   const get = async bound => {

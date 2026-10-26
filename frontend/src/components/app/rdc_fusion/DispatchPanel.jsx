@@ -1,17 +1,18 @@
 /* 研发 · ③ 分发与节点：生成式模板的分片覆盖 + 节点命令 + 节点与租约（/api/distributed/summary、/api/tasks，只显示实时数据）。 */
 import { useState } from 'react';
 import { fmtAgoTs, useApi } from './api.js';
-import { Card, Empty, StatusPill } from './ui.jsx';
+import { Card, Empty, RefreshButton, StatusPill } from './ui.jsx';
 import { NodeCommand } from './FreezePanel.jsx';
 
 function NodesAndLeases() {
-  const summary = useApi('/api/distributed/summary', { interval: 30000 });
-  const tasks = useApi('/api/tasks', { interval: 30000 });
+  const summary = useApi('/api/distributed/summary', { online: true });
+  const tasks = useApi('/api/tasks', { online: true });
   const s = summary.data;
   const t = tasks.data;
   return (
     <>
-      <Card title="节点" sub={s ? `在线 ${s.nodes_online} / 全部 ${s.nodes_total}（10 分钟内有心跳算在线）` : ''}>
+      <Card title="节点" sub={s ? `在线 ${s.nodes_online} / 全部 ${s.nodes_total}（10 分钟内有心跳算在线）` : ''}
+        extra={<RefreshButton apis={[summary, tasks]} />}>
         {!s && <Empty>{summary.error ? `节点信息不可用（${summary.error}）` : '读取…'}</Empty>}
         {s && !s.nodes.length && <Empty>当前没有在线节点。</Empty>}
         {s?.nodes.map(n => (
@@ -36,12 +37,13 @@ function NodesAndLeases() {
 }
 
 function ShardCoverage({ tm }) {
-  const report = useApi(tm ? `/api/grammar/${encodeURIComponent(tm)}/report` : null, { interval: 20000 });
+  const report = useApi(tm ? `/api/grammar/${encodeURIComponent(tm)}/report` : null, { online: true });
   if (!report.data) return <Empty>{report.error ? `报告不可用（${report.error}）` : '读取…'}</Empty>;
   const r = report.data;
   const shards = Array.from({ length: r.shards }, (_, i) => `${i}/${r.shards}`);
   return (
     <div>
+      <div className="v6-toolbar"><RefreshButton apis={[report]} label="刷新分片" /></div>
       {!r.buckets.length && <Empty>还没有 real 结果；任务：{Object.entries(r.tasks).map(([k, v]) => `${k} ${v}`).join(' · ') || '无'}</Empty>}
       {r.buckets.map(b => (
         <div key={b.bucket} className="v6-shards">
@@ -61,7 +63,7 @@ function ShardCoverage({ tm }) {
 }
 
 export default function DispatchPanel({ onGo }) {
-  const templates = useApi('/api/templates', { interval: 30000 });
+  const templates = useApi('/api/templates', { online: true });
   const v3 = (templates.data?.templates || []).filter(t => t.protocol === 'v3');
   const [pick, setPick] = useState('');
   const tm = pick || v3[0]?.tm_id || '';

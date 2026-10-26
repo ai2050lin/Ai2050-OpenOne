@@ -1,0 +1,15 @@
+/* 本地数据状态条（DataBar）：固定在左下角，首页与工作台共用。 */
+.op-databar-host { position: fixed; left: 12px; bottom: 12px; z-index: 50; max-width: calc(100vw - 24px); }
+.op-databar { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 99px; font-size: 12px;
+  background: #fff; border: 1px solid #d8dde3; box-shadow: 0 2px 10px rgba(15, 23, 42, .08); color: #334155; font-family: system-ui, sans-serif; }
+.op-databar-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; flex-shrink: 0; }
+.op-databar.fresh .op-databar-dot { background: #0ca30c; }
+.op-databar.stale .op-databar-dot { background: #eda100; }
+.op-databar.none .op-databar-dot { background: #94a3b8; }
+.op-databar-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.op-databar-btn { border: 1px solid #184f95; background: #184f95; color: #fff; border-radius: 99px; padding: 2px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.op-databar-btn:disabled { opacity: .7; cursor: default; }
+.op-databar-err { color: #b3261e; }
+@media (prefers-color-scheme: dark) {
+  .op-databar { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+}

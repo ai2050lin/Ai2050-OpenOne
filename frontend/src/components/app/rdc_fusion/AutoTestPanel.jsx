@@ -5,7 +5,7 @@
    数据：/api/autotest/state（轮询）· /api/grammar/library · /api/models/local；写操作需管理令牌。 */
 import { useMemo, useState } from 'react';
 import { fmtAgoTs, postJson, useAdminToken, useApi } from './api.js';
-import { AdminTokenField, Card, Empty, SourceTag, StatusPill } from './ui.jsx';
+import { AdminTokenField, Card, Empty, RefreshButton, SourceTag, StatusPill } from './ui.jsx';
 import { STATUS_META } from './catalogUtil.js';
 
 const JOB_STATUS = {
@@ -141,19 +141,22 @@ function ModelForm({ initial, sandbox, token, onSaved, onCancel }) {
 }
 
 function JobLog({ job }) {
-  const log = useApi(`/api/autotest/jobs/${job.id}/log?tail=400`, { interval: job.status === 'running' ? 2000 : 0 });
+  const log = useApi(`/api/autotest/jobs/${job.id}/log?tail=400`, { online: true });
   return (
-    <pre className="v6-at-log" aria-label="作业日志">
-      {log.data ? (log.data.lines.join('\n') || '（暂无输出）') : log.error || '读取日志…'}
-    </pre>
+    <>
+      <div className="v6-toolbar"><RefreshButton apis={[log]} label="刷新日志" /></div>
+      <pre className="v6-at-log" aria-label="作业日志">
+        {log.data ? (log.data.lines.join('\n') || '（暂无输出）') : log.error || '读取日志…'}
+      </pre>
+    </>
   );
 }
 
 export default function AutoTestPanel({ onGo, onStation, presetFamilies }) {
   const [token, setToken] = useAdminToken();
-  const state = useApi('/api/autotest/state', { interval: 3000 });
+  const state = useApi('/api/autotest/state', { online: true });
   const lib = useApi('/api/grammar/library');
-  const catalog = useApi('/api/catalog', { interval: 20000 });
+  const catalog = useApi('/api/catalog', { online: true });
   const [selModels, setSelModels] = useState(() => new Set());
   const [selFams, setSelFams] = useState(() => new Set(presetFamilies || []));
   const [opts, setOpts] = useState({ pilot: true, pilot_per_cell: 3, min_pilot_pass: 0.5 });
@@ -335,9 +338,12 @@ export default function AutoTestPanel({ onGo, onStation, presetFamilies }) {
       )}
 
       <Card title="运行队列" sub="按提交顺序逐个执行；失败或中断可重跑，日志保存在中心数据目录"
-        extra={jobs.some(j => !['queued', 'running'].includes(j.status)) && (
-          <button type="button" className="fw-tbtn ghost" disabled={!token || busy === 'clear'} onClick={() => act('clear', () => postJson('/api/autotest/clear', {}, { adminToken: token }), r => `已清除 ${r.removed} 条已结束的作业记录`)}>清除已结束</button>
-        )}>
+        extra={<>
+          <RefreshButton apis={[state, catalog]} />
+          {jobs.some(j => !['queued', 'running'].includes(j.status)) && (
+            <button type="button" className="fw-tbtn ghost" disabled={!token || busy === 'clear'} onClick={() => act('clear', () => postJson('/api/autotest/clear', {}, { adminToken: token }), r => `已清除 ${r.removed} 条已结束的作业记录`)}>清除已结束</button>
+          )}
+        </>}>
         {!jobs.length && <Empty>还没有作业。勾选上方模型与模式族后点击运行。</Empty>}
         <ul className="v6-at-jobs">
           {jobs.map(j => (

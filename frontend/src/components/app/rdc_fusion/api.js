@@ -1,6 +1,8 @@
-/* 客户端 API 公共层（v6）：统一 API_BASE、轮询读取、写操作与管理令牌。
+/* 客户端 API 公共层（v6）：统一 API_BASE、读取（本地数据包优先，不轮询）、写操作与管理令牌。
    纪律：读取失败只返回 error，组件显示「未接入」空态，不回退演示数据。 */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+
+import { getLocal, getOnDemand, isOnDemand, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
 
 import { API_BASE } from '../../../config.js';
 
@@ -45,43 +47,64 @@ export function detailText(detail) {
   try { return JSON.stringify(detail); } catch { return String(detail); }
 }
 
-/* 读取 + 可选轮询。path 为 null 时不请求。返回 {data, error, loading, reload}。
-   setState 只在异步回调中调用（不在 effect 体内同步调用）；切换 path 时旧数据不串用。 */
-export function useApi(path, { interval = 0, pollWhilePending = false } = {}) {
+/* 读取：优先本地数据（手动下载的数据包，见 dataStore.js），命中就不访问服务器；
+   没命中时在线读取一次。不做定时轮询，需要最新数据时调用 reload()（管理类页面的「刷新」按钮）：
+   reload 之后改为在线读取，不再用本地数据包里的旧值。online：管理类页面始终在线读取（冻结、派发后要马上看到变化）。
+   实验响应的合并统计与规律分析体积大、不进数据包：第一次在线读取后存进本地，之后直接读本地。
+   pollWhilePending：服务端返回 pending（后台计算中）时 15 秒后自动复查，直到出结果。
+   返回 {data, error, loading, reload, local}；setState 只在异步回调中调用；切换 path 时旧数据不串用。 */
+export function useApi(path, { pollWhilePending = false, online = false } = {}) {
+  useSyncExternalStore(subscribe, storeTick);              // 数据包载入 / 更新后重新渲染
+  const ready = packInfo().ready;
+  const local = path ? getLocal(path) : undefined;
   const [state, setState] = useState({ key: null, data: null, error: '' });
   const [nonce, setNonce] = useState(0);
+  const useLocal = !online && nonce === 0 && local !== undefined;
+  const needFetch = Boolean(path) && (online || ready) && !useLocal;
   useEffect(() => {
-    if (!path) return undefined;
+    if (!needFetch) return undefined;
     const controller = new AbortController();
     let retry = null;
+    let dead = false;
     const run = () => getJson(path, { signal: controller.signal })
       .then(data => {
+        if (dead) return;
         setState({ key: path, data, error: '' });
+        if (isOnDemand(path)) putOnDemand(path, data);
         // 服务端后台计算中（data.pending）：15 秒后自动复查，直到出结果
         if (pollWhilePending && data?.pending) retry = window.setTimeout(run, 15000);
       })
       .catch(reason => {
-        if (reason?.name === 'AbortError') return;
+        if (reason?.name === 'AbortError' || dead) return;
         setState(previous => ({ key: path, data: previous.key === path ? previous.data : null, error: String(reason.message || reason) }));
       });
-    run();
-    const timer = interval > 0 ? window.setInterval(run, interval) : null;
-    return () => { controller.abort(); if (timer) window.clearInterval(timer); if (retry) window.clearTimeout(retry); };
-  }, [path, interval, nonce, pollWhilePending]);
+    if (isOnDemand(path) && nonce === 0) {
+      getOnDemand(path).then(cached => {
+        if (dead) return;
+        if (cached !== undefined) setState({ key: path, data: cached, error: '' });
+        else run();
+      });
+    } else {
+      run();
+    }
+    return () => { dead = true; controller.abort(); if (retry) window.clearTimeout(retry); };
+  }, [path, nonce, pollWhilePending, needFetch]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
+  if (useLocal) return { data: local, error: '', loading: false, reload, local: true };
   const current = state.key === path;
   return {
     data: current ? state.data : null,
     error: current ? state.error : '',
     loading: Boolean(path) && !current,
     reload,
+    local: false,
   };
 }
 
 /* 中心后台快照（/api/platform/snapshot/<name>）：合并全部模板、谱图等重计算端点由中心定时算好，公开页面只读快照。
    返回与 useApi 相同的形状；快照尚未算完时 loading 为 true。 */
-export function useSnapshot(name, { interval = 0 } = {}) {
-  const r = useApi(name ? `/api/platform/snapshot/${name}` : null, { interval: interval || 0 });
+export function useSnapshot(name) {
+  const r = useApi(name ? `/api/platform/snapshot/${name}` : null);
   const pending = Boolean(r.data?.pending);
   return { data: pending ? null : (r.data?.data ?? null), error: r.error || r.data?.error || '', loading: r.loading || pending,
            computedAt: r.data?.computed_at, reload: r.reload };

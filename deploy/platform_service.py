@@ -5,6 +5,7 @@
   GET /api/platform/overview        公开：研究进展快照（模式族、谱图、神经元普查与解释、节点、贡献者），后台定时刷新
   GET /api/platform/snapshot/{name} 公开：重计算端点的缓存副本（pipeline_overview / scoreboard / atlas / coverage / catalog）
   GET /api/platform/contributors    公开：按账号统计的贡献（只显示显示名）
+  GET /api/platform/datapack        公开：客户端离线数据包（deploy/datapack.py，后台子进程生成）
   GET /api/platform/kit             参与者一键包（zip）：节点程序、启动脚本、配置（不带绑定码）
   GET /api/auth/kit                 登录用户的一键包：内嵌一次性节点绑定码（7 天），节点自动归属该账号
   GET /api/auth/my-contributions    登录用户：我的节点与贡献
@@ -186,6 +187,7 @@ def config(request: Request) -> dict:
         'census_jobs': jobs,
         'models': models,
         'sandbox_synthetic': os.environ.get('AI2050_DIST_ALLOW_SYNTHETIC') == '1',
+        'datapack': _datapack_meta(),                    # 客户端离线数据包的版本与大小；客户端据此提示「有新数据」
         'local_tools': os.environ.get('AI2050_LOCAL_TOOLS') == '1',   # 本机中心：工作台显示自动测试与模型资产
         'public_scope': ['模式族合并结果', '语言谱图', '神经元单元卡（普查摘要、两极片段、解释等级）', '干预与解释检验结果', '预注册文件'],
         'not_public': ['研究记录（memo）', '节点本地原生全场'],
@@ -266,6 +268,25 @@ def build_overview() -> Dict[str, Any]:
 def overview() -> dict:
     s = snapshot('overview')
     return {**(s['data'] or {}), 'computed_at': s['computed_at']}
+
+
+def _datapack_meta():
+    import datapack as DP
+    m = DP.read_meta(D._DATA_DIR)
+    return {k: m.get(k) for k in ('version', 'created_at', 'bytes', 'raw_bytes', 'n_entries')} if m else None
+
+
+@router.get('/datapack')
+def datapack_download():
+    """客户端离线数据包（gzip JSON，datapack.v1）。由后台计算子进程在数据变化时重建；还没生成时返回 404。"""
+    from fastapi.responses import FileResponse
+    p = Path(D._DATA_DIR) / 'datapack' / 'datapack.json.gz'
+    if not p.is_file():
+        raise HTTPException(404, '数据包还在后台生成，请稍后再试')
+    meta = _datapack_meta() or {}
+    return FileResponse(p, media_type='application/octet-stream', filename='ai2050-datapack.json.gz',
+                        headers={'Content-Encoding': 'identity', 'X-Datapack-Version': str(meta.get('version') or ''),
+                                 'Cache-Control': 'no-cache'})
 
 
 @router.get('/snapshot/{name}')

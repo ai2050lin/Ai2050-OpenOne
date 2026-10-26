@@ -3,7 +3,7 @@
    审计只决定执行产物能否进入合并统计；Evidence 等级仍在 Research OS 登记。 */
 import { useState } from 'react';
 import { fmtAgoTs, postJson, useAdminToken, useApi } from './api.js';
-import { AdminTokenField, Card, Empty, StatusPill, Tabs } from './ui.jsx';
+import { AdminTokenField, Card, Empty, RefreshButton, StatusPill, Tabs } from './ui.jsx';
 
 const FILTERS = [
   { id: 'pending', label: '待审' }, { id: 'needs_rerun', label: '需重跑' },
@@ -12,7 +12,7 @@ const FILTERS = [
 
 export default function AuditQueue() {
   const [filter, setFilter] = useState('pending');
-  const queue = useApi(`/api/audit/queue?status=${filter}`, { interval: 20000 });
+  const queue = useApi(`/api/audit/queue?status=${filter}`, { online: true });
   const [sel, setSel] = useState('');
   const [token, setToken] = useAdminToken();
   const [reviewer, setReviewer] = useState('');
@@ -42,6 +42,7 @@ export default function AuditQueue() {
       <div className="v6-audit-list">
         <Tabs label="审计状态" value={filter} onChange={value => { setFilter(value); setSel(''); }}
           tabs={FILTERS.map(f => ({ ...f, badge: f.id !== 'all' && counts[f.id] ? counts[f.id] : null }))} />
+        <div className="v6-toolbar"><RefreshButton apis={[queue]} /></div>
         {!queue.data && <Empty>{queue.error ? `审计队列未接入（${queue.error}）` : '读取…'}</Empty>}
         {queue.data && !items.length && <Empty>该状态下没有结果。</Empty>}
         {items.length > 0 && (

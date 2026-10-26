@@ -149,13 +149,13 @@ function CoverageMatrix({ data, error, loading, onGo }) {
 }
 
 export default function HomeOverview({ onGo }) {
-  const overview = useSnapshot('pipeline_overview', { interval: 60000 });
-  const coverage = useSnapshot('coverage', { interval: 60000 });
-  const catalog = useApi('/api/catalog', { interval: 60000 });
-  const atlas = useSnapshot('atlas', { interval: 120000 });
-  const census = useApi('/api/census/jobs', { interval: 60000 });
+  const overview = useSnapshot('pipeline_overview');
+  const coverage = useSnapshot('coverage');
+  const catalog = useApi('/api/catalog');
+  const atlas = useSnapshot('atlas');
+  const census = useApi('/api/census/jobs');
   const censusRuns = useApi('/api/neurons/index');
-  const hyps = useApi('/api/atlas/hypotheses?limit=5', { interval: 120000 });
+  const hyps = useApi('/api/atlas/hypotheses?limit=5');
   const live = overview.data ? 'live' : overview.loading ? 'loading' : 'none';
   return (
     <div className="fw-view on v6-home">

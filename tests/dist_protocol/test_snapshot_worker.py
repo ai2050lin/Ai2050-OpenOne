@@ -22,11 +22,15 @@ class SnapshotWorkerTests(unittest.TestCase):
         import platform_service as PS
         import snapshot_worker as W
         cls.D, cls.PS, cls.W = D, PS, W
-        cls.tmp = Path(tempfile.mkdtemp())
-        D._DATA_DIR = cls.tmp
-        D._conn = None
-        D._tls = threading.local()
-        PS._file_cache.clear()
+
+    def setUp(self):                                           # 每个测试独立的数据目录
+        self.tmp = Path(tempfile.mkdtemp())
+        self.D._DATA_DIR = self.tmp
+        self.D._conn = None
+        self.D._tls = threading.local()
+        self.PS._file_cache.clear()
+        import census_service as CS
+        CS._schema_done = False                                # 换了数据库：普查表要重新建
 
     @classmethod
     def tearDownClass(cls):
@@ -58,6 +62,27 @@ class SnapshotWorkerTests(unittest.TestCase):
             db.commit()
         third = self.W.run_once(log=lambda *_: None)                   # 数据变化：重算
         self.assertEqual(sorted(third['computed']), sorted(self.W.NAMES))
+
+    def test_datapack_build_skip_and_serve(self):
+        import gzip
+        import json
+        import datapack as DP
+        self.assertEqual(DP.canonical('/api/neurons/space?model_key=m&layer=30'), '/api/neurons/space?layer=30&model_key=m')
+        self.assertEqual(DP.canonical('/api/x?b=2&a=%E4%B8%AD'), '/api/x?a=中&b=2')     # 与客户端 dataStore.canonical 同一规则
+        self.W.run_once(force=True, log=lambda *_: None)
+        meta = DP.read_meta(self.tmp)
+        self.assertEqual(meta['schema'], 'datapack.v1')
+        self.assertEqual(meta['errors'], [])
+        self.assertEqual(self.PS._datapack_meta()['version'], meta['version'])           # 站点配置带版本，客户端据此提示更新
+        resp = self.PS.datapack_download()
+        self.assertEqual(Path(resp.path), self.tmp / 'datapack' / 'datapack.json.gz')
+        doc = json.loads(gzip.decompress(Path(resp.path).read_bytes()))
+        self.assertEqual(doc['version'], meta['version'])
+        for key in ('/api/catalog', '/api/templates', '/api/platform/overview', '/api/platform/snapshot/catalog'):
+            self.assertIn(key, doc['entries'])
+        self.assertFalse(doc['entries']['/api/platform/snapshot/catalog']['pending'])
+        again = self.W.run_once(log=lambda *_: None)                  # 指纹没变：数据包不重建
+        self.assertEqual(again['datapack'], 'skipped')
 
 
 if __name__ == '__main__':

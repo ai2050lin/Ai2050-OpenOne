@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、规律分析预热与普查自动合并。
+"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、客户端离线数据包、规律分析预热与普查自动合并。
 
 与网站进程分开运行（低优先级），结果写到 <AI2050_DIST_DIR>/snapshots/<name>.json，网站进程只读文件，
 计算再久也不会拖慢页面。每个快照记录数据指纹（结果、审计、模板、普查的计数与最新时间）；
@@ -95,6 +95,17 @@ def run_once(force: bool = False, log=print) -> dict:
             log(f'[snapshots] {name} {time.time() - t0:.0f}s')
         except Exception as exc:                       # 失败时保留上一次的文件
             log(f'[snapshots] {name} 失败：{type(exc).__name__}: {exc}')
+    try:                                               # 客户端离线数据包：数据或研究文件变化时重建
+        import datapack as DP
+        from server import neuron_census_service as NS
+        version = f'{fp}-{DP.research_stamp(NS.research_root())}'
+        meta = DP.read_meta(D._DATA_DIR)
+        if force or not meta or meta.get('version') != version:
+            out['datapack'] = DP.build(D._DATA_DIR, version, log=log)
+        else:
+            out['datapack'] = 'skipped'
+    except Exception as exc:
+        log(f'[snapshots] datapack: {type(exc).__name__}: {exc}')
     marker = snapshot_dir() / '_analyses.fingerprint'
     if not force and marker.is_file() and marker.read_text(encoding='utf-8').strip() == fp:
         out['analyses'] = 'skipped'                    # 数据没变：规律分析缓存已齐，不必逐模板检查

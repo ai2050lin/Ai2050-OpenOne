@@ -59,7 +59,7 @@ export function CensusJobBar({ job }) {
 }
 
 export default function OpenHome({ config, onGo }) {
-  const ov = useApi('/api/platform/overview', { interval: 60000 });
+  const ov = useApi('/api/platform/overview');
   const d = ov.data;
   if (ov.error) return <Empty>中心服务未接入：{ov.error}</Empty>;
   if (!d) return <Empty>读取研究进展…</Empty>;

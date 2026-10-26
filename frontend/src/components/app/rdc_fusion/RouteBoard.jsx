@@ -14,7 +14,7 @@ function Verdict({ r }) {
 }
 
 export default function RouteBoard({ onGo }) {
-  const sb = useSnapshot('scoreboard', { interval: 120000 });
+  const sb = useSnapshot('scoreboard');
   const [open, setOpen] = useState('');
   const summary = useMemo(() => {
     const best = new Map();

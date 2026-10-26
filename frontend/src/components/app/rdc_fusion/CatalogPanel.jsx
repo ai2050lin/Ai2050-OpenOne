@@ -111,7 +111,7 @@ export function ParticipateSteps({ compact = false }) {
 }
 
 export default function CatalogPanel({ onGo, onAutotest, onStudio }) {
-  const cat = useApi('/api/catalog', { interval: 20000 });
+  const cat = useApi('/api/catalog');
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState('');
   const [query, setQuery] = useState('');

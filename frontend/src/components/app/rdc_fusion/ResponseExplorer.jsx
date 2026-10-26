@@ -374,7 +374,7 @@ function LegacyResults({ tm }) {
 }
 
 export default function ResponseExplorer({ initialTm, initialBucket, initialLayer, onContext }) {
-  const templates = useApi('/api/templates', { interval: 60000 });
+  const templates = useApi('/api/templates');
   const list = (templates.data?.templates || []).slice().sort((a, b) =>
     (a.protocol === 'v3' ? 0 : 1) - (b.protocol === 'v3' ? 0 : 1) || a.tm_id.localeCompare(b.tm_id));
   const [picked, setPicked] = useState(initialTm || '');

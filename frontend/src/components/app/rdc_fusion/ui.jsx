@@ -52,6 +52,16 @@ export function StatusPill({ status, label, title }) {
   return <span className={'v6-pill ' + tone} title={title}><i aria-hidden="true">{icon}</i>{label || text}</span>;
 }
 
+/* 管理类页面的「刷新」：页面不自动轮询，点击后在线重新读取（apis = 若干 useApi 返回值）。 */
+export function RefreshButton({ apis, label = '刷新' }) {
+  const list = apis.filter(Boolean);
+  const loading = list.some(a => a.loading);
+  return (
+    <button type="button" className="fw-tbtn ghost" disabled={loading} title="页面不自动刷新；点击在线读取最新状态"
+      onClick={() => list.forEach(a => a.reload())}>{loading ? '读取…' : `↻ ${label}`}</button>
+  );
+}
+
 export function Empty({ children, action }) {
   return <div className="v6-empty"><span>{children}</span>{action}</div>;
 }

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { CensusJobBar, CensusRuns } from '../../open/OpenHome.jsx';
 import { SHARD_STATES, fmtAgo, fmtTokens } from '../../open/openUtil.js';
 import { postJson, useAdminToken, useApi } from './api.js';
-import { AdminTokenField, Card, Empty } from './ui.jsx';
+import { AdminTokenField, Card, Empty, RefreshButton } from './ui.jsx';
 
 const STATE_META = Object.fromEntries(SHARD_STATES.map(s => [s.id, s]));
 
@@ -37,15 +37,15 @@ function ShardGrid({ job }) {
 }
 
 export default function CensusPanel() {
-  const jobs = useApi('/api/census/jobs', { interval: 30000 });
-  const review = useApi('/api/census/review', { interval: 60000 });
+  const jobs = useApi('/api/census/jobs', { online: true });
+  const review = useApi('/api/census/review', { online: true });
   const runs = useApi('/api/neurons/index');
   const [pick, setPick] = useState('');
   const [token, setToken] = useAdminToken();
   const [msg, setMsg] = useState('');
   const list = jobs.data?.jobs || [];
   const cur = list.find(j => j.job_id === pick) || list[0];
-  const detail = useApi(cur ? `/api/census/jobs/${encodeURIComponent(cur.job_id)}` : null, { interval: 30000 });
+  const detail = useApi(cur ? `/api/census/jobs/${encodeURIComponent(cur.job_id)}` : null, { online: true });
 
   const act = async (path, body, label) => {
     setMsg('');
@@ -70,6 +70,7 @@ export default function CensusPanel() {
             </select>
           </label>
         )}
+        <RefreshButton apis={[jobs, detail, review, runs]} />
         <AdminTokenField token={token} onChange={setToken} />
         {msg && <span className="v6-note">{msg}</span>}
       </div>

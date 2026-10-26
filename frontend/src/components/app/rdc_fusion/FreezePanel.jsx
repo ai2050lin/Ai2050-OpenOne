@@ -30,7 +30,7 @@ export function NodeCommand() {
 }
 
 function Report({ tm }) {
-  const report = useApi(tm ? `/api/grammar/${encodeURIComponent(tm)}/report` : null, { interval: 15000 });
+  const report = useApi(tm ? `/api/grammar/${encodeURIComponent(tm)}/report` : null, { online: true });
   if (!tm) return null;
   if (!report.data) return <Empty>{report.error ? `报告不可用（${report.error}）` : '读取执行报告…'}</Empty>;
   const r = report.data;
@@ -75,7 +75,7 @@ export default function FreezePanel({ draft, onDraft, onGo }) {
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState(null);
   const [ack, setAck] = useState(false);
-  const templates = useApi('/api/templates', { interval: 30000 });
+  const templates = useApi('/api/templates', { online: true });
   const v3 = (templates.data?.templates || []).filter(t => t.protocol === 'v3');
   const fam = draft?.family_id;
   const pilotTm = fam ? `TG-${fam}-P` : '';

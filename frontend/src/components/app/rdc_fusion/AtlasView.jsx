@@ -126,7 +126,7 @@ function AiPanel({ model, local }) {
 
 export default function AtlasView({ localAtlas, localName, onOpenFamily, snapshot = false }) {
   // snapshot：读中心后台定时计算的快照（开放平台公开页；谱图全量计算要十几秒）
-  const remote = useApi(localAtlas ? null : (snapshot ? '/api/platform/snapshot/atlas' : '/api/atlas'), { interval: 60000 });
+  const remote = useApi(localAtlas ? null : (snapshot ? '/api/platform/snapshot/atlas' : '/api/atlas'));
   const atlas = localAtlas || (snapshot ? remote.data?.data : remote.data);
   const [modelPick, setModel] = useState('');
   const [layerPick, setLayer] = useState('');
