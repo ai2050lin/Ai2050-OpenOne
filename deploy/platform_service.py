@@ -42,6 +42,9 @@ def _read_version() -> str:
 PLATFORM_VERSION = _read_version()
 REFRESH_SECONDS = float(os.environ.get('AI2050_SNAPSHOT_SECONDS', '300'))
 KIT_BIND_TTL = 7 * 86400
+# 站点配置没有登记有效模型时的缺省参与模型（快照与 Hugging Face 版本已逐文件核对一致，见 Phase 255 / 1.0.x 部署记录）
+DEFAULT_MODELS = [{'name': 'qwen3-4b', 'hf_repo': 'Qwen/Qwen3-4B', 'hf_revision': '1cfa9a7208912126459214e8b04321603b3df60c',
+                   'snapshot_sha256': '6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad', 'min_vram_gib': 12}]
 
 _snap: Dict[str, Dict[str, Any]] = {}
 _snap_lock = threading.Lock()
@@ -80,6 +83,13 @@ def _loop() -> None:
             print(f'[platform] census auto merge: {exc}', flush=True)
         for name in ('overview', 'catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
             _refresh_one(name)
+        try:                                             # 实验响应页的规律分析：逐个模板 × 模型桶预算并落盘
+            from shared.dist_protocol import pipeline as P
+            fresh = P.warm_analyses(D._db(), D._DATA_DIR)
+            if fresh:
+                print(f'[platform] 规律分析预热完成：{fresh}', flush=True)
+        except Exception as exc:
+            print(f'[platform] analysis warm-up: {exc}', flush=True)
         time.sleep(REFRESH_SECONDS)
 
 
@@ -144,7 +154,8 @@ def config(request: Request) -> dict:
     cfg = _config_file()
     jobs = census_open_jobs()
     models, seen = [], set()
-    for m in list(cfg.get('models') or []) + [j['model'] for j in jobs]:   # 参与所需模型：配置文件登记 + 开放的普查作业
+    listed = [m for m in (cfg.get('models') or []) if len(str(m.get('snapshot_sha256') or '')) == 64]
+    for m in (listed or DEFAULT_MODELS) + [j['model'] for j in jobs]:   # 参与所需模型：配置文件登记（缺省 DEFAULT_MODELS）+ 开放的普查作业
         snap = str(m.get('snapshot_sha256') or '')
         if len(snap) == 64 and all(ch in '0123456789abcdef' for ch in snap) and snap not in seen:   # 占位值不下发
             seen.add(m['snapshot_sha256'])

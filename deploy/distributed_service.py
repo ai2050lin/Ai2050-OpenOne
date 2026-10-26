@@ -1786,7 +1786,7 @@ def family_analysis(tm_id: str, bucket: str = '', gate: bool = True) -> dict:
     """模式族规律分析（analysis.v1）：置换零分布、留出探针、白化方向、句式不变性、组合可加性、
     词身份与长度对照、3D 响应空间坐标与规律陈述。需要结果附带 items.npz。"""
     _proto()
-    return _pipeline.analyze_bucket(_db(), _DATA_DIR, tm_id, bucket=bucket or None, gate=gate)
+    return _pipeline.analyze_bucket(_db(), _DATA_DIR, tm_id, bucket=bucket or None, gate=gate, background=True)
 
 
 @router.get('/coverage')

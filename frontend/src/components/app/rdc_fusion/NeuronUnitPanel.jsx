@@ -83,6 +83,9 @@ export default function NeuronUnitPanel() {
 
   const search = useApi(run && query ? `/api/neurons/search?model_key=${encodeURIComponent(run.model_key)}&run=${encodeURIComponent(run.run)}&q=${encodeURIComponent(query)}` : null);
   const explained = useApi(run ? `/api/neurons/explained?model_key=${encodeURIComponent(run.model_key)}${grade ? `&grade=${encodeURIComponent(grade)}` : ''}` : null);
+  // 没有指定单元时，默认显示第一个「文本可复现」的单元，页面不留空
+  const fallback = explained.data?.results?.find(r => r.grade === '文本可复现') || explained.data?.results?.[0];
+  const cur = sel || (fallback ? { block: fallback.block, unit: fallback.unit } : null);
   const selectivity = useApi(selRun ? `/api/neurons/selectivity?run=${encodeURIComponent(selRun.file)}&top=20` : null);
   const tag = selectivity.data?.tags.find(t => t.readout === readout && t.block === layer);
   const list = tag ? (rank === 'contrib' && selectivity.data.contribution ? tag.top_by_contrib : tag.top_by_d) : [];
@@ -118,7 +121,7 @@ export default function NeuronUnitPanel() {
             {search.error && <div className="nu-err">{search.error}</div>}
             {search.data?.note && <div className="nu-note">{search.data.note}</div>}
             {(search.data?.results || []).map(r => (
-              <button key={unitKey(r.block, r.unit)} className={'nu-item' + (sel && sel.block === r.block && sel.unit === r.unit ? ' on' : '')}
+              <button key={unitKey(r.block, r.unit)} className={'nu-item' + (cur && cur.block === r.block && cur.unit === r.unit ? ' on' : '')}
                       onClick={() => choose(r.block, r.unit)}>
                 <b>{unitKey(r.block, r.unit)}</b> {r.promotes && <span className="nu-note">{r.promotes.join(' ')}</span>}
               </button>
@@ -138,7 +141,7 @@ export default function NeuronUnitPanel() {
           <div className="nu-list nu-list-scroll">
             {explained.data.results.length === 0 && <div className="nu-note">无。</div>}
             {explained.data.results.map(r => (
-              <button key={unitKey(r.block, r.unit)} className={'nu-item' + (sel && sel.block === r.block && sel.unit === r.unit ? ' on' : '')}
+              <button key={unitKey(r.block, r.unit)} className={'nu-item' + (cur && cur.block === r.block && cur.unit === r.unit ? ' on' : '')}
                       onClick={() => choose(r.block, r.unit)} title={r.axis}>
                 <span style={{ color: GRADE_META[r.grade].color }}>{GRADE_META[r.grade].mark}</span>
                 <b>{unitKey(r.block, r.unit)}</b>
@@ -168,7 +171,7 @@ export default function NeuronUnitPanel() {
           <div className="nu-list">
             <div className="nu-note">B{tag.block} 入选 {tag.n_selected} / {tag.n_units}（阈值 |d| ≥ {fmtNum(tag.cut)}）</div>
             {list.map(u => (
-              <button key={u.unit} className={'nu-item' + (sel && sel.block === layer && sel.unit === u.unit ? ' on' : '')} onClick={() => choose(layer, u.unit)}>
+              <button key={u.unit} className={'nu-item' + (cur && cur.block === layer && cur.unit === u.unit ? ' on' : '')} onClick={() => choose(layer, u.unit)}>
                 <b>U{u.unit}</b> d {fmtNum(u.d_disc)} / {fmtNum(u.d_held)}
                 {u.dominant_regime && <span className="nu-reg" style={{ background: REGIME_META[u.dominant_regime].color }}>{u.dominant_regime}</span>}
                 <span className="nu-note">高极 {u.pos_level}{u.contrib != null && ` · 贡献 ${fmtNum(u.contrib)}`}</span>
@@ -178,7 +181,7 @@ export default function NeuronUnitPanel() {
         )}
       </aside>
       <main className="nu-main">
-        <MainViews run={run} sel={sel} choose={choose} view={mainView} setView={setMainView}
+        <MainViews run={run} sel={cur} choose={choose} view={mainView} setView={setMainView}
                    layers={(spaceIdx.data?.layers || []).filter(l => l.model_key === run.model_key)} />
       </main>
     </div>

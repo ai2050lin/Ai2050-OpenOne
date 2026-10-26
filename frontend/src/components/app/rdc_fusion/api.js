@@ -47,22 +47,27 @@ export function detailText(detail) {
 
 /* 读取 + 可选轮询。path 为 null 时不请求。返回 {data, error, loading, reload}。
    setState 只在异步回调中调用（不在 effect 体内同步调用）；切换 path 时旧数据不串用。 */
-export function useApi(path, { interval = 0 } = {}) {
+export function useApi(path, { interval = 0, pollWhilePending = false } = {}) {
   const [state, setState] = useState({ key: null, data: null, error: '' });
   const [nonce, setNonce] = useState(0);
   useEffect(() => {
     if (!path) return undefined;
     const controller = new AbortController();
+    let retry = null;
     const run = () => getJson(path, { signal: controller.signal })
-      .then(data => setState({ key: path, data, error: '' }))
+      .then(data => {
+        setState({ key: path, data, error: '' });
+        // 服务端后台计算中（data.pending）：15 秒后自动复查，直到出结果
+        if (pollWhilePending && data?.pending) retry = window.setTimeout(run, 15000);
+      })
       .catch(reason => {
         if (reason?.name === 'AbortError') return;
         setState(previous => ({ key: path, data: previous.key === path ? previous.data : null, error: String(reason.message || reason) }));
       });
     run();
     const timer = interval > 0 ? window.setInterval(run, interval) : null;
-    return () => { controller.abort(); if (timer) window.clearInterval(timer); };
-  }, [path, interval, nonce]);
+    return () => { controller.abort(); if (timer) window.clearInterval(timer); if (retry) window.clearTimeout(retry); };
+  }, [path, interval, nonce, pollWhilePending]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
   const current = state.key === path;
   return {

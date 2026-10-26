@@ -2,7 +2,7 @@
    数据源：/api/census/jobs、/api/census/jobs/{id}、/api/census/review；写操作带管理令牌。 */
 import { useState } from 'react';
 
-import { CensusJobBar } from '../../open/OpenHome.jsx';
+import { CensusJobBar, CensusRuns } from '../../open/OpenHome.jsx';
 import { SHARD_STATES, fmtAgo, fmtTokens } from '../../open/openUtil.js';
 import { postJson, useAdminToken, useApi } from './api.js';
 import { AdminTokenField, Card, Empty } from './ui.jsx';
@@ -39,6 +39,7 @@ function ShardGrid({ job }) {
 export default function CensusPanel() {
   const jobs = useApi('/api/census/jobs', { interval: 30000 });
   const review = useApi('/api/census/review', { interval: 60000 });
+  const runs = useApi('/api/neurons/index');
   const [pick, setPick] = useState('');
   const [token, setToken] = useAdminToken();
   const [msg, setMsg] = useState('');
@@ -72,8 +73,13 @@ export default function CensusPanel() {
         <AdminTokenField token={token} onChange={setToken} />
         {msg && <span className="v6-note">{msg}</span>}
       </div>
+      {(runs.data?.census || []).length > 0 && (
+        <Card title="已合并的普查结果" sub="单元卡（空间 · 原生神经元）读取这些结果；分布式作业合并后也会出现在这里">
+          <CensusRuns runs={runs.data.census} title={false} />
+        </Card>
+      )}
       {!list.length && (
-        <Empty>还没有普查作业。管理员在中心服务器上用 deploy/admin_tool.py census-create 建作业（见 deploy/README_DEPLOY.md）。</Empty>
+        <Empty>还没有分布式普查作业。管理员在中心服务器上用 deploy/admin_tool.py census-create 建作业（见 deploy/README_DEPLOY.md）。</Empty>
       )}
       {cur && (
         <Card title={`${cur.job_id} · ${cur.model?.name || cur.model?.model_key}`}

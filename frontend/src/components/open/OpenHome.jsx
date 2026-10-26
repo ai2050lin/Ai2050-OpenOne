@@ -15,6 +15,23 @@ function Stat({ value, label, sub, onClick }) {
   );
 }
 
+export function CensusRuns({ runs, onGo, title = true }) {
+  return (
+    <div className="op-runs">
+      {title && <h3>已合并的普查结果</h3>}
+      <table className="op-table">
+        <thead><tr><th>模型</th><th>运行</th><th>计入 token</th><th>层数</th><th /></tr></thead>
+        <tbody>{runs.map(r => (
+          <tr key={`${r.model_key}/${r.run}`}>
+            <td className="op-mono">{r.model_key}</td><td className="op-mono">{r.run}</td><td>{fmtTokens(r.n_tokens)}</td><td>{r.n_layers ?? '—'}</td>
+            <td>{onGo && <button type="button" className="op-btn" onClick={() => onGo('atlas')}>看单元卡 →</button>}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
+
 export function CensusJobBar({ job }) {
   const total = job.n_shards || 1;
   return (
@@ -73,7 +90,9 @@ export default function OpenHome({ config, onGo }) {
       <section className="op-section">
         <h2>神经元普查进度</h2>
         <p className="op-lead">每个分片 = 一段自然语料（token 切片）× 一组层。节点在本机 GPU 上统计每个 MLP 神经元的激活分布与最强激活片段，中心逐项校验、抽样复算，再合并成单元卡。</p>
-        {(d.census_jobs || []).length === 0 ? <Empty>还没有开放的普查作业。</Empty> : d.census_jobs.map(j => <CensusJobBar key={j.job_id} job={j} />)}
+        {(d.census_jobs || []).map(j => <CensusJobBar key={j.job_id} job={j} />)}
+        {census.length > 0 && <CensusRuns runs={census} onGo={onGo} />}
+        {(d.census_jobs || []).length === 0 && census.length === 0 && <Empty>还没有普查结果，也没有开放的普查作业。</Empty>}
       </section>
 
       <section className="op-section op-grid2">

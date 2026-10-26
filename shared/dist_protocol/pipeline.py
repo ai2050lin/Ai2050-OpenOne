@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
@@ -623,11 +624,24 @@ def overview(db: sqlite3.Connection, data_dir: Path, *, node_online_window: floa
 # ---------------- 模式族规律分析（analysis.v1） ----------------
 
 _ANALYSIS_CACHE: Dict[Tuple, Any] = {}
+_ANALYSIS_RUNNING: Dict[str, float] = {}
+
+
+def _analysis_code_hash() -> str:
+    """analysis.py 的内容哈希：分析方法改动后，磁盘缓存自动失效。"""
+    return hashlib.sha256(Path(analysis_mod.__file__).read_bytes()).hexdigest()[:16]
+
+
+def _analysis_disk_path(data_dir: Path, key: Tuple) -> Path:
+    raw = json.dumps([_analysis_code_hash(), *[list(k) if isinstance(k, tuple) else k for k in key]], ensure_ascii=False)
+    return Path(data_dir) / 'analysis_cache' / (hashlib.sha256(raw.encode('utf-8')).hexdigest() + '.json')
 
 
 def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket: Optional[str] = None,
-                   gate: bool = True, n_perm: Optional[int] = None) -> Dict[str, Any]:
-    """在一个模型桶的已合并分片上运行 analysis.v1（逐条向量 items.npz）。没有逐条向量时返回 available=False。"""
+                   gate: bool = True, n_perm: Optional[int] = None, background: bool = False) -> Dict[str, Any]:
+    """在一个模型桶的已合并分片上运行 analysis.v1（逐条向量 items.npz）。没有逐条向量时返回 available=False。
+    结果写入 <data_dir>/analysis_cache/（键含分片 sha、门控与 analysis.py 内容哈希），结果不可变，所以只算一次。
+    background=True 时，未命中缓存就在后台线程计算并立即返回 pending（大模板首次可能要十几分钟）。"""
     agg = aggregate(db, data_dir, tm_id, bucket=bucket, gate=gate)
     buckets = [b for b in agg['buckets'] if b.get('agg')]
     if not buckets:
@@ -642,35 +656,94 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
         hit = _ANALYSIS_CACHE.get(key)
     if hit is not None:
         return hit
-    blobs = []
-    for sha in chosen['primary_shas']:
-        row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
-        files = result_files(data_dir, sha, summary_of(row)) if row else {}
-        if 'items.npz' in files:
-            blobs.append(files['items.npz'])
+    disk = _analysis_disk_path(data_dir, key)
+    if disk.is_file():
+        try:
+            out = json.loads(disk.read_text(encoding='utf-8'))
+            with _CACHE_LOCK:
+                _ANALYSIS_CACHE[key] = out
+            return out
+        except (OSError, ValueError):
+            pass
     base = {'tm_id': tm_id, 'bucket': chosen['bucket'], 'buckets': [b['bucket'] for b in buckets],
             'shards_present': chosen['shards_present'], 'shards_expected': chosen['shards_expected'],
             'complete': chosen['complete'], 'gate_applied': gate, 'gate_excluded_cells': chosen['gate_excluded_cells']}
-    if not blobs:
-        out = {**base, 'available': False, 'reason': '结果中没有逐条向量（items.npz）；需用 runner_v3 且 capture_items 未关闭'}
-    else:
-        corpus = template_corpus(db, tm_id)
-        texts = {it['id']: it['text'] for it in corpus.get('items', []) if not it.get('canary')}
-        try:
-            items = analysis_mod.load_items(blobs)
-            result = analysis_mod.analyze(items, list(corpus.get('factors') or []), texts=texts,
-                                          exclude_cells=set(chosen['gate_excluded_cells']) if gate else None,
-                                          n_perm=n_perm)
-            out = {**base, 'available': True, 'items_from_shards': len(blobs), **result}
-        except ValueError as exc:
-            out = {**base, 'available': False, 'reason': f'逐条向量不可合并：{exc}'}
-    out['policy'] = ('只用合并口径内的分片（kind=real、design_sha 一致、金丝雀未漂移、审计未驳回，每分片一次）；'
-                     '判据固定写在 criteria 中；规律陈述是观测层面的候选，不自动成为 Evidence。')
+    if background:
+        with _CACHE_LOCK:
+            started = _ANALYSIS_RUNNING.get(disk.name)
+
+        def job():
+            conn = sqlite3.connect(str(Path(data_dir) / 'dist.sqlite3'), check_same_thread=False, timeout=60)
+            conn.row_factory = sqlite3.Row
+            try:
+                analyze_bucket(conn, data_dir, tm_id, bucket=chosen['bucket'], gate=gate, n_perm=n_perm)
+            finally:
+                conn.close()
+        if started is None:
+            threading.Thread(target=job, name=f'analysis-{tm_id}', daemon=True).start()
+        return {**base, 'available': False, 'pending': True, 'started_at': started or time.time(),
+                'reason': '规律分析正在后台计算（大模板首次可能需要十几分钟），完成后自动显示；结果会缓存，之后打开即时显示。'}
     with _CACHE_LOCK:
-        if len(_ANALYSIS_CACHE) > 16:
-            _ANALYSIS_CACHE.clear()
-        _ANALYSIS_CACHE[key] = out
-    return out
+        if disk.name in _ANALYSIS_RUNNING:          # 另一线程正在算同一份：不重复计算
+            return {**base, 'available': False, 'pending': True, 'started_at': _ANALYSIS_RUNNING[disk.name],
+                    'reason': '规律分析正在后台计算，完成后自动显示。'}
+        _ANALYSIS_RUNNING[disk.name] = time.time()
+    try:
+        blobs = []
+        for sha in chosen['primary_shas']:
+            row = db.execute('SELECT summary_json FROM results WHERE sha=?', (sha,)).fetchone()
+            files = result_files(data_dir, sha, summary_of(row)) if row else {}
+            if 'items.npz' in files:
+                blobs.append(files['items.npz'])
+        if not blobs:
+            out = {**base, 'available': False, 'reason': '结果中没有逐条向量（items.npz）；需用 runner_v3 且 capture_items 未关闭'}
+        else:
+            corpus = template_corpus(db, tm_id)
+            texts = {it['id']: it['text'] for it in corpus.get('items', []) if not it.get('canary')}
+            try:
+                items = analysis_mod.load_items(blobs)
+                result = analysis_mod.analyze(items, list(corpus.get('factors') or []), texts=texts,
+                                              exclude_cells=set(chosen['gate_excluded_cells']) if gate else None,
+                                              n_perm=n_perm)
+                out = {**base, 'available': True, 'items_from_shards': len(blobs), **result}
+            except ValueError as exc:
+                out = {**base, 'available': False, 'reason': f'逐条向量不可合并：{exc}'}
+        out['policy'] = ('只用合并口径内的分片（kind=real、design_sha 一致、金丝雀未漂移、审计未驳回，每分片一次）；'
+                         '判据固定写在 criteria 中；规律陈述是观测层面的候选，不自动成为 Evidence。')
+        try:
+            disk.parent.mkdir(parents=True, exist_ok=True)
+            tmp = disk.with_suffix('.tmp')
+            tmp.write_text(json.dumps(out, ensure_ascii=False), encoding='utf-8')
+            tmp.replace(disk)
+        except OSError:
+            pass
+        with _CACHE_LOCK:
+            if len(_ANALYSIS_CACHE) > 16:
+                _ANALYSIS_CACHE.clear()
+            _ANALYSIS_CACHE[key] = out
+        return out
+    finally:
+        with _CACHE_LOCK:
+            _ANALYSIS_RUNNING.pop(disk.name, None)
+
+
+def warm_analyses(db: sqlite3.Connection, data_dir: Path) -> List[str]:
+    """后台预热：为每个 v3 模板的每个有合并结果的模型桶算好规律分析（已缓存的跳过）。返回本次新算的。"""
+    done = []
+    for t, corpus in templates_v3(db):
+        if not is_v3(corpus):
+            continue
+        agg = aggregate(db, data_dir, t['tm_id'])
+        for b in agg['buckets']:
+            if not b.get('agg'):
+                continue
+            key = (t['tm_id'], b['bucket'], True, tuple(b['primary_shas']), tuple(b['gate_excluded_cells']), None)
+            if _analysis_disk_path(data_dir, key).is_file():
+                continue
+            out = analyze_bucket(db, data_dir, t['tm_id'], bucket=b['bucket'], gate=True)
+            if not out.get('pending'):
+                done.append(f"{t['tm_id']}/{b['bucket']}")
+    return done
 
 
 # ---------------- 题库（catalog.v1）：所有用户看到的题目、类别与测试状态 ----------------

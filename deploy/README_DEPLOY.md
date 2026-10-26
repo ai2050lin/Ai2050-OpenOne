@@ -136,11 +136,37 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
 - **复算**：抽样分片派给另一个账号，按均值 z 值、max 相对差、top-1 位置一致率和直方图 L1 距离比较。
 - **边界**：这些检查只说明产物可信、可以合并，不是证据晋级。合成（synthetic）结果只有沙盒中心（`AI2050_DIST_ALLOW_SYNTHETIC=1`）才接受。
 
-## 6. 迁移已有数据（可选）
+## 6. 导入研究数据（让各页面有内容）
 
-在开发机上已有的中心数据（`distributed_data/`，包括模式族模板、结果和账号）可以整目录同步到 `/var/lib/ai2050/center/`。同步前先停服务：`systemctl stop ai2050-center`，同步后执行 `chown -R ai2050:ai2050`。
+新中心刚装好时没有研究数据，首页、谱图、实验响应、路线、神经元卡都会显示空状态。用数据包把研发机上的研究数据**合并**进来。合并只新增记录，不覆盖已有记录，也不碰账号。
 
-已有的本机普查结果（`<native>/_census/<model_key>/<run>/`，Qwen3-4B 2000 万 token 约 1.1 GB）与对应语料一起同步到 `/var/lib/ai2050/native/_census/` 后，单元卡就能直接读取。
+1. **在研发机上导出：**
+
+   ```bash
+   python scripts/export_center_data.py      # → release/ai2050-data-<日期>.tar（约 6 GB）与 .sha256
+   ```
+
+   数据包包含：当前模板版本的 real 结果与模板包、规律分析缓存、最大的一次普查（含语料与 tokenizer）、模型快照。不包含账号、会话、旧版本结果和原生全场。
+
+2. **传到服务器后合并导入：**
+
+   ```bash
+   systemctl cat ai2050-center | grep -E "AI2050_(DIST|NATIVE)_DIR"        # 确认数据目录
+   systemctl stop ai2050-center
+   python3 /data/ai2050-center-<版本>/deploy/import_center_data.py ai2050-data-<日期>.tar        --data-dir <AI2050_DIST_DIR> --native-dir <AI2050_NATIVE_DIR>     # 可先加 --dry-run 看计划
+   chown -R ai2050:ai2050 <AI2050_DIST_DIR> <AI2050_NATIVE_DIR>
+   systemctl start ai2050-center
+   ```
+
+   导入前会自动备份数据库（`dist.sqlite3.before-import-<时间>`）。导入是幂等的，可以重复执行。
+
+3. **开放普查试点作业**（参与页随即出现可领取的任务）。数据包里带了模型快照与 tokenizer 目录：
+
+   ```bash
+   sudo python3 /data/ai2050-center-<版本>/deploy/admin_tool.py census-create --job-id CJ-qwen3-4b-pilot        --model-dir <AI2050_NATIVE_DIR>/_census/6be1034f0b55a6df-bf16/2ca5f0a756d36c8a-20000000/tokenizer        --snapshot-file <AI2050_NATIVE_DIR>/_census/snapshots/6be1034f0b55a6df-bf16.json        --corpus-fp 2ca5f0a756d36c8a --tokens-per-slice 2000000 --max-slices 2        --model-name qwen3-4b --hf-repo Qwen/Qwen3-4B --hf-revision 1cfa9a7208912126459214e8b04321603b3df60c
+   ```
+
+中心启动后会在后台计算总览、谱图与记分板的快照，并预热实验响应页的规律分析。数据包里已有缓存的模板，打开即时显示；没有缓存的大模板首次需要较长时间，页面会提示「后台计算中」，算完自动刷新。
 
 ## 7. 运维
 

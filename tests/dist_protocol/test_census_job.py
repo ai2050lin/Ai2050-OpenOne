@@ -256,7 +256,7 @@ class CenterE2ETests(unittest.TestCase):
         self.assertEqual(r.status_code, 200, r.text)
         self.assertEqual(r.json()['n_shards'], 6)
         cfg = self.c.get('/api/platform/config').json()
-        self.assertEqual(cfg['models'][0]['snapshot_sha256'], 'e' * 64)
+        self.assertIn('e' * 64, [m['snapshot_sha256'] for m in cfg['models']])      # 开放作业的模型（另有缺省参与模型）
         self.assertIn('census_shard', cfg['task_kinds'])
         out = self.tmp / 'work'
         # alice 做完全部 6 个分片；同一节点不能复算自己的分片

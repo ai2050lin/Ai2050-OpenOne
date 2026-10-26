@@ -2,7 +2,7 @@
    数据：/api/pipeline/overview · /api/coverage · /api/catalog · /api/atlas · /api/atlas/hypotheses（中心服务）+ 研究账本。
    纪律：各阶段计数来自独立数据表，不连成转化率；服务未接入显示空态，不填演示数字。 */
 import { fmtAgoTs, fmtNum, useApi, useSnapshot } from './api.js';
-import { CensusJobBar } from '../../open/OpenHome.jsx';
+import { CensusJobBar, CensusRuns } from '../../open/OpenHome.jsx';
 import { Card, Empty, SourceTag, StatusPill } from './ui.jsx';
 import { MISSION } from './distributedData.js';
 import { STATUS_META, STATUS_ORDER } from './catalogUtil.js';
@@ -154,6 +154,7 @@ export default function HomeOverview({ onGo }) {
   const catalog = useApi('/api/catalog', { interval: 60000 });
   const atlas = useSnapshot('atlas', { interval: 120000 });
   const census = useApi('/api/census/jobs', { interval: 60000 });
+  const censusRuns = useApi('/api/neurons/index');
   const hyps = useApi('/api/atlas/hypotheses?limit=5', { interval: 120000 });
   const live = overview.data ? 'live' : overview.loading ? 'loading' : 'none';
   return (
@@ -231,8 +232,9 @@ export default function HomeOverview({ onGo }) {
 
           <Card title="神经元普查" sub="分片状态：完成 / 等复算 / 运行中 / 待领取" extra={<button type="button" className="fw-home-mini-link" onClick={() => onGo('census')}>普查作业 →</button>}>
             {census.error && <Empty>{census.error}</Empty>}
-            {census.data && !census.data.jobs.length && <Empty>还没有开放的普查作业。</Empty>}
             {census.data?.jobs.map(j => <CensusJobBar key={j.job_id} job={j} />)}
+            {(censusRuns.data?.census || []).length > 0 && <CensusRuns runs={censusRuns.data.census} onGo={() => onGo('spatial', null, null, { view: 'units' })} />}
+            {census.data && !census.data.jobs.length && !(censusRuns.data?.census || []).length && <Empty>还没有普查结果，也没有开放的普查作业。</Empty>}
           </Card>
         </div>
       </div>

@@ -398,7 +398,8 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
   const layer = layers.find(l => l.tag === layerTag);
   const factors = agg.data?.factors || tpl?.factors || [];
   const wantAnalysis = isV3 && bucket?.agg && (view === 'space3d' || view === 'findings');
-  const analysis = useApi(wantAnalysis ? `/api/analysis/${encodeURIComponent(tm)}?bucket=${encodeURIComponent(bucket.bucket)}&gate=${gate}` : null);
+  const analysis = useApi(wantAnalysis ? `/api/analysis/${encodeURIComponent(tm)}?bucket=${encodeURIComponent(bucket.bucket)}&gate=${gate}` : null,
+    { pollWhilePending: true });                    // 大模板首次在服务端后台计算：自动复查
   const an = analysis.data?.available ? analysis.data : null;
   const methodV = method || (factors[0] ? `lda:${factors[0]}` : 'pca');
   const colorByV = colorBy || (factors[0] ? `factor:${factors[0]}` : 'split');
