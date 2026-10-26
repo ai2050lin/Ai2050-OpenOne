@@ -4,6 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { useApi } from './api.js';
+import NeuronSpace3D from './NeuronSpace3D.jsx';
 import NeuronUnitCard from './NeuronUnitCard.jsx';
 import { GRADES, GRADE_META, REGIME_META, fmtNum, parseUnitKey, unitKey } from './neuronUtil.js';
 import './neuron_units.css';
@@ -24,6 +25,43 @@ function writeUnitParam(sel) {
   } catch { /* 地址栏不可写时只保留页面状态 */ }
 }
 
+const MAIN_VIEWS = [
+  { id: 'card', label: '单元卡' },
+  { id: 'prop', label: '3D 属性空间', desc: '因果作用 × 激活密度 × 直接读出占比（实测量）' },
+  { id: 'sem', label: '3D 读出语义空间', desc: '读出向量 PCA 前三维（降维投影）' },
+];
+
+function MainViews({ run, sel, choose, view, setView, layers }) {
+  const [layerPick, setLayerPick] = useState(null);
+  const layer = layers.find(l => l.layer === layerPick)?.layer ?? layers[0]?.layer;
+  const space = useApi(view !== 'card' && layer != null ? `/api/neurons/space?model_key=${encodeURIComponent(run.model_key)}&layer=${layer}` : null);
+  return (
+    <>
+      <div className="nu-tabs" role="tablist" aria-label="主视图">
+        {MAIN_VIEWS.map(v => (
+          <button key={v.id} type="button" role="tab" aria-selected={view === v.id} className={view === v.id ? 'on' : ''}
+                  onClick={() => setView(v.id)} title={v.desc || ''} disabled={v.id !== 'card' && !layers.length}>{v.label}</button>
+        ))}
+        {view !== 'card' && layers.length > 1 && (
+          <select value={layer} onChange={e => setLayerPick(Number(e.target.value))} aria-label="层">
+            {layers.map(l => <option key={l.layer} value={l.layer}>第 {l.layer} 层</option>)}
+          </select>
+        )}
+        {!layers.length && <span className="nu-note">3D 视图需要层空间数据（scripts/build_layer_space.py），该模型尚无。</span>}
+      </div>
+      {view !== 'card' && (
+        space.error ? <div className="nu-empty nu-err">3D 数据不可用：{space.error}</div>
+          : !space.data ? <div className="nu-empty">读取 3D 视图数据…</div>
+            : <NeuronSpace3D data={space.data} view={view} selected={sel?.block === layer ? sel?.unit : null}
+                             onSelect={u => choose(layer, u)} />
+      )}
+      {(view === 'card' || sel) && (
+        <NeuronUnitCard modelKey={run.model_key} run={run.run} block={sel?.block} unit={sel?.unit}/>
+      )}
+    </>
+  );
+}
+
 export default function NeuronUnitPanel() {
   const index = useApi('/api/neurons/index');
   const census = useMemo(() => index.data?.census || [], [index.data]);
@@ -40,6 +78,8 @@ export default function NeuronUnitPanel() {
   const [query, setQuery] = useState('');
   const [sel, setSel] = useState(readUnitParam);
   const [grade, setGrade] = useState('');
+  const [mainView, setMainView] = useState('card');
+  const spaceIdx = useApi('/api/neurons/space/index');
 
   const search = useApi(run && query ? `/api/neurons/search?model_key=${encodeURIComponent(run.model_key)}&run=${encodeURIComponent(run.run)}&q=${encodeURIComponent(query)}` : null);
   const explained = useApi(run ? `/api/neurons/explained?model_key=${encodeURIComponent(run.model_key)}${grade ? `&grade=${encodeURIComponent(grade)}` : ''}` : null);
@@ -138,7 +178,8 @@ export default function NeuronUnitPanel() {
         )}
       </aside>
       <main className="nu-main">
-        <NeuronUnitCard modelKey={run.model_key} run={run.run} block={sel?.block} unit={sel?.unit}/>
+        <MainViews run={run} sel={sel} choose={choose} view={mainView} setView={setMainView}
+                   layers={(spaceIdx.data?.layers || []).filter(l => l.model_key === run.model_key)} />
       </main>
     </div>
   );

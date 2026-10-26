@@ -55,6 +55,26 @@
 .nu-expl-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .nu-expl-text { font-size: 13px; }
 .nu-grade { font-size: 12px; padding: 1px 8px; border-radius: 10px; }
+/* 主视图切换与 3D 视图 */
+.nu-tabs { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.nu-tabs button { border: 1px solid var(--line, #d8dde3); background: #fff; padding: 4px 12px; border-radius: 6px; font-size: 12.5px; cursor: pointer; }
+.nu-tabs button.on { border-color: #2f6fb3; background: #eaf2fb; color: #1d4f86; font-weight: 600; }
+.nu-tabs button:disabled { opacity: .5; cursor: default; }
+.ns3-wrap { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.ns3-bar { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.ns3-legend { display: flex; gap: 4px 10px; flex-wrap: wrap; font-size: 12px; align-items: center; }
+.ns3-legend button { border: 0; background: none; cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; color: var(--ink-1, #1e293b); }
+.ns3-legend button.off { opacity: .35; text-decoration: line-through; }
+.ns3-legend i, .ns3-ok i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+.ns3-ok i { border: 1.6px solid #0f172a; background: #fff; }
+.ns3-legend small, .ns3-ok small { color: var(--ink-3, #6b7480); }
+.ns3-ok { font-size: 12px; }
+.ns3-ctl { display: flex; gap: 8px; align-items: center; font-size: 12px; }
+.ns3-ctl select, .ns3-reset { font-size: 12px; padding: 3px 8px; border: 1px solid var(--line, #d8dde3); border-radius: 5px; background: #fff; cursor: pointer; }
+.ns3-canvas { position: relative; border: 1px solid var(--line, #d8dde3); border-radius: 8px; overflow: hidden; cursor: grab; }
+.ns3-canvas canvas { display: block; }
+.ns3-tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--line, #d8dde3); border-radius: 6px; padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(15, 23, 42, .12); max-width: 380px; z-index: 2; line-height: 1.55; }
+.ns3-axes { display: flex; flex-direction: column; gap: 2px; }
 @media (max-width: 900px) {
   .nu-wrap { grid-template-columns: 1fr; }
   .nu-side { border-right: none; border-bottom: 1px solid var(--line, #d8dde3); }

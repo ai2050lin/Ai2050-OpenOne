@@ -58,3 +58,11 @@ export const GRADE_META = {
   '只在语料中可识别': { color: '#2f6fb3', bg: '#eaf2fb', mark: '◐' },
   '未解释': { color: '#6b7480', bg: '#f1f3f5', mark: '○' },
 };
+
+/* 层空间（layer_space.v1）3D 视图：神经元类型的类别色（参考色板前 6 槽，固定顺序，经 validate_palette 检查：
+   CVD 相邻 ΔE ≥ 9.1；三个颜色对浅色底对比 < 3:1，所以图例始终带文字、点击即有单元卡与列表）。 */
+export const SPACE_TYPES = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
+export const SPACE_TYPE_COLOR = { T1: '#2a78d6', T2: '#eb6834', T3: '#1baf7a', T4: '#eda100', T5: '#e87ba4', T6: '#008300' };
+export const SPACE_TOPN = [
+  { v: 0, label: '全部' }, { v: 2000, label: '因果前 2000' }, { v: 500, label: '因果前 500' }, { v: 100, label: '因果前 100' },
+];

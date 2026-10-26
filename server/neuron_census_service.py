@@ -473,6 +473,37 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
     return card
 
 
+@lru_cache(maxsize=4)
+def _space(path: str, stamp: float) -> Dict[str, Any]:
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+def space_files() -> List[Path]:
+    return sorted((research_root() / 'neurons').glob('L*-space.json'), key=lambda q: int(q.name[1:].split('-')[0]))
+
+
+@router.get('/space/index')
+def space_index():
+    """有 3D 视图数据（layer_space.v1）的层。"""
+    out = []
+    for f in space_files():
+        d = _space(str(f), f.stat().st_mtime)
+        out.append({'model_key': d['model_key'], 'layer': d['layer'], 'n_units': d['n_units'], 'sources': d['sources']})
+    return {'schema': 'layer_space_index.v1', 'layers': out}
+
+
+@router.get('/space')
+def space(model_key: str = Query(...), layer: int = Query(..., ge=0)):
+    """单层神经元的属性空间与读出语义空间坐标（scripts/build_layer_space.py）。"""
+    f = research_root() / 'neurons' / f'L{layer}-space.json'
+    if not f.is_file():
+        raise HTTPException(404, f'第 {layer} 层没有 3D 视图数据')
+    d = _space(str(f), f.stat().st_mtime)
+    if d['model_key'] != model_key:
+        raise HTTPException(404, '该模型没有这一层的 3D 视图数据')
+    return d
+
+
 @router.get('/search')
 def search(model_key: str = Query(...), q: str = Query(..., min_length=1, max_length=64), run: Optional[str] = Query(None),
            limit: int = Query(30, ge=1, le=100)):

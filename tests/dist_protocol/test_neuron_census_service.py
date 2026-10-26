@@ -66,10 +66,14 @@ class NeuronCensusServiceTests(unittest.TestCase):
             (iv / f'{run}.prereg.json').write_text(json.dumps({'model': {'model_key': 'mk-synth'}}), encoding='utf-8')
             (iv / f'{run}.prereg.sha256').write_text('abc *x\n', encoding='utf-8')
             (iv / f'{run}-results.json').write_text(json.dumps({'units': recs}, ensure_ascii=False), encoding='utf-8')
+        nd = cls.tmp / 'research' / 'neurons'
+        nd.mkdir(parents=True)
+        (nd / 'L0-space.json').write_text(json.dumps({'schema': 'layer_space.v1', 'model_key': 'mk-synth', 'layer': 0, 'n_units': 1,
+                                                      'sources': {}, 'units': [{'u': 0, 'p': [0, 0, 0], 's': [0, 0, 0]}]}), encoding='utf-8')
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
         from server import neuron_census_service as S
-        for fn in (S.census_manifest, S.census_layer, S.corpus, S.tokenizer, S.readout_index, S._selectivity_json, S._expl_index):
+        for fn in (S.census_manifest, S.census_layer, S.corpus, S.tokenizer, S.readout_index, S._selectivity_json, S._expl_index, S._space):
             fn.cache_clear()
         app = FastAPI(); app.include_router(S.router)
         cls.client = TestClient(app)
@@ -109,6 +113,14 @@ class NeuronCensusServiceTests(unittest.TestCase):
         r = self.client.get('/api/neurons/explained', params={'model_key': 'mk-synth', 'grade': '未解释'}).json()
         self.assertEqual([(x['block'], x['unit']) for x in r['results']], [(0, 4)])
         self.assertEqual(self.client.get('/api/neurons/explained', params={'model_key': 'mk-synth', 'grade': 'x'}).status_code, 400)
+
+    def test_layer_space(self):
+        idx = self.client.get('/api/neurons/space/index').json()
+        self.assertEqual([(x['model_key'], x['layer']) for x in idx['layers']], [('mk-synth', 0)])
+        r = self.client.get('/api/neurons/space', params={'model_key': 'mk-synth', 'layer': 0})
+        self.assertEqual(r.json()['schema'], 'layer_space.v1')
+        self.assertEqual(self.client.get('/api/neurons/space', params={'model_key': 'other', 'layer': 0}).status_code, 404)
+        self.assertEqual(self.client.get('/api/neurons/space', params={'model_key': 'mk-synth', 'layer': 7}).status_code, 404)
 
     def test_search_and_errors(self):
         r = self.client.get('/api/neurons/search', params={'model_key': 'mk-synth', 'q': 'L0.U2'}).json()

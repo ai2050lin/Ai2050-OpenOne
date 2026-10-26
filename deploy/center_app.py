@@ -44,6 +44,8 @@ def create_app():
     app = FastAPI(title='AI2050 Open LLM Reverse-Engineering Platform', version=platform_service.PLATFORM_VERSION)
     origins = [o.strip() for o in os.environ.get('AI2050_CORS_ORIGINS', '*').split(',') if o.strip()]
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=['*'], allow_headers=['*'])
+    from fastapi.middleware.gzip import GZipMiddleware
+    app.add_middleware(GZipMiddleware, minimum_size=2048)      # 谱图、3D 神经元空间等大 JSON
     local_tools = os.environ.get('AI2050_LOCAL_TOOLS') == '1'
 
     @app.middleware('http')
