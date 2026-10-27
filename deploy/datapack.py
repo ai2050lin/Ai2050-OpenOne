@@ -93,6 +93,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     idx = NS.index()
     model_keys = sorted({r['model_key'] for r in idx.get('census', [])})
     for mk in model_keys:
+        plan.append((f'/api/neurons/tower?model_key={mk}', (lambda m=mk: NS.neuron_tower(model_key=m, run=None))))
         plan.append((f'/api/neurons/explained?model_key={mk}', (lambda m=mk: NS.explained(model_key=m, grade=None))))
         for g in NS.GRADES:
             plan.append((f'/api/neurons/explained?model_key={mk}&grade={g}', (lambda m=mk, gg=g: NS.explained(model_key=m, grade=gg))))
@@ -276,6 +277,12 @@ def card_entries(model_key: str, log=print) -> Tuple[Dict[str, Any], List[str]]:
     entries, notes = {}, []
     units = card_units(model_key)
     t0 = time.time()
+    for block in range(NS.census_manifest(model_key, run)['n_layers']):   # 逐层摘要（神经元主线的层阵列）
+        doc = NS.neuron_layer(model_key=model_key, block=block, run=run)
+        if doc.get('pending'):
+            notes.append(f'L{block}: 逐层摘要尚未生成')
+        else:
+            entries[canonical(f'/api/neurons/layer?model_key={model_key}&block={block}&run={run}')] = doc
     for i, (block, unit) in enumerate(units):
         try:
             card = NS.unit_card(model_key=model_key, block=block, unit=unit, run=run, n_poles=12)
@@ -361,7 +368,7 @@ def pack_hint(path: str) -> Optional[str]:
     m = re.match(r'^/api/(?:agg/([^/]+)/v2|analysis/([^/]+))$', p.path)
     if m:
         return f'tm:{m.group(1) or m.group(2)}'
-    if p.path == '/api/neurons/unit':
+    if p.path in ('/api/neurons/unit', '/api/neurons/layer'):
         mk = dict(parse_qsl(p.query)).get('model_key')
         return f'cards:{mk}' if mk else None
     return None

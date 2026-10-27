@@ -123,6 +123,14 @@ class RouteTRecoveryTests(unittest.TestCase):
         self.assertEqual(piece['readouts']['target']['baseline']['state'], 'missing')
         self.assertEqual(piece['level'], 2)
 
+    def test_scatter_at_peak_layer(self):
+        sc = self.ext['scatter']['category']
+        self.assertEqual((sc['readout'], sc['layer']), ('target', 1))           # 峰值层（植入在中层）
+        self.assertEqual(sc['tag'], 'target@L1')
+        self.assertLessEqual(len(sc['pts']), PC.MAX_SCATTER)
+        self.assertEqual(set(sc['levels']), {str(p[2]) for p in sc['pts']})
+        self.assertIsNotNone(_piece(self.ext)['scatter'])
+
     def test_unavailable_analysis_gives_no_piece(self):
         self.assertIsNone(_piece(PC.extract_analysis({'available': False})))
 
@@ -182,6 +190,31 @@ class AssembleTests(unittest.TestCase):
         self.assertEqual((sk['n_layers'], sk['d_model'], sk['d_ff']), (36, 2560, 9728))
         self.assertEqual((sk['census_key'], sk['census_run']), ('abababababababab-bf16', 'r'))
         self.assertIsNone(PC.skeleton_from_summary('x', {})['n_layers'])   # 缺字段留空，不猜
+        cfg = {'num_attention_heads': 32, 'num_key_value_heads': 8, 'head_dim': 128, 'private': 'x'}
+        sk2 = PC.skeleton_from_summary('qwen3-4b|cfg|bf16', s, [{'model_key': 'abababababababab-bf16', 'run': 'r', 'n_tokens': 5}],
+                                       census_config=lambda mk, run: cfg if (mk, run) == ('abababababababab-bf16', 'r') else None)
+        self.assertEqual(sk2['config'], {'num_attention_heads': 32, 'num_key_value_heads': 8, 'head_dim': 128})
+        self.assertIsNone(sk['config'])                                     # 没有普查 config：注意力头数等留空
+
+    def test_examples_minimal_pairs_from_discovery_only(self):
+        def it(fill, mood, frame, split='discovery'):
+            return {'filler_id': fill, 'cond': {'mood': mood}, 'frame_id': frame, 'split': split, 'text': f'{fill}-{mood}-{frame}',
+                    'probe': {'prompt': 'p', 'answers': ['a'], 'contrast': ['b']}}
+        items = [it('f1', 'decl', 'A'), it('f1', 'interrog', 'B'), it('f2', 'decl', 'A'),          # f2 只有一个水平：不是最小对
+                 it('f3', 'decl', 'A', 'lockbox'), it('f3', 'interrog', 'B', 'lockbox')]            # 留出材料不展示
+        ex = PC.examples_of(items, 'mood')
+        self.assertEqual(ex['levels'], ['decl', 'interrog'])
+        self.assertEqual({r['filler'] for r in ex['rows']}, {'f1'})
+        self.assertEqual(set(ex['probes']), {'decl', 'interrog'})
+
+    def test_examples_and_selectivity_attached_to_items(self):
+        tree = PC.load_tree()
+        ex = {('TG-GR-Q', 'mood'): ('GR-Q', {'levels': ['decl', 'interrog'], 'rows': [], 'probes': {}})}
+        sel = [{'file': 'GR-Q-v10.json', 'item': 'GR.Q', 'by_readout': {}}, {'file': 'Z.json', 'item': None, 'by_readout': {}}]
+        out = PC.assemble(tree, [], {}, ex, sel)
+        self.assertEqual([e['tm_id'] for e in out['items']['GR.Q']['examples']], ['TG-GR-Q'])
+        self.assertEqual([s['file'] for s in out['items']['GR.Q']['selectivity']], ['GR-Q-v10.json'])
+        self.assertEqual(out['items']['KN.ISA']['selectivity'], [])
 
 
 if __name__ == '__main__':

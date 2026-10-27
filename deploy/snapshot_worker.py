@@ -124,7 +124,8 @@ def build_datapack(fp: str, guard: 'Guard', force: bool = False, log=print):
     try:
         import datapack as DP
         from server import neuron_census_service as NS
-        version = f"{fp}-{DP.research_stamp(NS.research_root())}-{stored_fingerprint('lang_atlas') or 'nolang'}"
+        version = (f"{fp}-{DP.research_stamp(NS.research_root())}-{stored_fingerprint('lang_atlas') or 'nolang'}"
+                   f"-{neuron_layer_stamp()}")
         meta = DP.read_meta(D._DATA_DIR)
         if not guard.skip('datapack') and (force or not meta or meta.get('version') != version):
             guard.start('datapack')
@@ -135,6 +136,34 @@ def build_datapack(fp: str, guard: 'Guard', force: bool = False, log=print):
     return result
 
 
+def neuron_layer_stamp() -> str:
+    """逐层神经元摘要的版本：摘要代码哈希 + 已生成的块文件数（数据包与单元卡包的版本都含它）。"""
+    try:
+        from server import neuron_census_service as NS
+        from shared.dist_protocol import neuron_layers as NL
+        n = sum(len(list(NS.layer_base_dir(r['model_key'], r['run']).glob('L*.json'))) for r in NS.census_runs())
+        return f'nl{NL.code_hash()[:6]}x{n}'
+    except Exception:
+        return 'nl0'
+
+
+def build_neuron_layers(guard: 'Guard', log=print) -> int:
+    """每个有普查的模型（token 数最多的那次运行）生成缺失的逐层摘要；返回新生成的块数。"""
+    total = 0
+    try:
+        from server import neuron_census_service as NS
+        for mk in sorted({r['model_key'] for r in NS.census_runs()}):
+            run = NS.pick_census(mk, None)['run']
+            if guard.skip(f'neuron_layers:{mk}'):
+                continue
+            total += NS.build_layer_bases(mk, run, log=log, guard=guard)['computed']
+            guard.done()
+    except Exception as exc:
+        guard.done()
+        log(f'[snapshots] neuron_layers: {type(exc).__name__}: {exc}')
+    return total
+
+
 def lang_atlas_version(fp: str) -> str:
     """语言谱图快照的版本：数据指纹 + 已缓存的规律分析文件名 + 语言树文件 + pieces 代码哈希。
     放在规律分析预热之后计算：预热补上新的分析文件时版本随之变化，谱图会重建。"""
@@ -142,7 +171,10 @@ def lang_atlas_version(fp: str) -> str:
     from shared.dist_protocol import pieces as PC
     cache = Path(D._DATA_DIR) / 'analysis_cache'
     names = sorted(p.name for p in cache.glob('*.json')) if cache.is_dir() else []
-    raw = json.dumps([fp, names, hashlib.sha256(PC.TREE_PATH.read_bytes()).hexdigest(), PC.code_hash()])
+    import datapack as DP
+    from server import neuron_census_service as NS
+    raw = json.dumps([fp, names, hashlib.sha256(PC.TREE_PATH.read_bytes()).hexdigest(), PC.code_hash(),
+                      DP.research_stamp(NS.research_root())])          # 研究文件（模板选择性）变化时也重建
     return hashlib.sha256(raw.encode('utf-8')).hexdigest()[:20]
 
 
@@ -156,7 +188,13 @@ def build_lang_atlas(fp: str, guard: 'Guard', force: bool = False, log=print):
         from server import neuron_census_service as NS
         t0 = time.time()
         guard.start('lang_atlas')
-        data = PC.collect(D._db(), D._DATA_DIR, census_runs=NS.census_runs(), log=log)
+        def census_config(mk, run):
+            p = NS.native_root() / '_census' / mk / run / 'tokenizer' / 'config.json'
+            return json.loads(p.read_text(encoding='utf-8')) if p.is_file() else None
+        sel = [s | {'census_key': mk} for mk in sorted({r['model_key'] for r in NS.selectivity_runs()})
+               for s in NS.selectivity_summary(mk)]
+        data = PC.collect(D._db(), D._DATA_DIR, census_runs=NS.census_runs(), log=log,
+                          census_config=census_config, selectivity=sel)
         write_snapshot('lang_atlas', data, version, time.time() - t0)
         guard.done()
         log(f'[snapshots] lang_atlas {time.time() - t0:.0f}s')
@@ -224,14 +262,16 @@ def run_once(force: bool = False, log=print) -> dict:
         except Exception as exc:
             log(f'[snapshots] analysis warm-up: {exc}')
     out['lang_atlas'] = build_lang_atlas(fp, guard, force=force, log=log)
-    if out['lang_atlas'] == 'computed':                # 语言谱图变了：数据包随之重建（版本含谱图版本）
+    out['neuron_layers'] = build_neuron_layers(guard, log=log)
+    if out['lang_atlas'] == 'computed' or out['neuron_layers']:   # 语言谱图或逐层摘要变了：数据包随之重建（版本含两者）
         out['datapack'] = build_datapack(fp, guard, log=log)
     try:                                               # 离线客户端的附加包：模式族实验响应、单元卡
         import datapack as DP
         from server import neuron_census_service as NS
         runs = [(r['model_key'], r['run'], hashlib.sha256((NS.native_root() / '_census' / r['model_key'] / r['run'] / 'manifest.json')
                                                           .read_bytes()).hexdigest()[:12]) for r in NS.census_runs()]
-        cards = f"{DP.research_stamp(NS.research_root())}-{hashlib.sha256(json.dumps(runs).encode('utf-8')).hexdigest()[:8]}"
+        cards = (f"{DP.research_stamp(NS.research_root())}-{hashlib.sha256(json.dumps(runs).encode('utf-8')).hexdigest()[:8]}"
+                 f"-{neuron_layer_stamp()}")
         out['extras'] = DP.build_extras(D._DATA_DIR, cards, force=force, log=log, guard=guard)
     except Exception as exc:
         log(f'[snapshots] extras: {type(exc).__name__}: {exc}')

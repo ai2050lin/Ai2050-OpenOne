@@ -150,7 +150,7 @@ class SnapshotWorkerTests(unittest.TestCase):
         self.assertIn('/api/lang/tree', doc['entries'])                 # 谱图生成后数据包随之重建
         self.assertIn('/api/lang/item/GR.Q', doc['entries'])
         self.assertIn('/api/model/skeleton', doc['entries'])
-        self.assertTrue(doc['version'].endswith(self.W.stored_fingerprint('lang_atlas')))
+        self.assertIn(self.W.stored_fingerprint('lang_atlas'), doc['version'])          # 版本含谱图版本与逐层摘要戳
         again = self.W.run_once(log=lambda *_: None)                   # 数据、语言树与代码都没变：不重建
         self.assertEqual((again['lang_atlas'], again['datapack']), ('skipped', 'skipped'))
 

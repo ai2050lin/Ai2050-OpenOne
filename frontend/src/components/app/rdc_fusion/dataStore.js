@@ -48,7 +48,7 @@ export function packHint(path) {
   const [p, q = ''] = path.split('?');
   const m = /^\/api\/(?:agg\/([^/]+)\/v2|analysis\/([^/]+))$/.exec(p);
   if (m) return `tm:${decodeURIComponent(m[1] || m[2])}`;
-  if (p === '/api/neurons/unit') {
+  if (p === '/api/neurons/unit' || p === '/api/neurons/layer') {
     const mk = new URLSearchParams(q).get('model_key');
     return mk ? `cards:${mk}` : null;
   }

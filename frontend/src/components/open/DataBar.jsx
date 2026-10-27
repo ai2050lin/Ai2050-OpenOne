@@ -82,13 +82,14 @@ export function ExtraPackPrompt({ pack }) {
     }
     setBusy(null);
   };
-  if (have && !busy) return null;
+  const stale = Boolean(have && meta?.version && have.version !== meta.version);   // 服务器上的附加包已更新
+  if (have && !stale && !busy) return null;
   return (
     <div className="op-extra">
-      <span>{meta ? `需要附加包「${meta.label}」（${fmtMB(meta.bytes)}）` : cfg.data ? '服务器还没有生成这个附加包，稍后再试' : '读取附加包清单…'}</span>
+      <span>{meta ? `${stale ? '附加包有新版本' : '需要附加包'}「${meta.label}」（${fmtMB(meta.bytes)}）` : cfg.data ? '服务器还没有生成这个附加包，稍后再试' : '读取附加包清单…'}</span>
       {meta && (
         <button type="button" className="op-databar-btn" onClick={get} disabled={Boolean(busy)}>
-          {busy ? `下载中 ${busy.total ? Math.round((100 * busy.got) / busy.total) : 0}%` : '下载'}
+          {busy ? `下载中 ${busy.total ? Math.round((100 * busy.got) / busy.total) : 0}%` : stale ? '更新' : '下载'}
         </button>
       )}
       {err && <span className="op-databar-err" role="alert">{err}</span>}

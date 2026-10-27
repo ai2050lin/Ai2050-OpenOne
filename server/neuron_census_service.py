@@ -575,3 +575,123 @@ def explained(model_key: str = Query(...), grade: Optional[str] = Query(None)):
     return {'model_key': model_key, 'counts': counts, 'results': rows,
             'note': '等级以最新一次检验为准：文本可复现 = 文本测试 win；只在语料中可识别 = 文本测试未 win 但语料检索验证通过（仅 EXPL-v2）；'
                     '未解释附失败原因（工具 / 解释 / 训练 / 递归泛化 / 叠加，或无法解释）。解释由子代理生成，证据等级见对应预注册。'}
+
+
+# ---------------- 逐层神经元摘要（neuron_layers.v1）：v8「神经元」主线的层阵列与层塔 ----------------
+# 摘要由后台子进程（deploy/snapshot_worker.py）按普查运行生成，写在 <普查运行>/neuron_layers/<代码哈希>/L<b>.json；
+# 网站进程只读文件（不加载语料、不做分型计算）。解释等级与模板选择性在读取时合并（它们随研究文件更新）。
+
+def layer_base_dir(model_key: str, run: str) -> Path:
+    from shared.dist_protocol import neuron_layers as NL
+    return native_root() / '_census' / model_key / run / 'neuron_layers' / NL.code_hash()
+
+
+def build_layer_bases(model_key: str, run: str, log=print, guard=None) -> Dict[str, Any]:
+    """生成该普查运行缺失的逐层摘要（每块一个文件，已有的跳过）。语料 token 流只加载一次。"""
+    from shared.dist_protocol import neuron_layers as NL
+    man = census_manifest(model_key, run)
+    out_dir = layer_base_dir(model_key, run)
+    todo = [b for b in range(man['n_layers']) if not (out_dir / f'L{b}.json').is_file()]
+    if not todo:
+        return {'computed': 0}
+    out_dir.mkdir(parents=True, exist_ok=True)
+    _, streams = corpus(man['corpus_fp'])
+    tok = tokenizer(man['model_path'])
+    for b in todo:
+        if guard is not None:
+            guard.start(f'neuron_layers:{model_key}:{b}')
+        with np.load(native_root() / '_census' / model_key / run / f'L{b}.npz') as z:
+            base = NL.summarize({k: z[k] for k in z.files}, streams, lambda i: _decode(tok, [i]))
+        p = out_dir / f'L{b}.json'
+        tmp = p.with_suffix('.tmp')
+        tmp.write_text(json.dumps(base, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        tmp.replace(p)
+        log(f'[neuron_layers] {model_key} L{b}')
+    return {'computed': len(todo)}
+
+
+@lru_cache(maxsize=4)
+def _layer_base(path: str, stamp: float) -> Dict[str, Any]:
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+def layer_base(model_key: str, run: str, block: int) -> Optional[Dict[str, Any]]:
+    p = layer_base_dir(model_key, run) / f'L{block}.json'
+    try:
+        return _layer_base(str(p), p.stat().st_mtime)
+    except OSError:
+        return None
+
+
+def _family_item(tm_id: str, factor: str) -> Optional[str]:
+    from shared.dist_protocol import pieces as PC
+    fam = tm_id[3:] if tm_id.startswith('TG-') else tm_id
+    try:
+        return PC.factor_item(PC.load_tree(), fam, factor)
+    except Exception:
+        return None
+
+
+def selectivity_summary(model_key: str, top: int = 5) -> List[Dict[str, Any]]:
+    """该模型的模板选择性：每个运行按读出位置给出逐块入选单元数与前列单元（d_held、偏向水平）。
+    同一模板 × 因子有多个版本时只用最新版本（旧版本的冻结材料已被替换）。"""
+    latest: Dict[tuple, Dict[str, Any]] = {}
+    for r in selectivity_runs(model_key):
+        key = (r['tm_id'], r['factor'], r['model_key'])
+        if key not in latest or (r.get('version') or 0) > (latest[key].get('version') or 0):
+            latest[key] = r
+    out = []
+    for r in sorted(latest.values(), key=lambda x: x['file']):
+        res = selectivity(run=r['file'], top=20)
+        by_ro: Dict[str, List[int]] = {}
+        tops: Dict[str, Dict[str, List[list]]] = {}
+        n_layers = max((t['block'] for t in res['tags']), default=-1) + 1
+        for t in res['tags']:
+            by_ro.setdefault(t['readout'], [0] * n_layers)[t['block']] = int(t.get('n_selected') or 0)
+            tops.setdefault(t['readout'], {})[str(t['block'])] = [
+                [int(u['unit']), round(float(u.get('d_held') or 0), 3), u.get('pos_level')] for u in t['top_by_d'][:top]]
+        out.append({'file': r['file'], 'tm_id': r['tm_id'], 'version': r.get('version'), 'factor': r['factor'], 'hi': r['hi'], 'lo': r['lo'],
+                    'item': _family_item(r['tm_id'] or '', r['factor'] or ''), 'by_readout': by_ro, 'top': tops})
+    return out
+
+
+def _explained_by_block(model_key: str) -> Dict[int, Dict[int, str]]:
+    out: Dict[int, Dict[int, str]] = {}
+    for (mk, b, u), recs in expl_index().items():
+        if mk == model_key and recs:
+            out.setdefault(b, {})[u] = recs[-1]['grade']             # 以最新一次检验为准
+    return out
+
+
+@router.get('/layer')
+def neuron_layer(model_key: str = Query(...), block: int = Query(..., ge=0), run: Optional[str] = Query(None)):
+    """一个块全部 MLP 中间单元的列式摘要（按真实索引）、解释等级与模板选择性前列。摘要还没生成时返回 pending。"""
+    from shared.dist_protocol import neuron_layers as NL
+    c = pick_census(model_key, run)
+    man = census_manifest(model_key, c['run'])
+    if block >= man['n_layers']:
+        raise HTTPException(404, '块号超出范围')
+    base = layer_base(model_key, c['run'], block)
+    if base is None:
+        return {'schema': NL.SCHEMA, 'pending': True, 'model_key': model_key, 'run': c['run'], 'block': block,
+                'note': '逐层摘要正在后台生成（每块约十秒，首次全部生成需要几分钟），请稍后刷新。'}
+    sel = []
+    for s in selectivity_summary(model_key, top=20):                  # 阵列着色：每个运行的前 20 名全部标出
+        sel.append({k: s[k] for k in ('file', 'tm_id', 'version', 'factor', 'hi', 'lo', 'item')}
+                   | {'n_selected': {ro: v[block] if block < len(v) else 0 for ro, v in s['by_readout'].items()},
+                      'top': {ro: v.get(str(block), []) for ro, v in s['top'].items()}})
+    return {**NL.layer_doc(base, model_key=model_key, run=c['run'], block=block,
+                           explained=_explained_by_block(model_key).get(block, {}), selectivity=sel), 'pending': False}
+
+
+@router.get('/tower')
+def neuron_tower(model_key: str = Query(...), run: Optional[str] = Query(None)):
+    """全部块的叠加量（层塔着色用）：分型计数、强激活率中位数、已解释单元数、各模板逐块选择性单元数。"""
+    from shared.dist_protocol import neuron_layers as NL
+    c = pick_census(model_key, run)
+    man = census_manifest(model_key, c['run'])
+    bases = {b: layer_base(model_key, c['run'], b) for b in range(man['n_layers'])}
+    bases = {b: v for b, v in bases.items() if v is not None}
+    doc = NL.tower_doc(model_key, c['run'], man['n_layers'], man['d_ff'], bases, _explained_by_block(model_key),
+                       selectivity_summary(model_key))
+    return {**doc, 'pending': False, 'summaries_ready': len(bases)}

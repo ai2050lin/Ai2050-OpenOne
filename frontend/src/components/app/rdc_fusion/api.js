@@ -22,8 +22,9 @@ async function offlineJson(path) {
   const info = packInfo();
   const error = new Error(!info.version ? '离线客户端：还没有下载数据（页面左下角「下载数据」）'
     : pack && !info.extras[pack] ? '离线客户端：这项数据在附加包里，下载后显示'
-      : '离线客户端：已下载的数据包里没有这项数据（可在网页版查看）');
-  error.pack = pack && !info.extras[pack] ? pack : null;
+      : pack ? '离线客户端：本机的附加包版本较旧，没有这项数据，更新附加包后显示'
+        : '离线客户端：已下载的数据包里没有这项数据（可在网页版查看）');
+  error.pack = pack || null;                         // 没有该附加包，或本机的附加包版本较旧：都提示下载 / 更新
   error.offline = true;
   throw error;
 }

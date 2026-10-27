@@ -18,8 +18,8 @@ const App = lazy(() => import('./App.jsx'))
 const Workbench = lazy(() => import('./components/app/Workbench.jsx'))
 // rdc-* 专项页统一壳（P2 收敛：页头含返回工作台；目录见图谱透镜「专项视图」tab）
 const RdcPageShell = lazy(() => import('./components/app/RdcPageShell.jsx'))
-// v7 语言谱图客户端（/atlas；Electron 的 file:// 页面用 #/atlas）：图谱 / 3D 空间 / 进展
-const AtlasApp = lazy(() => import('./components/v7/AtlasApp.jsx'))
+// v8 客户端（/atlas；Electron 的 file:// 页面用 #/atlas）：两条主线 —— 语言图谱、神经元
+const AtlasApp = lazy(() => import('./components/v8/AtlasApp.jsx'))
 
 /* 路由表：[路径, 页面组件, 标题]。逐页协议化并入图谱透镜后，从此表删除对应行即可。 */
 const RDC_ROUTES = [

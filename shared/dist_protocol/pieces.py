@@ -37,6 +37,7 @@ CRITERIA = {
 }
 LEVEL_LABEL = {0: '未研究', 1: '有数据', 2: '可读出（confirm）', 3: '留出复现（未见词表）', 4: '跨模型 / 跨族复现'}
 READOUT_ORDER = ('target', 'cue', 'final', 'probe_answer')
+MAX_SCATTER = 300
 _TAG = re.compile(r'^(?P<ro>[A-Za-z_]+)@L(?P<i>\d+)$')
 
 
@@ -129,7 +130,34 @@ def extract_analysis(doc: Dict[str, Any]) -> Dict[str, Any]:
             if curve:
                 ros[ro] = _readout_summary(curve, C, CRITERIA['baseline_layer'] in degenerate.get(ro, ()))
         out['factors'][f] = ros
+        if ros:
+            sc = _scatter(doc, f, best_readout(ros), ros[best_readout(ros)])
+            if sc:
+                out.setdefault('scatter', {})[f] = sc
     return out
+
+
+def best_readout(ros: Dict[str, Any]) -> str:
+    """一张 piece 的代表读出位置：等级最高，其次峰值间隔最大，再按 target → cue → final → probe_answer 的顺序。"""
+    order = {r: i for i, r in enumerate(READOUT_ORDER)}
+    return max(ros, key=lambda ro: (ros[ro]['level'], (ros[ro]['peak'] or {}).get('sep') or -1, -order.get(ro, 9)))
+
+
+def _scatter(doc: Dict[str, Any], f: str, ro: str, summary: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """代表读出位置峰值层上的二维点云（该因子的 LDA 前两轴，discovery 拟合），最多 MAX_SCATTER 个点（按序等距抽样）。"""
+    if not summary.get('peak'):
+        return None
+    tag = f"{ro}@L{summary['peak']['layer']}"
+    co = ((doc.get('coords') or {}).get(tag) or {}).get(f'lda:{f}')
+    pts = doc.get('points') or []
+    if not co or len(co) != len(pts):
+        return None
+    step = max(1, -(-len(pts) // MAX_SCATTER))
+    rows = [[round(float(c[0]), 3), round(float(c[1]) if len(c) > 1 else 0.0, 3), str((p.get('cond') or {}).get(f)),
+             p.get('split'), p.get('text') or ''] for c, p in list(zip(co, pts))[::step]]
+    return {'readout': ro, 'layer': summary['peak']['layer'], 'tag': tag, 'axes': f'LDA（{f}，discovery 拟合，白化空间）',
+            'levels': [str(x) for x in (doc.get('levels') or {}).get(f, [])], 'pts': rows,
+            'n_total': len(pts), 'sampled': step > 1}
 
 
 def layer_readable(layer: Dict[str, Any], f: str, sp: str, C: Dict[str, Any]) -> bool:
@@ -199,18 +227,44 @@ def _readout_summary(curve: List[Dict[str, Any]], C: Dict[str, Any], identical: 
 
 
 def make_piece(ext: Dict[str, Any], *, family_id: str, tm_id: str, factor: str, item: Optional[str], model: str,
-               synthetic: bool = False, languages: Iterable[str] = (), source: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+               synthetic: bool = False, languages: Iterable[str] = (), source: Optional[Dict[str, Any]] = None,
+               behavior: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
     ros = (ext.get('factors') or {}).get(factor)
     if not ros:
         return None
-    order = {r: i for i, r in enumerate(READOUT_ORDER)}
-    best = max(ros, key=lambda ro: (ros[ro]['level'], (ros[ro]['peak'] or {}).get('sep') or -1, -order.get(ro, 9)))
+    best = best_readout(ros)
+    sc = (ext.get('scatter') or {}).get(factor)
     return {'id': f'T:{tm_id}:{factor}:{model}', 'route': 'T', 'item': item, 'family_id': family_id, 'tm_id': tm_id,
             'factor': factor, 'model': model, 'synthetic': bool(synthetic), 'languages': sorted(set(languages)),
             'readout': best, 'level': ros[best]['level'], 'readouts': ros,
             'axes': {'read': ros[best]['level'], 'control': None, 'explain': None},
             'gate_excluded_cells': ext.get('gate_excluded_cells') or [], 'n_items': ext.get('n_items'),
+            'scatter': sc if sc and sc.get('readout') == best else None, 'behavior': behavior or {},
             'source': source or {}}
+
+
+def examples_of(items: List[Dict[str, Any]], factor: str, n_fill: int = 2, n_frame: int = 2) -> Dict[str, Any]:
+    """对照例句：discovery 划分里同一填充在该因子各水平上都出现的句子（最小对），每个填充每水平最多 n_frame 句；
+    另给每个水平一条探针（问题、可接受答案、对照答案）。只取 discovery，不展示留出材料。"""
+    disc = [it for it in items if not it.get('canary') and it.get('split') == 'discovery' and factor in (it.get('cond') or {})]
+    levels = sorted({str(it['cond'][factor]) for it in disc})
+    by_fill: Dict[str, List[Dict[str, Any]]] = {}
+    for it in disc:
+        by_fill.setdefault(str(it.get('filler_id')), []).append(it)
+    full = [f for f in sorted(by_fill) if {str(it['cond'][factor]) for it in by_fill[f]} >= set(levels)][:n_fill]
+    rows = []
+    for f in full:
+        for lv in levels:
+            for it in sorted((x for x in by_fill[f] if str(x['cond'][factor]) == lv), key=lambda x: str(x.get('frame_id')))[:n_frame]:
+                rows.append({'filler': f, 'level': lv, 'frame': it.get('frame_id'), 'text': it.get('text'),
+                             'target': it.get('target'), 'target_char': it.get('target_char')})
+    probes = {}
+    for lv in levels:
+        it = next((x for x in disc if str(x['cond'][factor]) == lv and x.get('probe')), None)
+        if it:
+            pr = it['probe']
+            probes[lv] = {'prompt': pr.get('prompt'), 'answers': pr.get('answers') or [pr.get('answer')], 'contrast': pr.get('contrast')}
+    return {'levels': levels, 'rows': rows, 'probes': probes}
 
 
 def rule_text(p: Dict[str, Any]) -> str:
@@ -235,7 +289,9 @@ def rule_text(p: Dict[str, Any]) -> str:
 
 # ---------------- 汇总：语言树状态、语言项详情、3D 叠加 ----------------
 
-def assemble(tree: Dict[str, Any], pieces: List[Dict[str, Any]], skeletons: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def assemble(tree: Dict[str, Any], pieces: List[Dict[str, Any]], skeletons: Dict[str, Dict[str, Any]],
+             examples: Optional[Dict[Tuple[str, str], Tuple[str, Dict[str, Any]]]] = None,
+             selectivity: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     types = _type_of(tree)
     models = sorted({p['model'] for p in pieces} | set(skeletons))
     by_item: Dict[str, List[Dict[str, Any]]] = {}
@@ -273,7 +329,11 @@ def assemble(tree: Dict[str, Any], pieces: List[Dict[str, Any]], skeletons: Dict
         status[it['id']] = st
         items_out[it['id']] = {'schema': 'lang_item.v1', 'item': {**it, 'type': types[it['id']]}, 'status': st,
                                'rules': [{'piece': p['id'], 'model': p['model'], 'level': p['level'], 'text': rule_text(p)} for p in ps],
-                               'pieces': ps, 'criteria': CRITERIA, 'level_labels': LEVEL_LABEL}
+                               'pieces': ps, 'criteria': CRITERIA, 'level_labels': LEVEL_LABEL,
+                               'examples': [{'tm_id': tm, 'factor': f, 'family_id': fam, **ex}
+                                            for (tm, f), (fam, ex) in sorted((examples or {}).items())
+                                            if factor_item(tree, fam, f) == it['id']],
+                               'selectivity': [s for s in (selectivity or []) if s.get('item') == it['id']]}
     tree_out = {'schema': 'lang_tree_status.v1', 'version': tree.get('version'), 'note': tree.get('note'),
                 'types': tree['types'], 'categories': tree['categories'],
                 'items': [{**it, 'type': types[it['id']], 'status': _status_brief(status[it['id']])} for it in tree['items']],
@@ -307,26 +367,34 @@ def overlay(pieces: List[Dict[str, Any]], model: str, skeleton: Optional[Dict[st
             'note': '路线 T：逐层留出投影间隔（lockbox）与可读出判定；路线 N 与会合边尚未接入。'}
 
 
-def skeleton_from_summary(model: str, summary: Dict[str, Any], census_runs: Iterable[Dict[str, Any]] = ()) -> Dict[str, Any]:
-    """模型骨架：只取结果摘要与普查清单里记录的真实结构参数，缺的字段留空。"""
+CONFIG_KEYS = ('model_type', 'num_hidden_layers', 'hidden_size', 'intermediate_size', 'num_attention_heads', 'num_key_value_heads',
+               'head_dim', 'hidden_act', 'rope_theta', 'rms_norm_eps', 'vocab_size', 'tie_word_embeddings', 'max_position_embeddings')
+
+
+def skeleton_from_summary(model: str, summary: Dict[str, Any], census_runs: Iterable[Dict[str, Any]] = (),
+                          census_config: Optional[Any] = None) -> Dict[str, Any]:
+    """模型骨架：只取结果摘要、普查清单与普查保存的 config.json 里记录的真实结构参数，缺的字段留空。
+    census_config(census_key, run) → config.json 内容（没有普查时为 None，注意力头数等字段就留空）。"""
     snap = (summary.get('model_snapshot') or {}).get('sha256') or ''
     prec = summary.get('precision') or ''
     census_key = f'{snap[:16]}-{prec}' if snap and prec else None
     run = max((r for r in census_runs if r.get('model_key') == census_key), key=lambda r: r.get('n_tokens') or 0, default=None)
     n_hs = summary.get('n_hidden_states')
+    cfg = (census_config(census_key, run['run']) if census_config and run else None) or {}
     return {'schema': 'model_skeleton.v1', 'model': model, 'model_id': summary.get('model_id') or model.split('|')[0],
             'n_layers': (n_hs - 1) if n_hs else (run or {}).get('n_layers'),
             'd_model': summary.get('dim'), 'd_ff': (summary.get('mlp_units') or {}).get('d_ff') or (run or {}).get('d_ff'),
             'final_layer_norm': summary.get('final_layer_norm'), 'precision': prec, 'model_snapshot': snap or None,
             'census_key': census_key, 'census_run': (run or {}).get('run'),
             'hidden_state_boundary': summary.get('hidden_state_boundary'),
+            'config': {k: cfg[k] for k in CONFIG_KEYS if k in cfg} or None,
             'note': '层数、宽度来自结果摘要与普查清单；3D 中层板内的位置是单元索引排布，不代表模型几何。'}
 
 
 # ---------------- 中心端：从数据库与缓存收集 ----------------
 
 def code_hash() -> str:
-    src = inspect.getsource(extract_analysis) + inspect.getsource(_readout_summary) + inspect.getsource(layer_readable)
+    src = ''.join(inspect.getsource(f) for f in (extract_analysis, _readout_summary, layer_readable, best_readout, _scatter))
     return hashlib.sha256((src + json.dumps(CRITERIA, sort_keys=True)).encode('utf-8')).hexdigest()[:12]
 
 
@@ -349,18 +417,21 @@ def _cached_extract(data_dir: Path, path: Path) -> Dict[str, Any]:
 
 
 def collect(db, data_dir: Path, tree: Optional[Dict[str, Any]] = None, census_runs: Iterable[Dict[str, Any]] = (),
-            log=print) -> Dict[str, Any]:
-    """已冻结正式模板（不含试跑）× 模型桶 × 因子 → piece；只读已缓存的规律分析，不在这里计算。"""
+            log=print, census_config=None, selectivity: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """已冻结正式模板（不含试跑）× 模型桶 × 因子 → piece；只读已缓存的规律分析，不在这里计算。
+    另附：对照例句（冻结语料 discovery 划分）、行为门逐格结果、普查模型的 config 与模板选择性（selectivity，由调用方提供）。"""
     from . import pipeline as P
     tree = tree or load_tree()
     census_runs = list(census_runs)
-    pieces, skeletons, missing = [], {}, []
+    pieces, skeletons, missing, examples = [], {}, [], {}
     for t, c in P.templates_v3(db):
         if not P.is_v3(c) or c.get('mode') == 'pilot':
             continue
         tm, fam = t['tm_id'], c.get('family_id') or t['tm_id']
         agg = P.aggregate(db, data_dir, tm, gate=CRITERIA['gate'])
         langs = (tree.get('family_languages') or {}).get(fam) or []
+        for f in c.get('factors') or []:
+            examples[(tm, f)] = (fam, examples_of(c.get('items') or [], f))
         for b in agg['buckets']:
             if not b.get('agg'):
                 continue
@@ -368,7 +439,7 @@ def collect(db, data_dir: Path, tree: Optional[Dict[str, Any]] = None, census_ru
             if model not in skeletons and b.get('primary_shas'):
                 row = db.execute('SELECT summary_json FROM results WHERE sha=?', (b['primary_shas'][0],)).fetchone()
                 if row:
-                    skeletons[model] = skeleton_from_summary(model, P.summary_of(row), census_runs)
+                    skeletons[model] = skeleton_from_summary(model, P.summary_of(row), census_runs, census_config)
             path = P.analysis_cached_path(db, data_dir, tm, model, CRITERIA['gate'])
             if path is None:
                 missing.append(f'{tm} · {model}')
@@ -383,10 +454,12 @@ def collect(db, data_dir: Path, tree: Optional[Dict[str, Any]] = None, census_ru
                                model=model, synthetic=b.get('synthetic', False), languages=langs,
                                source={'tm_id': tm, 'bucket': model, 'design_sha': t['design_sha'],
                                        'analysis_cache': Path(path).name, 'gate': CRITERIA['gate'],
-                                       'shards': b.get('primary_shas') or []})
+                                       'shards': b.get('primary_shas') or []},
+                               behavior={'cells': b.get('behavior') or {}, 'mode': b.get('gate_mode'),
+                                         'threshold': b.get('behavior_threshold'), 'excluded': b.get('gate_excluded_cells') or []})
                 if p:
                     pieces.append(p)
-    out = assemble(tree, pieces, skeletons)
+    out = assemble(tree, pieces, skeletons, examples, selectivity)
     out['missing_analyses'] = missing
     out['code_hash'] = code_hash()
     return out
