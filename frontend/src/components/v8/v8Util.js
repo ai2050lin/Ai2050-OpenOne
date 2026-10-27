@@ -45,13 +45,13 @@ export function shortModel(key) {
   return String(key || '').split('|')[0] || '—';
 }
 
-/* 空间各 tab 的选中层分开记录：block = 神经元（块号），lblock / rlayer / alayer = 语言图谱 / 响应点云 / 谱图关系（hs 序号） */
-const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod', 'lblock', 'rlayer', 'alayer'];
-const NUM = new Set(['block', 'unit', 'lblock', 'rlayer', 'alayer']);
+/* 空间各 tab 的选中层分开记录：block = 神经元（块号），lblock / rlayer = 语言图谱 / 响应点云（hs 序号） */
+const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod', 'lblock', 'rlayer'];
+const NUM = new Set(['block', 'unit', 'lblock', 'rlayer']);
 
 function defaults() {
   return { page: 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
-           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp', lblock: null, rlayer: null, alayer: null };
+           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp', lblock: null, rlayer: null };
 }
 
 export function readState() {

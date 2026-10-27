@@ -1,12 +1,11 @@
-/* 研究工作台 · 空间：左侧常驻 LLM 的多层结构（3D 层塔），右侧按 tab 显示内容。
+/* 研究工作台 · 空间：需要层结构的 tab（神经元、语言图谱、响应点云）左侧显示 LLM 多层结构（3D 层塔），右侧按 tab 显示内容。
    层塔共用，含义属于 tab——每个 tab 自己决定「颜色是什么、标记是什么、点击做什么」，点击层塔从不切换 tab；
-   跨 tab 只走显式按钮（如「在神经元中查看 →」）。各 tab 的选中层分开记录（block / lblock / rlayer / alayer）。
+   跨 tab 只走显式按钮（如「在神经元中查看 →」）。各 tab 的选中层分开记录（block / lblock / rlayer）。
      神经元   颜色 = 神经元叠加量（选择性 / 已解释 / T1 / 强激活率）；点击 = 选中该块（右侧块结构、单元阵列、单元卡）
      语言图谱 颜色 = 当前语言项在各块的有效神经元（模板选择性单元数）；绿色边 = 未见词表上可读出（路线 T），粗边 = 峰值层；
               点击 = 在文章上方打开「该层」面板，并在 C / E 节高亮该层
      响应点云 颜色 = 所选模式族的逐层留出投影间隔；绿色边 = 可读出；点击 = 点云切到该层
-     谱图关系 颜色 = 谱图里该层的稳定特征数；绿色边 = 有共享编码轴；点击 = 列出该层的特征与共享轴
-     本地包   只画结构；打开研究包后在右侧查看
+     谱图关系、本地包：不显示层塔（谱图关系视图自带层选择与 3D 谱图；本地包在打开研究包之前没有模型数据），内容占满宽度
    层序号统一用 hs：hs[0] = 嵌入层，块 b 的输出 = hs[b+1]。全部读取来自本机数据包（只读数据包模式）。 */
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 
@@ -68,11 +67,9 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const itemId = tree ? pickItem(tree, st, model) : null;
   const itemApi = useApi(view === 'lang' && itemId ? `/api/lang/item/${itemId}` : null);
   const ovApi = useApi(view === 'response' && model ? `/api/space/overlay?model_key=${encodeURIComponent(model)}` : null);
-  const atlasApi = useApi(view === 'relations' ? '/api/platform/snapshot/atlas' : null);
   const rows = ovApi.data?.route_T || [];
   const respTm = tm || (rows.length ? `TG-${[...new Set(rows.map(r => r.family_id))].sort()[0]}` : '');
   const respRow = view === 'response' ? familyRow(rows, respTm) : null;
-  const graph = (atlasApi.data?.data?.graphs || []).find(g => g.model === model);
 
   /* 面板里的显式跳转（page: lang / neuron / response）换算成空间 tab；其余是本 tab 的状态 */
   const set = patch => {
@@ -111,18 +108,8 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
                color: respRow ? `颜色 = ${respTm} · ${respRow.factor} 的逐层留出投影间隔（${READOUT_LABEL[respRow.readout] || respRow.readout}读出）` : '颜色：该模式族在此模型上没有拼图',
                mark: respRow ? '绿色边 = 未见词表上可读出' : '', click: '点击 = 右侧点云切到该层' };
     }
-    if (view === 'relations') {
-      const values = Array.from({ length: n + 1 }, () => 0);
-      const marks = new Set();
-      (graph?.nodes || []).forEach(nd => { const h = hsOf(nd.layer); if (h != null && h <= n && nd.stable) values[h] += 1; });
-      (graph?.axes || []).forEach(ax => { const h = hsOf(ax.layer); if (h != null && ax.supported) marks.add(h); });
-      return { values: graph ? values : null, marks: [...marks], selected: st.alayer, allowEmbedding: true, onPick: hs => patchSt({ alayer: hs }),
-               valueLabel: '稳定特征', markLabel: '有共享编码轴',
-               color: graph ? '颜色 = 谱图里该层的稳定特征数（未见词表上复现）' : '颜色：当前模型没有谱图', mark: graph ? '绿色边 = 该层有通过留一族迁移的共享编码轴' : '',
-               click: '点击 = 在右侧列出该层的特征与共享轴' };
-    }
-    return { values: null, selected: null, onPick: null, color: '只画层结构', click: '本地包：在右侧打开研究包查看；层塔不参与' };
-  }, [view, nLayers, tower, st, block, itemApi.data, census, itemId, model, tree, respRow, respTm, graph]);
+    return { values: null, selected: null, onPick: null, color: '', click: '' };
+  }, [view, nLayers, tower, st, block, itemApi.data, census, itemId, model, tree, respRow, respTm]);
 
   const selRuns = tower?.selectivity || [];
   const selRun = selRuns.find(s => s.file === st.sel) || selRuns[0];
@@ -130,13 +117,16 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
   const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
+  const showTower = view === 'neuron' || view === 'lang' || view === 'response';   // 谱图关系、本地包不需要层结构
+
   return (
-    <div className="v8-space">
+    <div className={'v8-space' + (showTower ? '' : ' wide')}>
+      {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">
           <div className="v8-tower-title">
             <b>LLM 多层结构</b>
-            <select value={model} onChange={e => patchSt({ model: e.target.value, block: null, unit: null, lblock: null, rlayer: null, alayer: null })} aria-label="模型">
+            <select value={model} onChange={e => patchSt({ model: e.target.value, block: null, unit: null, lblock: null, rlayer: null })} aria-label="模型">
               {(tree?.models || []).map(m => <option key={m} value={m} title={m}>{shortModel(m)}{skeletons[m]?.census_run ? '' : '（未普查）'}</option>)}
             </select>
           </div>
@@ -168,6 +158,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
         <p className="v8-note">每块板 = 一层（下：嵌入层 hs[0]；块 b 的板 = 该块输出 hs[b+1]；上：输出头）。颜色按最大值归一化，浅 → 深。拖动旋转、滚轮缩放。层板只是排列，不代表模型几何。
           {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
       </aside>
+      )}
       <section className="v8-space-main">
         {!tree && <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
         <Suspense fallback={<Empty>加载中…</Empty>}>
@@ -180,29 +171,10 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
                               syncLayer={syncTag} onLayer={tag => { const h = hsOf(tag); if (h != null) patchSt({ rlayer: h }); }}
                               onContext={({ tm: t }) => { setTm(t); patchSt({ rlayer: null }); }} />
           )}
-          {view === 'relations' && (
-            <>
-              {st.alayer != null && graph && <RelationsLayer graph={graph} hs={st.alayer} onClose={() => patchSt({ alayer: null })} />}
-              <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />
-            </>
-          )}
+          {view === 'relations' && <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />}
           {view === 'local' && localPack}
         </Suspense>
       </section>
     </div>
-  );
-}
-
-function RelationsLayer({ graph, hs, onClose }) {
-  const nodes = (graph.nodes || []).filter(nd => hsOf(nd.layer) === hs);
-  const axes = (graph.axes || []).filter(ax => hsOf(ax.layer) === hs);
-  return (
-    <section className="v8-relations-layer" aria-label="该层的谱图特征">
-      <div className="v8-layerpanel-hd"><b>该层：{hsLabel(hs)}</b><button type="button" className="v6-linkbtn" onClick={onClose}>收起</button></div>
-      <p className="v8-note" style={{ marginTop: 0 }}>{nodes.filter(nd => nd.stable).length} 个稳定特征（共 {nodes.length} 个，含各读出位置）· {axes.length} 条共享编码轴（{axes.filter(a => a.supported).length} 条通过留一族迁移）</p>
-      {axes.length > 0 && <ul>{axes.map(a => <li key={a.id}>{a.supported ? '●' : '○'} {a.label || a.id}</li>)}</ul>}
-      {nodes.length > 0 && <ul>{nodes.filter(nd => nd.stable).slice(0, 40).map(nd => <li key={nd.id} title={nd.layer}>{nd.family}·{nd.factor}={nd.level}</li>)}</ul>}
-      {!nodes.length && <p className="v8-note">这一层没有谱图特征。</p>}
-    </section>
   );
 }
