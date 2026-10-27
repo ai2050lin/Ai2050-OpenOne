@@ -130,8 +130,8 @@ function LangProgress({ tree, model, onOpenItem }) {
 }
 
 const TABS = [
-  { id: 'neuron', label: '神经元逆向分析进展' },
-  { id: 'lang', label: '语言图谱进展' },
+  { id: 'neuron', label: '神经元逆向分析' },
+  { id: 'lang', label: '语言图谱' },
 ];
 
 function readTab() {

@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { LayerCurve, ScatterPlot, SelBars } from './Charts.jsx';
-import { LANG_LABEL, LEVELS, READOUT_LABEL, itemLevel, levelMeta, matchLang, pickItem, pickPiece, pieceLabel, segText, shortModel } from './v8Util.js';
+import { LANG_LABEL, LEVELS, READOUT_LABEL, hsLabel, itemLevel, levelMeta, matchLang, pickItem, pickPiece, pieceLabel, segText, shortModel } from './v8Util.js';
 
 export function LevelChip({ level, prefix, none, title }) {
   if (none) return <span className="v8-chip none" title={title}>{prefix && <em>{prefix}</em>}{none}</span>;
@@ -122,7 +122,7 @@ function SecB({ piece, ex }) {
   );
 }
 
-function SecE({ sel, census, block, ro, set, st }) {
+function SecE({ sel, census, block, ro, set, st, onLayer }) {
   if (!census) return <Empty>当前模型没有自然语料普查，神经元主线不可用。切换到有普查的模型（如 qwen3-4b）查看。</Empty>;
   const runs = sel.filter(s => s.census_key === census);
   if (!runs.length) return <Empty>当前模型没有这个语言项的神经元选择性运行（需要在模板里声明 mlp_units 并重新采集）。</Empty>;
@@ -139,7 +139,7 @@ function SecE({ sel, census, block, ro, set, st }) {
         <span className="v8-seg">{ros.map(x => <button key={x} type="button" className={x === r ? 'on' : ''} onClick={() => set({ ro: x })}>{READOUT_LABEL[x] || x}读出</button>)}</span>
         <span className="v8-note">{run.factor}：{run.hi} 对 {run.lo}</span>
       </div>
-      <SelBars counts={counts} block={b} onPick={nb => set({ block: nb })} />
+      <SelBars counts={counts} block={b} onPick={nb => (onLayer ? onLayer(nb + 1) : set({ block: nb }))} />
       <div className="v8-two">
         <div>
           <b className="v8-sub">块 {b} · {counts[b] || 0} 个选择性单元（共 9,728），效应最大的 {top.length} 个</b>
@@ -159,7 +159,48 @@ function SecE({ sel, census, block, ro, set, st }) {
   );
 }
 
-function ItemPage({ tree, itemId, model, skeleton, st, set }) {
+/* 该层面板：语言图谱 tab 里点层塔或曲线选中某层后，显示该语言项在这一层的读出与有效神经元（不切换 tab） */
+function LayerPanel({ layer, piece, sel, census, set, onClose }) {
+  const b = layer - 1;
+  const runs = (sel || []).filter(s => s.census_key === census);
+  return (
+    <section className="v8-layerpanel" aria-label="该层">
+      <div className="v8-layerpanel-hd"><b>该层：{hsLabel(layer)}</b><button type="button" className="v6-linkbtn" onClick={onClose}>收起</button></div>
+      <div className="v8-two">
+        <div>
+          <b className="v8-sub">读出（{piece ? pieceLabel(piece) : '—'}）</b>
+          {piece ? (
+            <ul className="v8-lp-list">
+              {Object.entries(piece.readouts).map(([ro, r]) => {
+                const c = r.curve.find(x => x.layer === layer);
+                return <li key={ro}>{READOUT_LABEL[ro] || ro}读出：{c ? <>间隔 <span className="mono">{c.sep ?? '—'}</span> · {c.readable ? '● 未见词表上可读出' : '○ 未达判据'}</> : '该层无记录（各样本向量相同或未采集）'}</li>;
+              })}
+            </ul>
+          ) : <p className="v8-note">当前模型上没有这个语言项的拼图。</p>}
+        </div>
+        <div>
+          <b className="v8-sub">有效神经元（块 {b >= 0 ? b : '—'} 的 MLP 单元）</b>
+          {layer === 0 ? <p className="v8-note">嵌入层没有 MLP 单元；它是 token 身份基线。</p>
+            : !census ? <p className="v8-note">该模型未普查，没有神经元数据。</p>
+              : runs.length ? runs.map(run => Object.entries(run.by_readout || {}).map(([ro, counts]) => {
+                const top = run.top?.[ro]?.[String(b)] || [];
+                return (
+                  <div key={run.file + ro} className="v8-lp-run">
+                    <small>{run.tm_id} · {READOUT_LABEL[ro] || ro}读出：{counts[b] || 0} 个选择性单元</small>
+                    {top.slice(0, 3).map(([u, d, pos]) => (
+                      <div key={u} className="v8-lp-unit"><span className="mono">U{u}</span> d={d} · 偏向 {pos}
+                        <button type="button" className="v6-linkbtn" onClick={() => set({ page: 'neuron', block: b, unit: u, sel: run.file, ro, ov: 'sel', color: 'sel', mod: 'mlp' })}>在神经元中查看 →</button></div>
+                    ))}
+                  </div>
+                );
+              })) : <p className="v8-note">这个语言项在此模型上没有神经元选择性运行。</p>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ItemPage({ tree, itemId, model, skeleton, st, set, layer, onLayer }) {
   const api = useApi(itemId ? `/api/lang/item/${itemId}` : null);
   const [allModels, setAllModels] = useState(false);
   const d = api.data && !api.data.pending ? api.data : null;
@@ -202,6 +243,7 @@ function ItemPage({ tree, itemId, model, skeleton, st, set }) {
         )}
       </nav>
       {oldCenter && <Empty>当前中心的数据版本较旧（1.0.8 及以前）：对照例句、行为门、点云与神经元选择性要在中心升级后显示；层曲线与规则照常可看。</Empty>}
+      {layer != null && onLayer && <LayerPanel layer={layer} piece={piece} sel={d.selectivity} census={skeleton?.census_key && skeleton?.census_run ? skeleton.census_key : null} set={set} onClose={() => onLayer(null)} />}
       {!piece && <Empty>{stt.planned ? '这个语言项还没有模式族：下面各节都是「未测」。' : `${shortModel(model)} 上还没有这个语言项的拼图；其他模型：${Object.keys(stt.by_model).map(shortModel).join('、') || '无'}。`}</Empty>}
       <section className="v8-sec" id="v8sec0"><h3><span className="k">A</span>这是什么</h3>
         <p className="v8-q">用最小对把语言现象固定下来：同一事实只在这一个因子上不同。</p><SecA ex={ex} piece={piece} /></section>
@@ -210,7 +252,7 @@ function ItemPage({ tree, itemId, model, skeleton, st, set }) {
         {piece ? <SecB piece={piece} ex={ex} /> : <Empty>未测。</Empty>}</section>
       <section className="v8-sec" id="v8sec2"><h3><span className="k">C</span>在哪一层被编码</h3>
         <p className="v8-q">每层、每个读出位置上用发现集拟合方向，在没见过的词上检验能否把两类分开（留出投影间隔）。</p>
-        {ro ? <><LayerCurve readouts={piece.readouts} nLayers={skeleton?.n_layers} />
+        {ro ? <><LayerCurve readouts={piece.readouts} nLayers={skeleton?.n_layers} highlight={layer} onPick={onLayer} />
           <p className="v8-note">{piece.readout ? `代表读出位置 ${READOUT_LABEL[piece.readout] || piece.readout}：可读出 ${segText(ro.segments)}${ro.peak ? `，峰值 L${ro.peak.layer}` : ''}。` : ''}
             {ro.token_identity ? '嵌入层 hs[0] 上已可分：差异可能来自读出位置的 token 身份，不计为留出复现。' : ro.baseline?.state === 'identical' ? '嵌入层 hs[0] 上各样本 token 相同：可读出来自上下文计算。' : ''}</p></> : <Empty>未测。</Empty>}</section>
       <section className="v8-sec" id="v8sec3"><h3><span className="k">D</span>编码长什么样</h3>
@@ -220,7 +262,7 @@ function ItemPage({ tree, itemId, model, skeleton, st, set }) {
           : <Empty>{piece ? '这张拼图没有达到可读出的峰值层，或分析结果里没有点云坐标。' : '未测。'}</Empty>}</section>
       <section className="v8-sec" id="v8sec4"><h3><span className="k">E</span>由哪些神经元承载</h3>
         <p className="v8-q">每块 MLP 的中间单元里，对这一变量有显著选择性的有多少、最强的是哪些。点柱子换块，点单元进入「神经元」主线。</p>
-        <SecE sel={d.selectivity || []} census={skeleton?.census_key && skeleton?.census_run ? skeleton.census_key : null} block={st.block} ro={st.ro} set={set} st={st} /></section>
+        <SecE sel={d.selectivity || []} census={skeleton?.census_key && skeleton?.census_run ? skeleton.census_key : null} block={layer != null && layer > 0 ? layer - 1 : (onLayer ? null : st.block)} ro={st.ro} set={set} st={st} onLayer={onLayer} /></section>
       <section className="v8-sec" id="v8sec5"><h3><span className="k">F</span>证据与结论</h3>
         <div className="v8-axes">
           <div><small>读出轴（是否编码）</small><LevelChip level={stt.by_model[model]?.read || 0} /></div>
@@ -239,12 +281,12 @@ function ItemPage({ tree, itemId, model, skeleton, st, set }) {
   );
 }
 
-export default function LangPage({ tree, model, skeleton, st, set, compact = false }) {
+export default function LangPage({ tree, model, skeleton, st, set, compact = false, layer = null, onLayer }) {
   const itemId = pickItem(tree, st, model);
   return (
     <div className={'v8-lang' + (compact ? ' compact' : '')}>
       <Sidebar tree={tree} model={model} st={{ ...st, item: itemId }} set={set} />
-      <ItemPage key={itemId} tree={tree} itemId={itemId} model={model} skeleton={skeleton} st={st} set={set} />
+      <ItemPage key={itemId} tree={tree} itemId={itemId} model={model} skeleton={skeleton} st={st} set={set} layer={layer} onLayer={onLayer} />
     </div>
   );
 }

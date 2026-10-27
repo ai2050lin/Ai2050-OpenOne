@@ -6,7 +6,7 @@ import { CATEGORICAL, READOUT_LABEL, seq } from './v8Util.js';
 
 const BASELINE_TEXT = { identical: '各样本 token 相同', not_separable: '不可分', separable: '已可分（token 身份）', missing: '无记录' };
 
-export function LayerCurve({ readouts, nLayers }) {
+export function LayerCurve({ readouts, nLayers, highlight, onPick }) {
   const ros = Object.keys(readouts || {});
   const [hover, setHover] = useState(null);
   if (!ros.length) return null;
@@ -26,6 +26,7 @@ export function LayerCurve({ readouts, nLayers }) {
           <text key={l} x={x(l)} y={H - 12} fontSize="10" fill="#94a3b8" textAnchor="middle">{l === 0 ? 'hs[0]' : `L${l}`}</text>
         ))}
         <rect x={x(0) - 6} y={T} width="12" height={H - T - B} fill="#f1f5f9" />
+        {highlight != null && <line x1={x(highlight)} x2={x(highlight)} y1={T} y2={H - B} stroke="#e34948" strokeWidth="1.5" strokeDasharray="4 3" />}
         <text x={x(0)} y={T - 4} fontSize="9.5" fill="#64748b" textAnchor="middle">嵌入层</text>
         {ros.map((r, k) => {
           const c = readouts[r].curve, col = CATEGORICAL[k % CATEGORICAL.length], pk = readouts[r].peak;
@@ -33,7 +34,8 @@ export function LayerCurve({ readouts, nLayers }) {
             <g key={r}>
               <polyline fill="none" stroke={col} strokeWidth="2" points={c.map(p => `${x(p.layer)},${y(p.sep || 0)}`).join(' ')} />
               {c.map(p => (
-                <circle key={p.layer} cx={x(p.layer)} cy={y(p.sep || 0)} r="3.6" fill={p.readable ? col : '#fff'} stroke={col} strokeWidth="1.5"
+                <circle key={p.layer} cx={x(p.layer)} cy={y(p.sep || 0)} r={p.layer === highlight ? 5 : 3.6} fill={p.readable ? col : '#fff'} stroke={col} strokeWidth="1.5"
+                        style={onPick ? { cursor: 'pointer' } : undefined} onClick={() => onPick?.(p.layer)}
                         onMouseEnter={() => setHover({ r, ...p, x: x(p.layer), y: y(p.sep || 0) })} onMouseLeave={() => setHover(null)} />
               ))}
               {pk && <text x={x(pk.layer)} y={y(pk.sep) - 9} fontSize="10.5" fill={col} textAnchor="middle" fontWeight="600">峰 L{pk.layer}</text>}

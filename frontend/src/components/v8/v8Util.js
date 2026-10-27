@@ -45,12 +45,13 @@ export function shortModel(key) {
   return String(key || '').split('|')[0] || '—';
 }
 
-const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod'];
-const NUM = new Set(['block', 'unit']);
+/* 空间各 tab 的选中层分开记录：block = 神经元（块号），lblock / rlayer / alayer = 语言图谱 / 响应点云 / 谱图关系（hs 序号） */
+const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod', 'lblock', 'rlayer', 'alayer'];
+const NUM = new Set(['block', 'unit', 'lblock', 'rlayer', 'alayer']);
 
 function defaults() {
   return { page: 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
-           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp' };
+           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp', lblock: null, rlayer: null, alayer: null };
 }
 
 export function readState() {
@@ -182,3 +183,6 @@ export function pickItem(tree, st, model) {
   if (st.item && tree.items.some(i => i.id === st.item)) return st.item;
   return (tree.items.find(i => i.type === st.type && itemLevel(i, model) > 0) || tree.items.find(i => i.type === st.type) || {}).id;
 }
+
+/* 层塔的层序号：hs[0] = 嵌入层，块 b 的输出 = hs[b+1] */
+export const hsLabel = hs => (hs === 0 ? '嵌入层 hs[0]' : `块 ${hs - 1}（输出 hs[${hs}]）`);

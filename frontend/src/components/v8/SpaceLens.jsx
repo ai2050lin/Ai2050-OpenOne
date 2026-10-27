@@ -1,7 +1,13 @@
-/* 研究工作台 · 空间：左侧常驻 LLM 的多层结构（3D 层塔），右侧按视图显示
-   神经元（选中块的内部结构 → MLP 单元阵列 → 单元卡）、语言图谱（语言项六节）、响应点云、谱图关系、本地包。
-   语言图谱视图里，层塔的颜色是当前语言项在各块的「有效神经元」（模板选择性单元数）；其他视图里是所选叠加量。
-   点击任一块 → 进入该块的神经元视图。全部读取来自本机数据包（只读数据包模式）。 */
+/* 研究工作台 · 空间：左侧常驻 LLM 的多层结构（3D 层塔），右侧按 tab 显示内容。
+   层塔共用，含义属于 tab——每个 tab 自己决定「颜色是什么、标记是什么、点击做什么」，点击层塔从不切换 tab；
+   跨 tab 只走显式按钮（如「在神经元中查看 →」）。各 tab 的选中层分开记录（block / lblock / rlayer / alayer）。
+     神经元   颜色 = 神经元叠加量（选择性 / 已解释 / T1 / 强激活率）；点击 = 选中该块（右侧块结构、单元阵列、单元卡）
+     语言图谱 颜色 = 当前语言项在各块的有效神经元（模板选择性单元数）；绿色边 = 未见词表上可读出（路线 T），粗边 = 峰值层；
+              点击 = 在文章上方打开「该层」面板，并在 C / E 节高亮该层
+     响应点云 颜色 = 所选模式族的逐层留出投影间隔；绿色边 = 可读出；点击 = 点云切到该层
+     谱图关系 颜色 = 谱图里该层的稳定特征数；绿色边 = 有共享编码轴；点击 = 列出该层的特征与共享轴
+     本地包   只画结构；打开研究包后在右侧查看
+   层序号统一用 hs：hs[0] = 嵌入层，块 b 的输出 = hs[b+1]。全部读取来自本机数据包（只读数据包模式）。 */
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
@@ -9,13 +15,15 @@ import { Empty } from '../app/rdc_fusion/ui.jsx';
 import LangPage from './LangPage.jsx';
 import NeuronPane from './NeuronPane.jsx';
 import Tower from './Tower.jsx';
-import { OVERLAYS, READOUT_LABEL, defaultModel, pickItem, readState, shortModel, towerValues, writeState } from './v8Util.js';
+import { OVERLAYS, READOUT_LABEL, defaultModel, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
 
-/* 语言项在当前普查模型上的选择性运行（每块的有效神经元数） */
+const hsOf = tag => { const m = /@L(\d+)$/.exec(tag || ''); return m ? Number(m[1]) : null; };
+const toHs = (blockValues, n) => (blockValues ? [null, ...Array.from({ length: n }, (_, b) => blockValues[b] ?? null)] : null);
+
 function itemSelectivity(item, census, st) {
   const runs = (item?.selectivity || []).filter(s => s.census_key === census);
   const run = runs.find(s => s.file === st.sel) || runs[0];
@@ -25,6 +33,21 @@ function itemSelectivity(item, census, st) {
   return { run, ro, values: run.by_readout[ro] || null };
 }
 
+/* 响应点云：所选模式族在该模型上的代表拼图（等级最高，同等级时峰值间隔最大） */
+function familyRow(rows, tm) {
+  const fam = String(tm || '').replace(/^TG-/, '');
+  const own = rows.filter(r => r.family_id === fam);
+  return [...own].sort((a, b) => b.level - a.level || ((b.peak?.sep || 0) - (a.peak?.sep || 0)))[0] || null;
+}
+
+function curveHs(row, n) {
+  if (!row) return { values: null, marks: [], peak: null };
+  const values = Array.from({ length: n + 1 }, () => null);
+  const marks = [];
+  row.layers.forEach((l, k) => { if (l <= n) { values[l] = row.sep[k]; if (row.readable[k]) marks.push(l); } });
+  return { values, marks, peak: row.peak?.layer ?? null };
+}
+
 export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
@@ -32,34 +55,80 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const skeletons = useMemo(() => Object.fromEntries((skApi.data?.models || []).map(s => [s.model, s])), [skApi.data]);
   const [st, setSt] = useState(readState);
   useEffect(() => { writeState(st); }, [st]);
+  const patchSt = patch => setSt(prev => ({ ...prev, ...patch }));
   const model = st.model && tree?.models?.includes(st.model) ? st.model : defaultModel(tree, skeletons);
   const skeleton = skeletons[model];
   const census = skeleton?.census_run ? skeleton.census_key : null;
   const tw = useApi(census ? `/api/neurons/tower?model_key=${encodeURIComponent(census)}` : null);
   const tower = tw.data && !tw.data.pending ? tw.data : null;
-  const itemId = tree ? pickItem(tree, st, model) : null;
-  const itemApi = useApi(view === 'lang' && itemId ? `/api/lang/item/${itemId}` : null);
   const nLayers = tower?.n_layers || skeleton?.n_layers || 0;
   const block = st.block != null && st.block < nLayers ? st.block : Math.min(18, Math.max(0, nLayers - 1));
 
-  /* 面板里的跳转（page: lang / neuron / response）换算成空间视图 */
+  // 各 tab 需要的数据（全部来自本机数据包；不在当前 tab 时不读取）
+  const itemId = tree ? pickItem(tree, st, model) : null;
+  const itemApi = useApi(view === 'lang' && itemId ? `/api/lang/item/${itemId}` : null);
+  const ovApi = useApi(view === 'response' && model ? `/api/space/overlay?model_key=${encodeURIComponent(model)}` : null);
+  const atlasApi = useApi(view === 'relations' ? '/api/platform/snapshot/atlas' : null);
+  const rows = ovApi.data?.route_T || [];
+  const respTm = tm || (rows.length ? `TG-${[...new Set(rows.map(r => r.family_id))].sort()[0]}` : '');
+  const respRow = view === 'response' ? familyRow(rows, respTm) : null;
+  const graph = (atlasApi.data?.data?.graphs || []).find(g => g.model === model);
+
+  /* 面板里的显式跳转（page: lang / neuron / response）换算成空间 tab；其余是本 tab 的状态 */
   const set = patch => {
     const { page, tm: nextTm, ...rest } = patch;
-    if (Object.keys(rest).length) setSt(prev => ({ ...prev, ...rest }));
+    if (Object.keys(rest).length) patchSt(rest);
     if (page === 'neuron' || page === 'lang') setView(page);
     if (page === 'response') { setTm(nextTm || ''); setView('response'); }
   };
 
-  const itemSel = view === 'lang' ? itemSelectivity(itemApi.data, census, st) : null;
-  const values = useMemo(() => {
-    if (view === 'lang') return itemSel?.values || null;
-    return tower ? towerValues(tower, st.ov, st.sel, st.ro) : null;
-  }, [view, itemSel?.values, tower, st.ov, st.sel, st.ro]);
+  /* 每个 tab 的层塔配置 */
+  const cfg = useMemo(() => {
+    const n = nLayers;
+    if (view === 'neuron') {
+      return { values: tower ? toHs(towerValues(tower, st.ov, st.sel, st.ro), n) : null, selected: block + 1, allowEmbedding: false,
+               onPick: hs => patchSt({ block: hs - 1, unit: null, mod: 'mlp' }),
+               valueLabel: (OVERLAYS.find(o => o[0] === st.ov) || [])[1] || '叠加量',
+               color: `颜色 = ${(OVERLAYS.find(o => o[0] === st.ov) || [])[1] || '无'}（每块）`, click: '点击 = 选中该块：右侧显示块结构、单元阵列与单元卡' };
+    }
+    if (view === 'lang') {
+      const d = itemApi.data;
+      const sel = itemSelectivity(d, census, st);
+      const piece = d && !d.pending ? pickPiece(d.pieces || [], itemId, model, st.piece) : null;
+      const ro = piece?.readouts?.[piece.readout];
+      const marks = (ro?.curve || []).filter(c => c.readable).map(c => c.layer);
+      const name = tree?.items.find(i => i.id === itemId)?.name || '—';
+      return { values: toHs(sel.values, n), marks, peak: ro?.peak?.layer ?? null, selected: st.lblock, allowEmbedding: true,
+               onPick: hs => patchSt({ lblock: hs }), valueLabel: '有效神经元', markLabel: '未见词表上可读出（路线 T）',
+               color: `颜色 = 「${name}」在各块的有效神经元（模板选择性单元数${sel.ro ? ` · ${READOUT_LABEL[sel.ro] || sel.ro}读出` : ''}）${!census ? '；该模型未普查' : !sel.run ? '；此模型上没有神经元选择性运行' : ''}`,
+               mark: piece ? `绿色边 = ${piece.family_id}.${piece.factor} 在该层可读出，粗边 = 峰值层` : '',
+               click: '点击 = 在右侧打开「该层」面板（读出与有效神经元），C / E 节同步高亮' };
+    }
+    if (view === 'response') {
+      const c = curveHs(respRow, n);
+      const sel = st.rlayer != null ? st.rlayer : (respRow?.peak?.layer ?? null);
+      return { ...c, selected: sel, allowEmbedding: true, onPick: hs => patchSt({ rlayer: hs }), valueLabel: '留出投影间隔', markLabel: '未见词表上可读出',
+               color: respRow ? `颜色 = ${respTm} · ${respRow.factor} 的逐层留出投影间隔（${READOUT_LABEL[respRow.readout] || respRow.readout}读出）` : '颜色：该模式族在此模型上没有拼图',
+               mark: respRow ? '绿色边 = 未见词表上可读出' : '', click: '点击 = 右侧点云切到该层' };
+    }
+    if (view === 'relations') {
+      const values = Array.from({ length: n + 1 }, () => 0);
+      const marks = new Set();
+      (graph?.nodes || []).forEach(nd => { const h = hsOf(nd.layer); if (h != null && h <= n && nd.stable) values[h] += 1; });
+      (graph?.axes || []).forEach(ax => { const h = hsOf(ax.layer); if (h != null && ax.supported) marks.add(h); });
+      return { values: graph ? values : null, marks: [...marks], selected: st.alayer, allowEmbedding: true, onPick: hs => patchSt({ alayer: hs }),
+               valueLabel: '稳定特征', markLabel: '有共享编码轴',
+               color: graph ? '颜色 = 谱图里该层的稳定特征数（未见词表上复现）' : '颜色：当前模型没有谱图', mark: graph ? '绿色边 = 该层有通过留一族迁移的共享编码轴' : '',
+               click: '点击 = 在右侧列出该层的特征与共享轴' };
+    }
+    return { values: null, selected: null, onPick: null, color: '只画层结构', click: '本地包：在右侧打开研究包查看；层塔不参与' };
+  }, [view, nLayers, tower, st, block, itemApi.data, census, itemId, model, tree, respRow, respTm, graph]);
+
   const selRuns = tower?.selectivity || [];
   const selRun = selRuns.find(s => s.file === st.sel) || selRuns[0];
   const ros = Object.keys(selRun?.by_readout || {});
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
-  const itemName = tree?.items.find(i => i.id === itemId)?.name;
+  const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
   return (
     <div className="v8-space">
@@ -67,45 +136,73 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
         <div className="v8-tower-hd">
           <div className="v8-tower-title">
             <b>LLM 多层结构</b>
-            <select value={model} onChange={e => setSt(prev => ({ ...prev, model: e.target.value, block: null, unit: null }))} aria-label="模型">
+            <select value={model} onChange={e => patchSt({ model: e.target.value, block: null, unit: null, lblock: null, rlayer: null, alayer: null })} aria-label="模型">
               {(tree?.models || []).map(m => <option key={m} value={m} title={m}>{shortModel(m)}{skeletons[m]?.census_run ? '' : '（未普查）'}</option>)}
             </select>
           </div>
-          {view === 'lang' ? (
-            <p className="v8-note">颜色 = 「{itemName || '—'}」在各块的有效神经元（模板选择性单元数{itemSel?.ro ? ` · ${READOUT_LABEL[itemSel.ro] || itemSel.ro}读出` : ''}）。
-              {!census ? '该模型未普查，没有神经元数据。' : !itemSel?.run ? '这个语言项在此模型上还没有神经元选择性运行。' : ''}</p>
-          ) : census && tower ? (
+          {view === 'neuron' && census && tower && (
             <>
-              <span className="v8-seg">{OVERLAYS.map(([k, t]) => <button key={k} type="button" className={st.ov === k ? 'on' : ''} onClick={() => setSt(p => ({ ...p, ov: k }))}>{t}</button>)}</span>
+              <span className="v8-seg">{OVERLAYS.map(([k, t]) => <button key={k} type="button" className={st.ov === k ? 'on' : ''} onClick={() => patchSt({ ov: k })}>{t}</button>)}</span>
               {st.ov === 'sel' && selRun && (
                 <div className="v8-tools">
-                  <select value={selRun.file} onChange={e => setSt(p => ({ ...p, sel: e.target.value }))} aria-label="选择性运行">
+                  <select value={selRun.file} onChange={e => patchSt({ sel: e.target.value })} aria-label="选择性运行">
                     {selRuns.map(s => <option key={s.file} value={s.file}>{s.item || s.tm_id} · {s.factor}（{s.hi} 对 {s.lo}）</option>)}
                   </select>
-                  <span className="v8-seg">{ros.map(x => <button key={x} type="button" className={x === ro ? 'on' : ''} onClick={() => setSt(p => ({ ...p, ro: x }))}>{READOUT_LABEL[x] || x}</button>)}</span>
+                  <span className="v8-seg">{ros.map(x => <button key={x} type="button" className={x === ro ? 'on' : ''} onClick={() => patchSt({ ro: x })}>{READOUT_LABEL[x] || x}</button>)}</span>
                 </div>
               )}
             </>
-          ) : <p className="v8-note">{!skeleton ? '读取模型骨架…' : !census ? `${shortModel(model)} 还没有自然语料普查：只画层结构，没有神经元数据。` : tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…'}</p>}
+          )}
+          <div className="v8-tower-legend">
+            <span>{cfg.color}</span>
+            {cfg.mark && <span><i aria-hidden="true" />{cfg.mark}</span>}
+            <span>{cfg.click}</span>
+            {cfg.selected != null && <span>当前选中：{hsLabel(cfg.selected)}</span>}
+          </div>
         </div>
         {nLayers ? (
-          <Tower nLayers={nLayers} block={block} values={values} onPick={b => { setSt(p => ({ ...p, block: b, unit: null, mod: 'mlp' })); setView('neuron'); }}
-                 caption={`${shortModel(model)} 的 ${nLayers} 个块；点击进入该块的神经元`} />
+          <Tower nLayers={nLayers} selected={cfg.selected} values={cfg.values} marks={cfg.marks} peak={cfg.peak} onPick={cfg.onPick}
+                 allowEmbedding={cfg.allowEmbedding} valueLabel={cfg.valueLabel} markLabel={cfg.markLabel}
+                 caption={`${shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
         ) : <Empty>没有模型骨架数据。</Empty>}
-        <p className="v8-note">每块板 = 一个 Transformer 块（下：嵌入层，上：输出头）；颜色按各块最大值归一化，浅 → 深。拖动旋转、滚轮缩放、点击进入该块的神经元。层板只是排列，不代表模型几何。
-          {tower && tower.summaries_ready < tower.n_layers ? ` 逐层摘要已生成 ${tower.summaries_ready}/${tower.n_layers} 块。` : ''}</p>
+        <p className="v8-note">每块板 = 一层（下：嵌入层 hs[0]；块 b 的板 = 该块输出 hs[b+1]；上：输出头）。颜色按最大值归一化，浅 → 深。拖动旋转、滚轮缩放。层板只是排列，不代表模型几何。
+          {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
       </aside>
       <section className="v8-space-main">
         {!tree && <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
         <Suspense fallback={<Empty>加载中…</Empty>}>
           {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} />
             : <Empty>{census ? (tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…') : `${shortModel(model)} 还没有自然语料普查，没有逐单元数据；左侧只画层结构。`}</Empty>)}
-          {view === 'lang' && tree && <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set} />}
-          {view === 'response' && <ResponseExplorer key={`${tm}|${model}`} initialTm={tm || undefined} initialBucket={model || undefined} />}
-          {view === 'relations' && <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />}
+          {view === 'lang' && tree && <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
+                                                layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />}
+          {view === 'response' && (
+            <ResponseExplorer key={`${respTm}|${model}`} initialTm={respTm || undefined} initialBucket={model || undefined}
+                              syncLayer={syncTag} onLayer={tag => { const h = hsOf(tag); if (h != null) patchSt({ rlayer: h }); }}
+                              onContext={({ tm: t }) => { setTm(t); patchSt({ rlayer: null }); }} />
+          )}
+          {view === 'relations' && (
+            <>
+              {st.alayer != null && graph && <RelationsLayer graph={graph} hs={st.alayer} onClose={() => patchSt({ alayer: null })} />}
+              <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />
+            </>
+          )}
           {view === 'local' && localPack}
         </Suspense>
       </section>
     </div>
+  );
+}
+
+function RelationsLayer({ graph, hs, onClose }) {
+  const nodes = (graph.nodes || []).filter(nd => hsOf(nd.layer) === hs);
+  const axes = (graph.axes || []).filter(ax => hsOf(ax.layer) === hs);
+  return (
+    <section className="v8-relations-layer" aria-label="该层的谱图特征">
+      <div className="v8-layerpanel-hd"><b>该层：{hsLabel(hs)}</b><button type="button" className="v6-linkbtn" onClick={onClose}>收起</button></div>
+      <p className="v8-note" style={{ marginTop: 0 }}>{nodes.filter(nd => nd.stable).length} 个稳定特征（共 {nodes.length} 个，含各读出位置）· {axes.length} 条共享编码轴（{axes.filter(a => a.supported).length} 条通过留一族迁移）</p>
+      {axes.length > 0 && <ul>{axes.map(a => <li key={a.id}>{a.supported ? '●' : '○'} {a.label || a.id}</li>)}</ul>}
+      {nodes.length > 0 && <ul>{nodes.filter(nd => nd.stable).slice(0, 40).map(nd => <li key={nd.id} title={nd.layer}>{nd.family}·{nd.factor}={nd.level}</li>)}</ul>}
+      {!nodes.length && <p className="v8-note">这一层没有谱图特征。</p>}
+    </section>
   );
 }

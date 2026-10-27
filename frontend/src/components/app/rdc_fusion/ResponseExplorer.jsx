@@ -374,7 +374,8 @@ function LegacyResults({ tm }) {
   );
 }
 
-export default function ResponseExplorer({ initialTm, initialBucket, initialLayer, onContext }) {
+/* syncLayer（可选）：外部（研究工作台 · 空间的层塔）选中的层标签，变化时同步；onLayer：层选择变化时回报给外部 */
+export default function ResponseExplorer({ initialTm, initialBucket, initialLayer, syncLayer, onLayer, onContext }) {
   const templates = useApi('/api/templates');
   const list = (templates.data?.templates || []).slice().sort((a, b) =>
     (a.protocol === 'v3' ? 0 : 1) - (b.protocol === 'v3' ? 0 : 1) || a.tm_id.localeCompare(b.tm_id));
@@ -391,7 +392,10 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
   const [method, setMethod] = useState('');
   const [colorBy, setColorBy] = useState('');
   const [hiddenSplits, setHiddenSplits] = useState(() => new Set());
-  const [layerPick, setLayerPick] = useState(initialLayer || '');
+  const [layerPick, setLayerPickState] = useState(initialLayer || syncLayer || '');
+  const setLayerPick = tag => { setLayerPickState(tag); if (tag) onLayer?.(tag); };
+  const [lastSync, setLastSync] = useState(syncLayer);
+  if (syncLayer !== lastSync) { setLastSync(syncLayer); if (syncLayer) setLayerPickState(syncLayer); }   // 外部选层：渲染期同步，不用副作用
   const [split, setSplit] = useState('discovery');
   const [colorFactor, setColorFactor] = useState('');
   const layers = bucket?.agg?.layers || [];
