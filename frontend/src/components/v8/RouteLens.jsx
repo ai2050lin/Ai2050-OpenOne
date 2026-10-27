@@ -1,12 +1,12 @@
-/* 研究工作台 · 路线：两条进展线 + 证据门链。
-   ① 神经元逆向分析进展：普查规模、逐层摘要、分型、解释检验与模板选择性，按块画成热力条（每格一个块）；
-   ② 语言图谱进展：大类 × 等级的覆盖、语言项 × 模型的等级矩阵、研究缺口；
-   ③ 模式族证据门链（记分板快照）。各来源分开计数，不拼成转化率；全部读取来自本机数据包。 */
+/* 研究工作台 · 路线：两个 tab（地址栏 ?rtab=neuron|lang）。
+   神经元逆向分析进展：普查规模、逐层摘要、分型、解释检验与模板选择性，按块画成热力条（每格一个块）；
+   语言图谱进展：大类 × 等级的覆盖、语言项 × 模型的等级矩阵、研究缺口，以及模式族证据门链（记分板快照）。
+   各来源分开计数，不拼成转化率；全部读取来自本机数据包。 */
 import { useMemo, useState } from 'react';
 
 import RouteBoard from '../app/rdc_fusion/RouteBoard.jsx';
 import { useApi } from '../app/rdc_fusion/api.js';
-import { Card, Empty } from '../app/rdc_fusion/ui.jsx';
+import { Card, Empty, Tabs } from '../app/rdc_fusion/ui.jsx';
 import '../app/workbench.css';
 import { LevelChip } from './LangPage.jsx';
 import { LEVELS, READOUT_LABEL, defaultModel, itemLevel, levelMeta, seq, shortModel } from './v8Util.js';
@@ -129,7 +129,25 @@ function LangProgress({ tree, model, onOpenItem }) {
   );
 }
 
+const TABS = [
+  { id: 'neuron', label: '神经元逆向分析进展' },
+  { id: 'lang', label: '语言图谱进展' },
+];
+
+function readTab() {
+  try { return new URLSearchParams(window.location.search).get('rtab') === 'lang' ? 'lang' : 'neuron'; } catch { return 'neuron'; }
+}
+
 export default function RouteLens({ onGoSpace, onGo }) {
+  const [tab, setTabState] = useState(readTab);
+  const setTab = t => {
+    setTabState(t);
+    try {
+      const url = new URL(window.location.href);
+      if (t === 'neuron') url.searchParams.delete('rtab'); else url.searchParams.set('rtab', t);
+      window.history.replaceState(null, '', url);
+    } catch { /* 地址栏不可写时只保留页面状态 */ }
+  };
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
@@ -139,14 +157,21 @@ export default function RouteLens({ onGoSpace, onGo }) {
   const census = skeleton?.census_run ? skeleton.census_key : null;
   return (
     <div className="v8-route">
-      <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查 → 逐层摘要与分型 → 解释检验 → 模板选择性（各项分开计数）`}>
-        <NeuronProgress census={census} skeleton={skeleton} onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />
-      </Card>
-      <Card title="语言图谱进展" sub="每个语言项在各模型上的读出轴等级（路线 T：模板对照）；路线 N（神经元经模板确认入树）尚未接入">
-        {tree ? <LangProgress tree={tree} model={model} onOpenItem={it => onGoSpace('lang', { item: it.id, type: it.type })} />
-          : <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
-      </Card>
-      <RouteBoard onGo={onGo} />
+      <Tabs tabs={TABS} value={tab} onChange={setTab} label="路线" />
+      {tab === 'neuron' && (
+        <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查 → 逐层摘要与分型 → 解释检验 → 模板选择性（各项分开计数）`}>
+          <NeuronProgress census={census} skeleton={skeleton} onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />
+        </Card>
+      )}
+      {tab === 'lang' && (
+        <>
+          <Card title="语言图谱进展" sub="每个语言项在各模型上的读出轴等级（路线 T：模板对照）；路线 N（神经元经模板确认入树）尚未接入">
+            {tree ? <LangProgress tree={tree} model={model} onOpenItem={it => onGoSpace('lang', { item: it.id, type: it.type })} />
+              : <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
+          </Card>
+          <RouteBoard onGo={onGo} />
+        </>
+      )}
     </div>
   );
 }
