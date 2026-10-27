@@ -64,6 +64,7 @@ def create_app():
     app.include_router(census_service.router)
     app.include_router(platform_service.router)
     app.include_router(platform_service.auth_router)
+    app.include_router(platform_service.lang_router)
     app.include_router(neuron_census_service.router)
 
     data_dir = Path(distributed_service._DATA_DIR).resolve()

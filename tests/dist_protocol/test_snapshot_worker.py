@@ -126,6 +126,34 @@ class SnapshotWorkerTests(unittest.TestCase):
         finally:
             DP.extras_plan, DP.template_entries, DP.template_version = orig
 
+    def test_lang_atlas_endpoints_and_datapack(self):
+        import gzip
+        import json
+        from fastapi import HTTPException
+        self.assertTrue(self.PS.lang_tree_ep()['pending'])              # 还没有谱图快照
+        out = self.W.run_once(log=lambda *_: None)
+        self.assertEqual(out['lang_atlas'], 'computed')
+        tree = self.PS.lang_tree_ep()
+        self.assertFalse(tree['pending'])
+        self.assertEqual(tree['schema'], 'lang_tree_status.v1')
+        self.assertEqual({t['id'] for t in tree['types']} >= {'KN', 'RS', 'GR'}, True)
+        self.assertTrue(all(it['status']['read'] == 0 for it in tree['items']))   # 空数据库：全部未研究
+        item = self.PS.lang_item_ep('GR.Q')
+        self.assertEqual(item['item']['type'], 'GR')
+        self.assertEqual(item['pieces'], [])
+        with self.assertRaises(HTTPException):
+            self.PS.lang_item_ep('NO.such')
+        self.assertEqual(self.PS.model_skeleton_ep()['models'], [])
+        with self.assertRaises(HTTPException):
+            self.PS.space_overlay_ep('no-model')
+        doc = json.loads(gzip.decompress((self.tmp / 'datapack' / 'datapack.json.gz').read_bytes()))
+        self.assertIn('/api/lang/tree', doc['entries'])                 # 谱图生成后数据包随之重建
+        self.assertIn('/api/lang/item/GR.Q', doc['entries'])
+        self.assertIn('/api/model/skeleton', doc['entries'])
+        self.assertTrue(doc['version'].endswith(self.W.stored_fingerprint('lang_atlas')))
+        again = self.W.run_once(log=lambda *_: None)                   # 数据、语言树与代码都没变：不重建
+        self.assertEqual((again['lang_atlas'], again['datapack']), ('skipped', 'skipped'))
+
     def test_datapack_build_skip_and_serve(self):
         import gzip
         import json

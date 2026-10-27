@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、客户端离线数据包与附加包、规律分析预热与普查自动合并。
+"""中心后台计算子进程：快照（总览漏斗、覆盖矩阵、题库、记分板、谱图）、客户端离线数据包与附加包、规律分析预热、
+语言谱图（lang_atlas，在规律分析预热之后生成）与普查自动合并。
 
 与网站进程分开运行（低优先级），结果写到 <AI2050_DIST_DIR>/snapshots/<name>.json，网站进程只读文件，
 计算再久也不会拖慢页面。每个快照记录数据指纹（结果、审计、模板、普查的计数与最新时间）；
@@ -116,6 +117,56 @@ class Guard:
         self.running.unlink(missing_ok=True)
 
 
+def build_datapack(fp: str, guard: 'Guard', force: bool = False, log=print):
+    """客户端离线数据包：数据、研究文件或语言谱图变化时重建。"""
+    import distributed_service as D
+    result = 'skipped'
+    try:
+        import datapack as DP
+        from server import neuron_census_service as NS
+        version = f"{fp}-{DP.research_stamp(NS.research_root())}-{stored_fingerprint('lang_atlas') or 'nolang'}"
+        meta = DP.read_meta(D._DATA_DIR)
+        if not guard.skip('datapack') and (force or not meta or meta.get('version') != version):
+            guard.start('datapack')
+            result = DP.build(D._DATA_DIR, version, log=log)
+    except Exception as exc:
+        log(f'[snapshots] datapack: {type(exc).__name__}: {exc}')
+    guard.done()
+    return result
+
+
+def lang_atlas_version(fp: str) -> str:
+    """语言谱图快照的版本：数据指纹 + 已缓存的规律分析文件名 + 语言树文件 + pieces 代码哈希。
+    放在规律分析预热之后计算：预热补上新的分析文件时版本随之变化，谱图会重建。"""
+    import distributed_service as D
+    from shared.dist_protocol import pieces as PC
+    cache = Path(D._DATA_DIR) / 'analysis_cache'
+    names = sorted(p.name for p in cache.glob('*.json')) if cache.is_dir() else []
+    raw = json.dumps([fp, names, hashlib.sha256(PC.TREE_PATH.read_bytes()).hexdigest(), PC.code_hash()])
+    return hashlib.sha256(raw.encode('utf-8')).hexdigest()[:20]
+
+
+def build_lang_atlas(fp: str, guard: 'Guard', force: bool = False, log=print):
+    import distributed_service as D
+    from shared.dist_protocol import pieces as PC
+    try:
+        version = lang_atlas_version(fp)
+        if (not force and stored_fingerprint('lang_atlas') == version) or guard.skip('lang_atlas'):
+            return 'skipped'
+        from server import neuron_census_service as NS
+        t0 = time.time()
+        guard.start('lang_atlas')
+        data = PC.collect(D._db(), D._DATA_DIR, census_runs=NS.census_runs(), log=log)
+        write_snapshot('lang_atlas', data, version, time.time() - t0)
+        guard.done()
+        log(f'[snapshots] lang_atlas {time.time() - t0:.0f}s')
+        return 'computed'
+    except Exception as exc:                           # 失败时保留上一次的文件
+        guard.done()
+        log(f'[snapshots] lang_atlas 失败：{type(exc).__name__}: {exc}')
+        return f'error: {exc}'
+
+
 def run_once(force: bool = False, log=print) -> dict:
     import distributed_service as D
     import platform_service as PS
@@ -155,21 +206,7 @@ def run_once(force: bool = False, log=print) -> dict:
         guard.done()
     except Exception as exc:
         log(f'[snapshots] agg warm-up: {type(exc).__name__}: {exc}')
-    try:                                               # 客户端离线数据包：数据或研究文件变化时重建
-        import datapack as DP
-        from server import neuron_census_service as NS
-        version = f'{fp}-{DP.research_stamp(NS.research_root())}'
-        meta = DP.read_meta(D._DATA_DIR)
-        if guard.skip('datapack'):
-            out['datapack'] = 'skipped'
-        elif force or not meta or meta.get('version') != version:
-            guard.start('datapack')
-            out['datapack'] = DP.build(D._DATA_DIR, version, log=log)
-        else:
-            out['datapack'] = 'skipped'
-    except Exception as exc:
-        log(f'[snapshots] datapack: {type(exc).__name__}: {exc}')
-    guard.done()
+    out['datapack'] = build_datapack(fp, guard, force=force, log=log)
     marker = snapshot_dir() / '_analyses.fingerprint'
     stamp = f'{fp}-warm2'                              # warm2：行为门开 / 关两种都预热（预热范围改变时升这个标记）
     if not force and marker.is_file() and marker.read_text(encoding='utf-8').strip() == stamp:
@@ -186,6 +223,9 @@ def run_once(force: bool = False, log=print) -> dict:
             marker.write_text(stamp, encoding='utf-8')
         except Exception as exc:
             log(f'[snapshots] analysis warm-up: {exc}')
+    out['lang_atlas'] = build_lang_atlas(fp, guard, force=force, log=log)
+    if out['lang_atlas'] == 'computed':                # 语言谱图变了：数据包随之重建（版本含谱图版本）
+        out['datapack'] = build_datapack(fp, guard, log=log)
     try:                                               # 离线客户端的附加包：模式族实验响应、单元卡
         import datapack as DP
         from server import neuron_census_service as NS

@@ -79,6 +79,17 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     ]
     for name in ('catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
         plan.append((f'/api/platform/snapshot/{name}', (lambda n=name: PS.snapshot(n))))
+    lang = PS._lang_atlas()                            # 语言谱图（体积小，进主数据包）：还没生成时不放条目，下一版数据包再补
+    if lang is not None:
+        data = lang['data']
+        plan.append(('/api/lang/tree', PS.lang_tree_ep))
+        plan.append(('/api/model/skeleton', PS.model_skeleton_ep))
+        for item_id in sorted(data['items']):
+            plan.append((f'/api/lang/item/{item_id}', (lambda i=item_id: PS.lang_item_ep(i))))
+        for mk in sorted(data['skeletons']):
+            plan.append((f'/api/model/skeleton?model_key={mk}', (lambda m=mk: PS.model_skeleton_ep(m))))
+        for mk in sorted(data['overlays']):
+            plan.append((f'/api/space/overlay?model_key={mk}', (lambda m=mk: PS.space_overlay_ep(m))))
     idx = NS.index()
     model_keys = sorted({r['model_key'] for r in idx.get('census', [])})
     for mk in model_keys:

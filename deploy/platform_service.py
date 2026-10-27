@@ -31,6 +31,8 @@ import distributed_service as D
 router = APIRouter(prefix='/api/platform', tags=['platform'])
 # 需要会话令牌的两个端点放在 /api/auth 下：客户端只给 /api/auth/* 请求带 Authorization 头
 auth_router = APIRouter(prefix='/api/auth', tags=['platform'])
+# 语言谱图（lang_atlas.v1）：语言树状态、语言项详情、模型骨架、3D 叠加。都只读后台子进程写好的 lang_atlas 快照
+lang_router = APIRouter(prefix='/api', tags=['platform'])
 
 _REPO = Path(__file__).resolve().parent.parent
 def _read_version() -> str:
@@ -436,3 +438,62 @@ def kit_bound(request: Request, authorization: str = Header(default='')) -> Resp
     u = D._auth_call(A.require_user, authorization)
     bind = D._auth_call(A.new_bind_code, u['user_id'], ttl=KIT_BIND_TTL)['code']
     return _kit_response(build_kit(public_url(request), bind, u.get('display_name') or u.get('username') or ''))
+
+
+# ---------- 语言谱图（lang_atlas.v1，pieces.py 生成，后台子进程写 snapshots/lang_atlas.json） ----------
+
+def _lang_atlas() -> Optional[Dict[str, Any]]:
+    doc = _read_file_snapshot('lang_atlas')
+    return doc if doc and doc.get('data') else None
+
+
+def _lang_pending() -> Dict[str, Any]:
+    start_refresher()
+    return {'pending': True, 'note': '语言谱图正在后台计算（规律分析预热完成后生成），请稍后刷新。'}
+
+
+@lang_router.get('/lang/tree')
+def lang_tree_ep() -> dict:
+    """语言树（类型 → 类别 → 语言项）与每个语言项在各模型上的两路线状态。"""
+    doc = _lang_atlas()
+    if doc is None:
+        return _lang_pending()
+    return {**doc['data']['tree'], 'pending': False, 'computed_at': doc.get('computed_at')}
+
+
+@lang_router.get('/lang/item/{item_id}')
+def lang_item_ep(item_id: str) -> dict:
+    """一个语言项：全部 piece、逐条规则陈述、判据与回查来源。"""
+    doc = _lang_atlas()
+    if doc is None:
+        return _lang_pending()
+    item = doc['data']['items'].get(item_id)
+    if item is None:
+        raise HTTPException(404, f'没有语言项 {item_id}')
+    return {**item, 'pending': False, 'computed_at': doc.get('computed_at')}
+
+
+@lang_router.get('/model/skeleton')
+def model_skeleton_ep(model_key: str = '') -> dict:
+    """模型骨架（层数、宽度等，来自结果摘要与普查清单）；不给 model_key 时列出全部模型。"""
+    doc = _lang_atlas()
+    if doc is None:
+        return _lang_pending()
+    sk = doc['data']['skeletons']
+    if not model_key:
+        return {'schema': 'model_skeletons.v1', 'pending': False, 'models': [sk[m] for m in sorted(sk)]}
+    if model_key not in sk:
+        raise HTTPException(404, f'没有模型 {model_key} 的骨架')
+    return {**sk[model_key], 'pending': False}
+
+
+@lang_router.get('/space/overlay')
+def space_overlay_ep(model_key: str) -> dict:
+    """3D 默认场景的叠加数据：该模型上每个语言项的逐层曲线（路线 T）。"""
+    doc = _lang_atlas()
+    if doc is None:
+        return _lang_pending()
+    ov = doc['data']['overlays'].get(model_key)
+    if ov is None:
+        raise HTTPException(404, f'没有模型 {model_key} 的叠加数据')
+    return {**ov, 'pending': False, 'computed_at': doc.get('computed_at')}

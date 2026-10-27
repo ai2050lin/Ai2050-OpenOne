@@ -1,0 +1,50 @@
+{
+  "schema": "lang_tree.v1",
+  "version": 1,
+  "note": "语言树是展示层的组织方式，不是模型内部结构的事实；交叉项只存一次（主类型 + also_in）。planned=true 的语言项还没有模式族，图谱显示为「未研究」。",
+  "types": [
+    {"id": "KN", "name": "知识网络", "desc": "实体、类别、属性与关系的表征和读出"},
+    {"id": "RS", "name": "功能推理", "desc": "真值、条件、因果、比较等推理功能与任务线索"},
+    {"id": "GR", "name": "语法规则", "desc": "句类、论元角色、句式与形态等语法结构"},
+    {"id": "EXT", "name": "扩展", "desc": "语种、风格、序列等暂未归入三种主类型的条件", "collapsed": true}
+  ],
+  "categories": [
+    {"id": "KN.taxonomy", "type": "KN", "name": "分类关系"},
+    {"id": "KN.attribute", "type": "KN", "name": "属性"},
+    {"id": "KN.relation", "type": "KN", "name": "实体关系"},
+    {"id": "RS.truth", "type": "RS", "name": "真值与否定"},
+    {"id": "RS.inference", "type": "RS", "name": "条件与因果"},
+    {"id": "RS.task", "type": "RS", "name": "任务功能"},
+    {"id": "GR.clause", "type": "GR", "name": "句类"},
+    {"id": "GR.argument", "type": "GR", "name": "论元角色"},
+    {"id": "GR.construction", "type": "GR", "name": "句式"},
+    {"id": "EXT.language", "type": "EXT", "name": "语种"}
+  ],
+  "items": [
+    {"id": "KN.ISA", "category": "KN.taxonomy", "name": "上下位（是一种）", "desc": "实体属于哪个上位类别，如「苹果是一种水果」", "languages": ["zh"]},
+    {"id": "KN.CAT", "category": "KN.taxonomy", "name": "名词语义类别", "desc": "名词所属的语义类（动物、工具、食物……）", "languages": ["zh", "en"]},
+    {"id": "KN.ATTR", "category": "KN.attribute", "name": "属性绑定", "desc": "实体的颜色、味道、温度等属性", "languages": ["zh"]},
+    {"id": "KN.PART", "category": "KN.relation", "name": "部分—整体", "desc": "「轮子是汽车的一部分」", "languages": [], "planned": true},
+    {"id": "KN.ORIGIN", "category": "KN.relation", "name": "来源与产地", "desc": "「葡萄酒由葡萄酿成」", "languages": [], "planned": true},
+    {"id": "RS.NEG", "category": "RS.truth", "name": "否定与真值", "desc": "否定词改变命题真值的判断", "languages": ["zh", "en"], "also_in": ["GR"]},
+    {"id": "RS.COND", "category": "RS.inference", "name": "条件推理", "desc": "「如果……那么……」的推断", "languages": [], "planned": true},
+    {"id": "RS.CAUSE", "category": "RS.inference", "name": "因果关系", "desc": "原因与结果的识别", "languages": [], "planned": true},
+    {"id": "RS.COMPARE", "category": "RS.inference", "name": "比较", "desc": "大小、多少、先后的比较判断", "languages": [], "planned": true},
+    {"id": "RS.TASK", "category": "RS.task", "name": "任务线索", "desc": "提示语指定的任务（翻译、判断、补全……）", "languages": ["zh", "en"]},
+    {"id": "GR.Q", "category": "GR.clause", "name": "疑问 / 陈述", "desc": "句子是疑问还是陈述（含嵌入式疑问，句末标点一致）", "languages": ["zh"]},
+    {"id": "GR.ROLE", "category": "GR.argument", "name": "施事 / 受事", "desc": "名词在事件中是施事还是受事", "languages": ["zh"]},
+    {"id": "GR.CONSTR", "category": "GR.construction", "name": "主动 / 把字 / 被字", "desc": "同一事件的不同句式", "languages": ["zh"]},
+    {"id": "EXT.LANG", "category": "EXT.language", "name": "语种识别", "desc": "输入是中文还是英文", "languages": ["zh", "en"]}
+  ],
+  "family_map": {
+    "GR-Q": {"mood": "GR.Q"},
+    "GR-NEG": {"polarity": "RS.NEG", "mood": "GR.Q"},
+    "GR-ROLE": {"role": "GR.ROLE", "construction": "GR.CONSTR"},
+    "KN-ATTR": {"attr": "KN.ATTR", "frame": "GR.Q"},
+    "KN-ISA": {"category": "KN.ISA", "frame": "GR.Q"},
+    "ENT-XF": {"cat": "KN.CAT", "lang": "EXT.LANG", "polarity": "RS.NEG", "task": "RS.TASK"}
+  },
+  "family_languages": {
+    "GR-Q": ["zh"], "GR-NEG": ["zh"], "GR-ROLE": ["zh"], "KN-ATTR": ["zh"], "KN-ISA": ["zh"], "ENT-XF": ["zh", "en"]
+  }
+}
