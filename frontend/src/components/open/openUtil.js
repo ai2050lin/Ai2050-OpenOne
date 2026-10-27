@@ -1,4 +1,4 @@
-/* 开放平台外壳（OpenPlatform）的共享函数（非组件）。数据全部来自 /api/platform/*、/api/census/*、/api/auth/*。 */
+/* 开放平台页面（参与、学习、首页普查进度）的共享函数（非组件）。数据全部来自 /api/platform/*、/api/census/*、/api/auth/*。 */
 import { API_BASE, detailText, getSession } from '../app/rdc_fusion/api.js';
 
 export const TABS = [

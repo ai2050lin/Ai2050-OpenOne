@@ -79,7 +79,7 @@ function Sentence({ row, readout }) {
 }
 
 function SecA({ ex, piece }) {
-  if (!ex?.rows?.length) return <Empty>这个语言项还没有冻结的模板材料。下一步：在「进展与参与」领题，或在工作台设计模板。</Empty>;
+  if (!ex?.rows?.length) return <Empty>这个语言项还没有冻结的模板材料。下一步：在「参与」领题，或在研究工作台设计模板。</Empty>;
   return (
     <>
       <div className="v8-pairs">

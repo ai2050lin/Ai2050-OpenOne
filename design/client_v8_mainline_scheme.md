@@ -1,6 +1,6 @@
 # 客户端 v8 方案：两条主线 + 分支（待确认）
 
-> 2026-10-27 · 第 5 节的方向已确认，已实施：服务端 neuron_layers.v1（/api/neurons/layer、/api/neurons/tower）与 lang_atlas 扩展（例句、行为门、点云、选择性、config），客户端 `frontend/src/components/v8/`（/atlas，取代 v7）。实施时的差异：单元卡复用已有的 NeuronUnitCard，上方另加「对应的语言特征」；分型对全部块按 L30-v1 规则计算（块 30 与 L30-v1 计数一致），其他块标为描述性应用。原型：`design/mockups/client_v8_mainline_prototype.html`（嵌入真实数据片段，可点击）。
+> 2026-10-27 · 第 5 节的方向已确认，已实施：服务端 neuron_layers.v1（/api/neurons/layer、/api/neurons/tower）与 lang_atlas 扩展（例句、行为门、点云、选择性、config），客户端 `frontend/src/components/v8/`（/atlas，取代 v7）。2026-10-27 追加：开放平台首页（/）并入同一外壳——顶部导航「首页 · ① 语言图谱 · ② 神经元 · 参与」，网页版另有「研究工作台 ↗」；学习方法、进展、响应点云、谱图关系进「更多」；首页精简为定位 + 两条主线入口（带真实计数）+ 参与 + 普查进度；旧 `?tab=` 链接自动换算。实施时的差异：单元卡复用已有的 NeuronUnitCard，上方另加「对应的语言特征」；分型对全部块按 L30-v1 规则计算（块 30 与 L30-v1 计数一致），其他块标为描述性应用。原型：`design/mockups/client_v8_mainline_prototype.html`（嵌入真实数据片段，可点击）。
 > 取代 v7 的「图谱 / 3D 空间 / 进展」三页结构；v7 已实现的端点（lang_atlas.v1）与组件尽量复用。
 
 ## 0. 为什么要改

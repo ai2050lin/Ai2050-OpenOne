@@ -260,7 +260,7 @@ Phase 编号接续现有记录，不随意重编号。已有记录的纠错采�
 
 ## 10. 可视化研究客户端
 
-客户端默认入口是面向新人的开放平台外壳（`frontend/src/components/open/`：首页 / 学习 / 图谱 / 参与，配置来自 `/api/platform/config`）。v8 客户端在 `/atlas`（Electron 的 file:// 页面用 `#/atlas`；`frontend/src/components/v8/`，设计见 `design/client_v8_mainline_scheme.md`）：两条主线——① 语言图谱（大类 → 语言族 → 语言项；语言项页固定六节：是什么、模型能不能做到、在哪一层被编码、编码长什么样、由哪些神经元承载、证据与结论）、② 神经元（3D 层塔 → 层内结构（按 config.json）→ MLP 中间单元阵列（按真实索引排列，排序须显式并标明）→ 单元卡与对应的语言特征）；进展与参与、响应点云、本地包、工作台是分支，从主线内按钮或「更多」进入。模型是两条主线共用的全局选择，URL 即状态。层板与阵列的位置只是排列，图上须注明不代表模型几何；注意力头在有逐头数据前只画结构；路线 N 与会合边接入前不画单元与连线。研究工作台在 `/workbench`（`frontend/src/components/app/Workbench.jsx`，导航与跳转归一见 `workbenchUtil.js`，设计见 `design/client_v6_pipeline_ia.md`），按研究闭环分为四个一级界面，全部只读写中心服务的真源端点，连接本机或公开中心都可用：
+客户端默认入口是网站外壳 v8（`frontend/src/components/v8/AtlasApp.jsx`，`/` 与 `/atlas` 共用，Electron 的 file:// 页面同样进入；设计见 `design/client_v8_mainline_scheme.md`，配置来自 `/api/platform/config`）。顶部导航：首页 · ① 语言图谱 · ② 神经元 · 参与，网页版另有「研究工作台 ↗」；学习方法、进展、响应点云、谱图关系在「更多」里。旧开放平台的 `?tab=` 链接自动换算（atlas → 语言图谱）；URL 只记录与缺省值不同的状态。参与与学习页复用 `frontend/src/components/open/` 的 OpenJoin、OpenLearn。两条主线——① 语言图谱（大类 → 语言族 → 语言项；语言项页固定六节：是什么、模型能不能做到、在哪一层被编码、编码长什么样、由哪些神经元承载、证据与结论）、② 神经元（3D 层塔 → 层内结构（按 config.json）→ MLP 中间单元阵列（按真实索引排列，排序须显式并标明）→ 单元卡与对应的语言特征）；进展与参与、响应点云、本地包、工作台是分支，从主线内按钮或「更多」进入。模型是两条主线共用的全局选择，URL 即状态。层板与阵列的位置只是排列，图上须注明不代表模型几何；注意力头在有逐头数据前只画结构；路线 N 与会合边接入前不画单元与连线。研究工作台在 `/workbench`（`frontend/src/components/app/Workbench.jsx`，导航与跳转归一见 `workbenchUtil.js`，设计见 `design/client_v6_pipeline_ia.md`），按研究闭环分为四个一级界面，全部只读写中心服务的真源端点，连接本机或公开中心都可用：
 
 | 界面 | 职责 |
 | --- | --- |

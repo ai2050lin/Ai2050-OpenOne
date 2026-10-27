@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './css/DNNAnalysisControlPanel.css'
 import ErrorBoundary from './ErrorBoundary.jsx'
-// 开放平台外壳（默认入口 /）：首页 / 学习 / 图谱 / 参与
-import OpenPlatform from './components/open/OpenPlatform.jsx'
+// 网站外壳（默认入口 /，与 /atlas 共用；Electron 的 file:// 页面同样进入）：首页 · 语言图谱 · 神经元 · 参与，其余在「更多」
+import AtlasApp from './components/v8/AtlasApp.jsx'
 import AuthGate from './components/app/rdc_fusion/AuthGate.jsx'
 import { DataBarHost } from './components/open/DataBar.jsx'
 import { initDataStore } from './components/app/rdc_fusion/dataStore.js'
@@ -18,8 +18,6 @@ const App = lazy(() => import('./App.jsx'))
 const Workbench = lazy(() => import('./components/app/Workbench.jsx'))
 // rdc-* 专项页统一壳（P2 收敛：页头含返回工作台；目录见图谱透镜「专项视图」tab）
 const RdcPageShell = lazy(() => import('./components/app/RdcPageShell.jsx'))
-// v8 客户端（/atlas；Electron 的 file:// 页面用 #/atlas）：两条主线 —— 语言图谱、神经元
-const AtlasApp = lazy(() => import('./components/v8/AtlasApp.jsx'))
 
 /* 路由表：[路径, 页面组件, 标题]。逐页协议化并入图谱透镜后，从此表删除对应行即可。 */
 const RDC_ROUTES = [
@@ -53,9 +51,7 @@ createRoot(document.getElementById('root')).render(
             ? <RdcPageShell title={legacyTitle}><LegacyPage /></RdcPageShell>
             : (path === '/workbench' || path === '/rdc-fusion')
               ? <AuthGate><Workbench /></AuthGate>
-              : (path === '/atlas' || window.location.hash.startsWith('#/atlas'))
-                ? <AuthGate><AtlasApp /></AuthGate>
-                : <OpenPlatform />}
+              : <AuthGate><AtlasApp /></AuthGate>}
         {!hit && !(devOnly && path === '/legacy') && <DataBarHost />}
       </Suspense>
     </ErrorBoundary>

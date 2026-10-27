@@ -114,7 +114,7 @@
 .v8-unit .nu-table{display:block;overflow-x:auto;max-width:100%}
 .v8-link-row{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:12px;padding:3px 0}
 .v8-link-row small{color:var(--fw-text-3)}
-/* ---- 分支：进展与参与 ---- */
+/* ---- 分支：进展 ---- */
 .v8-progress-page .v6-tabs{background:transparent;padding:0;margin-bottom:12px}
 .v8-progress{display:flex;flex-direction:column;gap:12px}
 .v8-cov{width:100%}.v8-cov td.num,.v8-cov th{text-align:center}.v8-cov tbody th{text-align:left}
@@ -130,4 +130,40 @@
   .v8-lang,.v8-neuron{grid-template-columns:minmax(0,1fr)}
   .v8-side,.v8-tower{position:static;max-height:none}
   .v8-axes{grid-template-columns:minmax(0,1fr)}
+}
+/* ---- 网站外壳：导航中的工作台入口、页脚 ---- */
+.v8-nav-wb{display:inline-flex;align-items:center;margin-left:8px;padding:5px 12px;border:1px solid rgba(24,79,149,.38);border-radius:99px;background:#fff;color:#184f95;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap}
+.v8-nav-wb:hover{background:#eef5fc;border-color:#184f95}
+.v8-nav-wb:focus-visible{outline:2px solid #184f95;outline-offset:2px}
+.v8-more>button.on{border-color:var(--fw-blue);color:var(--fw-blue)}
+.v8-foot{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:14px 16px 20px;font-size:11.5px;color:var(--fw-text-3);border-top:1px solid var(--fw-border);background:#fff}
+.v8-foot a{color:var(--fw-text-2)}
+/* ---- 首页 ---- */
+.v8-home{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-top:6px}
+.v8-hero{padding:26px 28px;border-radius:14px;background:linear-gradient(135deg,#0d366b,#256abf);color:#fff}
+.v8-hero h1{font-size:24px;margin:0 0 8px}
+.v8-hero p{font-size:14px;opacity:.92;margin:0;max-width:780px;line-height:1.7}
+.v8-mainlines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.v8-mainline{position:relative;text-align:left;background:#fff;border:1px solid var(--fw-border);border-radius:14px;padding:18px 20px 16px 62px;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:8px}
+.v8-mainline:hover{border-color:#9ec5f4;box-shadow:0 6px 18px rgba(13,54,107,.08)}
+.v8-mainline .n{position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:99px;background:#184f95;color:#fff;display:grid;place-items:center;font-weight:700}
+.v8-mainline h2{margin:0;font-size:18px}
+.v8-mainline p{margin:0;color:var(--fw-text-2);font-size:12.5px;line-height:1.7}
+.v8-mainline small{color:var(--fw-text-3);font-size:11px}
+.v8-mainline em{font-style:normal;color:var(--fw-blue);font-weight:600;font-size:12.5px}
+.v8-ml-stats{display:flex;gap:18px;flex-wrap:wrap}
+.v8-ml-stats span{display:flex;flex-direction:column;font-size:11px;color:var(--fw-text-3)}
+.v8-ml-stats b{font-size:20px;color:#0d366b;font-variant-numeric:tabular-nums}
+.v8-home-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.v8-home-card{background:#fff;border:1px solid var(--fw-border);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.v8-home-card h3{margin:0;font-size:14px}
+.v8-home-card p{margin:0;color:var(--fw-text-2);font-size:12.5px;line-height:1.7}
+.v8-home-card>div{width:100%}
+.v8-home-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--fw-text-2)}
+.v8-home-stats b{color:#0d366b;font-size:15px}
+.v8-home-note{font-size:11.5px;color:var(--fw-text-3);line-height:1.7;padding:0 4px}
+.v8-home-note p{margin:2px 0}
+@media (max-width:860px){
+  .v8-mainlines,.v8-home-row{grid-template-columns:minmax(0,1fr)}
+  .v8-nav{flex-wrap:wrap}
 }

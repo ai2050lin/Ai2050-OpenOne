@@ -1,4 +1,4 @@
-/* 分支：进展与参与。进度（按大类的覆盖与研究缺口、证据门链）、参与（题库与领题）、本地包（研究包 / 谱图包在浏览器内打开）。
+/* 分支：进展。进度（按大类的覆盖与研究缺口、证据门链）、题库（类别、状态与领题命令）、本地包（研究包 / 谱图包在浏览器内打开）。
    各来源分开计数，不拼成转化率；任务完成、上传、审计通过都不表示证据晋级。 */
 import { useState } from 'react';
 
@@ -12,7 +12,7 @@ import '../app/workbench.css';
 import { LevelChip } from './LangPage.jsx';
 import { LEVELS, itemLevel, shortModel } from './v8Util.js';
 
-const TABS = [{ id: 'coverage', label: '进度' }, { id: 'join', label: '参与' }, { id: 'local', label: '本地包' }];
+const TABS = [{ id: 'coverage', label: '进度' }, { id: 'join', label: '题库' }, { id: 'local', label: '本地包' }];
 
 function Coverage({ tree, model, set }) {
   const gaps = tree.items.filter(it => itemLevel(it, model) === 0);
@@ -81,7 +81,7 @@ export default function ProgressPage({ tree, model, set }) {
   const [tab, setTab] = useState('coverage');
   return (
     <div className="v8-progress-page">
-      <Tabs tabs={TABS} value={tab} onChange={setTab} label="进展与参与" />
+      <Tabs tabs={TABS} value={tab} onChange={setTab} label="进展" />
       {tab === 'coverage' && <Coverage tree={tree} model={model} set={set} />}
       {tab === 'join' && <div className="v8-progress"><CatalogPanel onGo={(_lens, _a, _b, extra) => set({ page: 'response', tm: extra?.tm || '' })} /></div>}
       {tab === 'local' && <LocalPacks />}

@@ -4,13 +4,21 @@ import { CATEGORICAL } from '../app/rdc_fusion/Space3D.jsx';
 
 export { CATEGORICAL };
 
+/* 顶部导航：首页、两条主线、参与；其余是分支（「更多」菜单） */
 export const PAGES = [
+  { id: 'home', label: '首页', desc: '平台定位、两条主线入口与参与' },
   { id: 'lang', n: 1, label: '语言图谱', desc: '按大类 → 语言族 → 语言项浏览：每种语言现象在 LLM 中怎样编码' },
   { id: 'neuron', n: 2, label: '神经元', desc: '全部层的 3D 结构 → 层内结构与神经元阵列 → 单个神经元的特征' },
+  { id: 'join', label: '参与', desc: '用你的 GPU 跑一个分片：一键包、贡献榜' },
 ];
 export const BRANCHES = [
-  { id: 'progress', label: '进展与参与', desc: '按大类的覆盖与研究缺口、证据门链、题库与领题、本地包' },
+  { id: 'learn', label: '学习方法', desc: '研究方法与概念：模式族、行为门、留出复现、普查与证据等级' },
+  { id: 'progress', label: '进展', desc: '按大类的覆盖与研究缺口、证据门链、题库与领题、本地包' },
+  { id: 'response', label: '响应点云', desc: '单个模式族的样本点云与规律分析' },
+  { id: 'relations', label: '谱图关系', desc: '跨模式族的特征谱图、共享编码轴与概念假设' },
 ];
+/* 旧开放平台的 ?tab= 链接 → 新页面 */
+const OLD_TABS = { home: 'home', learn: 'learn', atlas: 'lang', join: 'join' };
 
 /* 读出轴等级：符号 + 文字（不只靠颜色）。顺序量用单一色相由浅到深。 */
 export const LEVELS = [
@@ -36,27 +44,38 @@ export function shortModel(key) {
 const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod'];
 const NUM = new Set(['block', 'unit']);
 
+function defaults() {
+  return { page: isAtlasPath() ? 'lang' : 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
+           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp' };
+}
+
 export function readState() {
-  const st = { page: 'lang', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
-               ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp' };
+  const st = defaults();
   try {
     const q = new URLSearchParams(window.location.search);
+    if (!q.get('page') && OLD_TABS[q.get('tab')]) st.page = OLD_TABS[q.get('tab')];
     for (const k of KEYS) {
       const v = q.get(k);
       if (v == null || v === '') continue;
       st[k] = NUM.has(k) ? (Number.isFinite(Number(v)) ? Number(v) : null) : v;
     }
   } catch { /* 地址栏不可读：用默认状态 */ }
-  if (![...PAGES, ...BRANCHES].some(p => p.id === st.page)) st.page = 'lang';
+  if (![...PAGES, ...BRANCHES].some(p => p.id === st.page)) st.page = 'home';
   return st;
+}
+
+function isAtlasPath() {
+  try { return window.location.pathname === '/atlas' || window.location.hash.startsWith('#/atlas'); } catch { return false; }
 }
 
 export function writeState(st) {
   try {
     const url = new URL(window.location.href);
+    url.searchParams.delete('tab');                    // 旧开放平台参数，已换算成 page
+    const d = defaults();
     for (const k of KEYS) {
       const v = st[k];
-      if (v != null && v !== '') url.searchParams.set(k, String(v));
+      if (v != null && v !== '' && v !== d[k]) url.searchParams.set(k, String(v));   // 只写与缺省值不同的状态
       else url.searchParams.delete(k);
     }
     window.history.replaceState(null, '', url);
