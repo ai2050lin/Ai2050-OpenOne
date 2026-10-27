@@ -259,7 +259,7 @@ Phase 编号接续现有记录，不随意重编号。已有记录的纠错采�
 
 ## 10. 可视化研究客户端
 
-客户端默认入口是面向新人的开放平台外壳（`frontend/src/components/open/`：首页 / 学习 / 图谱 / 参与，配置来自 `/api/platform/config`）。研究工作台在 `/workbench`（`frontend/src/components/app/Workbench.jsx`，导航与跳转归一见 `workbenchUtil.js`，设计见 `design/client_v6_pipeline_ia.md`），按研究闭环分为四个一级界面，全部只读写中心服务的真源端点，连接本机或公开中心都可用：
+客户端默认入口是面向新人的开放平台外壳（`frontend/src/components/open/`：首页 / 学习 / 图谱 / 参与，配置来自 `/api/platform/config`）。v7 语言谱图客户端在 `/atlas`（Electron 的 file:// 页面用 `#/atlas`；`frontend/src/components/v7/`，设计见 `design/client_v7_two_routes_atlas.md`）：三个界面——图谱（语言树 → 语言项 → 内部规则，两路线分开显示等级）、3D 空间（默认：一个模型的多层结构 + 所选语言项的逐层编码，配同一数值的二维热力表；响应点云、单元卡、谱图关系是切换后才加载的次要视图）、进展（覆盖与研究缺口、证据门链、题库、本地包）；模型与语种是三页共用的全局选择，URL 即状态。层板内位置只是通道分区，图上须注明不代表模型几何；路线 N 与会合边接入前不画单元与连线。研究工作台在 `/workbench`（`frontend/src/components/app/Workbench.jsx`，导航与跳转归一见 `workbenchUtil.js`，设计见 `design/client_v6_pipeline_ia.md`），按研究闭环分为四个一级界面，全部只读写中心服务的真源端点，连接本机或公开中心都可用：
 
 | 界面 | 职责 |
 | --- | --- |
