@@ -4,7 +4,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 import AccountMenu from '../app/rdc_fusion/AccountMenu.jsx';
-import { API_BASE, OFFLINE_CLIENT, useApi } from '../app/rdc_fusion/api.js';
+import { API_BASE, REMOTE_CENTER, WEB_URL, useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/rdc_fusion/rdc_fusion.css';
 import '../app/rdc_fusion/rdc_fusion_v6.css';
@@ -73,8 +73,9 @@ export default function AtlasApp() {
             <button key={p.id} type="button" className={st.page === p.id ? 'on' : ''} title={p.desc} aria-current={st.page === p.id ? 'page' : undefined}
                     onClick={() => set({ page: p.id })}>{p.n && <span className="n">{p.n}</span>}{p.label}</button>
           ))}
-          {/* 研究工作台：独立页面（管理操作，网页版），用描边表示「跳出本站」 */}
-          {!OFFLINE_CLIENT && <a className="v8-nav-wb" href="/workbench" title="研究工作台：题库、模板工作室、试跑与冻结、分发、审计、普查作业">研究工作台 ↗</a>}
+          {/* 研究工作台：独立页面（管理员的实时操作，网页版），用描边表示「跳出本站」；远端客户端打开中心网址上的工作台 */}
+          <a className="v8-nav-wb" href={REMOTE_CENTER ? `${WEB_URL}/workbench` : '/workbench'} target={REMOTE_CENTER ? '_blank' : undefined} rel="noreferrer"
+             title="研究工作台：题库、模板工作室、试跑与冻结、分发、审计、普查作业（实时连接中心，管理操作用）">研究工作台 ↗</a>
         </nav>
         <div className="v8-right">
           {config?.sandbox_synthetic && <span className="v8-sandbox" title="该中心允许合成数据，只用于流程验证">合成·沙盒</span>}

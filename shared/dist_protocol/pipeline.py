@@ -746,17 +746,8 @@ def analyze_bucket(db: sqlite3.Connection, data_dir: Path, tm_id: str, *, bucket
     if background:
         with _CACHE_LOCK:
             started = _ANALYSIS_RUNNING.get(disk.name)
-
-        def job():
-            conn = sqlite3.connect(str(Path(data_dir) / 'dist.sqlite3'), check_same_thread=False, timeout=60)
-            conn.row_factory = sqlite3.Row
-            try:
-                analyze_bucket(conn, data_dir, tm_id, bucket=chosen['bucket'], gate=gate, n_perm=n_perm)
-            finally:
-                conn.close()
-        # 门控结果由后台计算子进程（warm_analyses）预热；只有不开门控的少数请求在本进程里补算
-        if started is None and not gate:
-            threading.Thread(target=job, name=f'analysis-{tm_id}', daemon=True).start()
+        # 行为门开 / 关两种都由后台计算子进程（warm_analyses）预热；网站进程从不自己计算（一份大模板的分析要数百 MB 内存、
+        # 几分钟 CPU，在小服务器上会拖垮整个网站），没有缓存时只返回 pending
         return {**base, 'available': False, 'pending': True, 'started_at': started or time.time(),
                 'reason': '规律分析正在后台计算（大模板首次可能需要十几分钟），完成后自动显示；结果会缓存，之后打开即时显示。'}
     with _CACHE_LOCK:

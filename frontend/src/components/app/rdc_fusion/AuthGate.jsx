@@ -1,4 +1,5 @@
 /* 账号入口（accounts.v1）：默认访客模式——客户端打开直接进入主界面，无需登录。
+   只读数据包模式（OFFLINE_CLIENT）：打开页面不访问账号服务，用本机保存的登录状态进入；只在登录 / 注册 / 注销时连接服务器。
    启动时用 GET /api/auth/status 校验已保存的会话：有效 → 以该账号进入主界面；
    无会话或已过期 → 以「访客」身份进入主界面（浏览不受影响，写操作/账号功能在
    右上角账号菜单「登录 / 注册」后可用）；中心服务不可达 → 同样直接进入主界面。 */
@@ -17,7 +18,7 @@ function Field({ label, hint, ...props }) {
   );
 }
 
-function AuthScreen({ info, offlineError, onRetry, onDone }) {
+function AuthScreen({ info, offlineError, onRetry, onDone, onCancel }) {
   const canRegister = !info || info.can_register;
   const firstUser = info && !info.has_users;
   const [mode, setMode] = useState(() => (firstUser || (!getLastUsername() && canRegister) ? 'register' : 'login'));
@@ -90,16 +91,22 @@ function AuthScreen({ info, offlineError, onRetry, onDone }) {
             {busy ? '请稍候…' : effectiveMode === 'register' ? (firstUser ? '创建管理员账号并进入' : '注册并进入') : '登录'}
           </button>
         </form>
+        {onCancel && <button type="button" className="fw-tbtn ghost v6-auth-cancel" onClick={onCancel}>返回（以访客继续浏览）</button>}
         <p className="v6-auth-foot">登录状态保存在本机浏览器，下次打开直接进入；在右上角账号菜单中退出登录。中心：<span className="mono">{API_BASE}</span></p>
       </div>
     </div>
   );
 }
 
+function startState() {
+  if (!OFFLINE_CLIENT) return { phase: 'checking', user: getCachedUser(), info: null, offline: '' };
+  // 只读数据包模式：打开页面不访问账号服务，用本机保存的登录状态进入；令牌在账号操作时由服务器校验
+  const cached = getSession() ? getCachedUser() : null;
+  return { phase: 'in', user: cached || GUEST_USER, info: null, offline: '' };
+}
+
 export default function AuthGate({ children }) {
-  // 离线客户端不连接账号服务：直接以访客进入（只读）
-  const [state, setState] = useState(() => (OFFLINE_CLIENT ? { phase: 'in', user: GUEST_USER, info: null, offline: '' }
-    : { phase: 'checking', user: getCachedUser(), info: null, offline: '' }));
+  const [state, setState] = useState(startState);
   const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
@@ -124,22 +131,30 @@ export default function AuthGate({ children }) {
   }, [nonce]);
 
   const logout = useCallback(async () => {
-    try { await authJson('/api/auth/logout', { method: 'POST' }); } catch { /* 离线时只清本机 */ }
+    try { await authJson('/api/auth/logout', { method: 'POST' }); } catch { /* 连不上时只清本机 */ }
     clearSession();
+    if (OFFLINE_CLIENT) { setState({ phase: 'in', user: GUEST_USER, info: null, offline: '' }); return; }
     setState({ phase: 'checking', user: null, info: null, offline: '' });
     setNonce(n => n + 1);
   }, []);
   const refresh = useCallback(() => setNonce(n => n + 1), []);
-  const enterAuth = useCallback(() => setState(s => ({ ...s, phase: 'auth' })), []);   // 访客 → 登录/注册页
+  // 访客 → 登录/注册页。只读数据包模式下这时才读取一次账号服务状态（是否允许注册、是否已有管理员）
+  const enterAuth = useCallback(() => {
+    if (!OFFLINE_CLIENT) { setState(s => ({ ...s, phase: 'auth' })); return; }
+    authJson('/api/auth/status')
+      .then(info => setState(s => ({ ...s, phase: 'auth', info, offline: '' })))
+      .catch(reason => setState(s => ({ ...s, phase: 'auth', info: null, offline: reason.message })));
+  }, []);
   const ctx = useMemo(() => ({ user: state.user, offline: Boolean(state.offline), guest: state.user?.role === 'guest', logout, refresh,
-    enterAuth: OFFLINE_CLIENT ? null : enterAuth }), [state.user, state.offline, logout, refresh, enterAuth]);
+    enterAuth }), [state.user, state.offline, logout, refresh, enterAuth]);
 
   if (state.phase === 'checking') {
     return <div className="v6-auth v6-auth-checking" aria-busy="true"><span className="v6-auth-logo" aria-hidden="true">A2</span><span>正在连接中心服务…</span></div>;
   }
   if (state.phase === 'auth') {
     return (
-      <AuthScreen info={state.info} offlineError={state.offline} onRetry={refresh}
+      <AuthScreen info={state.info} offlineError={state.offline} onRetry={OFFLINE_CLIENT ? enterAuth : refresh}
+        onCancel={() => setState(s => ({ ...s, phase: 'in', offline: '' }))}
         onDone={user => setState({ phase: 'in', user, info: null, offline: '' })} />
     );
   }

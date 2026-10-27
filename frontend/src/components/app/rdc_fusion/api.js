@@ -1,13 +1,15 @@
 /* 客户端 API 公共层（v6）：统一 API_BASE、读取（本地数据包优先，不轮询）、写操作与管理令牌。
-   离线客户端（config.js 的 OFFLINE_CLIENT）只在线读取站点配置，其余读取一律来自本机数据包与附加包，写操作不可用。
+   只读数据包模式（config.js 的 OFFLINE_CLIENT，研究工作台以外的缺省形态）：在线读取的只有站点配置，
+   账号操作（/api/auth/*：登录、注销、注册、修改密码、我的节点）与数据包 / 一键包下载照常连接服务器；
+   其余读取一律来自本机数据包与附加包，写操作（postJson）不可用。
    纪律：读取失败只返回 error，组件显示「未接入」空态，不回退演示数据。 */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 import { getExtraEntry, getLocal, getOnDemand, isOnDemand, packHint, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
 
-import { API_BASE, OFFLINE_CLIENT, WEB_URL } from '../../../config.js';
+import { API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
 
-export { API_BASE, OFFLINE_CLIENT, WEB_URL };
+export { API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL };
 
 /* 离线客户端唯一在线读取的接口。 */
 const ONLINE_PATHS = new Set(['/api/platform/config']);
@@ -179,11 +181,6 @@ export function clearSession() { store('del', SESSION_KEY); store('del', USER_KE
 
 /* /api/auth/* 调用：自动带会话令牌 */
 export async function authJson(path, { method = 'GET', body } = {}) {
-  if (OFFLINE_CLIENT) {
-    const error = new Error('离线客户端不连接账号服务');
-    error.offline = true;
-    throw error;
-  }
   const headers = { 'Content-Type': 'application/json' };
   const token = getSession();
   if (token) headers.Authorization = `Bearer ${token}`;
