@@ -2,8 +2,8 @@
    语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。 */
 
 export const LENSES = [
+  { id: 'route', label: '进展', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },          // id 沿用 route，旧链接 ?lens=route 照常可用
   { id: 'spatial', label: '空间', desc: 'LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元' },
-  { id: 'route', label: '路线', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },
   { id: 'process', label: '研发', desc: '题库、模板工作室、试跑与冻结、分发、审计、普查作业' },
 ];
 
@@ -53,7 +53,7 @@ export function writeState(st) {
 
 /* 各面板的跳转约定统一到 (lens, view/station)：
    onGo('process', 'studio') / onGo('audit') / onGo('spatial', null, null, {tm}) / onGo('spatial', null, undefined, {view:'atlas'})
-   旧的 'atlas' 透镜（研究账本）不再存在，归到路线。 */
+   旧的 'atlas' 透镜（研究账本）不再存在，归到进展（route）。 */
 export function resolveGo(prev, a, b, _c, extra = {}) {
   const station = STATIONS.find(s => s.id === a);
   if (station) return { ...prev, lens: 'process', station: a };

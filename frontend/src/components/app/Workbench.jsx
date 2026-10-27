@@ -1,6 +1,6 @@
-/* 研究工作台（v8，/workbench 与 /atlas）：空间 / 路线 / 研发。
-   空间：左侧常驻 LLM 多层结构，右侧是神经元逆向分析结果与语言图谱（v8/SpaceLens.jsx）；路线：神经元与语言图谱的进展（v8/RouteLens.jsx）；
-   研发：题库与管理工位。空间与路线只读本机数据包；只有网页版（与中心同源）的管理工位在操作时实时连接中心（config.js 的 ADMIN_LIVE），
+/* 研究工作台（v8，/workbench 与 /atlas）：进展 / 空间 / 研发。
+   空间：左侧常驻 LLM 多层结构，右侧是神经元逆向分析结果与语言图谱（v8/SpaceLens.jsx）；进展：神经元与语言图谱的进展（v8/RouteLens.jsx）；
+   研发：题库与管理工位。进展与空间只读本机数据包；只有网页版（与中心同源）的管理工位在操作时实时连接中心（config.js 的 ADMIN_LIVE），
    远端客户端只保留只读的题库。没有数据时显示空态，不回退演示数字。
    只适合研究者本机的工具（自动测试、读取本机模型权重的旧版空间视图）只在本机中心（config.local_tools）出现。 */
 import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
@@ -96,7 +96,7 @@ export default function Workbench() {
 
   const go = (a, b, c, extra) => setSt(prev => resolveGo(prev, a, b, c, extra));
   const set = patch => setSt(prev => ({ ...prev, ...patch }));
-  /* 路线 → 空间：先把空间内部状态（语言项、块等）写进地址栏，空间挂载时读取 */
+  /* 进展 → 空间：先把空间内部状态（语言项、块等）写进地址栏，空间挂载时读取 */
   const goSpace = (v, patch = {}) => { writeSpaceState({ ...readSpaceState(), ...patch }); set({ lens: 'spatial', view: v }); };
 
   return (

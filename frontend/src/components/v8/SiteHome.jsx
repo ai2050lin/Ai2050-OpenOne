@@ -53,7 +53,7 @@ export default function SiteHome({ config, set }) {
           <em>进入研究工作台 · 空间 →</em>
         </a>
       </section>
-      <p className="v8-home-route"><a href={workbenchHref('lens=route')}>查看研究进展（研究工作台 · 路线）→</a></p>
+      <p className="v8-home-route"><a href={workbenchHref('lens=route')}>查看研究进展（研究工作台 · 进展）→</a></p>
 
       <section className="v8-home-row">
         <div className="v8-home-card">

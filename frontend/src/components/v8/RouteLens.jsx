@@ -1,4 +1,4 @@
-/* 研究工作台 · 路线：两个 tab（地址栏 ?rtab=neuron|lang）。
+/* 研究工作台 · 进展：两个 tab（地址栏 ?rtab=neuron|lang）。
    神经元逆向分析进展：普查规模、逐层摘要、分型、解释检验与模板选择性，按块画成热力条（每格一个块）；
    语言图谱进展：大类 × 等级的覆盖、语言项 × 模型的等级矩阵、研究缺口，以及模式族证据门链（记分板快照）。
    各来源分开计数，不拼成转化率；全部读取来自本机数据包。 */
@@ -157,7 +157,7 @@ export default function RouteLens({ onGoSpace, onGo }) {
   const census = skeleton?.census_run ? skeleton.census_key : null;
   return (
     <div className="v8-route">
-      <Tabs tabs={TABS} value={tab} onChange={setTab} label="路线" />
+      <Tabs tabs={TABS} value={tab} onChange={setTab} label="进展" />
       {tab === 'neuron' && (
         <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查 → 逐层摘要与分型 → 解释检验 → 模板选择性（各项分开计数）`}>
           <NeuronProgress census={census} skeleton={skeleton} onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />
