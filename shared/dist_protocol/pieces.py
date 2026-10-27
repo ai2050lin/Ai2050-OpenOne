@@ -253,18 +253,32 @@ def examples_of(items: List[Dict[str, Any]], factor: str, n_fill: int = 2, n_fra
         by_fill.setdefault(str(it.get('filler_id')), []).append(it)
     full = [f for f in sorted(by_fill) if {str(it['cond'][factor]) for it in by_fill[f]} >= set(levels)][:n_fill]
     rows = []
+
+    def row(f, lv, it):
+        return {'filler': f, 'level': lv, 'frame': it.get('frame_id'), 'text': it.get('text'),
+                'target': it.get('target'), 'target_char': it.get('target_char')}
     for f in full:
         for lv in levels:
             for it in sorted((x for x in by_fill[f] if str(x['cond'][factor]) == lv), key=lambda x: str(x.get('frame_id')))[:n_frame]:
-                rows.append({'filler': f, 'level': lv, 'frame': it.get('frame_id'), 'text': it.get('text'),
-                             'target': it.get('target'), 'target_char': it.get('target_char')})
+                rows.append(row(f, lv, it))
+    pairs = bool(full)
+    if not pairs:   # 填充级因子（每个词只属于一个水平，如名词类别）：没有最小对，每个水平各取几句不同填充的句子
+        for lv in levels:
+            seen = []
+            for it in sorted((x for x in disc if str(x['cond'][factor]) == lv), key=lambda x: (str(x.get('filler_id')), str(x.get('frame_id')))):
+                if it.get('filler_id') in seen:
+                    continue
+                seen.append(it.get('filler_id'))
+                rows.append(row(str(it.get('filler_id')), lv, it))
+                if len(seen) >= n_fill * n_frame:
+                    break
     probes = {}
     for lv in levels:
         it = next((x for x in disc if str(x['cond'][factor]) == lv and x.get('probe')), None)
         if it:
             pr = it['probe']
             probes[lv] = {'prompt': pr.get('prompt'), 'answers': pr.get('answers') or [pr.get('answer')], 'contrast': pr.get('contrast')}
-    return {'levels': levels, 'rows': rows, 'probes': probes}
+    return {'levels': levels, 'rows': rows, 'probes': probes, 'minimal_pairs': pairs}
 
 
 def rule_text(p: Dict[str, Any]) -> str:

@@ -173,8 +173,10 @@ def lang_atlas_version(fp: str) -> str:
     names = sorted(p.name for p in cache.glob('*.json')) if cache.is_dir() else []
     import datapack as DP
     from server import neuron_census_service as NS
+    import inspect
+    layout = hashlib.sha256((inspect.getsource(PC.examples_of) + inspect.getsource(PC.assemble)).encode('utf-8')).hexdigest()[:12]
     raw = json.dumps([fp, names, hashlib.sha256(PC.TREE_PATH.read_bytes()).hexdigest(), PC.code_hash(),
-                      DP.research_stamp(NS.research_root())])          # 研究文件（模板选择性）变化时也重建
+                      DP.research_stamp(NS.research_root()), layout])  # 研究文件（模板选择性）或汇总方式变化时也重建
     return hashlib.sha256(raw.encode('utf-8')).hexdigest()[:20]
 
 

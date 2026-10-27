@@ -96,16 +96,17 @@ export const RUNTIME_MODE = detectMode(API_BASE);
 
 /** 只读数据包模式（OFFLINE_CLIENT）：使用中不实时访问服务器。只在这些操作时连接服务器——登录 / 注销 / 账号（/api/auth/*）、
  *  读取站点配置、下载主数据包与附加包、下载参与者一键包；其余读取一律来自本机数据包。
- *  缺省对所有形态生效：远端客户端（vite dev 指向线上、Electron 安装包）与中心同源托管的网页版都是只读数据包模式；
- *  例外只有研究工作台（/workbench，管理员的审计、冻结、分发等写操作需要实时数据）与连接本机后端的开发。
+ *  对所有形态生效（网站与研究工作台，网页版、远端 vite dev、Electron 安装包），只有连接本机后端的开发保持在线。
  *  VITE_CLIENT_MODE=online|offline 可显式指定。 */
 const CLIENT_MODE = import.meta.env.VITE_CLIENT_MODE;
 export const ADMIN_PAGE = typeof window !== 'undefined' && Boolean(window.location)
   && /^\/(workbench|rdc-fusion)(\/|$)/.test(window.location.pathname);
-export const OFFLINE_CLIENT = CLIENT_MODE === 'offline'
-  || (CLIENT_MODE !== 'online' && !ADMIN_PAGE && RUNTIME_MODE !== 'local');
+export const OFFLINE_CLIENT = CLIENT_MODE === 'offline' || (CLIENT_MODE !== 'online' && RUNTIME_MODE !== 'local');
 /** 连接的是另一台主机上的中心（远端客户端 / 安装包），而不是同源托管的网页：账号菜单里给出「网页版」链接 */
 export const REMOTE_CENTER = RUNTIME_MODE === 'remote' || RUNTIME_MODE === 'electron';
+/** 管理工位的实时连接：只在中心同源托管的研究工作台里，研发工位（题库之外的模板、冻结、分发、审计、普查）
+ *  显式标记 online 的读取与写操作才连接服务器，且只在打开该工位、点击操作时发生。 */
+export const ADMIN_LIVE = !OFFLINE_CLIENT || (ADMIN_PAGE && !REMOTE_CENTER && CLIENT_MODE !== 'offline');
 
 /** 网页版地址（离线客户端里「去网页版操作」的链接）。 */
 export const WEB_URL = API_BASE || (typeof window !== 'undefined' && window.location ? window.location.origin : '');

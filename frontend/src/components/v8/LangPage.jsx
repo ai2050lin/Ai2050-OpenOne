@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { LayerCurve, ScatterPlot, SelBars } from './Charts.jsx';
-import { LANG_LABEL, LEVELS, READOUT_LABEL, itemLevel, levelMeta, matchLang, pickPiece, pieceLabel, segText, shortModel } from './v8Util.js';
+import { LANG_LABEL, LEVELS, READOUT_LABEL, itemLevel, levelMeta, matchLang, pickItem, pickPiece, pieceLabel, segText, shortModel } from './v8Util.js';
 
 export function LevelChip({ level, prefix, none, title }) {
   if (none) return <span className="v8-chip none" title={title}>{prefix && <em>{prefix}</em>}{none}</span>;
@@ -91,7 +91,7 @@ function SecA({ ex, piece }) {
         ))}
       </div>
       <p className="v8-note"><span className="tg">下划线</span> = 目标词；<span className="ro">蓝框</span> = 代表读出位置（{READOUT_LABEL[piece?.readout] || piece?.readout || '—'}）。
-        同一行事实（填充词）在各水平上各取一两个句式，只展示发现集材料；模板 {ex.tm_id}。</p>
+        {ex.minimal_pairs === false ? '这个因子随填充词变化（每个词只属于一个水平），没有最小对：各水平各取几个不同填充的句子' : '同一行事实（填充词）在各水平上各取一两个句式'}，只展示发现集材料；模板 {ex.tm_id}。</p>
     </>
   );
 }
@@ -239,11 +239,10 @@ function ItemPage({ tree, itemId, model, skeleton, st, set }) {
   );
 }
 
-export default function LangPage({ tree, model, skeleton, st, set }) {
-  const itemId = st.item && tree.items.some(i => i.id === st.item) ? st.item
-    : (tree.items.find(i => i.type === st.type && itemLevel(i, model) > 0) || tree.items.find(i => i.type === st.type) || {}).id;
+export default function LangPage({ tree, model, skeleton, st, set, compact = false }) {
+  const itemId = pickItem(tree, st, model);
   return (
-    <div className="v8-lang">
+    <div className={'v8-lang' + (compact ? ' compact' : '')}>
       <Sidebar tree={tree} model={model} st={{ ...st, item: itemId }} set={set} />
       <ItemPage key={itemId} tree={tree} itemId={itemId} model={model} skeleton={skeleton} st={st} set={set} />
     </div>

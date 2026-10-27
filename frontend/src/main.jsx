@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './css/DNNAnalysisControlPanel.css'
 import ErrorBoundary from './ErrorBoundary.jsx'
-// 网站外壳（默认入口 /，与 /atlas 共用；Electron 的 file:// 页面同样进入）：首页 · 语言图谱 · 神经元 · 参与，其余在「更多」
+// 网站外壳（默认入口 /；Electron 的 file:// 页面同样进入）：首页 · 介绍 · 参与；语言图谱与神经元在研究工作台（/workbench，/atlas 同）
 import AtlasApp from './components/v8/AtlasApp.jsx'
 import AuthGate from './components/app/rdc_fusion/AuthGate.jsx'
 import { DataBarHost } from './components/open/DataBar.jsx'
@@ -49,7 +49,7 @@ createRoot(document.getElementById('root')).render(
           ? <><App /><a href="/" style={{position:'fixed',right:18,bottom:18,zIndex:10000,background:'#173347',color:'#b8e5ee',border:'1px solid #4b718a',borderRadius:7,padding:'10px 16px',fontSize:12}}>返回首页 ↗</a></>
           : hit
             ? <RdcPageShell title={legacyTitle}><LegacyPage /></RdcPageShell>
-            : (path === '/workbench' || path === '/rdc-fusion')
+            : (path === '/workbench' || path === '/rdc-fusion' || path === '/atlas' || new URLSearchParams(window.location.search).get('wb') === '1')
               ? <AuthGate><Workbench /></AuthGate>
               : <AuthGate><AtlasApp /></AuthGate>}
         {!hit && !(devOnly && path === '/legacy') && <DataBarHost />}

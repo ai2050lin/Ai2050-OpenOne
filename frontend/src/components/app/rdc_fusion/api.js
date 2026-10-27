@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 import { getExtraEntry, getLocal, getOnDemand, isOnDemand, packHint, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
 
-import { API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
+import { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
 
-export { API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL };
+export { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL };
 
 /* 离线客户端唯一在线读取的接口。 */
 const ONLINE_PATHS = new Set(['/api/platform/config']);
@@ -33,8 +33,10 @@ async function offlineJson(path) {
 
 let configOnce = null;             // 离线客户端：站点配置每次打开页面只读一次，各组件共用
 
-export async function getJson(path, { signal } = {}) {
-  if (OFFLINE_CLIENT && !ONLINE_PATHS.has(path.split('?')[0])) return offlineJson(path);
+export async function getJson(path, { signal, online = false } = {}) {
+  // online：管理工位显式要求的实时读取（只在 ADMIN_LIVE 时生效），其余在只读数据包模式下一律读本机数据包
+  if (OFFLINE_CLIENT && !(online && ADMIN_LIVE) && !ONLINE_PATHS.has(path.split('?')[0])) return offlineJson(path);
+  if (OFFLINE_CLIENT && online && ADMIN_LIVE) return fetchJson(path, { signal });
   if (OFFLINE_CLIENT) {
     if (!configOnce) configOnce = fetchJson(path).catch(reason => { configOnce = null; throw reason; });
     return configOnce;
@@ -56,7 +58,7 @@ async function fetchJson(path, { signal } = {}) {
 }
 
 export async function postJson(path, payload, { adminToken, method = 'POST' } = {}) {
-  if (OFFLINE_CLIENT) throw new Error(`离线客户端不能写入；请在网页版操作：${WEB_URL}`);
+  if (!ADMIN_LIVE) throw new Error(`这里只读数据包，不能写入；管理操作请在网页版的研究工作台进行：${WEB_URL}/workbench`);
   const headers = { 'Content-Type': 'application/json' };
   if (adminToken) headers['X-Admin-Token'] = adminToken;
   let response;
@@ -95,8 +97,9 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
   const local = path ? getLocal(path) : undefined;
   const [state, setState] = useState({ key: null, data: null, error: '', pack: null });
   const [nonce, setNonce] = useState(0);
-  const useLocal = (!online || OFFLINE_CLIENT) && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
-  const needFetch = Boolean(path) && ((online && !OFFLINE_CLIENT) || ready) && !useLocal;
+  const live = online && ADMIN_LIVE;                     // 管理工位的实时读取
+  const useLocal = !live && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
+  const needFetch = Boolean(path) && (live || ready) && !useLocal;
   const extrasKey = OFFLINE_CLIENT && path && !ONLINE_PATHS.has(path.split('?')[0])
     ? JSON.stringify(packInfo().extras) : '';                // 附加包下载后重读（站点配置不受影响）
   useEffect(() => {
@@ -104,7 +107,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     const controller = new AbortController();
     let retry = null;
     let dead = false;
-    const run = () => getJson(path, { signal: controller.signal })
+    const run = () => getJson(path, { signal: controller.signal, online: live })
       .then(data => {
         if (dead) return;
         setState({ key: path, data, error: '', pack: null });
@@ -127,7 +130,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
       run();
     }
     return () => { dead = true; controller.abort(); if (retry) window.clearTimeout(retry); };
-  }, [path, nonce, pollWhilePending, needFetch, extrasKey]);
+  }, [path, nonce, pollWhilePending, needFetch, extrasKey, live]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
   if (useLocal) return { data: local, error: '', loading: false, reload, local: true, missingPack: null };
   const current = state.key === path;

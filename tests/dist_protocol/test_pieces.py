@@ -206,6 +206,17 @@ class AssembleTests(unittest.TestCase):
         self.assertEqual(ex['levels'], ['decl', 'interrog'])
         self.assertEqual({r['filler'] for r in ex['rows']}, {'f1'})
         self.assertEqual(set(ex['probes']), {'decl', 'interrog'})
+        self.assertTrue(ex['minimal_pairs'])
+
+    def test_examples_for_filler_level_factor(self):
+        # 名词类别这类填充级因子：每个词只属于一个水平，没有最小对；每个水平各取几句（只取 discovery）
+        items = [{'filler_id': f'{c}{i}', 'cond': {'cat': c}, 'frame_id': 'A', 'split': 'discovery', 'text': f'{c}{i}'}
+                 for c in ('animal', 'tool') for i in range(6)] + [{'filler_id': 'z', 'cond': {'cat': 'tool'}, 'frame_id': 'A', 'split': 'lockbox', 'text': 'z'}]
+        ex = PC.examples_of(items, 'cat')
+        self.assertFalse(ex['minimal_pairs'])
+        self.assertEqual({r['level'] for r in ex['rows']}, {'animal', 'tool'})
+        self.assertNotIn('z', {r['filler'] for r in ex['rows']})
+        self.assertEqual(sum(1 for r in ex['rows'] if r['level'] == 'animal'), 4)
 
     def test_examples_and_selectivity_attached_to_items(self):
         tree = PC.load_tree()

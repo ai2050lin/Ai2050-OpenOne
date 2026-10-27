@@ -1,12 +1,16 @@
-/* 网站首页（v8 外壳）：一句话定位 → 两条主线入口（语言图谱、神经元，各带真实计数）→ 参与 → 普查进度与证据边界。
-   计数来自 /api/lang/tree 与 /api/platform/overview；没有数据时显示「—」，不回退演示数字。 */
+/* 网站首页：一句话定位 → 研究工作台的两个入口（神经元逆向分析、语言图谱，各带真实计数）→ 参与 → 普查进度与证据边界。
+   计数来自本机数据包里的 /api/lang/tree、/api/model/skeleton 与 /api/platform/overview；没有数据时显示「—」，不回退演示数字。 */
 import { useApi } from '../app/rdc_fusion/api.js';
 import { CensusJobBar } from '../open/OpenHome.jsx';
 import { fmtAgo, fmtInt, fmtTokens } from '../open/openUtil.js';
-import { itemLevel, levelMeta, shortModel } from './v8Util.js';
+import { defaultModel, itemLevel, levelMeta, shortModel, workbenchHref } from './v8Util.js';
 
-export default function SiteHome({ config, tree, model, set }) {
+export default function SiteHome({ config, set }) {
   const ov = useApi('/api/platform/overview');
+  const treeApi = useApi('/api/lang/tree');
+  const skApi = useApi('/api/model/skeleton');
+  const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
+  const model = defaultModel(tree, Object.fromEntries((skApi.data?.models || []).map(s => [s.model, s])));
   const d = ov.data;
   const items = tree?.items || [];
   const studied = items.filter(it => itemLevel(it, model) > 0).length;
@@ -22,11 +26,23 @@ export default function SiteHome({ config, tree, model, set }) {
         <p>{config?.tagline || '研究大语言模型怎样用有限参数编码语言：每种语言现象在模型内部对应什么结构，由哪些神经元承载。'}</p>
       </section>
 
-      <section className="v8-mainlines" aria-label="两条主线">
-        <button type="button" className="v8-mainline" onClick={() => set({ page: 'lang' })}>
+      <section className="v8-mainlines" aria-label="研究工作台入口">
+        <a className="v8-mainline" href={workbenchHref('lens=spatial&view=neuron')}>
           <span className="n">1</span>
+          <h2>神经元逆向分析</h2>
+          <p>在研究工作台的「空间」里看模型的全部层，点开一层看它的内部结构与 9,728 个 MLP 神经元，再点开一个神经元看它在自然语料中的激活与对应的语言特征。</p>
+          <div className="v8-ml-stats">
+            <span><b>{nTok ? fmtTokens(nTok) : '—'}</b>普查 token</span>
+            <span><b>{fmtInt(nExpl)}</b>已检验解释</span>
+            <span><b>{census.length || '—'}</b>次普查</span>
+          </div>
+          <small>{census.length ? '普查：自然语料上逐个神经元的激活统计，由参与者的 GPU 分片完成' : '还没有普查结果'}</small>
+          <em>进入研究工作台 · 空间 →</em>
+        </a>
+        <a className="v8-mainline" href={workbenchHref('lens=spatial&view=lang')}>
+          <span className="n">2</span>
           <h2>语言图谱</h2>
-          <p>按大类选一种语言现象（如疑问、否定、上下位），看它在模型里从哪一层开始被编码、编码长什么样、由哪些神经元承载。</p>
+          <p>按大类选一种语言现象（如疑问、否定、上下位），看它在模型里从哪一层开始被编码、编码长什么样，以及在 LLM 各层里的有效神经元。</p>
           <div className="v8-ml-stats">
             {types.map(t => {
               const its = items.filter(i => i.type === t.id);
@@ -34,21 +50,10 @@ export default function SiteHome({ config, tree, model, set }) {
             })}
           </div>
           <small>{tree ? `${studied} 个语言项已有数据 · ${shortModel(model)} · 状态 ${levelMeta(0).sym} 未研究 → ${levelMeta(4).sym} 跨模型复现` : '读取语言树…'}</small>
-          <em>进入语言图谱 →</em>
-        </button>
-        <button type="button" className="v8-mainline" onClick={() => set({ page: 'neuron' })}>
-          <span className="n">2</span>
-          <h2>神经元</h2>
-          <p>在 3D 中看模型的全部层，点开一层看它的内部结构与 9,728 个 MLP 神经元，再点开一个神经元看它在自然语料中的激活与对应的语言特征。</p>
-          <div className="v8-ml-stats">
-            <span><b>{nTok ? fmtTokens(nTok) : '—'}</b>普查 token</span>
-            <span><b>{fmtInt(nExpl)}</b>已检验解释</span>
-            <span><b>{census.length || '—'}</b>次普查</span>
-          </div>
-          <small>{census.length ? '普查：自然语料上逐个神经元的激活统计，由参与者的 GPU 分片完成' : '还没有普查结果'}</small>
-          <em>进入神经元 →</em>
-        </button>
+          <em>进入研究工作台 · 空间 →</em>
+        </a>
       </section>
+      <p className="v8-home-route"><a href={workbenchHref('lens=route')}>查看研究进展（研究工作台 · 路线）→</a></p>
 
       <section className="v8-home-row">
         <div className="v8-home-card">

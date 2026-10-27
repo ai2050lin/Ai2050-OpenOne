@@ -4,21 +4,25 @@ import { CATEGORICAL } from '../app/rdc_fusion/Space3D.jsx';
 
 export { CATEGORICAL };
 
-/* 顶部导航：首页、两条主线、参与；其余是分支（「更多」菜单） */
+/* 网站顶部导航：首页 · 介绍 · 参与；语言图谱与神经元在研究工作台的「空间」里 */
 export const PAGES = [
-  { id: 'home', label: '首页', desc: '平台定位、两条主线入口与参与' },
-  { id: 'lang', n: 1, label: '语言图谱', desc: '按大类 → 语言族 → 语言项浏览：每种语言现象在 LLM 中怎样编码' },
-  { id: 'neuron', n: 2, label: '神经元', desc: '全部层的 3D 结构 → 层内结构与神经元阵列 → 单个神经元的特征' },
+  { id: 'home', label: '首页', desc: '平台定位、研究工作台入口与参与' },
+  { id: 'learn', label: '介绍', desc: '研究方法与概念：模式族、行为门、留出复现、普查与证据等级' },
   { id: 'join', label: '参与', desc: '用你的 GPU 跑一个分片：一键包、贡献榜' },
 ];
-export const BRANCHES = [
-  { id: 'learn', label: '学习方法', desc: '研究方法与概念：模式族、行为门、留出复现、普查与证据等级' },
-  { id: 'progress', label: '进展', desc: '按大类的覆盖与研究缺口、证据门链、题库与领题、本地包' },
-  { id: 'response', label: '响应点云', desc: '单个模式族的样本点云与规律分析' },
-  { id: 'relations', label: '谱图关系', desc: '跨模式族的特征谱图、共享编码轴与概念假设' },
-];
-/* 旧开放平台的 ?tab= 链接 → 新页面 */
-const OLD_TABS = { home: 'home', learn: 'learn', atlas: 'lang', join: 'join' };
+export const BRANCHES = [];
+/* 旧链接：开放平台的 ?tab= 与 v8 网站的 ?page=；语言图谱 / 神经元 / 进展等转到研究工作台 */
+const OLD_TABS = { home: 'home', learn: 'learn', join: 'join' };
+/* 研究工作台地址：网页与 vite dev 用 /workbench；Electron 安装包的 file:// 页面用 index.html?wb=1（main.jsx 据此进入工作台） */
+export function workbenchHref(query = '') {
+  const file = typeof window !== 'undefined' && window.location?.protocol === 'file:';
+  if (file) return `${window.location.pathname}?wb=1${query ? `&${query}` : ''}`;
+  return `/workbench${query ? `?${query}` : ''}`;
+}
+export const WORKBENCH_REDIRECT = {
+  atlas: workbenchHref('lens=spatial&view=lang'), lang: workbenchHref('lens=spatial&view=lang'), neuron: workbenchHref('lens=spatial&view=neuron'),
+  progress: workbenchHref('lens=route'), response: workbenchHref('lens=spatial&view=response'), relations: workbenchHref('lens=spatial&view=relations'),
+};
 
 /* 读出轴等级：符号 + 文字（不只靠颜色）。顺序量用单一色相由浅到深。 */
 export const LEVELS = [
@@ -45,7 +49,7 @@ const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit',
 const NUM = new Set(['block', 'unit']);
 
 function defaults() {
-  return { page: isAtlasPath() ? 'lang' : 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
+  return { page: 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
            ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp' };
 }
 
@@ -54,18 +58,15 @@ export function readState() {
   try {
     const q = new URLSearchParams(window.location.search);
     if (!q.get('page') && OLD_TABS[q.get('tab')]) st.page = OLD_TABS[q.get('tab')];
+    if (!q.get('page') && WORKBENCH_REDIRECT[q.get('tab')]) st.page = q.get('tab');
     for (const k of KEYS) {
       const v = q.get(k);
       if (v == null || v === '') continue;
       st[k] = NUM.has(k) ? (Number.isFinite(Number(v)) ? Number(v) : null) : v;
     }
   } catch { /* 地址栏不可读：用默认状态 */ }
-  if (![...PAGES, ...BRANCHES].some(p => p.id === st.page)) st.page = 'home';
+  if (![...PAGES, ...BRANCHES].some(p => p.id === st.page) && !WORKBENCH_REDIRECT[st.page]) st.page = 'home';
   return st;
-}
-
-function isAtlasPath() {
-  try { return window.location.pathname === '/atlas' || window.location.hash.startsWith('#/atlas'); } catch { return false; }
 }
 
 export function writeState(st) {
@@ -159,4 +160,25 @@ export function unitColors(layer, mode, selRun, ro) {
                   { color: EMPTY_CELL, label: `其他（只标前列；该层共 ${s.n_selected?.[ro] ?? 0} 个入选）` }] : [];
   }
   return [colors, score, legend];
+}
+
+/* 层塔叠加量：按块的数值数组；没有数据时为 null（只画结构）。 */
+export const OVERLAYS = [['sel', '选择性'], ['expl', '已解释'], ['t1', 'T1 检测器数'], ['dens', '强激活率中位数'], ['none', '无']];
+
+export function towerValues(tower, ov, selRun, ro) {
+  const n = tower.n_layers;
+  if (ov === 'sel') {
+    const s = tower.selectivity.find(x => x.file === selRun) || tower.selectivity[0];
+    return s ? Array.from({ length: n }, (_, b) => (s.by_readout?.[ro] || s.by_readout?.[Object.keys(s.by_readout)[0]] || [])[b] || 0) : null;
+  }
+  if (ov === 'expl') return tower.blocks.map(b => Object.values(b.explained || {}).reduce((s, v) => s + v, 0));
+  if (ov === 't1') return tower.blocks.map(b => (b.types ? b.types[0] : 0));
+  if (ov === 'dens') return tower.blocks.map(b => b.dens_median || 0);
+  return null;
+}
+
+/* 当前语言项：URL 里的 item，否则当前大类里第一个有数据的语言项（语言图谱面板与层塔叠加共用） */
+export function pickItem(tree, st, model) {
+  if (st.item && tree.items.some(i => i.id === st.item)) return st.item;
+  return (tree.items.find(i => i.type === st.type && itemLevel(i, model) > 0) || tree.items.find(i => i.type === st.type) || {}).id;
 }
