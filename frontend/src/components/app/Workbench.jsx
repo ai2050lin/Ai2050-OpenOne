@@ -20,7 +20,7 @@ import { Empty } from './rdc_fusion/ui.jsx';
 import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, SPATIAL_VIEWS, STATIONS, readState, resolveGo, writeState } from './workbenchUtil.js';
+import { LENSES, ROUTE_VIEWS, SPATIAL_VIEWS, STATIONS, readState, resolveGo, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
@@ -89,8 +89,9 @@ export default function Workbench() {
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
   const station = stations.some(s => s.id === st.station) ? st.station : 'catalog';
   const view = SPATIAL_VIEWS.some(v => v.id === st.view) ? st.view : 'neuron';
+  const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) ? st.rtab : 'neuron';
 
-  useEffect(() => { writeState({ ...st, lens, station, view }); }, [st, lens, station, view]);
+  useEffect(() => { writeState({ ...st, lens, station, view, rtab }); }, [st, lens, station, view, rtab]);
   const lensLabel = lenses.find(l => l.id === lens)?.label || '';
   useEffect(() => { document.title = `研究工作台 · ${lensLabel} · AI2050`; }, [lensLabel]);
 
@@ -126,6 +127,7 @@ export default function Workbench() {
           ))}
         </nav>
         <div className="wb-body">
+          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab} onChange={v => set({ rtab: v })} label="进展视图" />}
           {lens === 'spatial' && <SubNav items={SPATIAL_VIEWS} value={view} onChange={v => set({ view: v })} label="空间视图" />}
           {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" />}
           <main className="wb-main">
@@ -138,7 +140,7 @@ export default function Workbench() {
               {lens === 'process' && station === 'audit' && <AuditQueue />}
               {lens === 'process' && station === 'census' && <CensusPanel />}
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
-              {lens === 'route' && <RouteLens onGoSpace={goSpace} onGo={go} />}
+              {lens === 'route' && <RouteLens tab={rtab} onGoSpace={goSpace} onGo={go} />}
               {lens === 'local' && <LensSpatial on onGo={() => {}} />}
             </Suspense>
           </main>

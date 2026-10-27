@@ -1,10 +1,16 @@
-/* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &tm=（空间内部的
+/* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &rtab= &tm=（空间内部的
    语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。 */
 
 export const LENSES = [
   { id: 'route', label: '进展', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },          // id 沿用 route，旧链接 ?lens=route 照常可用
   { id: 'spatial', label: '空间', desc: 'LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元' },
   { id: 'process', label: '研发', desc: '题库、模板工作室、试跑与冻结、分发、审计、普查作业' },
+];
+
+/* 进展视图：与空间/研发同一层级的子导航（?rtab=），默认 neuron */
+export const ROUTE_VIEWS = [
+  { id: 'neuron', label: '神经元逆向分析', desc: '普查规模、逐层摘要与分型、解释检验、模板选择性（各项分开计数）' },
+  { id: 'lang', label: '语言图谱', desc: '大类 × 等级覆盖、语言项 × 模型等级矩阵、研究缺口与证据门链' },
 ];
 
 /* 空间视图：左侧都常驻 LLM 多层结构（层塔） */
@@ -33,19 +39,20 @@ export function readState() {
     const q = new URLSearchParams(window.location.search);
     const lens = q.get('lens') === 'home' ? 'route' : q.get('lens') || 'spatial';
     const view = OLD_VIEWS[q.get('view')] || q.get('view') || 'neuron';
-    return { lens, view, station: q.get('station') || 'catalog', tm: q.get('tm') || '' };
+    return { lens, view, station: q.get('station') || 'catalog', rtab: q.get('rtab') === 'lang' ? 'lang' : 'neuron', tm: q.get('tm') || '' };
   } catch {
-    return { lens: 'spatial', view: 'neuron', station: 'catalog', tm: '' };
+    return { lens: 'spatial', view: 'neuron', station: 'catalog', rtab: 'neuron', tm: '' };
   }
 }
 
 export function writeState(st) {
   try {
     const url = new URL(window.location.href);
-    for (const k of ['lens', 'view', 'station', 'tm', 'obj', 'atlasTab', 'atlasSel']) url.searchParams.delete(k);
+    for (const k of ['lens', 'view', 'station', 'rtab', 'tm', 'obj', 'atlasTab', 'atlasSel']) url.searchParams.delete(k);
     url.searchParams.set('lens', st.lens);
     if (st.lens === 'spatial') url.searchParams.set('view', st.view);
     if (st.lens === 'process') url.searchParams.set('station', st.station);
+    if (st.lens === 'route' && st.rtab === 'lang') url.searchParams.set('rtab', 'lang');
     if (st.tm) url.searchParams.set('tm', st.tm);
     window.history.replaceState(null, '', url);
   } catch { /* 地址栏不可写时只保留页面状态 */ }

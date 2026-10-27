@@ -1,4 +1,5 @@
-/* 研究工作台 · 进展：两个 tab（地址栏 ?rtab=neuron|lang）。
+/* 研究工作台 · 进展：内容按 tab 渲染（?rtab=neuron|lang；页签本身在 Workbench 的顶部子导航，
+   与空间/研发共用同一个 SubNav 组件与 .wb-subnav 样式）。
    神经元逆向分析进展：普查规模、逐层摘要、分型、解释检验与模板选择性，按块画成热力条（每格一个块）；
    语言图谱进展：大类 × 等级的覆盖、语言项 × 模型的等级矩阵、研究缺口，以及模式族证据门链（记分板快照）。
    各来源分开计数，不拼成转化率；全部读取来自本机数据包。 */
@@ -6,7 +7,7 @@ import { useMemo, useState } from 'react';
 
 import RouteBoard from '../app/rdc_fusion/RouteBoard.jsx';
 import { useApi } from '../app/rdc_fusion/api.js';
-import { Card, Empty, Tabs } from '../app/rdc_fusion/ui.jsx';
+import { Card, Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/workbench.css';
 import { LevelChip } from './LangPage.jsx';
 import { LEVELS, READOUT_LABEL, defaultModel, itemLevel, levelMeta, seq, shortModel } from './v8Util.js';
@@ -129,25 +130,9 @@ function LangProgress({ tree, model, onOpenItem }) {
   );
 }
 
-const TABS = [
-  { id: 'neuron', label: '神经元逆向分析' },
-  { id: 'lang', label: '语言图谱' },
-];
-
-function readTab() {
-  try { return new URLSearchParams(window.location.search).get('rtab') === 'lang' ? 'lang' : 'neuron'; } catch { return 'neuron'; }
-}
-
-export default function RouteLens({ onGoSpace, onGo }) {
-  const [tab, setTabState] = useState(readTab);
-  const setTab = t => {
-    setTabState(t);
-    try {
-      const url = new URL(window.location.href);
-      if (t === 'neuron') url.searchParams.delete('rtab'); else url.searchParams.set('rtab', t);
-      window.history.replaceState(null, '', url);
-    } catch { /* 地址栏不可写时只保留页面状态 */ }
-  };
+/* 页签由工作台顶部的子导航（workbenchUtil.ROUTE_VIEWS）提供，这里只按 tab 渲染内容：
+   页签与空间/研发同一层级、同一组件，避免同一页面出现两种页签样式。 */
+export default function RouteLens({ tab = 'neuron', onGoSpace, onGo }) {
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
@@ -157,7 +142,6 @@ export default function RouteLens({ onGoSpace, onGo }) {
   const census = skeleton?.census_run ? skeleton.census_key : null;
   return (
     <div className="v8-route">
-      <Tabs tabs={TABS} value={tab} onChange={setTab} label="进展" />
       {tab === 'neuron' && (
         <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查 → 逐层摘要与分型 → 解释检验 → 模板选择性（各项分开计数）`}>
           <NeuronProgress census={census} skeleton={skeleton} onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />

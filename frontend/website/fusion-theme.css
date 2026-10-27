@@ -58,7 +58,8 @@ h1 {
   gap: 0.6rem;
 }
 
-.brand::before {
+/* 顶栏品牌：按需求去掉左侧图标，只留 AI2050 文字（页脚仍保留色块标识） */
+.site-footer .brand::before {
   content: "";
   width: 22px;
   height: 22px;
@@ -738,4 +739,107 @@ h1 {
 .refresh-btn:hover {
   border-color: var(--blue);
   color: var(--blue);
+}
+
+/* ---------- 顶栏窄屏：始终单行（结构在 styles.css 的 ≤980px 块里） ---------- */
+/* 本文件后加载，故字号/间距等视觉微调放这里才能真正生效。 */
+@media (max-width: 980px) {
+  .site-header {
+    gap: 0.9rem;
+  }
+
+  .nav-links {
+    gap: 1.1rem;
+  }
+
+  .nav-links a {
+    padding: 1.05rem 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    gap: 0.55rem;
+    padding: 0 0.7rem;
+  }
+
+  .brand {
+    gap: 0;
+  }
+
+  .brand-word {
+    font-size: 1rem;
+  }
+
+  .nav-links {
+    gap: 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .nav-links a {
+    padding: 1rem 0;
+  }
+
+  .header-action {
+    min-height: 30px;
+    padding: 0 0.62rem;
+    font-size: 0.78rem;
+    border-radius: 6px;
+  }
+
+  /* 窄屏省掉箭头，给导航让出宽度 */
+  .header-action::after {
+    display: none;
+  }
+}
+
+/* 窄屏第二档（≤380px）：导航改为左对齐，避免右对齐时首项被裁掉、压在品牌上。 */
+@media (max-width: 380px) {
+  .site-header {
+    gap: 0.45rem;
+    padding: 0 0.5rem;
+  }
+
+  .brand-word {
+    font-size: 0.9rem;
+  }
+
+  .nav-links {
+    gap: 0.45rem;
+    font-size: 0.72rem;
+  }
+
+  .nav-links a {
+    padding: 1rem 0;
+  }
+
+  .header-action {
+    min-height: 28px;
+    padding: 0 0.5rem;
+    font-size: 0.72rem;
+  }
+}
+
+/* 极窄屏（≤340px，如 iPhone SE 320）：再降一档字号，保证四个菜单 + 品牌 + 按钮在同一行 */
+@media (max-width: 340px) {
+  .site-header {
+    gap: 0.4rem;
+    padding: 0 0.42rem;
+  }
+
+  .brand-word {
+    font-size: 0.88rem;
+  }
+
+  .nav-links {
+    /* 宽度真的不够时才放弃右对齐：右对齐溢出会把首项裁掉、压到品牌上 */
+    justify-content: flex-start;
+    gap: 0.34rem;
+    font-size: 0.68rem;
+  }
+
+  .header-action {
+    padding: 0 0.42rem;
+    font-size: 0.68rem;
+  }
 }

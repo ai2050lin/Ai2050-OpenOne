@@ -1440,22 +1440,37 @@ h1 {
 }
 
 @media (max-width: 980px) {
+  /* 顶栏始终单行：品牌 | 导航（可横向滚动） | 参与讨论。
+     旧实现让导航换到第二行，并把该列撑成 min-content 宽，参与讨论因此被推到视口外/
+     压在导航条目上。这里三件东西固定同一行，宽度不足只在导航内部滚动。
+     字号与间距等视觉微调在 fusion-theme.css 的窄屏块里（该文件后加载）。 */
   .site-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .nav-links {
-    grid-column: 1 / -1;
-    order: 3;
+    grid-column: auto;
+    order: 0;
+    min-width: 0;
     justify-content: flex-end;
-    gap: 1.2rem;
     overflow-x: auto;
-    border-top: 1px solid var(--line);
+    border-top: 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-links a {
     min-width: max-content;
-    padding: 1rem 0;
+    white-space: nowrap;
+  }
+
+  .header-action {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .hero {

@@ -60,7 +60,7 @@ function AuthScreen({ info, offlineError, onRetry, onDone, onCancel }) {
           <div className="v6-auth-offline" role="alert">
             <b>连不上中心服务</b>
             <span>{API_BASE} · {offlineError}。请检查网络或稍后重试。</span>
-            <button type="button" className="fw-tbtn" onClick={onRetry}>重试连接</button>
+            <button type="button" className="v6-auth-retry" onClick={onRetry}>重试连接</button>
           </div>
         )}
         {canRegister && (
@@ -87,11 +87,12 @@ function AuthScreen({ info, offlineError, onRetry, onDone, onCancel }) {
             <Field label="确认密码" type="password" required autoComplete="new-password" value={f.confirm} onChange={set('confirm')} />
           )}
           {err && <div className="fw-ai-err" role="alert">{err}</div>}
-          <button type="submit" className="fw-tbtn primary v6-auth-submit" disabled={busy || Boolean(offlineError)}>
+          {/* 登录页有自己的按钮样式（v6-auth-*），此时尚未进入工作台容器，不能用工作台的 fw-tbtn */}
+          <button type="submit" className="v6-auth-submit" disabled={busy || Boolean(offlineError)}>
             {busy ? '请稍候…' : effectiveMode === 'register' ? (firstUser ? '创建管理员账号并进入' : '注册并进入') : '登录'}
           </button>
         </form>
-        {onCancel && <button type="button" className="fw-tbtn ghost v6-auth-cancel" onClick={onCancel}>返回（以访客继续浏览）</button>}
+        {onCancel && <button type="button" className="v6-auth-cancel" onClick={onCancel}>返回（以访客继续浏览）</button>}
         <p className="v6-auth-foot">登录状态保存在本机浏览器，下次打开直接进入；在右上角账号菜单中退出登录。中心：<span className="mono">{API_BASE}</span></p>
       </div>
     </div>

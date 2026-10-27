@@ -520,16 +520,25 @@ a.fw-tbtn{text-decoration:none}
 .v6-home-side .v6-steps-list .v6-cmd code{font-size:9.5px}
 .v6-tg-model{font-size:10.5px;color:var(--fw-text-3)}
 
-/* ---------- 账号：注册 / 登录入口与顶栏账号菜单（accounts.v1） ---------- */
-.v6-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px;background:radial-gradient(ellipse at 30% 10%,#eff6ff 0%,#f8fafc 45%,#eef2f7 100%);color-scheme:light;font-family:inherit}
-.v6-auth-checking{gap:12px;color:#475569;font-size:13px}
-.v6-auth-card{width:100%;max-width:420px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,.08);padding:26px 28px 20px;display:flex;flex-direction:column;gap:14px}
+/* ---------- 账号：注册 / 登录入口与顶栏账号菜单（accounts.v1） ----------
+   注意：AuthGate 的登录页渲染在 .fw-root 之外（AuthGate 包住工作台，登录页本身不在工作台里），
+   所以 --fw-* 主题变量在这里没有作用域。之前在登录页用 .fw-tbtn.primary 会得到
+   「color:#fff + background:var(--fw-blue) 解析失败→透明」= 白底白字看不见。
+   因此登录页自带：① 局部 color（覆盖 :root 的暗色白字）② --fw-* 兜底值（防御：本页若再嵌入工作台组件）
+   ③ 主/次按钮的完整样式（v6-auth-submit / v6-auth-cancel），完全不依赖工作台主题。
+   卡片用 margin:auto 居中而不是靠父级 align-items:center——这样视口比卡片矮时是内部滚动，不会把按钮裁掉。 */
+.v6-auth{height:100vh;height:100dvh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;background:radial-gradient(ellipse at 30% 10%,#eff6ff 0%,#f8fafc 45%,#eef2f7 100%);color:#0f172a;color-scheme:light;font-family:inherit;
+  --fw-blue:#0284c7; --fw-blue-hi:#0ea5e9; --fw-text:#1e293b; --fw-text-2:#475569; --fw-border:#e2e8f0; --fw-border-strong:#cbd5e1; --fw-bg-sub:#f8fafc}
+.v6-auth-checking{gap:12px;color:#475569;font-size:13px;align-items:center}
+.v6-auth-card{width:100%;max-width:420px;margin:auto;flex-shrink:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,.08);padding:26px 28px 20px;display:flex;flex-direction:column;gap:14px;color:#0f172a}
 .v6-auth-hd{display:flex;gap:12px;align-items:center}
 .v6-auth-hd h1{margin:0;font-size:18px;font-weight:700;color:#0f172a;letter-spacing:.01em}
 .v6-auth-hd p{margin:2px 0 0;font-size:12px;color:#64748b;line-height:1.5}
 .v6-auth-logo{flex-shrink:0;width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;font-weight:800;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
 .v6-auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#f1f5f9;border-radius:8px;padding:3px}
-.v6-auth-tabs button{border:0;background:none;padding:7px 0;border-radius:6px;font:inherit;font-size:13px;color:#475569;cursor:pointer}
+.v6-auth-tabs button{border:0;background:none;padding:7px 0;border-radius:6px;font:inherit;font-size:13px;color:#475569;cursor:pointer;transition:background .15s,color .15s}
+.v6-auth-tabs button:hover:not(:disabled):not(.on){color:#0f172a;background:rgba(255,255,255,.6)}
+.v6-auth-tabs button:focus-visible{outline:2px solid #93c5fd;outline-offset:1px}
 .v6-auth-tabs button.on{background:#fff;color:#0f172a;font-weight:600;box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .v6-auth-tabs button:disabled{opacity:.45;cursor:not-allowed}
 .v6-auth-note{margin:0;font-size:12px;color:#475569;line-height:1.6;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px}
@@ -539,10 +548,16 @@ a.fw-tbtn{text-decoration:none}
 .v6-auth-field small{font-weight:400;color:#94a3b8;font-size:11px}
 .v6-auth-field input{font:inherit;font-size:14px;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;color-scheme:light}
 .v6-auth-field input:focus{outline:2px solid #93c5fd;outline-offset:0;border-color:#3b82f6}
-.v6-auth-submit{justify-content:center;font-size:14px;padding:10px 14px;margin-top:2px}
+.v6-auth-submit{justify-content:center;display:flex;align-items:center;width:100%;min-height:42px;font:inherit;font-size:14px;font-weight:600;padding:11px 14px;margin-top:4px;border:1px solid transparent;border-radius:9px;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(37,99,235,.28);transition:filter .15s,box-shadow .15s,transform .1s}
+.v6-auth-submit:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 4px 16px rgba(37,99,235,.34)}
+.v6-auth-submit:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 6px rgba(37,99,235,.3)}
+.v6-auth-submit:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;filter:none}
+.v6-auth-submit:focus-visible{outline:2px solid #1d4ed8;outline-offset:2px}
 .v6-auth-foot{margin:0;font-size:11px;color:#94a3b8;line-height:1.6}
 .v6-auth-offline{display:flex;flex-direction:column;gap:6px;border:1px solid #fed7aa;background:#fff7ed;border-radius:8px;padding:9px 11px;font-size:12px;color:#9a3412}
-.v6-auth-offline .fw-tbtn{align-self:flex-start}
+.v6-auth-retry{align-self:flex-start;font:inherit;font-size:12px;padding:5px 11px;border:1px solid #fdba74;border-radius:7px;background:#fff;color:#9a3412;cursor:pointer}
+.v6-auth-retry:hover{background:#ffedd5;border-color:#fb923c;color:#7c2d12}
+.v6-auth-retry:focus-visible{outline:2px solid #fdba74;outline-offset:2px}
 .v6-acct{position:relative;margin-left:8px}
 .v6-acct-btn{display:flex;align-items:center;gap:7px;border:1px solid var(--fw-border);background:#fff;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer;font:inherit;font-size:12px;color:var(--fw-text);max-width:180px}
 .v6-acct-btn:hover{border-color:var(--fw-border-strong)}
@@ -578,4 +593,17 @@ a.fw-tbtn{text-decoration:none}
 .v6-bind small.warn{color:var(--v6-warn)}
 .v6-token.via-account{display:inline-flex;align-items:center;gap:6px}
 .v6-token.via-account em{font-style:normal;font-size:11px;color:var(--v6-good);background:var(--v6-good-bg);border:1px solid #bbf7d0;border-radius:99px;padding:1px 8px}
-.v6-auth-cancel{align-self:center;margin-top:-4px}
+.v6-auth-cancel{align-self:center;margin-top:-2px;font:inherit;font-size:12.5px;padding:8px 14px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#475569;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.v6-auth-cancel:hover{border-color:#94a3b8;background:#f8fafc;color:#0f172a}
+.v6-auth-cancel:focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+@media (max-width:480px){
+  .v6-auth{padding:16px 12px}
+  .v6-auth-card{padding:20px 18px 16px;border-radius:12px;gap:12px}
+  .v6-auth-hd h1{font-size:16px}
+  .v6-auth-hd p{font-size:11.5px}
+  .v6-auth-field input{font-size:16px}   /* 16px 起步，避免 iOS 聚焦时自动放大 */
+}
+@media (max-height:560px){
+  .v6-auth{padding:14px 16px}
+  .v6-auth-card{padding:18px 22px 16px}
+}
