@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """忘记密码时在中心服务器上重置账号密码（只依赖标准库，直接写中心数据库，不经接口、不需要管理令牌）。
 
-数据目录读取顺序：--data-dir、环境变量 AI2050_DIST_DIR、/var/lib/ai2050。新密码从终端输入两次（不回显、不进命令行历史）。
+数据目录读取顺序：--data-dir、环境变量 AI2050_DIST_DIR、/var/lib/ai2050/center（install_center.sh 的布局）。新密码从终端输入两次（不回显、不进命令行历史）。
 重置后该账号的全部登录失效、锁定与停用解除；--make-admin 同时设为管理员（管理员账号全部丢失时用）。
 
     sudo -u ai2050 python3 deploy/reset_password.py --list
@@ -39,7 +39,7 @@ def main(argv=None) -> int:
             pass
     ap = argparse.ArgumentParser(description='AI2050 center: reset an account password')
     ap.add_argument('username', nargs='?')
-    ap.add_argument('--data-dir', default=os.environ.get('AI2050_DIST_DIR', '/var/lib/ai2050'))
+    ap.add_argument('--data-dir', default=os.environ.get('AI2050_DIST_DIR', '/var/lib/ai2050/center'))
     ap.add_argument('--list', action='store_true', help='列出账号')
     ap.add_argument('--make-admin', action='store_true', help='同时设为管理员')
     args = ap.parse_args(argv)
