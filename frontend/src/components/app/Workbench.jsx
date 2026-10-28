@@ -26,6 +26,7 @@ import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
 
 const AutoTestPanel = lazy(() => import('./rdc_fusion/AutoTestPanel.jsx'));
+const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 const LensSpatial = lazy(() => import('./rdc_fusion/LensSpatial.jsx'));
 
 function LocalPack() {
@@ -81,9 +82,9 @@ export default function Workbench() {
   const [st, setSt] = useState(readState);
   const [draft, setDraft] = useState(null);
   // 不能实时连接中心时（远端客户端、安装包）只保留只读的题库；模板、冻结、分发、审计、普查、自动测试在网页版的工作台操作
-  const stations = STATIONS.filter(s => (!ADMIN_LIVE ? s.id === 'catalog' : !s.localOnly || localTools));
+  const stations = STATIONS.filter(s => (!ADMIN_LIVE ? s.id === 'catalog' || s.everywhere : !s.localOnly || localTools));
   const baseLenses = !ADMIN_LIVE
-    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '题库（这里只读；模板、冻结、分发、审计在网页版的研究工作台操作）' } : l))
+    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '题库（这里只读）与贡献算力；模板、冻结、分发、审计在网页版的研究工作台操作' } : l))
     : LENSES;
   const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
@@ -134,6 +135,7 @@ export default function Workbench() {
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
               {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!ADMIN_LIVE ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!ADMIN_LIVE ? null : () => go('studio')} />}
+              {lens === 'process' && station === 'contribute' && <ContributePanel />}
               {lens === 'process' && station === 'studio' && <TemplateStudio draft={draft} onDraft={setDraft} onNext={() => go('freeze')} />}
               {lens === 'process' && station === 'freeze' && <FreezePanel draft={draft} onDraft={setDraft} onGo={go} />}
               {lens === 'process' && station === 'dispatch' && <DispatchPanel onGo={go} />}

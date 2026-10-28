@@ -4,7 +4,7 @@
 export const LENSES = [
   { id: 'route', label: '进展', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },          // id 沿用 route，旧链接 ?lens=route 照常可用
   { id: 'spatial', label: '空间', desc: 'LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元' },
-  { id: 'process', label: '研发', desc: '题库、模板工作室、试跑与冻结、分发、审计、普查作业' },
+  { id: 'process', label: '研发', desc: '题库、贡献算力、模板工作室、试跑与冻结、分发、审计、普查作业' },
 ];
 
 /* 进展视图：与空间/研发同一层级的子导航（?rtab=），默认 neuron */
@@ -23,9 +23,11 @@ export const SPATIAL_VIEWS = [
 ];
 const OLD_VIEWS = { atlas: 'relations', units: 'neuron' };
 
-/* 研发工位：autotest 只在本机中心（local_tools）出现——公开中心没有被测模型 */
+/* 研发工位：autotest 只在本机中心（local_tools）出现——公开中心没有被测模型；
+   贡献算力（everywhere）在所有形态出现：桌面客户端控制本机节点，网页版只显示下载入口 */
 export const STATIONS = [
   { id: 'catalog', label: '题库' },
+  { id: 'contribute', label: '贡献算力', everywhere: true },
   { id: 'studio', label: '模板工作室' },
   { id: 'freeze', label: '试跑与冻结' },
   { id: 'dispatch', label: '分发与节点' },

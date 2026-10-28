@@ -15,12 +15,19 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const { NodeSupervisor } = require('./nodeSupervisor');
 
 const DEFAULT_SERVER = 'https://server.ai2050.com';
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
 
 /* ── 配置读写 ─────────────────────────────────────────────── */
 function readConfig() {
+  /* 沙盒联调：AI2050_CLIENT_SERVER 直接指定中心，不读写用户配置里的服务器 */
+  if (process.env.AI2050_CLIENT_SERVER) {
+    let saved = {};
+    try { saved = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8')); } catch { /* 无配置 */ }
+    return { ...saved, server: normalizeServer(process.env.AI2050_CLIENT_SERVER), verified: true };
+  }
   try {
     const cfg = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8'));
     if (typeof cfg.server === 'string' && cfg.server.trim()) return cfg;
@@ -31,6 +38,12 @@ function readConfig() {
 }
 
 function writeConfig(cfg) {
+  if (process.env.AI2050_CLIENT_SERVER) {
+    let saved = {};
+    try { saved = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8')); } catch { /* 无配置 */ }
+    cfg = { ...cfg, server: saved.server, verified: saved.verified };     // 环境变量指定的中心不写进用户配置
+    if (!cfg.server) delete cfg.server;
+  }
   fs.mkdirSync(path.dirname(CONFIG_FILE()), { recursive: true });
   fs.writeFileSync(CONFIG_FILE(), JSON.stringify(cfg, null, 2), 'utf8');
 }
@@ -221,6 +234,7 @@ function buildMenu() {
               detail: (p.ok ? custom + '\n\n正在重新加载界面…'
                           : custom + '\n\n界面会显示「未接入」空态，请检查地址或网络。'),
             });
+            nodeSup.stop().then(() => nodeSup.start(custom));
             if (mainWindow) mainWindow.reload();
           },
         },
@@ -286,6 +300,7 @@ if (!app.requestSingleInstanceLock()) {
     if (!server) { app.quit(); return; }
     buildMenu();
     createWindow(server);
+    nodeSup.start(server);
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow((readConfig() || {}).server || DEFAULT_SERVER);
@@ -294,6 +309,34 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+
+  /* 退出前关掉自己启动的本机节点服务（运行中的任务被结束，中心在租约到期后重派） */
+  let nodeStopped = false;
+  app.on('before-quit', e => {
+    if (nodeStopped) return;
+    e.preventDefault();
+    nodeStopped = true;
+    nodeSup.stop().finally(() => app.quit());
+  });
 }
 
 ipcMain.handle('ai2050:get-server', () => (readConfig() || {}).server || DEFAULT_SERVER);
+
+/* ── 本机节点服务（贡献算力）：界面只经这几个 IPC 调用，令牌不离开主进程 ── */
+const nodeSup = new NodeSupervisor({
+  app, readConfig, writeConfig,
+  onChange: info => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('ai2050:node-info', info); },
+});
+ipcMain.handle('ai2050:node-info', () => nodeSup.info());
+ipcMain.handle('ai2050:node-request', (_e, req) => nodeSup.request(req && req.method, req && req.path, req && req.body));
+ipcMain.handle('ai2050:node-restart', () => nodeSup.restart());
+ipcMain.handle('ai2050:node-pick-python', async () => {
+  const r = await dialog.showOpenDialog(mainWindow, {
+    title: '选择运行任务的 Python（需要 torch 与 transformers）',
+    properties: ['openFile'],
+    filters: process.platform === 'win32' ? [{ name: 'python.exe', extensions: ['exe'] }] : [],
+  });
+  if (r.canceled || !r.filePaths[0]) return nodeSup.info();
+  await nodeSup.setPython(r.filePaths[0]);
+  return nodeSup.start();
+});

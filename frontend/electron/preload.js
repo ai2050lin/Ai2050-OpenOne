@@ -41,6 +41,18 @@ contextBridge.exposeInMainWorld('ai2050Desktop', {
   mode,
   server: config.apiBase,
   getServer: () => ipcRenderer.invoke('ai2050:get-server'),
+  /* 本机节点服务（贡献算力）：主进程只转发白名单内的接口，本机令牌不进页面 */
+  node: {
+    info: () => ipcRenderer.invoke('ai2050:node-info'),
+    request: (method, path, body) => ipcRenderer.invoke('ai2050:node-request', { method, path, body }),
+    restart: () => ipcRenderer.invoke('ai2050:node-restart'),
+    pickPython: () => ipcRenderer.invoke('ai2050:node-pick-python'),
+    onInfo: cb => {
+      const h = (_e, info) => cb(info);
+      ipcRenderer.on('ai2050:node-info', h);
+      return () => ipcRenderer.removeListener('ai2050:node-info', h);
+    },
+  },
 });
 
 /* 隔离世界侧自留一份（仅供调试/后续 preload 内部使用；主世界不依赖它）。 */
