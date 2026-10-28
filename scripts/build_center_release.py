@@ -27,7 +27,7 @@ INCLUDE = [
     'VERSION', 'LICENSE', 'NOTICE', 'README.md', 'CONTRIBUTING.md',
     'deploy/center_app.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/platform_service.py',
     'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/reset_password.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
-    'deploy/install_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
+    'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
     'server/__init__.py', 'server/neuron_census_service.py',
     'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py',
@@ -99,9 +99,11 @@ def main() -> int:
         import io
         tar.addfile(info, io.BytesIO(data))
     digest = hashlib.sha256(tar_path.read_bytes()).hexdigest()
-    (out / f'{name}.tar.gz.sha256').write_text(f'{digest}  {tar_path.name}\n', encoding='utf-8')
+    (out / f'{name}.tar.gz.sha256').write_bytes(f'{digest}  {tar_path.name}\n'.encode('utf-8'))
+    (out / 'upgrade_center.sh').write_bytes((ROOT / 'deploy' / 'upgrade_center.sh').read_bytes())   # 与发布包一起上传，升级时直接运行
     print(f'版本 {cur} → {PLATFORM_VERSION}')
     print(f'{tar_path}  {tar_path.stat().st_size / 2**20:.1f} MB  {len(fl)} 个文件  sha256 {digest[:16]}')
+    print(f'升级：把 {tar_path.name}、{tar_path.name}.sha256 与 upgrade_center.sh 传到服务器同一目录，运行 sudo bash upgrade_center.sh')
     print('提醒：VERSION 已改，请连同代码一起提交，保证仓库版本与发布包一致')
     return 0
 

@@ -70,7 +70,28 @@ sudo -u ai2050 /opt/ai2050/venv/bin/python /opt/ai2050/app/deploy/reset_password
 
 用安装脚本部署时，程序会复制到 `/opt/ai2050/app`，数据默认在 `/var/lib/ai2050/`，两者都与解压目录无关。直接在解压目录里运行 `center_app.py` 时，必须在 systemd 里设置 `AI2050_DIST_DIR` 与 `AI2050_NATIVE_DIR`，让它们指向版本目录之外。
 
-**升级步骤（直接从解压目录运行的情况）：**
+**一键升级（推荐）**：打包时会在 `release/` 里同时放一份 `upgrade_center.sh`。把发布包、它的 `.sha256` 和这个脚本传到服务器的同一目录，以 root 运行：
+
+```bash
+scp release/ai2050-center-<版本>.tar.gz release/ai2050-center-<版本>.tar.gz.sha256 release/upgrade_center.sh root@<服务器>:/data/
+ssh root@<服务器> 'cd /data && bash upgrade_center.sh'
+```
+
+脚本依次完成以下步骤：
+
+1. 核对发布包的 sha256。
+2. 从 systemd 读出当前的程序目录、数据目录和端口。
+3. 把数据库在线备份到 `/root/ai2050-backups/`，并检查备份的完整性。
+4. 部署新版本并重启，等 `/api/health` 报告新版本号。
+
+两种布局都支持：
+
+- **版本目录**（如 `/data/ai2050-center-1.0.13`）：新版本解压到同一父目录，systemd 改指新目录，旧目录保留。
+- **固定目录**（`/opt/ai2050/app`）：先把旧程序复制为 `app.bak-<旧版本>`，再原地同步新程序。
+
+脚本在动手前先做检查，以下情况直接拒绝，不改任何东西：数据目录在程序目录之内、sha256 不一致、当前已经是新版本。重启失败或 health 不对时，脚本会自动恢复旧版本的程序与 systemd 配置，并打印启动日志。
+
+**手动升级步骤（直接从解压目录运行的情况）：**
 
 ```bash
 # 1. 备份数据库
