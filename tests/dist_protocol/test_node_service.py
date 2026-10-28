@@ -1,0 +1,306 @@
+# -*- coding: utf-8 -*-
+"""node_service.v1（本机节点服务，design/contributor_client_v1.md P1）：
+nvidia-smi 解析、时间窗、配置白名单、资源门、显存估计、退避；本机接口的访问关卡（令牌、Host、Origin）；
+以及对沙盒中心的端到端流程（绑定码注册 → 开始 → 领取普查分片 → synthetic 运行 → 上传 → 中心校验通过 → 停止）。"""
+import io
+import json
+import os
+import random
+import shutil
+import sys
+import tempfile
+import threading
+import time
+import unittest
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'deploy'))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import node_service as S  # noqa: E402
+
+SMI = '''0, NVIDIA GeForce RTX 5080, 16303, 1024, 6, 610.62
+1, NVIDIA RTX A6000, 49140, 40000, 97, 610.62
+garbage line
+'''
+FAKE = {'gpus': lambda: S.parse_nvidia_smi(SMI), 'battery': lambda: None, 'disk': lambda p: 100.0,
+        'runtime': lambda py: {'ok': True, 'python': py}}
+
+
+def lt(h, m):
+    return time.struct_time((2026, 10, 27, h, m, 0, 1, 300, 0))
+
+
+class PureTests(unittest.TestCase):
+    def test_parse_nvidia_smi(self):
+        g = S.parse_nvidia_smi(SMI)
+        self.assertEqual([x['index'] for x in g], [0, 1])
+        self.assertEqual(g[0]['name'], 'NVIDIA GeForce RTX 5080')
+        self.assertAlmostEqual(g[0]['vram_gib'], 15.9)
+        self.assertEqual(g[1]['util'], 97.0)
+        self.assertEqual(S.parse_nvidia_smi(''), [])
+
+    def test_window(self):
+        self.assertTrue(S.in_window('', lt(3, 0)))
+        self.assertTrue(S.in_window('09:00-18:00', lt(9, 0)))
+        self.assertFalse(S.in_window('09:00-18:00', lt(18, 0)))
+        self.assertTrue(S.in_window('22:00-08:00', lt(23, 30)))      # 跨午夜
+        self.assertTrue(S.in_window('22:00-08:00', lt(7, 59)))
+        self.assertFalse(S.in_window('22:00-08:00', lt(12, 0)))
+        for bad in ('9-18', '25:00-01:00', '08:00-08:00', 'x'):
+            with self.assertRaises(ValueError):
+                S.parse_window(bad)
+
+    def test_validate_config(self):
+        base = json.loads(json.dumps(S.DEFAULT_CONFIG))
+        c = S.validate_config(base, {'server': 'https://server.ai2050.com/', 'limits': {'hours': '22:00-08:00'}})
+        self.assertEqual(c['server'], 'https://server.ai2050.com')
+        self.assertEqual(c['limits']['hours'], '22:00-08:00')
+        self.assertTrue(c['limits']['pause_on_battery'])               # 其余限制保留缺省
+        self.assertEqual(base['server'], '')                            # 不改原配置
+        for bad in ({'python': 'evil.exe'}, {'server': 'ftp://x'}, {'device': 'cuda:x'}, {'task_kinds': ['rm']},
+                    {'limits': {'yield_gpu_util': 150}}, {'limits': {'hours': '9-18'}}, {'limits': {'shell': 1}},
+                    {'limits': {'pause_on_battery': 'yes'}}, {'model_dirs': ['a']}):
+            with self.assertRaises(ValueError, msg=bad):
+                S.validate_config(base, bad)
+
+    def test_gates(self):
+        cfg = S.validate_config(json.loads(json.dumps(S.DEFAULT_CONFIG)), {})
+        gpus = S.parse_nvidia_smi(SMI)
+        ok = dict(now_struct=lt(12, 0), gpus=gpus, battery=False, disk_free_gib=100)
+        self.assertEqual(S.gate_reasons(cfg, **ok), [])
+        self.assertEqual(len(S.gate_reasons(cfg, **{**ok, 'battery': True})), 1)
+        self.assertEqual(len(S.gate_reasons(cfg, **{**ok, 'disk_free_gib': 1.0})), 1)
+        self.assertEqual(len(S.gate_reasons(cfg, **{**ok, 'gpus': []})), 1)              # 没有 NVIDIA GPU
+        busy = S.validate_config(cfg, {'device': 'cuda:1'})                               # 卡 1 利用率 97%
+        self.assertIn('GPU 正被其他程序使用', S.gate_reasons(busy, **ok)[0])
+        self.assertEqual(S.gate_reasons(busy, **{**ok, 'gpus': []}, synthetic=True), [])  # 联调不看 GPU
+        night = S.validate_config(cfg, {'limits': {'hours': '22:00-08:00'}})
+        self.assertEqual(len(S.gate_reasons(night, **ok)), 1)
+        nobat = S.validate_config(cfg, {'limits': {'pause_on_battery': False}})
+        self.assertEqual(S.gate_reasons(nobat, **{**ok, 'battery': True}), [])
+
+    def test_model_fits(self):
+        cfg = S.validate_config(json.loads(json.dumps(S.DEFAULT_CONFIG)), {})
+        gpus = S.parse_nvidia_smi(SMI)
+        self.assertTrue(S.model_fits(8.0, cfg, gpus))                 # 8 × 1.2 ≤ 15.9
+        self.assertFalse(S.model_fits(14.0, cfg, gpus))
+        self.assertFalse(S.model_fits(8.0, S.validate_config(cfg, {'limits': {'max_vram_gib': 8}}), gpus))
+        self.assertTrue(S.model_fits(0, cfg, gpus))
+
+    def test_log_survives_gbk_console(self):
+        """中文控制台（GBK，严格编码）打印 ✓ 不能让任务失败（曾导致已上传的分片被报为失败）。"""
+        import node_agent as A
+        old, buf = sys.stdout, io.BytesIO()
+        out = sys.stdout = io.TextIOWrapper(buf, encoding='gbk', errors='strict')
+        try:
+            A.log('上传完成，中心校验通过 ✓')
+            sys.stdout.flush()
+        finally:
+            sys.stdout = old
+        self.assertIn('上传完成'.encode('gbk'), buf.getvalue())
+        out.detach()
+
+    def test_backoff(self):
+        b = S.Backoff(random.Random(0))
+        idle = [b.next('idle') for _ in range(8)]
+        self.assertTrue(48 <= idle[0] <= 72)
+        self.assertTrue(all(a <= c * 1.5 + 1 for a, c in zip(idle, idle[1:])))
+        self.assertTrue(all(x <= 900 * 1.2 for x in idle))
+        self.assertGreaterEqual(idle[-1], 900 * 0.8)                   # 到上限
+        e = b.next('error')                                            # 换类型：另一类计数清零
+        self.assertTrue(24 <= e <= 36)
+        self.assertTrue(48 <= b.next('idle') <= 72)
+        b.reset()
+        self.assertTrue(24 <= b.next('error') <= 36)
+
+
+def call(port, path, method='GET', body=None, token='', host=None, origin=None):
+    req = urllib.request.Request(f'http://127.0.0.1:{port}{path}', method=method,
+                                 data=json.dumps(body).encode('utf-8') if body is not None else None)
+    req.add_header('Content-Type', 'application/json')
+    if token:
+        req.add_header('X-Local-Token', token)
+    if host:
+        req.add_header('Host', host)
+    if origin:
+        req.add_header('Origin', origin)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return r.status, json.loads(r.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        return e.code, json.loads(e.read().decode('utf-8') or '{}')
+
+
+def start_service(home, **kw):
+    box = {}
+    ev = threading.Event()
+
+    def ready(httpd, svc, token):
+        box.update(httpd=httpd, svc=svc, token=token, port=httpd.server_address[1])
+        ev.set()
+    t = threading.Thread(target=S.serve, args=(home, 0), kwargs={'ready': ready, 'probes': FAKE, **kw}, daemon=True)
+    t.start()
+    assert ev.wait(10)
+    box['thread'] = t
+    return box
+
+
+class LocalApiTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.b = start_service(self.tmp / 'svc', allow_origins=('http://localhost:5173',))
+
+    def tearDown(self):
+        call(self.b['port'], '/shutdown', 'POST', {}, token=self.b['token'])
+        self.b['thread'].join(10)
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_service_file(self):
+        info = json.loads((self.tmp / 'svc' / 'service.json').read_text(encoding='utf-8'))
+        self.assertEqual(info['port'], self.b['port'])
+        self.assertEqual(info['token'], self.b['token'])
+
+    def test_guards(self):
+        p, tok = self.b['port'], self.b['token']
+        self.assertEqual(call(p, '/status')[0], 401)                                         # 没有令牌
+        self.assertEqual(call(p, '/status', token='wrong')[0], 401)
+        self.assertEqual(call(p, '/status', token=tok, host=f'evil.example:{p}')[0], 403)   # DNS 重绑定
+        self.assertEqual(call(p, '/status', token=tok, origin='https://evil.example')[0], 403)
+        self.assertEqual(call(p, '/status', token=tok, origin='http://localhost:5173')[0], 200)   # 显式放行
+        self.assertEqual(call(p, '/status', token=tok, host=f'localhost:{p}')[0], 200)
+        st, s = call(p, '/status', token=tok)
+        self.assertEqual((st, s['state'], s['bound']), (200, 'stopped', False))
+        self.assertEqual(call(p, '/nope', token=tok)[0], 404)
+
+    def test_config_and_controls(self):
+        p, tok = self.b['port'], self.b['token']
+        st, c = call(p, '/config', 'PUT', {'limits': {'hours': '22:00-08:00'}}, token=tok)
+        self.assertEqual((st, c['limits']['hours']), (200, '22:00-08:00'))
+        self.assertEqual(call(p, '/config', 'PUT', {'python': 'x'}, token=tok)[0], 400)
+        saved = json.loads((self.tmp / 'svc' / 'config.json').read_text(encoding='utf-8'))
+        self.assertEqual(saved['limits']['hours'], '22:00-08:00')
+        self.assertEqual(call(p, '/start', 'POST', {}, token=tok)[0], 409)                 # 未注册不能开始
+        self.assertEqual(call(p, '/bind', 'POST', {'bind_code': 'x'}, token=tok)[0], 400)  # 没有中心地址
+        st, d = call(p, '/device', token=tok)
+        self.assertEqual(d['gpus'][0]['name'], 'NVIDIA GeForce RTX 5080')
+        self.assertTrue(d['runtime']['ok'])
+        self.assertEqual(call(p, '/logs?after=0', token=tok)[0], 200)
+        self.assertEqual(call(p, '/history', token=tok)[1], {'items': []})
+
+
+class SandboxCenterE2ETests(unittest.TestCase):
+    """沙盒中心（允许 synthetic）以真实 HTTP 运行，本机服务经 urllib 访问它。"""
+
+    @classmethod
+    def setUpClass(cls):
+        import uvicorn
+        from test_census_job import SEP, synth_streams
+        cls.tmp = Path(tempfile.mkdtemp())
+        cls.env = {k: os.environ.get(k) for k in ('AI2050_DIST_ALLOW_SYNTHETIC', 'AI2050_NATIVE_DIR', 'AI2050_SNAPSHOT_DISABLE',
+                                                   'AI2050_PUBLIC_URL')}
+        os.environ['AI2050_DIST_ALLOW_SYNTHETIC'] = '1'
+        os.environ['AI2050_NATIVE_DIR'] = str(cls.tmp / 'native')
+        os.environ['AI2050_SNAPSHOT_DISABLE'] = '1'
+        cdir = cls.tmp / 'native' / '_census' / 'corpus' / 'fp0'
+        cdir.mkdir(parents=True)
+        for name, t in zip(('a', 'b'), synth_streams()):
+            buf = io.BytesIO(); np.savez(buf, tokens=t, doc_starts=np.array([0])); (cdir / f'tokens_{name}.npz').write_bytes(buf.getvalue())
+        (cdir / 'manifest.json').write_text(json.dumps({'schema': 'census_corpus.v1', 'separator_id': SEP,
+                                                        'sources': [{'source': 'a', 'file': 'tokens_a.npz'}, {'source': 'b', 'file': 'tokens_b.npz'}]}))
+        mdir = cls.tmp / 'model'
+        mdir.mkdir()
+        (mdir / 'config.json').write_text(json.dumps({'num_hidden_layers': 4, 'intermediate_size': 12}))
+        tok = ROOT / 'models' / 'hf' / 'qwen3-4b' / 'tokenizer.json'
+        (mdir / 'tokenizer.json').write_bytes(tok.read_bytes() if tok.is_file() else b'{}')
+        import distributed_service as D
+        import census_service as CS
+        import platform_service as PS
+        D._DATA_DIR = cls.tmp / 'dist'
+        D._DATA_DIR.mkdir()
+        D._conn = None
+        D._tls = threading.local()
+        CS._schema_done = False
+        CS._job_cached.cache_clear(); CS._counted.cache_clear()
+        cls.D = D
+        from fastapi import FastAPI
+        app = FastAPI()
+        for r in (D.router, CS.router, PS.router, PS.auth_router):
+            app.include_router(r)
+        cls.srv = uvicorn.Server(uvicorn.Config(app, host='127.0.0.1', port=0, log_level='warning'))
+        cls.srv_thread = threading.Thread(target=cls.srv.run, daemon=True)
+        cls.srv_thread.start()
+        for _ in range(200):
+            if cls.srv.started:
+                break
+            time.sleep(0.05)
+        port = cls.srv.servers[0].sockets[0].getsockname()[1]
+        cls.center = f'http://127.0.0.1:{port}'
+        os.environ['AI2050_PUBLIC_URL'] = cls.center
+        cls.mdir = mdir
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.should_exit = True
+        cls.srv_thread.join(10)
+        cls.D._conn = None
+        cls.D._tls = threading.local()
+        for k, v in cls.env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def http(self, path, method='GET', body=None, headers=None):
+        req = urllib.request.Request(self.center + path, method=method,
+                                     data=json.dumps(body).encode('utf-8') if body is not None else None)
+        req.add_header('Content-Type', 'application/json')
+        for k, v in (headers or {}).items():
+            req.add_header(k, v)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read().decode('utf-8'))
+
+    def test_bind_start_run_upload(self):
+        admin = self.http('/api/auth/register', 'POST', {'username': 'erin', 'password': 'pw-erinerin', 'display_name': 'Erin'})['token']
+        code = self.http('/api/auth/node-code', 'POST', {}, {'Authorization': f'Bearer {admin}'})['code']
+        body = {'job_id': 'CJ-svc', 'model_dir': str(self.mdir), 'snapshot': {'sha256': 'f' * 64, 'files': {}},
+                'corpus_fp': 'fp0', 'tokens_per_slice': 2048, 'max_slices': 1, 'seq_len': 64, 'skip_head': 4, 'k': 6,
+                'group_size': 2, 'replica_rate': 0.0, 'batch': 4, 'model_name': 'toy'}
+        self.assertEqual(self.http('/api/census/jobs', 'POST', body, {'X-Admin-Token': admin})['n_shards'], 2)
+        b = start_service(self.tmp / 'svc', synthetic=True, server_override=self.center)
+        p, tok = b['port'], b['token']
+        try:
+            st, r = call(p, '/bind', 'POST', {'bind_code': code}, token=tok)
+            self.assertEqual(st, 200, r)
+            self.assertTrue(r['owner_bound'])
+            self.assertTrue(call(p, '/status', token=tok)[1]['bound'])
+            self.assertEqual(call(p, '/start', 'POST', {}, token=tok)[0], 200)
+            deadline = time.time() + 120
+            while time.time() < deadline:
+                s = call(p, '/status', token=tok)[1]
+                if s['counts']['done'] + s['counts']['failed'] + s['counts']['rejected'] >= 2:
+                    break
+                time.sleep(0.5)
+            self.assertEqual(s['counts'], {'done': 2, 'failed': 0, 'rejected': 0}, s)
+            hist = call(p, '/history', token=tok)[1]['items']
+            self.assertEqual(sorted(h['status'] for h in hist), ['accepted', 'accepted'])
+            self.assertEqual({h['job'] for h in hist}, {'CJ-svc'})
+            prog = self.http('/api/census/jobs/CJ-svc')
+            self.assertEqual(prog['counts'], {'done': 2}, prog['counts'])
+            logs = call(p, '/logs?after=0', token=tok)[1]['items']
+            self.assertFalse(any(code in x['msg'] for x in logs))                  # 绑定码不进日志
+            self.assertEqual(call(p, '/stop', 'POST', {}, token=tok)[1]['state'], 'stopped')
+        finally:
+            call(p, '/shutdown', 'POST', {}, token=tok)
+            b['thread'].join(10)
+
+
+if __name__ == '__main__':
+    unittest.main()

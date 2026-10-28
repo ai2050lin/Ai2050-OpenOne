@@ -403,7 +403,9 @@ def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
            'device': 'cuda', 'model_dirs': {}, 'models_root': '', 'node_name': '',
            'created_at': time.strftime('%Y-%m-%d %H:%M:%S'),
            'note': 'bind_code 一次性有效（7 天内）；model_dirs 按作业的模型快照填写本机目录，留空时程序会询问。'}
-    agent = (Path(D.__file__).resolve().parent / 'node_agent.py').read_bytes()
+    here = Path(D.__file__).resolve().parent
+    agent = (here / 'node_agent.py').read_bytes()
+    service = (here / 'node_service.py').read_bytes()       # node_agent.py serve：本机节点服务（桌面客户端控制）
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
         def add(name: str, data, mode: int = 0o644):
@@ -412,6 +414,7 @@ def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
             info.compress_type = zipfile.ZIP_DEFLATED
             z.writestr(info, data if isinstance(data, bytes) else data.encode('utf-8'))
         add('node_agent.py', agent)
+        add('node_service.py', service)
         add('config.json', json.dumps(cfg, ensure_ascii=False, indent=1))
         add('requirements.txt', KIT_REQUIREMENTS)
         add('README.txt', KIT_README)

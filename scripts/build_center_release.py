@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / 'deploy'))
 INCLUDE = [
     'VERSION', 'LICENSE', 'NOTICE', 'README.md', 'CONTRIBUTING.md',
     'deploy/center_app.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/platform_service.py',
-    'deploy/node_agent.py', 'deploy/admin_tool.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
+    'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
     'deploy/install_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
     'server/__init__.py', 'server/neuron_census_service.py',

@@ -5,7 +5,7 @@
 ```
 浏览器 ──https──> nginx :80/443 ──> center_app 127.0.0.1:5010 ──> /var/lib/ai2050/center   SQLite、结果、普查作业
                                                               └─> /var/lib/ai2050/native   普查语料、合并后的普查
-参与者节点（node_agent.py participate）──> 同一个域名的 /api/*
+参与者节点（node_agent.py participate；桌面客户端经本机节点服务 node_agent.py serve）──> 同一个域名的 /api/*
 ```
 
 ## 1. 生成发布包（在开发机上）

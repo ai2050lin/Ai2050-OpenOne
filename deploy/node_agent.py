@@ -60,8 +60,52 @@ def http_json(url: str, method: str = 'GET', payload=None, token: str = '',
         raise RuntimeError(f'{method} {url} -> network: {e.reason}') from e
 
 
+# 本机节点服务（node_service.py）挂接的钩子：日志、runner 进度、任务结论；命令行下为空。
+LOG_HOOKS: list = []
+PROGRESS_HOOKS: list = []
+RESULT_HOOKS: list = []
+RUNNING: set = set()            # 正在运行的 runner 子进程（服务的「停止」会结束它们）
+
+
+def _emit(hooks, *a) -> None:
+    for h in list(hooks):
+        try:
+            h(*a)
+        except Exception:
+            pass
+
+
+def _console(line: str, end: str = '\n') -> None:
+    """打印到控制台；中文控制台（GBK）不能编码的字符替换掉，输出已关闭时忽略——控制台输出不能让任务失败。"""
+    try:
+        print(line, end=end, flush=True)
+    except (UnicodeEncodeError, OSError, ValueError):
+        try:
+            enc = getattr(sys.stdout, 'encoding', None) or 'ascii'
+            print(line.encode(enc, 'replace').decode(enc, 'replace'), end=end, flush=True)
+        except Exception:
+            pass
+
+
 def log(msg: str) -> None:
-    print(f"[agent {time.strftime('%H:%M:%S')}] {msg}", flush=True)
+    _console(f"[agent {time.strftime('%H:%M:%S')}] {msg}")
+    _emit(LOG_HOOKS, msg)
+
+
+def abort_running() -> int:
+    """结束全部正在运行的 runner；返回结束的个数。未上传的租约到期后由中心重新派发。"""
+    n = 0
+    for p in list(RUNNING):
+        if p.poll() is None:
+            p.kill()
+            n += 1
+    return n
+
+
+def _spawn(cmd, **kw):
+    p = subprocess.Popen(cmd, **kw)
+    RUNNING.add(p)
+    return p
 
 
 def creds_path(data_dir: Path) -> Path:
@@ -126,13 +170,19 @@ def execute_task(args, task: dict, work_root: Path) -> Path:
         env['AI2050_PRECISION'] = args.dtype
     suffix = f" work_unit={research_ref.get('work_unit_id')}" if research_ref else ''
     log(f"exec {task['tm_id']} ({task['name']}) runner with {Path(args.python).name}{suffix}")
-    proc = subprocess.run(
-        [args.python, str(runner), '--out', str(tdir / 'outputs')],
-        cwd=str(tdir), env=env, timeout=args.run_timeout,
-        capture_output=True, text=True)
-    log(f"runner exit={proc.returncode} {proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else ''}")
+    proc = _spawn([args.python, str(runner), '--out', str(tdir / 'outputs')], cwd=str(tdir), env=env,
+                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+    try:
+        out, err = proc.communicate(timeout=args.run_timeout)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        out, err = proc.communicate()
+        raise RuntimeError(f'runner timeout after {args.run_timeout:.0f}s')
+    finally:
+        RUNNING.discard(proc)
+    log(f"runner exit={proc.returncode} {out.strip().splitlines()[-1] if out.strip() else ''}")
     if proc.returncode != 0:
-        raise RuntimeError(f'runner failed: {proc.stderr[-500:]}')
+        raise RuntimeError(f'runner failed: {err[-500:]}')
     return tdir / 'outputs'
 
 
@@ -200,8 +250,12 @@ def run_one(args, creds: dict, work_root: Path) -> bool:
         log(f"result sha={sha[:16]} uploaded")
         http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
                   {'status': 'done', 'result_sha': sha}, token=creds['node_token'])
+        _emit(RESULT_HOOKS, {'kind': 'family_test', 'task': task['task_id'], 'tm_id': task['tm_id'],
+                             'shard': task.get('shard'), 'status': 'done', 'sha': sha})
     except Exception as e:
         log(f"task failed: {e}")
+        _emit(RESULT_HOOKS, {'kind': 'family_test', 'task': task['task_id'], 'tm_id': task['tm_id'],
+                             'shard': task.get('shard'), 'status': 'failed', 'note': str(e)[:300]})
         try:
             http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
                       {'status': 'failed', 'note': str(e)[:300]}, token=creds['node_token'])
@@ -471,19 +525,23 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
                '--tokens', str(tdir / tokens), '--out', str(tdir / 'outputs'), '--device', device, '--mode', mode]
         if mode == 'real':
             cmd += ['--model', model_dir]
-        proc = subprocess.Popen(cmd, cwd=str(tdir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                                encoding='utf-8', errors='replace')
+        proc = _spawn(cmd, cwd=str(tdir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                      encoding='utf-8', errors='replace')
         tail = []
         for line in proc.stdout:
             line = line.rstrip()
             tail = (tail + [line])[-20:]
             if line.startswith('@@progress '):
                 p = json.loads(line[11:])
-                print(f"\r  进度 {p['done']}/{p['total']} 窗口 · {p['tokens']:,} token · {p['tok_per_s']:.0f} tok/s · "
-                      f"{p['seconds']:.0f}s   ", end='', flush=True)
-        if proc.wait() != 0:
+                _emit(PROGRESS_HOOKS, {'job': lease['job_id'], 'shard': lease['shard'], **p})
+                _console(f"\r  进度 {p['done']}/{p['total']} 窗口 · {p['tokens']:,} token · {p['tok_per_s']:.0f} tok/s · "
+                         f"{p['seconds']:.0f}s   ", end='')
+        rc = proc.wait()
+        proc.stdout.close()
+        RUNNING.discard(proc)
+        if rc != 0:
             raise RuntimeError('runner 失败：' + ' | '.join(tail[-5:]))
-        print()
+        _console('')
         data = (tdir / 'outputs' / 'shard.npz').read_bytes()
         summary = json.loads((tdir / 'outputs' / 'summary.json').read_text(encoding='utf-8'))
         size = int(lease.get('chunk_bytes') or 4_000_000)
@@ -491,6 +549,12 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
             http_bytes(server + f'/api/census/leases/{lid}/chunk?seq={seq}', data[i:i + size], token)
         _, fin = http_json(server + f'/api/census/leases/{lid}/finish', 'POST',
                            {'sha256': hashlib.sha256(data).hexdigest(), 'summary': summary}, token=token, timeout=600)
+        res = {'kind': 'census_shard', 'task': lid, 'job': lease['job_id'], 'shard': lease['shard'],
+               'status': fin.get('status') or 'unknown', 'sha': fin.get('sha', ''),
+               'replica': (fin.get('replica') or {}).get('ok')}
+        if fin.get('status') != 'accepted':
+            res['note'] = '; '.join(fin.get('errors') or [])[:300]
+        _emit(RESULT_HOOKS, res)
         if fin.get('status') == 'accepted':
             rep = fin.get('replica')
             log(f"上传完成，中心校验通过 ✓ {fin['sha'][:12]}"
@@ -499,6 +563,8 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
             log(f"中心拒收：{'; '.join(fin.get('errors') or [])[:400]}")
     except Exception as e:
         log(f'普查分片失败：{e}')
+        _emit(RESULT_HOOKS, {'kind': 'census_shard', 'task': lid, 'job': lease['job_id'], 'shard': lease['shard'],
+                             'status': 'failed', 'note': str(e)[:300]})
         try:
             http_json(server + f'/api/census/leases/{lid}/fail', 'POST', {'note': str(e)[:400]}, token=token)
         except Exception:
@@ -651,6 +717,12 @@ def main() -> None:
     pp.add_argument('--non-interactive', action='store_true', help='不询问（缺模型时跳过）')
     pp.add_argument('--synthetic', action='store_true', help='协议联调：伪激活，只在沙盒中心可用')
     pp.set_defaults(fn=cmd_participate)
+
+    sv = sub.add_parser('serve', help='本机节点服务：供桌面客户端控制的本机接口（只监听 127.0.0.1，见 node_service.py）')
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import node_service
+    node_service.add_arguments(sv)
+    sv.set_defaults(fn=node_service.run_from_args)
 
     args = ap.parse_args()
     args.data_dir = str(Path(args.data_dir).resolve())  # 子进程 cwd 切换前先固定绝对路径
