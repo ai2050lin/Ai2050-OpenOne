@@ -206,8 +206,11 @@ function createWindow(server) {
     return { action: 'deny' };
   });
 
-  // 打包后 dist 在 app.asar 内；开发时指向 frontend/dist
-  win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+  // 打包后 dist 在 app.asar 内；开发时指向 frontend/dist。
+  // VSCode 调试（scripts/start_visualization.ps1 -Mode client）设置 AI2050_CLIENT_DEV_URL，未打包时改为加载本机 vite dev（热更新）
+  const devUrl = process.env.AI2050_CLIENT_DEV_URL || '';
+  if (!app.isPackaged && /^http:\/\/(localhost|127\.0\.0\.1):\d+\/?$/.test(devUrl)) win.loadURL(devUrl);
+  else win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
   win.once('ready-to-show', () => win.show());
   win.on('closed', () => { if (mainWindow === win) mainWindow = null; });
 

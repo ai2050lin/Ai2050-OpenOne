@@ -1,6 +1,7 @@
 ﻿[CmdletBinding()]
 param(
-    [ValidateSet('dev', 'build', 'preview', 'lint')]
+    # client：启动 vite dev 后打开 Electron 客户端（加载 dev 服务器，热更新），客户端窗口关闭即结束
+    [ValidateSet('dev', 'build', 'preview', 'lint', 'client')]
     [string]$Mode = 'dev',
     [ValidateRange(1, 65535)]
     [int]$Port = 5173,
@@ -169,6 +170,23 @@ try {
             if ($Foreground) { $previewArgs += '--foreground' }
             if ($Detach) { $previewArgs += '--detach' }
             & $nodeExecutable @previewArgs
+            exit $LASTEXITCODE
+        }
+        'client' {
+            # 1) vite dev 由守护器托管（幂等复用、就绪后才返回）
+            & $nodeExecutable $devServer --port "$Port" --detach
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            # 2) Electron 二进制：npm ci 跳过下载时补装（electron/install.js 按包内 checksums.json 核对）
+            $electronExe = Join-Path $frontendRoot 'node_modules\electron\dist\electron.exe'
+            if (-not (Test-Path -LiteralPath $electronExe)) {
+                Write-Host '[AI2050] Downloading the Electron binary (first run only)...' -ForegroundColor Yellow
+                & $nodeExecutable (Join-Path $frontendRoot 'node_modules\electron\install.js')
+                if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $electronExe)) { throw "Electron binary not installed: $electronExe" }
+            }
+            # 3) 客户端加载 dev 服务器（只在未打包时生效，见 electron/main.js 的 AI2050_CLIENT_DEV_URL）
+            $env:AI2050_CLIENT_DEV_URL = "http://localhost:$Port/"
+            Write-Host "[AI2050] Electron client -> $($env:AI2050_CLIENT_DEV_URL)" -ForegroundColor Green
+            & $electronExe $frontendRoot
             exit $LASTEXITCODE
         }
         'build' { & $nodeExecutable $viteScript build; exit $LASTEXITCODE }
