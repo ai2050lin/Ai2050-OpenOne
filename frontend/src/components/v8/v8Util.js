@@ -11,7 +11,10 @@ export const PAGES = [
   { id: 'join', label: '参与', desc: '用你的 GPU 跑一个分片：一键包、贡献榜' },
 ];
 /* 不进主导航的页面：账号管理（管理员，从账号菜单进入） */
-export const BRANCHES = [{ id: 'accounts', label: '账号管理', desc: '管理本中心的全部账号' }];
+export const BRANCHES = [
+  { id: 'accounts', label: '账号管理', desc: '管理本中心的全部账号' },
+  { id: 'data', label: '数据管理', desc: '服务器上的数据与存储，以及每个账号上传了什么（只读）' },
+];
 /* 旧链接：开放平台的 ?tab= 与 v8 网站的 ?page=；语言图谱 / 神经元 / 进展等转到研究工作台 */
 const OLD_TABS = { home: 'home', learn: 'learn', join: 'join' };
 /* 研究工作台地址：网页与 vite dev 用 /workbench；Electron 安装包的 file:// 页面用 index.html?wb=1（main.jsx 据此进入工作台） */

@@ -3,7 +3,7 @@
 
     python deploy/center_app.py --host 0.0.0.0 --port 5010
 
-挂载：distributed_service（模板、节点、结果、谱图、账号）、census_service（神经元普查分片）、platform_service（公开配置、
+挂载：distributed_service（模板、节点、结果、谱图、账号）、census_service（神经元普查分片）、data_admin_service（管理员数据管理，只读）、platform_service（公开配置、
 进展快照、贡献榜、参与者一键包）、server/neuron_census_service（神经元单元卡）；frontend/dist 存在时同源托管客户端。
 
 环境变量（生产部署见 deploy/README_DEPLOY.md）：
@@ -37,6 +37,7 @@ def create_app():
     from fastapi.responses import FileResponse, JSONResponse
 
     import census_service
+    import data_admin_service
     import distributed_service
     import platform_service
     from server import neuron_census_service
@@ -62,6 +63,7 @@ def create_app():
 
     app.include_router(distributed_service.router)
     app.include_router(census_service.router)
+    app.include_router(data_admin_service.router)
     app.include_router(platform_service.router)
     app.include_router(platform_service.auth_router)
     app.include_router(platform_service.lang_router)

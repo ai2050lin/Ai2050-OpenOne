@@ -68,9 +68,10 @@ if _deploy_dir not in sys.path:
 try:
     from distributed_service import router as distributed_router  # type: ignore
     from census_service import router as census_router  # type: ignore  # 神经元普查分片（census_job.v1）
+    from data_admin_service import router as data_admin_router  # type: ignore  # 管理员数据管理（data_admin.v1，只读）
     from platform_service import router as platform_router, auth_router as platform_auth_router, lang_router as platform_lang_router  # type: ignore  # 开放平台
 except ImportError:
-    distributed_router = census_router = platform_router = platform_auth_router = platform_lang_router = None  # type: ignore[assignment]
+    distributed_router = census_router = data_admin_router = platform_router = platform_auth_router = platform_lang_router = None  # type: ignore[assignment]
 from server.research_asset_service import router as research_asset_router
 from server.research_kernel.router import router as research_kernel_router
 from server.research_trace_service import router as research_trace_router
@@ -255,6 +256,7 @@ app.include_router(neuron_census_router)
 if distributed_router is not None:
     app.include_router(distributed_router)
     app.include_router(census_router)
+    app.include_router(data_admin_router)
     app.include_router(platform_router)
     app.include_router(platform_auth_router)
     app.include_router(platform_lang_router)

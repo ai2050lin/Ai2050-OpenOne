@@ -17,6 +17,7 @@ import './v8.css';
 const OpenJoin = lazy(() => import('../open/OpenJoin.jsx'));
 const OpenLearn = lazy(() => import('../open/OpenLearn.jsx'));
 const AccountAdmin = lazy(() => import('../app/rdc_fusion/AccountAdmin.jsx'));
+const DataAdmin = lazy(() => import('../app/rdc_fusion/DataAdmin.jsx'));
 
 export default function AtlasApp() {
   const cfg = useApi('/api/platform/config');
@@ -26,7 +27,7 @@ export default function AtlasApp() {
   const set = patch => setSt(prev => ({ ...prev, ...patch }));
   const redirect = WORKBENCH_REDIRECT[st.page];
   const pages = PAGES.filter(p => p.id !== 'join' || !config?.ui?.tabs || config.ui.tabs.includes('join'))
-    .concat(user?.role === 'admin' ? BRANCHES.filter(p => p.id === 'accounts') : []);   // 账号管理只对管理员显示
+    .concat(user?.role === 'admin' ? BRANCHES : []);   // 账号管理、数据管理只对管理员显示
 
   useEffect(() => { if (redirect) window.location.replace(redirect); else writeState(st); }, [st, redirect]);
   const label = [...PAGES, ...BRANCHES].find(p => p.id === st.page)?.label || '';
@@ -60,6 +61,7 @@ export default function AtlasApp() {
           {st.page === 'learn' && <OpenLearn onGo={t => (WORKBENCH_REDIRECT[t] ? window.location.assign(WORKBENCH_REDIRECT[t]) : set({ page: t }))} />}
           {st.page === 'join' && <OpenJoin config={config} />}
           {st.page === 'accounts' && <AccountAdmin />}
+          {st.page === 'data' && <DataAdmin />}
         </Suspense>
       </main>
       <footer className="v8-foot">

@@ -1,4 +1,4 @@
-/* 顶栏账号菜单：当前账号、修改密码、我的节点、退出登录；管理员另有「账号管理」（网站 ?page=accounts，AccountAdmin.jsx）。 */
+/* 顶栏账号菜单：当前账号、修改密码、我的节点、退出登录；管理员另有「账号管理」（网站 ?page=accounts，AccountAdmin.jsx）与「数据管理」（?page=data，DataAdmin.jsx）。 */
 import { useEffect, useRef, useState } from 'react';
 import { authJson } from './api.js';
 import { useAuth } from './authContext.js';
@@ -103,6 +103,7 @@ function OnlineAccountMenu() {
               <button type="button" role="menuitem" className="v6-acct-item" onClick={() => setPanel(panel === 'pw' ? '' : 'pw')}>修改密码</button>
               {panel === 'pw' && <div className="v6-acct-panel"><PasswordForm onDone={() => setPanel('')} /></div>}
               {user.role === 'admin' && <a role="menuitem" className="v6-acct-item" href={siteHref('accounts')} onClick={() => setOpen(false)}>账号管理</a>}
+              {user.role === 'admin' && <a role="menuitem" className="v6-acct-item" href={siteHref('data')} onClick={() => setOpen(false)}>数据管理</a>}
               <button type="button" role="menuitem" className="v6-acct-item danger" onClick={() => { setOpen(false); logout(); }}>退出登录</button>
             </>
           )}
