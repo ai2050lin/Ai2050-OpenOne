@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================================
 #  AI2050 平台一键部署（CentOS 7/8/9 Stream）
-#  域名：platform.ai2050.com
+#  域名：server.ai2050.com
 #
 #  作用：把本仓库部署为
 #     nginx  :80/:443  →  静态前端 dist + /api 反代 127.0.0.1:5001（同源，无 CORS）
@@ -17,12 +17,12 @@
 #  幂等：可重复执行。已存在的目录/venv/unit 只更新不重建；nginx 配置先备份后覆盖。
 #  不幂等的部分（会明确提示）：--fresh 重建 venv、--reset-admin-token 换令牌。
 #
-#  前置：域名 platform.ai2050.com 的 A 记录已指向本机公网 IP。
+#  前置：域名 server.ai2050.com 的 A 记录已指向本机公网 IP。
 # ============================================================================
 set -euo pipefail
 
 # ── 可配置项（环境变量可覆盖）────────────────────────────────
-DOMAIN="${DOMAIN:-platform.ai2050.com}"
+DOMAIN="${DOMAIN:-server.ai2050.com}"
 REPO_SRC="${REPO_SRC:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 INSTALL_ROOT="${INSTALL_ROOT:-/opt/ai2050}"
 REPO_DIR="${INSTALL_ROOT}/Ai2050-OpenOne"

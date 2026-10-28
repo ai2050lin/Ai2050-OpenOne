@@ -17,7 +17,7 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-/* 形如 --ai2050-server=https://platform.ai2050.com */
+/* 形如 --ai2050-server=https://server.ai2050.com */
 const argv = process.argv || [];
 let server = '';
 let mode = 'electron';

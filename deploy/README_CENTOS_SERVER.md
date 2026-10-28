@@ -1,4 +1,4 @@
-# CentOS 部署指南 — AI2050 平台（域名 platform.ai2050.com）
+# CentOS 部署指南 — AI2050 平台（域名 server.ai2050.com）
 
 对应服务：`server/server.py`（:5001，客户端**唯一数据源**）+ nginx 静态托管 + 可选分布式平台（:5010）。
 
@@ -16,7 +16,7 @@
 ### 0.1 前置
 
 ```bash
-# 1) 域名 A 记录：platform.ai2050.com → 本机公网 IP（先确认 IP）
+# 1) 域名 A 记录：server.ai2050.com → 本机公网 IP（先确认 IP）
 curl -fsS https://api.ipify.org
 
 # 2) 本机准备前端产物（服务器不装 node，直接传 dist）
@@ -59,7 +59,7 @@ sudo bash deploy/install_centos.sh --yes
 ### 0.4 部署后
 
 ```
-站点      https://platform.ai2050.com
+站点      https://server.ai2050.com
 中心服务  http://127.0.0.1:5001        (systemd: ai2050-server)
 前端文件  /var/www/ai2050
 数据目录  /var/lib/ai2050/distributed
@@ -145,7 +145,7 @@ sudo semanage port -a -t http_port_t -p tcp 80 || true
 
 ```bash
 sudo dnf install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d platform.ai2050.com --redirect
+sudo certbot --nginx -d server.ai2050.com --redirect
 # 证书续期定时器：systemctl list-timers | grep certbot
 ```
 
@@ -161,7 +161,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1/    # 前端 200
 curl -s http://127.0.0.1/api/ai-rnd/atlas/registry | head -c 200
 
 # 公网
-curl -s -o /dev/null -w '%{http_code}\n' https://platform.ai2050.com/
+curl -s -o /dev/null -w '%{http_code}\n' https://server.ai2050.com/
 ```
 
 ---
@@ -177,8 +177,8 @@ sudo systemctl daemon-reload && sudo systemctl enable --now ai2050-distributed
 节点接入（任意机器，Windows/Linux 皆可；`node_agent.py` 仅需标准库）：
 
 ```bash
-python deploy/node_agent.py --server http://platform.ai2050.com:5010 register --name gpu-box-1 --gpu "RTX 5080"
-python deploy/node_agent.py --server http://platform.ai2050.com:5010 run --once   # 冒烟
+python deploy/node_agent.py --server http://server.ai2050.com:5010 register --name gpu-box-1 --gpu "RTX 5080"
+python deploy/node_agent.py --server http://server.ai2050.com:5010 run --once   # 冒烟
 ```
 
 > 冒烟结果 `kind=smoke`，与真实结果在 `/api/results` 中可辨 —— 诚实口径，不冒充实测。
