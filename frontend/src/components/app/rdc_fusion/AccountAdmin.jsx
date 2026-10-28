@@ -1,4 +1,5 @@
-/* 账号管理页（网站 ?page=accounts，管理员）：搜索与筛选、注册策略、创建账号；逐个账号改角色、资料、重置密码、强制下线、停用 / 启用、删除。
+/* 账号管理页（网站 ?page=accounts，管理员）：搜索与筛选、注册策略、创建账号；逐个账号改角色、资料、重置密码、强制下线、停用 / 启用、删除；
+   自己的账号可修改密码（要原密码，其他设备上的登录随之失效）。
    全部操作走 /api/auth/*（只在点击时连接中心），网页与桌面客户端相同；账号只用于署名与授权，不影响结果的合并口径与证据等级。 */
 import { useEffect, useState } from 'react';
 import { authJson, fmtAgoTs } from './api.js';
@@ -10,7 +11,7 @@ import './accounts.css';
 const EMPTY_NEW = { username: '', password: '', display_name: '', email: '', role: 'member' };
 
 function RowPanel({ u, mode, onDone, onCancel }) {
-  const [f, setF] = useState({ display_name: u.display_name || '', email: u.email || '', password: '', confirm: '', del: '' });
+  const [f, setF] = useState({ display_name: u.display_name || '', email: u.email || '', old: '', password: '', confirm: '', del: '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const run = async (path, body) => {
@@ -21,9 +22,10 @@ function RowPanel({ u, mode, onDone, onCancel }) {
   const submit = e => {
     e.preventDefault();
     if (mode === 'edit') run(`/api/auth/users/${u.user_id}`, { display_name: f.display_name, email: f.email });
-    else if (mode === 'password') {
+    else if (mode === 'password' || mode === 'own-password') {
       if (f.password !== f.confirm) { setErr('两次输入的新密码不一致'); return; }
-      run(`/api/auth/users/${u.user_id}/password`, { new_password: f.password });
+      if (mode === 'own-password') run('/api/auth/password', { old_password: f.old, new_password: f.password });
+      else run(`/api/auth/users/${u.user_id}/password`, { new_password: f.password });
     } else if (mode === 'delete') run(`/api/auth/users/${u.user_id}/delete`, { confirm: f.del });
   };
   const field = (k, props) => <input {...props} value={f[k]} onChange={e => setF(v => ({ ...v, [k]: e.target.value }))} />;
@@ -33,10 +35,12 @@ function RowPanel({ u, mode, onDone, onCancel }) {
         <label>显示名称{field('display_name', { maxLength: 60 })}</label>
         <label>邮箱{field('email', { type: 'email', maxLength: 120, placeholder: '可留空' })}</label>
       </>)}
-      {mode === 'password' && (<>
+      {mode === 'own-password' && <label>原密码{field('old', { type: 'password', autoComplete: 'current-password', required: true })}</label>}
+      {(mode === 'password' || mode === 'own-password') && (<>
         <label>新密码{field('password', { type: 'password', autoComplete: 'new-password', required: true, minLength: 8 })}</label>
         <label>确认新密码{field('confirm', { type: 'password', autoComplete: 'new-password', required: true, minLength: 8 })}</label>
-        <small>重置后该账号的全部登录立即失效，登录锁定一并解除；请通过其他渠道把新密码告诉对方。</small>
+        <small>{mode === 'own-password' ? '修改后，你在其他设备和浏览器上的登录都会失效；当前这个页面保持登录。'
+          : '重置后该账号的全部登录立即失效，登录锁定一并解除；请通过其他渠道把新密码告诉对方。'}</small>
       </>)}
       {mode === 'delete' && (<>
         <small>永久删除 <b>{u.username}</b>：账号、登录与绑定码都会删除，不能恢复；名下 {u.nodes} 个节点改为无主（已上传的结果保留，去掉署名）。只想暂时禁止登录请用「停用」。</small>
@@ -45,7 +49,7 @@ function RowPanel({ u, mode, onDone, onCancel }) {
       <div className="acm-panel-act">
         <button type="submit" className={'fw-tbtn ' + (mode === 'delete' ? 'acm-danger' : 'primary')}
                 disabled={busy || (mode === 'delete' && f.del.trim().toLowerCase() !== u.username.toLowerCase())}>
-          {busy ? '处理中…' : mode === 'edit' ? '保存' : mode === 'password' ? '重置密码' : '永久删除'}
+          {busy ? '处理中…' : { edit: '保存', password: '重置密码', 'own-password': '修改密码', delete: '永久删除' }[mode]}
         </button>
         <button type="button" className="fw-tbtn" onClick={onCancel}>取消</button>
         {err && <span className="acm-err" role="alert">{err}</span>}
@@ -196,6 +200,7 @@ export default function AccountAdmin() {
                     <td>{u.created_at ? new Date(u.created_at * 1000).toLocaleDateString() : '—'}</td>
                     <td className="acm-act">
                       <button type="button" className={'fw-tbtn' + (isOpen && open.mode === 'edit' ? ' on' : '')} onClick={() => toggle(u, 'edit')}>资料</button>
+                      {me && <button type="button" className={'fw-tbtn' + (isOpen && open.mode === 'own-password' ? ' on' : '')} onClick={() => toggle(u, 'own-password')}>修改密码</button>}
                       {!me && (<>
                         <button type="button" className={'fw-tbtn' + (isOpen && open.mode === 'password' ? ' on' : '')} onClick={() => toggle(u, 'password')}>重置密码</button>
                         <button type="button" className="fw-tbtn" disabled={!u.sessions} title={u.sessions ? '注销该账号的全部登录' : '没有登录中的会话'}
@@ -211,7 +216,8 @@ export default function AccountAdmin() {
                       <td colSpan={8}>
                         <RowPanel u={u} mode={open.mode} onCancel={() => setOpen({ id: '', mode: '' })}
                                   onDone={r => reload(open.mode === 'delete' ? `已删除 ${r.deleted}${r.nodes_unowned ? `，${r.nodes_unowned} 个节点改为无主` : ''}`
-                                    : open.mode === 'password' ? `${u.username} 的密码已重置，其登录已全部失效` : `${u.username} 的资料已保存`)} />
+                                    : open.mode === 'password' ? `${u.username} 的密码已重置，其登录已全部失效`
+                                    : open.mode === 'own-password' ? '你的密码已修改；其他设备上的登录已失效' : `${u.username} 的资料已保存`)} />
                       </td>
                     </tr>
                   ),
@@ -221,7 +227,7 @@ export default function AccountAdmin() {
           </table>
           {!shown.length && <Empty>没有符合条件的账号</Empty>}
         </div>
-        <p className="acm-note">自己的账号请用右上角菜单的「修改密码」「退出登录」。忘记管理员密码时，在中心服务器上运行 <code>deploy/reset_password.py</code>。</p>
+        <p className="acm-note">自己的账号可在本页「修改密码」，退出登录在右上角菜单。忘记管理员密码时，在中心服务器上运行 <code>deploy/reset_password.py</code>。</p>
       </>)}
     </div>
   );
