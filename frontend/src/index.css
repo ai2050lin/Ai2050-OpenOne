@@ -22,6 +22,14 @@ body {
   overflow: hidden;
 }
 
+/* 网站页面（首页 / 介绍 / 参与 / 账号管理，.v8-root）是普通文档流：内容高于视口时要能上下滚动。
+   上面的 overflow:hidden 只为自带滚动区的旧 3D 界面与研究工作台保留。 */
+body:has(.v8-root) {
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 #root {
   width: 100%;
   height: 100vh;

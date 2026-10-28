@@ -4,6 +4,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 
 import AccountMenu from '../app/rdc_fusion/AccountMenu.jsx';
+import { useAuth } from '../app/rdc_fusion/authContext.js';
 import { API_BASE, useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/rdc_fusion/rdc_fusion.css';
@@ -19,11 +20,13 @@ const AccountAdmin = lazy(() => import('../app/rdc_fusion/AccountAdmin.jsx'));
 
 export default function AtlasApp() {
   const cfg = useApi('/api/platform/config');
+  const { user } = useAuth();
   const config = cfg.data;
   const [st, setSt] = useState(readState);
   const set = patch => setSt(prev => ({ ...prev, ...patch }));
   const redirect = WORKBENCH_REDIRECT[st.page];
-  const pages = PAGES.filter(p => p.id !== 'join' || !config?.ui?.tabs || config.ui.tabs.includes('join'));
+  const pages = PAGES.filter(p => p.id !== 'join' || !config?.ui?.tabs || config.ui.tabs.includes('join'))
+    .concat(user?.role === 'admin' ? BRANCHES.filter(p => p.id === 'accounts') : []);   // 账号管理只对管理员显示
 
   useEffect(() => { if (redirect) window.location.replace(redirect); else writeState(st); }, [st, redirect]);
   const label = [...PAGES, ...BRANCHES].find(p => p.id === st.page)?.label || '';
