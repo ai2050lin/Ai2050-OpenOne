@@ -302,5 +302,191 @@ class SandboxCenterE2ETests(unittest.TestCase):
             b['thread'].join(10)
 
 
+class FakeHF:
+    """本机假的 Hugging Face：文件列表 API + 支持 Range 的 resolve；可设置损坏或不支持续传。"""
+    REV = 'a' * 40
+
+    def __init__(self):
+        import hashlib
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        self.files = {'config.json': b'{"num_hidden_layers": 2}', 'model.safetensors': bytes(range(256)) * 4096}
+        self.corrupt, self.no_range, self.ranges = set(), False, []
+        lfs = {'model.safetensors': hashlib.sha256(self.files['model.safetensors']).hexdigest()}
+        fake = self
+
+        class H(BaseHTTPRequestHandler):
+            def log_message(self, *a):
+                pass
+
+            def do_GET(self):  # noqa: N802
+                u = urlparse(self.path)
+                if u.path == f'/api/models/org/toy/revision/{fake.REV}':
+                    sib = [{'rfilename': n, 'size': len(b), **({'lfs': {'sha256': lfs[n], 'size': len(b)}} if n in lfs else {})}
+                           for n, b in fake.files.items()]
+                    sib += [{'rfilename': 'sub/x.bin', 'size': 3}, {'rfilename': '..', 'size': 1}, {'rfilename': '.gitattributes', 'size': 1}]
+                    body = json.dumps({'siblings': sib}).encode()
+                    self.send_response(200); self.send_header('Content-Length', str(len(body))); self.end_headers(); self.wfile.write(body)
+                    return
+                name = u.path.rsplit('/', 1)[-1]
+                if not u.path.startswith(f'/org/toy/resolve/{fake.REV}/') or name not in fake.files:
+                    self.send_response(404); self.end_headers(); return
+                data = fake.files[name]
+                if name in fake.corrupt:
+                    data = b'\x00' * len(data)
+                rng = self.headers.get('Range')
+                fake.ranges.append((name, rng))
+                start = int(rng[6:].split('-')[0]) if rng and not fake.no_range else 0
+                self.send_response(206 if start else 200)
+                self.send_header('Content-Length', str(len(data) - start)); self.end_headers()
+                self.wfile.write(data[start:])
+
+        self.httpd = ThreadingHTTPServer(('127.0.0.1', 0), H)
+        threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
+        self.url = f'http://127.0.0.1:{self.httpd.server_address[1]}'
+
+    def close(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
+
+
+from urllib.parse import urlparse  # noqa: E402
+
+
+class ModelDownloadTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.env = os.environ.get('AI2050_HOME')
+        os.environ['AI2050_HOME'] = str(self.tmp / 'home')      # model_snapshot 的哈希缓存
+        self.hf = FakeHF()
+
+    def tearDown(self):
+        self.hf.close()
+        if self.env is None:
+            os.environ.pop('AI2050_HOME', None)
+        else:
+            os.environ['AI2050_HOME'] = self.env
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_safe_filename(self):
+        for ok in ('model.safetensors', 'tokenizer.json', 'model-00001-of-00002.safetensors'):
+            self.assertTrue(S.safe_filename(ok), ok)
+        for bad in ('..', '../x', 'a/b', 'a\\b', 'C:x', '.gitattributes', '', 'a\x00b'):
+            self.assertFalse(S.safe_filename(bad), bad)
+
+    def test_file_list_skips_nested_and_unsafe(self):
+        files = S.hf_file_list(self.hf.url, 'org/toy', FakeHF.REV)
+        self.assertEqual(sorted(f['name'] for f in files), ['config.json', 'model.safetensors'])
+        self.assertTrue(next(f for f in files if f['name'] == 'model.safetensors')['sha256'])
+        with self.assertRaises(ValueError):
+            S.hf_file_list(self.hf.url, '../etc', FakeHF.REV)
+
+    def test_resume_from_part(self):
+        data = self.hf.files['model.safetensors']
+        dest = self.tmp / 'model.safetensors'
+        (self.tmp / 'model.safetensors.part').write_bytes(data[:300_000])
+        url = f'{self.hf.url}/org/toy/resolve/{FakeHF.REV}/model.safetensors'
+        import hashlib
+        got = S.download_file(url, dest, size=len(data), sha256=hashlib.sha256(data).hexdigest())
+        self.assertEqual(dest.read_bytes(), data)
+        self.assertEqual(got, hashlib.sha256(data).hexdigest())
+        self.assertEqual(self.hf.ranges[-1], ('model.safetensors', 'bytes=300000-'))
+        self.assertFalse((self.tmp / 'model.safetensors.part').exists())
+
+    def test_server_without_range_restarts(self):
+        self.hf.no_range = True
+        data = self.hf.files['model.safetensors']
+        (self.tmp / 'model.safetensors.part').write_bytes(b'junk' * 10)
+        seen = []
+        S.download_file(f'{self.hf.url}/org/toy/resolve/{FakeHF.REV}/model.safetensors', self.tmp / 'model.safetensors',
+                        size=len(data), on_bytes=seen.append)
+        self.assertEqual((self.tmp / 'model.safetensors').read_bytes(), data)
+        self.assertEqual(sum(seen), len(data))                   # 进度计数在重新开始时扣回
+
+    def test_sha_mismatch_rejected(self):
+        self.hf.corrupt.add('model.safetensors')
+        data = self.hf.files['model.safetensors']
+        import hashlib
+        with self.assertRaises(RuntimeError):
+            S.download_file(f'{self.hf.url}/org/toy/resolve/{FakeHF.REV}/model.safetensors', self.tmp / 'm.safetensors',
+                            size=len(data), sha256=hashlib.sha256(data).hexdigest())
+        self.assertFalse((self.tmp / 'm.safetensors').exists())
+        self.assertFalse((self.tmp / 'm.safetensors.part').exists())
+
+    def _service(self, disk=100.0):
+        ref = self.tmp / 'ref'
+        ref.mkdir()
+        for n, b in self.hf.files.items():
+            (ref / n).write_bytes(b)
+        want = S.A.model_snapshot(ref)['sha256']
+        svc = S.NodeService(self.tmp / 'svc', probes={**FAKE, 'disk': lambda p: disk})
+        svc.update_config({'models_root': str(self.tmp / 'models')})
+        svc.cfg['hf_endpoint'] = self.hf.url                     # 测试用本机来源（真实配置只接受白名单）
+        svc.pcfg = {'models': [{'snapshot_sha256': want, 'name': 'toy', 'hf_repo': 'org/toy', 'hf_revision': FakeHF.REV}]}
+        return svc, want
+
+    def _wait(self, svc, snap, until=('ok', 'mismatch', 'error', 'cancelled')):
+        deadline = time.time() + 30
+        while time.time() < deadline:
+            st = (svc.checks.get(snap) or {}).get('status')
+            if st in until:
+                return svc.checks[snap]
+            time.sleep(0.05)
+        self.fail(f'download did not finish: {svc.checks.get(snap)}')
+
+    def test_service_download_and_verify(self):
+        svc, want = self._service()
+        try:
+            self.assertEqual(svc.download_model(want)['status'], 'downloading')
+            r = self._wait(svc, want)
+            self.assertEqual(r['status'], 'ok', r)
+            d = Path(svc.cfg['model_dirs'][want])
+            self.assertEqual(d, self.tmp / 'models' / 'toy')
+            self.assertEqual(sorted(p.name for p in d.iterdir()), ['config.json', 'model.safetensors'])
+            cache = json.loads((self.tmp / 'home' / 'snapshot_cache.json').read_text())
+            self.assertTrue(any('model.safetensors' in k for k in cache))
+            self.assertEqual(svc.models()[0]['status'], 'ok')
+            n = len(self.hf.ranges)
+            svc.download_model(want)                              # 已齐全：不再请求文件
+            self._wait(svc, want, until=('ok',))
+            self.assertEqual(len(self.hf.ranges), n)
+        finally:
+            svc.shutdown()
+
+    def test_corrupt_download_is_error_not_ok(self):
+        self.hf.corrupt.add('model.safetensors')
+        svc, want = self._service()
+        try:
+            svc.download_model(want)
+            r = self._wait(svc, want)
+            self.assertEqual(r['status'], 'error')
+            self.assertNotIn(want, svc.cfg['model_dirs'])
+        finally:
+            svc.shutdown()
+
+    def test_refuses_when_disk_too_small(self):
+        svc, want = self._service(disk=1.0)
+        try:
+            svc.download_model(want)
+            r = self._wait(svc, want)
+            self.assertEqual(r['status'], 'error')
+            self.assertIn('磁盘空间不够', r['error'])
+            self.assertEqual(self.hf.ranges, [])
+        finally:
+            svc.shutdown()
+
+    def test_unknown_snapshot_and_config_whitelist(self):
+        svc, _ = self._service()
+        try:
+            with self.assertRaises(ValueError):
+                svc.download_model('0' * 64)
+            with self.assertRaises(ValueError):
+                svc.update_config({'hf_endpoint': 'http://evil.example'})
+            with self.assertRaises(ValueError):
+                svc.update_config({'models_root': 'relative/dir'})
+            self.assertEqual(svc.update_config({'hf_endpoint': 'https://hf-mirror.com'})['hf_endpoint'], 'https://hf-mirror.com')
+        finally:
+            svc.shutdown()
+
+
 if __name__ == '__main__':
     unittest.main()

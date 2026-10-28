@@ -1,5 +1,5 @@
 /* 研发 · 贡献算力（贡献算力客户端 P2，设计见 design/contributor_client_v1.md）：
-   桌面客户端里控制本机节点服务——节点服务 → 设备 → 绑定账号 → 模型 → 资源限制 → 运行 → 日志与我的记录。
+   桌面客户端里控制本机节点服务——节点服务 → 计算组件（P3）→ 设备 → 绑定账号 → 模型（下载与核对，P3）→ 资源限制 → 运行 → 日志与我的记录。
    界面只和本机节点服务通信（经 Electron 主进程转发）；只有节点服务访问中心（注册 / 领取 / 续租 / 上传 / 站点配置）。
    唯一的例外是「绑定到我的账号」：向中心 /api/auth/node-code 取一次性绑定码，只在点击时。
    浏览器里的网页不能控制节点，只显示下载入口。上传与中心校验通过只表示结果可以合并，不改变证据等级。 */
@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { downloadKit } from '../../open/openUtil.js';
 import { API_BASE, authJson } from './api.js';
 import { useAuth } from './authContext.js';
-import { NODE_STATE, RESULT_LABEL, SUP_STATE, TASK_KIND_LABEL, fmtTime, nodeCall, useNode } from './contributeUtil.js';
+import { NODE_STATE, RESULT_LABEL, SUP_STATE, TASK_KIND_LABEL, fmtBytes, fmtTime, nodeBridge, nodeCall, useNode, useRuntime } from './contributeUtil.js';
 import { Card, Empty } from './ui.jsx';
 import './contribute.css';
 
@@ -56,7 +56,7 @@ function HostCard({ node }) {
         <dt>服务目录</dt><dd className="ct-mono">{sup.home}</dd>
       </dl>
       {bad && sup.tail?.length > 0 && <pre className="ct-log short">{sup.tail.join('\n')}</pre>}
-      {sup.state === 'no-python' && <p className="v6-note">计算组件的一键安装在下一期（P3）实现；现在请选择一个装好 torch（CUDA 版）与 transformers 的 python.exe。</p>}
+      {sup.state === 'no-python' && <p className="v6-note">还没有可用的 Python：在「计算组件」里一键安装，或选择一个装好 torch（CUDA 版）与 transformers 的 python.exe。</p>}
     </Card>
   );
 }
@@ -141,45 +141,110 @@ function AccountCard({ node }) {
   );
 }
 
-const MODEL_STATUS = { ok: ['good', '✓', '快照一致'], checking: ['warn', '…', '核对中'], mismatch: ['bad', '✗', '快照不一致'], missing: ['muted', '○', '未指定目录'] };
+function RuntimeCard({ onInstalled }) {
+  const { bridge, info, setInfo } = useRuntime();
+  const [mirror, setMirror] = useState('pypi');
+  if (!bridge) return null;
+  if (!info) return <Card title="计算组件"><Empty>读取…</Empty></Card>;
+  const running = info.state === 'running';
+  const ins = info.installed;
+  const driverOk = info.driver != null && info.driver >= info.min_driver;
+  const install = async () => { const r = await bridge.install(mirror); setInfo(r); if (r.state === 'done') onInstalled?.(); };
+  return (
+    <Card title="计算组件" sub="Python + torch（CUDA 13.0）+ transformers；版本与开发机验证过的组合相同，每个包按锁文件的 sha256 核对"
+          extra={running ? <button type="button" className="fw-tbtn ghost" onClick={() => bridge.cancel().then(setInfo)}>取消</button> : <>
+            <button type="button" className="fw-tbtn ghost" onClick={() => bridge.pickDir().then(setInfo)}>换目录…</button>
+            <button type="button" className={'fw-tbtn' + (ins && info.current ? ' ghost' : '')} disabled={!driverOk} onClick={install}>{ins ? (info.current ? '重新安装' : '升级') : '安装（约 3 GB 下载）'}</button>
+          </>}>
+      <dl className="ct-kv">
+        <dt>状态</dt><dd>{running ? <Pill tone="warn" icon="…">安装中</Pill>
+          : ins ? (info.current ? <Pill tone="good" icon="✓">已安装</Pill> : <Pill tone="warn" icon="!">版本过旧，需要升级</Pill>)
+            : <Pill tone="muted" icon="○">未安装</Pill>}
+          {ins && <span className="ct-mono">torch {ins.torch} · CUDA {ins.cuda} · transformers {ins.transformers}</span>}</dd>
+        <dt>目录</dt><dd className="ct-mono">{info.dir}<small>剩余 {info.free_gib ?? '—'} GiB（需要约 {info.need_gib} GiB）</small></dd>
+        <dt>显卡驱动</dt><dd>{info.driver == null ? <Pill tone="bad" icon="✗">没有检测到 NVIDIA 驱动</Pill>
+          : driverOk ? <>{info.driver}<small>（≥ {info.min_driver}）</small></> : <Pill tone="bad" icon="✗">{info.driver}：需要 ≥ {info.min_driver}，请先更新驱动</Pill>}</dd>
+        {!running && <><dt>下载源</dt><dd><select value={mirror} onChange={e => setMirror(e.target.value)}>
+          {Object.entries(info.mirrors).map(([k, label]) => <option key={k} value={k}>{label}</option>)}</select>
+          <small>torch 来自 download.pytorch.org；镜像与官方的文件按同一 sha256 核对</small></dd></>}
+        {running && <><dt>步骤</dt><dd>{info.step}{info.step.startsWith('下载 uv') && <small>{fmtBytes(info.bytes)} / {fmtBytes(info.uvSize)}</small>}</dd></>}
+        {info.state === 'failed' && <><dt>失败</dt><dd className="ct-err">{info.error}</dd></>}
+      </dl>
+      {(running || info.state === 'failed') && info.log.length > 0 && <pre className="ct-log short">{info.log.slice(-30).join('\n')}</pre>}
+    </Card>
+  );
+}
+
+const MODEL_STATUS = {
+  ok: ['good', '✓', '快照一致'], checking: ['warn', '…', '核对中'], mismatch: ['bad', '✗', '快照不一致'], missing: ['muted', '○', '未下载'],
+  downloading: ['info', '↓', '下载中'], error: ['bad', '✗', '下载失败'], cancelled: ['muted', '❚❚', '已暂停下载'],
+};
 
 function ModelsCard({ live }) {
-  const [models, setModels] = useState(null);
+  const [res, setRes] = useState(null);
   const [dirs, setDirs] = useState({});
   const [err, setErr] = useState('');
-  const load = refresh => nodeCall('GET', `/models${refresh ? '?refresh=1' : ''}`).then(r => { setModels(r.models); setErr(''); }).catch(e => setErr(e.message));
+  const [now, setNow] = useState(() => Date.now() / 1000);
+  const load = refresh => nodeCall('GET', `/models${refresh ? '?refresh=1' : ''}`).then(r => { setRes(r); setErr(''); setNow(Date.now() / 1000); }).catch(e => setErr(e.message));
   useEffect(() => { if (live) load(false); }, [live]);
+  const models = res?.models;
   useEffect(() => {
-    if (!models?.some(m => m.status === 'checking')) return undefined;
-    const t = setTimeout(() => load(false), 2000);
+    if (!models?.some(m => m.status === 'checking' || m.status === 'downloading')) return undefined;
+    const t = setTimeout(() => load(false), 1500);
     return () => clearTimeout(t);
   }, [models]);
-  const check = async m => {
-    try { await nodeCall('POST', '/models/check', { snapshot: m.snapshot, dir: dirs[m.snapshot] ?? m.dir }); load(false); } catch (e) { setErr(e.message); }
-  };
+  const act = async (path, body) => { setErr(''); try { await nodeCall('POST', path, body); load(false); } catch (e) { setErr(e.message); } };
+  const setCfg = async patch => { setErr(''); try { await nodeCall('PUT', '/config', patch); load(false); } catch (e) { setErr(e.message); } };
+  const pickRoot = async () => { const d = await nodeBridge()?.pickModelsDir?.(); if (d) setCfg({ models_root: d }); };
   return (
-    <Card title="模型" sub="中心要求的模型快照；本机目录按权重与 tokenizer 文件的 sha256 核对后才会领取该模型的任务"
+    <Card title="模型" sub="中心要求的模型快照；下载或指定的目录按权重与 tokenizer 文件的 sha256 核对一致后，才会领取该模型的任务"
           extra={<button type="button" className="fw-tbtn ghost" disabled={!live} onClick={() => load(true)}>↻ 读取中心要求</button>}>
       {err && <p className="v6-note warn">{err}</p>}
+      {res && (
+        <dl className="ct-kv">
+          <dt>下载目录</dt><dd className="ct-mono">{res.models_root}<small>剩余 {res.models_free_gib ?? '—'} GiB</small>
+            <button type="button" className="fw-tbtn ghost" onClick={pickRoot}>更改…</button></dd>
+          <dt>下载来源</dt><dd><select value={res.hf_endpoint} onChange={e => setCfg({ hf_endpoint: e.target.value })}>
+            {res.hf_endpoints.map(u => <option key={u} value={u}>{u.replace('https://', '')}</option>)}</select>
+            <small>两处的文件相同；下载完成后按中心给出的模型快照核对</small></dd>
+        </dl>
+      )}
       {!models ? <Empty>{live ? '读取…' : '本机节点服务没有运行'}</Empty> : !models.length ? <Empty>中心当前没有列出模型（站点配置的 models 为空）。</Empty> : (
         <table className="v6-mini-table ct-models">
           <thead><tr><th>模型</th><th>快照</th><th>本机目录</th><th className="num">权重</th><th>状态</th><th /></tr></thead>
           <tbody>{models.map(m => {
             const [tone, icon, label] = MODEL_STATUS[m.status] || ['muted', '·', m.status];
+            const p = m.progress;
+            const rate = p && p.started && now > p.started ? p.done / (now - p.started) : 0;
+            const busy = m.status === 'checking' || m.status === 'downloading';
             return (
               <tr key={m.snapshot}>
-                <td><b>{m.name}</b>{m.hf_repo && <small className="ct-mono">{m.hf_repo}</small>}</td>
+                <td><b>{m.name}</b>{m.hf_repo && <small className="ct-mono">{m.hf_repo}@{(m.hf_revision || 'main').slice(0, 10)}</small>}
+                  {m.min_vram_gib ? <small>需要显存约 {m.min_vram_gib} GiB</small> : null}</td>
                 <td className="ct-mono" title={m.snapshot}>{m.snapshot.slice(0, 12)}</td>
-                <td><input className="ct-input wide" placeholder="D:\models\…" value={dirs[m.snapshot] ?? m.dir ?? ''} onChange={e => setDirs({ ...dirs, [m.snapshot]: e.target.value })} /></td>
+                <td><input className="ct-input wide" placeholder="已有模型时填目录核对" value={dirs[m.snapshot] ?? m.dir ?? ''} disabled={busy}
+                           onChange={e => setDirs({ ...dirs, [m.snapshot]: e.target.value })} /></td>
                 <td className="num">{m.weight_gib ? `${m.weight_gib} GiB` : '—'}</td>
-                <td><Pill tone={tone} icon={icon}>{label}</Pill></td>
-                <td><button type="button" className="fw-tbtn ghost" disabled={!(dirs[m.snapshot] ?? m.dir) || m.status === 'checking'} onClick={() => check(m)}>核对</button></td>
+                <td><Pill tone={tone} icon={icon}>{label}</Pill>
+                  {p?.total ? <>
+                    <span className="ct-progress"><span style={{ width: `${Math.min(100, (100 * p.done) / p.total)}%` }} /></span>
+                    <small>{fmtBytes(p.done)} / {fmtBytes(p.total)}{rate ? ` · ${fmtBytes(rate)}/s` : ''}{p.file ? ` · ${p.file}` : ''}</small>
+                  </> : null}
+                  {m.error && <small className="ct-err">{m.error}</small>}</td>
+                <td className="ct-actions">
+                  {m.status === 'downloading'
+                    ? <button type="button" className="fw-tbtn ghost" onClick={() => act('/models/cancel', { snapshot: m.snapshot })}>暂停</button>
+                    : <>
+                      {m.hf_repo && m.status !== 'ok' && <button type="button" className="fw-tbtn" disabled={busy} onClick={() => act('/models/download', { snapshot: m.snapshot })}>{m.status === 'cancelled' || m.status === 'error' ? '继续下载' : '下载'}</button>}
+                      <button type="button" className="fw-tbtn ghost" disabled={!(dirs[m.snapshot] ?? m.dir) || busy} onClick={() => act('/models/check', { snapshot: m.snapshot, dir: dirs[m.snapshot] ?? m.dir })}>核对</button>
+                    </>}
+                </td>
               </tr>
             );
           })}</tbody>
         </table>
       )}
-      <p className="v6-note">模型下载在下一期（P3）实现；现在请先用 huggingface 等工具下载到本机目录，再填写目录核对。</p>
+      <p className="v6-note">下载断点续传；暂停或失败后再点「继续下载」。需要登录授权的模型仓库暂不支持。</p>
     </Card>
   );
 }
@@ -304,6 +369,7 @@ export default function ContributePanel() {
       <div className="ct-grid">
         <HostCard node={node} />
         <RunCard node={node} />
+        <RuntimeCard />
         <AccountCard node={node} />
         <DeviceCard live={node.live} />
       </div>

@@ -16,6 +16,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const { NodeSupervisor } = require('./nodeSupervisor');
+const { RuntimeInstaller, readRuntime } = require('./runtimeInstaller');
 
 const DEFAULT_SERVER = 'https://server.ai2050.com';
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
@@ -323,8 +324,12 @@ if (!app.requestSingleInstanceLock()) {
 ipcMain.handle('ai2050:get-server', () => (readConfig() || {}).server || DEFAULT_SERVER);
 
 /* ── 本机节点服务（贡献算力）：界面只经这几个 IPC 调用，令牌不离开主进程 ── */
+const runtimeDir = () => (readConfig() || {}).runtimeDir || path.join(app.getPath('userData'), 'runtime');
+const lockFile = [path.join(process.resourcesPath || '', 'node', 'runtime', 'requirements-win-cu130.lock'),
+  path.join(__dirname, '..', '..', 'deploy', 'runtime', 'requirements-win-cu130.lock')].find(p => fs.existsSync(p));
 const nodeSup = new NodeSupervisor({
   app, readConfig, writeConfig,
+  runtimePython: () => (readRuntime(runtimeDir()) || {}).python || '',
   onChange: info => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('ai2050:node-info', info); },
 });
 ipcMain.handle('ai2050:node-info', () => nodeSup.info());
@@ -339,4 +344,33 @@ ipcMain.handle('ai2050:node-pick-python', async () => {
   if (r.canceled || !r.filePaths[0]) return nodeSup.info();
   await nodeSup.setPython(r.filePaths[0]);
   return nodeSup.start();
+});
+
+/* ── 计算组件（Python + torch + transformers）：主进程安装，不需要系统里已有 Python ── */
+const runtime = new RuntimeInstaller({
+  dir: runtimeDir, lockFile,
+  onChange: info => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('ai2050:runtime-info', info); },
+});
+ipcMain.handle('ai2050:runtime-info', () => runtime.info());
+ipcMain.handle('ai2050:runtime-install', async (_e, req) => {
+  const info = await runtime.install({ mirror: req && req.mirror });
+  // 装好后：用户没有手动指定 Python 时，节点服务改用新环境
+  if (info.state === 'done' && !(readConfig() || {}).nodePython && nodeSup.python !== info.installed.python) await nodeSup.restart();
+  return runtime.info();
+});
+ipcMain.handle('ai2050:runtime-cancel', () => runtime.cancel());
+ipcMain.handle('ai2050:runtime-pick-dir', async () => {
+  if (runtime.state === 'running') return runtime.info();
+  const r = await dialog.showOpenDialog(mainWindow, {
+    title: '选择计算组件的安装目录（约 6 GB，建议放在空间大的盘）', properties: ['openDirectory', 'createDirectory'],
+  });
+  if (!r.canceled && r.filePaths[0]) {
+    const dir = path.join(r.filePaths[0], 'ai2050-runtime');
+    writeConfig({ ...(readConfig() || {}), runtimeDir: dir });
+  }
+  return runtime.info();
+});
+ipcMain.handle('ai2050:node-pick-models-dir', async () => {
+  const r = await dialog.showOpenDialog(mainWindow, { title: '选择模型下载目录（每个模型 1–30 GB）', properties: ['openDirectory', 'createDirectory'] });
+  return r.canceled || !r.filePaths[0] ? '' : r.filePaths[0];
 });

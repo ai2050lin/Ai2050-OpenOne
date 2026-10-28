@@ -17,6 +17,7 @@
     "sync:phase1132-review": "node scripts/sync_phase1132_review_queue.mjs",
     "build": "vite build",
     "lint": "eslint .",
+    "test:electron": "node --test electron/runtimeInstaller.test.js",
     "preview": "vite preview",
     "desktop": "electron .",
     "pack": "electron-builder --dir",
@@ -65,7 +66,8 @@
     "asar": true,
     "extraResources": [
       { "from": "../deploy/node_agent.py", "to": "node/node_agent.py" },
-      { "from": "../deploy/node_service.py", "to": "node/node_service.py" }
+      { "from": "../deploy/node_service.py", "to": "node/node_service.py" },
+      { "from": "../deploy/runtime/requirements-win-cu130.lock", "to": "node/runtime/requirements-win-cu130.lock" }
     ],
     "win": {
       "target": [

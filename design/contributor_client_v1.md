@@ -1,6 +1,6 @@
 # 贡献算力客户端 v1（contributor_client.v1）
 
-状态：设计；P1（本机节点服务）与 P2（Electron 监护 + 贡献算力页）已实现，P3–P4 未开始。范围先只做 **Windows + NVIDIA**。
+状态：设计；P1（本机节点服务）、P2（Electron 监护 + 贡献算力页）与 P3（计算组件安装、模型下载）已实现，P4 未开始。范围先只做 **Windows + NVIDIA**。
 
 ## 1. 目标与边界
 
@@ -105,6 +105,32 @@
 - 模型：中心要求的快照、本机目录与核对。
 - 资源限制、日志、本机完成记录。
 
+### 5.3 计算组件与模型（P3）
+
+**计算组件**（`frontend/electron/runtimeInstaller.js`，主进程执行，不需要系统里已有 Python）装到运行时目录。运行时目录缺省为 `userData/runtime`，可换到空间大的盘，约需 8 GiB：
+
+1. 检查：NVIDIA 驱动 ≥ 580（CUDA 13.0），目录所在盘剩余 ≥ 8 GiB。
+2. 下载 uv 0.11.28 的 PyPI wheel，来源为 PyPI 或清华镜像，二者文件相同。按固定的 sha256 与大小核对，再用 Windows 自带的 `tar.exe` 解出 `uv.exe`。
+3. 安装 Python 并建环境：先 `uv python install 3.14.6`，再 `uv venv --python-preference only-managed`。
+4. 安装依赖：`uv pip install --require-hashes --no-deps -r requirements-win-cu130.lock`。torch 来自 `download.pytorch.org/whl/cu130`，其余来自 PyPI 或镜像，每个包都按锁文件里的 sha256 核对。缓存 `UV_CACHE_DIR` 也放在运行时目录里。
+5. 在新环境里检测 torch / CUDA / transformers，通过后写 `runtime.json`（含 `RUNTIME_ID` 与锁文件 sha256）。节点服务随后改用这个解释器，用户手动选的 Python 优先。
+
+锁文件 `deploy/runtime/requirements-win-cu130.lock` 由 `.in` 文件生成，固定的是开发机验证过的组合（Python 3.14.6、torch 2.13.0+cu130、transformers 5.14.1）。改版本时按下面的命令重新生成，并升级 `RUNTIME_ID`，已装的旧环境会提示「升级」：
+
+```
+uv pip compile deploy/runtime/requirements-win-cu130.in --generate-hashes --python-version 3.14 --python-platform x86_64-pc-windows-msvc --index-url https://pypi.org/simple --extra-index-url https://download.pytorch.org/whl/cu130 --index-strategy unsafe-best-match --no-header -o deploy/runtime/requirements-win-cu130.lock
+```
+
+`uv python install` 从 GitHub（python-build-standalone）下载解释器，国内网络可能较慢，镜像尚未接入。
+
+**模型下载**（节点服务 `POST /models/download`、`/models/cancel`，仅标准库）：
+
+- 来源：按中心站点配置的 `hf_repo@hf_revision`，经 Hugging Face 文件列表 API 下载仓库顶层文件。不下载子目录、隐藏文件与不安全的文件名。来源只能是 `huggingface.co` 或 `hf-mirror.com`（配置白名单 `hf_endpoint`）。
+- 存放与容量：文件放到 `models_root/<名称>`，`models_root` 必须是绝对路径，缺省为 `<home>/models`。下载前检查剩余磁盘（保留 `min_free_disk_gib`）。
+- 校验：断点续传（`.part` + Range，服务器不支持续传时从头开始）；LFS 文件按仓库记录的 sha256 核对，不一致时删除。下载时算出的 sha256 写入 `model_snapshot` 的缓存，核对时不必再读一遍大文件。
+- 完成：最后按中心要求的模型快照核对，一致才写入 `model_dirs`。
+- 尚未支持：需要登录授权的仓库。
+
 界面每 2 秒读一次本机 `/status` 与新日志，不访问中心；中心只在「读取中心要求」「绑定」时由节点服务或账号接口访问。「试一句话」本机前向是后续可选项。
 
 ## 6. 安全与可信（P4）
@@ -118,5 +144,5 @@
 | --- | --- | --- |
 | P1 | 本机节点服务：接口、安全、资源门、退避、日志、历史；保留命令行 | 单元测试；沙盒中心 synthetic 全流程（领取 → 运行 → 上传 → 校验） |
 | P2 | Electron 集成：主进程监护节点服务；贡献算力页 | 监护器（真实代码、纯 Node 宿主）+ 页面对沙盒中心走通：绑定账号 → 开始 → 4 个 synthetic 分片校验通过；资源门等待、暂停 / 停止、重启、进程被杀后自动恢复。安装包本身尚未在干净机器上构建验证 |
-| P3 | 计算组件安装（uv、镜像）、模型下载与核对 | 干净 Windows 机器得到真实 GPU 结果 |
+| P3 | 计算组件安装（uv、镜像）、模型下载与核对 | 单元测试（安装器：下载核对、驱动 / 磁盘门、命令与参数、检测失败、取消；模型下载：续传、sha256 不一致、无续传、文件名过滤、磁盘不足、下载后快照核对）与页面联调（安装器命令为假）已完成。开发机真实安装一次（2026-10-28，D: 新目录，PyPI 来源）：约 18 分钟，其中 37 个包按 sha256 核对 17.5 分钟；目录共 3.1 GB（venv 从同盘缓存硬链接）；torch 2.13.0+cu130 在 RTX 5080 上 bf16 运算正常，节点服务用该解释器检测通过。尚未在干净 Windows 机器上验证，也尚未用这套环境跑真实任务 |
 | P4 | 内置 runner + 签名、自动升级、贡献面板 | 篡改负对照被拒 |

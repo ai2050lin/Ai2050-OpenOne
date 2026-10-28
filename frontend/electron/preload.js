@@ -47,10 +47,23 @@ contextBridge.exposeInMainWorld('ai2050Desktop', {
     request: (method, path, body) => ipcRenderer.invoke('ai2050:node-request', { method, path, body }),
     restart: () => ipcRenderer.invoke('ai2050:node-restart'),
     pickPython: () => ipcRenderer.invoke('ai2050:node-pick-python'),
+    pickModelsDir: () => ipcRenderer.invoke('ai2050:node-pick-models-dir'),
     onInfo: cb => {
       const h = (_e, info) => cb(info);
       ipcRenderer.on('ai2050:node-info', h);
       return () => ipcRenderer.removeListener('ai2050:node-info', h);
+    },
+  },
+  /* 计算组件安装（主进程执行；页面只发起、取消与查看进度） */
+  runtime: {
+    info: () => ipcRenderer.invoke('ai2050:runtime-info'),
+    install: mirror => ipcRenderer.invoke('ai2050:runtime-install', { mirror }),
+    cancel: () => ipcRenderer.invoke('ai2050:runtime-cancel'),
+    pickDir: () => ipcRenderer.invoke('ai2050:runtime-pick-dir'),
+    onInfo: cb => {
+      const h = (_e, info) => cb(info);
+      ipcRenderer.on('ai2050:runtime-info', h);
+      return () => ipcRenderer.removeListener('ai2050:runtime-info', h);
     },
   },
 });

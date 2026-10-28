@@ -18,7 +18,7 @@ const path = require('path');
 /* 界面可调用的接口（/shutdown 只由主进程在退出时调用） */
 const ROUTES = new Set([
   'GET /status', 'GET /device', 'GET /config', 'GET /models', 'GET /logs', 'GET /history',
-  'PUT /config', 'POST /models/check', 'POST /bind', 'POST /start', 'POST /pause', 'POST /resume', 'POST /stop',
+  'PUT /config', 'POST /models/check', 'POST /models/download', 'POST /models/cancel', 'POST /bind', 'POST /start', 'POST /pause', 'POST /resume', 'POST /stop',
 ]);
 const READY_TIMEOUT = 30000;
 const MAX_FAILS = 5;
@@ -68,11 +68,12 @@ function httpJson(port, token, method, route, body, timeoutMs = 15000) {
 }
 
 class NodeSupervisor {
-  constructor({ app, readConfig, writeConfig, onChange }) {
+  constructor({ app, readConfig, writeConfig, onChange, runtimePython }) {
     this.app = app;
     this.readConfig = readConfig;
     this.writeConfig = writeConfig;
     this.onChange = onChange || (() => {});
+    this.runtimePython = runtimePython || (() => '');
     this.home = nodeHome();
     this.synthetic = process.env.AI2050_NODE_SYNTHETIC === '1';
     this.server = '';
@@ -116,13 +117,13 @@ class NodeSupervisor {
     return [this.app.isPackaged ? packed : dev, packed, dev].find(exists) || '';
   }
 
-  /* 优先级：用户在界面里选的 → 环境变量 → 客户端安装的计算组件（P3）→ 开发仓库的 .venv → PATH */
+  /* 优先级：用户在界面里选的 → 环境变量 → 客户端安装的计算组件（runtimeInstaller）→ 开发仓库的 .venv → PATH */
   resolvePython() {
     const cfg = this.readConfig() || {};
     const cands = [
       cfg.nodePython,
       process.env.AI2050_PYTHON,
-      path.join(this.app.getPath('userData'), 'runtime', 'python', process.platform === 'win32' ? 'python.exe' : 'bin/python3'),
+      this.runtimePython(),
       this.app.isPackaged ? '' : path.join(__dirname, '..', '..', '.venv', 'Scripts', 'python.exe'),
       this.app.isPackaged ? '' : path.join(__dirname, '..', '..', '.venv', 'bin', 'python3'),
     ];

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""AI2050 本机节点服务（contributor_client.v1 P1，设计见 design/contributor_client_v1.md）
+"""AI2050 本机节点服务（contributor_client.v1 P1 / P3 模型下载，设计见 design/contributor_client_v1.md）
 
 桌面客户端的界面只和这个服务通信；只有它访问中心，并且只做 注册 / 领取 / 续租 / 上传 / 读取站点配置，带退避。
 任务循环复用 node_agent.py（普查分片、模式族分片），任务包照旧按 sha256 核对后才运行。
@@ -15,18 +15,22 @@ from __future__ import annotations
 
 import argparse
 import collections
+import hashlib
 import json
 import os
 import random
+import re
 import secrets
 import shutil
 import subprocess
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import node_agent as A  # noqa: E402
@@ -36,8 +40,9 @@ VERSION = '1'
 DEFAULT_PORT = 5030
 TASK_KINDS = ('census_shard', 'family_test')
 DEFAULT_LIMITS = {'hours': '', 'pause_on_battery': True, 'yield_gpu_util': 30, 'max_vram_gib': 0, 'min_free_disk_gib': 5}
+HF_ENDPOINTS = ('https://huggingface.co', 'https://hf-mirror.com')   # 模型下载来源只能二选一；文件最终按模型快照核对
 DEFAULT_CONFIG = {'server': '', 'task_kinds': list(TASK_KINDS), 'device': 'cuda:0', 'node_name': '',
-                  'models_root': '', 'model_dirs': {}, 'limits': dict(DEFAULT_LIMITS)}
+                  'models_root': '', 'model_dirs': {}, 'hf_endpoint': HF_ENDPOINTS[0], 'limits': dict(DEFAULT_LIMITS)}
 CONFIG_TTL = 1800.0          # 站点配置最多每 30 分钟读一次
 GATE_RECHECK = 60.0          # 资源门不满足时每分钟复查一次
 VRAM_FACTOR = 1.2            # 显存需求 ≈ 权重文件总大小 × 1.2（近似）
@@ -133,6 +138,15 @@ def validate_config(cur: dict, patch: dict) -> dict:
             if not (v == 'cpu' or (isinstance(v, str) and (v == 'cuda' or (v.startswith('cuda:') and v[5:].isdigit())))):
                 raise ValueError('device 只能是 cuda、cuda:N 或 cpu')
             new[k] = v
+        elif k == 'hf_endpoint':
+            if v not in HF_ENDPOINTS:
+                raise ValueError(f'hf_endpoint 只能取 {", ".join(HF_ENDPOINTS)}')
+            new[k] = v
+        elif k == 'models_root':
+            v = str(v).strip()
+            if v and not Path(v).is_absolute():
+                raise ValueError('models_root 必须是绝对路径')
+            new[k] = v
         elif k == 'model_dirs':
             if not isinstance(v, dict) or not all(isinstance(a, str) and isinstance(b, str) for a, b in v.items()):
                 raise ValueError('model_dirs 必须是 {快照: 目录}')
@@ -198,6 +212,101 @@ class Backoff:
 
     def reset(self) -> None:
         self.n = {'idle': 0, 'error': 0}
+
+
+class Cancelled(Exception):
+    """下载被取消：已下载的部分保留在 .part 文件里，下次从断点继续。"""
+
+
+_REPO_RE = re.compile(r'^[A-Za-z0-9][\w.-]*/[\w.-]+$')
+_REV_RE = re.compile(r'^[\w.-]{1,64}$')
+
+
+def safe_filename(name: str) -> bool:
+    """只下载仓库顶层的普通文件名（model_snapshot 只看顶层）；拒绝路径分隔、上级目录、盘符与隐藏文件。"""
+    return bool(name) and len(name) <= 200 and not re.search(r'[\\/:*?"<>|\x00-\x1f]', name) \
+        and not name.startswith('.') and name not in ('..',)
+
+
+def hf_file_list(endpoint: str, repo: str, revision: str, timeout: float = 60) -> list:
+    """Hugging Face 仓库某个版本的顶层文件：[{name, size, sha256（LFS 文件才有）}]。来源由配置白名单限定（HF_ENDPOINTS）。"""
+    if not _REPO_RE.match(repo or '') or not _REV_RE.match(revision or 'main'):
+        raise ValueError(f'仓库或版本不合法：{repo}@{revision}')
+    url = f"{endpoint}/api/models/{quote(repo, safe='/')}/revision/{quote(revision or 'main', safe='')}?blobs=true"
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as r:
+            data = json.loads(r.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f'读取文件列表失败：HTTP {e.code}' + ('（该仓库需要登录授权，暂不支持）' if e.code in (401, 403) else '')) from e
+    except (urllib.error.URLError, OSError) as e:
+        raise RuntimeError(f'连不上 {endpoint}：{e}') from e
+    out = []
+    for s in data.get('siblings') or []:
+        name = s.get('rfilename') or ''
+        if '/' in name or not safe_filename(name):
+            continue
+        lfs = s.get('lfs') or {}
+        size = s.get('size') if s.get('size') is not None else lfs.get('size')
+        out.append({'name': name, 'size': int(size) if size is not None else None, 'sha256': str(lfs.get('sha256') or '').lower()})
+    return out
+
+
+def download_file(url: str, dest: Path, *, size=None, sha256: str = '', on_bytes=None, cancel=None, timeout: float = 60) -> str:
+    """断点续传下载到 dest（先写 dest.part）；返回文件 sha256。已知 sha256 时不一致则删除并报错。"""
+    part = dest.with_name(dest.name + '.part')
+    have = part.stat().st_size if part.exists() else 0
+    if size is not None and have > size:
+        part.unlink()
+        have = 0
+    h = hashlib.sha256()
+    if have:
+        with part.open('rb') as fh:
+            for chunk in iter(lambda: fh.read(1 << 22), b''):
+                h.update(chunk)
+        if on_bytes:
+            on_bytes(have)
+    if size is None or have < size:
+        req = urllib.request.Request(url, headers={'Range': f'bytes={have}-'} if have else {})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            if have and r.status != 206:              # 服务器不支持续传：从头开始
+                if on_bytes:
+                    on_bytes(-have)
+                have, h = 0, hashlib.sha256()
+                part.unlink()
+            with part.open('ab') as fh:
+                while True:
+                    if cancel is not None and cancel.is_set():
+                        raise Cancelled()
+                    b = r.read(1 << 20)
+                    if not b:
+                        break
+                    fh.write(b)
+                    h.update(b)
+                    if on_bytes:
+                        on_bytes(len(b))
+    got_size = part.stat().st_size
+    if size is not None and got_size != size:
+        raise RuntimeError(f'{dest.name} 大小不符：{got_size} ≠ {size}（网络中断？重试会从断点继续）')
+    digest = h.hexdigest()
+    if sha256 and digest != sha256:
+        part.unlink()
+        raise RuntimeError(f'{dest.name} 的 sha256 与仓库记录不一致，已删除')
+    part.replace(dest)
+    return digest
+
+
+def seed_snapshot_cache(entries: list) -> None:
+    """下载时已算出的 sha256 写入 model_snapshot 的缓存（键与 node_agent.model_snapshot 相同），核对时不必再读一遍大文件。"""
+    p = A._home() / 'snapshot_cache.json'
+    try:
+        cache = json.loads(p.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        cache = {}
+    for path, digest in entries:
+        st = Path(path).stat()
+        cache[f'{Path(path).resolve()}|{st.st_size}|{int(st.st_mtime)}'] = digest
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(cache), encoding='utf-8')
 
 
 def weight_gib(model_dir: str) -> float:
@@ -311,7 +420,8 @@ class NodeService:
         self.last_error = ''
         self.counts = {'done': 0, 'failed': 0, 'rejected': 0}
         self.backoff = Backoff()
-        self.checks: dict = {}           # 快照 → {'status': checking|ok|mismatch|missing, 'dir', 'got'}
+        self.checks: dict = {}           # 快照 → {'status': checking|ok|mismatch|missing|downloading|error|cancelled, 'dir', ...}
+        self.cancels: dict = {}          # 快照 → 下载取消事件
         self.pcfg, self.pcfg_at = None, 0.0
         self.runtime, self.runtime_at = None, 0.0
         self.cfg = self._load_config()
@@ -413,7 +523,9 @@ class NodeService:
             chk = self.checks.get(snap) or ({'status': 'ok', 'dir': d} if d else {'status': 'missing'})
             out.append({'snapshot': snap, 'name': m.get('name') or snap[:12], 'hf_repo': m.get('hf_repo') or '',
                         'hf_revision': m.get('hf_revision') or '', 'dir': chk.get('dir', d), 'status': chk['status'],
-                        'weight_gib': weight_gib(chk.get('dir') or d) if (chk.get('dir') or d) else None})
+                        'weight_gib': weight_gib(chk.get('dir') or d) if (chk.get('dir') or d) and chk['status'] != 'downloading' else None,
+                        'min_vram_gib': m.get('min_vram_gib'), 'error': chk.get('error', ''),
+                        'progress': {k: chk.get(k) for k in ('done', 'total', 'file', 'started')} if chk['status'] == 'downloading' else None})
         return out
 
     def check_model(self, snapshot: str, model_dir: str) -> dict:
@@ -424,26 +536,113 @@ class NodeService:
         with self.lock:
             if (self.checks.get(snapshot) or {}).get('status') == 'checking':
                 return self.checks[snapshot]
+            if snapshot in self.cancels:
+                raise ValueError('该模型正在下载')
             self.checks[snapshot] = {'status': 'checking', 'dir': model_dir}
-
-        def work():
-            try:
-                got = A.model_snapshot(model_dir)['sha256']
-            except OSError as e:
-                got, err = '', str(e)
-            else:
-                err = ''
-            with self.lock:
-                if got == snapshot:
-                    self.checks[snapshot] = {'status': 'ok', 'dir': model_dir}
-                    self.cfg['model_dirs'][snapshot] = model_dir
-                    self._save_config()
-                    A.log(f'模型快照一致 ✓ {model_dir}')
-                else:
-                    self.checks[snapshot] = {'status': 'mismatch', 'dir': model_dir, 'got': got, 'error': err}
-                    A.log(f'模型目录 {model_dir} 的快照与要求不一致，不能用于该模型的任务')
-        threading.Thread(target=work, daemon=True).start()
+        threading.Thread(target=self._verify, args=(snapshot, model_dir), daemon=True).start()
         return self.checks[snapshot]
+
+    def _verify(self, snapshot: str, model_dir: str) -> None:
+        try:
+            got = A.model_snapshot(model_dir)['sha256']
+        except OSError as e:
+            got, err = '', str(e)
+        else:
+            err = ''
+        with self.lock:
+            if got == snapshot:
+                self.checks[snapshot] = {'status': 'ok', 'dir': model_dir}
+                self.cfg['model_dirs'][snapshot] = model_dir
+                self._save_config()
+                A.log(f'模型快照一致 ✓ {model_dir}')
+            else:
+                self.checks[snapshot] = {'status': 'mismatch', 'dir': model_dir, 'got': got, 'error': err}
+                A.log(f'模型目录 {model_dir} 的快照与要求不一致，不能用于该模型的任务')
+
+    def models_root(self) -> Path:
+        return Path(self.cfg.get('models_root') or (self.home / 'models'))
+
+    def download_model(self, snapshot: str) -> dict:
+        """按中心站点配置的 hf_repo@hf_revision 下载到 models_root/<名称>，完成后按快照核对。断点续传。"""
+        m = next((x for x in (self.pcfg or {}).get('models') or [] if x.get('snapshot_sha256') == snapshot), None)
+        if not m:
+            raise ValueError('中心没有列出这个模型快照（先「读取中心要求」）')
+        if not m.get('hf_repo'):
+            raise ValueError('中心没有给出这个模型的下载来源（hf_repo）')
+        name = re.sub(r'[^\w.-]', '_', m.get('name') or snapshot[:16])
+        target = self.models_root() / name
+        endpoint = self.cfg.get('hf_endpoint') or HF_ENDPOINTS[0]
+        with self.lock:
+            if snapshot in self.cancels or (self.checks.get(snapshot) or {}).get('status') == 'checking':
+                return self.checks[snapshot]
+            cancel = threading.Event()
+            self.cancels[snapshot] = cancel
+            self.checks[snapshot] = {'status': 'downloading', 'dir': str(target), 'done': 0, 'total': None, 'file': '',
+                                     'started': time.time()}
+        threading.Thread(target=self._download, args=(snapshot, m, target, endpoint, cancel), daemon=True).start()
+        return self.checks[snapshot]
+
+    def _download(self, snapshot: str, m: dict, target: Path, endpoint: str, cancel) -> None:
+        st = self.checks[snapshot]
+        repo, rev = m['hf_repo'], m.get('hf_revision') or 'main'
+        try:
+            files = hf_file_list(endpoint, repo, rev)
+            if not files:
+                raise RuntimeError('仓库里没有文件')
+            target.mkdir(parents=True, exist_ok=True)
+            todo = [f for f in files if not ((target / f['name']).is_file() and f['size'] is not None
+                                             and (target / f['name']).stat().st_size == f['size'])]
+            total = sum(f['size'] or 0 for f in files)
+            done = total - sum(f['size'] or 0 for f in todo)
+            need = sum((f['size'] or 0) - ((target / (f['name'] + '.part')).stat().st_size
+                                           if (target / (f['name'] + '.part')).is_file() else 0) for f in todo)
+            free = self.probes['disk'](target)
+            floor = (self.cfg.get('limits') or {}).get('min_free_disk_gib', DEFAULT_LIMITS['min_free_disk_gib'])
+            if free is not None and free - need / 2**30 < floor:
+                raise RuntimeError(f'磁盘空间不够：还需 {need / 2**30:.1f} GiB，{target.anchor or target} 剩余 {free:.1f} GiB'
+                                   f'（至少保留 {floor} GiB）。可以在「模型目录」换一个盘')
+            with self.lock:
+                st.update(total=total, done=done)
+            A.log(f'下载模型 {m.get("name") or repo}：{repo}@{rev[:12]} → {target}（{len(todo)}/{len(files)} 个文件，'
+                  f'{need / 2**30:.1f} GiB，来源 {endpoint}）')
+
+            def on_bytes(n):
+                with self.lock:
+                    st['done'] += n
+            seeded = []
+            for f in todo:
+                with self.lock:
+                    st['file'] = f['name']
+                url = f"{endpoint}/{quote(repo, safe='/')}/resolve/{quote(rev, safe='')}/{quote(f['name'])}"
+                digest = download_file(url, target / f['name'], size=f['size'], sha256=f['sha256'], on_bytes=on_bytes, cancel=cancel)
+                seeded.append((target / f['name'], digest))
+            if seeded:
+                seed_snapshot_cache(seeded)
+        except Cancelled:
+            with self.lock:
+                self.checks[snapshot] = {'status': 'cancelled', 'dir': str(target)}
+                self.cancels.pop(snapshot, None)
+            A.log('已取消下载（已下载的部分保留，下次继续）')
+            return
+        except (RuntimeError, ValueError, OSError) as e:
+            with self.lock:
+                self.checks[snapshot] = {'status': 'error', 'dir': str(target), 'error': str(e)[:300]}
+                self.cancels.pop(snapshot, None)
+            A.log(f'下载失败：{e}')
+            return
+        with self.lock:
+            self.checks[snapshot] = {'status': 'checking', 'dir': str(target)}
+            self.cancels.pop(snapshot, None)
+        A.log('下载完成，核对模型快照…')
+        self._verify(snapshot, str(target))
+
+    def cancel_download(self, snapshot: str) -> dict:
+        with self.lock:
+            ev = self.cancels.get(snapshot)
+        if ev is None:
+            raise ValueError('这个模型没有在下载')
+        ev.set()
+        return self.checks.get(snapshot) or {}
 
     # --- 设备 ---
     def device(self, refresh: bool = False) -> dict:
@@ -721,7 +920,13 @@ def make_handler(svc: NodeService, token: str, port_ref: dict, allow_origins=())
                     return self._send(200, svc.update_config(self._body()))
                 if route == ('GET', '/models'):
                     svc.platform_config(force=q.get('refresh') == '1')
-                    return self._send(200, {'models': svc.models()})
+                    root = svc.models_root()
+                    return self._send(200, {'models': svc.models(), 'models_root': str(root), 'hf_endpoint': svc.cfg.get('hf_endpoint'),
+                                            'hf_endpoints': list(HF_ENDPOINTS), 'models_free_gib': svc.probes['disk'](root)})
+                if route == ('POST', '/models/download'):
+                    return self._send(200, svc.download_model(str(self._body().get('snapshot') or '')))
+                if route == ('POST', '/models/cancel'):
+                    return self._send(200, svc.cancel_download(str(self._body().get('snapshot') or '')))
                 if route == ('POST', '/models/check'):
                     b = self._body()
                     return self._send(200, svc.check_model(str(b.get('snapshot') or ''), str(b.get('dir') or '')))

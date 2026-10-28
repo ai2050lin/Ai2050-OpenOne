@@ -8,6 +8,32 @@ export function nodeBridge() {
   return window.ai2050Desktop?.node || null;
 }
 
+export function runtimeBridge() {
+  if (typeof window === 'undefined') return null;
+  return window.ai2050Desktop?.runtime || null;
+}
+
+/* 计算组件安装状态（主进程推送进度） */
+export function useRuntime() {
+  const bridge = runtimeBridge();
+  const [info, setInfo] = useState(null);
+  useEffect(() => {
+    if (!bridge) return undefined;
+    let dead = false;
+    bridge.info().then(i => { if (!dead) setInfo(i); });
+    const off = bridge.onInfo(i => setInfo(i));
+    return () => { dead = true; off?.(); };
+  }, [bridge]);
+  return { bridge, info, setInfo };
+}
+
+export function fmtBytes(n) {
+  if (n == null) return '—';
+  if (n >= 2 ** 30) return `${(n / 2 ** 30).toFixed(2)} GiB`;
+  if (n >= 2 ** 20) return `${(n / 2 ** 20).toFixed(1)} MiB`;
+  return `${Math.round(n / 1024)} KiB`;
+}
+
 export async function nodeCall(method, path, body) {
   const bridge = nodeBridge();
   if (!bridge) throw new Error('只有桌面客户端可以控制本机节点');
