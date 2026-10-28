@@ -4,7 +4,8 @@
 - 密码：PBKDF2-HMAC-SHA256（20 万次迭代、16 字节随机盐），只存哈希；比较用 hmac.compare_digest。
 - 会话：32 字节随机令牌，库里只存 SHA-256；默认 30 天，使用时顺延（滑动过期）。
 - 第一个注册的账号自动成为管理员（admin），其余为成员（member）。
-- 注册策略 AI2050_REGISTRATION：open（默认，任何人可注册）/ closed（只有管理员能创建账号；第一个账号仍可自助注册）。
+- 注册策略：open（默认，任何人可注册）/ closed（只有管理员能创建账号；第一个账号仍可自助注册）。管理员在账号管理页设置的值
+  存在 account_settings 表里，优先于环境变量 AI2050_REGISTRATION。
 - 防暴力破解：同一用户名连续失败 5 次，锁定 5 分钟。
 - 节点绑定码：登录用户生成一次性码（30 分钟），GPU 节点注册时带上，节点即归属该账号（贡献者可署名）。
 只依赖标准库；调用方传入 sqlite3 连接并负责加锁。
@@ -43,6 +44,8 @@ CREATE TABLE IF NOT EXISTS login_failures(
     username TEXT PRIMARY KEY COLLATE NOCASE, fails INTEGER NOT NULL DEFAULT 0, locked_until REAL);
 CREATE TABLE IF NOT EXISTS node_bind_codes(
     code_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, created_at REAL, expires_at REAL, used_by TEXT);
+CREATE TABLE IF NOT EXISTS account_settings(
+    key TEXT PRIMARY KEY, value TEXT, updated_at REAL, updated_by TEXT);
 '''
 
 
@@ -67,9 +70,27 @@ def _has_table(db, name) -> bool:
     return db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone() is not None
 
 
-def registration_policy() -> str:
+def registration_policy(db=None) -> str:
+    return registration_info(db)['policy']
+
+
+def registration_info(db=None) -> Dict[str, Any]:
+    """source：db（管理员在页面上设置）/ env（AI2050_REGISTRATION 或缺省 open）。"""
+    row = db.execute("SELECT value FROM account_settings WHERE key='registration'").fetchone()         if db is not None and _has_table(db, 'account_settings') else None
+    if row is not None and row[0] in ('open', 'closed'):
+        return {'policy': row[0], 'source': 'db'}
     v = os.environ.get('AI2050_REGISTRATION', 'open').strip().lower()
-    return v if v in ('open', 'closed') else 'open'
+    return {'policy': v if v in ('open', 'closed') else 'open', 'source': 'env'}
+
+
+def set_registration_policy(db, actor: Dict[str, Any], policy: str) -> Dict[str, Any]:
+    if policy not in ('open', 'closed'):
+        raise AuthError(400, '注册策略只能是 open 或 closed')
+    db.execute("INSERT INTO account_settings(key,value,updated_at,updated_by) VALUES('registration',?,?,?) "
+               "ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at, updated_by=excluded.updated_by",
+               (policy, time.time(), actor['user_id']))
+    db.commit()
+    return registration_info(db)
 
 
 def _hash_pw(password: str, salt: bytes, iters: int) -> str:
@@ -101,7 +122,7 @@ def user_count(db) -> int:
 
 def status(db) -> Dict[str, Any]:
     n = user_count(db)
-    policy = registration_policy()
+    policy = registration_policy(db)
     return {'schema': SCHEMA, 'has_users': n > 0, 'registration': policy,
             'can_register': n == 0 or policy == 'open', 'first_user_becomes_admin': n == 0}
 
@@ -125,7 +146,7 @@ def create_user(db, username: str, password: str, *, display_name: str = '', ema
     if email and not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
         raise AuthError(400, '邮箱格式不正确')
     first = user_count(db) == 0
-    if not first and not by_admin and registration_policy() != 'open':
+    if not first and not by_admin and registration_policy(db) != 'open':
         raise AuthError(403, '本中心关闭了自助注册，请联系管理员创建账号')
     if db.execute('SELECT 1 FROM users WHERE username=?', (username,)).fetchone():
         raise AuthError(409, '用户名已被使用')
@@ -250,9 +271,60 @@ def reset_password(db, username: str, new: str, *, make_admin: bool = False) -> 
     return public_user(db.execute('SELECT * FROM users WHERE user_id=?', (row['user_id'],)).fetchone())
 
 
+def _user_row(db, user_id: str):
+    row = db.execute('SELECT * FROM users WHERE user_id=?', (user_id,)).fetchone()
+    if row is None:
+        raise AuthError(404, '账号不存在')
+    return row
+
+
+def _last_admin(db, row) -> bool:
+    return row['role'] == 'admin' and not row['disabled'] and         db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND disabled=0").fetchone()[0] <= 1
+
+
+def admin_reset_password(db, actor: Dict[str, Any], user_id: str, new: str) -> Dict[str, Any]:
+    """管理员为他人设新密码；自己的密码用 change_password（要原密码）。"""
+    row = _user_row(db, user_id)
+    if user_id == actor['user_id']:
+        raise AuthError(409, '自己的密码请用「修改密码」')
+    return reset_password(db, row['username'], new)
+
+
+def revoke_sessions(db, actor: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    _user_row(db, user_id)
+    if user_id == actor['user_id']:
+        raise AuthError(409, '不能强制下线自己，请用「退出登录」')
+    n = db.execute('DELETE FROM sessions WHERE user_id=?', (user_id,)).rowcount
+    db.commit()
+    return {'revoked': n}
+
+
+def delete_user(db, actor: Dict[str, Any], user_id: str, confirm: str) -> Dict[str, Any]:
+    """永久删除：账号、会话、绑定码、锁定记录；名下节点改为无主（结果保留，署名去掉）。confirm 必须等于用户名。"""
+    row = _user_row(db, user_id)
+    if user_id == actor['user_id']:
+        raise AuthError(409, '不能删除自己的账号')
+    if (confirm or '').strip().lower() != row['username'].lower():
+        raise AuthError(400, '确认用户名不一致，未删除')
+    if _last_admin(db, row):
+        raise AuthError(409, '至少保留一个可用的管理员账号')
+    nodes = 0
+    if _has_table(db, 'nodes') and 'owner_user_id' in {r[1] for r in db.execute('PRAGMA table_info(nodes)')}:
+        nodes = db.execute('UPDATE nodes SET owner_user_id=NULL WHERE owner_user_id=?', (user_id,)).rowcount
+    db.execute('DELETE FROM sessions WHERE user_id=?', (user_id,))
+    db.execute('DELETE FROM node_bind_codes WHERE user_id=?', (user_id,))
+    db.execute('DELETE FROM login_failures WHERE username=?', (row['username'],))
+    db.execute('DELETE FROM users WHERE user_id=?', (user_id,))
+    db.commit()
+    return {'deleted': row['username'], 'nodes_unowned': nodes}
+
+
 def list_users(db) -> List[Dict[str, Any]]:
     out = []
     owned = {}
+    now = time.time()
+    sess = {r[0]: r[1] for r in db.execute('SELECT user_id, COUNT(*) FROM sessions WHERE expires_at >= ? GROUP BY user_id', (now,))}
+    locked = {r[0].lower() for r in db.execute('SELECT username FROM login_failures WHERE locked_until > ?', (now,))}
     if _has_table(db, 'nodes'):
         cols = {r[1] for r in db.execute('PRAGMA table_info(nodes)')}
         if 'owner_user_id' in cols:
@@ -261,11 +333,14 @@ def list_users(db) -> List[Dict[str, Any]]:
     for row in db.execute('SELECT * FROM users ORDER BY created_at'):
         u = public_user(row)
         u['nodes'] = owned.get(row['user_id'], 0)
+        u['sessions'] = sess.get(row['user_id'], 0)
+        u['locked'] = row['username'].lower() in locked
         out.append(u)
     return out
 
 
-def update_user(db, actor: Dict[str, Any], user_id: str, *, role: Optional[str] = None, disabled: Optional[bool] = None) -> Dict[str, Any]:
+def update_user(db, actor: Dict[str, Any], user_id: str, *, role: Optional[str] = None, disabled: Optional[bool] = None,
+                display_name: Optional[str] = None, email: Optional[str] = None) -> Dict[str, Any]:
     row = db.execute('SELECT * FROM users WHERE user_id=?', (user_id,)).fetchone()
     if row is None:
         raise AuthError(404, '账号不存在')
@@ -278,6 +353,13 @@ def update_user(db, actor: Dict[str, Any], user_id: str, *, role: Optional[str] 
             raise AuthError(409, '至少保留一个可用的管理员账号')
     if user_id == actor['user_id'] and disabled:
         raise AuthError(409, '不能停用自己的账号')
+    if email is not None:
+        email = email.strip()[:120]
+        if email and not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+            raise AuthError(400, '邮箱格式不正确')
+        db.execute('UPDATE users SET email=? WHERE user_id=?', (email, user_id))
+    if display_name is not None:
+        db.execute('UPDATE users SET display_name=? WHERE user_id=?', (display_name.strip()[:60] or row['username'], user_id))
     if role is not None:
         db.execute('UPDATE users SET role=? WHERE user_id=?', (role, user_id))
     if disabled is not None:

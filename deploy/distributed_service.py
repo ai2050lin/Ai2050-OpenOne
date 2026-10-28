@@ -2620,6 +2620,20 @@ class AuthCreateUserReq(BaseModel):
 class AuthUpdateUserReq(BaseModel):
     role: Optional[str] = None
     disabled: Optional[bool] = None
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+
+
+class AuthResetPasswordReq(BaseModel):
+    new_password: str
+
+
+class AuthDeleteUserReq(BaseModel):
+    confirm: str
+
+
+class AuthRegistrationReq(BaseModel):
+    policy: str
 
 
 def _auth_call(fn, *args, **kwargs):
@@ -2676,7 +2690,8 @@ def auth_password(b: AuthPasswordReq, authorization: str = Header(default='')) -
 @router.get('/auth/users')
 def auth_users(authorization: str = Header(default='')) -> dict:
     _auth_call(_accounts.require_admin, authorization)
-    return {'users': _auth_call(_accounts.list_users), 'registration': _accounts.registration_policy()}
+    info = _auth_call(_accounts.registration_info)
+    return {'users': _auth_call(_accounts.list_users), 'registration': info['policy'], 'registration_source': info['source']}
 
 
 @router.post('/auth/users')
@@ -2689,7 +2704,33 @@ def auth_create_user(b: AuthCreateUserReq, authorization: str = Header(default='
 @router.post('/auth/users/{user_id}')
 def auth_update_user(user_id: str, b: AuthUpdateUserReq, authorization: str = Header(default='')) -> dict:
     actor = _auth_call(_accounts.require_admin, authorization)
-    return {'user': _auth_call(_accounts.update_user, actor, user_id, role=b.role, disabled=b.disabled)}
+    return {'user': _auth_call(_accounts.update_user, actor, user_id, role=b.role, disabled=b.disabled,
+                               display_name=b.display_name, email=b.email)}
+
+
+@router.post('/auth/users/{user_id}/password')
+def auth_reset_user_password(user_id: str, b: AuthResetPasswordReq, authorization: str = Header(default='')) -> dict:
+    actor = _auth_call(_accounts.require_admin, authorization)
+    return {'user': _auth_call(_accounts.admin_reset_password, actor, user_id, b.new_password),
+            'note': '密码已重置；该账号的全部登录已失效，锁定已解除。'}
+
+
+@router.post('/auth/users/{user_id}/logout')
+def auth_revoke_user_sessions(user_id: str, authorization: str = Header(default='')) -> dict:
+    actor = _auth_call(_accounts.require_admin, authorization)
+    return _auth_call(_accounts.revoke_sessions, actor, user_id)
+
+
+@router.post('/auth/users/{user_id}/delete')
+def auth_delete_user(user_id: str, b: AuthDeleteUserReq, authorization: str = Header(default='')) -> dict:
+    actor = _auth_call(_accounts.require_admin, authorization)
+    return _auth_call(_accounts.delete_user, actor, user_id, b.confirm)
+
+
+@router.post('/auth/registration')
+def auth_set_registration(b: AuthRegistrationReq, authorization: str = Header(default='')) -> dict:
+    actor = _auth_call(_accounts.require_admin, authorization)
+    return _auth_call(_accounts.set_registration_policy, actor, b.policy)
 
 
 @router.post('/auth/node-code')

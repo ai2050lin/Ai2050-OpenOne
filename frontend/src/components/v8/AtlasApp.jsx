@@ -10,11 +10,12 @@ import '../app/rdc_fusion/rdc_fusion.css';
 import '../app/rdc_fusion/rdc_fusion_v6.css';
 import '../open/open.css';
 import SiteHome from './SiteHome.jsx';
-import { PAGES, WORKBENCH_REDIRECT, readState, workbenchHref, writeState } from './v8Util.js';
+import { BRANCHES, PAGES, WORKBENCH_REDIRECT, readState, workbenchHref, writeState } from './v8Util.js';
 import './v8.css';
 
 const OpenJoin = lazy(() => import('../open/OpenJoin.jsx'));
 const OpenLearn = lazy(() => import('../open/OpenLearn.jsx'));
+const AccountAdmin = lazy(() => import('../app/rdc_fusion/AccountAdmin.jsx'));
 
 export default function AtlasApp() {
   const cfg = useApi('/api/platform/config');
@@ -25,7 +26,7 @@ export default function AtlasApp() {
   const pages = PAGES.filter(p => p.id !== 'join' || !config?.ui?.tabs || config.ui.tabs.includes('join'));
 
   useEffect(() => { if (redirect) window.location.replace(redirect); else writeState(st); }, [st, redirect]);
-  const label = PAGES.find(p => p.id === st.page)?.label || '';
+  const label = [...PAGES, ...BRANCHES].find(p => p.id === st.page)?.label || '';
   useEffect(() => { document.title = `${st.page === 'home' ? '' : `${label} · `}${config?.title || 'AI2050'}`; }, [label, st.page, config]);
   useEffect(() => { window.scrollTo?.(0, 0); }, [st.page]);
   if (redirect) return <Empty>正在打开研究工作台…</Empty>;
@@ -55,6 +56,7 @@ export default function AtlasApp() {
           {st.page === 'home' && <SiteHome config={config} set={set} />}
           {st.page === 'learn' && <OpenLearn onGo={t => (WORKBENCH_REDIRECT[t] ? window.location.assign(WORKBENCH_REDIRECT[t]) : set({ page: t }))} />}
           {st.page === 'join' && <OpenJoin config={config} />}
+          {st.page === 'accounts' && <AccountAdmin />}
         </Suspense>
       </main>
       <footer className="v8-foot">

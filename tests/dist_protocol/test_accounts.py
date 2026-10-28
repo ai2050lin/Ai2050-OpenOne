@@ -150,6 +150,61 @@ class AccountsTests(unittest.TestCase):
             self.assertTrue(A.login(db, 'alice', 'brand-new-789')['token'])
             db.close()
 
+    def test_admin_account_management(self):
+        root = A.register(self.db, 'root', 'secret-123')
+        bob = A.register(self.db, 'bob_2', 'another-456')
+        actor, bid = root['user'], bob['user']['user_id']
+        self.db.execute("INSERT INTO nodes(node_id,name,owner_user_id) VALUES('N1','gpu',?)", (bid,))
+        # 资料
+        u = A.update_user(self.db, actor, bid, display_name='  Bob  ', email='bob@example.org')
+        self.assertEqual((u['display_name'], u['email']), ('Bob', 'bob@example.org'))
+        with self.assertRaises(A.AuthError):
+            A.update_user(self.db, actor, bid, email='not-an-email')
+        # 会话数、锁定、强制下线
+        for _ in range(A.MAX_FAILS):
+            with self.assertRaises(A.AuthError):
+                A.login(self.db, 'bob_2', 'wrong-pass')
+        row = {u['username']: u for u in A.list_users(self.db)}['bob_2']
+        self.assertEqual((row['sessions'], row['locked'], row['nodes']), (1, True, 1))
+        self.assertEqual(A.revoke_sessions(self.db, actor, bid)['revoked'], 1)
+        self.assertIsNone(A.session_user(self.db, bob['token']))
+        with self.assertRaises(A.AuthError):
+            A.revoke_sessions(self.db, actor, actor['user_id'])
+        # 管理员重置他人密码：解除锁定；不能用来改自己的
+        A.admin_reset_password(self.db, actor, bid, 'reset-by-admin-1')
+        self.assertTrue(A.login(self.db, 'bob_2', 'reset-by-admin-1')['token'])
+        with self.assertRaises(A.AuthError):
+            A.admin_reset_password(self.db, actor, actor['user_id'], 'whatever-123')
+        # 删除：确认名必须一致；不能删自己；最后一个管理员不能删；节点改为无主
+        with self.assertRaises(A.AuthError) as cm:
+            A.delete_user(self.db, actor, bid, 'bob')
+        self.assertEqual(cm.exception.status, 400)
+        with self.assertRaises(A.AuthError):
+            A.delete_user(self.db, actor, actor['user_id'], 'root')
+        r = A.delete_user(self.db, actor, bid, 'BOB_2')
+        self.assertEqual((r['deleted'], r['nodes_unowned']), ('bob_2', 1))
+        self.assertIsNone(self.db.execute("SELECT owner_user_id FROM nodes WHERE node_id='N1'").fetchone()[0])
+        self.assertEqual([u['username'] for u in A.list_users(self.db)], ['root'])
+        carol = A.create_user(self.db, 'carol', 'secret-123', role='admin', by_admin=True)
+        A.update_user(self.db, actor, carol['user_id'], disabled=True)
+        with self.assertRaises(A.AuthError) as cm:                              # root 是唯一可用的管理员
+            A.delete_user(self.db, A.session_user(self.db, A.login(self.db, 'root', 'secret-123')['token']), actor['user_id'], 'root')
+        self.assertEqual(cm.exception.status, 409)
+
+    def test_registration_policy_in_db_overrides_env(self):
+        root = A.register(self.db, 'root', 'secret-123')['user']
+        with mock.patch.dict(os.environ, {'AI2050_REGISTRATION': 'closed'}):
+            self.assertEqual(A.registration_info(self.db), {'policy': 'closed', 'source': 'env'})
+            A.set_registration_policy(self.db, root, 'open')
+            self.assertEqual(A.registration_info(self.db), {'policy': 'open', 'source': 'db'})
+            self.assertTrue(A.register(self.db, 'dave', 'secret-123')['token'])
+        A.set_registration_policy(self.db, root, 'closed')
+        with self.assertRaises(A.AuthError) as cm:
+            A.register(self.db, 'erin', 'secret-123')
+        self.assertEqual(cm.exception.status, 403)
+        with self.assertRaises(A.AuthError):
+            A.set_registration_policy(self.db, root, 'maybe')
+
     def test_node_bind_code_is_one_time(self):
         u = A.register(self.db, 'hank', 'secret-123')['user']
         code = A.new_bind_code(self.db, u['user_id'])['code']

@@ -10,7 +10,8 @@ export const PAGES = [
   { id: 'learn', label: '介绍', desc: '研究方法与概念：模式族、行为门、留出复现、普查与证据等级' },
   { id: 'join', label: '参与', desc: '用你的 GPU 跑一个分片：一键包、贡献榜' },
 ];
-export const BRANCHES = [];
+/* 不进主导航的页面：账号管理（管理员，从账号菜单进入） */
+export const BRANCHES = [{ id: 'accounts', label: '账号管理', desc: '管理本中心的全部账号' }];
 /* 旧链接：开放平台的 ?tab= 与 v8 网站的 ?page=；语言图谱 / 神经元 / 进展等转到研究工作台 */
 const OLD_TABS = { home: 'home', learn: 'learn', join: 'join' };
 /* 研究工作台地址：网页与 vite dev 用 /workbench；Electron 安装包的 file:// 页面用 index.html?wb=1（main.jsx 据此进入工作台） */
@@ -18,6 +19,12 @@ export function workbenchHref(query = '') {
   const file = typeof window !== 'undefined' && window.location?.protocol === 'file:';
   if (file) return `${window.location.pathname}?wb=1${query ? `&${query}` : ''}`;
   return `/workbench${query ? `?${query}` : ''}`;
+}
+/* 网站页面地址（研究工作台里的链接用）：网页与 vite dev 用 /?page=；Electron 的 file:// 页面用同一文件、不带 wb=1 */
+export function siteHref(page = 'home') {
+  const file = typeof window !== 'undefined' && window.location?.protocol === 'file:';
+  const q = page === 'home' ? '' : `?page=${page}`;
+  return file ? `${window.location.pathname}${q}` : `/${q}`;
 }
 export const WORKBENCH_REDIRECT = {
   atlas: workbenchHref('lens=spatial&view=lang'), lang: workbenchHref('lens=spatial&view=lang'), neuron: workbenchHref('lens=spatial&view=neuron'),

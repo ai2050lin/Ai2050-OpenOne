@@ -182,7 +182,7 @@ def config(request: Request) -> dict:
         'title': cfg.get('title', 'AI2050 · 开源 LLM 逆向研究平台'),
         'tagline': cfg.get('tagline', '一起绘制大语言模型的语言编码图谱：看进展、学方法、用自己的 GPU 跑一个分片。'),
         'public_url': public_url(request),
-        'registration': A.registration_policy(),
+        'registration': A.registration_policy(D._db()),
         'task_kinds': cfg.get('task_kinds', ['family_test', 'census_shard']),
         'contact': cfg.get('contact', ''),
         'repo_url': cfg.get('repo_url', 'https://github.com/ai2050lin/Ai2050-OpenOne'),
