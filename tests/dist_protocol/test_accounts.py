@@ -110,6 +110,46 @@ class AccountsTests(unittest.TestCase):
             A.require_admin(self.db, f'Bearer {A.register(self.db, "gina", "secret-123")["token"]}')
         self.assertEqual([u['username'] for u in A.list_users(self.db)], ['root', 'frank', 'gina'])
 
+    def test_server_side_password_reset(self):
+        A.register(self.db, 'alice', 'secret-123')
+        bob = A.register(self.db, 'bob_2', 'another-456')
+        for _ in range(A.MAX_FAILS):
+            with self.assertRaises(A.AuthError):
+                A.login(self.db, 'bob_2', 'wrong-pass')
+        self.db.execute("UPDATE users SET disabled=1 WHERE username='bob_2'")
+        self.db.commit()
+        u = A.reset_password(self.db, 'bob_2', 'brand-new-789', make_admin=True)
+        self.assertEqual(u['role'], 'admin')
+        self.assertFalse(u['disabled'])
+        self.assertIsNone(A.session_user(self.db, bob['token']))              # 旧会话失效
+        self.assertTrue(A.login(self.db, 'bob_2', 'brand-new-789')['token'])  # 锁定已解除
+        with self.assertRaises(A.AuthError):
+            A.login(self.db, 'bob_2', 'another-456')
+        with self.assertRaises(A.AuthError) as e:
+            A.reset_password(self.db, 'nobody', 'brand-new-789')
+        self.assertEqual(e.exception.status, 404)
+        with self.assertRaises(A.AuthError):
+            A.reset_password(self.db, 'alice', 'short')
+
+    def test_reset_password_cli(self):
+        import tempfile
+        sys.path.insert(0, str(ROOT / 'deploy'))
+        import reset_password as R
+        with tempfile.TemporaryDirectory() as d:
+            db = sqlite3.connect(os.path.join(d, 'dist.sqlite3'))
+            db.row_factory = sqlite3.Row
+            A.ensure_schema(db)
+            A.register(db, 'alice', 'secret-123')
+            db.close()
+            with mock.patch('getpass.getpass', side_effect=['brand-new-789', 'brand-new-789']):
+                self.assertEqual(R.main(['--data-dir', d, 'alice']), 0)
+            with mock.patch('getpass.getpass', side_effect=['brand-new-000', 'mismatch-000']):
+                with self.assertRaises(SystemExit):
+                    R.main(['--data-dir', d, 'alice'])
+            db = R.open_db(d)
+            self.assertTrue(A.login(db, 'alice', 'brand-new-789')['token'])
+            db.close()
+
     def test_node_bind_code_is_one_time(self):
         u = A.register(self.db, 'hank', 'secret-123')['user']
         code = A.new_bind_code(self.db, u['user_id'])['code']

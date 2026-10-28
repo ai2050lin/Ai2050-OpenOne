@@ -32,6 +32,16 @@ DOMAIN=platform.example.org bash deploy/install_center.sh --yes --https
 
 安装后先在浏览器打开站点并注册**第一个账号**，它会自动成为管理员。之后的注册方式由 `AI2050_REGISTRATION` 控制：`open` 表示任何人都能注册，`closed` 表示只能由管理员创建账号。修改位置是 `/etc/systemd/system/ai2050-center.service`。
 
+**忘记密码**：页面上没有找回功能，需要在中心服务器上重置。脚本直接修改数据库，不需要管理令牌。新密码要在终端输入两次，输入时不回显。重置后，该账号已有的登录全部失效，锁定和停用状态也会一起解除。
+
+- **找数据目录**：用 `systemctl show ai2050-center -p Environment` 查看 `AI2050_DIST_DIR`。用安装脚本部署的中心，数据目录默认是 `/var/lib/ai2050`。
+- **管理员账号全部丢失时**：加 `--make-admin`，重置的同时把账号设为管理员。
+
+```bash
+sudo -u ai2050 /opt/ai2050/venv/bin/python /opt/ai2050/app/deploy/reset_password.py --data-dir /var/lib/ai2050 --list
+sudo -u ai2050 /opt/ai2050/venv/bin/python /opt/ai2050/app/deploy/reset_password.py --data-dir /var/lib/ai2050 <用户名>
+```
+
 ## 2.1 版本与升级
 
 - 每次打包都会递增版本号：仓库根目录 `VERSION`，缺省递增补丁号。发布包和解压目录都带版本号，如 `ai2050-center-1.0.1/`。

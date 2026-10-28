@@ -232,6 +232,24 @@ def change_password(db, user_id: str, old: str, new: str, *, keep_token: str = '
     db.commit()
 
 
+def reset_password(db, username: str, new: str, *, make_admin: bool = False) -> Dict[str, Any]:
+    """服务器本机重置（忘记密码时，deploy/reset_password.py 调用）：换哈希、解除锁定与停用、注销该账号全部会话。
+    不经中心接口，只有能写数据库文件的人能做。"""
+    row = db.execute('SELECT * FROM users WHERE username=?', ((username or '').strip(),)).fetchone()
+    if row is None:
+        raise AuthError(404, '账号不存在')
+    _check_password(new)
+    salt = secrets.token_bytes(16)
+    db.execute('UPDATE users SET pw_hash=?, pw_salt=?, pw_iter=?, disabled=0 WHERE user_id=?',
+               (_hash_pw(new, salt, PBKDF2_ITER), salt.hex(), PBKDF2_ITER, row['user_id']))
+    if make_admin:
+        db.execute("UPDATE users SET role='admin' WHERE user_id=?", (row['user_id'],))
+    db.execute('DELETE FROM sessions WHERE user_id=?', (row['user_id'],))
+    db.execute('DELETE FROM login_failures WHERE username=?', (row['username'],))
+    db.commit()
+    return public_user(db.execute('SELECT * FROM users WHERE user_id=?', (row['user_id'],)).fetchone())
+
+
 def list_users(db) -> List[Dict[str, Any]]:
     out = []
     owned = {}
