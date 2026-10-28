@@ -99,16 +99,16 @@ export const RUNTIME_MODE = detectMode(API_BASE);
  *  对所有形态生效（网站与研究工作台，网页版、远端 vite dev、Electron 安装包），只有连接本机后端的开发保持在线。
  *  VITE_CLIENT_MODE=online|offline 可显式指定。 */
 const CLIENT_MODE = import.meta.env.VITE_CLIENT_MODE;
-export const ADMIN_PAGE = typeof window !== 'undefined' && Boolean(window.location)
-  && /^\/(workbench|rdc-fusion)(\/|$)/.test(window.location.pathname);
 export const OFFLINE_CLIENT = CLIENT_MODE === 'offline' || (CLIENT_MODE !== 'online' && RUNTIME_MODE !== 'local');
 /** 连接的是另一台主机上的中心（远端客户端 / 安装包），而不是同源托管的网页：账号菜单里给出「网页版」链接 */
 export const REMOTE_CENTER = RUNTIME_MODE === 'remote' || RUNTIME_MODE === 'electron';
-/** 管理工位的实时连接：只在中心同源托管的研究工作台里，研发工位（题库之外的模板、冻结、分发、审计、普查）
- *  显式标记 online 的读取与写操作才连接服务器，且只在打开该工位、点击操作时发生。 */
-export const ADMIN_LIVE = !OFFLINE_CLIENT || (ADMIN_PAGE && !REMOTE_CENTER && CLIENT_MODE !== 'offline');
+/** 桌面客户端（Electron 安装包）：执行测试（贡献算力、Goodfire 神经元测试）与管理工位都只在这里。 */
+export const DESKTOP = isDesktop();
+/** 管理工位的实时连接：网页只能浏览；只有桌面客户端（或连接本机后端的开发）里，研发工位（题库之外的模板、冻结、分发、
+ *  审计、普查）显式标记 online 的读取与写操作才连接服务器，且只在打开该工位、点击操作时发生。 */
+export const ADMIN_LIVE = !OFFLINE_CLIENT || (DESKTOP && CLIENT_MODE !== 'offline');
 
-/** 网页版地址（离线客户端里「去网页版操作」的链接）。 */
+/** 网页版地址（客户端账号菜单里「网页版」的链接）。 */
 export const WEB_URL = API_BASE || (typeof window !== 'undefined' && window.location ? window.location.origin : '');
 
 /** 把相对路径拼成完整 URL（下载链接用；同源托管下返回站点绝对地址）。 */

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""AI2050 本机节点服务（contributor_client.v1 P1 / P3 模型下载，设计见 design/contributor_client_v1.md）
+"""AI2050 本机节点服务（contributor_client.v1 P1 / P3 模型下载 / Goodfire 神经元测试，设计见 design/contributor_client_v1.md）
 
 桌面客户端的界面只和这个服务通信；只有它访问中心，并且只做 注册 / 领取 / 续租 / 上传 / 读取站点配置，带退避。
 任务循环复用 node_agent.py（普查分片、模式族分片），任务包照旧按 sha256 核对后才运行。
@@ -422,6 +422,7 @@ class NodeService:
         self.backoff = Backoff()
         self.checks: dict = {}           # 快照 → {'status': checking|ok|mismatch|missing|downloading|error|cancelled, 'dir', ...}
         self.cancels: dict = {}          # 快照 → 下载取消事件
+        self.probe = None                # 当前的 Goodfire 神经元测试 {id, status, progress, proc, ...}
         self.pcfg, self.pcfg_at = None, 0.0
         self.runtime, self.runtime_at = None, 0.0
         self.cfg = self._load_config()
@@ -653,9 +654,10 @@ class NodeService:
                 'platform': sys.platform}
 
     def gates(self) -> list:
-        return gate_reasons(self.cfg, now_struct=time.localtime(), gpus=[] if self.synthetic else self.probes['gpus'](),
-                            battery=self.probes['battery'](), disk_free_gib=self.probes['disk'](self.home),
-                            synthetic=self.synthetic)
+        busy = ['本机正在进行神经元测试（结束后继续领取）'] if self.probe_busy() else []
+        return busy + gate_reasons(self.cfg, now_struct=time.localtime(), gpus=[] if self.synthetic else self.probes['gpus'](),
+                                   battery=self.probes['battery'](), disk_free_gib=self.probes['disk'](self.home),
+                                   synthetic=self.synthetic)
 
     # --- 控制 ---
     def status(self) -> dict:
@@ -709,6 +711,8 @@ class NodeService:
 
     def shutdown(self) -> None:
         self.stop()
+        if self.probe_busy():
+            self.cancel_probe()
         self.quit.set()
         self.wake.set()
         for hooks, f in ((A.LOG_HOOKS, self._on_log), (A.PROGRESS_HOOKS, self._on_progress), (A.RESULT_HOOKS, self._on_result)):
@@ -724,6 +728,196 @@ class NodeService:
             self._save_config()
         self.wake.set()
         return self.cfg
+
+    # --- Goodfire 式神经元逆向分析（goodfire_probe.v1，只在本机：结果不上传） ---
+    @property
+    def probes_dir(self) -> Path:
+        return self.home / 'probes'
+
+    def probe_busy(self) -> bool:
+        return bool(self.probe and self.probe.get('status') in ('preparing', 'running'))
+
+    def probe_runner(self) -> Path:
+        """runner 与统计模块：安装包 / 一键包里与本文件同目录，开发仓库里在 shared/dist_protocol。"""
+        if self.probes.get('gf_runner'):
+            return Path(self.probes['gf_runner'])
+        here = Path(__file__).resolve().parent
+        for d in (here, here.parent / 'shared' / 'dist_protocol'):
+            if (d / 'goodfire_runner.py').is_file() and (d / 'goodfire_probe.py').is_file():
+                return d / 'goodfire_runner.py'
+        raise RuntimeError('缺少 goodfire_runner.py / goodfire_probe.py（安装包不完整）')
+
+    @staticmethod
+    def validate_probe(b: dict) -> dict:
+        def num(key, lo, hi, default=None, kind=int):
+            v = b.get(key, default)
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not lo <= v <= hi or (kind is int and int(v) != v):
+                raise ValueError(f'{key} 应为 {lo}–{hi} 的{"整数" if kind is int else "数"}')
+            return kind(v)
+
+        def texts(key, n_max, len_max):
+            v = b.get(key) or []
+            if not isinstance(v, list) or len(v) > n_max:
+                raise ValueError(f'{key} 最多 {n_max} 条')
+            return v
+        snap = str(b.get('snapshot') or '')
+        if not re.fullmatch(r'[0-9a-f]{64}', snap):
+            raise ValueError('snapshot 应为 64 位十六进制')
+        prompts = texts('prompts', 8, 200)
+        if not all(isinstance(p, str) and 0 < len(p) <= 200 for p in prompts):
+            raise ValueError('每条提示 1–200 字')
+        pairs = texts('pairs', 20, 300)
+        if not all(isinstance(p, dict) and all(isinstance(p.get(x), str) and 0 < len(p[x]) <= 300 for x in ('a', 'b')) for p in pairs):
+            raise ValueError('最小对每句 1–300 字，格式 {a, b}')
+        alphas = b.get('alphas') or [-2, -1, 0, 1, 2]
+        if not (isinstance(alphas, list) and 3 <= len(alphas) <= 9 and all(isinstance(x, (int, float)) and not isinstance(x, bool)
+                                                                       and -8 <= x <= 8 for x in alphas)
+                and min(alphas) < 0 < max(alphas) and 0 in alphas):
+            raise ValueError('alphas 须含 0 与正负两侧，3–9 个，|α| ≤ 8')
+        return {'snapshot': snap, 'layer': num('layer', 0, 1000), 'unit': num('unit', 0, 1_000_000), 'k': num('k', 20, 500, 100),
+                'shoulder': num('shoulder', 0, 500, 100), 'n_slices': num('n_slices', 1, 8, 2), 'prompts': prompts, 'pairs': pairs,
+                'alphas': [float(x) for x in alphas], 'gen_tokens': num('gen_tokens', 1, 200, 40)}
+
+    def start_probe(self, body: dict) -> dict:
+        p = self.validate_probe(body)
+        model_dir = self.cfg['model_dirs'].get(p['snapshot'])
+        if not model_dir or not Path(model_dir).is_dir():
+            raise ValueError('这个模型还没有核对一致的本机目录（先在「模型」里下载或核对）')
+        if not self.cfg.get('server'):
+            raise ValueError('请先配置中心地址：测试语料来自中心的普查作业')
+        with self.lock:
+            if self.probe_busy():
+                raise PermissionError('已有一个神经元测试在运行')
+            if self.current:
+                raise PermissionError('正在运行贡献任务：先暂停贡献，等当前任务结束后再测试')
+            pid = f"GF-L{p['layer']}-U{p['unit']}-{time.strftime('%Y%m%d-%H%M%S')}"
+            self.probe = {'id': pid, 'status': 'preparing', 'params': p, 'started': time.time(), 'progress': None, 'error': '', 'proc': None}
+        threading.Thread(target=self._probe_work, args=(self.probe, model_dir), daemon=True).start()
+        return self.probe_status()
+
+    def probe_status(self) -> dict:
+        with self.lock:
+            return {k: v for k, v in (self.probe or {}).items() if k != 'proc'} or {'status': 'idle'}
+
+    def _corpus(self, snapshot: str, n_slices: int, pr: dict) -> tuple:
+        """中心普查作业里与该模型快照对应的语料切片（公开文件），按作业记录的 sha256 核对后缓存在本机。"""
+        server = self.cfg['server']
+        _, jl = A.http_json(server + '/api/census/jobs', 'GET')
+        jobs = [j for j in jl.get('jobs') or [] if (j.get('model') or {}).get('snapshot_sha256') == snapshot]
+        if not jobs:
+            raise RuntimeError('中心还没有这个模型快照的普查作业，没有可用的测试语料')
+        jid = jobs[0]['job_id']
+        if not re.fullmatch(r'[\w.-]{1,80}', jid):
+            raise RuntimeError('普查作业编号不合法')
+        _, det = A.http_json(server + f'/api/census/jobs/{jid}', 'GET')
+        cdir = self.home / 'corpus' / jid
+        cdir.mkdir(parents=True, exist_ok=True)
+        base = server + f'/api/census/jobs/{jid}/files/'
+        A.http_download(base + 'job.json', cdir / 'job.json')
+        files = []
+        for sl in (det.get('slices') or [])[:n_slices]:
+            name = sl.get('file') or ''
+            if not re.fullmatch(r'tokens_S\d+\.npz', name):
+                raise RuntimeError(f'切片文件名不合法：{name}')
+            dest = cdir / name
+            if not (dest.is_file() and A.sha256_file(dest) == sl.get('sha256')):
+                with self.lock:
+                    pr['progress'] = {'stage': 'corpus', 'done': len(files), 'total': n_slices}
+                A.http_download(base + name, dest)
+                if A.sha256_file(dest) != sl.get('sha256'):
+                    dest.unlink()
+                    raise RuntimeError(f'{name} 的 sha256 与普查作业记录不一致，已删除')
+            files.append(dest)
+        if not files:
+            raise RuntimeError('普查作业没有语料切片')
+        return cdir / 'job.json', files
+
+    def _probe_work(self, pr: dict, model_dir: str) -> None:
+        p = pr['params']
+        out_dir = self.probes_dir / pr['id']
+        try:
+            job_json, slices = self._corpus(p['snapshot'], p['n_slices'], pr)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            spec = out_dir / 'spec.json'
+            spec.write_text(json.dumps({k: p[k] for k in ('prompts', 'pairs', 'alphas', 'gen_tokens')}, ensure_ascii=False), encoding='utf-8')
+            cmd = [self.python, '-u', str(self.probe_runner()), '--model', model_dir, '--layer', str(p['layer']), '--unit', str(p['unit']),
+                   '--job', str(job_json), '--slices', *map(str, slices), '--spec', str(spec), '--out', str(out_dir / 'result.json'),
+                   '--k', str(p['k']), '--shoulder', str(p['shoulder']), '--device', self.cfg.get('device') or 'cuda:0']
+            A.log(f"Goodfire 神经元测试 {pr['id']}：第 {p['layer']} 层单元 {p['unit']}，语料 {len(slices)} 个切片")
+            with self.lock:
+                if pr.get('status') == 'cancelled':
+                    return
+                pr['status'] = 'running'
+                pr['proc'] = proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8',
+                                                     errors='replace', env={**os.environ, 'PYTHONIOENCODING': 'utf-8'},
+                                                     creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+            tail = collections.deque(maxlen=30)
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line.startswith('@@progress '):
+                    try:
+                        with self.lock:
+                            pr['progress'] = json.loads(line[11:])
+                    except ValueError:
+                        pass
+                elif line:
+                    tail.append(line)
+            rc = proc.wait()
+            proc.stdout.close()
+            with self.lock:
+                if pr['status'] == 'cancelled':
+                    return
+                if rc != 0 or not (out_dir / 'result.json').is_file():
+                    pr['status'], pr['error'] = 'failed', ('\n'.join(tail) or f'退出码 {rc}')[-600:]
+                else:
+                    pr['status'] = 'done'
+                    r = json.loads((out_dir / 'result.json').read_text(encoding='utf-8'))
+                    pr['verdict'] = r.get('verdict')
+            A.log(f"神经元测试 {pr['id']}：" + ('完成' if pr['status'] == 'done' else f"失败 {pr['error'][-200:]}"))
+        except (RuntimeError, ValueError, OSError) as e:
+            with self.lock:
+                if pr['status'] != 'cancelled':
+                    pr['status'], pr['error'] = 'failed', str(e)[:600]
+            A.log(f'神经元测试失败：{e}')
+        finally:
+            with self.lock:
+                pr['proc'] = None
+                pr['finished'] = time.time()
+            try:
+                out_dir.mkdir(parents=True, exist_ok=True)
+                (out_dir / 'status.json').write_text(json.dumps({k: v for k, v in pr.items() if k != 'proc'}, ensure_ascii=False), encoding='utf-8')
+            except OSError:
+                pass
+
+    def cancel_probe(self) -> dict:
+        with self.lock:
+            pr = self.probe
+            if not self.probe_busy():
+                raise ValueError('没有正在运行的神经元测试')
+            pr['status'] = 'cancelled'
+            proc = pr.get('proc')
+        if proc is not None and proc.poll() is None:
+            proc.kill()
+        A.log('已取消神经元测试')
+        return self.probe_status()
+
+    def list_probes(self) -> list:
+        out = []
+        for d in sorted(self.probes_dir.glob('GF-*'), reverse=True)[:200]:
+            try:
+                st = json.loads((d / 'status.json').read_text(encoding='utf-8'))
+            except (OSError, ValueError):
+                continue
+            out.append({k: st.get(k) for k in ('id', 'status', 'params', 'started', 'finished', 'verdict', 'error')})
+        return out
+
+    def get_probe(self, pid: str) -> dict:
+        if not re.fullmatch(r'GF-L\d+-U\d+-\d{8}-\d{6}', pid or ''):
+            raise ValueError('测试编号不合法')
+        p = self.probes_dir / pid / 'result.json'
+        if not p.is_file():
+            raise ValueError('没有这个测试的结果')
+        return json.loads(p.read_text(encoding='utf-8'))
 
     # --- 任务循环 ---
     def _sleep(self, seconds: float) -> None:
@@ -817,7 +1011,7 @@ class NodeService:
 
     def _run(self, kind: str, model, fn) -> bool:
         with self.lock:
-            if self.state != 'running':
+            if self.state != 'running' or self.probe_busy():
                 return False
             self.current = {'kind': kind, 'model': (model or {}).get('name') or ('synthetic' if self.synthetic else ''),
                             'started': time.time(), 'progress': None}
@@ -932,6 +1126,16 @@ def make_handler(svc: NodeService, token: str, port_ref: dict, allow_origins=())
                     return self._send(200, svc.check_model(str(b.get('snapshot') or ''), str(b.get('dir') or '')))
                 if route == ('POST', '/bind'):
                     return self._send(200, svc.bind(str(self._body().get('bind_code') or '')))
+                if route == ('POST', '/probe/start'):
+                    return self._send(200, svc.start_probe(self._body()))
+                if route == ('POST', '/probe/cancel'):
+                    return self._send(200, svc.cancel_probe())
+                if route == ('GET', '/probe'):
+                    return self._send(200, svc.probe_status())
+                if route == ('GET', '/probes'):
+                    return self._send(200, {'items': svc.list_probes()})
+                if method == 'GET' and route[1].startswith('/probes/'):
+                    return self._send(200, svc.get_probe(route[1][len('/probes/'):]))
                 if route == ('GET', '/logs'):
                     return self._send(200, {'items': svc.logs_after(int(q.get('after') or 0))})
                 if route == ('GET', '/history'):

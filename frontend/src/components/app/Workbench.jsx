@@ -1,7 +1,7 @@
 /* 研究工作台（v8，/workbench 与 /atlas）：进展 / 空间 / 研发。
    空间：左侧常驻 LLM 多层结构，右侧是神经元逆向分析结果与语言图谱（v8/SpaceLens.jsx）；进展：神经元与语言图谱的进展（v8/RouteLens.jsx）；
-   研发：题库与管理工位。进展与空间只读本机数据包；只有网页版（与中心同源）的管理工位在操作时实时连接中心（config.js 的 ADMIN_LIVE），
-   远端客户端只保留只读的题库。没有数据时显示空态，不回退演示数字。
+   研发：题库、贡献算力与管理工位。进展与空间只读本机数据包；网页只能浏览（题库只读、贡献算力只给下载入口），
+   执行测试与管理工位只在桌面客户端（config.js 的 ADMIN_LIVE；管理工位另需管理员账号）。没有数据时显示空态，不回退演示数字。
    只适合研究者本机的工具（自动测试、读取本机模型权重的旧版空间视图）只在本机中心（config.local_tools）出现。 */
 import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
 
@@ -14,19 +14,21 @@ import DispatchPanel from './rdc_fusion/DispatchPanel.jsx';
 import FreezePanel from './rdc_fusion/FreezePanel.jsx';
 import LocalPackView from './rdc_fusion/LocalPackView.jsx';
 import TemplateStudio from './rdc_fusion/TemplateStudio.jsx';
-import { ADMIN_LIVE, API_BASE, useApi } from './rdc_fusion/api.js';
+import { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
+import { useAuth } from './rdc_fusion/authContext.js';
 import { loadLocalPack } from './rdc_fusion/localPack.js';
 import { Empty } from './rdc_fusion/ui.jsx';
 import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, ROUTE_VIEWS, SPATIAL_VIEWS, STATIONS, readState, resolveGo, writeState } from './workbenchUtil.js';
+import { LENSES, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
 
 const AutoTestPanel = lazy(() => import('./rdc_fusion/AutoTestPanel.jsx'));
 const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
+const GoodfireProbePanel = lazy(() => import('./rdc_fusion/GoodfireProbePanel.jsx'));
 const LensSpatial = lazy(() => import('./rdc_fusion/LensSpatial.jsx'));
 
 function LocalPack() {
@@ -81,10 +83,12 @@ export default function Workbench() {
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
   const [draft, setDraft] = useState(null);
-  // 不能实时连接中心时（远端客户端、安装包）只保留只读的题库；模板、冻结、分发、审计、普查、自动测试在网页版的工作台操作
-  const stations = STATIONS.filter(s => (!ADMIN_LIVE ? s.id === 'catalog' || s.everywhere : !s.localOnly || localTools));
+  // 网页只能浏览：题库只读、贡献算力只给下载入口；测试与管理在桌面客户端，管理工位另需管理员账号（本机开发不限）
+  const { user } = useAuth();
+  const isAdmin = !OFFLINE_CLIENT || user?.role === 'admin';
+  const stations = visibleStations({ live: ADMIN_LIVE, admin: isAdmin, localTools });
   const baseLenses = !ADMIN_LIVE
-    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '题库（这里只读）与贡献算力；模板、冻结、分发、审计在网页版的研究工作台操作' } : l))
+    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '网页只能浏览：题库只读；执行测试与管理请用桌面客户端' } : l))
     : LENSES;
   const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
@@ -134,8 +138,9 @@ export default function Workbench() {
           <main className="wb-main">
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
-              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!ADMIN_LIVE ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!ADMIN_LIVE ? null : () => go('studio')} />}
+              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('studio')} />}
               {lens === 'process' && station === 'contribute' && <ContributePanel />}
+              {lens === 'process' && station === 'probe' && <GoodfireProbePanel />}
               {lens === 'process' && station === 'studio' && <TemplateStudio draft={draft} onDraft={setDraft} onNext={() => go('freeze')} />}
               {lens === 'process' && station === 'freeze' && <FreezePanel draft={draft} onDraft={setDraft} onGo={go} />}
               {lens === 'process' && station === 'dispatch' && <DispatchPanel onGo={go} />}

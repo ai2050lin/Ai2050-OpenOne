@@ -488,5 +488,128 @@ class ModelDownloadTests(unittest.TestCase):
             svc.shutdown()
 
 
+FAKE_RUNNER = r'''
+import argparse, json, sys, time
+ap = argparse.ArgumentParser()
+for k in ('--model', '--layer', '--unit', '--job', '--spec', '--out', '--k', '--shoulder', '--device'):
+    ap.add_argument(k)
+ap.add_argument('--slices', nargs='+')
+a = ap.parse_args()
+spec = json.load(open(a.spec, encoding='utf-8'))
+if spec['prompts'] == ['hang']:
+    time.sleep(60)
+print('@@progress ' + json.dumps({'stage': 'S1', 'done': 1, 'total': 1}), flush=True)
+json.dump({'schema': 'goodfire_probe.v1', 'verdict': {'status': 'auto_passed_needs_S9', 'failed': []},
+           'params': {'layer': int(a.layer), 'unit': int(a.unit)}, 'slices': a.slices,
+           'job': json.load(open(a.job, encoding='utf-8'))}, open(a.out, 'w', encoding='utf-8'))
+'''
+
+
+class GoodfireProbeServiceTests(unittest.TestCase):
+    """神经元测试：语料来自（假的）中心普查作业并按 sha256 核对，runner 用假脚本；校验、互斥、取消与结果读取。"""
+    SNAP = 'ab' * 32
+
+    def setUp(self):
+        import hashlib
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        self.tmp = Path(tempfile.mkdtemp())
+        self.files = {'job.json': json.dumps({'job_id': 'CJ-1', 'seq_len': 8, 'skip_head': 1, 'separator_id': 0}).encode(),
+                      'tokens_S0.npz': b'slice-0', 'tokens_S1.npz': b'slice-1'}
+        self.tamper = set()
+        slices = [{'slice': i, 'file': f'tokens_S{i}.npz', 'sha256': hashlib.sha256(self.files[f'tokens_S{i}.npz']).hexdigest()} for i in (0, 1)]
+        t = self
+
+        class H(BaseHTTPRequestHandler):
+            def log_message(self, *a):
+                pass
+
+            def do_GET(self):  # noqa: N802
+                if self.path == '/api/census/jobs':
+                    body = {'jobs': [{'job_id': 'CJ-other', 'model': {'snapshot_sha256': 'cd' * 32}},
+                                     {'job_id': 'CJ-1', 'model': {'snapshot_sha256': t.SNAP}}]}
+                elif self.path == '/api/census/jobs/CJ-1':
+                    body = {'job_id': 'CJ-1', 'slices': slices}
+                elif self.path.startswith('/api/census/jobs/CJ-1/files/'):
+                    name = self.path.rsplit('/', 1)[-1]
+                    data = b'evil' if name in t.tamper else t.files.get(name)
+                    if data is None:
+                        self.send_response(404); self.end_headers(); return
+                    self.send_response(200); self.send_header('Content-Length', str(len(data))); self.end_headers(); self.wfile.write(data)
+                    return
+                else:
+                    self.send_response(404); self.end_headers(); return
+                b = json.dumps(body).encode()
+                self.send_response(200); self.send_header('Content-Length', str(len(b))); self.end_headers(); self.wfile.write(b)
+
+        self.httpd = ThreadingHTTPServer(('127.0.0.1', 0), H)
+        threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
+        runner = self.tmp / 'fake_runner.py'
+        runner.write_text(FAKE_RUNNER, encoding='utf-8')
+        (self.tmp / 'model').mkdir()
+        self.svc = S.NodeService(self.tmp / 'svc', python=sys.executable, probes={**FAKE, 'gf_runner': str(runner)})
+        self.svc.update_config({'server': f'http://127.0.0.1:{self.httpd.server_address[1]}', 'model_dirs': {self.SNAP: str(self.tmp / 'model')}})
+
+    def tearDown(self):
+        self.svc.shutdown()
+        self.httpd.shutdown()
+        self.httpd.server_close()
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def wait(self, until=('done', 'failed', 'cancelled')):
+        deadline = time.time() + 30
+        while time.time() < deadline:
+            st = self.svc.probe_status()
+            if st['status'] in until:
+                return st
+            time.sleep(0.05)
+        self.fail(f'probe did not finish: {self.svc.probe_status()}')
+
+    def test_run_downloads_verified_corpus_and_lists_result(self):
+        st = self.svc.start_probe({'snapshot': self.SNAP, 'layer': 30, 'unit': 9517, 'n_slices': 2, 'prompts': ['你好'],
+                                   'pairs': [{'a': '香港', 'b': '巴黎'}]})
+        self.assertEqual(st['status'], 'preparing')
+        st = self.wait()
+        self.assertEqual(st['status'], 'done', st)
+        self.assertEqual(st['verdict']['status'], 'auto_passed_needs_S9')
+        res = self.svc.get_probe(st['id'])
+        self.assertEqual(res['params'], {'layer': 30, 'unit': 9517})
+        self.assertEqual([Path(x).name for x in res['slices']], ['tokens_S0.npz', 'tokens_S1.npz'])
+        self.assertEqual(res['job']['job_id'], 'CJ-1')                     # 选中与模型快照一致的作业
+        self.assertEqual([p['id'] for p in self.svc.list_probes()], [st['id']])
+        with self.assertRaises(ValueError):
+            self.svc.get_probe('../../etc')
+
+    def test_tampered_slice_rejected(self):
+        self.tamper.add('tokens_S1.npz')
+        self.svc.start_probe({'snapshot': self.SNAP, 'layer': 1, 'unit': 2, 'n_slices': 2})
+        st = self.wait()
+        self.assertEqual(st['status'], 'failed')
+        self.assertIn('sha256', st['error'])
+        self.assertFalse((self.tmp / 'svc' / 'corpus' / 'CJ-1' / 'tokens_S1.npz').exists())
+
+    def test_validation_and_exclusion(self):
+        bad = [{'snapshot': 'x', 'layer': 1, 'unit': 1}, {'snapshot': self.SNAP, 'layer': -1, 'unit': 1},
+               {'snapshot': self.SNAP, 'layer': 1, 'unit': 1, 'alphas': [0, 1, 2]},           # 只有正向
+               {'snapshot': self.SNAP, 'layer': 1, 'unit': 1, 'k': 5},
+               {'snapshot': self.SNAP, 'layer': 1, 'unit': 1, 'pairs': [{'a': 'x'}]},
+               {'snapshot': 'cd' * 32, 'layer': 1, 'unit': 1}]                                # 没有核对过的模型目录
+        for b in bad:
+            with self.assertRaises(ValueError, msg=b):
+                self.svc.start_probe(b)
+        self.svc.current = {'kind': 'census_shard'}
+        with self.assertRaises(PermissionError):
+            self.svc.start_probe({'snapshot': self.SNAP, 'layer': 1, 'unit': 1})
+        self.svc.current = None
+
+    def test_cancel_and_contribution_waits(self):
+        self.svc.start_probe({'snapshot': self.SNAP, 'layer': 1, 'unit': 1, 'n_slices': 1, 'prompts': ['hang']})
+        self.wait(until=('running',))
+        self.assertTrue(any('神经元测试' in r for r in self.svc.gates()))       # 测试期间贡献循环不领取
+        with self.assertRaises(PermissionError):
+            self.svc.start_probe({'snapshot': self.SNAP, 'layer': 1, 'unit': 1})
+        self.assertEqual(self.svc.cancel_probe()['status'], 'cancelled')
+        self.assertFalse(self.svc.probe_busy())
+
+
 if __name__ == '__main__':
     unittest.main()

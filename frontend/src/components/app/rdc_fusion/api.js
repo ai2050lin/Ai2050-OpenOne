@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 import { getExtraEntry, getLocal, getOnDemand, isOnDemand, packHint, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
 
-import { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
+import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
 
-export { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL };
+export { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL };
 
 /* 离线客户端唯一在线读取的接口。 */
 const ONLINE_PATHS = new Set(['/api/platform/config']);
@@ -58,7 +58,7 @@ async function fetchJson(path, { signal } = {}) {
 }
 
 export async function postJson(path, payload, { adminToken, method = 'POST' } = {}) {
-  if (!ADMIN_LIVE) throw new Error(`这里只读数据包，不能写入；管理操作请在网页版的研究工作台进行：${WEB_URL}/workbench`);
+  if (!ADMIN_LIVE) throw new Error('网页只能浏览，不能写入；测试与管理操作请在桌面客户端（研究工作台 → 研发）进行');
   const headers = { 'Content-Type': 'application/json' };
   if (adminToken) headers['X-Admin-Token'] = adminToken;
   let response;

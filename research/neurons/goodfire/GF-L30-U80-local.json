@@ -1,0 +1,581 @@
+{
+ "schema": "goodfire_probe.v1",
+ "env": {
+  "runner": "goodfire_runner.v1",
+  "torch": "2.13.0+cu130",
+  "transformers": "5.14.1",
+  "python": "3.14.6",
+  "dtype": "bf16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 5080"
+ },
+ "criteria": {
+  "coh_P_min": 0.3,
+  "coh_ratio_to_random": 3.0,
+  "eff_text_ratio": 0.2,
+  "k_min": 20,
+  "split_half_min": 0.5,
+  "R_min": 0.6,
+  "shoulder_acc_min": 0.9,
+  "read_write_gap_max": 0.2,
+  "steer_monotone_min": 0.8,
+  "pairs_sign_min": 0.9,
+  "split_seed": 20261028
+ },
+ "params": {
+  "layer": 30,
+  "unit": 80,
+  "k": 100,
+  "shoulder": 100,
+  "batch": 8,
+  "alphas": [
+   -2.0,
+   -1.0,
+   0.0,
+   1.0,
+   2.0
+  ],
+  "gen_tokens": 30
+ },
+ "corpus": {
+  "job_id": "LOCAL-gf-test",
+  "corpus_fp": "2ca5f0a756d36c8a",
+  "seq_len": 256,
+  "skip_head": 4,
+  "n_windows": 3904,
+  "n_positions": 983030,
+  "slices": [
+   "tokens_S0.npz",
+   "tokens_S1.npz"
+  ],
+  "text_unit": "窗口内文档段（窗口 × 分隔符分段）；窗口之间不共享注意力"
+ },
+ "S1": {
+  "h_norm_mean": 287.5331123142579,
+  "mu_norm": 189.84259033203125,
+  "g_mean": 1.1929749415274131,
+  "g_std": 1.5643915297185311,
+  "hook": "h = post_attention_layernorm 的输入（norm 之前）；g = gate_proj 输出第 j 维（SiLU 之前）"
+ },
+ "reading": "axis",
+ "checks": {
+  "S2_coh": {
+   "value": 0.34889540441838984,
+   "random": 0.1,
+   "pass": true
+  },
+  "S3_k": {
+   "value": 100,
+   "pass": true
+  },
+  "S3_effective_texts": {
+   "value": 63,
+   "pos": 68,
+   "neg": 63,
+   "need": 20,
+   "pass": true
+  },
+  "S4_split_half": {
+   "value": 0.9042114883888979,
+   "reliability": 0.9496964952710446,
+   "pass": true
+  },
+  "S5_duality": {
+   "value": 1.3228988976345804,
+   "coh_P": 0.34889540441838984,
+   "coh_N": 0.461553345894859,
+   "pass": true
+  },
+  "S5_shoulder": {
+   "value": 0.99,
+   "n": 200,
+   "acc": 0.99,
+   "pos_acc": 0.98,
+   "neg_acc": 1.0,
+   "pass": true
+  },
+  "S8_read_write": {
+   "value": 0.13797879749496988,
+   "cos_read": 0.3904523263921721,
+   "cos_write": 0.2524735288972022,
+   "pass": true
+  }
+ },
+ "g": {
+  "pos_min": 4.78125,
+  "neg_max": -3.71875,
+  "mean": 1.1929749415274131,
+  "std": 1.5643915297185311,
+  "z_pos_min": 2.2937192916870117,
+  "z_neg_max": -3.1397032737731934
+ },
+ "delta_norm": 129.89255808564897,
+ "S6": {
+  "pos": [
+   "古代",
+   "以",
+   "形",
+   "造",
+   "特别是",
+   "群",
+   "广泛",
+   "现代",
+   "较",
+   "普遍",
+   " Raq",
+   "社会",
+   "与",
+   "非",
+   "发展",
+   "有关",
+   "土",
+   "具有",
+   "基本",
+   "零"
+  ],
+  "neg": [
+   " California",
+   " Florida",
+   " Texas",
+   " Washington",
+   " American",
+   "洛杉矶",
+   " federal",
+   " Ohio",
+   " Arizona",
+   " USA",
+   " US",
+   " Federal",
+   "美國",
+   " USDA",
+   "USA",
+   " state",
+   " America",
+   "芝加哥",
+   " Louisiana",
+   " Iowa"
+  ],
+  "write_pos": [
+   " Whilst",
+   " fortn",
+   " learnt",
+   " enquiry",
+   "Whilst",
+   " Provision",
+   " campaigners",
+   " envis",
+   " whilst",
+   " consultancy"
+  ],
+  "write_neg": [
+   " Alabama",
+   " Mississippi",
+   "ря",
+   "答え",
+   "ookie",
+   " college",
+   " ju",
+   " physician",
+   " Boone",
+   " Texas"
+  ],
+  "note": "U(γ⊙Δ̂)：Δ 的直接读出近似；write_* 为 U(γ⊙W_down[:, j])，对照用"
+ },
+ "S8": {
+  "cos_read": 0.3904523263921721,
+  "cos_write": 0.2524735288972022,
+  "upstream": {
+   "layer": 29,
+   "top": [
+    {
+     "unit": 470,
+     "cos": -0.2918718755245209
+    },
+    {
+     "unit": 196,
+     "cos": -0.13508428633213043
+    },
+    {
+     "unit": 61,
+     "cos": 0.12638096511363983
+    },
+    {
+     "unit": 17,
+     "cos": -0.12264981865882874
+    },
+    {
+     "unit": 469,
+     "cos": -0.08706816285848618
+    }
+   ],
+   "abs_p99": 0.046128980815410614,
+   "note": "cos(上一层 W_down[:, i], γ_post ⊙ W_gate[j])：只看直接通路，不含注意力与更早的层"
+  }
+ },
+ "poles": {
+  "pos": [
+   {
+    "g": 5.90625,
+    "z": 3.012848745940609,
+    "left": "迄今为止有文字记载的历史达三千年之久，素有“中国古代文化博物馆”之美称。西河度",
+    "hit": "文化和",
+    "right": "丁村文化遗址表明,早在旧"
+   },
+   {
+    "g": 5.65625,
+    "z": 2.85304220438705,
+    "left": " or Andosini () during the 7th and 2nd centuries BC. Influenced by the Aquitanian",
+    "hit": ",",
+    "right": " Basque and Iberian languages,"
+   },
+   {
+    "g": 5.46875,
+    "z": 2.7331872982218806,
+    "left": "ini () during the 7th and 2nd centuries BC. Influenced by the Aquitanian, Basque",
+    "hit": " and",
+    "right": " Iberian languages, the locals developed"
+   },
+   {
+    "g": 5.375,
+    "z": 2.673259845139296,
+    "left": "读、俄语会话、俄语外贸会话、俄罗斯概况、俄语语言与文化、笔译",
+    "hit": "、",
+    "right": "口译、俄罗斯文学等。\n培养"
+   },
+   {
+    "g": 5.28125,
+    "z": 2.6133323920567118,
+    "left": ")。\n左云县最大的地主李郁，一家占有土地160多顷，其中有25顷",
+    "hit": " �",
+    "right": "��人耕地，其余的部分出租"
+   },
+   {
+    "g": 5.28125,
+    "z": 2.6133323920567118,
+    "left": "（中属中亚）、“Serindia”（塞林迪亚、西域）还是“Sinkiang”",
+    "hit": "（",
+    "right": "新疆）并无共识，这些词常常"
+   },
+   {
+    "g": 5.25,
+    "z": 2.5933565743625167,
+    "left": ", Kempstone Hill, Catto Long Barrow and Cairn Lee. The area was settled in the Bronze Age by",
+    "hit": " the",
+    "right": " Beaker culture, who arrived from the"
+   },
+   {
+    "g": 5.21875,
+    "z": 2.573380756668322,
+    "left": "。\n1992年8月17日，南部非洲发展协调会议(",
+    "hit": "简称",
+    "right": "萨达克或萨迪克)"
+   },
+   {
+    "g": 5.21875,
+    "z": 2.573380756668322,
+    "left": "发生在山西，中华民族的始祖黄帝、炎帝都曾把山西作为活动的主要地区。西侯度",
+    "hit": "文化和",
+    "right": "丁村文化遗址表明，在旧石"
+   },
+   {
+    "g": 5.15625,
+    "z": 2.5334291212799323,
+    "left": "，《国家中长期教育改革和发展规划纲要（2010——2020年）》（",
+    "hit": "以下简称",
+    "right": "《纲要》）颁布后，"
+   },
+   {
+    "g": 5.15625,
+    "z": 2.5334291212799323,
+    "left": "汉藏语系藏缅语族，青海藏族除玉树部分人讲康巴方言外，均",
+    "hit": "操",
+    "right": "安多方言，通用藏语文，"
+   },
+   {
+    "g": 5.125,
+    "z": 2.513453303585737,
+    "left": "日至10日在青岛召开的2018年上合组织成员国元首理事会会议(以下简称为",
+    "hit": "“",
+    "right": "上合组织峰会”)，则被"
+   }
+  ],
+  "neg": [
+   {
+    "g": -4.9375,
+    "z": -3.918759993945008,
+    "left": " northwest unit boundary has also been revised to include areas north of U.S. Highway 96 and west of U.S",
+    "hit": ".",
+    "right": " Highway 281. Additionally,"
+   },
+   {
+    "g": -4.65625,
+    "z": -3.738977634697254,
+    "left": " various services for migrants who recently arrived to the United States. With branches in Minneapolis/Saint Paul, St. Louis,",
+    "hit": " San",
+    "right": " Francisco, and other major U.S."
+   },
+   {
+    "g": -4.625,
+    "z": -3.7190018170030594,
+    "left": " bag limit has been extended into northwest Kansas. The northwest unit boundary has also been revised to include areas north of U.S",
+    "hit": ".",
+    "right": " Highway 96 and west of U"
+   },
+   {
+    "g": -4.59375,
+    "z": -3.6990259993088648,
+    "left": " the Texas Court of Criminal Appeals, which only hears appeals raised in criminal cases, and the U.S. Court of Appeals",
+    "hit": " for",
+    "right": " the Federal Circuit, which has general jurisdiction"
+   },
+   {
+    "g": -4.59375,
+    "z": -3.6990259993088648,
+    "left": " noted instrument and clock makers. The family was most associated with Mendham, N.J. (where a historic marker on",
+    "hit": " N",
+    "right": ".J. Route 24 indicates Dod"
+   },
+   {
+    "g": -4.5625,
+    "z": -3.6790501816146697,
+    "left": " Naveen Pawar measured the speeds of heavy trucks and automobiles in five states. Speed-limit configurations ranged from a uniform",
+    "hit": " ",
+    "right": "75 mph for cars and heavy trucks"
+   },
+   {
+    "g": -4.5,
+    "z": -3.63909854622628,
+    "left": " argument form is with a counterexample with true premises but an obviously false conclusion.  For example:\n\nIf someone lives in",
+    "hit": " San",
+    "right": " Diego, then they live in California.\n"
+   },
+   {
+    "g": -4.5,
+    "z": -3.63909854622628,
+    "left": " established to provide various services for migrants who recently arrived to the United States. With branches in Minneapolis/Saint Paul, St",
+    "hit": ".",
+    "right": " Louis, San Francisco, and other major"
+   },
+   {
+    "g": -4.40625,
+    "z": -3.5791710931436955,
+    "left": " Kansas. The northwest unit boundary has also been revised to include areas north of U.S. Highway 96 and west",
+    "hit": " of",
+    "right": " U.S. Highway 281"
+   },
+   {
+    "g": -4.40625,
+    "z": -3.5791710931436955,
+    "left": " and clock makers. The family was most associated with Mendham, N.J. (where a historic marker on N.J",
+    "hit": ".",
+    "right": " Route 24 indicates Dod's house"
+   },
+   {
+    "g": -4.3125,
+    "z": -3.5192436400611107,
+    "left": " International Institute was established to provide various services for migrants who recently arrived to the United States. With branches in Minneapolis/S",
+    "hit": "aint",
+    "right": " Paul, St. Louis, San Francisco"
+   },
+   {
+    "g": -4.3125,
+    "z": -3.5192436400611107,
+    "left": " was established to provide various services for migrants who recently arrived to the United States. With branches in Minneapolis/Saint Paul,",
+    "hit": " St",
+    "right": ". Louis, San Francisco, and other"
+   }
+  ]
+ },
+ "S7": {
+  "summary": {
+   "monotone_frac": 1.0,
+   "both_sides_frac": 1.0,
+   "pass": true
+  },
+  "prompts": [
+   {
+    "prompt": "我想聊聊关于",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -14.089159965515137,
+      "g_last": -19.25,
+      "text": " Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego Diego"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -12.47836971282959,
+      "g_last": -15.25,
+      "text": " weight loss and weight gain\n I want to talk about weight loss and weight gain. I want to talk about the factors that affect weight weight weight weight"
+     },
+     {
+      "alpha": 0.0,
+      "shift": 4.414453506469727,
+      "g_last": 2.203125,
+      "text": "我最近的项目，我正在开发一个基于深度学习的图像分割模型，用于医学影像分析。这个项目的目标是提高诊断的准确性"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 13.7880859375,
+      "g_last": 12.4375,
+      "text": "“人类在古代社会，尤其是原始社会，是否可能掌握“非自然”即“非自然的自然”即“非自然的自然"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 18.14375114440918,
+      "g_last": 15.4375,
+      "text": "“古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代古代"
+     }
+    ]
+   },
+   {
+    "prompt": "这篇新闻报道的是",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -15.011670112609863,
+      "g_last": -19.875,
+      "text": " Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis Louis"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -13.734766006469727,
+      "g_last": -16.125,
+      "text": " what?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+     },
+     {
+      "alpha": 0.0,
+      "shift": 2.7164063453674316,
+      "g_last": 1.8984375,
+      "text": "什么事件？请用中文简要概括。\n\n新闻标题：中国科学家在深海发现新型微生物群落\n\n新闻内容：近日，中国"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 13.64375114440918,
+      "g_last": 12.3125,
+      "text": "“三三制”在晋中古代社会中的应用，即“三三制”在晋中古代社会中的应用，即“三"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 18.21875,
+      "g_last": 15.375,
+      "text": "“南南南南南南南南南南南南南南南南南南南南南南南南南南南南南"
+     }
+    ]
+   },
+   {
+    "prompt": "The article is about",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -15.14993953704834,
+      "g_last": -19.625,
+      "text": " Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -13.100488662719727,
+      "g_last": -16.5,
+      "text": " the 155th anniversary of the 1855 Louis Le Louis Le Louis Le Louis Le Louis Le Louis Le Louis Le Louis Le"
+     },
+     {
+      "alpha": 0.0,
+      "shift": -4.698046684265137,
+      "g_last": 0.055908203125,
+      "text": " the history of the United States, focusing on the period from the 18th century to the 20th century. The author is a"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 13.490234375,
+      "g_last": 12.125,
+      "text": "“古代青铜器的铸造，以青铜铸造为古代社会的青铜器铸造，以青铜铸造为古代社会的青铜铸造，古代青铜"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 18.034374237060547,
+      "g_last": 15.4375,
+      "text": "“古代“三三即“三三即“三三即“三三即“三三即“三三即“三三即"
+     }
+    ]
+   },
+   {
+    "prompt": "Let me tell you about",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -15.053924560546875,
+      "g_last": -19.5,
+      "text": " Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles Charles"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -11.956445693969727,
+      "g_last": -16.5,
+      "text": " the 15th Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street Street"
+     },
+     {
+      "alpha": 0.0,
+      "shift": -5.350879192352295,
+      "g_last": 0.08447265625,
+      "text": " the new product I have. It's a new type of smartwatch that's designed for people who are always on the go. The smartwatch has"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 12.879297256469727,
+      "g_last": 12.5625,
+      "text": "我的“新”“旧”“新”“旧”“新”“旧”“新”“旧”“新”“旧"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 17.4140625,
+      "g_last": 15.75,
+      "text": "“非““非““非““非““非““非““非““非““非““非“"
+     }
+    ]
+   }
+  ],
+  "h_scale": 287.5331123142579,
+  "note": "α 以 ‖h‖ 的倍数给出，加在第 l 层解码块的输入上（全部位置）"
+ },
+ "S9": {
+  "summary": {
+   "n": 3,
+   "sign_acc": 0.6666666666666666,
+   "mean_dz": 0.046610241286454634,
+   "pass": false
+  },
+  "pairs": [
+   {
+    "a": "香港与内地的往来越来越频繁。",
+    "b": "巴黎与里昂的往来越来越频繁。",
+    "z_a": 1.1650856092275839,
+    "z_b": 0.9253757968972457,
+    "dz": 0.23970981233033817
+   },
+   {
+    "a": "两岸关系是大陆和台湾共同关心的话题。",
+    "b": "健康饮食是大家共同关心的话题。",
+    "z_a": 1.1051581561449995,
+    "z_b": 1.4247712392521172,
+    "dz": -0.3196130831071178
+   },
+   {
+    "a": "他从深圳过关去了香港。",
+    "b": "他从车站出发去了学校。",
+    "z_a": 1.005279067674025,
+    "z_b": 0.7855450730378816,
+    "dz": 0.21973399463614351
+   }
+  ]
+ },
+ "seconds": {
+  "total": 132.0,
+  "S1": 121.5
+ },
+ "verdict": {
+  "status": "not_passed",
+  "failed": [
+   "S9_pairs"
+  ]
+ }
+}

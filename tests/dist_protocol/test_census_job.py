@@ -330,7 +330,8 @@ class CenterE2ETests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         z = zipfile.ZipFile(io.BytesIO(r.content))
         names = set(z.namelist())
-        for n in ('node_agent.py', 'node_service.py', 'config.json', 'requirements.txt', 'README.txt', 'start_windows.bat', 'start_linux.sh'):
+        for n in ('node_agent.py', 'node_service.py', 'goodfire_runner.py', 'goodfire_probe.py', 'config.json', 'requirements.txt',
+                  'README.txt', 'start_windows.bat', 'start_linux.sh'):
             self.assertIn(f'ai2050-node/{n}', names)
         cfg = json.loads(z.read('ai2050-node/config.json'))
         self.assertEqual(cfg['server'], 'http://center.test')

@@ -18,7 +18,8 @@ const path = require('path');
 /* 界面可调用的接口（/shutdown 只由主进程在退出时调用） */
 const ROUTES = new Set([
   'GET /status', 'GET /device', 'GET /config', 'GET /models', 'GET /logs', 'GET /history',
-  'PUT /config', 'POST /models/check', 'POST /models/download', 'POST /models/cancel', 'POST /bind', 'POST /start', 'POST /pause', 'POST /resume', 'POST /stop',
+  'PUT /config', 'POST /models/check', 'POST /models/download', 'POST /models/cancel',
+  'GET /probe', 'GET /probes', 'POST /probe/start', 'POST /probe/cancel', 'POST /bind', 'POST /start', 'POST /pause', 'POST /resume', 'POST /stop',
 ]);
 const READY_TIMEOUT = 30000;
 const MAX_FAILS = 5;
@@ -238,7 +239,9 @@ class NodeSupervisor {
   async request(method, route, body) {
     const m = String(method || 'GET').toUpperCase();
     const p = String(route || '');
-    if (!ROUTES.has(`${m} ${p.split('?')[0]}`)) return { status: 403, data: { detail: '不允许的本机接口' } };
+    const bare = p.split('?')[0];
+    const allowed = ROUTES.has(`${m} ${bare}`) || (m === 'GET' && /^\/probes\/GF-L\d+-U\d+-\d{8}-\d{6}$/.test(bare));
+    if (!allowed) return { status: 403, data: { detail: '不允许的本机接口' } };
     if (!this.port || !this.token) return { status: 0, data: { detail: '本机节点服务没有运行' } };
     const r = await httpJson(this.port, this.token, m, p, body);
     if (r.status === 0 && this.state === 'attached') this._set('failed', '接管的本机节点服务已不可达');

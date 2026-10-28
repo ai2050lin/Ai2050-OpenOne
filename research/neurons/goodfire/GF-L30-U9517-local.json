@@ -1,0 +1,581 @@
+{
+ "schema": "goodfire_probe.v1",
+ "env": {
+  "runner": "goodfire_runner.v1",
+  "torch": "2.13.0+cu130",
+  "transformers": "5.14.1",
+  "python": "3.14.6",
+  "dtype": "bf16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 5080"
+ },
+ "criteria": {
+  "coh_P_min": 0.3,
+  "coh_ratio_to_random": 3.0,
+  "eff_text_ratio": 0.2,
+  "k_min": 20,
+  "split_half_min": 0.5,
+  "R_min": 0.6,
+  "shoulder_acc_min": 0.9,
+  "read_write_gap_max": 0.2,
+  "steer_monotone_min": 0.8,
+  "pairs_sign_min": 0.9,
+  "split_seed": 20261028
+ },
+ "params": {
+  "layer": 30,
+  "unit": 9517,
+  "k": 100,
+  "shoulder": 100,
+  "batch": 8,
+  "alphas": [
+   -2.0,
+   -1.0,
+   0.0,
+   1.0,
+   2.0
+  ],
+  "gen_tokens": 30
+ },
+ "corpus": {
+  "job_id": "LOCAL-gf-test",
+  "corpus_fp": "2ca5f0a756d36c8a",
+  "seq_len": 256,
+  "skip_head": 4,
+  "n_windows": 3904,
+  "n_positions": 983030,
+  "slices": [
+   "tokens_S0.npz",
+   "tokens_S1.npz"
+  ],
+  "text_unit": "窗口内文档段（窗口 × 分隔符分段）；窗口之间不共享注意力"
+ },
+ "S1": {
+  "h_norm_mean": 287.5331123142579,
+  "mu_norm": 189.84259033203125,
+  "g_mean": -0.8252820001642057,
+  "g_std": 1.6181498929097404,
+  "hook": "h = post_attention_layernorm 的输入（norm 之前）；g = gate_proj 输出第 j 维（SiLU 之前）"
+ },
+ "reading": "axis",
+ "checks": {
+  "S2_coh": {
+   "value": 0.6340989099903194,
+   "random": 0.1,
+   "pass": true
+  },
+  "S3_k": {
+   "value": 100,
+   "pass": true
+  },
+  "S3_effective_texts": {
+   "value": 55,
+   "pos": 55,
+   "neg": 74,
+   "need": 20,
+   "pass": true
+  },
+  "S4_split_half": {
+   "value": 0.9152380410139338,
+   "reliability": 0.955743381673229,
+   "pass": true
+  },
+  "S5_duality": {
+   "value": 0.6337253951651752,
+   "coh_P": 0.6340989099903194,
+   "coh_N": 0.40184458230742204,
+   "pass": true
+  },
+  "S5_shoulder": {
+   "value": 1.0,
+   "n": 200,
+   "acc": 1.0,
+   "pos_acc": 1.0,
+   "neg_acc": 1.0,
+   "pass": true
+  },
+  "S8_read_write": {
+   "value": 0.3332185220919465,
+   "cos_read": 0.40598361661167476,
+   "cos_write": 0.07276509451972824,
+   "pass": false
+  }
+ },
+ "g": {
+  "pos_min": 9.875,
+  "neg_max": -5.625,
+  "mean": -0.8252820001642057,
+  "std": 1.6181498929097404,
+  "z_pos_min": 6.612664222717285,
+  "z_neg_max": -2.9661762714385986
+ },
+ "delta_norm": 152.39622124665752,
+ "S6": {
+  "pos": [
+   "香港",
+   " Hong",
+   "Hong",
+   "港澳",
+   " Taiwan",
+   "港",
+   "台湾",
+   "在香港",
+   "澳门",
+   "hk",
+   " HK",
+   " Taipei",
+   " Chinese",
+   "中文",
+   "HK",
+   " Taiwanese",
+   "Tai",
+   "台",
+   "粤",
+   " tai"
+  ],
+  "neg": [
+   "омн",
+   " physiological",
+   "吲",
+   " phys",
+   "ElementException",
+   " mineral",
+   "(Db",
+   "紋",
+   "苫",
+   "蓖",
+   " pressure",
+   "VERAGE",
+   "揮",
+   "党组书记",
+   "埃尔",
+   "邗",
+   "沘",
+   " habit",
+   "GINE",
+   "äch"
+  ],
+  "write_pos": [
+   "港",
+   "大陆",
+   "两岸",
+   "大陸",
+   " simplified",
+   "简化",
+   "简",
+   "内地",
+   "台湾",
+   " Simpl"
+  ],
+  "write_neg": [
+   " vent",
+   "iaz",
+   "上限",
+   "小康社会",
+   " Lump",
+   "抚",
+   "ope",
+   " intercept",
+   "腹",
+   "tee"
+  ],
+  "note": "U(γ⊙Δ̂)：Δ 的直接读出近似；write_* 为 U(γ⊙W_down[:, j])，对照用"
+ },
+ "S8": {
+  "cos_read": 0.40598361661167476,
+  "cos_write": 0.07276509451972824,
+  "upstream": {
+   "layer": 29,
+   "top": [
+    {
+     "unit": 7147,
+     "cos": -0.20173150300979614
+    },
+    {
+     "unit": 528,
+     "cos": -0.1626248061656952
+    },
+    {
+     "unit": 469,
+     "cos": 0.09067817032337189
+    },
+    {
+     "unit": 470,
+     "cos": -0.0884985476732254
+    },
+    {
+     "unit": 272,
+     "cos": 0.07641766965389252
+    }
+   ],
+   "abs_p99": 0.04971083998680115,
+   "note": "cos(上一层 W_down[:, i], γ_post ⊙ W_gate[j])：只看直接通路，不含注意力与更早的层"
+  }
+ },
+ "poles": {
+  "pos": [
+   {
+    "g": 13.0,
+    "z": 8.54388215871876,
+    "left": "拓香港界址专条》，英国租借新界99年，从此香港脱离新安县。18",
+    "hit": "9",
+    "right": "9年5月，英军由"
+   },
+   {
+    "g": 12.875,
+    "z": 8.466633443659846,
+    "left": "義與分類\n\n黑客（Hacker）当中的中文音译「-{zh-hans:黑;zh",
+    "hit": "-h",
+    "right": "k:黑;zh-tw:�"
+   },
+   {
+    "g": 12.75,
+    "z": 8.38938472860093,
+    "left": "于深圳经济特区建立同年实施即捕即解政策，逃港人数开始骤减，至19",
+    "hit": "9",
+    "right": "7年几近绝迹。\n\n1"
+   },
+   {
+    "g": 12.625,
+    "z": 8.312136013542014,
+    "left": "展拓香港界址专条》，英国租借新界99年，从此香港脱离新安县。1",
+    "hit": "8",
+    "right": "99年5月，英军"
+   },
+   {
+    "g": 12.3125,
+    "z": 8.119014225894723,
+    "left": "黑客（Hacker）当中的中文音译「-{zh-hans:黑;zh-hk:黑;",
+    "hit": "zh",
+    "right": "-tw:駭}-」字总"
+   },
+   {
+    "g": 12.1875,
+    "z": 8.041765510835807,
+    "left": "自由软件运动\nCopyleft媒体\n自由软件文化文档<|endoftext|>-{T|zh-hans:材料科学; zh",
+    "hit": "-h",
+    "right": "ant:材料科學; zh-sg"
+   },
+   {
+    "g": 12.125,
+    "z": 8.00314115330635,
+    "left": "年6月，孫到檀香山-{zh-hans:毛伊;zh-tw:茂宜;zh",
+    "hit": "-h",
+    "right": "k:毛伊;}-島茄"
+   },
+   {
+    "g": 12.125,
+    "z": 8.00314115330635,
+    "left": "直譯器翻译成机器语言。 有时，也可以用-{zh-hans:汇编语言; zh",
+    "hit": "-h",
+    "right": "ant:組合語言;}-编程"
+   },
+   {
+    "g": 11.9375,
+    "z": 7.887268080717975,
+    "left": "\n河北省 – 395\n重庆市 – 389\n福建省 – 335\n湖南省 –",
+    "hit": " ",
+    "right": "313\n湖北省 – 3"
+   },
+   {
+    "g": 11.9375,
+    "z": 7.887268080717975,
+    "left": "名稱「」所對應的朝-{}-鮮漢字，在-{zh-hans:韩国; zh",
+    "hit": "-h",
+    "right": "ant:南韓;}-（標準"
+   },
+   {
+    "g": 11.6875,
+    "z": 7.732770650600144,
+    "left": " and town on southwest Hong Kong Island\n Aberdeen Channel, a channel between Ap Lei Chau (Aberdeen Island)",
+    "hit": " and",
+    "right": " Nam Long Shan on the Hong Kong Island"
+   },
+   {
+    "g": 11.6875,
+    "z": 7.732770650600144,
+    "left": "海外所生子女，一律具有中华民國國籍，也被称为海外华侨。中華民國政府、",
+    "hit": "香港",
+    "right": "特區政府、澳门特區政府"
+   }
+  ],
+  "neg": [
+   {
+    "g": -6.71875,
+    "z": -3.6421026418252396,
+    "left": " Brønsted–Lowry acids, they can also function as Lewis bases due to the lone pairs of electrons on",
+    "hit": " their",
+    "right": " oxygen and nitrogen atoms.\n\nArrhenius"
+   },
+   {
+    "g": -6.4375,
+    "z": -3.4682930329426784,
+    "left": " the Constitution, the County of Marion shall have two senators, and four representatives.\nLinn two senators, and four representatives",
+    "hit": ".\n",
+    "right": "Lane two senators, and three representatives.\n"
+   },
+   {
+    "g": -6.375,
+    "z": -3.4296686754132204,
+    "left": " second is the reproductive success of this breeding population. Reproductive success consists of nest success (the number of nests that",
+    "hit": " successfully",
+    "right": " hatched) and chick survival (the"
+   },
+   {
+    "g": -6.34375,
+    "z": -3.4103564966484914,
+    "left": " able to remember new events, recall one or more memories of the past, or both.\nForgetfulness; Amnesia;",
+    "hit": " Imp",
+    "right": "aired memory; Loss of memory; Am"
+   },
+   {
+    "g": -6.3125,
+    "z": -3.3910443178837624,
+    "left": " -- that doctors once thought was only a problem for adults with the condition.\nOne study even found that kids with high blood",
+    "hit": " pressure",
+    "right": " have subtle changes in the brain area that"
+   },
+   {
+    "g": -6.25,
+    "z": -3.3524199603543043,
+    "left": " activity or when the heel’s fat pad becomes thinner, providing less protection to the foot.\n- Ill fitting shoes.\n-",
+    "hit": " Bi",
+    "right": "omechanical problems (e.g."
+   },
+   {
+    "g": -6.21875,
+    "z": -3.3331077815895753,
+    "left": "注、缺氧状态。 \n（2）微循环扩张期：若休克状态继续加重，动静脉",
+    "hit": "短",
+    "right": "路、直接通道进一步开放，使"
+   },
+   {
+    "g": -6.1875,
+    "z": -3.3137956028248463,
+    "left": " article uses information by permission from Alan Greene, M.D., © Greene Ink, Inc.\nGeorge F. Longstreth",
+    "hit": ",",
+    "right": " MD, Department of Gastroenterology"
+   },
+   {
+    "g": -6.1875,
+    "z": -3.3137956028248463,
+    "left": " mission candidate for launch in 2017 as part of the Cosmic Vision 2015-20",
+    "hit": "2",
+    "right": "5 programme and will spend five years in"
+   },
+   {
+    "g": -6.1875,
+    "z": -3.3137956028248463,
+    "left": " or an ARB, a diuretic can also be useful. Beta blockers, calcium channel blockers, and other blood",
+    "hit": " pressure",
+    "right": " drugs may also be needed.\nAn example"
+   },
+   {
+    "g": -6.15625,
+    "z": -3.2944834240601173,
+    "left": " Reaction Engines] can avoid later [technology] pitfalls and could travel from Brussels to Sydney,” says ESA’s LAPCAT project",
+    "hit": " co",
+    "right": "-ordinator Johan Steelant. Criteria for"
+   },
+   {
+    "g": -6.125,
+    "z": -3.2751712452953883,
+    "left": " a baby with serious birth defects of the brain and spine (neural tube defects). For this reason, all women who",
+    "hit": " can",
+    "right": " become pregnant should take supplements containing 4"
+   }
+  ]
+ },
+ "S7": {
+  "summary": {
+   "monotone_frac": 1.0,
+   "both_sides_frac": 1.0,
+   "pass": true
+  },
+  "prompts": [
+   {
+    "prompt": "我想聊聊关于",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -19.223438262939453,
+      "g_last": -24.75,
+      "text": " habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -10.390430450439453,
+      "g_last": -19.25,
+      "text": " the development of the human brain.  could you give me a general overview of the development of the human brain, from the first stages of development to"
+     },
+     {
+      "alpha": 0.0,
+      "shift": 3.1001954078674316,
+      "g_last": 0.46875,
+      "text": "我最近的项目，我正在开发一个基于深度学习的图像分割模型，用于医学影像分析。这个项目的目标是提高诊断的准确性"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 11.981152534484863,
+      "g_last": 19.25,
+      "text": "国台 HK199999999999999999999999999"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 17.753124237060547,
+      "g_last": 24.25,
+      "text": "香港 HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK"
+     }
+    ]
+   },
+   {
+    "prompt": "这篇新闻报道的是",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -18.806251525878906,
+      "g_last": -24.625,
+      "text": " a human being being of course, but the human being is not human, so the human being is not human, so the human being is not human"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -10.189844131469727,
+      "g_last": -18.875,
+      "text": " a new type of drug that is being developed to treat the disease.  The drug is being developed by a company that is in the pharmaceutical industry."
+     },
+     {
+      "alpha": 0.0,
+      "shift": 4.550976753234863,
+      "g_last": 1.65625,
+      "text": "什么事件？请用中文简要概括。\n\n新闻标题：中国科学家在深海发现新型微生物群落\n\n新闻内容：近日，中国"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 12.822461128234863,
+      "g_last": 19.875,
+      "text": "1998年92090000 HK0000 HK0000 HK0000 HK0"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 18.465625762939453,
+      "g_last": 24.625,
+      "text": "香港回归香港回归香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港香港"
+     }
+    ]
+   },
+   {
+    "prompt": "The article is about",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -19.78242301940918,
+      "g_last": -25.25,
+      "text": " the development of the human habit of habit of habit of habit of habit of habit of habit of habit of habit of habit of habit of habit of habit"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -12.113086700439453,
+      "g_last": -20.375,
+      "text": " the development of the human brain and the human being. The human brain is the most complex and powerful of the human body. The human being is the"
+     },
+     {
+      "alpha": 0.0,
+      "shift": 0.6346678733825684,
+      "g_last": -0.953125,
+      "text": " the history of the United States, focusing on the period from the 18th century to the 20th century. The author is a"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 10.26621150970459,
+      "g_last": 19.375,
+      "text": " the918hk HK198hk HK198hk HK198hk HK198hk HK198hk"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 16.65625,
+      "g_last": 24.625,
+      "text": " HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK"
+     }
+    ]
+   },
+   {
+    "prompt": "Let me tell you about",
+    "rows": [
+     {
+      "alpha": -2.0,
+      "shift": -19.576953887939453,
+      "g_last": -25.5,
+      "text": " the habit of habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit habit"
+     },
+     {
+      "alpha": -1.0,
+      "shift": -11.879297256469727,
+      "g_last": -20.875,
+      "text": " the new drug that is being developed for the treatment of chronic, severe, and even chronic, severe, and even chronic, and so on. So"
+     },
+     {
+      "alpha": 0.0,
+      "shift": 0.6187498569488525,
+      "g_last": -1.4921875,
+      "text": " the new product I have. It's a new type of smartwatch that's designed for people who are always on the go. The smartwatch has"
+     },
+     {
+      "alpha": 1.0,
+      "shift": 11.250659942626953,
+      "g_last": 19.625,
+      "text": " the97080000000000000000000000000"
+     },
+     {
+      "alpha": 2.0,
+      "shift": 17.330469131469727,
+      "g_last": 24.625,
+      "text": " HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK HK"
+     }
+    ]
+   }
+  ],
+  "h_scale": 287.5331123142579,
+  "note": "α 以 ‖h‖ 的倍数给出，加在第 l 层解码块的输入上（全部位置）"
+ },
+ "S9": {
+  "summary": {
+   "n": 3,
+   "sign_acc": 1.0,
+   "mean_dz": 4.938687382021844,
+   "pass": true
+  },
+  "pairs": [
+   {
+    "a": "香港与内地的往来越来越频繁。",
+    "b": "巴黎与里昂的往来越来越频繁。",
+    "z_a": 6.380918137069114,
+    "z_b": 1.1618018259010998,
+    "dz": 5.219116311168014
+   },
+   {
+    "a": "两岸关系是大陆和台湾共同关心的话题。",
+    "b": "健康饮食是大家共同关心的话题。",
+    "z_a": 5.376684841303205,
+    "z_b": 0.8129755969631822,
+    "dz": 4.563709244340023
+   },
+   {
+    "a": "他从深圳过关去了香港。",
+    "b": "他从车站出发去了学校。",
+    "z_a": 6.1105476343629075,
+    "z_b": 1.0773110438054105,
+    "dz": 5.033236590557497
+   }
+  ]
+ },
+ "seconds": {
+  "total": 125.2,
+  "S1": 120.4
+ },
+ "verdict": {
+  "status": "not_passed",
+  "failed": [
+   "S8_read_write"
+  ]
+ }
+}
