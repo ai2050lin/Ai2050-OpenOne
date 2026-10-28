@@ -37,11 +37,14 @@ function HeatStrip({ label, sub, values, onPick }) {
   );
 }
 
+const EXPL_LABEL = { 文本可复现: '文本可复现', 只在语料中可识别: '语料可识别', 未解释: '未解释' };
+
 function NeuronProgress({ census, skeleton, onOpenBlock }) {
   const tw = useApi(census ? `/api/neurons/tower?model_key=${encodeURIComponent(census)}` : null);
   const idx = useApi('/api/neurons/index');
   const tower = tw.data && !tw.data.pending ? tw.data : null;
   const [ro, setRo] = useState('final');
+  const [showSel, setShowSel] = useState(false);
   if (!census) return <Empty>当前模型还没有自然语料普查，没有神经元逆向分析数据。</Empty>;
   if (tw.error) return <Empty>层塔数据不在本机数据包里：{tw.error}</Empty>;
   if (!tower) return <Empty>读取层塔…</Empty>;
@@ -52,39 +55,64 @@ function NeuronProgress({ census, skeleton, onOpenBlock }) {
   const nExpl = Object.values(grades).reduce((a, b) => a + b, 0);
   const typeSum = k => blocks.reduce((s, b) => s + (b.types ? b.types[k] : 0), 0);
   const sel = tower.selectivity || [];
+  const legend = `linear-gradient(90deg, ${seq(0)}, ${seq(0.5)}, ${seq(1)})`;
   return (
     <>
+      <h4 className="v8-h4">已经做到哪一步 <small>对 {shortModel(skeleton?.model)} 全部 MLP 中间单元做自然语料普查，再逐块分型与检验</small></h4>
       <div className="v8-route-tiles">
-        <div><b>{fmtTok(run?.n_tokens)}</b><span>普查 token</span><small>{run ? `${run.sources?.length || 0} 个语料来源 · 每窗口 ${run.seq_len} token` : '—'}</small></div>
-        <div><b>{tower.summaries_ready}/{tower.n_layers}</b><span>块已生成逐层摘要</span><small>{(tower.d_ff * tower.n_layers).toLocaleString()} 个 MLP 单元（{tower.n_layers} 块 × {tower.d_ff.toLocaleString()}）</small></div>
-        <div><b>{typeSum(0) + typeSum(1)}</b><span>单 token / 上下文检测器（T1 + T2）</span><small>按 L30-v1 规则分型；块 30 以外为描述性应用</small></div>
-        <div><b>{nExpl}</b><span>已做解释检验的单元</span><small>{Object.entries(grades).map(([g, n]) => `${g} ${n}`).join(' · ') || '—'}</small></div>
-        <div><b>{sel.length}</b><span>模板选择性运行</span><small>{sel.map(s => `${s.item || s.tm_id}·${s.factor}`).join('、') || '—'}</small></div>
+        <div><b>{fmtTok(run?.n_tokens)}</b><span>普查语料规模</span><small>{run ? `${run.sources?.length || 0} 个语料来源 · 每窗口 ${run.seq_len} token` : '—'}</small></div>
+        <div><b>{(tower.d_ff * tower.n_layers).toLocaleString()}</b><span>MLP 单元全部有画像</span><small>{tower.n_layers} 块 × {tower.d_ff.toLocaleString()} · 逐层摘要 {tower.summaries_ready}/{tower.n_layers} 已生成</small></div>
+        <div><b>{typeSum(0) + typeSum(1)}</b><span>检测器型单元（T1 + T2）</span><small>T1 单 token {typeSum(0).toLocaleString()} · T2 上下文 {typeSum(1).toLocaleString()} · 按 L30-v1 规则分型</small></div>
+        <div><b>{nExpl}</b><span>做过解释检验的单元</span><small>{Object.entries(grades).map(([g, n]) => `${EXPL_LABEL[g] || g} ${n}`).join(' · ') || '尚未开始'}</small></div>
       </div>
-      <div className="v8-tools">
-        <span className="v8-note">每格一个块（块 0 → 块 {tower.n_layers - 1}，从左到右）；颜色按本行最大值归一化。点格子进入该块的神经元。</span>
-        <span className="v8-seg">{['final', 'probe_answer'].map(x => <button key={x} type="button" className={ro === x ? 'on' : ''} onClick={() => setRo(x)}>选择性：{READOUT_LABEL[x] || x}读出</button>)}</span>
-      </div>
+      <h4 className="v8-h4">每一层（块）的情况 <small>每格一个块（块 0 → {tower.n_layers - 1}，从左到右）；<i className="v8-legend-bar" style={{ background: legend }} /> 颜色浅 = 少、深 = 多（按本行最大值归一）；点格子进入该块的神经元</small></h4>
       <div className="v8-strips">
-        <HeatStrip label="T1 单 token 检测器" values={blocks.map(b => (b.types ? b.types[0] : null))} onPick={onOpenBlock} />
-        <HeatStrip label="T3 稀疏强激活" values={blocks.map(b => (b.types ? b.types[2] : null))} onPick={onOpenBlock} />
-        <HeatStrip label="强激活率中位数" values={blocks.map(b => b.dens_median ?? null)} onPick={onOpenBlock} />
-        <HeatStrip label="已解释单元" sub="文本可复现 + 语料可识别 + 未解释" values={blocks.map(b => Object.values(b.explained || {}).reduce((a, c) => a + c, 0))} onPick={onOpenBlock} />
-        {sel.map(s => (
-          <HeatStrip key={s.file} label={`选择性：${s.item || s.tm_id}`} sub={`${s.factor}（${s.hi} 对 ${s.lo}）`}
-                     values={(s.by_readout?.[ro] || []).map(v => v ?? 0)} onPick={onOpenBlock} />
-        ))}
+        <HeatStrip label="T1 单 token 检测器" sub="激活集中命中同一个词的单元数" values={blocks.map(b => (b.types ? b.types[0] : null))} onPick={onOpenBlock} />
+        <HeatStrip label="T3 稀疏强激活" sub="很少激活但一旦激活很强的单元数" values={blocks.map(b => (b.types ? b.types[2] : null))} onPick={onOpenBlock} />
+        <HeatStrip label="强激活率中位数" sub="该块单元整体的激活频繁程度" values={blocks.map(b => b.dens_median ?? null)} onPick={onOpenBlock} />
+        <HeatStrip label="已解释单元" sub="解释检验覆盖数（三个等级合计）" values={blocks.map(b => Object.values(b.explained || {}).reduce((a, c) => a + c, 0))} onPick={onOpenBlock} />
       </div>
-      <p className="v8-note">尚未覆盖：注意力头的逐头分析、跨层计算边（归因图）、多数单元的因果检验。控制轴结论见各单元卡的「干预记录」。{skeleton?.model ? ` 模型：${shortModel(skeleton.model)}。` : ''}</p>
+      {sel.length > 0 && (
+        <>
+          <h4 className="v8-h4">模板选择性 <small>{sel.length} 个运行：对照句式里哪些块的单元能区分两个水平</small>
+            <button type="button" className="v6-linkbtn" onClick={() => setShowSel(v => !v)}>{showSel ? '收起' : `展开 ${sel.length} 行`}</button>
+          </h4>
+          {showSel && (
+            <>
+              <div className="v8-tools">
+                <span className="v8-seg">{['final', 'probe_answer'].map(x => <button key={x} type="button" className={ro === x ? 'on' : ''} onClick={() => setRo(x)}>在「{READOUT_LABEL[x] || x}」位置读出</button>)}</span>
+              </div>
+              <div className="v8-strips">
+                {sel.map(s => (
+                  <HeatStrip key={s.file} label={`${s.item || s.tm_id} · ${s.factor}`} sub={`区分「${s.hi}」与「${s.lo}」，入选单元数`}
+                             values={(s.by_readout?.[ro] || []).map(v => v ?? 0)} onPick={onOpenBlock} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+      <p className="v8-note">边界：分型是描述性分类，不是证据等级；注意力头逐头分析、跨层计算边（归因图）与多数单元的因果检验尚未覆盖——控制轴结论见各单元卡的「干预记录」。{skeleton?.model ? ` 模型：${shortModel(skeleton.model)}。` : ''}</p>
     </>
   );
 }
 
 function LangProgress({ tree, model, onOpenItem }) {
   const models = tree.models || [];
-  const gaps = tree.items.filter(it => itemLevel(it, model) === 0);
+  const lv = it => itemLevel(it, model);
+  const gaps = tree.items.filter(it => lv(it) === 0);
+  const nHas = tree.items.filter(it => lv(it) >= 1).length;
+  const nHeld = tree.items.filter(it => lv(it) >= 3).length;
   return (
     <>
+      <h4 className="v8-h4">已经做到哪一步 <small>语言项 = 一条可检验的语言规律；等级看「能不能在 {shortModel(model)} 上读出并复现」</small></h4>
+      <div className="v8-route-tiles">
+        <div><b>{tree.items.length}</b><span>条语言规律（语言项）</span><small>分属 {tree.types.length} 个大类，全部来自模板对照实验</small></div>
+        <div><b>{nHas}</b><span>在此模型上有数据</span><small>至少完成过一次读出测量</small></div>
+        <div><b>{nHeld}</b><span>留出复现及以上</span><small>证据最强：新数据上也读得出来</small></div>
+        <div><b>{gaps.length}</b><span>还没有数据</span><small>{gaps.length ? '见下方研究缺口，可点进条目看怎么补' : '当前模型上每个语言项都已有数据'}</small></div>
+      </div>
+      <h4 className="v8-h4">覆盖与缺口 <small>左：各大类处在哪个等级；右：还没动手的条目</small></h4>
       <div className="v8-two">
         <table className="v6-mini-table v8-cov">
           <thead><tr><th>大类</th>{LEVELS.map(l => <th key={l.level}><LevelChip level={l.level} /></th>)}<th className="num">合计</th></tr></thead>
@@ -107,7 +135,11 @@ function LangProgress({ tree, model, onOpenItem }) {
           ))}</ul> : <Empty>当前模型上每个语言项都已有数据。</Empty>}
         </div>
       </div>
-      <h4 className="v8-h4">语言项 × 模型 <small>读出轴等级；各模型分开记录，方向不跨模型比较</small></h4>
+      <h4 className="v8-h4">语言项 × 模型明细 <small>每格一个等级（悬停看全称）；各模型分开记录，方向不跨模型比较</small></h4>
+      <div className="v8-levels-legend">
+        {LEVELS.slice(1).map(l => <LevelChip key={l.level} level={l.level} />)}
+        <LevelChip none="○ 未研究" />
+      </div>
       <div className="v8-matrix-wrap">
         <table className="v6-mini-table v8-matrix">
           <thead><tr><th>语言项</th>{models.map(m => <th key={m} title={m}>{shortModel(m)}</th>)}</tr></thead>
@@ -118,7 +150,7 @@ function LangProgress({ tree, model, onOpenItem }) {
                 {models.map(m => {
                   const l = it.status?.by_model?.[m] ?? 0;
                   const meta = levelMeta(l);
-                  return <td key={m} title={`${it.name} · ${shortModel(m)}：${meta.label}`}><span className="v8-chip" style={{ background: meta.color, color: meta.ink }}>{meta.sym} {meta.label}</span></td>;
+                  return <td key={m} title={`${it.name} · ${shortModel(m)}：${meta.label}`}><span className="v8-chip" style={{ background: meta.color, color: meta.ink }}>{meta.sym}</span></td>;
                 })}
               </tr>
             )))}
@@ -143,13 +175,13 @@ export default function RouteLens({ tab = 'neuron', onGoSpace, onGo }) {
   return (
     <div className="v8-route">
       {tab === 'neuron' && (
-        <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查 → 逐层摘要与分型 → 解释检验 → 模板选择性（各项分开计数）`}>
+        <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 普查 → 分型 → 解释检验 → 模板选择性（各来源分开计数，不拼成转化率）`}>
           <NeuronProgress census={census} skeleton={skeleton} onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />
         </Card>
       )}
       {tab === 'lang' && (
         <>
-          <Card title="语言图谱进展" sub="每个语言项在各模型上的读出轴等级（路线 T：模板对照）；路线 N（神经元经模板确认入树）尚未接入">
+          <Card title="语言图谱进展" sub={`${shortModel(model)} · 每条语言规律在各模型上的读出等级（模板对照实验）；路线 N（神经元经模板确认入树）尚未接入`}>
             {tree ? <LangProgress tree={tree} model={model} onOpenItem={it => onGoSpace('lang', { item: it.id, type: it.type })} />
               : <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
           </Card>

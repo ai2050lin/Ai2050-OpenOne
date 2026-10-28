@@ -66,7 +66,11 @@ function ItemCard({ item, onGo, onAutotest, onStudio }) {
         {onAutotest && item.protocol === 'v3' && item.in_library && <button type="button" className="fw-tbtn primary" onClick={() => onAutotest(item.id)}>加入自动测试 →</button>}
         {item.claim_command && <button type="button" className="fw-tbtn" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? '收起命令' : '本地领题命令'}</button>}
         {onStudio && item.status === 'draft' && <button type="button" className="fw-tbtn" onClick={() => onStudio()}>去模板工作室冻结 →</button>}
+        {onStudio && item.protocol === 'legacy' && item.status === 'open' && <button type="button" className="fw-tbtn" onClick={() => onStudio()}>在模板工作室重建为 v3 →</button>}
       </footer>
+      {item.protocol === 'legacy' && item.status === 'open' && (
+        <p className="v6-cat-desc">早期手写模板（legacy 协议），现役测试链只执行 v3 文法（因子设计 · 确定性切分 · 行为门），无法直接运行；如需测试，请在模板工作室把它重建为 v3 模式族并冻结。</p>
+      )}
       {open && item.claim_command && (
         <div className="v6-cmd">
           <code>{claimCommand(item)}</code>

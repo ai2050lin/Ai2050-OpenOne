@@ -1,6 +1,8 @@
-/* 研究工作台（v8，/workbench 与 /atlas）：进展 / 空间 / 研发。
+/* 研究工作台（v8，/workbench 与 /atlas）：进展 / 空间 / 研发 / 配置。
    空间：左侧常驻 LLM 多层结构，右侧是神经元逆向分析结果与语言图谱（v8/SpaceLens.jsx）；进展：神经元与语言图谱的进展（v8/RouteLens.jsx）；
-   研发：题库、贡献算力与管理工位。进展与空间只读本机数据包；网页只能浏览（题库只读、贡献算力只给下载入口），
+   研发：题库、贡献算力与管理工位；配置：连接与运行形态、账号、被测模型（ConfigView.jsx）。
+   左轨分隔线之上是研究对象与实验生产（进展 / 空间 / 研发），之下是形态相关的界面（配置、本机工具）。
+   进展与空间只读本机数据包；网页只能浏览（题库只读、贡献算力只给下载入口），
    执行测试与管理工位只在桌面客户端（config.js 的 ADMIN_LIVE；管理工位另需管理员账号）。没有数据时显示空态，不回退演示数字。
    只适合研究者本机的工具（自动测试、读取本机模型权重的旧版空间视图）只在本机中心（config.local_tools）出现。 */
 import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
@@ -10,22 +12,26 @@ import AtlasView from './rdc_fusion/AtlasView.jsx';
 import AuditQueue from './rdc_fusion/AuditQueue.jsx';
 import CatalogPanel from './rdc_fusion/CatalogPanel.jsx';
 import CensusPanel from './rdc_fusion/CensusPanel.jsx';
+import ConfigView from './ConfigView.jsx';
 import DispatchPanel from './rdc_fusion/DispatchPanel.jsx';
 import FreezePanel from './rdc_fusion/FreezePanel.jsx';
 import LocalPackView from './rdc_fusion/LocalPackView.jsx';
 import TemplateStudio from './rdc_fusion/TemplateStudio.jsx';
-import { ADMIN_LIVE, API_BASE, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
+import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
 import { useAuth } from './rdc_fusion/authContext.js';
 import { loadLocalPack } from './rdc_fusion/localPack.js';
 import { Empty } from './rdc_fusion/ui.jsx';
 import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
+import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
 import { LENSES, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
 
+const AiChatDrawer = lazy(() => import('./rdc_fusion/AiChatDrawer.jsx'));
+const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
 const AutoTestPanel = lazy(() => import('./rdc_fusion/AutoTestPanel.jsx'));
 const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 const GoodfireProbePanel = lazy(() => import('./rdc_fusion/GoodfireProbePanel.jsx'));
@@ -61,12 +67,13 @@ function LensIcon({ id }) {
     spatial: <><circle cx="12" cy="12" r="3" /><ellipse cx="12" cy="12" rx="10" ry="4.2" /><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)" /></>,
     process: <path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16" />,
     route: <><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z" /><circle cx="7" cy="12" r="2.5" /><circle cx="15" cy="12" r="2.5" /></>,
+    config: <><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5" /><circle cx="9" cy="7.5" r="2.1" /><circle cx="15" cy="16.5" r="2.1" /></>,
     local: <><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></>,
   }[id];
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{p}</svg>;
 }
 
-function SubNav({ items, value, onChange, label }) {
+function SubNav({ items, value, onChange, label, onHelp }) {
   return (
     <nav className="wb-subnav" aria-label={label}>
       {items.map(it => (
@@ -74,6 +81,9 @@ function SubNav({ items, value, onChange, label }) {
           {it.label}
         </button>
       ))}
+      {onHelp && (
+        <button type="button" className="wb-help-btn" onClick={onHelp} title="本页功能与原理说明" aria-label="本页功能与原理说明">?</button>
+      )}
     </nav>
   );
 }
@@ -83,6 +93,7 @@ export default function Workbench() {
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
   const [draft, setDraft] = useState(null);
+  const [helpOpen, setHelpOpen] = useState(false);
   // 网页只能浏览：题库只读、贡献算力只给下载入口；测试与管理在桌面客户端，管理工位另需管理员账号（本机开发不限）
   const { user } = useAuth();
   const isAdmin = !OFFLINE_CLIENT || user?.role === 'admin';
@@ -118,11 +129,11 @@ export default function Workbench() {
       </header>
       {cfg.error && <div className="op-banner" role="alert">连不上中心服务：{cfg.error}</div>}
       <div className="wb-frame">
-        {/* 左轨：一级界面（沿用 v5 工作台的图标轨布局） */}
+        {/* 左轨：一级界面（沿用 v5 工作台的图标轨布局）。分隔线之上是研究对象与实验生产，之下是形态相关的界面 */}
         <nav className="fw-rail" aria-label="工作台界面">
           {lenses.map(l => (
             <Fragment key={l.id}>
-              {l.id === 'process' && <div className="fw-rdiv" />}
+              {l.id === 'config' && <div className="fw-rdiv" />}
               {l.id === 'local' && <div className="fw-rdiv" />}
               <button type="button" className={'fw-rbtn' + (lens === l.id ? ' on' : '')} onClick={() => set({ lens: l.id })}
                       title={`${l.label}：${l.desc}`} aria-current={lens === l.id ? 'page' : undefined}>
@@ -132,15 +143,18 @@ export default function Workbench() {
           ))}
         </nav>
         <div className="wb-body">
-          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab} onChange={v => set({ rtab: v })} label="进展视图" />}
-          {lens === 'spatial' && <SubNav items={SPATIAL_VIEWS} value={view} onChange={v => set({ view: v })} label="空间视图" />}
-          {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" />}
+          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab} onChange={v => set({ rtab: v })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
+          {lens === 'spatial' && <SubNav items={SPATIAL_VIEWS} value={view} onChange={v => set({ view: v })} label="空间视图" onHelp={() => setHelpOpen(true)} />}
+          {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
+          {/* 配置是一页到底，没有子页签；保留同一根横条只为了让内容起始高度与其它界面一致、并给出「?」入口 */}
+          {lens === 'config' && <SubNav items={[]} value="" onChange={() => {}} label="配置" onHelp={() => setHelpOpen(true)} />}
           <main className="wb-main">
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
               {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('studio')} />}
               {lens === 'process' && station === 'contribute' && <ContributePanel />}
               {lens === 'process' && station === 'probe' && <GoodfireProbePanel />}
+              {lens === 'process' && station === 'ai' && <AiSettingsPanel />}
               {lens === 'process' && station === 'studio' && <TemplateStudio draft={draft} onDraft={setDraft} onNext={() => go('freeze')} />}
               {lens === 'process' && station === 'freeze' && <FreezePanel draft={draft} onDraft={setDraft} onGo={go} />}
               {lens === 'process' && station === 'dispatch' && <DispatchPanel onGo={go} />}
@@ -148,10 +162,14 @@ export default function Workbench() {
               {lens === 'process' && station === 'census' && <CensusPanel />}
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
               {lens === 'route' && <RouteLens tab={rtab} onGoSpace={goSpace} onGo={go} />}
+              {lens === 'config' && <ConfigView cfg={cfg} onGo={go} />}
               {lens === 'local' && <LensSpatial on onGo={() => {}} />}
             </Suspense>
           </main>
+          {/* 「问 AI」侧栏：只在桌面客户端（Key 在主进程）；网页版不显示 */}
+          {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => go('ai')} /></Suspense>}
         </div>
+        {helpOpen && <WorkbenchHelp lens={lens} onClose={() => setHelpOpen(false)} />}
       </div>
     </div>
   );

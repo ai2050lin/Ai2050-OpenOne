@@ -1,4 +1,8 @@
 /* ===== v8 客户端：两条主线（语言图谱 / 神经元）+ 分支 —— 沿用 slate 体系与 --fw-* 变量 ===== */
+/* v8 公开站（首页 / 介绍 / 参与等）：恢复页面级上下滚动。全局 body{overflow:hidden}
+   是为旧 3D 应用与工作台（.wb-root，fixed 布局自带滚动）设的；v8 站是普通文档流，
+   内容高于视口时必须能滚，否则页面下半部分不可达。仅在 .v8-root 在场时生效，不波及工作台。 */
+body:has(.fw-root.v8-root){display:block;overflow-x:hidden;overflow-y:auto}
 .fw-root.v8-root{height:auto;overflow:visible;min-height:100vh;background:var(--fw-bg-sub);color:var(--fw-text);font-size:13px;display:flex;flex-direction:column}
 .v8-root .v8-top{height:auto;flex-shrink:0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 16px;min-height:54px;background:#fff;border-bottom:1px solid var(--fw-border);position:sticky;top:0;z-index:30}
 .v8-brand{display:flex;align-items:center;gap:9px;color:inherit;text-decoration:none}
@@ -202,9 +206,12 @@ a.v8-mainline{text-decoration:none}
 .v8-strip-max{font-size:10.5px;color:var(--fw-text-3);text-align:right}
 .v8-h4{font-size:12.5px;font-weight:600;margin:14px 0 8px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .v8-h4 small{font-weight:400;color:var(--fw-text-3);font-size:11px}
+.v8-legend-bar{display:inline-block;width:88px;height:10px;border-radius:5px;border:1px solid var(--fw-border);vertical-align:baseline;margin:0 2px}
 .v8-matrix-wrap{overflow-x:auto}
 .v8-matrix th small{display:block;font-weight:400;font-size:10px;color:var(--fw-text-3)}
 .v8-matrix tr.first th,.v8-matrix tr.first td{border-top:2px solid var(--fw-border-strong)}
+.v8-matrix td .v8-chip{min-width:34px;text-align:center;display:inline-block}
+.v8-levels-legend{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
 @media (max-width:860px){
   .v8-space{grid-template-columns:minmax(0,1fr)}
   .v8-space .v8-tower{position:static}

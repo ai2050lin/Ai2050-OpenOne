@@ -16,13 +16,29 @@
 .wb-center { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--fw-text-3); }
 .wb-root .op-sandbox { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #fff1ec; color: #c2410c; border: 1px solid #fed7aa; }
 .wb-root .op-banner { padding: 8px 16px; background: #fff1ec; color: #9a3412; font-size: 12px; }
-.wb-subnav { display: flex; gap: 4px; padding: 6px 16px; background: #fff; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; overflow-x: auto; }
+.wb-subnav { display: flex; gap: 4px; padding: 6px 16px; background: #fff; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; overflow-x: auto; min-height: 39px; box-sizing: border-box; }
 .wb-subnav button { border: 1px solid transparent; background: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12.5px; color: var(--fw-text-2); white-space: nowrap; }
 .wb-subnav button:hover { background: var(--fw-bg-panel); }
 .wb-subnav button.on { border-color: #9ec5f4; background: #eaf2fb; color: #184f95; font-weight: 600; }
 .wb-main { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 24px; }
 .wb-main > .fw-view { position: static; display: grid; }
 .wb-local { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- 「?」页面说明按钮与弹窗 ---- */
+.wb-subnav .wb-help-btn { margin-left: auto; width: 22px; height: 22px; padding: 0; border: 1px solid var(--fw-border); border-radius: 50%; color: var(--fw-text-3); font-size: 12.5px; line-height: 1; display: grid; place-items: center; flex-shrink: 0; }
+.wb-subnav .wb-help-btn:hover { background: var(--fw-bg-panel); color: var(--fw-text); }
+.wb-help-mask { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: grid; place-items: center; padding: 24px; z-index: 1000; }
+.wb-help-modal { width: min(720px, 100%); max-height: min(80vh, 640px); overflow: auto; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(15, 23, 42, 0.25); }
+.wb-help-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px 12px; border-bottom: 1px solid var(--fw-border); background: #fff; border-radius: 12px 12px 0 0; }
+.wb-help-head h2 { margin: 0; font-size: 15px; color: var(--fw-text); }
+.wb-help-head p { margin: 2px 0 0; font-size: 12px; color: var(--fw-text-3); }
+.wb-help-close { margin-left: auto; border: none; background: none; font-size: 20px; line-height: 1; cursor: pointer; color: var(--fw-text-3); padding: 2px 8px; border-radius: 6px; }
+.wb-help-close:hover { background: var(--fw-bg-panel); color: var(--fw-text); }
+.wb-help-body { padding: 14px 20px 20px; font-size: 12.5px; color: var(--fw-text-2); }
+.wb-help-intro { margin: 0 0 4px; }
+.wb-help-body h3 { margin: 14px 0 6px; font-size: 13px; color: var(--fw-text); }
+.wb-help-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.wb-help-foot { margin: 16px 0 0; padding-top: 10px; border-top: 1px dashed var(--fw-border); font-size: 11.5px; color: var(--fw-text-3); }
 
 .v6-census { display: flex; flex-direction: column; gap: 12px; }
 .v6-census-grid { border-collapse: separate; border-spacing: 3px; margin-top: 10px; font-size: 11px; }
@@ -40,6 +56,36 @@
 .v6-table th, .v6-table td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--fw-border); }
 .v6-table th { color: var(--fw-text-3); font-weight: 600; font-size: 11px; }
 .v6-node-row { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--fw-border); font-size: 12px; flex-wrap: wrap; }
+
+/* ---------- 配置（左轨分隔线下方的一级界面）：只展示运行时判定与中心实况 ---------- */
+/* 卡片高度差别大，用多列流式排布避免网格行留下的空洞；窄屏回落单列 */
+.wb-cfg { columns: 2; column-gap: 12px; }
+.wb-cfg .v6-card { break-inside: avoid; margin: 0 0 12px; }
+.wb-cfg-kv { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 8px 14px; margin: 0; font-size: 12.5px; line-height: 1.55; }
+.wb-cfg-kv dt { color: var(--fw-text-3); }
+.wb-cfg-kv dd { margin: 0; min-width: 0; color: var(--fw-text); overflow-wrap: anywhere; }
+.wb-cfg-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+.wb-cfg-mono small { color: var(--fw-text-3); }
+.wb-cfg-sub { display: block; margin-top: 1px; font-size: 11px; color: var(--fw-text-3); }
+.wb-cfg-warn { color: #9a3412; font-size: 11px; }
+.wb-cfg-link { color: #184f95; text-decoration: none; border-bottom: 1px solid #cde2fb; }
+.wb-cfg-link:hover { border-bottom-color: #184f95; }
+.wb-cfg-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.wb-cfg-act > a.fw-tbtn { display: inline-flex; align-items: center; text-decoration: none; }
+.wb-cfg-note { margin: 10px 0 0; font-size: 11.5px; color: var(--fw-text-3); line-height: 1.65; }
+.wb-cfg-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.wb-cfg-table th, .wb-cfg-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--fw-border); vertical-align: top; }
+.wb-cfg-table thead th { font-weight: 500; font-size: 11px; color: var(--fw-text-3); }
+.wb-cfg-table tbody th { font-weight: 600; }
+.wb-cfg-table tbody tr:last-child th, .wb-cfg-table tbody tr:last-child td { border-bottom: none; }
+@media (max-width: 760px) {
+  .wb-cfg { columns: 1; }
+  .wb-cfg-kv { grid-template-columns: 72px minmax(0, 1fr); }
+  .wb-cfg-table { display: block; overflow-x: auto; }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .wb-cfg-kv { grid-template-columns: 78px minmax(0, 1fr); }
+}
 @media (max-width: 760px) {
   .wb-lens-title small, .wb-center { display: none; }
   .wb-frame .fw-rail { width: 52px; }

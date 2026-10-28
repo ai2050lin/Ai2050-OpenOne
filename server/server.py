@@ -70,8 +70,11 @@ try:
     from census_service import router as census_router  # type: ignore  # 神经元普查分片（census_job.v1）
     from data_admin_service import router as data_admin_router  # type: ignore  # 管理员数据管理（data_admin.v1，只读）
     from platform_service import router as platform_router, auth_router as platform_auth_router, lang_router as platform_lang_router  # type: ignore  # 开放平台
-except ImportError:
+except ImportError as _deploy_err:
     distributed_router = census_router = data_admin_router = platform_router = platform_auth_router = platform_lang_router = None  # type: ignore[assignment]
+    # 不再静默：fresh clone 无 deploy/ 属正常跳过；本机/部署机出现此行说明 deploy 依赖缺失，
+    # 工作台「研发」工位与分布式中心会大面积 404，必须当场暴露原因。
+    print(f"[WARN] deploy/ 分布式中心路由未挂载：{_deploy_err}")
 from server.research_asset_service import router as research_asset_router
 from server.research_kernel.router import router as research_kernel_router
 from server.research_trace_service import router as research_trace_router
@@ -244,7 +247,7 @@ async def lifespan(app: FastAPI):
     # Shutdown logic
     print("Shutting down...")
 
-app = FastAPI(title="TransformerLens 3D API", lifespan=lifespan)
+app = FastAPI(title="AI2050 LLM Mechanism Atlas API", lifespan=lifespan)
 run_service = RunService(
     agi_core_provider=lambda: agi_core,
     model_provider=lambda: model,

@@ -2,6 +2,7 @@
    每节只用真实数据（lang_atlas.v1 端点）；某一节没有数据时显示「未测」与下一步，不用示意数据填充。 */
 import { useMemo, useState } from 'react';
 
+import { langItemContext, useAiContext } from '../app/rdc_fusion/aiContext.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { LayerCurve, ScatterPlot, SelBars } from './Charts.jsx';
@@ -205,6 +206,7 @@ function ItemPage({ tree, itemId, model, skeleton, st, set, layer, onLayer }) {
   const [allModels, setAllModels] = useState(false);
   const d = api.data && !api.data.pending ? api.data : null;
   const piece = useMemo(() => (d ? pickPiece(d.pieces || [], itemId, model, st.piece) : null), [d, itemId, model, st.piece]);
+  useAiContext(useMemo(() => langItemContext(d, piece, model), [d, piece, model]));          // 「问 AI」侧栏附带这一页的数据
   if (!itemId) return <Empty>在左侧选一个语言项。</Empty>;
   if (api.error) return <Empty>该语言项的数据未接入：{api.error}</Empty>;
   if (!d) return <Empty>{api.data?.note || '读取中…'}</Empty>;

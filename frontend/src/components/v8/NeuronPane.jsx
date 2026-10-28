@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import NeuronUnitCard from '../app/rdc_fusion/NeuronUnitCard.jsx';
+import { neuronUnitContext, useAiContext } from '../app/rdc_fusion/aiContext.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -109,6 +110,11 @@ export default function NeuronPane({ census, tower, skeleton, block, st, set }) 
   const ros = Object.keys(selRun?.by_readout || {});
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
   const cfg = skeleton?.config;
+  const unit = st.mod === 'mlp' ? st.unit : null;
+  useAiContext(useMemo(() => neuronUnitContext(layer, unit, {                        // 「问 AI」侧栏附带选中单元的数据
+    census, block, links: (layer?.selectivity || []).flatMap(s => Object.entries(s.top || {}).flatMap(([r, tops]) =>
+      tops.filter(t => t[0] === unit).map(t => ({ item: s.item, tm_id: s.tm_id, version: s.version, factor: s.factor, readout: r, heldout_d: t[1], direction: t[2] })))),
+  }), [layer, unit, census, block]));
   return (
     <div className="v8-layerp">
         <BlockStructure block={block} cfg={cfg} skeleton={skeleton} mod={st.mod} set={set} />

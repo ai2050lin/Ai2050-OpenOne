@@ -5,12 +5,37 @@
 import { useMemo, useState } from 'react';
 import { ADMIN_LIVE, API_BASE, fmtAgoTs, fmtNum, postJson, useAdminToken, useApi } from './api.js';
 import { AdminTokenField, Empty, SourceTag, StatusPill, Tabs } from './ui.jsx';
+import AtlasMatrix from './AtlasMatrix.jsx';
 import AtlasSpace3D from './AtlasSpace3D.jsx';
 import { HYP_STATUS } from './atlasUtil.js';
 import { safeName } from './catalogUtil.js';
 import { CopyButton } from './CatalogPanel.jsx';
 
 const FIND_KIND = { supported: ['pass', '支持'], negative: ['fail', '未支持'], warning: ['warn', '注意'], info: ['na', '描述'] };
+
+/* 默认层：共享轴最多、且不是「token 身份即可解释」的那一层。
+   原先取中间层，对三个模型都恰好落在 final@L0 —— 那一层的边全部 token_identity=true
+   （嵌入层上同一类别的方向本来就重合），首屏会给出一条 cos=1.00 的伪影。 */
+function richestLayer(g) {
+  const score = l => {
+    const ax = (g.axes || []).filter(a => a.layer === l);
+    const ed = (g.edges || []).filter(e => e.layer === l);
+    return [
+      ax.filter(a => a.supported_beyond_token).length,
+      ax.filter(a => a.supported).length,
+      ed.filter(e => e.token_identity !== true).length,
+      ed.length,
+    ];
+  };
+  let best = null, bs = null;
+  for (const l of g.layers || []) {
+    const s = score(l);
+    if (!bs) { best = l; bs = s; continue; }
+    const d = s.findIndex((v, i) => v !== bs[i]);
+    if (d >= 0 && s[d] > bs[d]) { best = l; bs = s; }
+  }
+  return best;
+}
 
 function AxisCard({ ax, on, onClick }) {
   return (
@@ -136,9 +161,11 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
   const [showUnstable, setShowUnstable] = useState(true);
   const [allLayers, setAllLayers] = useState(false);
   const [tab, setTab] = useState('axes');
+  // 默认看关系矩阵：账本判据直接可读，不做降维。3D 点云保留为可切换的「空间」子视图。
+  const [view, setView] = useState('matrix');
   const graphs = useMemo(() => atlas?.graphs || [], [atlas]);
   const g = graphs.find(x => x.model === modelPick) || graphs[0];
-  const layer = g?.layers.includes(layerPick) ? layerPick : g?.layers[Math.floor((g?.layers.length || 1) / 2)];
+  const layer = g?.layers.includes(layerPick) ? layerPick : (g ? richestLayer(g) : '');
   const node = g?.nodes.find(n => n.id === nodeId && n.layer === layer);
   const axesShown = (g?.axes || []).filter(a => allLayers || a.layer === layer);
 
@@ -191,8 +218,26 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
       )}
       <div className="v6-atlas-body">
         <div className="v6-atlas-main">
-          <AtlasSpace3D graph={g} layer={layer} axisId={axisId} nodeId={node?.id} onSelectNode={id => setNodeId(id || '')} showUnstable={showUnstable} />
-          <p className="v6-note">坐标 = {layer} 层全部特征单位方向的经典 MDS（距离 √(2−2cos)）：方向相近的特征靠在一起；只在同一模型内有意义。实线 = 预注册概念之间的边，虚线 = 未预注册（新发现候选）。共享方向不等于共享机制，机制需要沿轴干预。</p>
+          <div className="v6-mx-switch">
+            <div className="v6-seg" role="group" aria-label="谱图显示方式">
+              <button type="button" className={view === 'matrix' ? 'on' : ''} onClick={() => setView('matrix')}>关系矩阵</button>
+              <button type="button" className={view === 'space' ? 'on' : ''} onClick={() => setView('space')}>3D 空间</button>
+            </div>
+            <span className="v6-mx-switch-hint">
+              {view === 'matrix' ? '账本判据原样上表，不做降维；点格子看具体边。' : 'MDS 前三维点云，拖动旋转；坐标轴没有语义，仅表示方向远近的近似。'}
+            </span>
+          </div>
+          {view === 'matrix' ? (
+            <>
+              <AtlasMatrix graph={g} layer={layer} axisId={axisId} criteria={atlas.criteria} onSelectNode={id => setNodeId(id || '')} />
+              <p className="v6-note">点格子 = 看这对族在本层的具体边（哪个特征 ↔ 哪个特征、cos、留出 cos、稳健 z、是否预注册）；右侧「共享编码轴」列出这些边组成的轴。</p>
+            </>
+          ) : (
+            <>
+              <AtlasSpace3D graph={g} layer={layer} axisId={axisId} nodeId={node?.id} onSelectNode={id => setNodeId(id || '')} showUnstable={showUnstable} />
+              <p className="v6-note">坐标 = {layer} 层全部特征单位方向的经典 MDS（距离 √(2−2cos)）：方向相近的特征靠在一起；只在同一模型内有意义。实线 = 预注册概念之间的边，虚线 = 未预注册（新发现候选）。共享方向不等于共享机制，机制需要沿轴干预。</p>
+            </>
+          )}
         </div>
         <aside className="v6-atlas-side">
           {node && (

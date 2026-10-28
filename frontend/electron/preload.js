@@ -54,6 +54,29 @@ contextBridge.exposeInMainWorld('ai2050Desktop', {
       return () => ipcRenderer.removeListener('ai2050:node-info', h);
     },
   },
+  /* AI 助手：配置与 Key 在主进程，页面只能看到「已设置 · 尾号」；回答经 ai2050:ai-event 流式推回 */
+  ai: (() => {
+    const call = async (ch, arg) => {
+      const r = await ipcRenderer.invoke(ch, arg);
+      if (!r || !r.ok) throw new Error((r && r.error) || 'AI 助手不可用');
+      return r.data;
+    };
+    return {
+      config: () => call('ai2050:ai-config'),
+      save: profile => call('ai2050:ai-save', profile),
+      remove: id => call('ai2050:ai-remove', { id }),
+      settings: s => call('ai2050:ai-settings', s),
+      test: id => call('ai2050:ai-test', { id }),
+      chat: req => call('ai2050:ai-chat', req),
+      cancel: id => call('ai2050:ai-cancel', { id }),
+      openLogs: () => call('ai2050:ai-open-logs'),
+      onEvent: cb => {
+        const h = (_e, ev) => cb(ev);
+        ipcRenderer.on('ai2050:ai-event', h);
+        return () => ipcRenderer.removeListener('ai2050:ai-event', h);
+      },
+    };
+  })(),
   /* 计算组件安装（主进程执行；页面只发起、取消与查看进度） */
   runtime: {
     info: () => ipcRenderer.invoke('ai2050:runtime-info'),

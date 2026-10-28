@@ -481,6 +481,73 @@ a.fw-tbtn{text-decoration:none}
 .v6-space3d-legend i.v6-line-key{display:inline-block;width:18px;height:0;border-radius:0;border-top:2px solid rgba(15,23,42,.62);vertical-align:middle}
 .v6-space3d-legend i.v6-line-key.dashed{border-top-style:dashed}
 
+/* ---------- 谱图关系 · 关系矩阵（族 × 族，替代纯 3D 点云作默认） ---------- */
+.v6-mx-switch{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.v6-mx-switch-hint{font-size:11px;color:var(--fw-text-3);line-height:1.4}
+.v6-mx{display:flex;flex-direction:column;gap:8px}
+.v6-mx-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.v6-mx-hd b{font-size:12.5px;color:var(--fw-text)}
+.v6-mx-hd span{font-size:11px;color:var(--fw-text-3)}
+.v6-mx-none{margin:0;font-size:11.5px;line-height:1.55;color:var(--fw-text-2);background:var(--fw-bg-sub);border-radius:6px;padding:6px 9px}
+.v6-mx-wrap{overflow-x:auto}
+.v6-mx-t{border-collapse:separate;border-spacing:3px;font-size:11.5px;width:100%;max-width:580px}
+.v6-mx-t caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.v6-mx-t thead th{font-weight:500;font-size:11px;color:var(--fw-text-2);text-align:center;padding:0 2px 2px;white-space:nowrap}
+.v6-mx-t tbody th{font-weight:500;font-size:11px;color:var(--fw-text-2);text-align:right;padding-right:4px;white-space:nowrap}
+.v6-mx-t .c0{width:64px}
+.v6-mx-t .sw{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.v6-mx-t td{height:38px;text-align:center;border-radius:6px;vertical-align:middle}
+.v6-mx-t td.diag{background:var(--fw-bg-sub)}
+.v6-mx-t td.lower{background:transparent}
+.v6-mx-t td.miss{border:1px dashed var(--fw-border);color:var(--fw-text-3)}
+.v6-mx-t td.miss .other{font-size:10px;color:var(--fw-text-3)}
+.v6-mx-t td.miss .nil{font-size:11px;opacity:.5}
+.v6-mx-t td.hit button{width:100%;height:100%;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:0;border-radius:6px;background:none;font:inherit;cursor:pointer;padding:0}
+.v6-mx-t td.hit b{font-size:12.5px;font-weight:600;line-height:1.2}
+.v6-mx-t td.hit em{font-size:9.5px;font-style:normal;opacity:.8;line-height:1.2}
+.v6-mx-t td.t1{background:#eaf3fd;border:1px solid #cfe4f8}
+.v6-mx-t td.t1 b{color:#0c447c}
+.v6-mx-t td.t1 em{color:#185fa5}
+.v6-mx-t td.t2{background:#bcd8f6;border:1px solid #9ec5f4}
+.v6-mx-t td.t2 b{color:#0c447c}
+.v6-mx-t td.t2 em{color:#185fa5}
+.v6-mx-t td.t3{background:#85b7eb;border:1px solid #6ba4e3}
+.v6-mx-t td.t3 b{color:#042c53}
+.v6-mx-t td.t3 em{color:#0c447c}
+.v6-mx-t td.t4{background:#185fa5;border:1px solid #0c447c}
+.v6-mx-t td.t4 b{color:#fff}
+.v6-mx-t td.t4 em{color:#cfe4f8}
+.v6-mx-t td.on{box-shadow:0 0 0 2px #0f172a}
+.v6-mx-t td.cur button{outline:2px solid #0f172a;outline-offset:-2px}
+.v6-mx-t td.hit .tok{position:absolute;color:inherit}
+.v6-mx-t td.ti{position:relative}
+.v6-mx-t td.ti .tok{top:1px;right:4px;font-size:9px;border:1px solid currentColor;border-radius:3px;padding:0 2px;line-height:1.35;opacity:.75}
+.v6-mx-note{margin:0;font-size:11px;line-height:1.55;color:var(--fw-text-3)}
+.v6-mx-detail{border:1px solid var(--fw-border);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.v6-mx-detail-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.v6-mx-detail-hd b{font-size:12.5px}
+.v6-mx-detail tr.tok th,.v6-mx-detail tr.tok td{background:#fffbeb}
+.v6-mx-detail .v6-mini-table th:first-child{width:58%;text-align:left;font-weight:400}
+.v6-mx-detail .v6-mini-table thead th{font-weight:500;color:var(--fw-text-2);text-align:right}
+.v6-mx-detail .v6-mini-table thead th:first-child{text-align:left}
+.v6-mx-lk{border:0;background:none;padding:0;font:inherit;font-size:11.5px;color:var(--fw-blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.v6-mx-lk:hover{color:#0b3e78}
+.v6-mx-axes{display:flex;flex-direction:column;gap:4px}
+.v6-mx-ax{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--fw-text-2);border-left:3px solid #0f172a;padding:2px 0 2px 8px}
+.v6-mx-ax.weak{border-left-color:#cbd5e1}
+.v6-mx-ax b{font-size:11.5px;color:var(--fw-text)}
+@media (max-width:560px){
+  .v6-mx-t{min-width:0;border-spacing:2px}
+  .v6-mx-t .c0{width:38px}
+  .v6-mx-t .sw{display:none}
+  .v6-mx-t thead th,.v6-mx-t tbody th{font-size:10px}
+  .v6-mx-t td{height:34px}
+  .v6-mx-t td.hit button{min-height:34px}
+  .v6-mx-t td.hit b{font-size:11.5px}
+  .v6-mx-t td.hit em{font-size:9px}
+  .v6-mx-switch-hint{display:none}
+}
+
 /* ---------- 总览 · 题库概览 / 谱图进展 / 贡献者 ---------- */
 .v6-home-pair{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
 @media (max-width:1100px){.v6-home-pair{grid-template-columns:minmax(0,1fr)}}

@@ -1,0 +1,52 @@
+/* AI 助手：设置页（AiSettingsPanel.jsx）与「问 AI」侧栏（AiChatDrawer.jsx） */
+.ai-settings{display:flex;flex-direction:column;gap:12px;max-width:1100px}
+.ai-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px 14px;align-items:start;border:1px solid var(--fw-border);border-radius:8px;padding:12px 14px;background:var(--fw-bg-sub);margin-bottom:12px}
+.ai-form label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--fw-text-2)}
+.ai-form label small{color:var(--fw-text-3);font-size:10.5px}
+.ai-form .wide{grid-column:1/-1}
+.ai-form input,.ai-form select,.ai-usage input,.ai-dh select,.ai-compose textarea{font:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--fw-border-strong);border-radius:6px;background:#fff;color:var(--fw-text);color-scheme:light}
+.ai-form input:disabled{background:var(--fw-bg-panel)}
+.ai-presets{grid-column:1/-1;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--fw-text-3)}
+.ai-check{display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--fw-text-2)}
+.ai-form-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ai-form-act .fw-tbtn{padding:6px 14px;font-size:12px}
+.ai-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ai-table th,.ai-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--fw-border);vertical-align:middle}
+.ai-table thead th{font-size:11.5px;color:var(--fw-text-3);font-weight:600;background:var(--fw-bg-sub)}
+.ai-table tbody th{font-weight:400}
+.ai-act{display:flex;gap:4px;flex-wrap:wrap}
+.ai-tag{font-style:normal;font-size:10.5px;margin-left:6px;padding:0 6px;border-radius:99px;background:#e0ecff;color:#1d4ed8}
+.ai-danger{color:var(--v6-bad)!important}
+.ai-err{color:var(--v6-bad);font-size:12px}
+.ai-err.block,.ai-ok{padding:8px 12px;border-radius:8px;font-size:12.5px;margin-bottom:10px}
+.ai-err.block{background:#fef2f2;border:1px solid #fecaca}
+.ai-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.ai-usage{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;font-size:12.5px}
+.ai-usage label{display:flex;gap:6px;align-items:center}
+.ai-usage input{width:130px}
+.ai-note{color:var(--fw-text-3);font-size:12px;line-height:1.6;margin:10px 0 0}
+.ai-note-list{margin:0;padding-left:18px;font-size:12.5px;line-height:1.8;color:var(--fw-text-2)}
+
+.ai-fab{position:fixed;right:20px;bottom:20px;z-index:70;border:0;border-radius:99px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;color:#fff;background:#2563eb;box-shadow:0 8px 24px rgba(37,99,235,.35);cursor:pointer}
+.ai-fab:hover{background:#1d4ed8}
+.ai-drawer{position:fixed;top:0;right:0;bottom:0;z-index:75;width:min(440px,100vw);background:#fff;border-left:1px solid var(--fw-border);box-shadow:-12px 0 32px rgba(15,23,42,.12);display:flex;flex-direction:column;font-size:13px;color:var(--fw-text)}
+.ai-dh{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--fw-border)}
+.ai-dh b{font-size:14px;margin-right:auto}
+.ai-dh select{max-width:220px;font-size:12px;padding:4px 6px}
+.ai-empty{margin:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--fw-text-2)}
+.ai-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.ai-hint{color:var(--fw-text-3);font-size:12.5px;line-height:1.7;padding:6px 2px}
+.ai-msg{display:flex;flex-direction:column;gap:4px;max-width:92%}
+.ai-msg.user{align-self:flex-end;align-items:flex-end}
+.ai-msg-text{white-space:pre-wrap;word-break:break-word;line-height:1.65;padding:8px 11px;border-radius:10px;background:var(--fw-bg-sub);border:1px solid var(--fw-border)}
+.ai-msg.user .ai-msg-text{background:#eff6ff;border-color:#bfdbfe}
+.ai-msg-ctx,.ai-msg-meta{font-size:10.5px;color:var(--fw-text-3);line-height:1.5}
+.ai-msg-meta b{color:#b45309;font-weight:600}
+.ai-note-line{align-self:center;font-size:11px;color:var(--fw-text-3);background:var(--fw-bg-panel);border-radius:99px;padding:2px 10px}
+.ai-compose{border-top:1px solid var(--fw-border);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ai-ctx{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;color:var(--fw-text-2);line-height:1.5}
+.ai-ctx input{margin-top:2px}
+.ai-warn{display:block;font-style:normal;color:#b45309}
+.ai-compose textarea{resize:vertical;min-height:60px}
+.ai-compose-act{display:flex;gap:10px;align-items:center}
+.ai-compose-act .fw-tbtn{padding:6px 16px;font-size:12px}

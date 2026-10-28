@@ -10,13 +10,14 @@
  */
 'use strict';
 
-const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, Menu, dialog, ipcMain, safeStorage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const { NodeSupervisor } = require('./nodeSupervisor');
 const { RuntimeInstaller, readRuntime } = require('./runtimeInstaller');
+const { AiAssistant } = require('./aiAssistant');
 
 const DEFAULT_SERVER = 'https://server.ai2050.com';
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
@@ -377,3 +378,17 @@ ipcMain.handle('ai2050:node-pick-models-dir', async () => {
   const r = await dialog.showOpenDialog(mainWindow, { title: '选择模型下载目录（每个模型 1–30 GB）', properties: ['openDirectory', 'createDirectory'] });
   return r.canceled || !r.filePaths[0] ? '' : r.filePaths[0];
 });
+
+/* ── AI 助手（ai_assist.v1）：模型配置与 API Key 只在主进程；页面只发问题与上下文，Key 不进页面 ── */
+const ai = new AiAssistant({ dir: () => app.getPath('userData'), cipher: safeStorage });
+const aiCall = fn => async (_e, arg) => {
+  try { return { ok: true, data: await fn(arg || {}, _e) }; } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
+};
+ipcMain.handle('ai2050:ai-config', aiCall(() => ai.publicConfig()));
+ipcMain.handle('ai2050:ai-save', aiCall(a => ai.saveProfile(a)));
+ipcMain.handle('ai2050:ai-remove', aiCall(a => ai.removeProfile(String(a.id || ''))));
+ipcMain.handle('ai2050:ai-settings', aiCall(a => ai.setSettings(a)));
+ipcMain.handle('ai2050:ai-test', aiCall(a => ai.test(a.id ? String(a.id) : '')));
+ipcMain.handle('ai2050:ai-chat', aiCall((a, e) => ai.chat(a, ev => { if (!e.sender.isDestroyed()) e.sender.send('ai2050:ai-event', ev); })));
+ipcMain.handle('ai2050:ai-cancel', aiCall(a => ai.cancel(String(a.id || ''))));
+ipcMain.handle('ai2050:ai-open-logs', aiCall(async () => { fs.mkdirSync(ai.logDir, { recursive: true }); return shell.openPath(ai.logDir); }));

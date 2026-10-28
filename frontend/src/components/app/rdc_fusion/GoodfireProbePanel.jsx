@@ -3,8 +3,9 @@
    集中度、Δ 与劈半、对偶与肩部留出、词表投影、读 / 写方向、双向 steering 与最小对；结果只存在本机，不上传。
    判据固定在 shared/dist_protocol/goodfire_probe.py 的 CRITERIA 并随结果返回；通过只描述本次检验，不是证据等级。
    方法拆解见 research/gpt5/docs/GOODFIRE_FIND_FEATURE_STEPS_v2.md。 */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { probeContext, useAiContext } from './aiContext.js';
 import { fmtTime, nodeBridge, nodeCall } from './contributeUtil.js';
 import { Card, Empty } from './ui.jsx';
 import './contribute.css';
@@ -132,6 +133,7 @@ export default function GoodfireProbePanel() {
   const [st, setSt] = useState(null);
   const [items, setItems] = useState([]);
   const [report, setReport] = useState(null);
+  useAiContext(useMemo(() => probeContext(report), [report]));          // 「问 AI」侧栏附带这份报告（本机结果）
   const [err, setErr] = useState('');
 
   useEffect(() => {

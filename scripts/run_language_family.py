@@ -85,7 +85,10 @@ def run_agent(args, tm_id, env):
            '--gpu', args.gpu, '--python', args.python, '--run-timeout', str(args.run_timeout)]
     if args.model_path:
         cmd += ['--model-path', args.model_path]
-    proc = subprocess.run(cmd, env=env, capture_output=True, text=True)
+    # node_agent 按 UTF-8 输出（自动测试队列给驱动设了 PYTHONIOENCODING=utf-8，会传给子进程）；
+    # 这里显式按 UTF-8 解码，否则中文 Windows 用 GBK 解码会在读线程里报错、stdout 变成 None
+    proc = subprocess.run(cmd, env={**env, 'PYTHONIOENCODING': 'utf-8'}, capture_output=True,
+                          text=True, encoding='utf-8', errors='replace')
     sys.stdout.write(proc.stdout)
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
@@ -158,6 +161,7 @@ def main():
     ap.add_argument('--pilot-per-cell', type=int, default=3)
     ap.add_argument('--skip-pilot', action='store_true')
     ap.add_argument('--min-pilot-pass', type=float, default=0.5, help='试跑行为门达标格比例低于该值时停止（不冻结正式模板）')
+    ap.add_argument('--analysis-timeout', type=float, default=3600.0, help='等待后台规律分析完成的最长秒数')
     ap.add_argument('--synthetic', action='store_true', help='合成模式：只用于沙盒中心验证流程')
     ap.add_argument('--report-dir', default=str(ROOT / 'research' / 'family_runs'))
     ap.add_argument('--progress', action='store_true', help='输出 @@progress / @@result 机器可读行（供中心作业队列解析）')
@@ -243,7 +247,13 @@ def main():
         raise SystemExit(f'分片未采集完整（{len(mine[0]["shards_present"])}/{mine[0]["shards_expected"]}）：检查 node_agent 输出后重跑。')
     progress(6, '规律分析', '计算中（置换检验需要一点时间）', tm_id=tm, bucket=bucket)
 
-    analysis = http(args.center, f'/api/analysis/{urllib.parse.quote(tm)}?bucket={urllib.parse.quote(bucket)}')
+    # 网站进程不做重计算：新模板的规律分析先返回 pending，由后台子进程算完后才可用，这里等它算完
+    deadline = time.time() + args.analysis_timeout
+    while True:
+        analysis = http(args.center, f'/api/analysis/{urllib.parse.quote(tm)}?bucket={urllib.parse.quote(bucket)}')
+        if analysis.get('available') or not analysis.get('pending') or time.time() > deadline:
+            break
+        time.sleep(15)
     if not analysis.get('available'):
         raise SystemExit('规律分析不可用：' + analysis.get('reason', ''))
     sb = http(args.center, '/api/scoreboard')

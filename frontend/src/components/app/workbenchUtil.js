@@ -1,10 +1,13 @@
 /* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &rtab= &tm=（空间内部的
    语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。 */
 
+/* 一级界面：前三个是研究对象（进展 / 空间）与实验生产（研发），同属一组、排在左轨分隔线之上；
+   分隔线之下是本机形态相关的界面（配置、本机工具）。 */
 export const LENSES = [
   { id: 'route', label: '进展', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },          // id 沿用 route，旧链接 ?lens=route 照常可用
   { id: 'spatial', label: '空间', desc: 'LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元' },
   { id: 'process', label: '研发', desc: '题库、贡献算力、神经元测试；管理员另有模板工作室、试跑与冻结、分发、审计、普查作业' },
+  { id: 'config', label: '配置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
 ];
 
 /* 进展视图：与空间/研发同一层级的子导航（?rtab=），默认 neuron */
@@ -29,6 +32,7 @@ export const STATIONS = [
   { id: 'catalog', label: '题库', web: true },
   { id: 'contribute', label: '贡献算力', web: true },
   { id: 'probe', label: '神经元测试' },
+  { id: 'ai', label: 'AI 助手' },
   { id: 'studio', label: '模板工作室', admin: true },
   { id: 'freeze', label: '试跑与冻结', admin: true },
   { id: 'dispatch', label: '分发与节点', admin: true },

@@ -70,7 +70,8 @@ function SpecStructure({ spec }) {
         <span>模板族 <b className="mono">{spec.family_id}</b></span>
         <span>模块 <b>{spec.module || '—'}</b></span>
         <span>因子 <b>{(spec.factors || []).join(' × ')}</b></span>
-        <span>层位 <b>{(spec.layers || []).join(' / ')}</b></span>
+        {/* 文法的 layers 可以是层位列表，也可以是 "all"（全部层，含嵌入层 hs[0]） */}
+        <span>层位 <b>{Array.isArray(spec.layers) ? spec.layers.join(' / ') : spec.layers === 'all' ? '全部层（含 hs[0]）' : String(spec.layers ?? '—')}</b></span>
         <span>分片 <b>{spec.shards || 1}</b></span>
         <span>留出句式 <b>{(spec.splits?.heldout_frames || []).join('、') || '无'}</b></span>
       </div>

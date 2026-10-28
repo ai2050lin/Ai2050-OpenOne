@@ -215,3 +215,21 @@ python -c "import numpy as np;z=np.load(r'D:\ai2050_native\_census\6be1034f0b55a
 # 失败账本条目
 grep -c '"id": "F' tests/glm5/result/rdc_query_construction_20260913/phase3279/g5h42_appx1_landing/atlas_registry_v1_39.json
 ```
+
+---
+
+## 10 复核记录（2026-10-27，独立复检）
+
+**问题 1 部分撤回。** 复检发现本报告漏查了 `/api/neurons/*` 服务面（`server/neuron_census_service.py`，前端 `NeuronPane.jsx` / `NeuronUnitCard.jsx` / `NeuronUnitPanel.jsx` 已接线）：
+
+- 单元卡 `/api/neurons/unit`（unit_card.v1）**已实现**：top-32 强/弱激活上下文（token 级还原）、65 箱 × 4 象限直方图、读出极性、模板选择性、干预、归因、EXPL 解释检验、evidence_axes。
+- 逐层阵列 `/api/neurons/layer`（neuron_layers.v1）**已实现**：9,728 单元列式摘要 + 分型 + EXPL 解释列合并。
+- 因此「访客只能阅读不能探索」与「0.0074%」不成立——**接口与视图早已写好，真正缺口是本机两套 census（1M/20M）的 `neuron_layers/` 摘要从未生成**，`/layer` 与 `/tower` 一直返回 pending，导致阵列在产品里呈"不可用"状态，与实测观感（只有 26 条结论可看）一致。
+
+**当日修复**：对 20M 运行（19,042,014 token）生成全部 36 块摘要（13.7s，零 GPU，`tests/gpt5_temp/_gen_neuron_layers_20m.py`）。验证 13/13 + HTTP 层 7/7 全过：`summaries_ready=36/36`、L16 分型计数（T1 35 / T2 2 / T3 104 / T4 29 / T5 4761 / T6 4797）、L16 合并 11 个解释等级、单元卡极点还原真实上下文。EXPL 解释总量实测 265（v1+v2 合并口径：文本可复现 133 / 只在语料中可识别 32 / 未解释 100），非 v1 单独的 200。
+
+**其余问题（2–8）与六项能力清单维持原判**，但第 1 项"单元浏览器"改判为**已完成大半**：剩余增量仅是排序/筛选打磨与 1M 套交叉核验。P0 中仍有效的是 registry schema v2、`/api/v1` 版本化 + `atlas verify` CLI。
+
+### 10.1 P0-3 达成（2026-10-27 续）
+
+`scripts/atlas_cli.py` 落地（chain / registry / show / verify 四子命令，零 GPU 只读）。P0-3 验收达成：`python scripts/atlas_cli.py verify FTR-01` 逐锚复现 C/S/R 份额与 fpmin，|d|=0.000e+00；23/23 特征全过（312 项断言）。哈希链复算 a6bf3af5 命中。复核器同时暴露三项真实账本缺陷（只报告未修补）：#430 A-gate 条目缺 prev_post；3 个早期 bak 非前缀（就地迁移未登记）；18 处锚值 REGISTRY_ONLY（未回写封存 result，证据降级已逐处标注）。
