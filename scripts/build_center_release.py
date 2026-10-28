@@ -81,6 +81,12 @@ def main() -> int:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     fl = files()
+    # Windows 上 core.autocrlf=true 的检出会把文本变成 CRLF：服务器上的脚本、unit、VERSION 与预注册哈希都会坏
+    crlf = [str(p.relative_to(ROOT).as_posix()) for p in fl
+            if (p.name == 'VERSION' or p.suffix in ('.sh', '.service', '.conf', '.sha256', '.tsv') or p.name.endswith('.prereg.json'))
+            and b'\r' in p.read_bytes()]
+    if crlf:
+        raise SystemExit(f'这些文件含 CR（Windows 换行），在服务器上会出错：{crlf[:8]}…  用 git -c core.autocrlf=false 检出后再打包')
     manifest = {'name': name, 'version': PLATFORM_VERSION, 'previous_version': cur, 'git_commit': commit,
                 'git_dirty': dirty, 'built_at': time.strftime('%Y-%m-%d %H:%M:%S'),
                 'files': {str(p.relative_to(ROOT).as_posix()): hashlib.sha256(p.read_bytes()).hexdigest() for p in fl}}

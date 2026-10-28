@@ -69,7 +69,7 @@ PORT=$(grep -oE -- '--port[ =][0-9]+' <<<"$EXEC" | grep -oE '[0-9]+' || true)
 PORT=${PORT:-5010}
 HEALTH="http://127.0.0.1:$PORT/api/health"
 OLD_VER=$(curl -fsS -m 5 "$HEALTH" 2>/dev/null | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' || true)
-[ -n "$OLD_VER" ] || OLD_VER=$(cat "$OLD_DIR/VERSION" 2>/dev/null || echo unknown)
+[ -n "$OLD_VER" ] || OLD_VER=$(tr -d '[:space:]' < "$OLD_DIR/VERSION" 2>/dev/null || echo unknown)
 SVC_USER=$(systemctl show -p User --value "$SERVICE"); SVC_USER=${SVC_USER:-root}
 SVC_GROUP=$(systemctl show -p Group --value "$SERVICE"); SVC_GROUP=${SVC_GROUP:-$SVC_USER}
 ok "程序目录 $OLD_DIR（版本 $OLD_VER）"
@@ -123,7 +123,9 @@ STAGE=$(mktemp -d "${TMPDIR:-/tmp}/ai2050-upgrade.XXXXXX")
 trap 'rm -rf "$STAGE"' EXIT
 tar xzf "$PKG" -C "$STAGE"
 SRC="$STAGE/$NAME"
-[ -f "$SRC/deploy/center_app.py" ] && [ "$(cat "$SRC/VERSION")" = "$NEW_VER" ] || die "发布包内容不完整或版本号不符"
+[ -f "$SRC/deploy/center_app.py" ] || die "发布包内容不完整：缺 deploy/center_app.py"
+PKG_VER=$(tr -d '[:space:]' < "$SRC/VERSION" 2>/dev/null || true)      # 容忍 CRLF 与行尾空白
+[ "$PKG_VER" = "$NEW_VER" ] || die "发布包里的 VERSION 是 '$PKG_VER'，与文件名的 $NEW_VER 不符"
 
 rollback() {
   printf '\n\033[31m✗ %s，回退到 %s\033[0m\n' "$1" "$OLD_VER" >&2
