@@ -492,8 +492,13 @@ def _load_result(job_id: str, sha: str):
 def finish(lease_id: str, b: FinishIn, x_node_token: str = Header(default='')) -> dict:
     n = D._auth_node(x_node_token)
     r = _lease(lease_id, n['node_id'])
-    if r['status'] == 'done' and r['result_sha'] == b.sha256:
-        return {'lease_id': lease_id, 'idempotent_replay': True, 'sha': b.sha256}
+    if r['status'] in ('done', 'rejected') and r['result_sha'] == b.sha256:
+        # 节点没收到上一次的响应而重试：按已登记的结论回答，不重复校验与入库
+        prev = db().execute('SELECT status,validation_json FROM census_results WHERE lease_id=?', (lease_id,)).fetchone()
+        errors = (json.loads(prev['validation_json'] or '{}').get('errors') or []) if prev else []
+        return {'lease_id': lease_id, 'result_id': lease_id, 'idempotent_replay': True, 'sha': b.sha256,
+                'status': prev['status'] if prev else ('accepted' if r['status'] == 'done' else 'rejected'),
+                'errors': errors, 'replica': None}
     if r['status'] != 'claimed':
         raise HTTPException(409, f"lease status={r['status']}")
     p = _upload_path(lease_id)

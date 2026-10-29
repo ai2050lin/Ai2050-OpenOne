@@ -243,6 +243,11 @@ class CenterE2ETests(unittest.TestCase):
             self.assertEqual(rr.status_code, 200, rr.text)
         fin = self.c.post(f"/api/census/leases/{lease['lease_id']}/finish", json={'sha256': CJ.sha256_bytes(data), 'summary': s},
                           headers={'X-Node-Token': node_token}).json()
+        # 节点没收到响应而重试 finish：按已登记的结论回答（节点据 status 判断是否被接受）
+        again = self.c.post(f"/api/census/leases/{lease['lease_id']}/finish", json={'sha256': CJ.sha256_bytes(data), 'summary': s},
+                            headers={'X-Node-Token': node_token}).json()
+        self.assertTrue(again.get('idempotent_replay'), again)
+        self.assertEqual(again['status'], fin['status'])
         return lease, fin
 
     def test_end_to_end(self):

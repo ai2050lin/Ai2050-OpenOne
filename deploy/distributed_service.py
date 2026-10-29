@@ -38,6 +38,8 @@ import hmac
 import json
 import math
 import os
+import re
+import shutil
 import sqlite3
 import struct
 import subprocess
@@ -96,7 +98,8 @@ _RUNNER_V3 = _WORKSPACE / 'shared' / 'dist_protocol' / 'runner_v3.py'
 
 _db_lock = threading.Lock()
 _conn: Optional[sqlite3.Connection] = None
-_upload_buf: Dict[str, dict] = {}
+_upload_lock = threading.Lock()   # finish 串行：同一上传重复提交时只入库一次
+UPLOAD_TTL = 24 * 3600            # 未完成的上传在磁盘上保留的时长；完成记录保留同样久，供 finish 重放
 
 
 # ---------- 存储层 ----------
@@ -1137,40 +1140,91 @@ def upload_init(b: UploadInit, x_node_token: str = Header(default='')) -> dict:
     for f in b.manifest:
         if int(f.get('size', 0)) > MAX_FILE_BYTES:
             raise HTTPException(413, f"file {f.get('path')} too large（敏感原始数据不上传，见方案 S4）")
+    _upload_gc()
     upload_id = 'U-' + uuid.uuid4().hex[:10]
     chunks_expected = (total + CHUNK_SIZE - 1) // CHUNK_SIZE
-    _upload_buf[upload_id] = {'meta': b.model_dump(), 'node_id': n['node_id'],
-                              'chunks': {}, 'chunks_expected': chunks_expected,
-                              'created_at': time.time()}
+    d = _upload_dir(upload_id)
+    d.mkdir(parents=True)
+    (d / 'meta.json').write_text(json.dumps({'meta': b.model_dump(), 'node_id': n['node_id'],
+                                             'chunks_expected': chunks_expected, 'created_at': time.time()},
+                                            ensure_ascii=False), encoding='utf-8')
     return {'upload_id': upload_id, 'chunk_size': CHUNK_SIZE,
             'chunks_expected': chunks_expected}
+
+
+# 上传中的分块落盘（<data>/uploads/<upload_id>/）：中心重启后节点可以接着传；同一 seq 重传会覆盖，
+# 节点因网络中断重试分块是安全的。finish 成功后只留 done.json，重复的 finish 返回同一结果。
+_UPLOAD_ID_RE = re.compile(r'^U-[0-9a-f]{10}$')
+
+
+def _upload_dir(upload_id: str) -> Path:
+    if not _UPLOAD_ID_RE.match(upload_id):
+        raise HTTPException(404, 'upload not found')
+    return Path(_DATA_DIR) / 'uploads' / upload_id
+
+
+def _upload_load(upload_id: str, node_id: str) -> tuple:
+    d = _upload_dir(upload_id)
+    try:
+        up = json.loads((d / 'meta.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        raise HTTPException(404, 'upload not found（超过 24 小时未完成的上传已清理，请重新上传）')
+    if up['node_id'] != node_id:
+        raise HTTPException(403, 'upload belongs to another node')
+    return d, up
+
+
+def _upload_gc() -> None:
+    root = Path(_DATA_DIR) / 'uploads'
+    if not root.is_dir():
+        return
+    cutoff = time.time() - UPLOAD_TTL
+    for d in root.iterdir():
+        try:
+            if d.is_dir() and d.stat().st_mtime < cutoff:
+                shutil.rmtree(d, ignore_errors=True)
+        except OSError:
+            pass
 
 
 @router.post('/results/upload/{upload_id}/chunk')
 def upload_chunk(upload_id: str, b: ChunkIn, x_node_token: str = Header(default='')) -> dict:
     n = _auth_node(x_node_token)
-    up = _upload_buf.get(upload_id)
-    if not up:
-        raise HTTPException(404, 'upload not found（服务重启会丢未完成分块，请重传）')
-    if up['node_id'] != n['node_id']:
-        raise HTTPException(403, 'upload belongs to another node')
-    up['chunks'][b.seq] = base64.b64decode(b.data_b64)
-    return {'upload_id': upload_id, 'received': len(up['chunks'])}
+    d, up = _upload_load(upload_id, n['node_id'])
+    if (d / 'done.json').is_file():
+        raise HTTPException(409, 'upload already finished')
+    if b.seq < 0 or b.seq > up['chunks_expected']:
+        raise HTTPException(422, f"seq {b.seq} out of range（应在 0–{up['chunks_expected']}）")
+    tmp = d / f'{b.seq:06d}.tmp'
+    tmp.write_bytes(base64.b64decode(b.data_b64))
+    tmp.replace(d / f'{b.seq:06d}.part')
+    return {'upload_id': upload_id, 'received': len(list(d.glob('*.part')))}
 
 
 @router.post('/results/upload/{upload_id}/finish')
 def upload_finish(upload_id: str, x_node_token: str = Header(default='')) -> dict:
     n = _auth_node(x_node_token)
-    up = _upload_buf.pop(upload_id, None)
-    if not up:
-        raise HTTPException(404, 'upload not found')
-    if up['node_id'] != n['node_id']:
-        _upload_buf[upload_id] = up
-        raise HTTPException(403, 'upload belongs to another node')
+    with _upload_lock:
+        d, up = _upload_load(upload_id, n['node_id'])
+        done = d / 'done.json'
+        if done.is_file():                     # 节点没收到上一次的响应而重试：返回同一结果，不重复入库
+            return {**json.loads(done.read_text(encoding='utf-8')), 'idempotent_replay': True}
+        try:
+            out = _upload_register(n, up, sorted(d.glob('*.part')))
+        except HTTPException as exc:
+            if exc.status_code != 409:         # 内容不合格：丢弃这次上传；409（分块不全、租约失效）保留分块
+                shutil.rmtree(d, ignore_errors=True)
+            raise
+        done.write_text(json.dumps(out, ensure_ascii=False), encoding='utf-8')
+        for p in d.glob('*.part'):
+            p.unlink(missing_ok=True)
+        return out
+
+
+def _upload_register(n, up: dict, parts: List[Path]) -> dict:
     meta = up['meta']
-    actual_sequences = set(up['chunks'])
-    if not actual_sequences or actual_sequences != set(range(max(actual_sequences) + 1)):
-        _upload_buf[upload_id] = up
+    actual_sequences = [int(p.stem) for p in parts]
+    if not actual_sequences or actual_sequences != list(range(max(actual_sequences) + 1)):
         raise HTTPException(409, 'upload chunks are incomplete or contain unexpected sequence numbers')
     task = None
     task_ref = {}
@@ -1180,7 +1234,7 @@ def upload_finish(upload_id: str, x_node_token: str = Header(default='')) -> dic
         if not task or task['status'] != 'claimed':
             raise HTTPException(409, 'task lease is no longer active; uploaded bytes were not registered as a result')
         task_ref = json.loads(task['research_ref_json'] or '{}')
-    blob = b''.join(up['chunks'][i] for i in sorted(up['chunks']))
+    blob = b''.join(p.read_bytes() for p in parts)
     # 传输格式（与 node_agent 约定）：4B 路径表长(big-endian) + 路径表 JSON + 按 manifest 顺序的文件内容
     if len(blob) < 4:
         raise HTTPException(422, 'empty upload blob')
@@ -1194,7 +1248,6 @@ def upload_finish(upload_id: str, x_node_token: str = Header(default='')) -> dic
     expected_paths = [str(f.get('path', '')) for f in manifest]
     if paths != expected_paths:
         raise HTTPException(422, 'path table order or entries differ from manifest')
-    files_out: Dict[str, str] = {}
     raw_files: Dict[str, bytes] = {}
     offset = 0
     for i, f in enumerate(manifest):
@@ -1205,7 +1258,6 @@ def upload_finish(upload_id: str, x_node_token: str = Header(default='')) -> dic
         if actual != f['sha256']:
             raise HTTPException(422, f"sha256 mismatch for {f['path']}: "
                                      f"expected {f['sha256'][:12]} got {actual[:12]}")
-        files_out[f['path']] = base64.b64encode(content).decode('ascii')
         raw_files[f['path']] = content
     if offset != len(rest):
         raise HTTPException(422, 'blob payload length does not match manifest sizes')
@@ -1262,7 +1314,7 @@ def upload_finish(upload_id: str, x_node_token: str = Header(default='')) -> dic
         db.execute('UPDATE nodes SET last_seen=? WHERE node_id=?', (time.time(), n['node_id']))
         db.commit()
     return {'sha': whole, 'tm_id': meta['tm_id'], 'kind': meta['kind'],
-            'files': list(files_out), 'replica': replica_note or None,
+            'files': list(raw_files), 'replica': replica_note or None,
             'note': '已入库；内容寻址可去重' if not replica_note else f'与已有结果字节相同：{replica_note}'}
 
 

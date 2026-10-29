@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import http.client
 import json
 import os
 import subprocess
@@ -32,6 +33,22 @@ import uuid
 from pathlib import Path
 
 CHUNK_SIZE = 1_500_000  # 与中心 CHUNK_SIZE 一致（base64 前）
+
+
+class TransientError(RuntimeError):
+    """网络中断、超时、中心 5xx 或 429：稍后重试可能成功。其他 HTTP 错误（4xx）照常是 RuntimeError。"""
+
+
+def _http_error(method: str, url: str, e: urllib.error.HTTPError, body: bytes) -> RuntimeError:
+    try:
+        detail = json.loads(body.decode('utf-8')).get('detail', body[:200])
+    except Exception:
+        detail = body[:200].decode('utf-8', 'replace')
+    cls = TransientError if e.code >= 500 or e.code == 429 else RuntimeError
+    return cls(f'{method} {url} -> {e.code}: {detail}')
+
+
+NETWORK_ERRORS = (urllib.error.URLError, TimeoutError, ConnectionError, http.client.HTTPException)
 
 
 def http_json(url: str, method: str = 'GET', payload=None, token: str = '',
@@ -49,15 +66,26 @@ def http_json(url: str, method: str = 'GET', payload=None, token: str = '',
         body = e.read()
         if ok_204 and e.code == 204:
             return 204, None
+        raise _http_error(method, url, e, body) from e
+    except NETWORK_ERRORS as e:
+        raise TransientError(f'{method} {url} -> network: {getattr(e, "reason", e)}') from e
+
+
+RETRY_DELAYS = (5, 15, 30, 60, 120)   # 合计约 4 分钟：覆盖中心重启、反向代理短暂 502 与网络抖动
+ABORT = threading.Event()             # 「停止」时置位：重试等待立即结束
+
+
+def with_retry(fn, what: str):
+    """调用 fn；遇到 TransientError 按 RETRY_DELAYS 退避重试，其他错误直接抛出。
+    只用于可以安全重放的请求：分块按 seq 覆盖，finish 在中心端幂等。"""
+    for i, delay in enumerate(RETRY_DELAYS):
         try:
-            detail = json.loads(body.decode('utf-8')).get('detail', body[:200])
-        except Exception:
-            detail = body[:200].decode('utf-8', 'replace')
-        raise RuntimeError(f'{method} {url} -> {e.code}: {detail}') from e
-    except urllib.error.HTTPError:
-        raise
-    except urllib.error.URLError as e:
-        raise RuntimeError(f'{method} {url} -> network: {e.reason}') from e
+            return fn()
+        except TransientError as e:
+            log(f'{what}失败：{e}；{delay} 秒后重试（{i + 1}/{len(RETRY_DELAYS)}）')
+            if ABORT.wait(delay):
+                raise
+    return fn()
 
 
 # 本机节点服务（node_service.py）挂接的钩子：日志、runner 进度、任务结论；命令行下为空。
@@ -93,7 +121,8 @@ def log(msg: str) -> None:
 
 
 def abort_running() -> int:
-    """结束全部正在运行的 runner；返回结束的个数。未上传的租约到期后由中心重新派发。"""
+    """结束全部正在运行的 runner 与上传重试；返回结束的个数。未上传的租约到期后由中心重新派发。"""
+    ABORT.set()
     n = 0
     for p in list(RUNNING):
         if p.poll() is None:
@@ -201,23 +230,23 @@ def upload_outputs(args, creds: dict, task: dict, out_dir: Path) -> str:
     manifest = [{'path': name, 'sha256': hashlib.sha256(b).hexdigest(), 'size': len(b)}
                 for name, b in files.items()]
     base = args.server.rstrip('/') if not creds.get('server') else creds['server']
-    st, init = http_json(base + '/api/results/upload/init', 'POST', {
+    st, init = with_retry(lambda: http_json(base + '/api/results/upload/init', 'POST', {
         'task_id': task['task_id'], 'tm_id': task['tm_id'],
         'design_sha': task['design_sha'], 'model_id': args.model_id,
         'model_rev': args.model_rev, 'precision': args.dtype,
         'tokenizer_sha256': args.tokenizer_sha256,
         'seed': args.seed, 'kind': kind,
         'summary': summary, 'manifest': manifest,
-    }, token=creds['node_token'])
+    }, token=creds['node_token']), '上传登记')
     blob = pack_blob(files)
     chunks = [blob[i:i + CHUNK_SIZE] for i in range(0, len(blob), CHUNK_SIZE)] or [b'']
     log(f"upload kind={kind} {len(files)} files {len(blob)} bytes -> {len(chunks)} chunks")
     for seq, c in enumerate(chunks):
-        http_json(base + f"/api/results/upload/{init['upload_id']}/chunk", 'POST',
-                  {'seq': seq, 'data_b64': base64.b64encode(c).decode('ascii')},
-                  token=creds['node_token'])
-    st, fin = http_json(base + f"/api/results/upload/{init['upload_id']}/finish", 'POST',
-                        {}, token=creds['node_token'])
+        body = {'seq': seq, 'data_b64': base64.b64encode(c).decode('ascii')}
+        with_retry(lambda: http_json(base + f"/api/results/upload/{init['upload_id']}/chunk", 'POST',
+                                     body, token=creds['node_token'], timeout=120), f'上传分块 {seq + 1}/{len(chunks)} ')
+    st, fin = with_retry(lambda: http_json(base + f"/api/results/upload/{init['upload_id']}/finish", 'POST',
+                                           {}, token=creds['node_token'], timeout=300), '上传完成确认')
     return fin['sha']
 
 
@@ -232,6 +261,7 @@ def run_one(args, creds: dict, work_root: Path) -> bool:
                          token=creds['node_token'], ok_204=True)
     if st == 204 or not task:
         return False
+    ABORT.clear()
     log(f"claimed {task['task_id']} {task['tm_id']} v{task['version']} "
         f"design_sha={task['design_sha'][:12]}" + (f" shard={task['shard']}" if task.get('shard') else ''))
     stop_hb = threading.Event()
@@ -248,8 +278,8 @@ def run_one(args, creds: dict, work_root: Path) -> bool:
         out_dir = execute_task(args, task, work_root)
         sha = upload_outputs(args, creds, task, out_dir)
         log(f"result sha={sha[:16]} uploaded")
-        http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
-                  {'status': 'done', 'result_sha': sha}, token=creds['node_token'])
+        with_retry(lambda: http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
+                                     {'status': 'done', 'result_sha': sha}, token=creds['node_token']), '任务完成登记')
         _emit(RESULT_HOOKS, {'kind': 'family_test', 'task': task['task_id'], 'tm_id': task['tm_id'],
                              'shard': task.get('shard'), 'status': 'done', 'sha': sha})
     except Exception as e:
@@ -412,7 +442,9 @@ def http_bytes(url: str, data: bytes, token: str, timeout: float = 300) -> dict:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode('utf-8') or '{}')
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f'POST {url} -> {e.code}: {e.read()[:200]!r}') from e
+        raise _http_error('POST', url, e, e.read()) from e
+    except NETWORK_ERRORS as e:
+        raise TransientError(f'POST {url} -> network: {getattr(e, "reason", e)}') from e
 
 
 def sha256_file(p: Path) -> str:
@@ -491,6 +523,7 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
                           token=token, ok_204=True)
     if st == 204 or not lease:
         return False
+    ABORT.clear()
     lid = lease['lease_id']
     layers = lease['spec']['layers']
     log(f"领取普查分片 {lease['job_id']} / {lease['shard']}（层 {layers[0]}–{layers[-1]}，"
@@ -545,10 +578,13 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
         data = (tdir / 'outputs' / 'shard.npz').read_bytes()
         summary = json.loads((tdir / 'outputs' / 'summary.json').read_text(encoding='utf-8'))
         size = int(lease.get('chunk_bytes') or 4_000_000)
-        for seq, i in enumerate(range(0, max(len(data), 1), size)):
-            http_bytes(server + f'/api/census/leases/{lid}/chunk?seq={seq}', data[i:i + size], token)
-        _, fin = http_json(server + f'/api/census/leases/{lid}/finish', 'POST',
-                           {'sha256': hashlib.sha256(data).hexdigest(), 'summary': summary}, token=token, timeout=600)
+        n_chunks = (max(len(data), 1) + size - 1) // size
+        for seq, i in enumerate(range(0, max(len(data), 1), size)):   # 中心对已收到的 seq 返回 duplicate，重传安全
+            with_retry(lambda: http_bytes(server + f'/api/census/leases/{lid}/chunk?seq={seq}', data[i:i + size], token),
+                       f'上传分块 {seq + 1}/{n_chunks} ')
+        _, fin = with_retry(lambda: http_json(server + f'/api/census/leases/{lid}/finish', 'POST',
+                                              {'sha256': hashlib.sha256(data).hexdigest(), 'summary': summary},
+                                              token=token, timeout=600), '上传完成确认')
         res = {'kind': 'census_shard', 'task': lid, 'job': lease['job_id'], 'shard': lease['shard'],
                'status': fin.get('status') or 'unknown', 'sha': fin.get('sha', ''),
                'replica': (fin.get('replica') or {}).get('ok')}
