@@ -2,13 +2,26 @@
    纪律：本页只展示「运行时判定（config.js）」与「中心实况（/api/platform/config）」，不摆会被静默丢弃的开关——
    界面上的每个值都能在代码或接口里找到来源。真正的写操作只有「登录 / 注册」与「退出登录」，其余是到对应页面的链接。
    被测模型来自中心 config.models（只认 snapshot_sha256 完整的条目），空时如实说明，不用示例数据填充。 */
-import { Fragment } from 'react';
+import { Fragment, useSyncExternalStore } from 'react';
 
 import { RUNTIME_MODE } from '../../config.js';
 import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from './rdc_fusion/api.js';
 import { useAuth } from './rdc_fusion/authContext.js';
 import { Card, Empty, StatusPill } from './rdc_fusion/ui.jsx';
 import { siteHref } from '../v8/v8Util.js';
+import { clearErrors, errorCount, exportDiagnostics, getErrors } from '../../diagnostics.js';
+
+/* 全局错误计数订阅（diagnostics.js 在每次入账/清除后派发 ai2050-errors-updated）。 */
+function useErrorCount() {
+  return useSyncExternalStore(
+    notify => {
+      window.addEventListener('ai2050-errors-updated', notify);
+      return () => window.removeEventListener('ai2050-errors-updated', notify);
+    },
+    () => errorCount(),
+    () => 0,
+  );
+}
 
 const MODE = {
   electron: '桌面客户端（安装包）',
@@ -43,6 +56,7 @@ export default function ConfigView({ cfg, onGo }) {
   const name = user ? (user.display_name || user.username) : '';
   const role = guest ? ['na', '访客'] : (user?.role === 'admin' ? ['pass', '管理员'] : ['na', '成员']);
   const conn = cfg?.pending ? ['na', '读取中…'] : (cfg?.error ? ['fail', '连接失败'] : ['pass', '已连接']);
+  const errCount = useErrorCount();
 
   return (
     <div className="wb-cfg">
@@ -65,6 +79,26 @@ export default function ConfigView({ cfg, onGo }) {
             : <StatusPill status="pass" label="否（未启用合成数据）" />],
           REMOTE_CENTER && ['网页版地址', <a key="w" className="wb-cfg-link" href={WEB_URL} target="_blank" rel="noreferrer">{WEB_URL || center}</a>],
         ]} />
+      </Card>
+
+      <Card title="诊断" sub="未捕获的异常会记在本机；反馈问题时请附上诊断包"
+            extra={<span className="wb-cfg-sub">{errCount ? `${errCount} 条最近错误` : '无记录'}</span>}>
+        {errCount ? (
+          <div className="wb-cfg-act">
+            <button type="button" className="fw-tbtn" onClick={() => {
+              const blob = new Blob([exportDiagnostics()], { type: 'text/plain;charset=utf-8' });
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `ai2050-diagnostics-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.txt`;
+              a.click();
+              URL.revokeObjectURL(a.href);
+            }}>导出诊断包</button>
+            <button type="button" className="fw-tbtn" onClick={() => clearErrors()}>清除记录</button>
+            <small className="wb-cfg-sub">{getErrors()[getErrors().length - 1]?.message || ''}</small>
+          </div>
+        ) : (
+          <Empty>本页显示运行期未捕获错误（加载失败、脚本异常等）。当前没有记录——如果某个页面显示「没数据」，这里的记录能区分「没下载」和「出错了」。</Empty>
+        )}
       </Card>
 
       <Card title="账号" sub={offline ? '中心服务暂不可达，显示的是本机保存的登录信息' : '登录后可领题测试、绑定节点、署名贡献'}

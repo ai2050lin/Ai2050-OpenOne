@@ -12,6 +12,7 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import LangPage from './LangPage.jsx';
+import LivePane from './LivePane.jsx';
 import NeuronPane from './NeuronPane.jsx';
 import Tower from './Tower.jsx';
 import { OVERLAYS, READOUT_LABEL, defaultModel, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
@@ -55,13 +56,20 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const [st, setSt] = useState(readState);
   useEffect(() => { writeState(st); }, [st]);
   const patchSt = patch => setSt(prev => ({ ...prev, ...patch }));
+
+  // 实时分析：一次前向的观察数据与步进位置（0 = 嵌入层，1..L = 块，L+1 = 输出头）；数据留在会话内，不进地址栏
+  const [liveTrace, setLiveTrace] = useState(null);
+  const [liveStep, setLiveStep] = useState(0);
+
   const model = st.model && tree?.models?.includes(st.model) ? st.model : defaultModel(tree, skeletons);
   const skeleton = skeletons[model];
   const census = skeleton?.census_run ? skeleton.census_key : null;
   const tw = useApi(census ? `/api/neurons/tower?model_key=${encodeURIComponent(census)}` : null);
   const tower = tw.data && !tw.data.pending ? tw.data : null;
-  const nLayers = tower?.n_layers || skeleton?.n_layers || 0;
-  const block = st.block != null && st.block < nLayers ? st.block : Math.min(18, Math.max(0, nLayers - 1));
+  const nLayersCensus = tower?.n_layers || skeleton?.n_layers || 0;
+  // 实时分析不依赖普查骨架：有 trace 就按 trace 的层数画层塔（本机模型 36 块）
+  const nLayers = view === 'live' ? (liveTrace?.n_layers || 0) : nLayersCensus;
+  const block = st.block != null && st.block < nLayers ? st.block : Math.min(18, Math.max(0, nLayersCensus - 1));
 
   // 各 tab 需要的数据（全部来自本机数据包；不在当前 tab 时不读取）
   const itemId = tree ? pickItem(tree, st, model) : null;
@@ -108,8 +116,24 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
                color: respRow ? `颜色 = ${respTm} · ${respRow.factor} 的逐层留出投影间隔（${READOUT_LABEL[respRow.readout] || respRow.readout}读出）` : '颜色：该模式族在此模型上没有拼图',
                mark: respRow ? '绿色边 = 未见词表上可读出' : '', click: '点击 = 右侧点云切到该层' };
     }
+    if (view === 'live') {
+      const tr = liveTrace;
+      let values = null;
+      if (tr) {
+        // 每块活动量 = 平均每个 token 的注意力总写出能量（Σ_h 头输出范数）；嵌入层 = 残差流入范数
+        const act = tr.layers.map(l => l.heads.out_norm.reduce((s, row) => s + row.reduce((a, b) => a + b, 0), 0) / tr.n_tokens);
+        const top = Math.max(...act, 1e-9);
+        values = [tr.layers[0]?.resid_in?.reduce((a, b) => a + b, 0) / (tr.n_tokens || 1) || 0,
+                  ...act.map(v => v / top)];
+      }
+      return { values, selected: liveStep, allowEmbedding: true, onPick: hs => setLiveStep(hs),
+               valueLabel: '该块活动量',
+               color: tr ? `颜色 = 「${tr.model_name}」对这段输入的逐块活动量（注意力总写出能量，归一化）`
+                         : '颜色 = 运行实时分析后按各块活动量着色',
+               click: '点击 = 跳到该层（嵌入层 / 块 / 输出头）' };
+    }
     return { values: null, selected: null, onPick: null, color: '', click: '' };
-  }, [view, nLayers, tower, st, block, itemApi.data, census, itemId, model, tree, respRow, respTm]);
+  }, [view, nLayers, tower, st, block, itemApi.data, census, itemId, model, tree, respRow, respTm, liveTrace, liveStep]);
 
   const selRuns = tower?.selectivity || [];
   const selRun = selRuns.find(s => s.file === st.sel) || selRuns[0];
@@ -117,7 +141,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
   const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
-  const showTower = view === 'neuron' || view === 'lang' || view === 'response';   // 谱图关系、本地包不需要层结构
+  const showTower = view === 'neuron' || view === 'lang' || view === 'response' || view === 'live';   // 谱图关系、本地包不需要层结构
 
   return (
     <div className={'v8-space' + (showTower ? '' : ' wide')}>
@@ -153,7 +177,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
         {nLayers ? (
           <Tower nLayers={nLayers} selected={cfg.selected} values={cfg.values} marks={cfg.marks} peak={cfg.peak} onPick={cfg.onPick}
                  allowEmbedding={cfg.allowEmbedding} valueLabel={cfg.valueLabel} markLabel={cfg.markLabel}
-                 caption={`${shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
+                 caption={`${view === 'live' && liveTrace ? liveTrace.model_name : shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
         ) : <Empty>没有模型骨架数据。</Empty>}
         <p className="v8-note">每块板 = 一层（下：嵌入层 hs[0]；块 b 的板 = 该块输出 hs[b+1]；上：输出头）。颜色按最大值归一化，浅 → 深。拖动旋转、滚轮缩放。层板只是排列，不代表模型几何。
           {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
@@ -166,6 +190,8 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
             : <Empty>{census ? (tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…') : `${shortModel(model)} 还没有自然语料普查，没有逐单元数据；左侧只画层结构。`}</Empty>)}
           {view === 'lang' && tree && <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
                                                 layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />}
+          {view === 'live' && <LivePane census={census} skeleton={skeleton} tower={tower}
+                                        trace={liveTrace} setTrace={setLiveTrace} step={liveStep} setStep={setLiveStep} />}
           {view === 'response' && (
             <ResponseExplorer key={`${respTm}|${model}`} initialTm={respTm || undefined} initialBucket={model || undefined}
                               syncLayer={syncTag} onLayer={tag => { const h = hsOf(tag); if (h != null) patchSt({ rlayer: h }); }}

@@ -8,8 +8,10 @@ import AtlasApp from './components/v8/AtlasApp.jsx'
 import AuthGate from './components/app/rdc_fusion/AuthGate.jsx'
 import { DataBarHost } from './components/open/DataBar.jsx'
 import { initDataStore } from './components/app/rdc_fusion/dataStore.js'
+import { installGlobalErrorCapture } from './diagnostics.js'
 
 initDataStore()          // 启动时载入本机保存的数据包（IndexedDB）；页面优先读本地，不定时访问服务器
+installGlobalErrorCapture()   // 未捕获异常/Promise 拒绝 → localStorage 环形缓冲（连接页可导出诊断包）
 
 /* 其余入口按需加载：新人打开首页不下载工作台、旧版 3D 界面与专项页的代码。 */
 // 旧版 3D 主界面 —— 归档为 /legacy（原样保留、无入口链接）

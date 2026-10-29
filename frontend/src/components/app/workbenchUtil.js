@@ -18,6 +18,7 @@ export const ROUTE_VIEWS = [
 
 /* 空间视图：左侧都常驻 LLM 多层结构（层塔） */
 export const SPATIAL_VIEWS = [
+  { id: 'live', label: '实时分析', desc: '输入一段文本，逐层观察模型怎么算：每个注意力头与 MLP 单元的实时响应和参数' },
   { id: 'neuron', label: '神经元', desc: '选中块的内部结构、9,728 个 MLP 单元阵列与单元卡' },
   { id: 'lang', label: '语言图谱', desc: '大类 → 语言族 → 语言项：编码层段、点云、有效神经元与证据' },
   { id: 'response', label: '响应点云', desc: '单个模式族：3D 响应空间、规律分析、合并统计' },

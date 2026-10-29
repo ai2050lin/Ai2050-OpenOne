@@ -11,6 +11,7 @@
 'use strict';
 
 const { app, BrowserWindow, Menu, dialog, ipcMain, safeStorage, shell } = require('electron');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -50,10 +51,22 @@ function writeConfig(cfg) {
   fs.writeFileSync(CONFIG_FILE(), JSON.stringify(cfg, null, 2), 'utf8');
 }
 
+const LOCAL_HOSTS = /^(localhost|127\.0\.0\.1|\[::1\]|::1)(:\d+)?$/i;
+
 function normalizeServer(input) {
   let s = String(input || '').trim();
   if (!s) return null;
   if (!/^https?:\/\//i.test(s)) s = 'http://' + s;
+  // 安全：登录等请求会把账号密码 POST 到这个地址。非本机地址一律强制 HTTPS，
+  // 防止"自定义服务器"被诱导填成攻击者的 http 主机（client_architecture_review P0-3）。
+  // 本机开发例外：localhost / 127.0.0.1 / ::1 允许 http。
+  try {
+    const u = new URL(s);
+    if (u.protocol === 'http:' && !LOCAL_HOSTS.test(u.hostname)) {
+      u.protocol = 'https:';
+      s = u.toString().replace(/\/+$/, '') || s;
+    }
+  } catch { /* 非法地址交给 probe 判不可达 */ }
   return s.replace(/\/+$/, '');
 }
 
@@ -290,6 +303,75 @@ function buildMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
+/* ── 本机实时前向服务自动拉起 ─────────────────────────────── */
+/* 「空间 · 实时分析」要跑真实前向，与客户端连哪个中心无关——只要本机有模型权重就能算。
+   无条件探测 127.0.0.1:5002（live-only 轻量前向服务，秒级就绪）；没起且本机有仓库环境
+   （.venv + server/live_only_app.py）就拉起，日志 tempdata/live_only.log。
+   安装版（打包后没有仓库环境）静默跳过。完整中心 :5001 的拉起由 maybeStartLocalCenter 单独负责。 */
+function ensureLiveOnly() {
+  try {
+    if (app.isPackaged) return;
+    const repo = path.resolve(__dirname, '..', '..');
+    const py = path.join(repo, '.venv', 'Scripts', 'python.exe');
+    const entry = path.join(repo, 'server', 'live_only_app.py');
+    if (!fs.existsSync(py) || !fs.existsSync(entry)) return;
+    const hasLive = url => new Promise(resolve => {
+      const req = http.get(url + '/api/live/status', { timeout: 2000 }, res => {
+        let body = '';
+        res.on('data', c => { body += c; });
+        res.on('end', () => {
+          try { const d = JSON.parse(body); resolve(d.status === 'ready' || d.status === 'loading'); }
+          catch { resolve(false); }
+        });
+      });
+      req.on('timeout', () => { req.destroy(); resolve(false); });
+      req.on('error', () => resolve(false));
+    });
+    void (async () => {
+      if (await hasLive('http://127.0.0.1:5001')) return;   // 完整中心已有前向能力，不必另起
+      if (await hasLive('http://127.0.0.1:5002')) return;   // live-only 已在跑
+      try {
+        const out = fs.openSync(path.join(repo, 'tempdata', 'live_only.log'), 'a');
+        const child = spawn(py, [entry], {
+          cwd: repo,
+          env: { ...process.env, AI2050_HOST: '127.0.0.1', AI2050_PORT: '5002' },
+          stdio: ['ignore', out, out],
+        });
+        console.log(`[client] 已自动拉起本机实时前向服务 :5002 (pid ${child.pid})，日志 tempdata/live_only.log`);
+      } catch (e) { console.log('[client] 拉起实时前向服务失败:', e.message); }
+    })();
+  } catch { /* 环境缺失——忽略，保持原行为 */ }
+}
+
+/* ── 本机中心自动拉起 ─────────────────────────────────────── */
+/* 「空间 · 实时分析」（真实前向）需要带模型权重的中心。用户连的是本机地址、
+   而 :5001 没起时，用仓库自带的 .venv 拉起 server/server.py（全程本机、不联网）。
+   非本机地址、打包安装版（没有仓库环境）则静默跳过，保持原行为。 */
+function maybeStartLocalCenter(server) {
+  try {
+    const u = new URL(server);
+    if (!['localhost', '127.0.0.1'].includes(u.hostname)) return;
+    if (app.isPackaged) return;                       // 安装版没有仓库环境
+    const repo = path.resolve(__dirname, '..', '..');
+    const py = path.join(repo, '.venv', 'Scripts', 'python.exe');
+    const entry = path.join(repo, 'server', 'server.py');
+    if (!fs.existsSync(py) || !fs.existsSync(entry)) return;
+    const port = u.port || '5001';
+    const req = http.get(`http://127.0.0.1:${port}/api/v1/health`, { timeout: 1500 }, res => { res.resume(); });
+    req.on('error', () => {
+      try {
+        const out = fs.openSync(path.join(repo, 'tempdata', 'center_auto.log'), 'a');
+        const child = spawn(py, [entry], {
+          cwd: repo,
+          env: { ...process.env, AI2050_HOST: '127.0.0.1', AI2050_PORT: port },
+          stdio: ['ignore', out, out],
+        });
+        console.log(`[client] 本机中心未运行，已自动拉起 (pid ${child.pid})，日志 tempdata/center_auto.log`);
+      } catch (e) { console.log('[client] 自动拉起本机中心失败:', e.message); }
+    });
+  } catch { /* server 不是合法 URL——忽略，保持原行为 */ }
+}
+
 /* ── 生命周期 ─────────────────────────────────────────────── */
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -303,6 +385,8 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     const server = await ensureServer(null);
     if (!server) { app.quit(); return; }
+    maybeStartLocalCenter(server);
+    ensureLiveOnly();                 // 与所连中心无关：本机有权重就能跑实时分析
     buildMenu();
     createWindow(server);
     nodeSup.start(server);

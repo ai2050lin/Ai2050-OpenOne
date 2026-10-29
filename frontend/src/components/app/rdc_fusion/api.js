@@ -33,23 +33,36 @@ async function offlineJson(path) {
 
 let configOnce = null;             // 离线客户端：站点配置每次打开页面只读一次，各组件共用
 
-export async function getJson(path, { signal, online = false } = {}) {
+/* 请求超时（client_architecture_review P0-5）：弱网下按钮不再永久 busy。
+   与调用方的 AbortController 合并；旧内核没有 AbortSignal.any 时保持可取消、放弃超时。
+   数据包下载不走这里（dataStore 自带 fetch），不受影响。 */
+const REQUEST_TIMEOUT_MS = 60000;
+function withTimeout(signal, timeoutMs) {
+  const ms = timeoutMs ?? REQUEST_TIMEOUT_MS;
+  if (!ms || typeof AbortSignal?.timeout !== 'function') return signal;
+  const timer = AbortSignal.timeout(ms);
+  if (!signal) return timer;
+  try { return AbortSignal.any([signal, timer]); } catch { return signal; }
+}
+
+export async function getJson(path, { signal, online = false, timeoutMs } = {}) {
   // online：管理工位显式要求的实时读取（只在 ADMIN_LIVE 时生效），其余在只读数据包模式下一律读本机数据包
   if (OFFLINE_CLIENT && !(online && ADMIN_LIVE) && !ONLINE_PATHS.has(path.split('?')[0])) return offlineJson(path);
-  if (OFFLINE_CLIENT && online && ADMIN_LIVE) return fetchJson(path, { signal });
+  if (OFFLINE_CLIENT && online && ADMIN_LIVE) return fetchJson(path, { signal, timeoutMs });
   if (OFFLINE_CLIENT) {
     if (!configOnce) configOnce = fetchJson(path).catch(reason => { configOnce = null; throw reason; });
     return configOnce;
   }
-  return fetchJson(path, { signal });
+  return fetchJson(path, { signal, timeoutMs });
 }
 
-async function fetchJson(path, { signal } = {}) {
+async function fetchJson(path, { signal, timeoutMs } = {}) {
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, { signal, cache: 'no-store' });
+    response = await fetch(`${API_BASE}${path}`, { signal: withTimeout(signal, timeoutMs), cache: 'no-store' });
   } catch (reason) {
     if (reason?.name === 'AbortError') throw reason;
+    if (reason?.name === 'TimeoutError') throw new Error(`连接超时（${Math.round((timeoutMs ?? REQUEST_TIMEOUT_MS) / 1000)} 秒无响应），请稍后重试`);
     throw new Error('中心服务暂时无法连接，请稍后重试');
   }
   const body = await response.json().catch(() => ({}));
@@ -57,14 +70,15 @@ async function fetchJson(path, { signal } = {}) {
   return body;
 }
 
-export async function postJson(path, payload, { adminToken, method = 'POST' } = {}) {
+export async function postJson(path, payload, { adminToken, method = 'POST', timeoutMs } = {}) {
   if (!ADMIN_LIVE) throw new Error('网页只能浏览，不能写入；测试与管理操作请在桌面客户端（研究工作台 → 研发）进行');
   const headers = { 'Content-Type': 'application/json' };
   if (adminToken) headers['X-Admin-Token'] = adminToken;
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, { method, headers, body: JSON.stringify(payload ?? {}) });
-  } catch {
+    response = await fetch(`${API_BASE}${path}`, { method, headers, body: JSON.stringify(payload ?? {}), signal: withTimeout(undefined, timeoutMs) });
+  } catch (reason) {
+    if (reason?.name === 'TimeoutError') throw new Error(`操作超时（${Math.round((timeoutMs ?? REQUEST_TIMEOUT_MS) / 1000)} 秒无响应），请稍后重试`);
     throw new Error('中心服务暂时无法连接，请稍后重试');
   }
   const body = await response.json().catch(() => ({}));
@@ -132,12 +146,14 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     return () => { dead = true; controller.abort(); if (retry) window.clearTimeout(retry); };
   }, [path, nonce, pollWhilePending, needFetch, extrasKey, live]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
-  if (useLocal) return { data: local, error: '', loading: false, reload, local: true, missingPack: null };
+  if (useLocal) return { data: local, error: '', loading: false, pending: false, reload, local: true, missingPack: null };
   const current = state.key === path;
+  const loading = Boolean(path) && !current;
   return {
     data: current ? state.data : null,
     error: current ? state.error : '',
-    loading: Boolean(path) && !current,
+    loading,
+    pending: loading,          // ConfigView 等按 pending 判"读取中"：与 loading 同源，加载中不再假显"已连接"
     reload,
     local: false,
     missingPack: current ? state.pack : null,
@@ -183,14 +199,15 @@ export function setSession(token, user) {
 export function clearSession() { store('del', SESSION_KEY); store('del', USER_KEY); }
 
 /* /api/auth/* 调用：自动带会话令牌 */
-export async function authJson(path, { method = 'GET', body } = {}) {
+export async function authJson(path, { method = 'GET', body, timeoutMs } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   const token = getSession();
   if (token) headers.Authorization = `Bearer ${token}`;
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', body: body === undefined ? undefined : JSON.stringify(body) });
-  } catch {
+    response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', signal: withTimeout(undefined, timeoutMs), body: body === undefined ? undefined : JSON.stringify(body) });
+  } catch (reason) {
+    if (reason?.name === 'TimeoutError') throw new Error(`操作超时（${Math.round((timeoutMs ?? REQUEST_TIMEOUT_MS) / 1000)} 秒无响应），请稍后重试`);
     const error = new Error('中心服务暂时无法连接，请稍后重试');
     error.offline = true;
     throw error;

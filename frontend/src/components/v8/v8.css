@@ -228,3 +228,135 @@ a.v8-mainline{text-decoration:none}
 .v8-tower-legend{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--fw-text-2);margin-top:4px}
 .v8-tower-legend span i{display:inline-block;width:14px;height:4px;border-radius:2px;background:#1baf7a;margin-right:5px;vertical-align:2px}
 .v8-space.wide{grid-template-columns:minmax(0,1fr)}
+
+/* ---- 空间 · 实时分析（LivePane）：输入 → 一次真实前向 → 逐层步进观察 ---- */
+.lv-root{display:flex;flex-direction:column;gap:12px}
+.lv-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lv-hd b{font-size:15px}
+.lv-badge{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--fw-border-strong)}
+.lv-badge.ok{color:#1baf7a;border-color:#1baf7a;background:rgba(27,175,122,.08)}
+.lv-badge.wait{color:#b45309;border-color:#eda100;background:rgba(237,161,0,.1)}
+.lv-note{font-size:11px;color:var(--fw-text-2)}
+.lv-err{font-size:12px;color:#b42318}
+.lv-input{display:flex;flex-direction:column;gap:6px;background:var(--fw-panel);border:1px solid var(--fw-border);border-radius:10px;padding:10px}
+.lv-input textarea{width:100%;box-sizing:border-box;font:inherit;resize:vertical;border:1px solid var(--fw-border-strong);border-radius:8px;padding:8px;background:#fff}
+.lv-input-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lv-input-tools label{font-size:11px;color:var(--fw-text-2);display:flex;gap:6px;align-items:center}
+.lv-run{background:#256abf;color:#fff;border:0;border-radius:8px;padding:6px 16px;font:inherit;font-weight:600;cursor:pointer}
+.lv-run:disabled{opacity:.5;cursor:default}
+.lv-tokens{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.lv-tok{font:inherit;font-size:12px;border:1px solid var(--fw-border);background:#fff;border-radius:6px;padding:2px 7px;cursor:pointer;white-space:pre}
+.lv-tok.on{background:#256abf;color:#fff;border-color:#256abf}
+.lv-steps{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lv-steps button{font:inherit;font-size:12px;border:1px solid var(--fw-border-strong);background:#fff;border-radius:8px;padding:5px 12px;cursor:pointer}
+.lv-steps button.primary{background:#256abf;color:#fff;border-color:#256abf}
+.lv-steps button:disabled{opacity:.4;cursor:default}
+.lv-steps input[type=range]{flex:1;min-width:120px}
+.lv-pos{font-size:12px;color:var(--fw-text-2);white-space:nowrap}
+.lv-card{background:var(--fw-panel);border:1px solid var(--fw-border);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.lv-card h4{margin:0;font-size:13px}
+.lv-card p{margin:0;font-size:12px;color:var(--fw-text-2)}
+.lv-bars{display:flex;align-items:flex-end;gap:3px;height:56px}
+.lv-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:14px}
+.lv-bar i{width:100%;background:#6da7ec;border-radius:2px 2px 0 0}
+.lv-bar.on i{background:#0d366b}
+.lv-bar span{font-size:9px;color:var(--fw-text-3);max-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:12px}
+.lv-heads{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;max-width:560px}
+.lv-head{aspect-ratio:1;border:1px solid var(--fw-border);border-radius:4px;font-size:9px;color:#123;cursor:pointer;padding:0}
+.lv-head.on{outline:2px solid #0d366b;outline-offset:1px}
+.lv-head-detail{display:flex;gap:18px;flex-wrap:wrap;border-top:1px dashed var(--fw-border);padding-top:8px}
+.lv-head-col{flex:1;min-width:260px;display:flex;flex-direction:column;gap:6px}
+.lv-head-col b{font-size:12px}
+.lv-pairs{list-style:none;margin:0;padding:0;font-size:11px;color:var(--fw-text-2);display:flex;flex-direction:column;gap:2px}
+.lv-heat-row{display:flex;gap:14px;flex-wrap:wrap}
+.lv-heat b{display:block;font-size:11px;margin-bottom:3px;color:var(--fw-text-2)}
+.lv-heat-g{display:grid;gap:1px;width:144px}
+.lv-heat-g i{aspect-ratio:1;border-radius:1px}
+.lv-units{display:flex;flex-direction:column;gap:3px;max-width:520px}
+.lv-unit{display:flex;align-items:center;gap:8px;font-size:11px}
+.lv-unit-id{width:56px;text-align:right;color:var(--fw-text-2);font-variant-numeric:tabular-nums}
+.lv-unit-bar{flex:1;height:10px;background:var(--fw-empty,#eef2f7);border-radius:3px;overflow:hidden;display:block}
+.lv-unit-bar i{display:block;height:100%}
+.lv-unit-val{width:64px;font-variant-numeric:tabular-nums;color:var(--fw-text-2)}
+.lv-unit-marks{width:34px;display:flex;gap:3px;align-items:center}
+.lv-mark{width:10px;height:10px;border-radius:2px;display:inline-block}
+.lv-mark-s{font-size:9px;font-weight:700;color:#fff;background:#7a3fbf;border-radius:3px;padding:0 3px}
+.lv-logits{display:flex;flex-direction:column;gap:3px;max-width:420px}
+.lv-steps button.lv-play{background:#1baf7a;color:#fff;border-color:#1baf7a;min-width:74px}
+.lv-steps button.lv-play:disabled{opacity:.4;cursor:default}
+
+/* ---- 空间 · 神经元（三层漏斗版）：速览 → 精选单元 → 全量阵列 ---- */
+.v8-digest-say{margin:0;font-size:13px;line-height:1.7;color:var(--fw-text-1)}
+.v8-digest-say b{font-weight:700}
+.v8-digest-bar{display:flex;height:18px;border-radius:5px;overflow:hidden;margin-top:8px}
+.v8-digest-bar i{display:block;height:100%}
+.v8-digest-stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+.v8-digest-stats span{display:flex;align-items:baseline;gap:6px;font-size:11px;color:var(--fw-text-2)}
+.v8-digest-stats b{font-size:20px;font-variant-numeric:tabular-nums;color:var(--fw-text-1)}
+.v8-picked{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:1100px){.v8-picked{grid-template-columns:repeat(2,1fr)}}
+.v8-pick{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:#fff;border:1px solid var(--fw-border);border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit}
+.v8-pick:hover{border-color:#256abf}
+.v8-pick.on{border-color:#e34948;box-shadow:0 0 0 1px #e34948}
+.v8-pick b{display:flex;align-items:center;gap:6px;font-size:13px}
+.v8-pick b i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.v8-pick span{font-size:11px;color:var(--fw-text-2);line-height:1.4}
+.v8-pick em{font-style:normal;font-size:10px;color:var(--fw-text-3)}
+
+/* ---- 进展 · 神经元逆向分析：一句话进展 + 全景剖面图 + 推荐块 ---- */
+.v8-prof{width:100%;max-width:860px;height:auto;display:block;background:var(--fw-panel,#fff);border:1px solid var(--fw-border);border-radius:10px;padding:6px 4px}
+.v8-prof-lab{font-size:12px;font-weight:700;fill:var(--fw-text-1,#1c2733)}
+.v8-prof-labsub{font-size:10px;font-weight:400;fill:var(--fw-text-3,#8a97a6)}
+.v8-prof-tick{font-size:10px;fill:var(--fw-text-3,#8a97a6);font-variant-numeric:tabular-nums}
+.v8-prof-col{fill:transparent;cursor:pointer}
+.v8-prof-col:hover{fill:rgba(37,106,191,.08)}
+.v8-prof-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:11px;color:var(--fw-text-2)}
+.v8-prof-legend span{display:flex;align-items:center;gap:4px}
+.v8-prof-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.v8-prof-lg-sep{width:1px;height:12px;background:var(--fw-border-strong);margin:0 4px}
+.v8-prof-say{margin:0;font-size:13px;line-height:1.8;color:var(--fw-text-1)}
+
+/* ---- 进展 · 神经元逆向分析（简洁大气版）：大数字、去框线、大留白 ---- */
+.v8-nprog{display:flex;flex-direction:column;gap:30px;padding-top:4px}
+.v8-nprog-say{margin:0;font-size:15px;line-height:2.05;color:var(--fw-text-1);border-left:3px solid #0d366b;padding-left:18px}
+.v8-nprog-say b{font-variant-numeric:tabular-nums;color:#0d366b;font-weight:700}
+.v8-nprog-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 32px}
+@media (max-width:1000px){.v8-nprog-tiles{grid-template-columns:repeat(2,1fr)}}
+.v8-nprog-tiles>div{display:flex;flex-direction:column;gap:4px;border-top:2px solid var(--fw-border);padding-top:12px}
+.v8-nprog-tiles b{font-size:28px;font-weight:700;color:#0d366b;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.1}
+.v8-nprog-tiles span{font-size:12.5px;font-weight:600;color:var(--fw-text-1)}
+.v8-nprog-tiles small{font-size:11px;color:var(--fw-text-3);line-height:1.6}
+.v8-nprog .v8-prof{border:0;background:transparent;padding:0;border-radius:0}
+.v8-nprog .v8-prof-legend{margin-top:4px}
+.v8-nprog .v8-tools{margin:0 0 6px}
+
+/* ---- 进展 · 语言图谱：置顶大类条 ---- */
+.v8-nprog-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 26px}
+@media (max-width:1000px){.v8-nprog-cats{grid-template-columns:repeat(2,1fr)}}
+.v8-nprog-cats>div{border-left:3px solid;padding-left:14px;display:flex;flex-direction:column;gap:2px}
+.v8-nprog-cats b{font-size:16px;font-weight:700;color:var(--fw-text-1)}
+.v8-nprog-cats span{font-size:12px;color:var(--fw-text-2)}
+.v8-nprog-cats small{font-size:11px;color:var(--fw-text-3)}
+
+/* ---- 进展 · 语言图谱：逐条进度完整列表 ---- */
+.v8-prog-list{display:flex;flex-direction:column;gap:16px;max-width:860px}
+.v8-prog-catname{font-size:13px;font-weight:700;border-left:3px solid;padding-left:10px;margin-bottom:4px;color:var(--fw-text-1)}
+.v8-prog-row{display:grid;grid-template-columns:160px 1fr 46px 110px;gap:12px;align-items:center;width:100%;background:none;border:0;padding:3px 0;font:inherit;text-align:left;cursor:pointer}
+.v8-prog-row:hover .v8-prog-name{color:#256abf}
+.v8-prog-name{font-size:12.5px;color:var(--fw-text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v8-prog-track{height:10px;background:var(--fw-empty,#eef2f7);border-radius:5px;overflow:hidden;display:block}
+.v8-prog-track i{display:block;height:100%;border-radius:5px;transition:width .3s}
+.v8-prog-pct{font-size:12px;color:var(--fw-text-2);text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.v8-prog-lab{font-size:11px;color:var(--fw-text-3)}
+
+/* ---- 进展 · 语言图谱：图谱测试题（C-Eval 数据集实测） ---- */
+.v8-bench{display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--fw-border);padding-bottom:26px}
+.v8-bench-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.v8-bench-btn{font:inherit;font-size:12.5px;font-weight:600;color:#fff;background:#0d366b;border:0;border-radius:6px;padding:7px 16px;cursor:pointer;white-space:nowrap}
+.v8-bench-btn:hover{background:#124a94}
+.v8-bench-btn:disabled{opacity:.55;cursor:default}
+.v8-bench-runbar{display:flex;flex-direction:column;gap:5px}
+.v8-bench-runtrack{height:8px;background:var(--fw-empty,#eef2f7);border-radius:4px;overflow:hidden}
+.v8-bench-runtrack i{display:block;height:100%;background:#0d366b;border-radius:4px;transition:width .4s}
+.v8-bench-runbar span{font-size:11.5px;color:var(--fw-text-3)}
+.v8-bench-acc{font-size:26px;font-weight:700;color:#0d366b;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.15}

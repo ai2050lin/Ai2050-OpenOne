@@ -39,6 +39,7 @@ import json
 import math
 import os
 import re
+import secrets
 import shutil
 import sqlite3
 import struct
@@ -75,7 +76,14 @@ _DATA_DIR = Path(os.environ.get('AI2050_DIST_DIR',
                                 Path(__file__).resolve().parent.parent / 'distributed_data'))
 _WORKSPACE = Path(__file__).resolve().parent.parent
 _RESEARCH_OS = _WORKSPACE / 'ai2050_research_os'
-ADMIN_TOKEN = os.environ.get('AI2050_DIST_ADMIN_TOKEN', 'ai2050-admin-dev')
+# 管理令牌：生产必须显式设置 AI2050_DIST_ADMIN_TOKEN（center_app 入口强制）。
+# 未设置时（本机开发/临时进程）生成一次性随机令牌并打印到日志——不使用固定默认值，
+# 防止绕过 center_app 直接启动的服务带着可猜测的开发令牌上线（client_architecture_review P0-3）。
+ADMIN_TOKEN = os.environ.get('AI2050_DIST_ADMIN_TOKEN', '')
+if not ADMIN_TOKEN:
+    ADMIN_TOKEN = secrets.token_hex(16)
+    print('[distributed_service] AI2050_DIST_ADMIN_TOKEN 未设置：本次进程使用随机管理令牌 '
+          f'{ADMIN_TOKEN}（管理员账号会话同样可用；写进环境变量可固定）', flush=True)
 NEWS_OFFLINE = os.environ.get('AI2050_DIST_NEWS_OFFLINE', '') == '1'
 
 router = APIRouter(prefix='/api', tags=['distributed'])
@@ -1749,7 +1757,9 @@ class GrammarPreviewIn(BaseModel):
 
 
 @router.post('/grammar/preview')
-def grammar_preview(b: GrammarPreviewIn) -> dict:
+def grammar_preview(b: GrammarPreviewIn, x_admin_token: str = Header(default='')) -> dict:
+    """模板预览有真实计算成本（生成式展开+功效近似），与其它管理写操作同级鉴权。"""
+    _auth_admin(x_admin_token)
     _proto()
     return _grammar.preview(b.spec, dims=b.dims)
 

@@ -201,9 +201,11 @@ h1 {
 
 /* 变体背景必须在 base 之后重声明：否则本层 base 的 background 简写
    会覆盖 styles.css 中 .horizon/.brain/.forum 的 url() 栏目图 */
+/* 图在右、文在左：白遮罩只在贴文字的一侧浓，向右逐渐透明。
+   原写法两端都是 0.84–0.92 的白，把右侧图压得几乎看不见（与 02 卡的实图对比很割裂）。 */
 .horizon {
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.84)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.34) 40%, rgba(255, 255, 255, 0) 100%),
     url("assets/home_plan.png") center / cover no-repeat;
 }
 
@@ -215,7 +217,7 @@ h1 {
 
 .forum {
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.86)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.32) 40%, rgba(255, 255, 255, 0) 100%),
     url("assets/home_forum.png") center / cover no-repeat;
 }
 
@@ -842,4 +844,293 @@ h1 {
     padding: 0 0.42rem;
     font-size: 0.68rem;
   }
+}
+
+
+/* ============================================================
+   2026-10-28 增补：与研究中心（可视化客户端）对齐的三处
+   ① 顶栏客户端入口（次级描边按钮，不用主 CTA 的渐变，避免两个主按钮抢焦点）
+   ② AGI 研究页「项目进展」改为可核对指标（大号 mono 数字 + 单位 + 口径 + 来源）
+   ③ 页脚未建页面不再伪装成链接（.footer-soon）
+   ============================================================ */
+
+/* ---------- ① 顶栏客户端入口（研究中心） ---------- */
+/* 研究中心指向站外，但按需求与左侧菜单共用一套皮肤：同字号、同字重、同文字色、
+   同一条底部下划线动效；不再用「文字 + 竖分隔线 + ↗」的独立样式。 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.7rem;                     /* 两个入口都成了文字，间距与菜单内部同档 */
+  flex-shrink: 0;
+}
+
+.header-wb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 20px;               /* 与「关于我们」额外拉开 20px：顶栏栅格 gap 24 → 视觉 44 */
+  padding: 1.2rem 0;               /* 与 .nav-links a 同高，下划线才会和菜单同线 */
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.16s ease;
+}
+
+/* 与左侧菜单之间保留一条竖分隔线。
+   条目本身已 58.6px 高（padding 1.2rem），若用 border-left 会从顶栏顶端一直拉到底边，
+   与顶栏下边框接成 T 形；改用定高伪元素，在顶栏垂直中线上画 32px 短线。 */
+.header-wb::before {
+  position: absolute;
+  top: 50%;
+  left: -22px;                     /* 落在「关于我们」与本项之间 44px 空隙正中 */
+  width: 1px;
+  height: 32px;
+  content: "";
+  background: var(--line);
+  transform: translateY(-50%);
+}
+
+/* 去掉 ↗，换成导航项那条从中间展开的蓝色下划线 */
+.header-wb::after {
+  position: absolute;
+  right: 38%;
+  bottom: 0;
+  left: 38%;
+  height: 2px;
+  content: "";
+  background: var(--blue);
+  opacity: 0;
+  transition: 0.2s ease;
+}
+
+.header-wb:hover {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.header-wb:hover::after {
+  right: 0;
+  left: 0;
+  opacity: 1;
+}
+
+.header-wb:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* 参与讨论：既不要描边也不要色块，按纯文字链接处理，靠句尾箭头和悬停反馈表达「可点」。
+   常态不用蓝色：左侧菜单的蓝色专表「当前页」，常态就蓝会被读成第二个激活项。
+   尺寸只在 ≥721px 与菜单对齐，窄屏沿用下方各断点已收好的字号，避免反压它们。 */
+.header-actions .header-action.dark {
+  border: 0;                       /* 连透明边框也去掉：留着会让盒子比菜单高 2px、顶栏整体长高 */
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+@media (min-width: 721px) {
+  .header-actions .header-action.dark {
+    min-height: 0;
+    padding: 1.2rem 0;             /* 与 .nav-links a 同高，文字基线与菜单齐平 */
+    font-size: 0.86rem;
+  }
+}
+
+.header-actions .header-action.dark::after {
+  margin-left: 0.4rem;
+  opacity: 0.7;
+  transition: transform 0.16s ease;
+}
+
+.header-actions .header-action.dark:hover {
+  border-color: transparent;
+  color: var(--blue);
+  background: transparent;
+  text-decoration: none;
+}
+
+.header-actions .header-action.dark:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* ---------- ② AGI 研究页：实测指标 ---------- */
+.section-aside {
+  margin-left: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.01em;
+}
+
+.progress-metric {
+  display: block;
+  margin-top: 1.5rem;
+  color: #0f172a;
+  font-family: var(--mono);
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-align: center;
+}
+
+.progress-unit {
+  display: block;
+  margin-top: 0.55rem;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.progress-scope {
+  display: block;
+  margin-top: 0.5rem;
+  color: #64748b;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.progress-source {
+  margin: 1.5rem 0 0;
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+
+.progress-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.75rem;
+  color: #184f95;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.progress-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- ③ 页脚未开放条目 ---------- */
+.footer-soon {
+  color: #94a3b8;
+  font-size: 0.92rem;
+  cursor: not-allowed;
+}
+
+/* ---------- 计划页：<picture> 不破坏布局 ---------- */
+.plan-detail-visual {
+  position: relative;
+}
+
+.plan-detail-visual picture {
+  display: contents;      /* picture 不参与布局，<source> 只用于格式选择 */
+}
+
+/* 图片绝对定位填满容器：高度由同行文字列决定（min-height 260 / 窄屏 210），
+   不再由图片原始比例（1536×1024 → 660 宽时 440 高）撑开卡片。 */
+.plan-detail-visual img {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+
+/* 901–980：栅格 gap 已收到 14.4px，两个入口的 padding 却仍按桌面 1.2rem 走，
+   会出现「研究中心下划线比菜单低 2.4px」。此段统一到菜单的 1.05rem，
+   并让分隔线回到新的 34.4px 空隙中点（必须写在本文件基础规则之后才生效）。 */
+@media (max-width: 980px) {
+  .header-wb,
+  .header-actions .header-action.dark {
+    padding: 1.05rem 0;
+  }
+
+  .header-wb::before {
+    left: -17px;
+  }
+}
+
+/* ---------- 窄屏：客户端入口让位给导航（页脚与首页 CTA 仍可进入） ---------- */
+@media (max-width: 900px) {
+  .header-actions {
+    gap: 1.1rem;                   /* 跟随 .nav-links 在窄屏的间距 */
+  }
+
+  .header-wb::before {
+    height: 28px;                   /* 顶栏变矮，线也收一档；left 由 ≤980 块统一给出 */
+  }
+}
+
+@media (max-width: 720px) {
+  .header-wb {
+    display: none;
+  }
+
+  .header-actions .header-action.dark {
+    padding: 1rem 0;               /* 跟随 ≤720 的 .nav-links a */
+  }
+}
+/* 堆叠布局（≤980px，图在文字下方、整幅铺满）时方向要换：上白下透明 */
+@media (max-width: 980px) {
+  .horizon {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 100%),
+      url("assets/home_plan.png");
+  }
+
+  .forum {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 100%),
+      url("assets/home_forum.png");
+  }
+
+  .brain {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0) 100%),
+      url("assets/home_agi.png");
+  }
+}
+
+/* ---------- AGI 研究页：项目地址条（原来是一整块 110px 高的空板，只有一行链接） ---------- */
+.project-link-bar {
+  min-height: 0;
+  margin: 1.1rem 0 2.2rem;
+  padding: 0.85rem 1.1rem;
+  justify-content: flex-start;
+  gap: 0.9rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.project-link-bar::before {
+  content: "代码仓库";
+  flex-shrink: 0;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  color: #184f95;
+  background: #eaf2fb;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.project-link-bar a {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #cde2fb;
+  overflow-wrap: anywhere;
+}
+
+.project-link-bar a:hover {
+  border-bottom-color: var(--blue);
 }

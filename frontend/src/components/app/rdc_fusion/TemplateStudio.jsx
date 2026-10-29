@@ -2,7 +2,7 @@
    左：内置模板族库（shared/dist_protocol/grammars）；中：结构视图 + JSON 编辑；右：生成预览
    （逐格 × 划分计数、功效近似、样例、告警）。预览只计算，不写盘；冻结在「② 试跑与冻结」。 */
 import { useMemo, useState } from 'react';
-import { postJson, useApi, fmtNum } from './api.js';
+import { postJson, useAdminToken, useApi, fmtNum } from './api.js';
 import { Card, Empty, StatusPill } from './ui.jsx';
 
 const SPLITS = ['discovery', 'confirm', 'lockbox', 'lockbox_frame'];
@@ -166,6 +166,7 @@ function Preview({ result }) {
 export default function TemplateStudio({ draft, onDraft, onNext }) {
   const library = useApi('/api/grammar/library');
   const catalog = useApi('/api/catalog');
+  const [token] = useAdminToken();
   const grammars = library.data?.grammars || [];
   const [text, setText] = useState(() => (draft ? JSON.stringify(draft, null, 1) : ''));
   const [showJson, setShowJson] = useState(false);
@@ -192,7 +193,8 @@ export default function TemplateStudio({ draft, onDraft, onNext }) {
     if (!current) return;
     setBusy(true); setError('');
     try {
-      setPreview(await postJson('/api/grammar/preview', { spec: current }));
+      // preview 有真实计算成本，服务端与管理写操作同级鉴权（管理员会话自动作为令牌回退）
+      setPreview(await postJson('/api/grammar/preview', { spec: current }, { adminToken: token }));
       onDraft?.(current);
     } catch (reason) { setError(String(reason.message || reason)); }
     setBusy(false);

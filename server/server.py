@@ -51,6 +51,8 @@ from server.api_v1_runs import create_runs_router
 from server.cross_bundle_service import cross_bundle_aligner
 from server.current_research_progress import build_current_research_progress
 from server.global_workspace_service import global_workspace_controller
+from server.live_analysis_service import router as live_analysis_router
+from server.lang_bench_service import router as lang_bench_router
 from server.rag_fiber_service import rag_fiber_manager
 from server.ricci_flow_service import ricci_flow_service
 from server.runtime.run_service import RunService
@@ -255,6 +257,8 @@ run_service = RunService(
 app.include_router(create_runs_router(run_service))
 app.include_router(ai_rnd_router)
 app.include_router(object_card_router)
+app.include_router(live_analysis_router)
+app.include_router(lang_bench_router)
 app.include_router(neuron_census_router)
 if distributed_router is not None:
     app.include_router(distributed_router)
