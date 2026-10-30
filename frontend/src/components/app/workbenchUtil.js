@@ -22,10 +22,10 @@ export const SPATIAL_VIEWS = [
   { id: 'neuron', label: '神经元', desc: '选中块的内部结构、9,728 个 MLP 单元阵列与单元卡' },
   { id: 'lang', label: '语言图谱', desc: '大类 → 语言族 → 语言项：编码层段、点云、有效神经元与证据' },
   { id: 'response', label: '响应点云', desc: '单个模式族：3D 响应空间、规律分析、合并统计' },
-  { id: 'relations', label: '谱图关系', desc: '跨模式族的特征、共享编码轴、概念假设' },
+  /* 谱图关系（跨模式族共享编码轴 / 概念假设）不再是一级 tab：作为语言图谱里的入口进入（SpaceLens 仍渲染该视图，旧链接 ?view=relations|atlas 照常可用） */
   { id: 'local', label: '本地包', desc: '在浏览器内打开下载的研究包 / 谱图包（不上传）' },
 ];
-const OLD_VIEWS = { atlas: 'relations', units: 'neuron' };
+const OLD_VIEWS = { atlas: 'relations', units: 'neuron' };   // relations 不在导航里，但视图仍可从语言图谱进入
 
 /* 研发工位：网页只能浏览（web: 题库只读、贡献算力只显示下载入口）；执行测试（神经元测试）与管理都在桌面客户端。
    admin：只给管理员账号（连接本机后端的开发不限）；autotest 另外只在本机中心（local_tools）出现——公开中心没有被测模型 */

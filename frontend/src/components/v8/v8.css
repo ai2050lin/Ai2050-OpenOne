@@ -100,7 +100,7 @@ body:has(.fw-root.v8-root){display:block;overflow-x:hidden;overflow-y:auto}
 .v8-tower-hd b{font-size:13px}
 .v8-tower-canvas{position:relative;user-select:none}
 .v8-tower-canvas canvas{display:block;cursor:grab;max-width:100%}
-.v8-reset{position:absolute;right:0;top:0}
+.v8-reset{position:static}
 .v8-layerp{display:flex;flex-direction:column;gap:12px;min-width:0}
 .v8-card{background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:12px 14px;min-width:0}
 .v8-card h3{margin:0 0 8px;font-size:14px}.v8-card h3 small{font-weight:400;color:var(--fw-text-3);font-size:11px;margin-left:6px}
@@ -360,3 +360,102 @@ a.v8-mainline{text-decoration:none}
 .v8-bench-runtrack i{display:block;height:100%;background:#0d366b;border-radius:4px;transition:width .4s}
 .v8-bench-runbar span{font-size:11.5px;color:var(--fw-text-3)}
 .v8-bench-acc{font-size:26px;font-weight:700;color:#0d366b;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.15}
+.v8-bench .v8-prog-list{max-height:320px;overflow:auto;padding-right:6px}
+
+/* ---- 简洁大气整理（空间各界面统一视觉语言）：去框线白卡 + 大留白 + 15px 蓝竖线标题句 ---- */
+/* 实时分析 */
+.lv-root{gap:20px}
+.lv-input{background:#fff;border:0;border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.lv-input textarea{font-size:13.5px;border-color:var(--fw-border);padding:10px 12px}
+.lv-input textarea:focus{outline:2px solid rgba(13,54,107,.25);outline-offset:-1px}
+.lv-run{background:#0d366b;border-radius:8px;padding:8px 22px}
+.lv-run:hover{background:#124a94}
+.lv-steps{background:#fff;border:0;border-radius:12px;padding:10px 14px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.lv-steps button{border:0;background:var(--fw-bg-panel);padding:7px 15px;font-weight:600}
+.lv-steps button.primary{background:#0d366b;color:#fff}
+.lv-steps button.primary:hover{background:#124a94}
+.lv-card{background:#fff;border:0;border-radius:12px;padding:16px 18px 18px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.lv-card h4{font-size:14.5px;font-weight:700;margin-bottom:2px}
+.lv-card p{font-size:12.5px;color:var(--fw-text-2);line-height:1.7}
+/* 神经元：节与节用留白 + 细分隔线，速览句升为标题句 */
+.v8-layerp{gap:0}
+.v8-layerp .v8-card{border:0;background:transparent;border-radius:0;padding:18px 2px 20px;border-bottom:1px solid var(--fw-border)}
+.v8-layerp .v8-card:last-child{border-bottom:0;padding-bottom:4px}
+.v8-layerp .v8-card h3{font-size:15px;margin-bottom:12px}
+.v8-layerp .v8-card h3 small{font-size:11.5px}
+.v8-layerp .v8-digest-say{font-size:15px;line-height:2.05;border-left:3px solid #0d366b;padding-left:18px}
+.v8-layerp .v8-digest-say b{color:#0d366b;font-variant-numeric:tabular-nums}
+.v8-layerp .v8-digest-stats b{font-size:24px;color:#0d366b;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.v8-layerp .v8-pick{border:0;background:var(--fw-bg-panel);border-radius:10px;padding:12px 14px}
+.v8-layerp .v8-pick:hover{background:#eef4fb}
+.v8-layerp .v8-pick.on{background:#fff;box-shadow:0 0 0 2px #e34948 inset}
+.v8-layerp .v8-pick b{font-size:14px}
+.v8-layerp .v8-gridwrap canvas{border-radius:8px}
+/* 语言图谱 */
+.v8-article{gap:16px}
+.v8-ihead h2{font-size:22px;letter-spacing:-.3px}
+.v8-ihead p{font-size:12.5px;line-height:1.7}
+.v8-sec{border:0;border-radius:12px;background:#fff;padding:18px 20px 20px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.v8-sec h3{font-size:15px;margin-bottom:4px}
+.v8-sec h3 .k{width:24px;height:24px;border-radius:7px;font-size:12px;background:#0d366b}
+.v8-q{font-size:12.5px;margin-bottom:12px;color:var(--fw-text-3)}
+.v8-toc a{border:0;background:var(--fw-bg-panel);padding:3px 11px;color:var(--fw-text-2)}
+.v8-toc a:hover{background:#eef4fb;color:#0d366b}
+.v8-side{border:0;border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.v8-bigcats button.on{background:#0d366b;border-color:#0d366b}
+.v8-itm.on{background:#eef4fb;box-shadow:0 0 0 1px rgba(13,54,107,.18) inset}
+/* 层塔侧栏 */
+.v8-space .v8-tower{border:0;border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(13,54,107,.06)}
+.v8-tower-hd b{font-size:14px}
+.v8-tower-legend{font-size:10.5px;color:var(--fw-text-3);gap:3px;margin-top:6px;line-height:1.6}
+
+/* ---- 神经元 · 上下游电路（跨层连线 + 电路列表） ---- */
+.v8-tower-btns{position:absolute;right:10px;bottom:8px;display:flex;gap:4px}
+.v8-cir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v8-cir-cols h4{margin:0 0 8px;font-size:12.5px;color:var(--fw-text-2)}
+.v8-cir-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:var(--fw-bg-panel);border-radius:8px;padding:8px 11px;margin-bottom:6px;font:inherit;cursor:pointer}
+.v8-cir-row:hover{background:#eef4fb}
+.v8-cir-row b{font-size:13px;color:#0d366b}
+.v8-cir-row span{font-size:11.5px;color:var(--fw-text-2)}
+.v8-cir-row em{font-style:normal;font-size:12px;font-variant-numeric:tabular-nums;color:var(--fw-text-2);margin-left:auto}
+.v8-cir-row small{width:100%;font-size:11px;color:var(--fw-text-3)}
+
+/* ===== 3D 前后锥（Bowtie3D）：一个 MLP 单元的上下游一致性 =====
+   读轴 / 写轴张成的平面是精确二维（不降维），层板只是排列。 */
+.v8-bowtie-hd{border-bottom:1px dashed var(--fw-border);padding-bottom:8px;margin-bottom:8px}
+.v8-bowtie-metrics{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--fw-text-2)}
+.v8-bowtie-metrics b{font-size:15px;color:#0d366b;margin-left:4px;font-variant-numeric:tabular-nums}
+.v8-bowtie-metrics small{color:var(--fw-text-3);margin-left:5px}
+.v8-bowtie-bar{display:inline-block;width:52px;height:5px;border-radius:3px;background:#e2e8f0;margin-left:7px;vertical-align:2px;overflow:hidden}
+.v8-bowtie-bar em{display:block;height:100%;background:#d85a30}
+.v8-bowtie-say{margin:7px 0 0;font-size:12px;line-height:1.65;color:var(--fw-text)}
+.v8-bowtie-canvas{position:relative;user-select:none}
+.v8-bowtie-canvas canvas{display:block;cursor:grab;max-width:100%;background:linear-gradient(180deg,#fbfdff,#f4f7fb);border-radius:8px}
+.v8-bowtie-btns{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+.v8-bowtie-lg{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--fw-text-2);margin-top:8px}
+.v8-bowtie-lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.v8-bowtie-lg i.ring{background:none;border:2.5px solid #64748b;border-radius:99px;width:9px;height:9px}
+.v8-bowtie-lists{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.v8-bowtie-side h4{margin:0 0 6px;font-size:12px;color:var(--fw-text-2);display:flex;align-items:center;gap:6px}
+.v8-bowtie-side h4 i{display:inline-block;width:9px;height:9px;border-radius:2px}
+.v8-bowtie-side h4 small{font-weight:400;color:var(--fw-text-3);font-size:11px}
+.v8-bowtie-row{display:grid;grid-template-columns:20px auto 1fr;grid-template-areas:"no name tokens" "no meta meta";align-items:center;gap:2px 8px;width:100%;text-align:left;border:0;background:var(--fw-bg-panel);border-radius:8px;padding:6px 9px;margin-bottom:5px;font:inherit;cursor:pointer}
+.v8-bowtie-row:hover{background:#eef4fb}
+.v8-bowtie-row b{grid-area:no;display:grid;place-items:center;width:18px;height:18px;border-radius:99px;border:1.5px solid #94a3b8;font-size:10px;color:var(--fw-text-2)}
+.v8-bowtie-row span{grid-area:name;font-size:12px;color:#0d366b;font-weight:600}
+.v8-bowtie-row em{grid-area:tokens;font-style:normal;font-size:11.5px;color:var(--fw-text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v8-bowtie-row small{grid-area:meta;font-size:10.5px;color:var(--fw-text-3);font-variant-numeric:tabular-nums}
+.v8-bowtie-tags{margin:4px 0 0;font-size:11.5px;color:var(--fw-text-3)}
+.v8-bowtie-tags b{color:var(--fw-text-2);font-weight:600;margin:0 2px}
+
+/* ---- 谱图关系（从语言图谱进入的降级视图）：返回头 ---- */
+.v8-atlaswrap{display:flex;flex-direction:column;gap:14px}
+.v8-atlas-back{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.v8-atlas-back button{font:inherit;font-size:13px;font-weight:600;color:#0d366b;background:var(--fw-bg-panel);border:0;border-radius:8px;padding:7px 14px;cursor:pointer}
+.v8-atlas-back button:hover{background:#eef4fb}
+.v8-atlas-back b{font-size:16px;letter-spacing:-.2px}
+.v8-atlas-back span{font-size:12px;color:var(--fw-text-3)}
+
+/* 失败态的重试：以前请求报错被静默吞掉，卡片永远停在「正在计算…」 */
+.v8-retry{margin-left:8px;border:1px solid #cbd5e1;background:#fff;color:#0d366b;border-radius:7px;padding:2px 9px;font:inherit;font-size:11.5px;cursor:pointer}
+.v8-retry:hover{background:#eef4fb;border-color:#94a3b8}

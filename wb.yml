@@ -1,0 +1,686 @@
+- generic [ref=e2]:
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - link "研究工作台 返回首页" [ref=e12] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=e13]: A2
+        - generic [ref=e14]:
+          - generic [ref=e15]: 研究工作台
+          - generic [ref=e16]: 返回首页
+      - generic [ref=e17]:
+        - text: 空间
+        - generic [ref=e18]: LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元
+      - generic [ref=e19]:
+        - generic "当前连接的中心服务" [ref=e20]: http://localhost:5001
+        - button "访客" [ref=e22] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e23]: 访
+    - generic [ref=e25]:
+      - navigation "工作台界面" [ref=e26]:
+        - button "进展" [ref=e27] [cursor=pointer]
+        - button "空间" [ref=e32] [cursor=pointer]
+        - button "研发" [ref=e37] [cursor=pointer]
+        - button "配置" [ref=e41] [cursor=pointer]
+        - button "本机工具" [ref=e47] [cursor=pointer]
+      - generic [ref=e51]:
+        - navigation "空间视图" [ref=e52]:
+          - button "实时分析" [ref=e53] [cursor=pointer]
+          - button "神经元" [ref=e54] [cursor=pointer]
+          - button "语言图谱" [ref=e55] [cursor=pointer]
+          - button "响应点云" [ref=e56] [cursor=pointer]
+          - button "谱图关系" [ref=e57] [cursor=pointer]
+          - button "本地包" [ref=e58] [cursor=pointer]
+          - button "本页功能与原理说明" [ref=e59] [cursor=pointer]: "?"
+        - main [ref=e60]:
+          - generic [ref=e61]:
+            - complementary [ref=e62]:
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: LLM 多层结构
+                  - combobox "模型" [ref=e66]:
+                    - option "glm4-9b（未普查）"
+                    - option "qwen3-14b（未普查）"
+                    - option "qwen3-4b" [selected]
+                - generic [ref=e67]:
+                  - button "选择性" [ref=e68] [cursor=pointer]
+                  - button "已解释" [ref=e69] [cursor=pointer]
+                  - button "T1 检测器数" [ref=e70] [cursor=pointer]
+                  - button "强激活率中位数" [ref=e71] [cursor=pointer]
+                  - button "无" [ref=e72] [cursor=pointer]
+                - generic [ref=e73]:
+                  - combobox "选择性运行" [ref=e74]:
+                    - option "GR.Q · mood（interrog 对 decl）" [selected]
+                  - generic [ref=e75]:
+                    - button "句末" [ref=e76] [cursor=pointer]
+                    - button "答案前" [ref=e77] [cursor=pointer]
+                - generic [ref=e78]:
+                  - generic [ref=e79]: 颜色 = 选择性（每块）
+                  - generic [ref=e80]: 橙线 = 前一层写入者（上游）
+                  - generic [ref=e82]: 蓝虚线 = 后一层读取者（下游）
+                  - generic [ref=e84]: 点击 = 选中该块：右侧显示块结构、单元阵列与单元卡
+                  - generic [ref=e85]: 当前选中：块 18（输出 hs[19]）
+              - generic [ref=e86]:
+                - img "qwen3-4b 的 36 个块：颜色 = 选择性（每块）" [ref=e87]
+                - generic [ref=e88]:
+                  - button "放大" [ref=e89] [cursor=pointer]
+                  - button "缩小" [ref=e90] [cursor=pointer]
+                  - button "重置视角" [ref=e91] [cursor=pointer]
+              - paragraph [ref=e92]: 每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。拖动旋转、滚轮缩放。
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - heading "块 18 的内部结构 输入 hs[18] → 输出 hs[19]；维度来自 结果摘要（未找到 config.json，部分字段留空）" [level=3] [ref=e96]:
+                  - text: 块 18 的内部结构
+                  - generic [ref=e97]: 输入 hs[18] → 输出 hs[19]；维度来自 结果摘要（未找到 config.json，部分字段留空）
+                - generic [ref=e98]:
+                  - generic [ref=e99]:
+                    - generic [ref=e100]: 输入残差
+                    - generic [ref=e101]: 2560 维（hs[18]）
+                  - generic [ref=e102]: ↓
+                  - generic [ref=e103] [cursor=pointer]:
+                    - generic [ref=e104]: RMSNorm
+                    - generic [ref=e105]: 逐位置归一化 × γ
+                    - emphasis [ref=e106]: 只有 γ 参数，无单元级分析
+                  - generic [ref=e107]: ↓
+                  - generic [ref=e108] [cursor=pointer]:
+                    - generic [ref=e109]: 自注意力
+                    - generic [ref=e110]: 头数未记录
+                    - emphasis [ref=e111]: 逐头分析在研究计划中（想看逐头实时计算，切到「实时分析」输入文本）
+                  - generic [ref=e112]: ↓ ＋残差
+                  - generic [ref=e113] [cursor=pointer]:
+                    - generic [ref=e114]: RMSNorm
+                    - generic [ref=e115]: 逐位置归一化 × γ
+                    - emphasis [ref=e116]: 同上
+                  - generic [ref=e117]: ↓
+                  - generic [ref=e118] [cursor=pointer]:
+                    - generic [ref=e119]: MLP ↓ 本页主体
+                    - generic [ref=e120]: gate / up 2560→9728 · SwiGLU A = silu(G)⊙V · down 9728→2560
+                    - emphasis [ref=e121]: 9,728 个中间单元 · 已普查
+                  - generic [ref=e122]: ↓ ＋残差
+                  - generic [ref=e123]:
+                    - generic [ref=e124]: 输出残差
+                    - generic [ref=e125]: 2560 维（hs[19]）
+              - generic [ref=e126]:
+                - heading "块 18 普查发现了什么 数字全部来自本层语料普查，句式是固定模板、不含推测" [level=3] [ref=e127]
+                - paragraph [ref=e128]:
+                  - text: 这一块有 9,728 个 MLP 中间单元。其中 文本可复现 4 个、只在语料中可识别 2 个、未解释 6 个（做过解释检验的共 12 个）；模板选择性方面，
+                  - generic [ref=e129]: 1 个运行
+                  - text: （如 GR.Q）在本层有前列单元；最常见的类型是 T5 负极主导（49.1%）。
+                - generic "T1 单 token 检测器 52（0.5%） · T2 上下文 token 检测器 10（0.1%） · T3 稀疏强激活 64（0.7%） · T4 稠密 140（1.4%） · T5 负极主导 4779（49.1%） · T6 其他 4683（48.1%）" [ref=e130]:
+                  - generic "T1 单 token 检测器：52 个（0.5%）" [ref=e131]
+                  - generic "T2 上下文 token 检测器：10 个（0.1%）" [ref=e132]
+                  - generic "T3 稀疏强激活：64 个（0.7%）" [ref=e133]
+                  - generic "T4 稠密：140 个（1.4%）" [ref=e134]
+                  - generic "T5 负极主导：4779 个（49.1%）" [ref=e135]
+                  - generic "T6 其他：4683 个（48.1%）" [ref=e136]
+                - generic [ref=e137]:
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: "4"
+                    - text: 文本可复现
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: "2"
+                    - text: 语料可识别
+                  - generic [ref=e142]:
+                    - generic [ref=e143]: "336"
+                    - text: 选择性前列单元（按运行计）
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: "0.0071"
+                    - text: 强激活率中位数
+                - generic [ref=e146]:
+                  - generic [ref=e147]: T1 单 token 检测器
+                  - generic [ref=e149]: T2 上下文 token 检测器
+                  - generic [ref=e151]: T3 稀疏强激活
+                  - generic [ref=e153]: T4 稠密
+                  - generic [ref=e155]: T5 负极主导
+                  - generic [ref=e157]: T6 其他
+              - generic [ref=e159]:
+                - heading "从这 8 个开始看 已解释的在前，其次选择性最强，再按强激活率补足——点一个直达它的单元卡" [level=3] [ref=e160]
+                - generic [ref=e161]:
+                  - button "U1472 文本可复现 T5 负极主导" [ref=e162] [cursor=pointer]:
+                    - generic [ref=e163]: U1472
+                    - generic [ref=e165]: 文本可复现
+                    - emphasis [ref=e166]: T5 负极主导
+                  - button "U1899 文本可复现 T5 负极主导" [ref=e167] [cursor=pointer]:
+                    - generic [ref=e168]: U1899
+                    - generic [ref=e170]: 文本可复现
+                    - emphasis [ref=e171]: T5 负极主导
+                  - button "U2715 文本可复现 T6 其他" [ref=e172] [cursor=pointer]:
+                    - generic [ref=e173]: U2715
+                    - generic [ref=e175]: 文本可复现
+                    - emphasis [ref=e176]: T6 其他
+                  - button "U5425 文本可复现 T5 负极主导" [ref=e177] [cursor=pointer]:
+                    - generic [ref=e178]: U5425
+                    - generic [ref=e180]: 文本可复现
+                    - emphasis [ref=e181]: T5 负极主导
+                  - button "U3324 只在语料中可识别 T5 负极主导" [ref=e182] [cursor=pointer]:
+                    - generic [ref=e183]: U3324
+                    - generic [ref=e185]: 只在语料中可识别
+                    - emphasis [ref=e186]: T5 负极主导
+                  - button "U8297 只在语料中可识别 T6 其他" [ref=e187] [cursor=pointer]:
+                    - generic [ref=e188]: U8297
+                    - generic [ref=e190]: 只在语料中可识别
+                    - emphasis [ref=e191]: T6 其他
+                  - button "U1731 未解释 T4 稠密" [ref=e192] [cursor=pointer]:
+                    - generic [ref=e193]: U1731
+                    - generic [ref=e195]: 未解释
+                    - emphasis [ref=e196]: T4 稠密
+                  - button "U2755 未解释 T6 其他" [ref=e197] [cursor=pointer]:
+                    - generic [ref=e198]: U2755
+                    - generic [ref=e200]: 未解释
+                    - emphasis [ref=e201]: T6 其他
+              - generic [ref=e202]:
+                - generic [ref=e203]:
+                  - heading "块 18·U100 的 3D 前后锥 读方向与写方向张成的平面：上游写入者该收拢在读轴、下游读取者该收拢在写轴，蝴蝶结收拢 = 前后一致" [level=3] [ref=e204]
+                  - generic [ref=e205]:
+                    - generic [ref=e206]:
+                      - generic [ref=e207]:
+                        - generic "读方向（它检测什么）与写方向（它写出什么）的夹角。小 = 检测与写出同一个概念；大 = 像在做转换。" [ref=e208]:
+                          - text: 自洽角
+                          - generic [ref=e209]: 122.1°
+                          - emphasis [ref=e211]
+                        - generic "上游写入者的写出方向沿读轴的平均投影（1 = 完全对齐）。" [ref=e212]:
+                          - text: 上游对齐 17%
+                          - generic [ref=e213]: 标签重叠 0%
+                        - generic "下游读取者的读方向沿写轴的平均投影。" [ref=e214]:
+                          - text: 下游对齐 9%
+                          - generic [ref=e215]: 标签重叠 0%
+                      - paragraph [ref=e216]: 读与写明显不同向（122.1°）：更像「检测 A、写出 B」的转换单元；上游 6 个写入者沿读轴平均对齐 0.168（token 重叠 0.0），下游 6 个读取者沿写轴平均对齐 0.092（token 重叠 0.0）。
+                    - generic [ref=e217]:
+                      - img "块 18 单元 100 的上下游前后锥：自洽角 122.1 度，上游 6 个、下游 6 个" [ref=e218]
+                      - generic [ref=e219]:
+                        - button "放大" [ref=e220] [cursor=pointer]
+                        - button "缩小" [ref=e221] [cursor=pointer]
+                        - button "重置视角" [ref=e222] [cursor=pointer]
+                    - generic [ref=e223]:
+                      - generic [ref=e224]: 读轴：它检测什么（上游节点应向这里收拢）
+                      - generic [ref=e226]: 写轴：它写出什么（下游节点应向这里收拢）
+                      - generic [ref=e228]: 描边越粗 = 标签与目标重叠越多
+                      - generic [ref=e230]: 节点大小 = 权重路径强度；平面坐标是方向投影（精确二维），层板只是排列
+                    - paragraph [ref=e231]: 读 = gate 行、写 = down 列，标签来自 logit lens（W_U(γ ⊙ d̂) 的 top-4）；分数是权重路径强度。 读得出 ≠ 控得住：这里显示的是电路假设，确认需要干预实验。
+                - generic [ref=e232]:
+                  - heading "块 18·U100 的上下游神经元 写入端看前一层谁喂它，读取端看后一层谁用它——跨层电路的「前后一致」验证" [level=3] [ref=e233]
+                  - generic [ref=e234]:
+                    - generic [ref=e235]:
+                      - heading "上游 · 前一层写入者" [level=4] [ref=e236]
+                      - button "B17·U6 残差直连 0.4953 T4 稠密" [ref=e237] [cursor=pointer]:
+                        - generic [ref=e238]: B17·U6
+                        - generic [ref=e239]: 残差直连
+                        - emphasis [ref=e240]: "0.4953"
+                        - generic [ref=e241]: T4 稠密
+                      - button "B17·U2364 残差直连 0.1978 T6 其他" [ref=e242] [cursor=pointer]:
+                        - generic [ref=e243]: B17·U2364
+                        - generic [ref=e244]: 残差直连
+                        - emphasis [ref=e245]: "0.1978"
+                        - generic [ref=e246]: T6 其他
+                      - button "B17·U332 残差直连 0.1902 T3 稀疏强激活" [ref=e247] [cursor=pointer]:
+                        - generic [ref=e248]: B17·U332
+                        - generic [ref=e249]: 残差直连
+                        - emphasis [ref=e250]: "0.1902"
+                        - generic [ref=e251]: T3 稀疏强激活
+                      - button "B17·U995 残差直连 0.1796 T5 负极主导" [ref=e252] [cursor=pointer]:
+                        - generic [ref=e253]: B17·U995
+                        - generic [ref=e254]: 残差直连
+                        - emphasis [ref=e255]: "0.1796"
+                        - generic [ref=e256]: T5 负极主导
+                      - button "B17·U1965 残差直连 0.1554 T6 其他" [ref=e257] [cursor=pointer]:
+                        - generic [ref=e258]: B17·U1965
+                        - generic [ref=e259]: 残差直连
+                        - emphasis [ref=e260]: "0.1554"
+                        - generic [ref=e261]: T6 其他
+                    - generic [ref=e262]:
+                      - heading "下游 · 后一层读取者" [level=4] [ref=e263]
+                      - button "B19·U616 残差直连 0.2045 T6 其他" [ref=e264] [cursor=pointer]:
+                        - generic [ref=e265]: B19·U616
+                        - generic [ref=e266]: 残差直连
+                        - emphasis [ref=e267]: "0.2045"
+                        - generic [ref=e268]: T6 其他
+                      - button "B19·U734 残差直连 0.1702 T5 负极主导" [ref=e269] [cursor=pointer]:
+                        - generic [ref=e270]: B19·U734
+                        - generic [ref=e271]: 残差直连
+                        - emphasis [ref=e272]: "0.1702"
+                        - generic [ref=e273]: T5 负极主导
+                      - button "B19·U296 残差直连 0.1488 T5 负极主导" [ref=e274] [cursor=pointer]:
+                        - generic [ref=e275]: B19·U296
+                        - generic [ref=e276]: 残差直连
+                        - emphasis [ref=e277]: "0.1488"
+                        - generic [ref=e278]: T5 负极主导
+                      - button "B19·U228 残差直连 0.1484 T5 负极主导" [ref=e279] [cursor=pointer]:
+                        - generic [ref=e280]: B19·U228
+                        - generic [ref=e281]: 残差直连
+                        - emphasis [ref=e282]: "0.1484"
+                        - generic [ref=e283]: T5 负极主导
+                      - button "B19·U10 残差直连 0.1450 T5 负极主导" [ref=e284] [cursor=pointer]:
+                        - generic [ref=e285]: B19·U10
+                        - generic [ref=e286]: 残差直连
+                        - emphasis [ref=e287]: "0.1450"
+                        - generic [ref=e288]: T5 负极主导
+                  - paragraph [ref=e289]: 分数 = 权重余弦路径强度（残差直连 / 经该注意力头的 OV 电路），是电路假设，最终确认需干预实验。左侧层塔已画出对应连线（橙=上游、蓝虚线=下游、红圈=本单元）；点一行跳到那个单元，沿电路继续走。
+                - generic [ref=e290]:
+                  - heading "对应的语言特征" [level=4] [ref=e291]
+                  - paragraph [ref=e292]: 这个单元不在任何模板选择性运行的前列名单里。完整的模板选择性记录见下方单元卡「模板选择性」。
+                - article "单元 mlp:6be1034f0b55a6df-bf16:B18:U100" [ref=e293]:
+                  - generic [ref=e294]:
+                    - generic [ref=e295]:
+                      - heading "L18.U100" [level=3] [ref=e296]
+                      - generic [ref=e297]: MLP 中间单元（SwiGLU，A = silu(G)⊙V；不是残差流坐标）
+                      - generic [ref=e298]: mlp:6be1034f0b55a6df-bf16:B18:U100
+                    - generic [ref=e299]:
+                      - generic "读出：有模板记录，未达入选判据" [ref=e300]: 读出 有模板记录，未达入选判据
+                      - generic "控制：未检验" [ref=e301]: 控制 未检验
+                      - generic "解释：未检验" [ref=e302]: 解释 未检验
+                  - generic [ref=e303]:
+                    - heading "自然语料激活（19,042,014 token · fineweb-edu-en / wikipedia-en / fineweb-edu-zh / wikipedia-zh）" [level=4] [ref=e304]
+                    - generic [ref=e305]:
+                      - generic [ref=e306]: 最大 3.26
+                      - generic [ref=e307]: 最小 -2.58
+                      - generic [ref=e308]: 均值 -5.6e-3 · 标准差 0.116
+                      - generic [ref=e309]: ">10% 最大值：0.69%（约每页 2.8 次）"
+                      - generic [ref=e310]: ">50% 最大值：2.7e-6（约每 933 页一次）"
+                    - img "激活值分布（symlog 横轴，对数计数，按符号区堆叠）" [ref=e311]:
+                      - generic "≤ -1.911 · +×− 门控开·值负 · 26 次" [ref=e312]
+                      - generic "≤ -1.334 · +×− 门控开·值负 · 127 次" [ref=e313]
+                      - generic "≤ -0.931 · +×− 门控开·值负 · 503 次" [ref=e314]
+                      - generic "≤ -0.649 · +×− 门控开·值负 · 1190 次" [ref=e315]
+                      - generic "≤ -0.453 · +×− 门控开·值负 · 2461 次" [ref=e316]
+                      - generic "≤ -0.453 · −×+ 门控关·值正（小幅负输出） · 232 次" [ref=e317]
+                      - generic "≤ -0.316 · +×− 门控开·值负 · 4586 次" [ref=e318]
+                      - generic "≤ -0.316 · −×+ 门控关·值正（小幅负输出） · 22509 次" [ref=e319]
+                      - generic "≤ -0.221 · +×− 门控开·值负 · 7477 次" [ref=e320]
+                      - generic "≤ -0.221 · −×+ 门控关·值正（小幅负输出） · 245396 次" [ref=e321]
+                      - generic "≤ -0.154 · +×− 门控开·值负 · 11236 次" [ref=e322]
+                      - generic "≤ -0.154 · −×+ 门控关·值正（小幅负输出） · 830115 次" [ref=e323]
+                      - generic "≤ -0.107 · +×− 门控开·值负 · 15775 次" [ref=e324]
+                      - generic "≤ -0.107 · −×+ 门控关·值正（小幅负输出） · 1437833 次" [ref=e325]
+                      - generic "≤ -0.075 · +×− 门控开·值负 · 20978 次" [ref=e326]
+                      - generic "≤ -0.075 · −×+ 门控关·值正（小幅负输出） · 1690235 次" [ref=e327]
+                      - generic "≤ -0.052 · +×− 门控开·值负 · 26035 次" [ref=e328]
+                      - generic "≤ -0.052 · −×+ 门控关·值正（小幅负输出） · 1595467 次" [ref=e329]
+                      - generic "≤ -0.037 · +×− 门控开·值负 · 30265 次" [ref=e330]
+                      - generic "≤ -0.037 · −×+ 门控关·值正（小幅负输出） · 1328930 次" [ref=e331]
+                      - generic "≤ -0.025 · +×− 门控开·值负 · 32819 次" [ref=e332]
+                      - generic "≤ -0.025 · −×+ 门控关·值正（小幅负输出） · 1034776 次" [ref=e333]
+                      - generic "≤ -0.018 · +×− 门控开·值负 · 34019 次" [ref=e334]
+                      - generic "≤ -0.018 · −×+ 门控关·值正（小幅负输出） · 774421 次" [ref=e335]
+                      - generic "≤ -0.012 · +×− 门控开·值负 · 33763 次" [ref=e336]
+                      - generic "≤ -0.012 · −×+ 门控关·值正（小幅负输出） · 565379 次" [ref=e337]
+                      - generic "≤ -8.7e-3 · +×− 门控开·值负 · 31782 次" [ref=e338]
+                      - generic "≤ -8.7e-3 · −×+ 门控关·值正（小幅负输出） · 411893 次" [ref=e339]
+                      - generic "≤ -6.0e-3 · +×− 门控开·值负 · 28574 次" [ref=e340]
+                      - generic "≤ -6.0e-3 · −×+ 门控关·值正（小幅负输出） · 296607 次" [ref=e341]
+                      - generic "≤ -4.2e-3 · +×− 门控开·值负 · 25248 次" [ref=e342]
+                      - generic "≤ -4.2e-3 · −×+ 门控关·值正（小幅负输出） · 214328 次" [ref=e343]
+                      - generic "≤ -2.9e-3 · +×− 门控开·值负 · 21326 次" [ref=e344]
+                      - generic "≤ -2.9e-3 · −×+ 门控关·值正（小幅负输出） · 154119 次" [ref=e345]
+                      - generic "≤ -2.1e-3 · +×− 门控开·值负 · 18008 次" [ref=e346]
+                      - generic "≤ -2.1e-3 · −×+ 门控关·值正（小幅负输出） · 110309 次" [ref=e347]
+                      - generic "≤ -1.4e-3 · +×− 门控开·值负 · 14763 次" [ref=e348]
+                      - generic "≤ -1.4e-3 · −×+ 门控关·值正（小幅负输出） · 79732 次" [ref=e349]
+                      - generic "≤ -1.0e-3 · +×− 门控开·值负 · 11740 次" [ref=e350]
+                      - generic "≤ -1.0e-3 · −×+ 门控关·值正（小幅负输出） · 57222 次" [ref=e351]
+                      - generic "≥ 0.000 · +×+ 门控开·值正 · 124468 次" [ref=e352]
+                      - generic "≥ 0.000 · −×− 门控关·值负（小幅正输出） · 58724 次" [ref=e353]
+                      - generic "≥ 0.000 · +×− 门控开·值负 · 40449 次" [ref=e354]
+                      - generic "≥ 0.000 · −×+ 门控关·值正（小幅负输出） · 144960 次" [ref=e355]
+                      - generic "≥ 1.0e-3 · +×+ 门控开·值正 · 47002 次" [ref=e356]
+                      - generic "≥ 1.0e-3 · −×− 门控关·值负（小幅正输出） · 19064 次" [ref=e357]
+                      - generic "≥ 1.4e-3 · +×+ 门控开·值正 · 64776 次" [ref=e358]
+                      - generic "≥ 1.4e-3 · −×− 门控关·值负（小幅正输出） · 24645 次" [ref=e359]
+                      - generic "≥ 2.1e-3 · +×+ 门控开·值正 · 88442 次" [ref=e360]
+                      - generic "≥ 2.1e-3 · −×− 门控关·值负（小幅正输出） · 31223 次" [ref=e361]
+                      - generic "≥ 2.9e-3 · +×+ 门控开·值正 · 120361 次" [ref=e362]
+                      - generic "≥ 2.9e-3 · −×− 门控关·值负（小幅正输出） · 39178 次" [ref=e363]
+                      - generic "≥ 4.2e-3 · +×+ 门控开·值正 · 161810 次" [ref=e364]
+                      - generic "≥ 4.2e-3 · −×− 门控关·值负（小幅正输出） · 47743 次" [ref=e365]
+                      - generic "≥ 6.0e-3 · +×+ 门控开·值正 · 216118 次" [ref=e366]
+                      - generic "≥ 6.0e-3 · −×− 门控关·值负（小幅正输出） · 56778 次" [ref=e367]
+                      - generic "≥ 8.7e-3 · +×+ 门控开·值正 · 284269 次" [ref=e368]
+                      - generic "≥ 8.7e-3 · −×− 门控关·值负（小幅正输出） · 65152 次" [ref=e369]
+                      - generic "≥ 0.012 · +×+ 门控开·值正 · 368046 次" [ref=e370]
+                      - generic "≥ 0.012 · −×− 门控关·值负（小幅正输出） · 70995 次" [ref=e371]
+                      - generic "≥ 0.018 · +×+ 门控开·值正 · 468655 次" [ref=e372]
+                      - generic "≥ 0.018 · −×− 门控关·值负（小幅正输出） · 90962 次" [ref=e373]
+                      - generic "≥ 0.025 · +×+ 门控开·值正 · 579148 次" [ref=e374]
+                      - generic "≥ 0.025 · −×− 门控关·值负（小幅正输出） · 68241 次" [ref=e375]
+                      - generic "≥ 0.037 · +×+ 门控开·值正 · 683101 次" [ref=e376]
+                      - generic "≥ 0.037 · −×− 门控关·值负（小幅正输出） · 55782 次" [ref=e377]
+                      - generic "≥ 0.052 · +×+ 门控开·值正 · 767752 次" [ref=e378]
+                      - generic "≥ 0.052 · −×− 门控关·值负（小幅正输出） · 39449 次" [ref=e379]
+                      - generic "≥ 0.075 · +×+ 门控开·值正 · 798268 次" [ref=e380]
+                      - generic "≥ 0.075 · −×− 门控关·值负（小幅正输出） · 22436 次" [ref=e381]
+                      - generic "≥ 0.107 · +×+ 门控开·值正 · 749454 次" [ref=e382]
+                      - generic "≥ 0.107 · −×− 门控关·值负（小幅正输出） · 10079 次" [ref=e383]
+                      - generic "≥ 0.154 · +×+ 门控开·值正 · 616530 次" [ref=e384]
+                      - generic "≥ 0.154 · −×− 门控关·值负（小幅正输出） · 3956 次" [ref=e385]
+                      - generic "≥ 0.221 · +×+ 门控开·值正 · 423860 次" [ref=e386]
+                      - generic "≥ 0.221 · −×− 门控关·值负（小幅正输出） · 2397 次" [ref=e387]
+                      - generic "≥ 0.316 · +×+ 门控开·值正 · 232086 次" [ref=e388]
+                      - generic "≥ 0.316 · −×− 门控关·值负（小幅正输出） · 2171 次" [ref=e389]
+                      - generic "≥ 0.453 · +×+ 门控开·值正 · 96225 次" [ref=e390]
+                      - generic "≥ 0.453 · −×− 门控关·值负（小幅正输出） · 907 次" [ref=e391]
+                      - generic "≥ 0.649 · +×+ 门控开·值正 · 27915 次" [ref=e392]
+                      - generic "≥ 0.649 · −×− 门控关·值负（小幅正输出） · 49 次" [ref=e393]
+                      - generic "≥ 0.931 · +×+ 门控开·值正 · 5481 次" [ref=e394]
+                      - generic "≥ 1.334 · +×+ 门控开·值正 · 652 次" [ref=e395]
+                      - generic "≥ 1.911 · +×+ 门控开·值正 · 48 次" [ref=e396]
+                      - generic "≥ 2.738 · +×+ 门控开·值正 · 3 次" [ref=e397]
+                      - generic [ref=e398]: −100
+                      - generic [ref=e399]: "0"
+                      - generic [ref=e400]: "+100"
+                      - generic [ref=e401]: 激活值 A（symlog；|A|<0.001 为零箱）· 纵轴为对数计数
+                    - generic [ref=e402]:
+                      - generic [ref=e403]: +×+ 门控开·值正 36.36%
+                      - generic [ref=e405]: −×− 门控关·值负（小幅正输出） 3.73%
+                      - generic [ref=e407]: +×− 门控开·值负 2.17%
+                      - generic [ref=e409]: −×+ 门控关·值正（小幅负输出） 57.74%
+                    - generic [ref=e411]: 每个 512 token 窗口的前 16 个位置与文档分隔符不计入
+                  - generic [ref=e412]:
+                    - generic [ref=e413]:
+                      - heading "正极（最高激活）" [level=4] [ref=e414]
+                      - list [ref=e415]:
+                        - listitem [ref=e416]:
+                          - generic [ref=e417]: "3.26"
+                          - generic "+×+ 门控开·值正" [ref=e418]: ++
+                          - generic [ref=e419]:
+                            - text: 1707年）：魏枝叶之年号 永兴（1708年）：朱文非之
+                            - mark [ref=e420]: 年
+                            - text: 号 永兴（170
+                          - generic [ref=e421]: wikipedia-zh
+                        - listitem [ref=e422]:
+                          - generic [ref=e423]: "3.17"
+                          - generic "+×+ 门控开·值正" [ref=e424]: ++
+                          - generic [ref=e425]:
+                            - text: "\"Animals\" (Maroon 5 song), 2014 \"Animals\" (Martin Garrix song),"
+                            - mark [ref=e426]: "2"
+                            - text: 013 "Animals"
+                          - generic [ref=e427]: wikipedia-en
+                        - listitem [ref=e428]:
+                          - generic [ref=e429]: "2.91"
+                          - generic "+×+ 门控开·值正" [ref=e430]: ++
+                          - generic [ref=e431]:
+                            - text: 辛貝·埃亞德馬，多哥政治人物，第5任多哥總統（2005年逝世）
+                            - mark [ref=e432]: "1"
+                            - text: 937年：約翰·
+                          - generic [ref=e433]: wikipedia-zh
+                        - listitem [ref=e434]:
+                          - generic [ref=e435]: "2.70"
+                          - generic "+×+ 门控开·值正" [ref=e436]: ++
+                          - generic [ref=e437]:
+                            - text: 邦情勢緊張，瑞士爆發中世纪的一次重大宗教战争：第一次卡佩尔战争。 17世紀
+                            - mark [ref=e438]
+                            - text: 1645年（顺治
+                          - generic [ref=e439]: wikipedia-zh
+                        - listitem [ref=e440]:
+                          - generic [ref=e441]: "2.69"
+                          - generic "+×+ 门控开·值正" [ref=e442]: ++
+                          - generic [ref=e443]:
+                            - text: "点指针域为空 */ } Status ListEmpty(LinkList L) { /* 初始条件：线性表L已存在。"
+                            - mark [ref=e444]: 操作
+                            - text: 结果：若L为空表，则返回
+                          - generic [ref=e445]: wikipedia-zh
+                        - listitem [ref=e446]:
+                          - generic [ref=e447]: "2.38"
+                          - generic "+×+ 门控开·值正" [ref=e448]: ++
+                          - generic [ref=e449]:
+                            - text: 0 To 100 Is 关系运算符表达式 例：Is < 60 Do
+                            - mark [ref=e450]: ...
+                            - text: Loop 語句 Do While
+                          - generic [ref=e451]: wikipedia-zh
+                        - listitem [ref=e452]:
+                          - generic [ref=e453]: "2.34"
+                          - generic "+×+ 门控开·值正" [ref=e454]: ++
+                          - generic [ref=e455]:
+                            - text: p' not found.\n"); - Compare two blocks of memory (function - Locate first occurrence of character in string (function -
+                            - mark [ref=e456]: Locate
+                            - text: last occurrence of character in string (function
+                          - generic [ref=e457]: fineweb-edu-en
+                        - listitem [ref=e458]:
+                          - generic [ref=e459]: "2.34"
+                          - generic "+×+ 门控开·值正" [ref=e460]: ++
+                          - generic [ref=e461]:
+                            - text: fuck实现、程序和quine。 Cat's Eye Technologies. Brainfuck Frans Faase. BF is Turing Complete Brainfucked
+                            - mark [ref=e462]: "-"
+                            - text: Brainfuck Compiler BrainFuck Codes -
+                          - generic [ref=e463]: wikipedia-zh
+                        - listitem [ref=e464]:
+                          - generic [ref=e465]: "2.31"
+                          - generic "+×+ 门控开·值正" [ref=e466]: ++
+                          - generic [ref=e467]:
+                            - text: of tool-tip text and status-bar text for menus and dockable toolbars, reading and writing preferences in the registry, maintaining the "recent
+                            - mark [ref=e468]: ly
+                            - text: used files" list, and so forth
+                          - generic [ref=e469]: fineweb-edu-en
+                        - listitem [ref=e470]:
+                          - generic [ref=e471]: "2.31"
+                          - generic "+×+ 门控开·值正" [ref=e472]: ++
+                          - generic [ref=e473]:
+                            - text: "easy to get confused. Here is an example of how to use this method: The output of this program is 12:49"
+                            - mark [ref=e474]: ":"
+                            - text: 30.0, which is correct
+                          - generic [ref=e475]: fineweb-edu-en
+                        - listitem [ref=e476]:
+                          - generic [ref=e477]: "2.25"
+                          - generic "+×+ 门控开·值正" [ref=e478]: ++
+                          - generic [ref=e479]:
+                            - text: . ( less expensive drives rotated at speeds up to 7,200 RPM; 10,000 and
+                            - mark [ref=e480]
+                            - text: 15,000 R
+                          - generic [ref=e481]: wikipedia-en
+                        - listitem [ref=e482]:
+                          - generic [ref=e483]: "2.23"
+                          - generic "+×+ 门控开·值正" [ref=e484]: ++
+                          - generic [ref=e485]:
+                            - text: The type of user-defined functions and functions created by lambda expressions. The type of generator-iterator objects, produced by calling a generator function.
+                            - mark [ref=e486]: The
+                            - text: type of methods of user-defined class instances
+                          - generic [ref=e487]: fineweb-edu-en
+                    - generic [ref=e488]:
+                      - heading "负极（最低激活）" [level=4] [ref=e489]
+                      - list [ref=e490]:
+                        - listitem [ref=e491]:
+                          - generic [ref=e492]: "-2.58"
+                          - generic "+×− 门控开·值负" [ref=e493]: +-
+                          - generic [ref=e494]:
+                            - text: provides a useful application/template/document/view architecture. You create an application object, then add one or more document templates to the application. A document
+                            - mark [ref=e495]: template
+                            - text: knows how to create a specific document,
+                          - generic [ref=e496]: fineweb-edu-en
+                        - listitem [ref=e497]:
+                          - generic [ref=e498]: "-2.58"
+                          - generic "+×− 门控开·值负" [ref=e499]: +-
+                          - generic [ref=e500]:
+                            - text: it into the main window */ gtk_container_add (GTK_CONTAINER (window), label); /* make sure that everything, window and
+                            - mark [ref=e501]: label
+                            - text: ", are visible */ gtk_widget_show"
+                          - generic [ref=e502]: wikipedia-zh
+                        - listitem [ref=e503]:
+                          - generic [ref=e504]: "-2.36"
+                          - generic "+×− 门控开·值负" [ref=e505]: +-
+                          - generic [ref=e506]:
+                            - text: "‘(’，’)’，’{’，’}’，’[’，’]’ 的字符串，判断字符串是否"
+                            - mark [ref=e507]: 有效
+                            - text: 。 有效字符串需满足： 左括
+                          - generic [ref=e508]: fineweb-edu-zh
+                        - listitem [ref=e509]:
+                          - generic [ref=e510]: "-2.30"
+                          - generic "+×− 门控开·值负" [ref=e511]: +-
+                          - generic [ref=e512]:
+                            - text: ces, I'd then subtract 10 and see if the value was now 21 or under, looping for each ace in the
+                            - mark [ref=e513]: hand
+                            - text: ... Note - just typing that out implies
+                          - generic [ref=e514]: fineweb-edu-en
+                        - listitem [ref=e515]:
+                          - generic [ref=e516]: "-2.29"
+                          - generic "+×− 门控开·值负" [ref=e517]: +-
+                          - generic [ref=e518]:
+                            - text: 。在这个方法中可以实现从本地磁盘、网络、数据库等其他数据源中读取class文件并转化为字节数
+                            - mark [ref=e519]: 组
+                            - text: ，然后调用defineClass()方法
+                          - generic [ref=e520]: fineweb-edu-zh
+                        - listitem [ref=e521]:
+                          - generic [ref=e522]: "-2.27"
+                          - generic "+×− 门控开·值负" [ref=e523]: +-
+                          - generic [ref=e524]:
+                            - text: ); /* Create the "Hello, World" label */ label = gtk_label_new ("Hello, World"); /* and insert
+                            - mark [ref=e525]: it
+                            - text: into the main window */ gtk
+                          - generic [ref=e526]: wikipedia-zh
+                        - listitem [ref=e527]:
+                          - generic [ref=e528]: "-2.26"
+                          - generic "+×− 门控开·值负" [ref=e529]: +-
+                          - generic [ref=e530]:
+                            - text: main window */ gtk_container_add (GTK_CONTAINER (window), label); /* make sure that everything, window and label, are
+                            - mark [ref=e531]: visible
+                            - text: "*/ gtk_widget_show_all (window"
+                          - generic [ref=e532]: wikipedia-zh
+                        - listitem [ref=e533]:
+                          - generic [ref=e534]: "-2.23"
+                          - generic "+×− 门控开·值负" [ref=e535]: +-
+                          - generic [ref=e536]:
+                            - text: "); } Q->front = Q->rear = 0; return Q; } // 销毁队列Q，"
+                            - mark [ref=e537]: Q
+                            - text: 不再存在 void Q_Destroy(Sq
+                          - generic [ref=e538]: wikipedia-zh
+                        - listitem [ref=e539]:
+                          - generic [ref=e540]: "-2.22"
+                          - generic "+×− 门控开·值负" [ref=e541]: +-
+                          - generic [ref=e542]:
+                            - text: 示例中，我们有一个名为Subject的被观察者类，以及两个观察者类Observer1和Observer2。当被观察
+                            - mark [ref=e543]: 者
+                            - text: 对象的状态发生变化时，所有观察者
+                          - generic [ref=e544]: fineweb-edu-zh
+                        - listitem [ref=e545]:
+                          - generic [ref=e546]: "-2.22"
+                          - generic "+×− 门控开·值负" [ref=e547]: +-
+                          - generic [ref=e548]:
+                            - text: our custom application object. The general design of the Scribble application is simple. Define the document object to keep a list of strokes. A
+                            - mark [ref=e549]: stroke
+                            - text: is the start and end coordinates of a
+                          - generic [ref=e550]: fineweb-edu-en
+                        - listitem [ref=e551]:
+                          - generic [ref=e552]: "-2.21"
+                          - generic "+×− 门控开·值负" [ref=e553]: +-
+                          - generic [ref=e554]:
+                            - text: _SIZE); gets(s); /* 輸入字串 */ l=strlen(s); /* 求字串的長
+                            - mark [ref=e555]: 度
+                            - text: "*/ for(;i<l;i++)"
+                          - generic [ref=e556]: wikipedia-zh
+                        - listitem [ref=e557]:
+                          - generic [ref=e558]: "-2.17"
+                          - generic "+×− 门控开·值负" [ref=e559]: +-
+                          - generic [ref=e560]:
+                            - text: 若这样的数据元素不存在，则返回值为0。算法2.6 */ ElemType *p; int i=1; /*
+                            - mark [ref=e561]: i
+                            - text: 的初值为第1个元素
+                          - generic [ref=e562]: wikipedia-zh
+                  - generic [ref=e563]:
+                    - heading "直接输出读出" [level=4] [ref=e564]
+                    - generic [ref=e565]:
+                      - generic [ref=e566]: 推高
+                      - code [ref=e567]: claimer
+                      - code [ref=e568]: taboo
+                      - code [ref=e569]: atori
+                      - code [ref=e570]: 梗
+                      - code [ref=e571]: filler
+                      - code [ref=e572]: kdir
+                      - code [ref=e573]: sujet
+                      - code [ref=e574]: fill
+                      - code [ref=e575]: closest
+                      - code [ref=e576]: 骼
+                    - generic [ref=e577]:
+                      - generic [ref=e578]: 压低
+                      - code [ref=e579]: mé
+                      - code [ref=e580]: mé
+                      - code [ref=e581]: "`_"
+                      - code [ref=e582]: "`"
+                      - code [ref=e583]: 契约
+                      - code [ref=e584]: "`\""
+                      - code [ref=e585]: "`."
+                      - code [ref=e586]: OTHERWISE
+                      - code [ref=e587]: Bernstein
+                      - code [ref=e588]: "`$"
+                    - generic [ref=e589]: W_U(γ⊙W_down[:, j]) 的前 / 后 10 个 token：直接通路近似，不含后续层
+                  - generic [ref=e590]:
+                    - heading "解释检验（解释轴）" [level=4] [ref=e591]
+                    - generic [ref=e592]: 未检验：该单元不在 EXPL-v1 / v2 的抽样中。
+                  - generic [ref=e593]:
+                    - heading "模板选择性（读出轴）" [level=4] [ref=e594]
+                    - table [ref=e595]:
+                      - rowgroup [ref=e596]:
+                        - row [ref=e597]:
+                          - columnheader "运行" [ref=e598]
+                          - columnheader "对照" [ref=e599]
+                          - columnheader "读出" [ref=e600]
+                          - columnheader "d（发现）" [ref=e601]
+                          - columnheader "d（留出）" [ref=e602]
+                          - columnheader "阈值" [ref=e603]
+                          - columnheader "入选" [ref=e604]
+                          - columnheader "来源" [ref=e605]
+                      - rowgroup [ref=e606]:
+                        - row [ref=e607]:
+                          - cell "GR-Q-v10-qwen3-4b-mood.json" [ref=e608]
+                          - cell "mood：interrog 对 decl" [ref=e609]
+                          - cell "final" [ref=e610]
+                          - cell "1.37" [ref=e611]
+                          - cell "1.15" [ref=e612]
+                          - cell "2.34" [ref=e613]
+                          - cell "✗ 否" [ref=e614]
+                          - cell "节点本地 MLP 中间单元重算" [ref=e615]
+                        - row [ref=e616]:
+                          - cell "GR-Q-v10-qwen3-4b-mood.json" [ref=e617]
+                          - cell "mood：interrog 对 decl" [ref=e618]
+                          - cell "probe_answer" [ref=e619]
+                          - cell "0.24" [ref=e620]
+                          - cell "0.08" [ref=e621]
+                          - cell "2.85" [ref=e622]
+                          - cell "✗ 否" [ref=e623]
+                          - cell "节点本地 MLP 中间单元重算" [ref=e624]
+                        - row [ref=e625]:
+                          - cell "GR-Q-v9-qwen3-4b-mood.json" [ref=e626]
+                          - cell "mood：interrog 对 decl" [ref=e627]
+                          - cell "final" [ref=e628]
+                          - cell "1.37" [ref=e629]
+                          - cell "1.15" [ref=e630]
+                          - cell "2.34" [ref=e631]
+                          - cell "✗ 否" [ref=e632]
+                          - cell "节点本地 MLP 中间单元重算" [ref=e633]
+                        - row [ref=e634]:
+                          - cell "GR-Q-v9-qwen3-4b-mood.json" [ref=e635]
+                          - cell "mood：interrog 对 decl" [ref=e636]
+                          - cell "probe_answer" [ref=e637]
+                          - cell "0.24" [ref=e638]
+                          - cell "0.08" [ref=e639]
+                          - cell "2.85" [ref=e640]
+                          - cell "✗ 否" [ref=e641]
+                          - cell "节点本地 MLP 中间单元重算" [ref=e642]
+                  - generic [ref=e643]:
+                    - heading "干预记录（控制轴）" [level=4] [ref=e644]
+                    - generic [ref=e645]: 未检验：该单元不在任何预注册干预的单元清单中。
+                  - generic [ref=e646]:
+                    - generic [ref=e647]: · 极值片段天然有选择偏差：它们是 top / bottom-k，不代表典型激活
+                    - generic [ref=e648]: · 语料以教育筛选网页与百科为主（中英），不含对话、代码与广告页
+                    - generic [ref=e649]: · 读出 token 只是直接通路近似
+              - generic [ref=e650]:
+                - heading "全部单元阵列 · 块 18 9,728 个单元，按真实索引排列：左上角为 0 号，每行 128 个；悬停看单个单元，点击选中" [level=3] [ref=e651]:
+                  - text: 全部单元阵列 · 块 18
+                  - generic [ref=e652]: 9,728 个单元，按真实索引排列：左上角为 0 号，每行 128 个；悬停看单个单元，点击选中
+                - generic [ref=e653]:
+                  - generic [ref=e654]:
+                    - button "分型" [ref=e655] [cursor=pointer]
+                    - button "强激活率" [ref=e656] [cursor=pointer]
+                    - button "主导符号区" [ref=e657] [cursor=pointer]
+                    - button "解释等级" [ref=e658] [cursor=pointer]
+                    - button "选择性" [ref=e659] [cursor=pointer]
+                  - generic [ref=e660]:
+                    - checkbox "按着色量排序" [ref=e661]
+                    - text: 按着色量排序
+                - generic [ref=e662]:
+                  - generic "块 18 的 9728 个 MLP 中间单元（按真实索引）" [ref=e664]
+                  - generic [ref=e665]:
+                    - generic [ref=e666]: T1 单 token 检测器
+                    - generic [ref=e668]: T2 上下文 token 检测器
+                    - generic [ref=e670]: T3 稀疏强激活
+                    - generic [ref=e672]: T4 稠密
+                    - generic [ref=e674]: T5 负极主导
+                    - generic [ref=e676]: T6 其他
+                - paragraph [ref=e678]: 分型规则：L30-v1 预注册分型规则（research/neurons/L30-v1.prereg.json）；其他块为描述性应用。分型是描述性分类，不是证据等级；选择性只标出各运行的前列单元。
+  - generic "页面优先读取本机保存的数据包，不会定时访问服务器；单元卡与管理类页面打开时在线读取" [ref=e7]:
+    - generic [ref=e9]: 未下载本地数据（页面临时在线读取）
+    - button "下载数据（1.5 MB）" [ref=e679] [cursor=pointer]

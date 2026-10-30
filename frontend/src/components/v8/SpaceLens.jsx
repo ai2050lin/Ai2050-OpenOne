@@ -85,6 +85,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
     if (Object.keys(rest).length) patchSt(rest);
     if (page === 'neuron' || page === 'lang') setView(page);
     if (page === 'response') { setTm(nextTm || ''); setView('response'); }
+    if (page === 'relations') setView('relations');   // 谱图关系：语言图谱内的入口（不再是一级 tab）
   };
 
   /* 每个 tab 的层塔配置 */
@@ -139,6 +140,35 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const selRun = selRuns.find(s => s.file === st.sel) || selRuns[0];
   const ros = Object.keys(selRun?.by_readout || {});
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
+
+  /* 上下游电路（Goodfire 口径的「前后一致」验证）：选中 MLP 单元后，按权重路径
+     W_out→残差→(注意力头 OV)→W_in 找前一层最强写入者与后一层最强读取者，
+     在层塔上画跨层连线；打分来自本机模型权重，是电路假设（确认需干预实验）。 */
+  const circuitApi = useApi(view === 'neuron' && census && tower && st.unit != null && st.mod === 'mlp'
+    ? `/api/neurons/circuit?block=${block}&unit=${st.unit}&k=5&model_key=${encodeURIComponent(census)}&run=${encodeURIComponent(tower.run || '')}` : null);
+  const circuit = circuitApi.data && circuitApi.data.available ? circuitApi.data : null;
+  /* 失败必须显式落到卡片上：以前只认 available===false，请求本身报错（服务重启、超时）时
+     circuitNote 为空，卡片就永远停在「正在计算…」——错误被静默吞掉。 */
+  const circuitNote = circuitApi.data && circuitApi.data.available === false
+    ? circuitApi.data.reason
+    : (circuitApi.error || null);
+
+  const UP_C = '#d85a30', DOWN_C = '#378add';
+  const dff = tower?.d_ff || 0;
+  const BCOLS = 128;
+  const unitPos = u => {
+    const rows = Math.max(1, Math.ceil(dff / BCOLS));
+    return [-1 + (2 * ((u % BCOLS) + 0.5)) / BCOLS, -0.6 + (1.2 * (Math.floor(u / BCOLS) + 0.5)) / rows];
+  };
+  let edges = null, target = null;
+  if (view === 'neuron' && circuit && st.mod === 'mlp' && dff) {
+    const tp = unitPos(circuit.unit);
+    target = { hs: block + 1, x: tp[0], z: tp[1] };
+    edges = [
+      ...circuit.upstream.map(u => { const p = unitPos(u.unit); return { hs1: block, hs2: block + 1, p1: p, p2: tp, color: UP_C }; }),
+      ...circuit.downstream.map(u => { const p = unitPos(u.unit); return { hs1: block + 1, hs2: block + 2, p1: tp, p2: p, color: DOWN_C, dash: [5, 3] }; }),
+    ];
+  }
   const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
   const showTower = view === 'neuron' || view === 'lang' || view === 'response' || view === 'live';   // 谱图关系、本地包不需要层结构
@@ -170,6 +200,8 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
           <div className="v8-tower-legend">
             <span>{cfg.color}</span>
             {cfg.mark && <span><i aria-hidden="true" />{cfg.mark}</span>}
+            {edges && <span><i aria-hidden="true" style={{ background: UP_C }} />橙线 = 前一层写入者（上游）</span>}
+            {edges && <span><i aria-hidden="true" style={{ background: DOWN_C }} />蓝虚线 = 后一层读取者（下游）</span>}
             <span>{cfg.click}</span>
             {cfg.selected != null && <span>当前选中：{hsLabel(cfg.selected)}</span>}
           </div>
@@ -177,16 +209,17 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
         {nLayers ? (
           <Tower nLayers={nLayers} selected={cfg.selected} values={cfg.values} marks={cfg.marks} peak={cfg.peak} onPick={cfg.onPick}
                  allowEmbedding={cfg.allowEmbedding} valueLabel={cfg.valueLabel} markLabel={cfg.markLabel}
+                 edges={edges} target={target} height={edges ? 780 : 600} focusKey={edges ? `${block}:${st.unit}` : ''}
                  caption={`${view === 'live' && liveTrace ? liveTrace.model_name : shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
         ) : <Empty>没有模型骨架数据。</Empty>}
-        <p className="v8-note">每块板 = 一层（下：嵌入层 hs[0]；块 b 的板 = 该块输出 hs[b+1]；上：输出头）。颜色按最大值归一化，浅 → 深。拖动旋转、滚轮缩放。层板只是排列，不代表模型几何。
+        <p className="v8-note">每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。拖动旋转、滚轮缩放。
           {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
       </aside>
       )}
       <section className="v8-space-main">
         {!tree && <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
         <Suspense fallback={<Empty>加载中…</Empty>}>
-          {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} />
+          {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} circuit={circuit} circuitNote={circuitNote} circuitLoading={st.unit != null ? circuitApi.loading : null} onRetryCircuit={circuitApi.reload} />
             : <Empty>{census ? (tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…') : `${shortModel(model)} 还没有自然语料普查，没有逐单元数据；左侧只画层结构。`}</Empty>)}
           {view === 'lang' && tree && <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
                                                 layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />}
@@ -197,7 +230,16 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
                               syncLayer={syncTag} onLayer={tag => { const h = hsOf(tag); if (h != null) patchSt({ rlayer: h }); }}
                               onContext={({ tm: t }) => { setTm(t); patchSt({ rlayer: null }); }} />
           )}
-          {view === 'relations' && <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />}
+          {view === 'relations' && (
+            <div className="v8-atlaswrap">
+              <div className="v8-atlas-back">
+                <button type="button" onClick={() => setView('lang')}>← 返回语言图谱</button>
+                <b>谱图关系</b>
+                <span>跨模式族的共享编码轴、概念假设与跨模型一致性；点击一个族回到响应点云看证据</span>
+              </div>
+              <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />
+            </div>
+          )}
           {view === 'local' && localPack}
         </Suspense>
       </section>

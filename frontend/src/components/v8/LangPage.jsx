@@ -236,6 +236,8 @@ function ItemPage({ tree, itemId, model, skeleton, st, set, layer, onLayer }) {
       </header>
       <nav className="v8-toc">
         {secs.map((s, i) => <a key={s} href={`#v8sec${i}`}>{s}</a>)}
+        <button type="button" className="v6-linkbtn" onClick={() => set({ page: 'relations' })}
+                title="跨模式族的共享编码轴、概念假设与跨模型一致性">跨模式族关系（谱图）→</button>
         {ps.length > 1 && (
           <label className="v8-piecesel">拼图
             <select value={piece?.id || ''} onChange={e => set({ piece: e.target.value })}>

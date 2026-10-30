@@ -104,7 +104,8 @@ export default function Workbench() {
   const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
   const station = stations.some(s => s.id === st.station) ? st.station : 'catalog';
-  const view = SPATIAL_VIEWS.some(v => v.id === st.view) ? st.view : 'neuron';
+  // 谱图关系（relations）不在 SPATIAL_VIEWS 导航里（已并入语言图谱入口），但仍是合法视图：入口与旧链接都能进入
+  const view = SPATIAL_VIEWS.some(v => v.id === st.view) || st.view === 'relations' ? st.view : 'neuron';
   const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) ? st.rtab : 'neuron';
 
   useEffect(() => { writeState({ ...st, lens, station, view, rtab }); }, [st, lens, station, view, rtab]);

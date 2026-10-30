@@ -4,13 +4,18 @@
      values  按 hs 序号的叠加量（长度 nLayers + 1，null = 无数据），颜色单一色相由浅到深、按最大值归一化；
      marks   按 hs 序号的边缘标记（如「未见词表上可读出」），peak 为峰值层；
      onPick  点击某层（参数为 hs 序号；allowEmbedding 为 false 时嵌入层不可选）。点击从不切换 tab。
-   零依赖 canvas 投影：左键拖动旋转、滚轮缩放。层板只是排列，不代表模型几何。 */
+     edges   跨层连线（神经元上下游电路）：{hs1, hs2, p1:[x,z], p2:[x,z], color}，x∈[-1,1]、z∈[-D,D]；
+             起终点画端点圆点、沿线在 75% 处画方向箭头（上游→目标 / 目标→下游）。
+     target  选中单元在层板上的位置 {hs, x, z}：红圈标记。
+     height  画布高度（选中单元聚焦时更高）。
+   零依赖 canvas 投影：左键拖动旋转、滚轮/按钮缩放。层板只是排列，不代表模型几何。 */
 import { useEffect, useRef, useState } from 'react';
 
 import { hsLabel, seq } from './v8Util.js';
 
 const DEG = Math.PI / 180;
 const MARK = '#1baf7a';
+const ZOOM_MAX = 4;
 
 function inside(pt, pts) {
   let c = false;
@@ -21,12 +26,12 @@ function inside(pt, pts) {
   return c;
 }
 
-export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption }) {
+export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption, edges, target, height = 600, focusKey = '' }) {
   const cv = useRef(null), hits = useRef([]), drag = useRef(null);
   const [view, setView] = useState({ yaw: -30 * DEG, pitch: 16 * DEG, zoom: 1 });
   const [hover, setHover] = useState(null);
   const [w, setW] = useState(340);
-  const H = 600;
+  const H = height;
   useEffect(() => {
     const el = cv.current?.parentElement;
     if (!el || typeof ResizeObserver === 'undefined') return undefined;
@@ -34,6 +39,12 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  /* 选中单元（出现上下游连线）时自动放大聚焦一次：渲染期派生（props 变化时调 state 的官方模式） */
+  const [prevFocus, setPrevFocus] = useState('');
+  if (focusKey && focusKey !== prevFocus) {
+    setPrevFocus(focusKey);
+    setView(v => (v.zoom >= 1.9 ? v : { ...v, zoom: 1.9 }));
+  }
   useEffect(() => {
     const c = cv.current;
     if (!c) return;
@@ -75,8 +86,34 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
         ctx.fillText(isHead ? '输出头' : hs === 0 ? '嵌入' : `块 ${hs - 1}${hs === peak ? ' 峰' : ''}`, lc[0] - 6, lc[1] + 3);
       }
     }
+    /* 跨层连线（上下游电路）：端点圆点 + 弧线 + 75% 处方向箭头，画在层板之上 */
+    for (const e of (edges || [])) {
+      const [x1, z1] = e.p1, [x2, z2] = e.p2;
+      const a = P(x1, yOf(e.hs1), z1), b = P(x2, yOf(e.hs2), z2);
+      const c = P((x1 + x2) / 2 * 0.72, (yOf(e.hs1) + yOf(e.hs2)) / 2, (z1 + z2) / 2 * 0.72);
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]);
+      ctx.lineWidth = 1.8; ctx.strokeStyle = e.color; ctx.setLineDash(e.dash || []); ctx.stroke(); ctx.setLineDash([]);
+      const t = 0.75, u = 1 - t;
+      const q = [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
+      const tx = 2 * u * (c[0] - a[0]) + 2 * t * (b[0] - c[0]), ty = 2 * u * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
+      const tl = Math.max(1e-6, Math.hypot(tx, ty)), nx = tx / tl, ny = ty / tl, ah = 6;
+      ctx.beginPath();
+      ctx.moveTo(q[0] - ah * nx - ah * 0.5 * -ny, q[1] - ah * ny - ah * 0.5 * nx);
+      ctx.lineTo(q[0], q[1]);
+      ctx.lineTo(q[0] - ah * nx + ah * 0.5 * -ny, q[1] - ah * ny + ah * 0.5 * nx);
+      ctx.lineWidth = 1.8; ctx.strokeStyle = e.color; ctx.stroke();
+      for (const p of [a, b]) { ctx.beginPath(); ctx.arc(p[0], p[1], 2.6, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+    if (target) {                                           // 选中单元：层板上的红圈标记
+      const p = P(target.x, yOf(target.hs), target.z);
+      ctx.beginPath(); ctx.arc(p[0], p[1], 5.5, 0, Math.PI * 2);
+      ctx.lineWidth = 2; ctx.strokeStyle = '#e34948'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(p[0], p[1], 2, 0, Math.PI * 2); ctx.fillStyle = '#e34948'; ctx.fill();
+    }
     hits.current = out.reverse();
-  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w]);
+  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w, H, edges, target]);
   const locate = e => {
     const r = cv.current.getBoundingClientRect();
     const pt = [e.clientX - r.left, e.clientY - r.top];
@@ -84,10 +121,11 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
   };
   useEffect(() => {
     const c = cv.current;
-    const wheel = e => { e.preventDefault(); setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(2.5, v.zoom * (e.deltaY < 0 ? 1.1 : 0.91))) })); };
+    const wheel = e => { e.preventDefault(); setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(ZOOM_MAX, v.zoom * (e.deltaY < 0 ? 1.1 : 0.91))) })); };
     c?.addEventListener('wheel', wheel, { passive: false });
     return () => c?.removeEventListener('wheel', wheel);
   }, []);
+  const zoomBy = f => setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(ZOOM_MAX, v.zoom * f)) }));
   return (
     <div className="v8-tower-canvas">
       <canvas ref={cv} style={{ width: w, height: H }} role="img" aria-label={caption || `${nLayers} 个块的层塔`}
@@ -111,7 +149,11 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
           {hover.mark && markLabel && <small>● {markLabel}{hover.peak ? '（峰值层）' : ''}</small>}
         </div>
       )}
-      <button type="button" className="fw-tbtn ghost v8-reset" onClick={() => setView({ yaw: -30 * DEG, pitch: 16 * DEG, zoom: 1 })}>重置视角</button>
+      <div className="v8-tower-btns">
+        <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1.3)}>放大</button>
+        <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1 / 1.3)}>缩小</button>
+        <button type="button" className="fw-tbtn ghost v8-reset" onClick={() => setView({ yaw: -30 * DEG, pitch: 16 * DEG, zoom: 1 })}>重置视角</button>
+      </div>
     </div>
   );
 }

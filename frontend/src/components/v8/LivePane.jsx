@@ -194,10 +194,11 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
   return (
     <div className="lv-root">
       <div className="lv-hd">
-        <b>实时分析</b>
-        {st === 'ready' && <span className="lv-badge ok">{status.model_name} · {status.device === 'cuda' ? 'GPU' : 'CPU'} 就绪</span>}
-        {st === 'loading' && <span className="lv-badge wait">{status.progress || '模型加载中…'}</span>}
-        <span className="lv-note">输入一段文本，本机中心跑一次真实前向：每一步看一层——32 个注意力头各自写了什么、MLP 哪些神经元被点亮、它们的参数长什么样。点「▶ 播放」自动逐层推进，左侧 3D 层塔会逐层点亮。</span>
+        <p className="v8-nprog-say">
+          输入一段文本，看模型逐块怎么算：每个注意力头写了什么、MLP 哪些单元被点亮、参数长什么样。
+          {st === 'ready' && <>当前 <b>{status.model_name}</b>（{status.device === 'cuda' ? 'GPU' : 'CPU'}）就绪，「▶ 播放」自动逐层推进。</>}
+          {st === 'loading' && <>{status.progress || '模型加载中…'}</>}
+        </p>
       </div>
 
       <div className="lv-input">

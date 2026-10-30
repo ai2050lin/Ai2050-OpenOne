@@ -9,6 +9,7 @@ import { neuronUnitContext, useAiContext } from '../app/rdc_fusion/aiContext.js'
 import { useApi } from '../app/rdc_fusion/api.js';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
+import Bowtie3D from './Bowtie3D.jsx';
 import { GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, unitColors } from './v8Util.js';
 
 const COLOR_MODES = [['type', '分型'], ['dens', '强激活率'], ['regime', '主导符号区'], ['expl', '解释等级'], ['sel', '选择性']];
@@ -161,8 +162,58 @@ function UnitGrid({ layer, mode, selRun, ro, sorted, unit, onPick }) {
   );
 }
 
-function LanguageLinks({ layer, unit, set }) {
-  const hits = (layer.selectivity || []).flatMap(s => Object.entries(s.top || {}).flatMap(([r, tops]) =>
+/* ── 上下游电路（Goodfire 口径的「前后一致」验证）：前后 = 前一层写入者 / 后一层读取者（跨层），
+      不是 MLP 内部——MLP 内神经元并行计算，没有先后。打分来自本机模型权重的线性路径强度。 ── */
+function CircuitPane({ circuit, circuitNote, block, unit, set, loading, onRetry }) {
+  const head = <h3>块 {block}·U{unit} 的上下游神经元 <small>写入端看前一层谁喂它，读取端看后一层谁用它——跨层电路的「前后一致」验证</small></h3>;
+  const Retry = onRetry ? <button type="button" className="v8-retry" onClick={onRetry}>重新计算</button> : null;
+  if (circuitNote) {
+    return <section className="v8-card"><h3>上下游神经元 <small>跨层电路验证</small></h3><p className="v8-note">暂时不可用：{circuitNote} {Retry}</p></section>;
+  }
+  if (!circuit) {
+    return (
+      <section className="v8-card">
+        {head}
+        <p className="v8-note">
+          {loading === false
+            ? <>请求已结束但没有数据（服务可能刚重启）。{Retry}</>
+            : <>正在沿模型权重计算跨层电路（首次需等本机模型加载到显存）…</>}
+        </p>
+      </section>
+    );
+  }
+  const Row = ({ h }) => (
+    <button type="button" className="v8-cir-row" onClick={() => set({ block: h.block, unit: h.unit, mod: 'mlp' })}>
+      <b>B{h.block}·U{h.unit}</b>
+      <span>{h.via === 'head' ? `经注意力头 ${h.head}` : '残差直连'}</span>
+      <em>{Number(h.score).toFixed(4)}</em>
+      {h.type_name && <small>{h.type_name}</small>}
+      {h.explained && <small>解释：{h.explained}</small>}
+    </button>
+  );
+  return (
+    <section className="v8-card">
+      {head}
+      <div className="v8-cir-cols">
+        <div>
+          <h4>上游 · 前一层写入者</h4>
+          {circuit.upstream.length
+            ? circuit.upstream.map(h => <Row key={`u${h.unit}-${h.via}-${h.head ?? 'x'}`} h={h} />)
+            : <p className="v8-note">第 0 块前面没有层。</p>}
+        </div>
+        <div>
+          <h4>下游 · 后一层读取者</h4>
+          {circuit.downstream.length
+            ? circuit.downstream.map(h => <Row key={`d${h.unit}-${h.via}-${h.head ?? 'x'}`} h={h} />)
+            : <p className="v8-note">最后一个块后面没有 MLP。</p>}
+        </div>
+      </div>
+      <p className="v8-note">分数 = 权重余弦路径强度（残差直连 / 经该注意力头的 OV 电路），是电路假设，最终确认需干预实验。左侧层塔已画出对应连线（橙=上游、蓝虚线=下游、红圈=本单元）；点一行跳到那个单元，沿电路继续走。</p>
+    </section>
+  );
+}
+
+function LanguageLinks({ layer, unit, set }) {  const hits = (layer.selectivity || []).flatMap(s => Object.entries(s.top || {}).flatMap(([r, tops]) =>
     tops.filter(t => t[0] === unit).map(t => ({ s, r, d: t[1], pos: t[2] }))));
   return (
     <section className="v8-card v8-langlinks">
@@ -177,7 +228,7 @@ function LanguageLinks({ layer, unit, set }) {
   );
 }
 
-export default function NeuronPane({ census, tower, skeleton, block, st, set }) {
+export default function NeuronPane({ census, tower, skeleton, block, st, set, circuit, circuitNote, circuitLoading, onRetryCircuit }) {
   const ly = useApi(`/api/neurons/layer?model_key=${encodeURIComponent(census)}&block=${block}&run=${encodeURIComponent(tower.run)}`);
   const layer = ly.data && !ly.data.pending ? ly.data : null;
   const selRuns = tower.selectivity || [];
@@ -202,6 +253,13 @@ export default function NeuronPane({ census, tower, skeleton, block, st, set }) 
               <PickedUnits layer={layer} selRun={selRun} unit={unit} onPick={u => set({ unit: u })} />
               {unit != null && (
                 <div className="v8-unit">
+                  <section className="v8-card">
+                    <h3>块 {block}·U{unit} 的 3D 前后锥 <small>读方向与写方向张成的平面：上游写入者该收拢在读轴、下游读取者该收拢在写轴，蝴蝶结收拢 = 前后一致</small></h3>
+                    <Bowtie3D census={census} run={tower.run} block={block} unit={unit}
+                              onPick={(b, u) => set({ block: b, unit: u, mod: 'mlp' })} />
+                  </section>
+                  <CircuitPane circuit={circuit} circuitNote={circuitNote} block={block} unit={unit} set={set}
+                    loading={circuitLoading} onRetry={onRetryCircuit} />
                   <LanguageLinks layer={layer} unit={unit} set={set} />
                   <NeuronUnitCard modelKey={census} block={block} unit={unit} run={tower.run} />
                 </div>
