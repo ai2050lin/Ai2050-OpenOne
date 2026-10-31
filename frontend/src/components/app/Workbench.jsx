@@ -1,36 +1,52 @@
-/* 研究工作台（v8，/workbench 与 /atlas）：进展 / 空间 / 研发 / 配置。
-   空间：左侧常驻 LLM 多层结构，右侧是神经元逆向分析结果与语言图谱（v8/SpaceLens.jsx）；进展：神经元与语言图谱的进展（v8/RouteLens.jsx）；
-   研发：题库、贡献算力与管理工位；配置：连接与运行形态、账号、被测模型（ConfigView.jsx）。
-   左轨分隔线之上是研究对象与实验生产（进展 / 空间 / 研发），之下是形态相关的界面（配置、本机工具）。
-   进展与空间只读本机数据包；网页只能浏览（题库只读、贡献算力只给下载入口），
-   执行测试与管理工位只在桌面客户端（config.js 的 ADMIN_LIVE；管理工位另需管理员账号）。没有数据时显示空态，不回退演示数字。
-   只适合研究者本机的工具（自动测试、读取本机模型权重的旧版空间视图）只在本机中心（config.local_tools）出现。 */
+/* 研究工作台（v9，/workbench 与 /atlas）：以「一句话」为中心的五个研究页面（设计见 design/attention_neuron_plan_v1.md §4）。
+     数据集        各数据集与类别、模型正确率、行为门；点题目或句子进入「例句」（子视图：语言项、响应点云、题库、本地包）
+     例句          一句话 → 行为 → 注意力路由（层 × 头：直接作用与总效应并列）→ 激活的神经元 → 保真度（子视图：输入一句话）
+     模式与优先级  每种冲突的逐层赛跑曲线与优先级表
+     神经元图谱    按层浏览 MLP 单元（3D 层塔降为侧边小导航）、归因优先级、本机测试
+     进展          各模式保真度、完整案例数、未通过的检验
+   左轨分隔线之下：贡献（贡献算力 + 我的上传）、管理（管理员的分步骤向导，只在桌面客户端）、配置、本机工具。
+   全部读取经 rdc_fusion/api.js（只读数据包模式）；没有数据时显示「未接入」，不回退演示数字。每个面板包 PanelBoundary，
+   一个面板出错不让整页白屏。旧链接（?lens=route|spatial|process 等）由 workbenchUtil.parseState 换算到新页面。 */
 import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
 
 import AccountMenu from './rdc_fusion/AccountMenu.jsx';
 import AtlasView from './rdc_fusion/AtlasView.jsx';
 import CatalogPanel from './rdc_fusion/CatalogPanel.jsx';
-import CensusPanel from './rdc_fusion/CensusPanel.jsx';
 import ConfigView, { CFG_SECTIONS } from './ConfigView.jsx';
 import LocalPackView from './rdc_fusion/LocalPackView.jsx';
+import PanelBoundary from './PanelBoundary.jsx';
 import TemplatePipeline from './rdc_fusion/TemplatePipeline.jsx';
 import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
 import { useAuth } from './rdc_fusion/authContext.js';
 import { loadLocalPack } from './rdc_fusion/localPack.js';
 import { Empty } from './rdc_fusion/ui.jsx';
-import RouteLens from '../v8/RouteLens.jsx';
-import SpaceLens from '../v8/SpaceLens.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
+import { DIVIDER_BEFORE, readState, resolveGo, visibleLenses, visibleSteps, visibleSubs, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
+import './mech/mech.css';
 
 const AiChatDrawer = lazy(() => import('./rdc_fusion/AiChatDrawer.jsx'));
 const AutoTestPanel = lazy(() => import('./rdc_fusion/AutoTestPanel.jsx'));
+
+const CensusPanel = lazy(() => import('./rdc_fusion/CensusPanel.jsx'));
+const ContributePage = lazy(() => import('./mech/ContributePage.jsx'));
+const DatasetsPage = lazy(() => import('./mech/DatasetsPage.jsx'));
 const GoodfireProbePanel = lazy(() => import('./rdc_fusion/GoodfireProbePanel.jsx'));
 const LensSpatial = lazy(() => import('./rdc_fusion/LensSpatial.jsx'));
+const ModesPage = lazy(() => import('./mech/ModesPage.jsx'));
+const NeuronPriority = lazy(() => import('./mech/NeuronPriority.jsx'));
+const ProgressPage = lazy(() => import('./mech/ProgressPage.jsx'));
+const SentencePage = lazy(() => import('./mech/SentencePage.jsx'));
+const SpaceLens = lazy(() => import('../v8/SpaceLens.jsx'));
+
+/* 子视图 → 空间组件（v8/SpaceLens）的 view：层塔是侧边小导航，主区是二维视图 */
+const SPACE_VIEW = {
+  'neurons/atlas': 'neuron', 'datasets/lang': 'lang', 'datasets/response': 'response',
+  'datasets/relations': 'relations', 'datasets/local': 'local', 'sentence/live': 'live',
+};
 
 function LocalPack() {
   const [pack, setPack] = useState(null);
@@ -48,20 +64,23 @@ function LocalPack() {
         {pack && <span className="v6-note">{pack.name} · {pack.kind === 'respack' ? '研究包' : '谱图包'}</span>}
         {err && <span className="v6-note warn">{err}</span>}
       </div>
-      {!pack && <Empty>研究包（实验响应页「下载研究包」）与谱图包（语言谱图页「导出谱图包」）都在浏览器内解压查看，不上传到任何服务器。</Empty>}
+      {!pack && <Empty>研究包（响应点云页「下载研究包」）与谱图包（谱图关系页「导出谱图包」）都在浏览器内解压查看，不上传到任何服务器。</Empty>}
       {pack?.kind === 'respack' && <LocalPackView pack={pack} />}
       {pack?.kind === 'atlaspack' && <AtlasView localAtlas={pack.atlas} localName={pack.name} />}
     </div>
   );
 }
 
-/* 左轨图标（v5 工作台同款线性图标） */
+/* 左轨线性图标 */
 function LensIcon({ id }) {
   const p = {
-    home: <path d="M3 10.5 12 3l9 7.5V21H3z" />,
-    spatial: <><circle cx="12" cy="12" r="3" /><ellipse cx="12" cy="12" rx="10" ry="4.2" /><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)" /></>,
-    process: <path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16" />,
-    route: <><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z" /><circle cx="7" cy="12" r="2.5" /><circle cx="15" cy="12" r="2.5" /></>,
+    datasets: <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></>,
+    sentence: <path d="M4 6h16M4 12h10M4 18h13" />,
+    modes: <path d="M3 20 9 12l4 4 8-11M15 5h6v6" />,
+    neurons: <><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="6" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 10.7 16M16.4 7.6 13.3 16M8.2 6h7.6" /></>,
+    progress: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>,
+    contribute: <><rect x="4" y="4" width="16" height="12" rx="2" /><path d="M8 20h8M12 16v4M9 10l2 2 4-4" /></>,
+    admin: <><path d="M12 3 4 6v6c0 4.4 3.4 8.2 8 9 4.6-.8 8-4.6 8-9V6z" /><path d="m9 12 2 2 4-4" /></>,
     config: <><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5" /><circle cx="9" cy="7.5" r="2.1" /><circle cx="15" cy="16.5" r="2.1" /></>,
     local: <><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></>,
   }[id];
@@ -88,36 +107,63 @@ export default function Workbench() {
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
   const [helpOpen, setHelpOpen] = useState(false);
-  // 网页只能浏览：题库只读、贡献算力只给下载入口；测试与管理在桌面客户端，管理工位另需管理员账号（本机开发不限）
+  // 网页只能浏览；测试与管理在桌面客户端，管理向导另需管理员账号（连接本机后端的开发不限）
   const { user } = useAuth();
   const isAdmin = !OFFLINE_CLIENT || user?.role === 'admin';
-  const stations = visibleStations({ live: ADMIN_LIVE, admin: isAdmin, localTools });
-  const baseLenses = !ADMIN_LIVE
-    ? LENSES.map(l => (l.id === 'process' ? { ...l, desc: '网页只能浏览：题库只读；执行测试与管理请用桌面客户端' } : l))
-    : LENSES;
-  const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
-  const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
-  const station = stations.some(s => s.id === st.station) ? st.station : (stations[0]?.id || 'catalog');
-  const pstep = PIPE_STEPS.some(s => s.id === st.pstep) ? st.pstep : 'design';
+  const lenses = visibleLenses({ live: ADMIN_LIVE, admin: isAdmin, localTools });
+  const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'sentence';
+  const subs = visibleSubs(lens, { live: ADMIN_LIVE });
+  const sub = st.sub && (subs.some(s => s.id === st.sub) || SPACE_VIEW[`${lens}/${st.sub}`]) ? st.sub : (subs[0]?.id || '');
   const csec = CFG_SECTIONS.some(s => s.id === st.csec) ? st.csec : 'conn';
-  // 谱图关系（relations）不在 SPATIAL_VIEWS 导航里（已并入语言图谱入口），但仍是合法视图：入口与旧链接都能进入
-  const view = SPATIAL_VIEWS.some(v => v.id === st.view) || st.view === 'relations' ? st.view : 'neuron';
-  const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) ? st.rtab : 'neuron';
+  const steps = visibleSteps({ localTools });
 
-  useEffect(() => { writeState({ ...st, lens, station, view, rtab, pstep, csec }); }, [st, lens, station, view, rtab, pstep, csec]);
-  const lensLabel = lenses.find(l => l.id === lens)?.label || '';
-  useEffect(() => { document.title = `研究工作台 · ${lensLabel} · AI2050`; }, [lensLabel]);
+  useEffect(() => { writeState({ ...st, lens, sub, csec }); }, [st, lens, sub, csec]);
+  const lensMeta = lenses.find(l => l.id === lens);
+  useEffect(() => { document.title = `研究工作台 · ${lensMeta?.label || ''} · AI2050`; }, [lensMeta]);
 
   const go = (a, b, c, extra) => setSt(prev => resolveGo(prev, a, b, c, extra));
   const set = patch => setSt(prev => ({ ...prev, ...patch }));
-  /* 进展 → 空间：先把空间内部状态（语言项、块等）写进地址栏，空间挂载时读取 */
-  const goSpace = (v, patch = {}) => { writeSpaceState({ ...readSpaceState(), ...patch }); set({ lens: 'spatial', view: v }); };
+  /* 跨页跳转：先把空间组件的内部状态（块、单元、语言项）写进地址栏，空间组件挂载时读取 */
+  const openUnit = (layer, unit) => { writeSpaceState({ ...readSpaceState(), block: layer, unit, mod: 'mlp' }); set({ lens: 'neurons', sub: 'atlas' }); };
+  const openItem = (item, model) => { writeSpaceState({ ...readSpaceState(), item, model, ltab: 'items' }); set({ lens: 'datasets', sub: 'lang' }); };
+  const openSentence = (caseId, cue, fact = '') => set({ lens: 'sentence', sub: 'case', case: caseId, cue: cue || '', fact });
+
+  const spaceView = SPACE_VIEW[`${lens}/${sub}`];
+  const page = (() => {
+    if (spaceView) {
+      return (
+        <div className="wb9-space">
+          <SpaceLens view={spaceView} setView={v => go('spatial', null, null, { view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />
+        </div>
+      );
+    }
+    if (lens === 'datasets' && sub === 'catalog') {
+      return <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go('admin', null, localTools ? 'autotest' : 'dispatch')}
+                           onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('admin', null, 'design')} />;
+    }
+    if (lens === 'datasets') return <DatasetsPage onFact={(id, fact) => openSentence(id, 'plain', fact)} onItem={openItem} />;
+    if (lens === 'sentence') return <SentencePage st={st} set={set} onUnit={openUnit} />;
+    if (lens === 'modes') return <ModesPage onSentence={(id, cue) => openSentence(id, cue)} />;
+    if (lens === 'neurons' && sub === 'priority') return <NeuronPriority st={st} set={set} onUnit={openUnit} />;
+    if (lens === 'neurons' && sub === 'probe') return <GoodfireProbePanel />;
+    if (lens === 'progress') return <ProgressPage />;
+    if (lens === 'contribute') return <ContributePage />;
+    if (lens === 'admin') {
+      return (
+        <TemplatePipeline step={st.step} onStep={v => set({ step: v })} onGo={go} canAudit={isAdmin} steps={steps}
+                          panels={{ census: <CensusPanel />, autotest: <AutoTestPanel onGo={go} onStation={s => go(s)} /> }} />
+      );
+    }
+    if (lens === 'config') return <ConfigView cfg={cfg} onGo={go} section={csec} />;
+    if (lens === 'local') return <LensSpatial on onGo={() => {}} />;
+    return <Empty>没有这个页面。</Empty>;
+  })();
 
   return (
-    <div className="fw-root wb-root">
+    <div className="fw-root wb-root wb9">
       <header className="wb-top">
         <a className="wb-brand" href={window.location.protocol === 'file:' ? window.location.pathname : '/'}><span className="op-logo" aria-hidden="true">A2</span><span><b>研究工作台</b><small>返回首页</small></span></a>
-        <span className="wb-lens-title">{lensLabel}<small>{lenses.find(l => l.id === lens)?.desc}</small></span>
+        <span className="wb-lens-title">{lensMeta?.label}<small>{lensMeta?.desc}</small></span>
         <div className="wb-top-right">
           {cfg.data?.sandbox_synthetic && <span className="op-sandbox">合成·沙盒</span>}
           <span className="wb-center" title="当前连接的中心服务">{API_BASE || window.location.origin}</span>
@@ -126,13 +172,11 @@ export default function Workbench() {
       </header>
       {cfg.error && <div className="op-banner" role="alert">连不上中心服务：{cfg.error}</div>}
       <div className="wb-frame">
-        {/* 左轨：一级界面（沿用 v5 工作台的图标轨布局）。分隔线之上是研究对象与实验生产，之下是形态相关的界面 */}
         <nav className="fw-rail" aria-label="工作台界面">
           {lenses.map(l => (
             <Fragment key={l.id}>
-              {l.id === 'config' && <div className="fw-rdiv" />}
-              {l.id === 'local' && <div className="fw-rdiv" />}
-              <button type="button" className={'fw-rbtn' + (lens === l.id ? ' on' : '')} onClick={() => set({ lens: l.id })}
+              {(DIVIDER_BEFORE.has(l.id) || l.id === 'local') && <div className="fw-rdiv" />}
+              <button type="button" className={'fw-rbtn' + (lens === l.id ? ' on' : '')} onClick={() => set({ lens: l.id, sub: '' })}
                       title={`${l.label}：${l.desc}`} aria-current={lens === l.id ? 'page' : undefined}>
                 <LensIcon id={l.id} />{l.label}
               </button>
@@ -140,23 +184,12 @@ export default function Workbench() {
           ))}
         </nav>
         <div className="wb-body">
-          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab} onChange={v => set({ rtab: v })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
-          {lens === 'spatial' && <SubNav items={SPATIAL_VIEWS} value={view} onChange={v => set({ view: v })} label="空间视图" onHelp={() => setHelpOpen(true)} />}
-          {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
-          {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
-          {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
+          {subs.length > 0 && <SubNav items={subs} value={sub} onChange={v => set({ sub: v })} label={`${lensMeta?.label}视图`} onHelp={() => setHelpOpen(true)} />}
+          {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" />}
           <main className="wb-main">
-            <Suspense fallback={<Empty>加载中…</Empty>}>
-              {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
-              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('pipeline')} />}
-              {lens === 'process' && station === 'probe' && <GoodfireProbePanel />}
-              {lens === 'process' && station === 'pipeline' && <TemplatePipeline step={pstep} onStep={v => set({ pstep: v })} onGo={go} canAudit={isAdmin} />}
-              {lens === 'process' && station === 'census' && <CensusPanel />}
-              {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
-              {lens === 'route' && <RouteLens tab={rtab} onGoSpace={goSpace} onGo={go} />}
-              {lens === 'config' && <ConfigView cfg={cfg} onGo={go} section={csec} />}
-              {lens === 'local' && <LensSpatial on onGo={() => {}} />}
-            </Suspense>
+            <PanelBoundary name={lensMeta?.label} resetKey={`${lens}|${sub}|${csec}`}>
+              <Suspense fallback={<Empty>加载中…</Empty>}>{page}</Suspense>
+            </PanelBoundary>
           </main>
           {/* 「问 AI」侧栏：只在桌面客户端（Key 在主进程）；网页版不显示 */}
           {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => set({ lens: 'config', csec: 'model' })} /></Suspense>}

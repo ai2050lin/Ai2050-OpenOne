@@ -1,11 +1,11 @@
-/* 研究工作台 · 进展 · 规则账本
+/* 研究工作台 · 进展 · 已测规则账本（含被否证的规则）
    目的不是"再展示一次结论"，而是防止重复劳动：每条规则给结论状态、关键数字、证据链，
    以及明确的重测判定（不要重测 / 重测需加样本 / 可以重测）。
    查重框可以贴一句"我准备测什么"，先看这件事有没有已经做过。
-   数据来自服务器 /api/rules/overview（本机 data/rules/ledger.json）。 */
+   数据来自服务器 /api/rules/overview（本机 data/rules/ledger.json；只在本机中心可读，经 api.js）。 */
 import { useEffect, useMemo, useState } from 'react';
 
-import { API_BASE } from '../app/rdc_fusion/api.js';
+import { getJson } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/workbench.css';
 import './v8.css';
@@ -116,8 +116,7 @@ function RuleCheck() {
     if (!q.trim()) return;
     setBusy(true);
     try {
-      const r = await fetch(`${API_BASE}/api/rules/check?q=${encodeURIComponent(q)}`, { cache: 'no-store' });
-      setRes(await r.json());
+      setRes(await getJson(`/api/rules/check?q=${encodeURIComponent(q)}`));
     } catch (e) {
       setRes({ advice: `查询失败：${e.message || e}`, hits: [] });
     } finally {
@@ -163,8 +162,7 @@ export default function RuleLedgerPage() {
 
   useEffect(() => {
     let dead = false;
-    fetch(`${API_BASE}/api/rules/overview`, { cache: 'no-store' })
-      .then(r => r.json())
+    getJson('/api/rules/overview')
       .then(d => { if (!dead) setData(d); })
       .catch(e => { if (!dead) setErr(e.message || String(e)); });
     return () => { dead = true; };

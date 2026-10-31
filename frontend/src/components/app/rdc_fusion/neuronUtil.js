@@ -11,10 +11,28 @@ export const REGIME_META = {
 };
 
 export const AXIS_META = {
-  read: '读出',
+  read: '可读',
+  readout: '读出',
   control: '控制',
+  connect: '连接',
   explain: '解释',
 };
+
+/* 单元卡四轴（可读 / 读出 / 控制 / 连接）+ 解释轴：可读、控制、解释来自服务端 evidence_axes（模板选择性、干预与归因、解释检验）；
+   读出 = 直接通路读出 token 是否有记录（近似，不含后续层）；连接 = 跨层上下游电路，单元卡里没有，按需在块视图里按权重计算。
+   只描述做过哪些检验，不是证据等级。 */
+export function unitAxes(card) {
+  const ax = card?.evidence_axes || {};
+  const ro = card?.census?.readout;
+  const hasReadout = Boolean(ro && ((ro.promotes || []).length || (ro.suppresses || []).length));
+  return [
+    ['read', ax.read || '未检验'],
+    ['readout', hasReadout ? '直接通路读出有记录（近似）' : '未检验'],
+    ['control', ax.control || '未检验'],
+    ['connect', '未检验（块视图里可按权重算上下游电路假设）'],
+    ['explain', ax.explain || '未检验'],
+  ];
+}
 
 export function unitKey(block, unit) {
   return `L${block}.U${unit}`;
@@ -40,7 +58,7 @@ export function fmtRate(r) {
 
 /* 证据轴状态 → 视觉档：established / partial / none */
 export function axisTone(text) {
-  if (!text || text === '未检验') return 'none';
+  if (!text || text.startsWith('未检验')) return 'none';
   if (/未通过|未达|未运行|未解释/.test(text)) return 'partial';
   return 'established';
 }

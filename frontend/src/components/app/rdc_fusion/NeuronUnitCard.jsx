@@ -1,9 +1,9 @@
 /* 原生 MLP 神经元单元卡（C1）：GET /api/neurons/unit 的只读展示。
    纪律：文本与标签全部来自服务端（普查片段、读出 token、选择性与干预记录），前端不生成任何描述；
-   读出 / 控制 / 解释三条证据轴分开显示；没有数据时显示空态，不用其他单元代替。 */
+   可读 / 读出 / 控制 / 连接四轴与解释轴分开显示（证据等级另行登记，不自动晋级）；没有数据时显示空态，不用其他单元代替。 */
 import { OFFLINE_CLIENT, useApi } from './api.js';
 import { ExtraPackPrompt } from '../../open/DataBar.jsx';
-import { AXIS_META, GRADE_META, REGIMES, REGIME_META, axisTone, fmtNum, fmtRate, histColumns } from './neuronUtil.js';
+import { AXIS_META, GRADE_META, REGIMES, REGIME_META, axisTone, fmtNum, fmtRate, histColumns, unitAxes } from './neuronUtil.js';
 import './neuron_units.css';
 
 function Histogram({ hist }) {
@@ -75,11 +75,14 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
           <div className="nu-sub nu-mono">{data.id}</div>
         </div>
         <div className="nu-axes">
-          {Object.entries(data.evidence_axes).map(([k, v]) => (
+          {unitAxes(data).map(([k, v]) => (
             <span key={k} className={`nu-axis nu-axis-${axisTone(v)}`} title={`${AXIS_META[k]}：${v}`}>
               <b>{AXIS_META[k]}</b> {v}
             </span>
           ))}
+          <span className="nu-axis nu-axis-none" title="证据等级在 Research OS 登记，不由单元卡的检验记录自动晋级">
+            <b>证据等级</b> {data.evidence_level || '未登记'}
+          </span>
         </div>
       </header>
 
@@ -114,7 +117,7 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
       </section>
 
       <section className="nu-sec">
-        <h4>直接输出读出</h4>
+        <h4>直接输出读出（读出轴）</h4>
         <div className="nu-tokens"><span className="nu-tl">推高</span>{c.readout.promotes.map((t, i) => <code key={i}>{t}</code>)}</div>
         <div className="nu-tokens"><span className="nu-tl">压低</span>{c.readout.suppresses.map((t, i) => <code key={i}>{t}</code>)}</div>
         <div className="nu-note">{c.readout.note}</div>
@@ -152,7 +155,7 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
       </section>
 
       <section className="nu-sec">
-        <h4>模板选择性（读出轴）</h4>
+        <h4>模板选择性（可读轴）</h4>
         {data.template_selectivity.length === 0 ? <div className="nu-note">该模型没有模板选择性运行。</div> : (
           <table className="nu-table">
             <thead><tr><th>运行</th><th>对照</th><th>读出</th><th>d（发现）</th><th>d（留出）</th><th>阈值</th><th>入选</th><th>来源</th></tr></thead>
