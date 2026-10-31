@@ -42,7 +42,6 @@ def create_app():
     import platform_service
     from server import neuron_census_service
     from server import mechanism_service
-    from server import dataset_progress_service
 
     app = FastAPI(title='AI2050 Open LLM Reverse-Engineering Platform', version=platform_service.PLATFORM_VERSION)
     origins = [o.strip() for o in os.environ.get('AI2050_CORS_ORIGINS', '*').split(',') if o.strip()]
@@ -71,7 +70,6 @@ def create_app():
     app.include_router(platform_service.lang_router)
     app.include_router(neuron_census_service.router)
     app.include_router(mechanism_service.router)        # 机制案例与方法校准报告（只读）
-    app.include_router(dataset_progress_service.router)  # 数据集进度（只读）
 
     data_dir = Path(distributed_service._DATA_DIR).resolve()
     in_release = REPO.resolve() in data_dir.parents          # 数据目录在带版本号的程序目录里：换新版本目录时会「丢」数据

@@ -141,7 +141,7 @@ export default function Workbench() {
       return <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go('admin', null, localTools ? 'autotest' : 'dispatch')}
                            onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('admin', null, 'design')} />;
     }
-    if (lens === 'datasets') return <DatasetsPage onFact={(id, fact) => openSentence(id, 'plain', fact)} onItem={openItem} onGo={go} />;
+    if (lens === 'datasets') return <DatasetsPage onFact={(id, fact) => openSentence(id, 'plain', fact)} onItem={openItem} />;
     if (lens === 'sentence') return <SentencePage st={st} set={set} onUnit={openUnit} />;
     if (lens === 'modes') return <ModesPage onSentence={(id, cue) => openSentence(id, cue)} />;
     if (lens === 'neurons' && sub === 'priority') return <NeuronPriority st={st} set={set} onUnit={openUnit} />;
