@@ -68,6 +68,7 @@ from server.agi_chat_service import agi_chat_engine
 from server.ai_rnd_service import router as ai_rnd_router
 from server.object_card_service import router as object_card_router
 from server.neuron_census_service import router as neuron_census_router
+from server.mechanism_service import router as mechanism_router
 # 分布式平台中心节点路由：本体在 deploy/distributed_service.py（deploy/ 不入 git）。
 # deploy/ 存在则挂载（本机/部署机）；公开仓库 fresh clone 无 deploy/ 时自动跳过，主后端照常启动。
 os.environ.setdefault("AI2050_LOCAL_TOOLS", "1")   # 本机研究后端：开放读取本机模型与下载模型的工具
@@ -274,6 +275,7 @@ app.include_router(mech_pair_router)
 app.include_router(mech_ablate_router)
 app.include_router(rule_ledger_router)
 app.include_router(neuron_census_router)
+app.include_router(mechanism_router)
 if distributed_router is not None:
     app.include_router(distributed_router)
     app.include_router(census_router)

@@ -1,117 +1,157 @@
-/* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &rtab= &tm=（空间内部的
-   语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。 */
+/* 研究工作台（v9，以「一句话」为中心）的导航配置与跳转归一（非组件）。设计见 design/attention_neuron_plan_v1.md §4。
+   URL 即状态：?lens= &sub= &step= &csec= &case= &cue= &fact= &tm=（空间组件内部的语言项、块、单元等状态由 v8/v8Util.js
+   记录在同一个地址栏里，键名不重叠；v8Util 会删除旧开放平台的 tab 参数，所以这里用 sub 而不是 tab）。
+   旧链接（v8 的 ?lens=route|spatial|process 与 ?view= ?station= ?rtab= ?pstep=）在读取时就地换算成新页面。 */
 
-/* 一级界面：前三个是研究对象（进展 / 空间）与实验生产（研发），同属一组、排在左轨分隔线之上；
-   分隔线之下是本机形态相关的界面（配置、本机工具）。 */
+/* 一级界面：分隔线之上是五个研究页面；之下是参与与管理（贡献、管理向导）和形态相关的界面（配置、本机工具）。 */
 export const LENSES = [
-  { id: 'route', label: '进展', desc: '神经元逆向分析进展、语言图谱进展与证据门链' },          // id 沿用 route，旧链接 ?lens=route 照常可用
-  { id: 'spatial', label: '空间', desc: 'LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元' },
-  { id: 'process', label: '研发', desc: '神经元测试、模板流水线、题库；管理员另有普查作业与自动测试' },
+  { id: 'datasets', label: '数据集', desc: '各数据集与类别、模型正确率、行为门；点题目或句子进入「例句」' },
+  { id: 'sentence', label: '例句', desc: '一句话：行为 → 注意力路由（直接作用 / 总效应）→ 激活的神经元 → 头电路保真度' },
+  { id: 'modes', label: '模式与优先级', desc: '每种冲突的逐层赛跑曲线与优先级表：决出层、负责的头、能翻转胜负的线索' },
+  { id: 'neurons', label: '神经元图谱', desc: '按层浏览 MLP 单元；单元卡四轴（可读 / 读出 / 控制 / 连接）与证据等级，按归因优先级排序' },
+  { id: 'progress', label: '进展', desc: '只放三类数：各模式保真度、完成的完整案例数、未通过的检验' },
+  { id: 'contribute', label: '贡献', desc: '贡献算力与我的上传' },
+  { id: 'admin', label: '管理', admin: true, desc: '管理向导：建模板 → 冻结 → 分发 → 审计 → 普查 → 自动测试' },
   { id: 'config', label: '配置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
 ];
+export const DIVIDER_BEFORE = new Set(['contribute', 'config']);
 
-/* 进展视图：与空间/研发同一层级的子导航（?rtab=），默认 neuron */
-export const ROUTE_VIEWS = [
-  { id: 'neuron', label: '神经元逆向分析', desc: '普查规模、逐层摘要与分型、解释检验、模板选择性（各项分开计数）' },
-  { id: 'lang', label: '语言图谱', desc: '大类 × 等级覆盖、语言项 × 模型等级矩阵、研究缺口与证据门链' },
-  { id: 'rules', label: '规则账本', desc: '已经测过的规则与结论（含被否证的），先查重再动手，避免重复测试' },
+/* 各页面的子视图（?sub=）；第一个是缺省。desktop：只在能执行测试的形态（ADMIN_LIVE）出现。 */
+export const SUBS = {
+  datasets: [
+    { id: 'overview', label: '数据集总览', desc: '冲突材料、行为广度题库、最小对模板，各自的行为门与正确率' },
+    { id: 'lang', label: '语言项', desc: '大类 → 语言族 → 语言项：编码层段、点云、有效神经元与证据' },
+    { id: 'response', label: '响应点云', desc: '单个模式族：3D 响应空间、规律分析、合并统计' },
+    { id: 'catalog', label: '题库', desc: '所有用户看到的同一份题目清单' },
+    { id: 'local', label: '本地包', desc: '在浏览器内打开下载的研究包 / 谱图包（不上传）' },
+  ],
+  sentence: [
+    { id: 'case', label: '案例例句', desc: '机制案例里的句子：行为、注意力路由、神经元、头电路保真度' },
+    { id: 'live', label: '输入一句话', desc: '本机模型实时前向：逐层观察每个注意力头与 MLP 单元（只在本机中心可用）' },
+  ],
+  neurons: [
+    { id: 'atlas', label: '按层浏览', desc: '选中块的内部结构、MLP 单元阵列与单元卡' },
+    { id: 'priority', label: '归因优先级', desc: '按单元对答案对数几率差的直接作用排序；四轴与证据等级' },
+    { id: 'probe', label: '本机测试', desc: '本机 GPU 对一个 MLP 单元跑 S1–S9；结果只存本机', desktop: true },
+  ],
+};
+/* 谱图关系（跨模式族共享轴）不在子导航里：从语言项页的入口进入，旧链接 ?view=relations 照常可用 */
+const HIDDEN_SUBS = { datasets: ['relations'] };
+
+/* 管理向导的步骤（?step=）：前四步是模板流水线（TemplatePipeline），后两步是普查与自动测试 */
+export const ADMIN_STEPS = [
+  { id: 'design', label: '建模板', desc: '句式框架 × 填充词表 × 因子水平' },
+  { id: 'freeze', label: '冻结', desc: '先试跑、再正式；冻结后不可修改' },
+  { id: 'dispatch', label: '分发', desc: '分片覆盖、节点与租约' },
+  { id: 'audit', label: '审计', desc: '自动检查 + 人工裁决' },
+  { id: 'census', label: '普查', desc: '作业进度、逐分片状态、复算不一致队列' },
+  { id: 'autotest', label: '自动测试', desc: '登记被测模型 → 勾选模式族 → 一键运行', localOnly: true },
 ];
 
-/* 空间视图：左侧都常驻 LLM 多层结构（层塔） */
-export const SPATIAL_VIEWS = [
-  { id: 'live', label: '实时分析', desc: '输入一段文本，逐层观察模型怎么算：每个注意力头与 MLP 单元的实时响应和参数' },
-  { id: 'neuron', label: '神经元', desc: '选中块的内部结构、9,728 个 MLP 单元阵列与单元卡' },
-  { id: 'lang', label: '语言图谱', desc: '大类 → 语言族 → 语言项：编码层段、点云、有效神经元与证据' },
-  { id: 'response', label: '响应点云', desc: '单个模式族：3D 响应空间、规律分析、合并统计' },
-  /* 谱图关系（跨模式族共享编码轴 / 概念假设）不再是一级 tab：作为语言图谱里的入口进入（SpaceLens 仍渲染该视图，旧链接 ?view=relations|atlas 照常可用） */
-  { id: 'local', label: '本地包', desc: '在浏览器内打开下载的研究包 / 谱图包（不上传）' },
-];
-const OLD_VIEWS = { atlas: 'relations', units: 'neuron' };   // relations 不在导航里，但视图仍可从语言图谱进入
-
-/* 研发工位：网页只能浏览；执行测试（神经元测试）与管理都在桌面客户端。
-   admin：只给管理员账号（连接本机后端的开发不限）；autotest 另外只在本机中心（local_tools）出现——公开中心没有被测模型。
-   2026-10-30 收敛：原「模板工作室 / 试跑与冻结 / 分发与节点 / 审计队列」是同一条闭环的四个阶段，合并为 pipeline 一个工位
-   （见 TemplatePipeline.jsx）；「AI 助手」与「贡献算力」是配置与账号属性，迁到「配置」界面，不再占研发工位。
-   旧链接 ?station=studio|freeze|dispatch|audit 由 OLD_STATIONS 重定向到 pipeline 的对应步骤。 */
-export const STATIONS = [
-  { id: 'probe', label: '神经元测试', desc: '本机 GPU 对一个 MLP 单元跑 S1–S9 找特征流程；结果只存本机' },
-  { id: 'pipeline', label: '模板流水线', admin: true, desc: '建模板 → 冻结 → 分发 → 审计：生成式模板的一条闭环' },
-  { id: 'catalog', label: '题库', web: true, desc: '所有用户看到的同一份题目清单' },
-  { id: 'census', label: '普查作业', admin: true, desc: '作业进度、逐分片状态、复算不一致队列' },
-  { id: 'autotest', label: '自动测试', admin: true, localOnly: true, desc: '登记被测模型 → 勾选模式族 → 一键运行' },
-];
-
-/* 流水线的四个步骤（?pstep=），与 TemplatePipeline.PIPE_STEPS 一一对应 */
-export const PIPE_STEPS = [
-  { id: 'design', label: '建模板' },
-  { id: 'freeze', label: '冻结' },
-  { id: 'dispatch', label: '分发' },
-  { id: 'audit', label: '审计' },
-];
-
-/* 已合并/迁移工位的旧链接：旧 station → 新落点（pipeline 的要带步骤） */
+/* 旧链接换算表：v8 的空间视图、进展、研发工位 → 新页面 [lens, sub, step] */
+const OLD_VIEWS = {
+  neuron: ['neurons', 'atlas'], units: ['neurons', 'atlas'], live: ['sentence', 'live'],
+  lang: ['datasets', 'lang'], response: ['datasets', 'response'], relations: ['datasets', 'relations'], atlas: ['datasets', 'relations'],
+  local: ['datasets', 'local'],
+};
 const OLD_STATIONS = {
-  studio: ['process', 'pipeline', 'design'],
-  freeze: ['process', 'pipeline', 'freeze'],
-  dispatch: ['process', 'pipeline', 'dispatch'],
-  audit: ['process', 'pipeline', 'audit'],
-  ai: ['config', '', ''],
-  contribute: ['config', '', ''],
+  catalog: ['datasets', 'catalog'], probe: ['neurons', 'probe'],
+  pipeline: ['admin', '', 'design'], studio: ['admin', '', 'design'], freeze: ['admin', '', 'freeze'],
+  dispatch: ['admin', '', 'dispatch'], audit: ['admin', '', 'audit'], census: ['admin', '', 'census'],
+  autotest: ['admin', '', 'autotest'], ai: ['config', '', '', 'model'], contribute: ['contribute', ''],
 };
 
-/* 当前形态可见的工位：live = config.ADMIN_LIVE（桌面客户端或本机开发），admin = 管理员账号或本机开发 */
-export function visibleStations({ live, admin, localTools }) {
-  return STATIONS.filter(s => (!live ? s.web : (!s.admin || admin) && (!s.localOnly || localTools)));
+export function defaultSub(lens) {
+  return SUBS[lens]?.[0]?.id || '';
+}
+
+function validSub(lens, sub) {
+  return Boolean(SUBS[lens]?.some(s => s.id === sub) || HIDDEN_SUBS[lens]?.includes(sub));
+}
+
+/* 从查询参数得到页面状态（纯函数，便于测试）：新参数优先，其余按旧链接换算。 */
+export function parseState(search) {
+  const q = new URLSearchParams(search || '');
+  const st = { lens: 'sentence', sub: '', step: 'design', csec: 'conn', tm: q.get('tm') || '',
+               case: q.get('case') || '', cue: q.get('cue') || '', fact: q.get('fact') || '' };
+  const lens = q.get('lens') || '';
+  if (LENSES.some(l => l.id === lens) || lens === 'local') {
+    st.lens = lens;
+    st.sub = q.get('sub') || '';
+    st.step = q.get('step') || q.get('pstep') || 'design';
+    st.csec = q.get('csec') || 'conn';
+  } else if (lens === 'route' || lens === 'home' || lens === 'atlas' || lens === 'progress') {
+    st.lens = 'progress';
+  } else if (lens === 'spatial' || (!lens && q.get('view'))) {
+    const v = OLD_VIEWS[q.get('view') || 'neuron'] || OLD_VIEWS.neuron;
+    [st.lens, st.sub] = v;
+  } else if (lens === 'process') {
+    const o = OLD_STATIONS[q.get('station') || 'catalog'] || OLD_STATIONS.catalog;
+    [st.lens, st.sub] = o;
+    if (o[2]) st.step = o[0] === 'admin' && q.get('pstep') && o[2] === 'design' ? q.get('pstep') : o[2];
+    if (o[3]) st.csec = o[3];
+  } else if (q.get('station')) {
+    const o = OLD_STATIONS[q.get('station')];
+    if (o) { [st.lens, st.sub] = o; if (o[2]) st.step = o[2]; if (o[3]) st.csec = o[3]; }
+  }
+  if (!validSub(st.lens, st.sub)) st.sub = defaultSub(st.lens);
+  if (!ADMIN_STEPS.some(s => s.id === st.step)) st.step = 'design';
+  return st;
 }
 
 export function readState() {
-  try {
-    const q = new URLSearchParams(window.location.search);
-    let lens = q.get('lens') === 'home' ? 'route' : q.get('lens') || 'spatial';
-    const view = OLD_VIEWS[q.get('view')] || q.get('view') || 'neuron';
-    let station = q.get('station') || 'probe';
-    let pstep = q.get('pstep') || 'design';
-    /* 旧工位链接（studio/freeze/dispatch/audit/ai/contribute）在读取时就地归一，地址栏随后由 writeState 改写 */
-    const old = OLD_STATIONS[station];
-    if (old) {
-      lens = old[0];
-      station = old[1] || station;
-      pstep = old[2] || 'design';
-    }
-    return { lens, view, station, rtab: q.get('rtab') || 'neuron', tm: q.get('tm') || '', pstep, csec: q.get('csec') || 'conn' };
-  } catch {
-    return { lens: 'spatial', view: 'neuron', station: 'probe', rtab: 'neuron', tm: '', pstep: 'design', csec: 'conn' };
-  }
+  try { return parseState(window.location.search); } catch { return parseState(''); }
+}
+
+const OWN_KEYS = ['lens', 'sub', 'step', 'csec', 'case', 'cue', 'fact', 'tm'];
+const OLD_KEYS = ['view', 'station', 'rtab', 'pstep', 'obj', 'atlasTab', 'atlasSel'];
+
+/* 写回地址栏：只写与缺省值不同的状态。 */
+export function stateQuery(st, base = '') {
+  const url = new URLSearchParams(base);
+  for (const k of [...OWN_KEYS, ...OLD_KEYS]) url.delete(k);
+  url.set('lens', st.lens);
+  if (st.sub && st.sub !== defaultSub(st.lens)) url.set('sub', st.sub);
+  if (st.lens === 'admin' && st.step && st.step !== 'design') url.set('step', st.step);
+  if (st.lens === 'config' && st.csec && st.csec !== 'conn') url.set('csec', st.csec);
+  for (const k of ['case', 'cue', 'fact', 'tm']) if (st[k]) url.set(k, st[k]);
+  return url.toString();
 }
 
 export function writeState(st) {
   try {
     const url = new URL(window.location.href);
-    for (const k of ['lens', 'view', 'station', 'rtab', 'tm', 'pstep', 'csec', 'obj', 'atlasTab', 'atlasSel']) url.searchParams.delete(k);
-    url.searchParams.set('lens', st.lens);
-    if (st.lens === 'spatial') url.searchParams.set('view', st.view);
-    if (st.lens === 'process') url.searchParams.set('station', st.station);
-    /* 流水线步骤只在非首步时写进地址栏，避免默认链接变长 */
-    if (st.lens === 'process' && st.station === 'pipeline' && st.pstep && st.pstep !== 'design') url.searchParams.set('pstep', st.pstep);
-    /* 配置分段同理：首段不进地址栏 */
-    if (st.lens === 'config' && st.csec && st.csec !== 'conn') url.searchParams.set('csec', st.csec);
-    if (st.lens === 'route' && st.rtab && st.rtab !== 'neuron') url.searchParams.set('rtab', st.rtab);
-    if (st.tm) url.searchParams.set('tm', st.tm);
+    url.search = stateQuery(st, url.search);
     window.history.replaceState(null, '', url);
   } catch { /* 地址栏不可写时只保留页面状态 */ }
 }
 
-/* 各面板的跳转约定统一到 (lens, view/station)：
-   onGo('process', 'pipeline') / onGo('audit') / onGo('spatial', null, null, {tm}) / onGo('spatial', null, undefined, {view:'atlas'})
-   旧的 'atlas' 透镜（研究账本）不再存在，归到进展（route）；旧工位 id（studio/freeze/dispatch/audit/ai/contribute）走 OLD_STATIONS 别名。 */
-export function resolveGo(prev, a, b, _c, extra = {}) {
-  const old = OLD_STATIONS[a];
-  if (old) return { ...prev, lens: old[0], station: old[1] || prev.station, pstep: old[2] || prev.pstep || 'design' };
-  const station = STATIONS.find(s => s.id === a);
-  if (station) return { ...prev, lens: 'process', station: a, pstep: a === 'pipeline' ? 'design' : (prev.pstep || 'design') };
-  if (a === 'process') return { ...prev, lens: 'process', station: STATIONS.some(s => s.id === b) ? b : prev.station };
-  if (a === 'spatial') return { ...prev, lens: 'spatial', view: OLD_VIEWS[extra.view] || extra.view || (extra.tm ? 'response' : prev.view), tm: extra.tm || prev.tm };
-  if (a === 'atlas' || a === 'progress' || a === 'route' || a === 'home') return { ...prev, lens: 'route' };
-  if (LENSES.some(l => l.id === a)) return { ...prev, lens: a };
+/* 当前形态可见的一级界面与子视图：live = config.ADMIN_LIVE，admin = 管理员账号（本机开发不限）。 */
+export function visibleLenses({ live, admin, localTools }) {
+  const out = LENSES.filter(l => !l.admin || (live && admin));
+  return localTools ? [...out, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : out;
+}
+export function visibleSubs(lens, { live }) {
+  return (SUBS[lens] || []).filter(s => !s.desktop || live);
+}
+export function visibleSteps({ localTools }) {
+  return ADMIN_STEPS.filter(s => !s.localOnly || localTools);
+}
+
+/* 各面板的跳转约定统一到 (lens, sub)：onGo('datasets', 'lang') / onGo('neurons', 'atlas') / onGo('admin', null, 'freeze')；
+   旧面板的 onGo('process', 'pipeline') / onGo('audit') / onGo('spatial', null, null, {view, tm}) 经旧链接换算表进入新页面。 */
+export function resolveGo(prev, a, b, c, extra = {}) {
+  const st = OLD_STATIONS[a];
+  if (st) return { ...prev, lens: st[0], sub: st[1] || defaultSub(st[0]), step: st[2] || prev.step, csec: st[3] || prev.csec };
+  if (a === 'process') return resolveGo(prev, b || 'catalog', null, null, extra);
+  if (a === 'spatial') {
+    const v = OLD_VIEWS[extra.view] || (extra.tm ? OLD_VIEWS.response : OLD_VIEWS.neuron);
+    return { ...prev, lens: v[0], sub: v[1], tm: extra.tm || prev.tm };
+  }
+  if (a === 'atlas' || a === 'route' || a === 'home') return { ...prev, lens: 'progress', sub: '' };
+  if (LENSES.some(l => l.id === a) || a === 'local') {
+    const sub = validSub(a, b) ? b : defaultSub(a);
+    return { ...prev, lens: a, sub, step: a === 'admin' && c ? c : prev.step, ...extra };
+  }
   return prev;
 }

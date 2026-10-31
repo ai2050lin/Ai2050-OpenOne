@@ -5,7 +5,7 @@
 客户端用同样的规则查找。离线客户端只在线读取站点配置与下载数据包，不实时访问其他接口。
 
 - 主数据包（GET /api/platform/datapack）：总览、题库、模板、谱图、记分板、普查与神经元索引、解释检验、选择性、
-  3D 层空间、legacy 结果等，约 1–2 MB。
+  3D 层空间、机制案例与方法校准报告、legacy 结果等，约 1–2 MB。
 - 附加包（GET /api/platform/datapack/extra/{id}）：体积大的部分按需下载。
   · tm:<tm_id>     一个模式族的合并统计（门控开 / 关）与已算好的规律分析（实验响应 3D 页）。
   · cards:<model>  已解释、模板选择性前列与 L 层检验过的单元卡（原生神经元页）；其余单元不打包。
@@ -54,6 +54,12 @@ def research_stamp(research_root: Path) -> str:
             for p in sorted(d.glob('*.json')):
                 h.update(p.name.encode('utf-8'))
                 h.update(hashlib.sha256(p.read_bytes()).digest())
+    for sub in ('mechanism', 'calibration'):           # 机制案例与方法校准报告（mechanism_service）：每个案例目录一个 report.json
+        d = Path(research_root) / sub
+        if d.is_dir():
+            for p in sorted(d.glob('*/report.json')):
+                h.update(f'{sub}/{p.parent.name}'.encode('utf-8'))
+                h.update(hashlib.sha256(p.read_bytes()).digest())
     return h.hexdigest()[:12]
 
 
@@ -62,6 +68,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     import census_service as CS
     import distributed_service as D
     import platform_service as PS
+    from server import mechanism_service as MS
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
 
@@ -76,7 +83,10 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
         ('/api/platform/contributors', PS.contributors_ep),
         ('/api/neurons/index', NS.index),
         ('/api/neurons/space/index', NS.space_index),
+        ('/api/mechanism/index', MS.index),
     ]
+    for _kind, case_id, _p in MS.report_files():      # 机制案例 / 方法校准报告（体积小，原样进主数据包）
+        plan.append((f'/api/mechanism/case/{case_id}', (lambda c=case_id: MS.case(c))))
     for name in ('catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
         plan.append((f'/api/platform/snapshot/{name}', (lambda n=name: PS.snapshot(n))))
     lang = PS._lang_atlas()                            # 语言谱图（体积小，进主数据包）：还没生成时不放条目，下一版数据包再补
@@ -302,6 +312,7 @@ def circuit_source(data_dir: Path, model_key: str) -> Path:
 def extras_plan() -> List[Dict[str, Any]]:
     """附加包清单：每个 v3 模式族一个，每个有普查结果的模型一个单元卡包与一个跨层电路包。"""
     import distributed_service as D
+    from server import mechanism_service as MS
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
     out = []

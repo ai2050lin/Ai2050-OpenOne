@@ -27,7 +27,7 @@ export default function SiteHome({ config, set }) {
       </section>
 
       <section className="v8-mainlines" aria-label="研究工作台入口">
-        <a className="v8-mainline" href={workbenchHref('lens=spatial&view=neuron')}>
+        <a className="v8-mainline" href={workbenchHref('lens=neurons')}>
           <span className="n">1</span>
           <h2>神经元逆向分析</h2>
           <p>在研究工作台的「空间」里看模型的全部层，点开一层看它的内部结构与 9,728 个 MLP 神经元，再点开一个神经元看它在自然语料中的激活与对应的语言特征。</p>
@@ -39,7 +39,7 @@ export default function SiteHome({ config, set }) {
           <small>{census.length ? '普查：自然语料上逐个神经元的激活统计，由参与者的 GPU 分片完成' : '还没有普查结果'}</small>
           <em>进入研究工作台 · 空间 →</em>
         </a>
-        <a className="v8-mainline" href={workbenchHref('lens=spatial&view=lang')}>
+        <a className="v8-mainline" href={workbenchHref('lens=datasets&sub=lang')}>
           <span className="n">2</span>
           <h2>语言图谱</h2>
           <p>按大类选一种语言现象（如疑问、否定、上下位），看它在模型里从哪一层开始被编码、编码长什么样，以及在 LLM 各层里的有效神经元。</p>
@@ -53,7 +53,7 @@ export default function SiteHome({ config, set }) {
           <em>进入研究工作台 · 空间 →</em>
         </a>
       </section>
-      <p className="v8-home-route"><a href={workbenchHref('lens=route')}>查看研究进展（研究工作台 · 进展）→</a></p>
+      <p className="v8-home-route"><a href={workbenchHref('lens=progress')}>查看研究进展（研究工作台 · 进展）→</a></p>
 
       <section className="v8-home-row">
         <div className="v8-home-card">

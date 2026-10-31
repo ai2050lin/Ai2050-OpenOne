@@ -13,12 +13,11 @@ import { siteHref } from '../v8/v8Util.js';
 import { clearErrors, errorCount, exportDiagnostics, getErrors } from '../../diagnostics.js';
 
 const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
-const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 
 /* 页内分段（?csec=）：配置项多，一页到底会太长；分段只是阅读顺序，不是导航层级 */
 export const CFG_SECTIONS = [
   { id: 'conn', label: '连接与诊断', desc: '中心服务、运行形态、本机错误记录' },
-  { id: 'account', label: '账号与本机节点', desc: '登录账号、节点绑定与贡献算力' },
+  { id: 'account', label: '账号', desc: '登录账号；贡献算力与我的上传在「贡献」页' },
   { id: 'model', label: '模型与 AI 助手', desc: '被测模型、AI 助手的模型与 Key' },
   { id: 'platform', label: '平台', desc: '中心自报的公开配置' },
 ];
@@ -142,15 +141,9 @@ export default function ConfigView({ cfg, onGo, section = 'conn', onSection }) {
             )}
           </Card>
 
-          <section className="wb-cfg-node">
-            <header>
-              <h4>本机节点与贡献</h4>
-              <small>{DESKTOP
-                ? '控制本机节点服务：设备、模型、资源限制、运行与日志；只有节点服务访问中心'
-                : '网页不能控制节点；要贡献算力请安装桌面客户端'}</small>
-            </header>
-            <Suspense fallback={<Empty>加载中…</Empty>}><ContributePanel /></Suspense>
-          </section>
+          <Card title="本机节点与贡献" sub="贡献算力与我的上传在左轨「贡献」页">
+            <button type="button" className="fw-tbtn" onClick={() => onGo?.('contribute')}>打开「贡献」页 →</button>
+          </Card>
         </>
       )}
 

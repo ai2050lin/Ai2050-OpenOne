@@ -29,9 +29,10 @@ export function siteHref(page = 'home') {
   const q = page === 'home' ? '' : `?page=${page}`;
   return file ? `${window.location.pathname}${q}` : `/${q}`;
 }
+/* v9 工作台的页面（workbenchUtil.LENSES / SUBS）：语言项与响应点云在「数据集」下，神经元在「神经元图谱」下 */
 export const WORKBENCH_REDIRECT = {
-  atlas: workbenchHref('lens=spatial&view=lang'), lang: workbenchHref('lens=spatial&view=lang'), neuron: workbenchHref('lens=spatial&view=neuron'),
-  progress: workbenchHref('lens=route'), response: workbenchHref('lens=spatial&view=response'), relations: workbenchHref('lens=spatial&view=relations'),
+  atlas: workbenchHref('lens=datasets&sub=lang'), lang: workbenchHref('lens=datasets&sub=lang'), neuron: workbenchHref('lens=neurons'),
+  progress: workbenchHref('lens=progress'), response: workbenchHref('lens=datasets&sub=response'), relations: workbenchHref('lens=datasets&sub=relations'),
 };
 
 /* 读出轴等级：符号 + 文字（不只靠颜色）。顺序量用单一色相由浅到深。 */
@@ -56,12 +57,12 @@ export function shortModel(key) {
 }
 
 /* 空间各 tab 的选中层分开记录：block = 神经元（块号），lblock / rlayer = 语言图谱 / 响应点云（hs 序号） */
-const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod', 'lblock', 'rlayer'];
+const KEYS = ['page', 'type', 'item', 'model', 'lang', 'piece', 'block', 'unit', 'ov', 'color', 'sort', 'sel', 'ro', 'mod', 'lblock', 'rlayer', 'ltab'];
 const NUM = new Set(['block', 'unit', 'lblock', 'rlayer']);
 
 function defaults() {
   return { page: 'home', type: 'GR', item: '', model: '', lang: '', piece: '', block: null, unit: null,
-           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp', lblock: null, rlayer: null };
+           ov: 'sel', color: 'type', sort: '', sel: '', ro: 'final', mod: 'mlp', lblock: null, rlayer: null, ltab: '' };
 }
 
 export function readState() {
