@@ -135,7 +135,7 @@ else
   ok "torch 已存在：$("$VPY" -c 'import torch;print(torch.__version__)')"
 fi
 
-REQ="$REPO_DIR/requirements-server.txt"
+REQ="$REPO_DIR/deploy/requirements-server.txt"
 if [ -f "$REQ" ]; then
   "$VPY" -m pip install -r "$REQ"
   ok "requirements-server.txt 安装完成"

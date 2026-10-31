@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'deploy'))
 
 INCLUDE = [
-    'VERSION', 'LICENSE', 'NOTICE', 'README.md', 'CONTRIBUTING.md',
+    'VERSION', 'LICENSE', 'NOTICE', 'README.md', '.github/CONTRIBUTING.md',
     'deploy/center_app.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/data_admin_service.py', 'deploy/platform_service.py',
     'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/reset_password.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
     'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',

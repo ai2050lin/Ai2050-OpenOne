@@ -20,7 +20,7 @@ AI2050 是一个开源的分布式研究平台。中心服务器保存图谱数�
 | 我想… | 去哪里 |
 | --- | --- |
 | 看进展、学方法、浏览图谱与神经元卡 | 平台网站：首页 / 学习 / 图谱 |
-| 用自己的 GPU 参与 | 网站「参与」页下载一键包；说明见 [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 用自己的 GPU 参与 | 网站「参与」页下载一键包；说明见 [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) |
 | 部署自己的中心 | [deploy/README_DEPLOY.md](deploy/README_DEPLOY.md)（`scripts/build_center_release.py` 生成部署包） |
 | 参与研发 | [AGENTS.md](AGENTS.md)（研究纪律与协议）· `tests/dist_protocol`（协议测试） |
 
