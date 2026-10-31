@@ -126,9 +126,10 @@ A 提出候选特征 → B 检验它表达哪个语言变量、能否推广 → 
 | `shared/dist_protocol/analysis.py` | 规律分析（analysis.v1）：η²、置换检验、句式不变性、可加性、3D 坐标 |
 | `shared/dist_protocol/atlas.py`    | 语言谱图（atlas.v1）：跨族稳定特征、成边、共享编码轴、概念假设     |
 | `deploy/`                          | 中心节点服务与节点 Agent（本地保留，不进公开仓库）                 |
+| `tools/`                           | 研究地基工具：provenance（五字段溯源）、atom_registry（原子注册表）、bench_categories（基准类别池）、power_analysis（McNemar 功效） |
 | `design/`                          | 平台设计方案（client_v6_pipeline_ia.md、platform_spec_v1.md）      |
 | `tests/dist_protocol/`             | 协议与中心测试（unittest，改动协议后必须全绿）                     |
-| `research/`                        | 研究记录：GLM5 / GPT5 备忘录、智能理论、主分析、README 归档        |
+| `research/`                        | 研究记录：GLM5 / GPT5 / DeepSeek 备忘录、智能理论、主分析、README 归档 |
 | `tests/glm5*/` `tests/gpt5*/`      | 研究测试脚本与结果（正式 / 临时 / result）                         |
 | `models/`                          | 本地模型入口                                                       |
 
@@ -156,6 +157,7 @@ A 提出候选特征 → B 检验它表达哪个语言变量、能否推广 → 
 - 没有真实数据时显示空态，不以示意图冒充真实 HiddenState 或计算连接；各来源计数分开呈现，不拼成转化率。
 - URL 即状态：`?lens=home|spatial|process|atlas|progress`；`⌘K` 快速跳转。
 - 账号体系（accounts.v1）：第一个注册账号为管理员；写操作需管理员登录或管理令牌。
+- **离线数据包模式**：客户端与网页版都按只读数据包工作（主包 + 附加包：模板响应、单元卡、跨层电路），数据中心零计算、无权重也能看图谱；连本机 :5001 时解锁实时分析（输入文本跑真实前向，逐层步进观察每个注意力头与 MLP 单元；模型加载 / 卸载按钮手动控制 GPU 占用）。
 - 界面细节：见 [design/client_v6_pipeline_ia.md](design/client_v6_pipeline_ia.md)。
 
 ## 分布式测试闭环
@@ -183,10 +185,14 @@ A 提出候选特征 → B 检验它表达哪个语言变量、能否推广 → 
 ## 当前状态
 
 - **进度不写进 README** —— 权威记录是研究备忘录，按时间追加：
+  - [GPT5 研究备忘录](research/gpt5/docs/AGI_GPT5_MEMO.md)（G 线现役：registry / gap 账本 / 双侧联合破解）；
   - [GLM5 研究备忘录](research/glm5/docs/AGI_GLM5_MEMO.md)（行为基线与完整场线）；
-  - [GPT5 研究备忘录](research/gpt5/docs/AGI_GPT5_MEMO.md)（G 线现役：registry / gap 账本 / 客户端对齐）。
-- 快照锚（2026-10-15）：测量账本 n=389、registry v1.32、gap 账本 v1.11（GAP-5 定谳 UPSTREAM_ABSENT）。
-- 平台现状：分布式协议 v3 与客户端 v6 已实现并通过离线测试；内置模板族已开始在 Qwen3-4B 上真实试跑，结果以研究记录为准。
+  - [DeepSeek 研究备忘录](research/deepseek/docs/AGI_DEEPSEEK_MEMO.md)（深线，P1–40 已收官）。
+- 快照锚（2026-10-31）：测量账本 n=439（链头 #439 post `8299f955`）、atom_registry v1.39（`ab14e586`）、gap 账本 v1.16（`12961b7b`）；E 线（机制边）已 CLOSED@3201。
+- **双侧联合破解方案（G5-DP01）进行中**：P0 地基已落（provenance 五字段强制、原子注册表 schema v1、三类功效池 pools.v1 n=1263/1411/1087、McNemar 功效模板）；Phase 3281 消费方归因修正已登记（份额归一化 D_norm 下静态写入强度预测动态份额，K-A 15/15、K-A2 0.340/0.362 双过——专用中继头族从"参数里像"升级为"运行时确实是"）；下一测量相 3282（路由侧 PR 积分筛选）已预注册。
+- **语言图谱外部基准**：C-Eval + CMMLU + CMExam 共 41,240 题全量实测完成（题库与结果进平台数据包）。
+- 平台现状：分布式协议 v3 已在正式服务器运转（生成式模板 → 试跑行为门 → 分片采集 → AGG-v2 充分统计量合并）；客户端 v9 句子中心工作台已并入（句子页、机制报告、数据集进度板）。
+- 项目系统审计与改进路线（2026-10-31）：[PROJECT_SYSTEM_REVIEW_20261031.md](research/gpt5/docs/PROJECT_SYSTEM_REVIEW_20261031.md)。
 - 对接清单：平台与研究的对接见 [CLIENT_SERVER_ALIGNMENT_v1.md](research/gpt5/docs/CLIENT_SERVER_ALIGNMENT_v1.md)。
 
 ## 纪律与工件
@@ -218,9 +224,9 @@ A 提出候选特征 → B 检验它表达哪个语言变量、能否推广 → 
 
 | 阶段 | 内容 | 进入下一阶段的依据 |
 | ---- | ---- | ------------------ |
-| P0 修正与首次真实闭环 | 文法因果检查、全层多读出采集、模型快照、试跑只用 discovery（已实现）；四个内置模式族在 Qwen3-4B 上跑通 试跑 → 采集 → 分析 → 谱图 | 真实数据上至少一族得到可复现的候选观测，或明确方法在哪里失效 |
-| P1 自底向上引擎 | 接入公开字典或在小模型上自训 SAE；特征卡与特征库；模板选择性挂到字典特征上 | 字典特征在未见词表上复现模板选择性 |
-| P2 因果引擎 | 归因与预注册干预任务类型；边的证据分级；开始计算谱图预测保真度 | 有一批经干预检验的边，保真度有基线可比 |
+| P0 修正与首次真实闭环（✅ 已完成） | 文法因果检查、全层多读出采集、模型快照、试跑只用 discovery；生成式模板已在正式服务器真实闭环（试跑 → 采集 → 行为门 → AGG-v2 合并），内置模式族在 Qwen3-4B/9B/14B 上出真实结果 | ✅ 真实数据上多族可复现候选观测（见备忘录 Phase 记录） |
+| P1 自底向上引擎（进行中） | 接入公开字典或在小模型上自训 SAE；特征卡与特征库（atom_registry v1 已冻结）；模板选择性挂到字典特征上 | 字典特征在未见词表上复现模板选择性 |
+| P2 因果引擎（预注册：Phase 3282 路由侧 PR 积分筛选） | 归因与预注册干预任务类型；边的证据分级；开始计算谱图预测保真度 | 有一批经干预检验的边，保真度有基线可比 |
 | P3 规模化 | 分布式字典训练与标注；跨模型特征匹配；扩展模式族与组合深度 | 跨模型、跨族规律可比 |
 
 ## 构建与检查
@@ -232,7 +238,7 @@ cd frontend ; npm run lint ; npm run build ; cd ..
 
 ## 研究入口
 
-- **研究备忘录**：[GLM5](research/glm5/docs/AGI_GLM5_MEMO.md) ｜ [GPT5](research/gpt5/docs/AGI_GPT5_MEMO.md)
+- **研究备忘录**：[GPT5](research/gpt5/docs/AGI_GPT5_MEMO.md)（现役）｜ [GLM5](research/glm5/docs/AGI_GLM5_MEMO.md) ｜ [DeepSeek](research/deepseek/docs/AGI_DEEPSEEK_MEMO.md)（已收官）
 - **理论与分析**：[智能理论](research/IntelligentTheory.md) ｜ [主分析文档](research/MainAnalysis/) ｜ [研究 OS 方案](ai2050_research_os/README.md)
 - **平台设计**：[平台规范 v1](design/platform_spec_v1.md) ｜ [客户端 v6 信息架构](design/client_v6_pipeline_ia.md) ｜ [客户端/服务器对齐](research/gpt5/docs/CLIENT_SERVER_ALIGNMENT_v1.md)
 - **历史归档**：[旧版完整 README（v1，含理论框架与 Phase 2578 进展全文）](research/README_v1_full_archive.md)
