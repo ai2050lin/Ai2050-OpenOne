@@ -278,6 +278,8 @@ app.include_router(neuron_census_router)
 app.include_router(mechanism_router)
 if distributed_router is not None:
     app.include_router(distributed_router)
+    from server.dataset_progress_service import router as dataset_progress_router   # 数据集进度（读中心数据）
+    app.include_router(dataset_progress_router)
     app.include_router(census_router)
     app.include_router(data_admin_router)
     app.include_router(platform_router)

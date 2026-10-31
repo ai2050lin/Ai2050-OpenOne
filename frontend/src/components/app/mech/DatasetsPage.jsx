@@ -1,4 +1,4 @@
-/* 数据集总览：三类材料各自的行为门与正确率，点题目或句子进入「例句」/「语言项」。
+/* 数据集总览：先是数据集进度（两条研究线逐阶段状态，见 DatasetProgress），再是三类材料各自的行为门与正确率，点题目或句子进入「例句」/「语言项」。
    ① 机制材料（冲突数据集）：每条事实的行为门（无上下文时模型知道该事实）与划分——来自机制案例报告；
    ② 行为广度（C-Eval / CMMLU 等考试题库）：各大类与科目的正确率——只做行为广度，不作机制材料（选项字母会污染读出）；
    ③ 最小对模板（语言项）：各大类语言项在所选模型上的读出等级——来自语言谱图（lang_atlas.v1）。
@@ -10,6 +10,7 @@ import { Empty } from '../rdc_fusion/ui.jsx';
 import PanelBoundary from '../PanelBoundary.jsx';
 import { itemLevel, levelMeta, shortModel } from '../../v8/v8Util.js';
 import BenchCard from './BenchCard.jsx';
+import DatasetProgress from './DatasetProgress.jsx';
 import { useMechCase, useMechIndex } from './mechData.js';
 import { fmt, isConflict, schemaLabel } from './mechUtil.js';
 
@@ -82,7 +83,7 @@ function LangItems({ onItem }) {
   );
 }
 
-export default function DatasetsPage({ onFact, onItem }) {
+export default function DatasetsPage({ onFact, onItem, onGo }) {
   const index = useMechIndex();
   const conflicts = index.cases.filter(c => isConflict(c) && !c.error);
   const sec = (title, sub, body) => (
@@ -93,6 +94,7 @@ export default function DatasetsPage({ onFact, onItem }) {
   );
   return (
     <div className="wb9-page">
+      {sec('数据集进度', '每个数据集在两条研究线上的阶段状态、逐层图与可贡献的计算', <DatasetProgress onGo={onGo} onItem={onItem} />)}
       {conflicts.length
         ? conflicts.map(c => sec(`机制材料 · ${schemaLabel(c.schema)}（${c.set}）`, `${c.id}：每条事实一行，点「例句」看这一句`,
           <ConflictSet key={c.id} summary={c} onFact={onFact} />))

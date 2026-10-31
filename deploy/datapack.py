@@ -54,7 +54,10 @@ def research_stamp(research_root: Path) -> str:
             for p in sorted(d.glob('*.json')):
                 h.update(p.name.encode('utf-8'))
                 h.update(hashlib.sha256(p.read_bytes()).digest())
-    for sub in ('mechanism', 'calibration'):           # 机制案例与方法校准报告（mechanism_service）：每个案例目录一个 report.json
+    for p in sorted((Path(research_root) / 'neurons' / 'goodfire').glob('*.json')):   # Goodfire 四轴检验记录（数据集进度）
+        h.update(f'goodfire/{p.name}'.encode('utf-8'))
+        h.update(hashlib.sha256(p.read_bytes()).digest())
+    for sub in ('mechanism', 'calibration', 'transcoder'):   # 机制案例、方法校准与字典原子报告：每个案例目录一个 report.json
         d = Path(research_root) / sub
         if d.is_dir():
             for p in sorted(d.glob('*/report.json')):
@@ -68,6 +71,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     import census_service as CS
     import distributed_service as D
     import platform_service as PS
+    from server import dataset_progress_service as DP
     from server import mechanism_service as MS
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
@@ -84,6 +88,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
         ('/api/neurons/index', NS.index),
         ('/api/neurons/space/index', NS.space_index),
         ('/api/mechanism/index', MS.index),
+        ('/api/progress/datasets', DP.build),            # 数据集进度：两条研究线逐阶段状态 + 可贡献的计算
     ]
     for _kind, case_id, _p in MS.report_files():      # 机制案例 / 方法校准报告（体积小，原样进主数据包）
         plan.append((f'/api/mechanism/case/{case_id}', (lambda c=case_id: MS.case(c))))
