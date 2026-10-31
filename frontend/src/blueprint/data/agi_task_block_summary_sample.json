@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "timestamp": "2026-03-09 21:35:27",
+    "current_stage": "M5"
+  },
+  "blocks": {
+    "A": {
+      "title": "超长程状态与信用分配",
+      "status": "partial",
+      "headline_score": 0.38450617283950617,
+      "sub_score": -0.051440329218107005,
+      "statement": "A 已经出现第一版突破，但把状态机拉到更长 horizon 后，平均增益重新转负，所以现在更准确的状态仍是“部分完成”。",
+      "metrics": {
+        "first_win_at_L32": 0.01587962962962952,
+        "best_machine_max_length_score": 0.38450617283950617,
+        "long_validation_mean_gain": -0.051440329218107005,
+        "long_validation_min_gain": -0.11574074074074076
+      }
+    },
+    "B": {
+      "title": "关系分型到任务收益",
+      "status": "completed",
+      "headline_score": 0.058249158249158245,
+      "sub_score": 0.038468013468013464,
+      "statement": "B 已从结构解释推进到任务层：relation typing 现在不仅能解释 synthetic bridge，也开始稳定提升 concept-conditioned 结构任务。",
+      "metrics": {
+        "relation_bridge_mean_gain": 0.058249158249158245,
+        "relation_bridge_mean_rank_corr": 0.48571428571371694,
+        "structure_task_mean_gain": 0.038468013468013464,
+        "structure_task_mean_rank_corr": 0.3743886743886024
+      }
+    },
+    "C": {
+      "title": "概念编码分解与任务桥接",
+      "status": "completed",
+      "headline_score": 0.7151826337758701,
+      "sub_score": 0.3743886743886024,
+      "statement": "C 不再停留在 `B_f + Delta_c` 的静态分解。当前编码分解质量已经开始对概念条件任务增益产生预测力。",
+      "metrics": {
+        "qwen_margin": 0.7564541129395886,
+        "deepseek_margin": 0.6739111546121516,
+        "qwen_royalty_gap": 0.8641153573989868,
+        "deepseek_royalty_gap": 0.9173443913459778,
+        "qwen_task_corr": 0.2051480051479657,
+        "deepseek_task_corr": 0.5436293436292391
+      }
+    },
+    "D": {
+      "title": "连续输入接地与整合律",
+      "status": "partial",
+      "headline_score": -0.012626262626262652,
+      "sub_score": -0.0017441860465116088,
+      "statement": "D 现在已经明确是固定点动力学问题。residual-gate 能打开 dual-positive，Bayesian 能压低 overall 屏障，learned controller 掉进 retention-first 固定点，而 two-phase、three-phase、base+offset 统一律以及新增的 offset-stabilization 门都仍然落在 novel-first 一侧。",
+      "metrics": {
+        "residual_dual_positive_count": 29.0,
+        "residual_best_overall_gain": -0.016414141414141437,
+        "bayes_best_overall_gain": -0.01388888888888895,
+        "learned_best_overall_gain": -0.012626262626262652,
+        "two_phase_overall_gain": -0.02714646464646464,
+        "three_phase_overall_gain": -0.02714646464646464,
+        "base_offset_best_overall_gain": -0.02188552188552184,
+        "base_offset_best_novel_gain": 0.8645833333333333,
+        "base_offset_best_retention_gain": -0.3573232323232323,
+        "offset_stabilization_best_overall_gain": -0.02188552188552184,
+        "multimodal_grounding_gain": -0.0017441860465116088,
+        "multimodal_consistency_gain": 0.003333333333333313
+      }
+    }
+  },
+  "next_plan": [
+    "A：把状态机升级成更稳的长 horizon 版本，而不是只在 L=32 一侧获胜。",
+    "B：继续把 relation typing 推进到更真实的多步任务和失效模式分析。",
+    "C：把概念编码分解扩到更大概念域，并和协议场调用直接闭环。",
+    "D：停止细扫当前固定点族，转向能穿过 retention-first / novel-first 鞍点区的显式多阶段整合律。"
+  ]
+}

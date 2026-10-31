@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 22:20:08",
+    "runtime_sec": 0.0051,
+    "core_constraint": "relation_tool_joint_head_upgrade_after_tool_stage_repair",
+    "trial_count": 384,
+    "stages": ["concept", "relation", "tool", "verify"]
+  },
+  "generator_profiles": {
+    "tool_stage_head_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3216,
+        "relation": 0.1842,
+        "tool": 0.2663,
+        "verify": 0.1855
+      }
+    },
+    "relation_tool_joint_head_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3204,
+        "relation": 0.2738,
+        "tool": 0.3028,
+        "verify": 0.1953
+      },
+      "upgrade_spec": {
+        "relation_head_gain": 1.4,
+        "tool_head_gain": 0.8,
+        "cross_gate_gain": 1.0,
+        "verify_guard_gain": 0.2,
+        "concept_guard_gain": 0.4
+      },
+      "best_trial_id": 379
+    }
+  },
+  "models": {
+    "qwen3_4b": {
+      "stage_demand": {
+        "concept": 0.2172,
+        "relation": 0.2959,
+        "tool": 0.3266,
+        "verify": 0.1231
+      },
+      "tool_stage_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3216, "demand": 0.2172, "undercoverage": 0.0, "slack": 0.1044, "alignment_gap": 0.1044 },
+          { "stage": "relation", "capacity": 0.1842, "demand": 0.2959, "undercoverage": 0.1117, "slack": 0.0, "alignment_gap": 0.1117 },
+          { "stage": "tool", "capacity": 0.2663, "demand": 0.3266, "undercoverage": 0.0603, "slack": 0.0, "alignment_gap": 0.0603 },
+          { "stage": "verify", "capacity": 0.1855, "demand": 0.1231, "undercoverage": 0.0, "slack": 0.0624, "alignment_gap": 0.0624 }
+        ],
+        "mean_undercoverage": 0.0430,
+        "mean_alignment_gap": 0.0847,
+        "worst_stage": "relation",
+        "worst_undercoverage": 0.1117
+      },
+      "relation_tool_joint_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3204, "demand": 0.2172, "undercoverage": 0.0, "slack": 0.1032, "alignment_gap": 0.1032 },
+          { "stage": "relation", "capacity": 0.2738, "demand": 0.2959, "undercoverage": 0.0222, "slack": 0.0, "alignment_gap": 0.0222 },
+          { "stage": "tool", "capacity": 0.3028, "demand": 0.3266, "undercoverage": 0.0238, "slack": 0.0, "alignment_gap": 0.0238 },
+          { "stage": "verify", "capacity": 0.1953, "demand": 0.1231, "undercoverage": 0.0, "slack": 0.0723, "alignment_gap": 0.0723 }
+        ],
+        "mean_undercoverage": 0.0115,
+        "mean_alignment_gap": 0.0554,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.0238
+      }
+    },
+    "deepseek_7b": {
+      "stage_demand": {
+        "concept": 0.5449,
+        "relation": 0.5513,
+        "tool": 0.6098,
+        "verify": 0.1520
+      },
+      "tool_stage_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3216, "demand": 0.5449, "undercoverage": 0.2233, "slack": 0.0, "alignment_gap": 0.2233 },
+          { "stage": "relation", "capacity": 0.1842, "demand": 0.5513, "undercoverage": 0.3672, "slack": 0.0, "alignment_gap": 0.3672 },
+          { "stage": "tool", "capacity": 0.2663, "demand": 0.6098, "undercoverage": 0.3435, "slack": 0.0, "alignment_gap": 0.3435 },
+          { "stage": "verify", "capacity": 0.1855, "demand": 0.1520, "undercoverage": 0.0, "slack": 0.0335, "alignment_gap": 0.0335 }
+        ],
+        "mean_undercoverage": 0.2335,
+        "mean_alignment_gap": 0.2419,
+        "worst_stage": "relation",
+        "worst_undercoverage": 0.3672
+      },
+      "relation_tool_joint_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3204, "demand": 0.5449, "undercoverage": 0.2245, "slack": 0.0, "alignment_gap": 0.2245 },
+          { "stage": "relation", "capacity": 0.2738, "demand": 0.5513, "undercoverage": 0.2776, "slack": 0.0, "alignment_gap": 0.2776 },
+          { "stage": "tool", "capacity": 0.3028, "demand": 0.6098, "undercoverage": 0.3070, "slack": 0.0, "alignment_gap": 0.3070 },
+          { "stage": "verify", "capacity": 0.1953, "demand": 0.1520, "undercoverage": 0.0, "slack": 0.0434, "alignment_gap": 0.0434 }
+        ],
+        "mean_undercoverage": 0.2023,
+        "mean_alignment_gap": 0.2131,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.3070
+      }
+    }
+  },
+  "headline_metrics": {
+    "best_system": "relation_tool_joint_head_generator_network",
+    "qwen_relation_undercoverage_gain": 0.0896,
+    "deepseek_relation_undercoverage_gain": 0.0896,
+    "qwen_tool_regression_after_joint_head": -0.0365,
+    "deepseek_tool_regression_after_joint_head": -0.0365,
+    "qwen_mean_undercoverage_gain": 0.0315,
+    "deepseek_mean_undercoverage_gain": 0.0312,
+    "qwen_worst_stage_after_joint_head": "tool",
+    "deepseek_worst_stage_after_joint_head": "tool"
+  },
+  "gains": {
+    "qwen_joint_minus_tool_head_relation_gap": 0.0896,
+    "deepseek_joint_minus_tool_head_relation_gap": 0.0896,
+    "qwen_joint_minus_tool_head_mean_undercoverage": 0.0315,
+    "deepseek_joint_minus_tool_head_mean_undercoverage": 0.0312
+  },
+  "hypotheses": {
+    "H1_joint_head_reduces_qwen_relation_undercoverage": true,
+    "H2_joint_head_reduces_deepseek_relation_undercoverage": true,
+    "H3_joint_head_keeps_tool_regression_bounded": true,
+    "H4_joint_head_improves_mean_undercoverage_on_both_models": true
+  },
+  "project_readout": {
+    "summary": "在 tool 头已经修复主瓶颈之后，这一步把结构升级推进成 relation/tool 联合头，目标是继续压 relation 缺口，同时守住刚修好的 tool 段。",
+    "next_question": "如果联合头已经能同时缩 relation 和 tool 缺口，下一步就该接入更硬的在线工具接口，看真实触发率能否一起下降。"
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 16:17:33",
+    "top_layers": 2,
+    "probe_concepts": 2,
+    "probe_relations": 2
+  },
+  "models": {
+    "qwen3_4b": {
+      "target_layers": [
+        {
+          "layer": 1,
+          "shared_score": 0.18996628702039484
+        },
+        {
+          "layer": 13,
+          "shared_score": 0.3342336574514505
+        }
+      ],
+      "control_layers": [
+        {
+          "layer": 29,
+          "shared_score": 0.0
+        },
+        {
+          "layer": 6,
+          "shared_score": 0.04344804466693866
+        }
+      ],
+      "probe_concepts": [
+        {
+          "concept": "orange",
+          "true_field": "fruit",
+          "baseline_margin": 0.9175345245277814,
+          "target_margin": 0.9213129493218701,
+          "control_margin": 0.7822097109777506,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.1474874350036361,
+          "causal_margin": -0.15160545420953925
+        },
+        {
+          "concept": "banana",
+          "true_field": "fruit",
+          "baseline_margin": 1.0006917051847077,
+          "target_margin": 1.1156038805981503,
+          "control_margin": 0.9420325161092991,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.05861864225658065,
+          "causal_margin": -0.17345138726481196
+        }
+      ],
+      "probe_relations": [
+        {
+          "relation": "cause_effect",
+          "baseline_peak_pair_bridge": 0.17617765876710353,
+          "target_peak_pair_bridge": 0.17617765876710353,
+          "control_peak_pair_bridge": 0.17617765876710353,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.0,
+          "causal_margin": 0.0
+        },
+        {
+          "relation": "gender",
+          "baseline_peak_pair_bridge": 0.279373608971519,
+          "target_peak_pair_bridge": 0.29176896987663403,
+          "control_peak_pair_bridge": 0.21783957310775995,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.22025715345865746,
+          "causal_margin": -0.2646255565827131
+        }
+      ],
+      "global_summary": {
+        "mean_concept_causal_margin": -0.1625284207371756,
+        "mean_relation_causal_margin": -0.13231277829135654,
+        "actual_targeted_orientation": 0.030215642445819063,
+        "actual_orientation_label": "balanced",
+        "predicted_orientation": -0.06078121172881508,
+        "predicted_orientation_label": "concept_led"
+      }
+    },
+    "deepseek_7b": {
+      "target_layers": [
+        {
+          "layer": 6,
+          "shared_score": 0.0744090619749762
+        },
+        {
+          "layer": 7,
+          "shared_score": 0.08370211291855927
+        }
+      ],
+      "control_layers": [
+        {
+          "layer": 11,
+          "shared_score": 0.0
+        },
+        {
+          "layer": 23,
+          "shared_score": 0.01954183397304819
+        }
+      ],
+      "probe_concepts": [
+        {
+          "concept": "orange",
+          "true_field": "fruit",
+          "baseline_margin": 0.6213490945343588,
+          "target_margin": 0.6372551963262005,
+          "control_margin": 0.6292205322511395,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.0,
+          "causal_margin": -0.012930998283773653
+        },
+        {
+          "concept": "apple",
+          "true_field": "fruit",
+          "baseline_margin": 0.801817610916067,
+          "target_margin": 0.6918731431621302,
+          "control_margin": 0.809741776900951,
+          "target_collapse_ratio": 0.1371190483434124,
+          "control_collapse_ratio": 0.0,
+          "causal_margin": 0.14700180207318
+        }
+      ],
+      "probe_relations": [
+        {
+          "relation": "gender",
+          "baseline_peak_pair_bridge": 0.3597941035699038,
+          "target_peak_pair_bridge": 0.4625222147775073,
+          "control_peak_pair_bridge": 0.3772365847698001,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.0,
+          "causal_margin": -0.23704009921580102
+        },
+        {
+          "relation": "synonym",
+          "baseline_peak_pair_bridge": 0.11989561101338331,
+          "target_peak_pair_bridge": 0.1688448174714333,
+          "control_peak_pair_bridge": 0.1198488317456279,
+          "target_collapse_ratio": 0.0,
+          "control_collapse_ratio": 0.00039016664046025813,
+          "causal_margin": -0.4086553737144521
+        }
+      ],
+      "global_summary": {
+        "mean_concept_causal_margin": 0.06703540189470318,
+        "mean_relation_causal_margin": -0.32284773646512654,
+        "actual_targeted_orientation": -0.38988313835982974,
+        "actual_orientation_label": "concept_led",
+        "predicted_orientation": 0.23141579289199304,
+        "predicted_orientation_label": "relation_led"
+      }
+    }
+  },
+  "headline_metrics": {
+    "qwen_concept_causal_margin": -0.1625284207371756,
+    "qwen_relation_causal_margin": -0.13231277829135654,
+    "deepseek_concept_causal_margin": 0.06703540189470318,
+    "deepseek_relation_causal_margin": -0.32284773646512654,
+    "qwen_actual_orientation": 0.030215642445819063,
+    "deepseek_actual_orientation": -0.38988313835982974
+  },
+  "gains": {
+    "qwen_concept_over_relation_margin": -0.030215642445819063,
+    "deepseek_relation_over_concept_margin": -0.38988313835982974,
+    "deepseek_minus_qwen_actual_orientation": -0.4200987808056488
+  },
+  "hypotheses": {
+    "H1_qwen_targeted_ablation_hits_concepts_more": false,
+    "H2_deepseek_targeted_ablation_hits_relations_more": false,
+    "H3_targeted_ablation_beats_control_on_both_models": false,
+    "H4_actual_orientation_matches_prediction": false
+  },
+  "project_readout": {
+    "summary": "这一版不再只做后验取向判断，而是直接对真实模型的高共享层带做定向消融。结果如果稳定，就能把“共享层带偏概念还是偏关系”从统计取向推进成真实干预证据。",
+    "next_question": "如果定向消融的实际伤害方向和预测取向一致，下一步就该把这些高共享层带接回最小控制桥和在线回退链，验证它们是否对应真实脆弱区。"
+  }
+}

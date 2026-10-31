@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 00:11:34",
+    "runtime_sec": 0.0009999275207519531,
+    "source": "phase_gated_unified_update_law_20260309.json"
+  },
+  "ranking_layer": {
+    "mean_absolute_gap": 0.11945725212716195,
+    "score_correlation": 0.9522580818834951
+  },
+  "calibration_layer": {
+    "features": [
+      "1",
+      "phase_gate",
+      "effective_offset - adaptive_offset",
+      "ranking_score"
+    ],
+    "coefficients": [
+      -1.4571001142019682,
+      0.09079816292386012,
+      -0.058705493232655004,
+      3.0912058235635635
+    ]
+  },
+  "two_layer_law": {
+    "mean_absolute_gap": 0.03285215793834863,
+    "score_correlation": 0.9562099038712607,
+    "gap_improvement_vs_ranking": 0.08660509418881332,
+    "correlation_improvement_vs_ranking": 0.003951821987765558
+  },
+  "leave_one_out": {
+    "rows": [
+      {
+        "row_id": "gpt2_dnn_bridge",
+        "source_type": "bridge",
+        "held_out_prediction": 0.7864104079560341,
+        "held_out_reference": 0.8098302379807074,
+        "held_out_gap": 0.023419830024673294
+      },
+      {
+        "row_id": "qwen3_4b_dnn_bridge",
+        "source_type": "bridge",
+        "held_out_prediction": 0.9941225166790622,
+        "held_out_reference": 0.8152893551778044,
+        "held_out_gap": 0.17883316150125772
+      },
+      {
+        "row_id": "qwen3_4b_mechanism_bridge",
+        "source_type": "bridge",
+        "held_out_prediction": 1.3180396652009252,
+        "held_out_reference": 0.7531501201677545,
+        "held_out_gap": 0.5648895450331707
+      },
+      {
+        "row_id": "deepseek_7b_mechanism_bridge",
+        "source_type": "bridge",
+        "held_out_prediction": 0.7313326265553717,
+        "held_out_reference": 0.9041073210652278,
+        "held_out_gap": 0.17277469450985616
+      },
+      {
+        "row_id": "residual_gate",
+        "source_type": "D",
+        "held_out_prediction": 0.5321154907042152,
+        "held_out_reference": 0.48737373737373735,
+        "held_out_gap": 0.04474175333047781
+      },
+      {
+        "row_id": "bayes_consolidation",
+        "source_type": "D",
+        "held_out_prediction": 0.48934509404564785,
+        "held_out_reference": 0.48737373737373735,
+        "held_out_gap": 0.001971356671910507
+      },
+      {
+        "row_id": "learned_controller",
+        "source_type": "D",
+        "held_out_prediction": 0.4809912490806485,
+        "held_out_reference": 0.48737373737373735,
+        "held_out_gap": 0.0063824882930888505
+      },
+      {
+        "row_id": "two_phase",
+        "source_type": "D",
+        "held_out_prediction": 0.5007984442386055,
+        "held_out_reference": 0.47285353535353536,
+        "held_out_gap": 0.027944908885070174
+      },
+      {
+        "row_id": "three_phase",
+        "source_type": "D",
+        "held_out_prediction": 0.5007984442386055,
+        "held_out_reference": 0.47285353535353536,
+        "held_out_gap": 0.027944908885070174
+      },
+      {
+        "row_id": "base_offset",
+        "source_type": "D",
+        "held_out_prediction": 0.48663163604193493,
+        "held_out_reference": 0.47811447811447816,
+        "held_out_gap": 0.008517157927456775
+      },
+      {
+        "row_id": "offset_stabilization",
+        "source_type": "D",
+        "held_out_prediction": 0.48663163604193493,
+        "held_out_reference": 0.47811447811447816,
+        "held_out_gap": 0.008517157927456775
+      },
+      {
+        "row_id": "multistage",
+        "source_type": "D",
+        "held_out_prediction": 0.4128695055775271,
+        "held_out_reference": 0.4911616161616162,
+        "held_out_gap": 0.07829211058408908
+      }
+    ],
+    "mean_held_out_gap": 0.09535242279779815,
+    "pass": false
+  },
+  "rows": [
+    {
+      "row_id": "gpt2_dnn_bridge",
+      "source_type": "bridge",
+      "reference_score": 0.8098302379807074,
+      "ranking_score": 0.7069871623209365,
+      "calibrated_score": 0.792928849856231,
+      "phase_gate": 0.7533200202038929,
+      "absolute_gap": 0.01690138812447639
+    },
+    {
+      "row_id": "qwen3_4b_dnn_bridge",
+      "source_type": "bridge",
+      "reference_score": 0.8152893551778044,
+      "ranking_score": 0.7345023675335264,
+      "calibrated_score": 0.8885016052909136,
+      "phase_gate": 0.757931194433457,
+      "absolute_gap": 0.07321225011310917
+    },
+    {
+      "row_id": "qwen3_4b_mechanism_bridge",
+      "source_type": "bridge",
+      "reference_score": 0.7531501201677545,
+      "ranking_score": 0.7194729701752834,
+      "calibrated_score": 0.781805386787721,
+      "phase_gate": 0.4297876715224977,
+      "absolute_gap": 0.028655266619966535
+    },
+    {
+      "row_id": "deepseek_7b_mechanism_bridge",
+      "source_type": "bridge",
+      "reference_score": 0.9041073210652278,
+      "ranking_score": 0.7054622827076874,
+      "calibrated_score": 0.7781995566039506,
+      "phase_gate": 0.45366722586413044,
+      "absolute_gap": 0.12590776446127727
+    },
+    {
+      "row_id": "residual_gate",
+      "source_type": "D",
+      "reference_score": 0.48737373737373735,
+      "ranking_score": 0.6194943006337061,
+      "calibrated_score": 0.5245954203915133,
+      "phase_gate": 0.6713620459132676,
+      "absolute_gap": 0.03722168301777595
+    },
+    {
+      "row_id": "bayes_consolidation",
+      "source_type": "D",
+      "reference_score": 0.48737373737373735,
+      "ranking_score": 0.6072881575281065,
+      "calibrated_score": 0.48902334369226264,
+      "phase_gate": 0.6151426584043324,
+      "absolute_gap": 0.0016496063185252874
+    },
+    {
+      "row_id": "learned_controller",
+      "source_type": "D",
+      "reference_score": 0.48737373737373735,
+      "ranking_score": 0.6060116318452416,
+      "calibrated_score": 0.4829252892292699,
+      "phase_gate": 0.742770162791871,
+      "absolute_gap": 0.004448448144467432
+    },
+    {
+      "row_id": "two_phase",
+      "source_type": "D",
+      "reference_score": 0.47285353535353536,
+      "ranking_score": 0.6134237991181146,
+      "calibrated_score": 0.4944882939938766,
+      "phase_gate": 0.291626008967673,
+      "absolute_gap": 0.021634758640341256
+    },
+    {
+      "row_id": "three_phase",
+      "source_type": "D",
+      "reference_score": 0.47285353535353536,
+      "ranking_score": 0.6134237991181146,
+      "calibrated_score": 0.4944882939938766,
+      "phase_gate": 0.291626008967673,
+      "absolute_gap": 0.021634758640341256
+    },
+    {
+      "row_id": "base_offset",
+      "source_type": "D",
+      "reference_score": 0.47811447811447816,
+      "ranking_score": 0.6104415717041142,
+      "calibrated_score": 0.4846667902544912,
+      "phase_gate": 0.2860499686545276,
+      "absolute_gap": 0.006552312140013061
+    },
+    {
+      "row_id": "offset_stabilization",
+      "source_type": "D",
+      "reference_score": 0.47811447811447816,
+      "ranking_score": 0.6104415717041142,
+      "calibrated_score": 0.4846667902544912,
+      "phase_gate": 0.2860499686545276,
+      "absolute_gap": 0.006552312140013061
+    },
+    {
+      "row_id": "multistage",
+      "source_type": "D",
+      "reference_score": 0.4911616161616162,
+      "ranking_score": 0.5922287974392263,
+      "calibrated_score": 0.4413062692617393,
+      "phase_gate": 0.7425489633389191,
+      "absolute_gap": 0.04985534689987686
+    }
+  ],
+  "project_readout": {
+    "current_verdict": "如果双层统一律能显著压低误差，但留一法仍然不稳，说明“排序层 + 标定层”方向是对的，但当前标定层还只是解析过拟合原型。",
+    "next_question": "下一步应该先把标定层推进到可学习版本，还是直接在真实任务上联合训练排序层和标定层？"
+  }
+}

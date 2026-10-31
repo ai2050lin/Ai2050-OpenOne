@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 09:14:00",
+    "runtime_sec": 3.7437031269073486,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ]
+  },
+  "factorized_basis_shells": {
+    "prototype_position_shell": {
+      "loop_rank": 4,
+      "mean_absolute_gap": 0.0056466004001902576,
+      "score_correlation": 0.9749663081187363,
+      "modality_mean_gap": {
+        "full": 0.012077061828851118,
+        "visual": 0.003545345467471117,
+        "tactile": 0.003993374557143853,
+        "language": 0.002970619747294942
+      },
+      "mean_held_out_gap": 0.007203048051354558,
+      "held_out_score_correlation": 0.9606078286143466,
+      "modality_held_out_gap": {
+        "full": 0.014297695015030514,
+        "visual": 0.004972458435118662,
+        "tactile": 0.005430145013965113,
+        "language": 0.004111893741303943
+      }
+    },
+    "prototype_boundary_width_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.00766211566353755,
+      "score_correlation": 0.9553976706872773,
+      "modality_mean_gap": {
+        "full": 0.010679480788103884,
+        "visual": 0.008751828866701427,
+        "tactile": 0.005535423189873892,
+        "language": 0.005681729809470992
+      },
+      "mean_held_out_gap": 0.00889307884881925,
+      "held_out_score_correlation": 0.9400471112685603,
+      "modality_held_out_gap": {
+        "full": 0.011925316418843607,
+        "visual": 0.010526368880240217,
+        "tactile": 0.006408124530080395,
+        "language": 0.0067125055661127805
+      }
+    },
+    "prototype_spacing_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007678016620343263,
+      "score_correlation": 0.9559146586435764,
+      "modality_mean_gap": {
+        "full": 0.010770717575329792,
+        "visual": 0.00750669152344399,
+        "tactile": 0.00641050438416948,
+        "language": 0.006024152998429791
+      },
+      "mean_held_out_gap": 0.008553346515969788,
+      "held_out_score_correlation": 0.944581490402583,
+      "modality_held_out_gap": {
+        "full": 0.011870596647549955,
+        "visual": 0.008551389826765746,
+        "tactile": 0.007123827137081223,
+        "language": 0.006667572452482224
+      }
+    }
+  },
+  "winner": "prototype_position_shell",
+  "hypotheses": {
+    "H1_position_beats_boundary": true,
+    "H2_position_beats_spacing": true,
+    "H3_basis_shell_is_position_heavy": true
+  },
+  "project_readout": {
+    "summary": "如果原型位置壳优于边界宽度壳和原型间距壳，就说明多模态差异更像先重写共享基底的原型中心，再向外扩展成边界与间距差异。",
+    "next_question": "共享中央回路和共享基底壳之间，最小需要交换的是原型中心坐标、原型置信度，还是更抽象的家族激活状态？"
+  }
+}

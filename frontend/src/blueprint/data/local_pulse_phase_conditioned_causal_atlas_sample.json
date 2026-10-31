@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 17:17:10",
+    "runtime_sec": 5.046772480010986,
+    "core_constraint": "phase_conditioned_local_causal_core_without_global_controller"
+  },
+  "systems": {
+    "heterogeneous_local_replay": {
+      "baseline_accuracy": 0.6722222222222223,
+      "decision_threshold": 0.0029463207721710516,
+      "same_if_margin_below": true,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.0,
+          "comparator": 0.09027777777777768,
+          "motor": 0.0
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.0,
+          "comparator": 0.05555555555555547,
+          "motor": 0.0
+        },
+        "recovery_phase": {
+          "sensory": 0.0,
+          "memory": 0.02083333333333326,
+          "comparator": 0.13888888888888884,
+          "motor": 0.15972222222222215
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.09027777777777768,
+          "upstream_mass": 0.0,
+          "downstream_mass": 0.09027777777777768,
+          "memory_comparator_mass": 0.09027777777777768,
+          "sensory_motor_mass": 0.0,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.0,
+            "comparator": 0.09027777777777768,
+            "motor": 0.0
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.05555555555555547,
+          "upstream_mass": 0.0,
+          "downstream_mass": 0.05555555555555547,
+          "memory_comparator_mass": 0.05555555555555547,
+          "sensory_motor_mass": 0.0,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.0,
+            "comparator": 0.05555555555555547,
+            "motor": 0.0
+          }
+        },
+        "recovery_phase": {
+          "top_region": "motor",
+          "top_drop": 0.15972222222222215,
+          "upstream_mass": 0.02083333333333326,
+          "downstream_mass": 0.298611111111111,
+          "memory_comparator_mass": 0.1597222222222221,
+          "sensory_motor_mass": 0.15972222222222215,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.02083333333333326,
+            "comparator": 0.13888888888888884,
+            "motor": 0.15972222222222215
+          }
+        },
+        "distinct_top_region_count": 2,
+        "top_region_sequence": [
+          "comparator",
+          "comparator",
+          "motor"
+        ]
+      }
+    },
+    "heterogeneous_local_stdp": {
+      "baseline_accuracy": 0.5166666666666667,
+      "decision_threshold": 0.0038701987266540616,
+      "same_if_margin_below": false,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.0,
+          "comparator": 0.0,
+          "motor": 0.0
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.0,
+          "comparator": 0.041666666666666685,
+          "motor": 0.0
+        },
+        "recovery_phase": {
+          "sensory": 0.0,
+          "memory": 0.0,
+          "comparator": 0.0,
+          "motor": 0.0
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "sensory",
+          "top_drop": 0.0,
+          "upstream_mass": 0.0,
+          "downstream_mass": 0.0,
+          "memory_comparator_mass": 0.0,
+          "sensory_motor_mass": 0.0,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.0,
+            "comparator": 0.0,
+            "motor": 0.0
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.041666666666666685,
+          "upstream_mass": 0.0,
+          "downstream_mass": 0.041666666666666685,
+          "memory_comparator_mass": 0.041666666666666685,
+          "sensory_motor_mass": 0.0,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.0,
+            "comparator": 0.041666666666666685,
+            "motor": 0.0
+          }
+        },
+        "recovery_phase": {
+          "top_region": "sensory",
+          "top_drop": 0.0,
+          "upstream_mass": 0.0,
+          "downstream_mass": 0.0,
+          "memory_comparator_mass": 0.0,
+          "sensory_motor_mass": 0.0,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.0,
+            "comparator": 0.0,
+            "motor": 0.0
+          }
+        },
+        "distinct_top_region_count": 2,
+        "top_region_sequence": [
+          "sensory",
+          "comparator",
+          "sensory"
+        ]
+      }
+    }
+  },
+  "headline_metrics": {
+    "baseline_accuracy": 0.6722222222222223,
+    "concept_phase_upstream_advantage": -0.09027777777777768,
+    "comparison_phase_memory_comparator_advantage": 0.05555555555555547,
+    "recovery_phase_replay_memory_comparator_advantage": 0.1597222222222221,
+    "distinct_top_region_count": 2
+  },
+  "hypotheses": {
+    "H1_concept_phase_prefers_upstream_regions": false,
+    "H2_comparison_phase_prefers_memory_comparator": true,
+    "H3_recovery_phase_is_replay_dependent": true,
+    "H4_no_single_global_core": true
+  },
+  "project_readout": {
+    "summary": "这一步不再问系统有没有共享结构，而是直接问：在严格局部更新的条件下，当前因果核心会不会随阶段变化。结果如果成立，说明系统级整合不是由一个全局指挥器固定完成，而是由不同阶段的局部核心依次接管。",
+    "next_question": "如果 concept / comparison / recovery 三个阶段真的对应不同局部核心，下一步就该把这些局部核心接回真实任务接口和真实模型层带，看条件门控是否也遵循同样的去全局化规律。"
+  }
+}

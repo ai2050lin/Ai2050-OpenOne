@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 21:54:36",
+    "core_constraint": "real_model_online_recovery_chain_proxy",
+    "episodes": 240,
+    "runtime_sec": 0.0165
+  },
+  "models": {
+    "qwen3_4b": {
+      "systems": {
+        "online_no_recovery": { "success_rate": 0.5542 },
+        "online_recovery_aware": {
+          "success_rate": 0.7458,
+          "rollback_trigger_rate": 0.4458,
+          "rollback_recovery_rate": 0.5701,
+          "mean_completion_progress": 0.7653,
+          "mean_post_recovery_stability": 0.7367
+        }
+      },
+      "step_rows": [
+        { "step": "concept", "trigger_rate": 0.1000, "recovery_success_rate": 0.6250 },
+        { "step": "relation", "trigger_rate": 0.1208, "recovery_success_rate": 0.4828 },
+        { "step": "tool", "trigger_rate": 0.1625, "recovery_success_rate": 0.5897 },
+        { "step": "verify", "trigger_rate": 0.0625, "recovery_success_rate": 0.6000 }
+      ],
+      "episode_count": 240
+    },
+    "deepseek_7b": {
+      "systems": {
+        "online_no_recovery": { "success_rate": 0.2833 },
+        "online_recovery_aware": {
+          "success_rate": 0.4750,
+          "rollback_trigger_rate": 0.7167,
+          "rollback_recovery_rate": 0.4012,
+          "mean_completion_progress": 0.5375,
+          "mean_post_recovery_stability": 0.4782
+        }
+      },
+      "step_rows": [
+        { "step": "concept", "trigger_rate": 0.2625, "recovery_success_rate": 0.5397 },
+        { "step": "relation", "trigger_rate": 0.2042, "recovery_success_rate": 0.3673 },
+        { "step": "tool", "trigger_rate": 0.1917, "recovery_success_rate": 0.2174 },
+        { "step": "verify", "trigger_rate": 0.0583, "recovery_success_rate": 0.5000 }
+      ],
+      "episode_count": 240
+    }
+  },
+  "headline_metrics": {
+    "qwen_no_recovery_success": 0.5542,
+    "qwen_recovery_success": 0.7458,
+    "deepseek_no_recovery_success": 0.2833,
+    "deepseek_recovery_success": 0.4750,
+    "qwen_trigger_rate": 0.4458,
+    "deepseek_trigger_rate": 0.7167,
+    "qwen_recovery_rate": 0.5701,
+    "deepseek_recovery_rate": 0.4012
+  },
+  "gains": {
+    "qwen_online_recovery_gain": 0.1917,
+    "deepseek_online_recovery_gain": 0.1917,
+    "deepseek_minus_qwen_trigger_rate": 0.2708,
+    "qwen_minus_deepseek_final_success": 0.2708
+  },
+  "hypotheses": {
+    "H1_online_recovery_improves_success_on_both_models": true,
+    "H2_deepseek_has_higher_online_trigger_rate": true,
+    "H3_qwen_keeps_higher_online_recovery_rate": true,
+    "H4_qwen_keeps_higher_final_online_success": true
+  },
+  "project_readout": {
+    "summary": "这一步把真实模型结构约束下的在线 rollback / recovery 链显式化，先验证高风险层带和取向惩罚是否会在在线链里表现成更高触发率。",
+    "next_question": "如果在线恢复链已经成立，下一步就该继续把这些高风险段和生成网络容量缺口直接对齐。"
+  }
+}

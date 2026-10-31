@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 09:32:21",
+    "runtime_sec": 7.0485851764678955,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ]
+  },
+  "minimal_interface_states": {
+    "prototype_center_state": {
+      "loop_rank": 4,
+      "mean_absolute_gap": 0.0056466004001902576,
+      "score_correlation": 0.9749663081187363,
+      "modality_mean_gap": {
+        "full": 0.012077061828851118,
+        "visual": 0.003545345467471117,
+        "tactile": 0.003993374557143853,
+        "language": 0.002970619747294942
+      },
+      "mean_held_out_gap": 0.007203048051354558,
+      "held_out_score_correlation": 0.9606078286143466,
+      "modality_held_out_gap": {
+        "full": 0.014297695015030514,
+        "visual": 0.004972458435118662,
+        "tactile": 0.005430145013965113,
+        "language": 0.004111893741303943
+      }
+    },
+    "prototype_confidence_state": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.005480146555028301,
+      "score_correlation": 0.974919949676863,
+      "modality_mean_gap": {
+        "full": 0.01141578134918029,
+        "visual": 0.0036043527191315706,
+        "tactile": 0.0033100319733832097,
+        "language": 0.0035904201784181357
+      },
+      "mean_held_out_gap": 0.006685533882058142,
+      "held_out_score_correlation": 0.9650991071008034,
+      "modality_held_out_gap": {
+        "full": 0.012943417997289278,
+        "visual": 0.004478275087819247,
+        "tactile": 0.00437502464950387,
+        "language": 0.0049454177936201745
+      }
+    },
+    "family_activation_state": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.006700709271086907,
+      "score_correlation": 0.9656101362192809,
+      "modality_mean_gap": {
+        "full": 0.011013579540929621,
+        "visual": 0.004591174072303697,
+        "tactile": 0.0056797142471182085,
+        "language": 0.005518369223996103
+      },
+      "mean_held_out_gap": 0.008635611352969726,
+      "held_out_score_correlation": 0.9432589442194508,
+      "modality_held_out_gap": {
+        "full": 0.01359278607044911,
+        "visual": 0.00636301829185649,
+        "tactile": 0.007496048679628414,
+        "language": 0.0070905923699448896
+      }
+    }
+  },
+  "winner": "prototype_confidence_state",
+  "hypotheses": {
+    "H1_center_beats_confidence": false,
+    "H2_center_beats_activation": true,
+    "H3_minimal_interface_is_center_like": false
+  },
+  "project_readout": {
+    "summary": "如果原型中心状态优于原型置信度和家族激活态，就说明共享中央回路与原型位置壳之间的最小接口更像交换原型中心坐标，而不是更高阶的置信度或激活统计。",
+    "next_question": "原型中心接口到底需要几维状态，才能同时支撑多模态统一回路、真实任务收益和脑侧约束？"
+  }
+}

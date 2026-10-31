@@ -1,0 +1,1557 @@
+{
+  "meta": {
+    "timestamp": "2026-03-08 22:04:35",
+    "seed": 42,
+    "num_seeds": 8,
+    "noise": 0.34,
+    "dropout_p": 0.14,
+    "lengths": [
+      6,
+      8,
+      10,
+      12
+    ],
+    "beta_values": [
+      0.5,
+      0.7,
+      0.8,
+      0.86,
+      0.92,
+      0.96
+    ],
+    "runtime_sec": 31.32775044441223
+  },
+  "trace_reference": {
+    "per_length": {
+      "6": {
+        "summary": {
+          "phase1_episode_success": {
+            "mean": 0.5711805555555556,
+            "std": 0.19212875808593038
+          },
+          "phase2_episode_success": {
+            "mean": 0.8506944444444444,
+            "std": 0.18526835516602916
+          },
+          "retention_after_phase2": {
+            "mean": 0.2204861111111111,
+            "std": 0.16973982394179077
+          },
+          "retention_drop": {
+            "mean": 0.3506944444444444,
+            "std": 0.3033180386355688
+          },
+          "overall_tool_accuracy": {
+            "mean": 0.8148148148148148,
+            "std": 0.051345076418562126
+          },
+          "overall_route_accuracy": {
+            "mean": 0.548900462962963,
+            "std": 0.14268273994392727
+          },
+          "overall_final_accuracy": {
+            "mean": 0.4826388888888889,
+            "std": 0.110476340734747
+          },
+          "overall_episode_success": {
+            "mean": 0.42939814814814814,
+            "std": 0.10310025111431782
+          }
+        },
+        "real_closure_score": 0.509693287037037
+      },
+      "8": {
+        "summary": {
+          "phase1_episode_success": {
+            "mean": 0.4635416666666667,
+            "std": 0.22662069548457744
+          },
+          "phase2_episode_success": {
+            "mean": 0.8611111111111112,
+            "std": 0.16256527653777256
+          },
+          "retention_after_phase2": {
+            "mean": 0.046875,
+            "std": 0.08302532778623849
+          },
+          "retention_drop": {
+            "mean": 0.4166666666666667,
+            "std": 0.21017702708918828
+          },
+          "overall_tool_accuracy": {
+            "mean": 0.769675925925926,
+            "std": 0.09089149183917995
+          },
+          "overall_route_accuracy": {
+            "mean": 0.48051697530864196,
+            "std": 0.09898202012378127
+          },
+          "overall_final_accuracy": {
+            "mean": 0.3773148148148148,
+            "std": 0.09980583859865788
+          },
+          "overall_episode_success": {
+            "mean": 0.31134259259259256,
+            "std": 0.06755730623848374
+          }
+        },
+        "real_closure_score": 0.4103684413580247
+      },
+      "10": {
+        "summary": {
+          "phase1_episode_success": {
+            "mean": 0.6579861111111112,
+            "std": 0.17234783445598226
+          },
+          "phase2_episode_success": {
+            "mean": 0.7916666666666667,
+            "std": 0.1577474540500076
+          },
+          "retention_after_phase2": {
+            "mean": 0.1736111111111111,
+            "std": 0.15166895602667746
+          },
+          "retention_drop": {
+            "mean": 0.484375,
+            "std": 0.3112194054451253
+          },
+          "overall_tool_accuracy": {
+            "mean": 0.7928240740740742,
+            "std": 0.1147118620706928
+          },
+          "overall_route_accuracy": {
+            "mean": 0.4949363425925926,
+            "std": 0.11578549120407493
+          },
+          "overall_final_accuracy": {
+            "mean": 0.48032407407407407,
+            "std": 0.07599329384805309
+          },
+          "overall_episode_success": {
+            "mean": 0.3611111111111111,
+            "std": 0.10424379860368242
+          }
+        },
+        "real_closure_score": 0.46993634259259265
+      },
+      "12": {
+        "summary": {
+          "phase1_episode_success": {
+            "mean": 0.5243055555555556,
+            "std": 0.1356834977956939
+          },
+          "phase2_episode_success": {
+            "mean": 0.829861111111111,
+            "std": 0.24352632979304134
+          },
+          "retention_after_phase2": {
+            "mean": 0.07465277777777779,
+            "std": 0.1293490162968985
+          },
+          "retention_drop": {
+            "mean": 0.4496527777777778,
+            "std": 0.21727761752813773
+          },
+          "overall_tool_accuracy": {
+            "mean": 0.7858796296296297,
+            "std": 0.06951192708841113
+          },
+          "overall_route_accuracy": {
+            "mean": 0.36643518518518514,
+            "std": 0.12310789337897267
+          },
+          "overall_final_accuracy": {
+            "mean": 0.4039351851851852,
+            "std": 0.14178595044703865
+          },
+          "overall_episode_success": {
+            "mean": 0.3194444444444444,
+            "std": 0.11207146700842784
+          }
+        },
+        "real_closure_score": 0.4023090277777778
+      }
+    },
+    "global_summary": {
+      "lengths": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "closure_curve": [
+        0.509693287037037,
+        0.4103684413580247,
+        0.46993634259259265,
+        0.4023090277777778
+      ],
+      "retention_curve": [
+        0.2204861111111111,
+        0.046875,
+        0.1736111111111111,
+        0.07465277777777779
+      ],
+      "closure_decay_slope": -0.013129243827160502,
+      "retention_decay_slope": -0.015538194444444436,
+      "closure_relative_drop": 0.10738425925925921,
+      "retention_relative_drop": 0.14583333333333331,
+      "mean_closure_score": 0.448076774691358,
+      "mean_retention_score": 0.12890625
+    }
+  },
+  "betas": {
+    "0.50": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.5,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.6145833333333334,
+              "std": 0.14193703774978958
+            },
+            "phase2_episode_success": {
+              "mean": 0.7881944444444444,
+              "std": 0.1914136312824683
+            },
+            "retention_after_phase2": {
+              "mean": 0.2690972222222222,
+              "std": 0.17947560305247448
+            },
+            "retention_drop": {
+              "mean": 0.34548611111111116,
+              "std": 0.2707832485740825
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8715277777777778,
+              "std": 0.03745067057260054
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5347222222222222,
+              "std": 0.08872869679986553
+            },
+            "overall_final_accuracy": {
+              "mean": 0.48842592592592593,
+              "std": 0.09507663323107803
+            },
+            "overall_episode_success": {
+              "mean": 0.43865740740740744,
+              "std": 0.10025446661436928
+            }
+          },
+          "real_closure_score": 0.5289641203703704
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5086805555555556,
+              "std": 0.25599839914080386
+            },
+            "phase2_episode_success": {
+              "mean": 0.7430555555555556,
+              "std": 0.2177279917582067
+            },
+            "retention_after_phase2": {
+              "mean": 0.2204861111111111,
+              "std": 0.22389103209271963
+            },
+            "retention_drop": {
+              "mean": 0.2881944444444444,
+              "std": 0.28898819740733483
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8506944444444444,
+              "std": 0.04708529075649998
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5233410493827161,
+              "std": 0.13243410849619974
+            },
+            "overall_final_accuracy": {
+              "mean": 0.48263888888888884,
+              "std": 0.14212567101496493
+            },
+            "overall_episode_success": {
+              "mean": 0.4039351851851852,
+              "std": 0.13623525926729427
+            }
+          },
+          "real_closure_score": 0.5053915895061728
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.640625,
+              "std": 0.1807474274316184
+            },
+            "phase2_episode_success": {
+              "mean": 0.7708333333333333,
+              "std": 0.3474304930930274
+            },
+            "retention_after_phase2": {
+              "mean": 0.2048611111111111,
+              "std": 0.18500787228829474
+            },
+            "retention_drop": {
+              "mean": 0.4357638888888889,
+              "std": 0.23651288324930894
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8483796296296297,
+              "std": 0.04628182644243564
+            },
+            "overall_route_accuracy": {
+              "mean": 0.4738136574074074,
+              "std": 0.08625391365515647
+            },
+            "overall_final_accuracy": {
+              "mean": 0.4224537037037037,
+              "std": 0.09293195910252698
+            },
+            "overall_episode_success": {
+              "mean": 0.37962962962962965,
+              "std": 0.10206207261596578
+            }
+          },
+          "real_closure_score": 0.47456597222222224
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5277777777777778,
+              "std": 0.14333171833715483
+            },
+            "phase2_episode_success": {
+              "mean": 0.7361111111111112,
+              "std": 0.37396977827322947
+            },
+            "retention_after_phase2": {
+              "mean": 0.2204861111111111,
+              "std": 0.2682783238846516
+            },
+            "retention_drop": {
+              "mean": 0.30729166666666663,
+              "std": 0.29864643686396664
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8634259259259259,
+              "std": 0.041343914582156825
+            },
+            "overall_route_accuracy": {
+              "mean": 0.4701388888888889,
+              "std": 0.1589802613792997
+            },
+            "overall_final_accuracy": {
+              "mean": 0.4479166666666667,
+              "std": 0.1716049209243707
+            },
+            "overall_episode_success": {
+              "mean": 0.39467592592592593,
+              "std": 0.2043307636083958
+            }
+          },
+          "real_closure_score": 0.4880381944444445
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.5289641203703704,
+          0.5053915895061728,
+          0.47456597222222224,
+          0.4880381944444445
+        ],
+        "retention_curve": [
+          0.2690972222222222,
+          0.2204861111111111,
+          0.2048611111111111,
+          0.2204861111111111
+        ],
+        "closure_decay_slope": -0.007680169753086425,
+        "retention_decay_slope": -0.008072916666666664,
+        "closure_relative_drop": 0.04092592592592592,
+        "retention_relative_drop": 0.048611111111111105,
+        "mean_closure_score": 0.4992399691358025,
+        "mean_retention_score": 0.2287326388888889
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.01927083333333346,
+          "retention_gain_vs_trace": 0.048611111111111105
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.0950231481481481,
+          "retention_gain_vs_trace": 0.1736111111111111
+        },
+        "10": {
+          "closure_gain_vs_trace": 0.004629629629629595,
+          "retention_gain_vs_trace": 0.03125
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.08572916666666675,
+          "retention_gain_vs_trace": 0.14583333333333331
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.2046527777777779,
+        "final_length_gain_vs_trace": 0.08572916666666675,
+        "final_length_retention_gain_vs_trace": 0.14583333333333331
+      }
+    },
+    "0.70": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.7,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5607638888888888,
+              "std": 0.14516006956030672
+            },
+            "phase2_episode_success": {
+              "mean": 0.84375,
+              "std": 0.13244604946361563
+            },
+            "retention_after_phase2": {
+              "mean": 0.2482638888888889,
+              "std": 0.16902804882202316
+            },
+            "retention_drop": {
+              "mean": 0.3125,
+              "std": 0.21006227030908575
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.863425925925926,
+              "std": 0.04410314556309642
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5703125,
+              "std": 0.10576156530909826
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5185185185185185,
+              "std": 0.0941990275434065
+            },
+            "overall_episode_success": {
+              "mean": 0.4305555555555556,
+              "std": 0.10279445977395611
+            }
+          },
+          "real_closure_score": 0.5353298611111111
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.6284722222222222,
+              "std": 0.29263644991864507
+            },
+            "phase2_episode_success": {
+              "mean": 0.7083333333333333,
+              "std": 0.26715811196765754
+            },
+            "retention_after_phase2": {
+              "mean": 0.30729166666666663,
+              "std": 0.14623580375860737
+            },
+            "retention_drop": {
+              "mean": 0.3211805555555556,
+              "std": 0.30755638315509637
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8553240740740741,
+              "std": 0.04241546805974236
+            },
+            "overall_route_accuracy": {
+              "mean": 0.6043595679012346,
+              "std": 0.10409787823591693
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5289351851851851,
+              "std": 0.0974905358390716
+            },
+            "overall_episode_success": {
+              "mean": 0.4398148148148148,
+              "std": 0.08784104611578832
+            }
+          },
+          "real_closure_score": 0.5537712191358025
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5885416666666666,
+              "std": 0.19641087758011297
+            },
+            "phase2_episode_success": {
+              "mean": 0.8020833333333334,
+              "std": 0.18552847232489647
+            },
+            "retention_after_phase2": {
+              "mean": 0.05034722222222222,
+              "std": 0.10275372747887285
+            },
+            "retention_drop": {
+              "mean": 0.5381944444444444,
+              "std": 0.16850118831320735
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8449074074074074,
+              "std": 0.061723572342469356
+            },
+            "overall_route_accuracy": {
+              "mean": 0.45529513888888884,
+              "std": 0.08299696109626713
+            },
+            "overall_final_accuracy": {
+              "mean": 0.375,
+              "std": 0.05113593063512621
+            },
+            "overall_episode_success": {
+              "mean": 0.30787037037037035,
+              "std": 0.02394463063145508
+            }
+          },
+          "real_closure_score": 0.41956018518518523
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.578125,
+              "std": 0.1557379727783929
+            },
+            "phase2_episode_success": {
+              "mean": 0.8680555555555556,
+              "std": 0.10914051142709519
+            },
+            "retention_after_phase2": {
+              "mean": 0.13020833333333334,
+              "std": 0.15386881575361447
+            },
+            "retention_drop": {
+              "mean": 0.44791666666666663,
+              "std": 0.15051192223398085
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8541666666666667,
+              "std": 0.05334128991575423
+            },
+            "overall_route_accuracy": {
+              "mean": 0.46793981481481484,
+              "std": 0.08503904722729715
+            },
+            "overall_final_accuracy": {
+              "mean": 0.42824074074074076,
+              "std": 0.08986133770269293
+            },
+            "overall_episode_success": {
+              "mean": 0.3715277777777778,
+              "std": 0.05936721575570444
+            }
+          },
+          "real_closure_score": 0.46248263888888896
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.5353298611111111,
+          0.5537712191358025,
+          0.41956018518518523,
+          0.46248263888888896
+        ],
+        "retention_curve": [
+          0.2482638888888889,
+          0.30729166666666663,
+          0.05034722222222222,
+          0.13020833333333334
+        ],
+        "closure_decay_slope": -0.017637635030864195,
+        "retention_decay_slope": -0.030555555555555572,
+        "closure_relative_drop": 0.07284722222222217,
+        "retention_relative_drop": 0.11805555555555555,
+        "mean_closure_score": 0.492785976080247,
+        "mean_retention_score": 0.1840277777777778
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.02563657407407416,
+          "retention_gain_vs_trace": 0.02777777777777779
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.14340277777777782,
+          "retention_gain_vs_trace": 0.26041666666666663
+        },
+        "10": {
+          "closure_gain_vs_trace": -0.05037615740740742,
+          "retention_gain_vs_trace": -0.1232638888888889
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.06017361111111119,
+          "retention_gain_vs_trace": 0.05555555555555555
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.17883680555555576,
+        "final_length_gain_vs_trace": 0.06017361111111119,
+        "final_length_retention_gain_vs_trace": 0.05555555555555555
+      }
+    },
+    "0.80": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.8,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5486111111111112,
+              "std": 0.16122481619783194
+            },
+            "phase2_episode_success": {
+              "mean": 0.8888888888888888,
+              "std": 0.11536977587386213
+            },
+            "retention_after_phase2": {
+              "mean": 0.24652777777777776,
+              "std": 0.15226397187000484
+            },
+            "retention_drop": {
+              "mean": 0.3020833333333333,
+              "std": 0.21265766663586888
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8645833333333333,
+              "std": 0.04291781531884064
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5813078703703703,
+              "std": 0.09005817827799632
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5185185185185186,
+              "std": 0.10485881160098265
+            },
+            "overall_episode_success": {
+              "mean": 0.4444444444444444,
+              "std": 0.09476615504842002
+            }
+          },
+          "real_closure_score": 0.5409722222222223
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.6527777777777778,
+              "std": 0.25335328259659307
+            },
+            "phase2_episode_success": {
+              "mean": 0.6666666666666667,
+              "std": 0.2718109137608462
+            },
+            "retention_after_phase2": {
+              "mean": 0.265625,
+              "std": 0.16498537100787128
+            },
+            "retention_drop": {
+              "mean": 0.3871527777777778,
+              "std": 0.3026565044462814
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.84375,
+              "std": 0.047538316615538985
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5731095679012346,
+              "std": 0.08822295310323845
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5462962962962963,
+              "std": 0.10817890227359186
+            },
+            "overall_episode_success": {
+              "mean": 0.39583333333333337,
+              "std": 0.11981263235747718
+            }
+          },
+          "real_closure_score": 0.5314332561728395
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5763888888888888,
+              "std": 0.20635636052921705
+            },
+            "phase2_episode_success": {
+              "mean": 0.7083333333333334,
+              "std": 0.20174776453241597
+            },
+            "retention_after_phase2": {
+              "mean": 0.1996527777777778,
+              "std": 0.20646587795012536
+            },
+            "retention_drop": {
+              "mean": 0.3767361111111111,
+              "std": 0.26429405117427657
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8460648148148148,
+              "std": 0.054766287797782316
+            },
+            "overall_route_accuracy": {
+              "mean": 0.47583912037037035,
+              "std": 0.09816226924288582
+            },
+            "overall_final_accuracy": {
+              "mean": 0.48032407407407407,
+              "std": 0.1026314335988319
+            },
+            "overall_episode_success": {
+              "mean": 0.3622685185185185,
+              "std": 0.15966769734926836
+            }
+          },
+          "real_closure_score": 0.48096064814814815
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.576388888888889,
+              "std": 0.16137430609197573
+            },
+            "phase2_episode_success": {
+              "mean": 0.8020833333333333,
+              "std": 0.18552847232489647
+            },
+            "retention_after_phase2": {
+              "mean": 0.1267361111111111,
+              "std": 0.1736718643700396
+            },
+            "retention_drop": {
+              "mean": 0.4496527777777778,
+              "std": 0.21437281789912718
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8541666666666666,
+              "std": 0.04385947991087135
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5465277777777777,
+              "std": 0.08318756541151237
+            },
+            "overall_final_accuracy": {
+              "mean": 0.42361111111111105,
+              "std": 0.09209938085221185
+            },
+            "overall_episode_success": {
+              "mean": 0.3715277777777778,
+              "std": 0.09771014030899962
+            }
+          },
+          "real_closure_score": 0.47675347222222214
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.5409722222222223,
+          0.5314332561728395,
+          0.48096064814814815,
+          0.47675347222222214
+        ],
+        "retention_curve": [
+          0.24652777777777776,
+          0.265625,
+          0.1996527777777778,
+          0.1267361111111111
+        ],
+        "closure_decay_slope": -0.012156442901234604,
+        "retention_decay_slope": -0.021267361111111126,
+        "closure_relative_drop": 0.06421875000000016,
+        "retention_relative_drop": 0.11979166666666666,
+        "mean_closure_score": 0.507529899691358,
+        "mean_retention_score": 0.20963541666666669
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.03127893518518532,
+          "retention_gain_vs_trace": 0.026041666666666657
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.12106481481481485,
+          "retention_gain_vs_trace": 0.21875
+        },
+        "10": {
+          "closure_gain_vs_trace": 0.011024305555555503,
+          "retention_gain_vs_trace": 0.026041666666666685
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.07444444444444437,
+          "retention_gain_vs_trace": 0.052083333333333315
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.23781250000000004,
+        "final_length_gain_vs_trace": 0.07444444444444437,
+        "final_length_retention_gain_vs_trace": 0.052083333333333315
+      }
+    },
+    "0.86": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.86,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5711805555555556,
+              "std": 0.17994521574995068
+            },
+            "phase2_episode_success": {
+              "mean": 0.8854166666666666,
+              "std": 0.08610831088636975
+            },
+            "retention_after_phase2": {
+              "mean": 0.25,
+              "std": 0.1515098904810516
+            },
+            "retention_drop": {
+              "mean": 0.3211805555555556,
+              "std": 0.2580155508849356
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8634259259259259,
+              "std": 0.04055883210170194
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5662615740740741,
+              "std": 0.10223214920829579
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5069444444444444,
+              "std": 0.10266405954415134
+            },
+            "overall_episode_success": {
+              "mean": 0.44212962962962965,
+              "std": 0.08645763609714398
+            }
+          },
+          "real_closure_score": 0.5353587962962963
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5381944444444444,
+              "std": 0.25841825814360586
+            },
+            "phase2_episode_success": {
+              "mean": 0.7777777777777778,
+              "std": 0.19641855032959654
+            },
+            "retention_after_phase2": {
+              "mean": 0.27951388888888884,
+              "std": 0.142223425966043
+            },
+            "retention_drop": {
+              "mean": 0.2586805555555556,
+              "std": 0.241456795444564
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8449074074074074,
+              "std": 0.043368041655544434
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5979938271604938,
+              "std": 0.10674116215079467
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5682870370370371,
+              "std": 0.14799887589709537
+            },
+            "overall_episode_success": {
+              "mean": 0.45717592592592593,
+              "std": 0.07275113486026723
+            }
+          },
+          "real_closure_score": 0.5584587191358025
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.7638888888888888,
+              "std": 0.15759452385986414
+            },
+            "phase2_episode_success": {
+              "mean": 0.6875,
+              "std": 0.3631751906942467
+            },
+            "retention_after_phase2": {
+              "mean": 0.2743055555555556,
+              "std": 0.2407379584953188
+            },
+            "retention_drop": {
+              "mean": 0.4895833333333333,
+              "std": 0.2510347029155556
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8553240740740742,
+              "std": 0.051122830614254114
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5144675925925926,
+              "std": 0.11750393092394346
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5231481481481481,
+              "std": 0.09555447889143655
+            },
+            "overall_episode_success": {
+              "mean": 0.4131944444444445,
+              "std": 0.17888217316394983
+            }
+          },
+          "real_closure_score": 0.5230324074074074
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.47222222222222227,
+              "std": 0.17691304448412495
+            },
+            "phase2_episode_success": {
+              "mean": 0.7256944444444444,
+              "std": 0.3053779471186807
+            },
+            "retention_after_phase2": {
+              "mean": 0.14583333333333331,
+              "std": 0.17595638137944344
+            },
+            "retention_drop": {
+              "mean": 0.32638888888888884,
+              "std": 0.32734788192757436
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8344907407407407,
+              "std": 0.06388846953700268
+            },
+            "overall_route_accuracy": {
+              "mean": 0.3927083333333333,
+              "std": 0.13844252153399253
+            },
+            "overall_final_accuracy": {
+              "mean": 0.38310185185185186,
+              "std": 0.1507253765830112
+            },
+            "overall_episode_success": {
+              "mean": 0.3287037037037037,
+              "std": 0.14618197596154578
+            }
+          },
+          "real_closure_score": 0.4261111111111111
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.5353587962962963,
+          0.5584587191358025,
+          0.5230324074074074,
+          0.4261111111111111
+        ],
+        "retention_curve": [
+          0.25,
+          0.27951388888888884,
+          0.2743055555555556,
+          0.14583333333333331
+        ],
+        "closure_decay_slope": -0.018158468364197565,
+        "retention_decay_slope": -0.015885416666666683,
+        "closure_relative_drop": 0.10924768518518524,
+        "retention_relative_drop": 0.10416666666666669,
+        "mean_closure_score": 0.5107402584876544,
+        "mean_retention_score": 0.23741319444444442
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.025665509259259367,
+          "retention_gain_vs_trace": 0.029513888888888895
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.14809027777777778,
+          "retention_gain_vs_trace": 0.23263888888888884
+        },
+        "10": {
+          "closure_gain_vs_trace": 0.05309606481481477,
+          "retention_gain_vs_trace": 0.10069444444444448
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.023802083333333335,
+          "retention_gain_vs_trace": 0.07118055555555552
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.25065393518518525,
+        "final_length_gain_vs_trace": 0.023802083333333335,
+        "final_length_retention_gain_vs_trace": 0.07118055555555552
+      }
+    },
+    "0.92": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.92,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.564236111111111,
+              "std": 0.1812137442452836
+            },
+            "phase2_episode_success": {
+              "mean": 0.8958333333333333,
+              "std": 0.10370267029908388
+            },
+            "retention_after_phase2": {
+              "mean": 0.2482638888888889,
+              "std": 0.16024032816386058
+            },
+            "retention_drop": {
+              "mean": 0.3159722222222222,
+              "std": 0.26965108771324897
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8622685185185186,
+              "std": 0.03912995718605781
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5697337962962963,
+              "std": 0.11214577518462732
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5081018518518519,
+              "std": 0.10105300146427255
+            },
+            "overall_episode_success": {
+              "mean": 0.4502314814814815,
+              "std": 0.0875890566782988
+            }
+          },
+          "real_closure_score": 0.537818287037037
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.6076388888888888,
+              "std": 0.2800040991212296
+            },
+            "phase2_episode_success": {
+              "mean": 0.7881944444444444,
+              "std": 0.2791416171735623
+            },
+            "retention_after_phase2": {
+              "mean": 0.29166666666666663,
+              "std": 0.1846491083376157
+            },
+            "retention_drop": {
+              "mean": 0.31597222222222227,
+              "std": 0.1672083212199237
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8460648148148148,
+              "std": 0.041132767694252
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5518904320987654,
+              "std": 0.10370823190391264
+            },
+            "overall_final_accuracy": {
+              "mean": 0.5474537037037037,
+              "std": 0.1370587367078659
+            },
+            "overall_episode_success": {
+              "mean": 0.45717592592592593,
+              "std": 0.11273290743641459
+            }
+          },
+          "real_closure_score": 0.5471257716049382
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.578125,
+              "std": 0.25927411395109123
+            },
+            "phase2_episode_success": {
+              "mean": 0.6180555555555556,
+              "std": 0.27207691700221853
+            },
+            "retention_after_phase2": {
+              "mean": 0.23090277777777776,
+              "std": 0.24610561467087835
+            },
+            "retention_drop": {
+              "mean": 0.3472222222222222,
+              "std": 0.22979711260797633
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8391203703703703,
+              "std": 0.07141306875417754
+            },
+            "overall_route_accuracy": {
+              "mean": 0.44979745370370366,
+              "std": 0.1366879741963367
+            },
+            "overall_final_accuracy": {
+              "mean": 0.44907407407407407,
+              "std": 0.140194480830803
+            },
+            "overall_episode_success": {
+              "mean": 0.3576388888888889,
+              "std": 0.1786423745750911
+            }
+          },
+          "real_closure_score": 0.47164351851851843
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5729166666666667,
+              "std": 0.11468850392301214
+            },
+            "phase2_episode_success": {
+              "mean": 0.7916666666666667,
+              "std": 0.26352313834736496
+            },
+            "retention_after_phase2": {
+              "mean": 0.1579861111111111,
+              "std": 0.16432637876408052
+            },
+            "retention_drop": {
+              "mean": 0.4149305555555556,
+              "std": 0.19200321449132043
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8460648148148148,
+              "std": 0.04854216892479346
+            },
+            "overall_route_accuracy": {
+              "mean": 0.4616898148148148,
+              "std": 0.11592202238354489
+            },
+            "overall_final_accuracy": {
+              "mean": 0.41666666666666663,
+              "std": 0.1027944597739561
+            },
+            "overall_episode_success": {
+              "mean": 0.3680555555555556,
+              "std": 0.13214734237214895
+            }
+          },
+          "real_closure_score": 0.4605960648148148
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.537818287037037,
+          0.5471257716049382,
+          0.47164351851851843,
+          0.4605960648148148
+        ],
+        "retention_curve": [
+          0.2482638888888889,
+          0.29166666666666663,
+          0.23090277777777776,
+          0.1579861111111111
+        ],
+        "closure_decay_slope": -0.015357445987654332,
+        "retention_decay_slope": -0.01657986111111112,
+        "closure_relative_drop": 0.07722222222222225,
+        "retention_relative_drop": 0.09027777777777779,
+        "mean_closure_score": 0.5042959104938272,
+        "mean_retention_score": 0.2322048611111111
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.028125000000000067,
+          "retention_gain_vs_trace": 0.02777777777777779
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.13675733024691356,
+          "retention_gain_vs_trace": 0.24479166666666663
+        },
+        "10": {
+          "closure_gain_vs_trace": 0.0017071759259257857,
+          "retention_gain_vs_trace": 0.05729166666666666
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.058287037037037026,
+          "retention_gain_vs_trace": 0.08333333333333331
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.22487654320987643,
+        "final_length_gain_vs_trace": 0.058287037037037026,
+        "final_length_retention_gain_vs_trace": 0.08333333333333331
+      }
+    },
+    "0.96": {
+      "config": {
+        "use_trace": 1.0,
+        "use_slow_memory": 1.0,
+        "memory_decay": 0.96,
+        "stability": 0.16,
+        "phase1_replay_stride": 1.0,
+        "phase2_replay_stride": 3.0
+      },
+      "per_length": {
+        "6": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5607638888888888,
+              "std": 0.18121374424528358
+            },
+            "phase2_episode_success": {
+              "mean": 0.8402777777777778,
+              "std": 0.19873733362853033
+            },
+            "retention_after_phase2": {
+              "mean": 0.2552083333333333,
+              "std": 0.1885180054725428
+            },
+            "retention_drop": {
+              "mean": 0.3055555555555555,
+              "std": 0.3009437316669507
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8622685185185185,
+              "std": 0.037163412865746134
+            },
+            "overall_route_accuracy": {
+              "mean": 0.5627893518518519,
+              "std": 0.13042516667809653
+            },
+            "overall_final_accuracy": {
+              "mean": 0.525462962962963,
+              "std": 0.13059741251793083
+            },
+            "overall_episode_success": {
+              "mean": 0.44328703703703703,
+              "std": 0.07669516322698758
+            }
+          },
+          "real_closure_score": 0.539207175925926
+        },
+        "8": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.578125,
+              "std": 0.14876962924225007
+            },
+            "phase2_episode_success": {
+              "mean": 0.5486111111111112,
+              "std": 0.3898178389079497
+            },
+            "retention_after_phase2": {
+              "mean": 0.1875,
+              "std": 0.18992769904412976
+            },
+            "retention_drop": {
+              "mean": 0.390625,
+              "std": 0.15872841485897218
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8425925925925926,
+              "std": 0.0424312564347763
+            },
+            "overall_route_accuracy": {
+              "mean": 0.44405864197530864,
+              "std": 0.09770709362694005
+            },
+            "overall_final_accuracy": {
+              "mean": 0.47916666666666663,
+              "std": 0.13206622060736956
+            },
+            "overall_episode_success": {
+              "mean": 0.3101851851851852,
+              "std": 0.05688984133076161
+            }
+          },
+          "real_closure_score": 0.45883487654320987
+        },
+        "10": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.7100694444444445,
+              "std": 0.19387783267983377
+            },
+            "phase2_episode_success": {
+              "mean": 0.9131944444444444,
+              "std": 0.11149023859723836
+            },
+            "retention_after_phase2": {
+              "mean": 0.05729166666666667,
+              "std": 0.09977731281597925
+            },
+            "retention_drop": {
+              "mean": 0.6527777777777779,
+              "std": 0.2240592472903011
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8483796296296295,
+              "std": 0.059095821348239576
+            },
+            "overall_route_accuracy": {
+              "mean": 0.3817997685185185,
+              "std": 0.087344847739543
+            },
+            "overall_final_accuracy": {
+              "mean": 0.3923611111111111,
+              "std": 0.08807710674076673
+            },
+            "overall_episode_success": {
+              "mean": 0.33217592592592593,
+              "std": 0.11278042895077581
+            }
+          },
+          "real_closure_score": 0.4161458333333334
+        },
+        "12": {
+          "summary": {
+            "phase1_episode_success": {
+              "mean": 0.5659722222222222,
+              "std": 0.13919237675574614
+            },
+            "phase2_episode_success": {
+              "mean": 0.8333333333333334,
+              "std": 0.17948399976833448
+            },
+            "retention_after_phase2": {
+              "mean": 0.1371527777777778,
+              "std": 0.1798111658453232
+            },
+            "retention_drop": {
+              "mean": 0.4288194444444444,
+              "std": 0.20239660473824136
+            },
+            "overall_tool_accuracy": {
+              "mean": 0.8368055555555556,
+              "std": 0.05799754544614606
+            },
+            "overall_route_accuracy": {
+              "mean": 0.46099537037037036,
+              "std": 0.11471904374501611
+            },
+            "overall_final_accuracy": {
+              "mean": 0.46759259259259256,
+              "std": 0.16833017558053562
+            },
+            "overall_episode_success": {
+              "mean": 0.37731481481481477,
+              "std": 0.10615388414627873
+            }
+          },
+          "real_closure_score": 0.46798032407407403
+        }
+      },
+      "global_summary": {
+        "lengths": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "closure_curve": [
+          0.539207175925926,
+          0.45883487654320987,
+          0.4161458333333334,
+          0.46798032407407403
+        ],
+        "retention_curve": [
+          0.2552083333333333,
+          0.1875,
+          0.05729166666666667,
+          0.1371527777777778
+        ],
+        "closure_decay_slope": -0.012818479938271607,
+        "retention_decay_slope": -0.024218750000000015,
+        "closure_relative_drop": 0.07122685185185201,
+        "retention_relative_drop": 0.11805555555555552,
+        "mean_closure_score": 0.47054205246913583,
+        "mean_retention_score": 0.15928819444444445
+      },
+      "gains_vs_trace": {
+        "6": {
+          "closure_gain_vs_trace": 0.02951388888888906,
+          "retention_gain_vs_trace": 0.03472222222222221
+        },
+        "8": {
+          "closure_gain_vs_trace": 0.048466435185185175,
+          "retention_gain_vs_trace": 0.140625
+        },
+        "10": {
+          "closure_gain_vs_trace": -0.05379050925925927,
+          "retention_gain_vs_trace": -0.11631944444444443
+        },
+        "12": {
+          "closure_gain_vs_trace": 0.06567129629629626,
+          "retention_gain_vs_trace": 0.0625
+        }
+      },
+      "global_comparison": {
+        "advantage_area_over_trace": 0.08986111111111122,
+        "final_length_gain_vs_trace": 0.06567129629629626,
+        "final_length_retention_gain_vs_trace": 0.0625
+      }
+    }
+  },
+  "ranking": [
+    {
+      "beta": 0.86,
+      "mean_closure_score": 0.5107402584876544,
+      "mean_retention_score": 0.23741319444444442,
+      "closure_relative_drop": 0.10924768518518524,
+      "advantage_area_over_trace": 0.25065393518518525,
+      "max_length_score": 0.4261111111111111,
+      "max_length_gain_vs_trace": 0.023802083333333335
+    },
+    {
+      "beta": 0.8,
+      "mean_closure_score": 0.507529899691358,
+      "mean_retention_score": 0.20963541666666669,
+      "closure_relative_drop": 0.06421875000000016,
+      "advantage_area_over_trace": 0.23781250000000004,
+      "max_length_score": 0.47675347222222214,
+      "max_length_gain_vs_trace": 0.07444444444444437
+    },
+    {
+      "beta": 0.92,
+      "mean_closure_score": 0.5042959104938272,
+      "mean_retention_score": 0.2322048611111111,
+      "closure_relative_drop": 0.07722222222222225,
+      "advantage_area_over_trace": 0.22487654320987643,
+      "max_length_score": 0.4605960648148148,
+      "max_length_gain_vs_trace": 0.058287037037037026
+    },
+    {
+      "beta": 0.5,
+      "mean_closure_score": 0.4992399691358025,
+      "mean_retention_score": 0.2287326388888889,
+      "closure_relative_drop": 0.04092592592592592,
+      "advantage_area_over_trace": 0.2046527777777779,
+      "max_length_score": 0.4880381944444445,
+      "max_length_gain_vs_trace": 0.08572916666666675
+    },
+    {
+      "beta": 0.7,
+      "mean_closure_score": 0.492785976080247,
+      "mean_retention_score": 0.1840277777777778,
+      "closure_relative_drop": 0.07284722222222217,
+      "advantage_area_over_trace": 0.17883680555555576,
+      "max_length_score": 0.46248263888888896,
+      "max_length_gain_vs_trace": 0.06017361111111119
+    },
+    {
+      "beta": 0.96,
+      "mean_closure_score": 0.47054205246913583,
+      "mean_retention_score": 0.15928819444444445,
+      "closure_relative_drop": 0.07122685185185201,
+      "advantage_area_over_trace": 0.08986111111111122,
+      "max_length_score": 0.46798032407407403,
+      "max_length_gain_vs_trace": 0.06567129629629626
+    }
+  ],
+  "best_betas": {
+    "best_mean_closure": {
+      "beta": 0.86,
+      "mean_closure_score": 0.5107402584876544,
+      "mean_retention_score": 0.23741319444444442,
+      "closure_relative_drop": 0.10924768518518524,
+      "advantage_area_over_trace": 0.25065393518518525,
+      "max_length_score": 0.4261111111111111,
+      "max_length_gain_vs_trace": 0.023802083333333335
+    },
+    "best_max_length": {
+      "beta": 0.5,
+      "mean_closure_score": 0.4992399691358025,
+      "mean_retention_score": 0.2287326388888889,
+      "closure_relative_drop": 0.04092592592592592,
+      "advantage_area_over_trace": 0.2046527777777779,
+      "max_length_score": 0.4880381944444445,
+      "max_length_gain_vs_trace": 0.08572916666666675
+    },
+    "best_advantage_area": {
+      "beta": 0.86,
+      "mean_closure_score": 0.5107402584876544,
+      "mean_retention_score": 0.23741319444444442,
+      "closure_relative_drop": 0.10924768518518524,
+      "advantage_area_over_trace": 0.25065393518518525,
+      "max_length_score": 0.4261111111111111,
+      "max_length_gain_vs_trace": 0.023802083333333335
+    },
+    "best_mean_retention": {
+      "beta": 0.86,
+      "mean_closure_score": 0.5107402584876544,
+      "mean_retention_score": 0.23741319444444442,
+      "closure_relative_drop": 0.10924768518518524,
+      "advantage_area_over_trace": 0.25065393518518525,
+      "max_length_score": 0.4261111111111111,
+      "max_length_gain_vs_trace": 0.023802083333333335
+    }
+  },
+  "hypotheses": {
+    "H1_some_beta_beats_trace_on_average": true,
+    "H2_some_beta_beats_trace_at_max_length": true,
+    "H3_best_beta_is_not_always_the_slowest": true
+  }
+}

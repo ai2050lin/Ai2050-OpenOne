@@ -1,0 +1,1481 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 20:40:57",
+    "runtime_sec": 197.29887866973877,
+    "core_constraint": "end_to_end_region_family_generator_network_without_global_controller",
+    "latent_dim": 5,
+    "train_latent_count": 3,
+    "eval_latent_count": 3,
+    "training_rounds": 4,
+    "proposals_per_round": 5
+  },
+  "systems": {
+    "shared_local_replay": {
+      "same_family_success_rate": 0.6666666666666666,
+      "lesion_recovery_rate": 0.6666666666666666,
+      "encoding_separation": 0.7916666666666666,
+      "transfer_stability": 0.9993774142646547,
+      "regional_specialization": 0.000572782420527397,
+      "local_integration_score": 0.6491472424878851,
+      "baseline_accuracy": 0.6666666666666666,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.01388888888888895,
+          "memory": 0.08333333333333337,
+          "comparator": 0.15972222222222232,
+          "motor": 0.006944444444444531
+        },
+        "comparison_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.16666666666666674,
+          "motor": 0.006944444444444531
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.11805555555555558,
+          "motor": 0.11805555555555558
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.15972222222222232,
+          "upstream_mass": 0.09722222222222232,
+          "downstream_mass": 0.16666666666666685,
+          "memory_comparator_mass": 0.2430555555555557,
+          "sensory_motor_mass": 0.02083333333333348,
+          "rows": {
+            "sensory": 0.01388888888888895,
+            "memory": 0.08333333333333337,
+            "comparator": 0.15972222222222232,
+            "motor": 0.006944444444444531
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.16666666666666674,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.17361111111111127,
+          "memory_comparator_mass": 0.17361111111111127,
+          "sensory_motor_mass": 0.013888888888889062,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.16666666666666674,
+            "motor": 0.006944444444444531
+          }
+        },
+        "recovery_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.23611111111111116,
+          "memory_comparator_mass": 0.1250000000000001,
+          "sensory_motor_mass": 0.1250000000000001,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.11805555555555558,
+            "motor": 0.11805555555555558
+          }
+        },
+        "distinct_top_region_count": 1,
+        "top_region_sequence": [
+          "comparator",
+          "comparator",
+          "comparator"
+        ]
+      },
+      "concept_phase_upstream_advantage": -0.06944444444444453,
+      "comparison_phase_memory_comparator_advantage": 0.1597222222222222,
+      "aggregate_objective": 0.6491472424878851,
+      "concept_score": 0.16851851851851823,
+      "comparison_score": 0.9324074074074074,
+      "recovery_local_score": 0.7999999999999999,
+      "closure_balance_score": 0.16851851851851823,
+      "three_stage_score": 0.46544632331718,
+      "family_spread": 0.0,
+      "training_epochs": 28
+    },
+    "learned_region_family": {
+      "same_family_success_rate": 0.6805555555555556,
+      "lesion_recovery_rate": 0.6481481481481481,
+      "encoding_separation": 0.6666666666666666,
+      "transfer_stability": 0.998962366179037,
+      "regional_specialization": 0.0015074180102803642,
+      "local_integration_score": 0.6261561282211963,
+      "baseline_accuracy": 0.6611111111111111,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.25000000000000006,
+          "comparator": 0.05555555555555558,
+          "motor": 0.02777777777777779
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.006944444444444531,
+          "comparator": 0.11805555555555558,
+          "motor": 0.02083333333333337
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.13194444444444453,
+          "motor": 0.22916666666666669
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "memory",
+          "top_drop": 0.25000000000000006,
+          "upstream_mass": 0.25000000000000006,
+          "downstream_mass": 0.08333333333333337,
+          "memory_comparator_mass": 0.30555555555555564,
+          "sensory_motor_mass": 0.02777777777777779,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.25000000000000006,
+            "comparator": 0.05555555555555558,
+            "motor": 0.02777777777777779
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.006944444444444531,
+          "downstream_mass": 0.13888888888888895,
+          "memory_comparator_mass": 0.1250000000000001,
+          "sensory_motor_mass": 0.02083333333333337,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.006944444444444531,
+            "comparator": 0.11805555555555558,
+            "motor": 0.02083333333333337
+          }
+        },
+        "recovery_phase": {
+          "top_region": "motor",
+          "top_drop": 0.22916666666666669,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.3611111111111112,
+          "memory_comparator_mass": 0.13888888888888906,
+          "sensory_motor_mass": 0.23611111111111122,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.13194444444444453,
+            "motor": 0.22916666666666669
+          }
+        },
+        "distinct_top_region_count": 3,
+        "top_region_sequence": [
+          "memory",
+          "comparator",
+          "motor"
+        ]
+      },
+      "concept_phase_upstream_advantage": 0.16666666666666669,
+      "comparison_phase_memory_comparator_advantage": 0.10416666666666674,
+      "aggregate_objective": 0.6261561282211963,
+      "concept_score": 0.9555555555555556,
+      "comparison_score": 0.7472222222222225,
+      "recovery_local_score": 0.3138888888888892,
+      "closure_balance_score": 0.3138888888888892,
+      "three_stage_score": 0.5651927388628298,
+      "family_spread": 1.2813352432051115,
+      "training_epochs": 24,
+      "law": {
+        "sensory_gain_a": 1.3258806922278736,
+        "sensory_gain_b": 1.170236868906142,
+        "early_memory_gain": 0.30493739643633216,
+        "mid_memory_gain": 0.14635041907575214,
+        "early_comparator_forward_scale": 0.09876170641754364,
+        "comparison_memory_scale": 0.3059723839660702,
+        "comparison_signal_scale": 0.6631401459532512,
+        "comparator_recurrence_scale": 0.09007138287151784,
+        "comparator_feedback_scale": 1.1039797857234084,
+        "motor_release_step": 8,
+        "prerelease_motor_forward_scale": 0.04574162115540195,
+        "motor_teacher_scale": 0.7150054100613455,
+        "replay_memory_scale": 0.46997320655235925,
+        "replay_comparator_scale": 0.37929655367697895
+      },
+      "region_params": [
+        {
+          "leak": 0.18,
+          "threshold": 0.5,
+          "refractory": 1,
+          "inhibition": 0.18299952725368218,
+          "plasticity": 0.02,
+          "feedback_gain": 0.03,
+          "tonic_bias": 0.08
+        },
+        {
+          "leak": 0.9718952311742866,
+          "threshold": 0.34,
+          "refractory": 2,
+          "inhibition": 0.04,
+          "plasticity": 0.04,
+          "feedback_gain": 0.21644048477714273,
+          "tonic_bias": 0.1
+        },
+        {
+          "leak": 0.58,
+          "threshold": 0.4067637158020569,
+          "refractory": 1,
+          "inhibition": 0.16,
+          "plasticity": 0.034,
+          "feedback_gain": 0.18641040795328984,
+          "tonic_bias": 0.07
+        },
+        {
+          "leak": 0.46,
+          "threshold": 0.4414299317010634,
+          "refractory": 1,
+          "inhibition": 0.08,
+          "plasticity": 0.028,
+          "feedback_gain": 0.09,
+          "tonic_bias": 0.05
+        }
+      ]
+    },
+    "fixed_region_generator_eval_family": {
+      "system_name": "fixed_region_generator_eval_family",
+      "latent_count": 3,
+      "aggregate_objective": 0.5876139770502204,
+      "three_stage_score": 0.3587810100714622,
+      "closure_balance_score": 0.05833333333333343,
+      "family_spread": 1.1683676423797829,
+      "comparison_phase_memory_comparator_advantage": 0.1111111111111111,
+      "concept_phase_upstream_advantage": 0.037037037037037056,
+      "per_latent": [
+        {
+          "latent_id": 0,
+          "latent_code": [
+            -0.7732028932231517,
+            -0.6797656540761395,
+            0.04546959633510406,
+            -0.6139741597248752,
+            0.3025676871638775
+          ],
+          "three_stage_score": 0.4968584888038416,
+          "closure_balance_score": 0.1750000000000003,
+          "aggregate_objective": 0.6261554406769552,
+          "family_spread": 1.1801554808549468,
+          "comparison_advantage": 0.07638888888888895,
+          "concept_advantage": 0.18750000000000006,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2787817578030246,
+            "comparison_signal_scale": 0.6654136257700064,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0699915030196014,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4881272677821919,
+            "replay_comparator_scale": 0.3974506149068116
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1716798661392009,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.08
+            },
+            {
+              "leak": 0.8967480107089123,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.2017276040068336,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4078734387197341,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17120456080661367,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.42516833741744925,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.09,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": []
+        },
+        {
+          "latent_id": 1,
+          "latent_code": [
+            -1.0,
+            -0.8597656540761396,
+            0.30546959633510407,
+            -0.43397415972487524,
+            0.18256768716387753
+          ],
+          "three_stage_score": 0.19116666666666668,
+          "closure_balance_score": 0.0,
+          "aggregate_objective": 0.5193485473787605,
+          "family_spread": 1.1561912403542325,
+          "comparison_advantage": 0.10416666666666669,
+          "concept_advantage": -0.12499999999999994,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2715817578030246,
+            "comparison_signal_scale": 0.6784136257700064,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0609915030196013,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4809272677821919,
+            "replay_comparator_scale": 0.3902506149068116
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.16835956507338762,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.08
+            },
+            {
+              "leak": 0.88,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.19783167528084503,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.41421895268624614,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.1671780959948226,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.42993578067982074,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.09,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": []
+        },
+        {
+          "latent_id": 2,
+          "latent_code": [
+            -0.8132028932231516,
+            -0.9997656540761395,
+            0.26546959633510403,
+            -0.5739741597248753,
+            0.36256768716387755
+          ],
+          "three_stage_score": 0.3883178747438783,
+          "closure_balance_score": 0.0,
+          "aggregate_objective": 0.6173379430949457,
+          "family_spread": 1.1687562059301693,
+          "comparison_advantage": 0.15277777777777768,
+          "concept_advantage": 0.04861111111111105,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2659817578030246,
+            "comparison_signal_scale": 0.6764136257700064,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0539915030196014,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4917272677821919,
+            "replay_comparator_scale": 0.4010506149068116
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.17109426765198912,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.08
+            },
+            {
+              "leak": 0.8928604297842152,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.19480150849396505,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4132427197683212,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.16404640114120733,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4262277692535318,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.09,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": []
+        }
+      ]
+    },
+    "generator_network_eval_family": {
+      "system_name": "generator_network_eval_family",
+      "latent_count": 3,
+      "aggregate_objective": 0.5876132500103365,
+      "three_stage_score": 0.4100149926478913,
+      "closure_balance_score": 0.1530864197530866,
+      "family_spread": 1.2076915887981612,
+      "comparison_phase_memory_comparator_advantage": 0.12268518518518522,
+      "concept_phase_upstream_advantage": 0.05555555555555558,
+      "per_latent": [
+        {
+          "latent_id": 0,
+          "latent_code": [
+            -0.7732028932231517,
+            -0.6797656540761395,
+            0.04546959633510406,
+            -0.6139741597248752,
+            0.3025676871638775
+          ],
+          "three_stage_score": 0.5712557469910663,
+          "closure_balance_score": 0.3138888888888892,
+          "aggregate_objective": 0.628099217650707,
+          "family_spread": 1.2122400263673119,
+          "comparison_advantage": 0.10416666666666674,
+          "concept_advantage": 0.1736111111111111,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2692151348922503,
+            "comparison_signal_scale": 0.6722413750507495,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0619056364804929,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.47061995000256,
+            "replay_comparator_scale": 0.40865630318083973
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1697353420073839,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.06994972031730935
+            },
+            {
+              "leak": 0.924848245020989,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20765643933893912,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4107945808957904,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17925030863312075,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4345439662406651,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08481347326782951,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.7093980149267998,
+            -0.5455671508859413,
+            0.16201806286058196,
+            -0.5412782849160171,
+            0.3375937048255541
+          ]
+        },
+        {
+          "latent_id": 1,
+          "latent_code": [
+            -1.0,
+            -0.8597656540761396,
+            0.30546959633510407,
+            -0.43397415972487524,
+            0.18256768716387753
+          ],
+          "three_stage_score": 0.25658333333333344,
+          "closure_balance_score": 0.14537037037037054,
+          "aggregate_objective": 0.5174032387954765,
+          "family_spread": 1.2025487290769652,
+          "comparison_advantage": 0.10416666666666669,
+          "concept_advantage": -0.07638888888888884,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.26385545169043456,
+            "comparison_signal_scale": 0.6861712759808423,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0543125325622758,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.46709081549753717,
+            "replay_comparator_scale": 0.39769486569315177
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1679525864904245,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.07060443691630505
+            },
+            {
+              "leak": 0.9185249562125406,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20607118637400007,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.41696402799098664,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.18034439327853846,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4365328119276213,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08515134497388116,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.8047437298235172,
+            -0.6440254238536363,
+            0.4099950712795661,
+            -0.3849430566042551,
+            0.2115533824721332
+          ]
+        },
+        {
+          "latent_id": 2,
+          "latent_code": [
+            -0.8132028932231516,
+            -0.9997656540761395,
+            0.26546959633510403,
+            -0.5739741597248753,
+            0.36256768716387755
+          ],
+          "three_stage_score": 0.40220589761927433,
+          "closure_balance_score": 0.0,
+          "aggregate_objective": 0.617337293584826,
+          "family_spread": 1.2082860109502063,
+          "comparison_advantage": 0.1597222222222222,
+          "concept_advantage": 0.06944444444444448,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2604788976856672,
+            "comparison_signal_scale": 0.6841715347466205,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0495703771509135,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.47371550706594917,
+            "replay_comparator_scale": 0.4139159184923417
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.16943212187598308,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.07095665635221318
+            },
+            {
+              "leak": 0.9237727478789843,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20508114119523885,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.41607835781927993,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.1789498106894983,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4349665703782527,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08533311061400298,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.7256148993646592,
+            -0.7055160128111986,
+            0.37439612112456994,
+            -0.5080590589255046,
+            0.39807150347753717
+          ]
+        }
+      ],
+      "generator_spec": {
+        "latent_scale": [
+          1.0139838174455202,
+          0.8152535778680732,
+          1.0454216803548837,
+          1.122368202597515,
+          1.1589948691967946
+        ],
+        "latent_mix": [
+          -0.022272718518972612,
+          -0.023954586859866567,
+          0.001873297246927419,
+          0.01595140279623916,
+          -0.011032413249952466
+        ],
+        "latent_bias": [
+          -0.1170959914429715,
+          -0.05677743998042677,
+          0.11707372249636647,
+          0.07831686240693381,
+          -0.007830476157645344
+        ],
+        "region_scale": [
+          0.10217405787803344,
+          0.06823738690985895,
+          0.07438885301977116,
+          0.06116354121291116,
+          0.14630692417933977,
+          0.028819235633654045,
+          0.03875533744134295
+        ],
+        "law_scale": [
+          0.05786771122561534,
+          0.05617416315691914,
+          0.07712001936808659,
+          0.033513381759456236,
+          0.08696770432680893,
+          0.041134130064507085
+        ]
+      },
+      "training_epochs": 24
+    },
+    "end_to_end_generator_train_family": {
+      "system_name": "generator_network_train_family",
+      "latent_count": 3,
+      "aggregate_objective": 0.5882633566003371,
+      "three_stage_score": 0.41742500042105374,
+      "closure_balance_score": 0.1646604938271606,
+      "family_spread": 1.2079599945684187,
+      "comparison_phase_memory_comparator_advantage": 0.12962962962962962,
+      "concept_phase_upstream_advantage": 0.05324074074074079,
+      "per_latent": [
+        {
+          "latent_id": 0,
+          "latent_code": [
+            -0.8532028932231517,
+            -0.8197656540761395,
+            0.16546959633510405,
+            -0.5139741597248753,
+            0.20256768716387752
+          ],
+          "three_stage_score": 0.5830631917616172,
+          "closure_balance_score": 0.3486111111111113,
+          "aggregate_objective": 0.6281006345619535,
+          "family_spread": 1.206438042980788,
+          "comparison_advantage": 0.10416666666666674,
+          "concept_advantage": 0.16666666666666669,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.28501247144949715,
+            "comparison_signal_scale": 0.6691242328832553,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0766729094626695,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4682434542274529,
+            "replay_comparator_scale": 0.3895924914331353
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1687132440554495,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.06927049146280528
+            },
+            {
+              "leak": 0.9212229467234254,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20650185220191297,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4131556214625082,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17911214697383998,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.43570255688565745,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08446295181744498,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.7640620779430618,
+            -0.6172772552141053,
+            0.25691858918917715,
+            -0.45020609455319716,
+            0.19036479288243285
+          ]
+        },
+        {
+          "latent_id": 1,
+          "latent_code": [
+            -0.6732028932231517,
+            -0.9397656540761395,
+            0.24546959633510407,
+            -0.5139741597248753,
+            0.2525676871638775
+          ],
+          "three_stage_score": 0.26352777777777786,
+          "closure_balance_score": 0.14537037037037054,
+          "aggregate_objective": 0.5193477077425296,
+          "family_spread": 1.2127908196492598,
+          "comparison_advantage": 0.11805555555555552,
+          "concept_advantage": -0.07638888888888884,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2843014954033367,
+            "comparison_signal_scale": 0.670901304166015,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0742068456260674,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4701643651920741,
+            "replay_comparator_scale": 0.39294323698933165
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.17030780243275204,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.07059176060724202
+            },
+            {
+              "leak": 0.9268787155855583,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.2056043016309497,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4150538011053112,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17903226228121297,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.43573663950259606,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08514480326380976,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.6787815630423064,
+            -0.6730231084455551,
+            0.33321471459571694,
+            -0.447526995950668,
+            0.2523177687952537
+          ]
+        },
+        {
+          "latent_id": 2,
+          "latent_code": [
+            -0.9532028932231517,
+            -0.6597656540761395,
+            0.12546959633510404,
+            -0.39397415972487526,
+            0.12256768716387752
+          ],
+          "three_stage_score": 0.40568403172376605,
+          "closure_balance_score": 0.0,
+          "aggregate_objective": 0.6173417274965282,
+          "family_spread": 1.2046511210752084,
+          "comparison_advantage": 0.16666666666666663,
+          "concept_advantage": 0.06944444444444453,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.28729283061816385,
+            "comparison_signal_scale": 0.6683461929612051,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0804989916766263,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.46646936619566703,
+            "replay_comparator_scale": 0.3844720077415762
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1680139868015697,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.06950185356832729
+            },
+            {
+              "leak": 0.9187427381218413,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20789439615179756,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4123245577029104,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.18016303447952967,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4370871310238726,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08458234807137888,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.8014599051457485,
+            -0.530787921732544,
+            0.2235145090940618,
+            -0.3413702429674976,
+            0.09569057859644702
+          ]
+        }
+      ]
+    },
+    "end_to_end_generator_eval_family": {
+      "system_name": "end_to_end_generator_eval_family",
+      "latent_count": 3,
+      "aggregate_objective": 0.5876141686514597,
+      "three_stage_score": 0.40885883301329945,
+      "closure_balance_score": 0.14537037037037057,
+      "family_spread": 1.2062244084797857,
+      "comparison_phase_memory_comparator_advantage": 0.12731481481481483,
+      "concept_phase_upstream_advantage": 0.05324074074074079,
+      "per_latent": [
+        {
+          "latent_id": 0,
+          "latent_code": [
+            -0.7732028932231517,
+            -0.6797656540761395,
+            0.04546959633510406,
+            -0.6139741597248752,
+            0.3025676871638775
+          ],
+          "three_stage_score": 0.5677846534544219,
+          "closure_balance_score": 0.3138888888888892,
+          "aggregate_objective": 0.6281000641648903,
+          "family_spread": 1.21083382747196,
+          "comparison_advantage": 0.10416666666666674,
+          "concept_advantage": 0.16666666666666669,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.2869139377804761,
+            "comparison_signal_scale": 0.6661981488671377,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0799175490225643,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.47054698078277735,
+            "replay_comparator_scale": 0.39563551169419353
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.16942028614626553,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.06940400546622326
+            },
+            {
+              "leak": 0.9237307675084001,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.2076827738172943,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.41003012325294835,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17894186604975737,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.43468433312137145,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08453185278037431,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.7262479004130424,
+            -0.5439315461492199,
+            0.13129117333386928,
+            -0.5302446041802177,
+            0.30209607250218795
+          ]
+        },
+        {
+          "latent_id": 1,
+          "latent_code": [
+            -1.0,
+            -0.8597656540761396,
+            0.30546959633510407,
+            -0.43397415972487524,
+            0.18256768716387753
+          ],
+          "three_stage_score": 0.2531111111111112,
+          "closure_balance_score": 0.12222222222222245,
+          "aggregate_objective": 0.5174031872300111,
+          "family_spread": 1.2014257465388174,
+          "comparison_advantage": 0.11805555555555552,
+          "concept_advantage": -0.08333333333333326,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.28500043137363784,
+            "comparison_signal_scale": 0.6722556566194599,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0758982290691195,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4681056801309183,
+            "replay_comparator_scale": 0.3880692550363897
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.16767290366251228,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.07009500686018771
+            },
+            {
+              "leak": 0.9175329439714741,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20621989890483083,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.4165004534040963,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.18029226303045034,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.4366343703047875,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08488844954334163,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.8197017871218656,
+            -0.6347890563601893,
+            0.39136198512737913,
+            -0.37695995757078615,
+            0.1622012017608698
+          ]
+        },
+        {
+          "latent_id": 2,
+          "latent_code": [
+            -0.8132028932231516,
+            -0.9997656540761395,
+            0.26546959633510403,
+            -0.5739741597248753,
+            0.36256768716387755
+          ],
+          "three_stage_score": 0.4056807344743654,
+          "closure_balance_score": 0.0,
+          "aggregate_objective": 0.6173392545594777,
+          "family_spread": 1.2064136514285801,
+          "comparison_advantage": 0.1597222222222222,
+          "concept_advantage": 0.07638888888888895,
+          "law": {
+            "sensory_gain_a": 1.3258806922278736,
+            "sensory_gain_b": 1.170236868906142,
+            "early_memory_gain": 0.30493739643633216,
+            "mid_memory_gain": 0.14635041907575214,
+            "early_comparator_forward_scale": 0.09876170641754364,
+            "comparison_memory_scale": 0.28359541863375576,
+            "comparison_signal_scale": 0.6712661597478674,
+            "comparator_recurrence_scale": 0.09007138287151784,
+            "comparator_feedback_scale": 1.0730740346862477,
+            "motor_release_step": 8,
+            "prerelease_motor_forward_scale": 0.04574162115540195,
+            "motor_teacher_scale": 0.7150054100613455,
+            "replay_memory_scale": 0.4723017148475631,
+            "replay_comparator_scale": 0.39890240252143755
+          },
+          "region_params": [
+            {
+              "leak": 0.18,
+              "threshold": 0.5,
+              "refractory": 1,
+              "inhibition": 0.1689959537084747,
+              "plasticity": 0.02,
+              "feedback_gain": 0.03,
+              "tonic_bias": 0.07046334942007051
+            },
+            {
+              "leak": 0.9222256948669643,
+              "threshold": 0.34,
+              "refractory": 2,
+              "inhibition": 0.04,
+              "plasticity": 0.04,
+              "feedback_gain": 0.20519200285314126,
+              "tonic_bias": 0.1
+            },
+            {
+              "leak": 0.58,
+              "threshold": 0.41544352179055,
+              "refractory": 1,
+              "inhibition": 0.16,
+              "plasticity": 0.034,
+              "feedback_gain": 0.17878411448744472,
+              "tonic_bias": 0.07
+            },
+            {
+              "leak": 0.46,
+              "threshold": 0.435143245269919,
+              "refractory": 1,
+              "inhibition": 0.08,
+              "plasticity": 0.028,
+              "feedback_gain": 0.08507853564977293,
+              "tonic_bias": 0.05
+            }
+          ],
+          "hidden": [
+            -0.7489421393314758,
+            -0.6986305203271472,
+            0.3488792900679268,
+            -0.49417135023761827,
+            0.36249863227154655
+          ]
+        }
+      ],
+      "generator_spec": {
+        "latent_scale": [
+          1.0139838174455202,
+          0.8152535778680732,
+          1.0454216803548837,
+          1.122368202597515,
+          1.1589948691967946
+        ],
+        "latent_mix": [
+          0.028877681481027397,
+          0.027195813140133442,
+          0.053023697246927425,
+          0.06710180279623917,
+          0.040117986750047546
+        ],
+        "latent_bias": [
+          -0.1170959914429715,
+          -0.05677743998042677,
+          0.11707372249636647,
+          0.07831686240693381,
+          -0.007830476157645344
+        ],
+        "region_scale": [
+          0.10217405787803344,
+          0.06823738690985895,
+          0.07438885301977116,
+          0.06116354121291116,
+          0.14630692417933977,
+          0.028819235633654045,
+          0.03875533744134295
+        ],
+        "law_scale": [
+          0.024985311225615335,
+          0.02329176315691913,
+          0.04423761936808659,
+          0.02,
+          0.054085304326808935,
+          0.02
+        ]
+      },
+      "final_scale": 0.029478,
+      "update_count": 3,
+      "training_epochs": 24
+    }
+  },
+  "optimization_history": [
+    {
+      "round": 0,
+      "source": "init",
+      "train_three_stage_score": 0.40839673385613845,
+      "train_closure_balance_score": 0.1530864197530866,
+      "train_aggregate_objective": 0.5876148874679401
+    },
+    {
+      "round": 1,
+      "source": "candidate_0",
+      "train_three_stage_score": 0.404137799362454,
+      "train_closure_balance_score": 0.13765432098765454,
+      "train_aggregate_objective": 0.5876152068502899
+    },
+    {
+      "round": 1,
+      "source": "candidate_1",
+      "train_three_stage_score": 0.4037672988662479,
+      "train_closure_balance_score": 0.1453703703703705,
+      "train_aggregate_objective": 0.587615042116517
+    },
+    {
+      "round": 1,
+      "source": "candidate_2",
+      "train_three_stage_score": 0.4088599448277154,
+      "train_closure_balance_score": 0.1530864197530866,
+      "train_aggregate_objective": 0.587615038154216
+    },
+    {
+      "round": 1,
+      "source": "candidate_3",
+      "train_three_stage_score": 0.39835012603146175,
+      "train_closure_balance_score": 0.12222222222222244,
+      "train_aggregate_objective": 0.5876146912771171
+    },
+    {
+      "round": 1,
+      "source": "candidate_4",
+      "train_three_stage_score": 0.4033653967104444,
+      "train_closure_balance_score": 0.14537037037037062,
+      "train_aggregate_objective": 0.5869664356121261
+    },
+    {
+      "round": 1,
+      "source": "accepted",
+      "train_three_stage_score": 0.4088599448277154,
+      "train_closure_balance_score": 0.1530864197530866,
+      "train_aggregate_objective": 0.587615038154216
+    },
+    {
+      "round": 2,
+      "source": "candidate_0",
+      "train_three_stage_score": 0.4018231346185057,
+      "train_closure_balance_score": 0.1299382716049384,
+      "train_aggregate_objective": 0.5876152695192342
+    },
+    {
+      "round": 2,
+      "source": "candidate_1",
+      "train_three_stage_score": 0.40538785167401953,
+      "train_closure_balance_score": 0.1453703703703705,
+      "train_aggregate_objective": 0.5876151431888282
+    },
+    {
+      "round": 2,
+      "source": "candidate_2",
+      "train_three_stage_score": 0.4174248985268463,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.588263292676217
+    },
+    {
+      "round": 2,
+      "source": "candidate_3",
+      "train_three_stage_score": 0.394879297582645,
+      "train_closure_balance_score": 0.11450617283950622,
+      "train_aggregate_objective": 0.5882640780430536
+    },
+    {
+      "round": 2,
+      "source": "candidate_4",
+      "train_three_stage_score": 0.3914988097369481,
+      "train_closure_balance_score": 0.11450617283950622,
+      "train_aggregate_objective": 0.5882630758176624
+    },
+    {
+      "round": 2,
+      "source": "accepted",
+      "train_three_stage_score": 0.4174248985268463,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.588263292676217
+    },
+    {
+      "round": 3,
+      "source": "candidate_0",
+      "train_three_stage_score": 0.3925640163757585,
+      "train_closure_balance_score": 0.11450617283950622,
+      "train_aggregate_objective": 0.5882635105947244
+    },
+    {
+      "round": 3,
+      "source": "candidate_1",
+      "train_three_stage_score": 0.4127953596745031,
+      "train_closure_balance_score": 0.15694444444444453,
+      "train_aggregate_objective": 0.5882633655826524
+    },
+    {
+      "round": 3,
+      "source": "candidate_2",
+      "train_three_stage_score": 0.41395283449906106,
+      "train_closure_balance_score": 0.15694444444444458,
+      "train_aggregate_objective": 0.5882633869855808
+    },
+    {
+      "round": 3,
+      "source": "candidate_3",
+      "train_three_stage_score": 0.4088596345317356,
+      "train_closure_balance_score": 0.15308641975308646,
+      "train_aggregate_objective": 0.5876147245972573
+    },
+    {
+      "round": 3,
+      "source": "candidate_4",
+      "train_three_stage_score": 0.4162677128582752,
+      "train_closure_balance_score": 0.1646604938271605,
+      "train_aggregate_objective": 0.5882634670294676
+    },
+    {
+      "round": 3,
+      "source": "accepted",
+      "train_three_stage_score": 0.4174248985268463,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.588263292676217
+    },
+    {
+      "round": 4,
+      "source": "candidate_0",
+      "train_three_stage_score": 0.3925639238740863,
+      "train_closure_balance_score": 0.11450617283950622,
+      "train_aggregate_objective": 0.5882634221662683
+    },
+    {
+      "round": 4,
+      "source": "candidate_1",
+      "train_three_stage_score": 0.4127953233383812,
+      "train_closure_balance_score": 0.15694444444444453,
+      "train_aggregate_objective": 0.588263336263704
+    },
+    {
+      "round": 4,
+      "source": "candidate_2",
+      "train_three_stage_score": 0.41742500042105374,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.5882633566003371
+    },
+    {
+      "round": 4,
+      "source": "candidate_3",
+      "train_three_stage_score": 0.40885987488485204,
+      "train_closure_balance_score": 0.15308641975308646,
+      "train_aggregate_objective": 0.5876149186276857
+    },
+    {
+      "round": 4,
+      "source": "candidate_4",
+      "train_three_stage_score": 0.4162676004957688,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.5882633794375214
+    },
+    {
+      "round": 4,
+      "source": "accepted",
+      "train_three_stage_score": 0.41742500042105374,
+      "train_closure_balance_score": 0.1646604938271606,
+      "train_aggregate_objective": 0.5882633566003371
+    }
+  ],
+  "headline_metrics": {
+    "end_to_end_best_system": "end_to_end_generator_eval_family",
+    "end_to_end_three_stage_gain_vs_network": -0.001156159634591869,
+    "end_to_end_balance_gain_vs_network": -0.007716049382716028,
+    "end_to_end_aggregate_gap_vs_network": 9.186411231709712e-07,
+    "end_to_end_three_stage_gain_vs_fixed": 0.05007782294183727,
+    "end_to_end_generalization_gap": 0.008566167407754288,
+    "end_to_end_vs_learned_gap": -0.15633390584953039,
+    "update_count": 3
+  },
+  "hypotheses": {
+    "H1_end_to_end_generator_beats_searched_network": false,
+    "H2_end_to_end_generator_improves_balance": false,
+    "H3_end_to_end_generator_keeps_cost_bounded": true,
+    "H4_end_to_end_generator_generalizes": true
+  },
+  "project_readout": {
+    "summary": "这一步把跨 latent 的小型生成网络继续推进成端到端训练式更新。目标不再是挑出一个好候选，而是看同一生成映射经过多轮更新后，能否在 held-out latent 上稳定变强。",
+    "next_question": "如果端到端训练式更新也成立，下一步就该把这套低维生成网络接到真实模型层带与在线 rollback 或 recovery 闭环。"
+  }
+}

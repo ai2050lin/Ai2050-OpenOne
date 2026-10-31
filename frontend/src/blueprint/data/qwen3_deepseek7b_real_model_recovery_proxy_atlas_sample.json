@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 21:34:12",
+    "core_constraint": "real_model_recovery_proxy_atlas_from_existing_artifacts",
+    "runtime_sec": 0.002048492431640625
+  },
+  "models": {
+    "qwen3_4b": {
+      "relation_recovery_rows": [
+        {
+          "relation": "meronym",
+          "classification": "compact_boundary",
+          "shared_layer_hit_ratio": 0.054319210285976346,
+          "uniform_success": 0.3606060606060606,
+          "bridge_aware_success": 0.43636363636363634,
+          "behavior_gain": 0.07575757575757575,
+          "repair_proxy": 0.7419040518832805
+        },
+        {
+          "relation": "gender",
+          "classification": "layer_cluster_only",
+          "shared_layer_hit_ratio": 0.15033583619680654,
+          "uniform_success": 0.3717171717171717,
+          "bridge_aware_success": 0.43333333333333335,
+          "behavior_gain": 0.061616161616161624,
+          "repair_proxy": 0.7072174733805799
+        },
+        {
+          "relation": "cause_effect",
+          "classification": "compact_boundary",
+          "shared_layer_hit_ratio": 0.19849602610132605,
+          "uniform_success": 0.37222222222222223,
+          "bridge_aware_success": 0.4292929292929293,
+          "behavior_gain": 0.05707070707070705,
+          "repair_proxy": 0.6915473900507023
+        },
+        {
+          "relation": "hypernym",
+          "classification": "distributed_none",
+          "shared_layer_hit_ratio": 0.05025103660292509,
+          "uniform_success": 0.34494949494949495,
+          "bridge_aware_success": 0.4101010101010101,
+          "behavior_gain": 0.06515151515151513,
+          "repair_proxy": 0.5483892211091511
+        },
+        {
+          "relation": "antonym",
+          "classification": "layer_cluster_only",
+          "shared_layer_hit_ratio": 0.04871820811786327,
+          "uniform_success": 0.3328282828282828,
+          "bridge_aware_success": 0.39141414141414144,
+          "behavior_gain": 0.05858585858585863,
+          "repair_proxy": 0.41706504168982644
+        },
+        {
+          "relation": "synonym",
+          "classification": "layer_cluster_only",
+          "shared_layer_hit_ratio": 0.09319144757262544,
+          "uniform_success": 0.3429292929292929,
+          "bridge_aware_success": 0.3803030303030303,
+          "behavior_gain": 0.03737373737373739,
+          "repair_proxy": 0.26998707897531526
+        }
+      ],
+      "target_band_rows": [
+        {
+          "layer": 1,
+          "shared_support": 0.31536917885358867,
+          "support_stage": "relation_biased",
+          "support_bias": 0.57462283522355
+        },
+        {
+          "layer": 13,
+          "shared_support": 1.0,
+          "support_stage": "concept_biased",
+          "support_bias": -0.52744427461001
+        }
+      ],
+      "top_structure_tasks": [
+        {
+          "task": "man__gender",
+          "concept": "man",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.101010101010101,
+          "structure_aware_success": 0.5045454545454545
+        },
+        {
+          "task": "king__gender",
+          "concept": "king",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.0944444444444445,
+          "structure_aware_success": 0.49898989898989904
+        },
+        {
+          "task": "woman__gender",
+          "concept": "woman",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.08333333333333337,
+          "structure_aware_success": 0.5060606060606061
+        },
+        {
+          "task": "apple__hypernym",
+          "concept": "apple",
+          "relation": "hypernym",
+          "compatibility": 1.0,
+          "behavior_gain": 0.0828282828282828,
+          "structure_aware_success": 0.49242424242424243
+        },
+        {
+          "task": "apple__meronym",
+          "concept": "apple",
+          "relation": "meronym",
+          "compatibility": 0.85,
+          "behavior_gain": 0.07979797979797976,
+          "structure_aware_success": 0.4848484848484848
+        },
+        {
+          "task": "queen__gender",
+          "concept": "queen",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.07878787878787874,
+          "structure_aware_success": 0.5141414141414141
+        },
+        {
+          "task": "man__antonym",
+          "concept": "man",
+          "relation": "antonym",
+          "compatibility": 0.45,
+          "behavior_gain": 0.07121212121212123,
+          "structure_aware_success": 0.40454545454545454
+        },
+        {
+          "task": "woman__synonym",
+          "concept": "woman",
+          "relation": "synonym",
+          "compatibility": 0.55,
+          "behavior_gain": 0.07070707070707066,
+          "structure_aware_success": 0.42676767676767674
+        }
+      ],
+      "global_summary": {
+        "bridge_side_gain": 0.05925925925925926,
+        "task_side_gain": 0.0406144781144781,
+        "bridge_aware_success": 0.4134680134680135,
+        "structure_aware_success": 0.4039141414141414,
+        "mechanism_bridge_score": 0.7531501201677545,
+        "orientation_gap_abs": 0.09099685417463414,
+        "bridge_gain_rank_correlation": 0.19999999999976578,
+        "concept_gain_rank_correlation": 0.2051480051479657,
+        "mean_target_band_shared_support": 0.6576845894267943,
+        "recovery_proxy_score": 0.46559692169214717
+      }
+    },
+    "deepseek_7b": {
+      "relation_recovery_rows": [
+        {
+          "relation": "gender",
+          "classification": "compact_boundary",
+          "shared_layer_hit_ratio": 0.3916054395052808,
+          "uniform_success": 0.40404040404040403,
+          "bridge_aware_success": 0.4767676767676768,
+          "behavior_gain": 0.07272727272727275,
+          "repair_proxy": 0.9538443087817097
+        },
+        {
+          "relation": "hypernym",
+          "classification": "layer_cluster_only",
+          "shared_layer_hit_ratio": 0.2046484330756358,
+          "uniform_success": 0.3813131313131313,
+          "bridge_aware_success": 0.4393939393939394,
+          "behavior_gain": 0.058080808080808066,
+          "repair_proxy": 0.7515795130965146
+        },
+        {
+          "relation": "cause_effect",
+          "classification": "compact_boundary",
+          "shared_layer_hit_ratio": 0.15489813219623644,
+          "uniform_success": 0.39141414141414144,
+          "bridge_aware_success": 0.45151515151515154,
+          "behavior_gain": 0.0601010101010101,
+          "repair_proxy": 0.7348795144408294
+        },
+        {
+          "relation": "meronym",
+          "classification": "compact_boundary",
+          "shared_layer_hit_ratio": 0.2528728034624737,
+          "uniform_success": 0.3616161616161616,
+          "bridge_aware_success": 0.4085858585858586,
+          "behavior_gain": 0.046969696969696995,
+          "repair_proxy": 0.5651793405478847
+        },
+        {
+          "relation": "synonym",
+          "classification": "distributed_none",
+          "shared_layer_hit_ratio": 0.31130237246363657,
+          "uniform_success": 0.31414141414141417,
+          "bridge_aware_success": 0.36717171717171715,
+          "behavior_gain": 0.05303030303030298,
+          "repair_proxy": 0.4928594373352272
+        },
+        {
+          "relation": "antonym",
+          "classification": "distributed_none",
+          "shared_layer_hit_ratio": 0.3007887368451567,
+          "uniform_success": 0.32222222222222224,
+          "bridge_aware_success": 0.3747474747474748,
+          "behavior_gain": 0.05252525252525253,
+          "repair_proxy": 0.4834475059827684
+        }
+      ],
+      "target_band_rows": [
+        {
+          "layer": 6,
+          "shared_support": 0.9191815838041684,
+          "support_stage": "relation_biased",
+          "support_bias": 0.5796823365505539
+        },
+        {
+          "layer": 7,
+          "shared_support": 0.7970681405057667,
+          "support_stage": "concept_biased",
+          "support_bias": -0.09019815182981272
+        }
+      ],
+      "top_structure_tasks": [
+        {
+          "task": "king__gender",
+          "concept": "king",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.09848484848484845,
+          "structure_aware_success": 0.5156565656565656
+        },
+        {
+          "task": "queen__antonym",
+          "concept": "queen",
+          "relation": "antonym",
+          "compatibility": 0.45,
+          "behavior_gain": 0.08181818181818185,
+          "structure_aware_success": 0.43434343434343436
+        },
+        {
+          "task": "king__synonym",
+          "concept": "king",
+          "relation": "synonym",
+          "compatibility": 0.55,
+          "behavior_gain": 0.07979797979797981,
+          "structure_aware_success": 0.43282828282828284
+        },
+        {
+          "task": "woman__gender",
+          "concept": "woman",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.07828282828282829,
+          "structure_aware_success": 0.5035353535353535
+        },
+        {
+          "task": "queen__gender",
+          "concept": "queen",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.07474747474747473,
+          "structure_aware_success": 0.49242424242424243
+        },
+        {
+          "task": "man__gender",
+          "concept": "man",
+          "relation": "gender",
+          "compatibility": 1.0,
+          "behavior_gain": 0.06767676767676767,
+          "structure_aware_success": 0.501010101010101
+        },
+        {
+          "task": "woman__antonym",
+          "concept": "woman",
+          "relation": "antonym",
+          "compatibility": 0.45,
+          "behavior_gain": 0.06212121212121213,
+          "structure_aware_success": 0.42424242424242425
+        },
+        {
+          "task": "king__antonym",
+          "concept": "king",
+          "relation": "antonym",
+          "compatibility": 0.45,
+          "behavior_gain": 0.06161616161616157,
+          "structure_aware_success": 0.41868686868686866
+        }
+      ],
+      "global_summary": {
+        "bridge_side_gain": 0.057239057239057235,
+        "task_side_gain": 0.036321548821548824,
+        "bridge_aware_success": 0.4196969696969697,
+        "structure_aware_success": 0.40643939393939393,
+        "mechanism_bridge_score": 0.9041073210652278,
+        "orientation_gap_abs": 0.6212989312518228,
+        "bridge_gain_rank_correlation": 0.7714285714276681,
+        "concept_gain_rank_correlation": 0.5436293436292391,
+        "mean_target_band_shared_support": 0.8581248621549675,
+        "recovery_proxy_score": 0.5137801180092078
+      }
+    }
+  },
+  "headline_metrics": {
+    "qwen_recovery_proxy_score": 0.46559692169214717,
+    "deepseek_recovery_proxy_score": 0.5137801180092078,
+    "qwen_bridge_side_gain": 0.05925925925925926,
+    "deepseek_bridge_side_gain": 0.057239057239057235,
+    "qwen_task_side_gain": 0.0406144781144781,
+    "deepseek_task_side_gain": 0.036321548821548824,
+    "qwen_orientation_gap_abs": 0.09099685417463414,
+    "deepseek_orientation_gap_abs": 0.6212989312518228
+  },
+  "gains": {
+    "qwen_minus_deepseek_task_side_gain": 0.004292929292929279,
+    "deepseek_minus_qwen_bridge_side_corr": 0.5714285714279023,
+    "deepseek_minus_qwen_recovery_gap_penalty": 0.5303020770771887,
+    "deepseek_minus_qwen_recovery_proxy_score": 0.048183196317060584
+  },
+  "hypotheses": {
+    "H1_both_models_keep_positive_bridge_and_task_side_repair_gain": true,
+    "H2_deepseek_has_larger_recovery_gap_penalty": true,
+    "H3_qwen_keeps_stronger_task_side_gain_but_deepseek_keeps_stronger_bridge_alignment": true,
+    "H4_both_models_retain_positive_recovery_proxy_score": true
+  },
+  "project_readout": {
+    "summary": "这一步不是声称已经测到了真实恢复链，而是把真实模型里与恢复最相关的桥接收益、结构收益、取向落差和目标层带风险压成了一张恢复代理 atlas。结果显示两类模型都保留了正的桥接侧和任务侧修复收益，但 DeepSeek 的取向落差惩罚显著更大，说明它的共享结构更强，却也更容易在状态门控处出现恢复瓶颈。",
+    "next_question": "如果恢复代理 atlas 已经把桥接收益和瓶颈惩罚同时钉到真实模型上，下一步就该把 rollback 或 recovery 的在线链路直接映射到这些目标层带，而不是继续停在代理层。"
+  }
+}

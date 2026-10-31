@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "project": "AGI 主干机制研究",
+    "updated_at": "2026-03-09",
+    "overall_progress": 0.58,
+    "current_stage_id": "M4"
+  },
+  "summary": {
+    "statement": "当前项目已经从模型内部结构解释，推进到“机制链 + 因果边界 + 长程调度”的主干验证阶段，但还没有进入真实连续世界的稳定闭环。",
+    "current_focus": "M4 长程信用分配与分层状态",
+    "completed_milestones": 3,
+    "total_milestones": 6
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "title": "模型数学结构逆向工程",
+      "status": "completed",
+      "progress": 1.0,
+      "goal": "从深度神经网络中抽取共享基底、个体偏移、门控、关系和拓扑这些可复用数学部件。",
+      "evidence": [
+        "共享基底 + 个体偏移已在多模型上得到一致性支持",
+        "G 从黑箱推进到可分解、可递推、可带非线性的控制律",
+        "T 在 Qwen3-4B / DeepSeek-7B 上已进入同协议直测"
+      ],
+      "next_gate": "把这些部件从概念层推进到关系协议层，建立真正的中观场解释。"
+    },
+    {
+      "id": "M2",
+      "title": "关系协议层与中观场分型",
+      "status": "completed",
+      "progress": 1.0,
+      "goal": "确认关系协议不是单头模块，而是跨层、冗余、分布式的中观拓扑场，并比较不同关系族的边界类型。",
+      "evidence": [
+        "关系族边界图谱已区分 compact / layer-cluster / distributed",
+        "Qwen3-4B 与 DeepSeek-7B 上均已得到协议场边界与关系分型结果",
+        "relation topology bridge 已开始解释为什么不同关系落到不同边界类型"
+      ],
+      "next_gate": "把关系分型和真实任务表现联动，验证哪类协议场更能转成长程收益。"
+    },
+    {
+      "id": "M3",
+      "title": "Qwen3 / DeepSeek7B 主干闭环",
+      "status": "completed",
+      "progress": 0.92,
+      "goal": "用更强模型替代 GPT-2，闭合 shared_basis + offset + H + G + R + T 的模型侧主干。",
+      "evidence": [
+        "Qwen3-4B / DeepSeek-7B 的机制桥接已稳定运行",
+        "概念到协议场调用 U(c, tau, l, h) 已能直接显示",
+        "T -> U -> k* 的链条已开始形成实证闭环"
+      ],
+      "next_gate": "扩大概念集和关系族，减少只靠少量 probe 的偶然性。"
+    },
+    {
+      "id": "M4",
+      "title": "长程信用分配与分层状态",
+      "status": "current",
+      "progress": 0.62,
+      "goal": "把机制解释推进到真实多步任务，压平长程衰减，并找到可写成公式的门控调度律。",
+      "evidence": [
+        "真实多步闭环、长度扫描、温度律、多时间常数记忆簇都已完成",
+        "L<=20 的联合温度律已有明确增益",
+        "L=24..32 进入新退化区，段级摘要 s_t 有帮助但还不够"
+      ],
+      "next_gate": "把单个 s_t 升级成双层状态，验证 tau_g(L, phase_t, remaining_t, s_t, z_t) 能否在超长程上重新超过单锚点基线。"
+    },
+    {
+      "id": "M5",
+      "title": "符号接地与连续多模态闭环",
+      "status": "upcoming",
+      "progress": 0.18,
+      "goal": "让概念从连续输入中形成，再进入协议场，而不是只依赖预置 token。",
+      "evidence": [
+        "当前还没有真实连续世界中的概念自发形成闭环",
+        "现有证据主要来自语言模型内部结构和受控任务"
+      ],
+      "next_gate": "构建连续输入到概念编码的实验链，并与 B_f / Delta_c / R_tau 的分解联动。"
+    },
+    {
+      "id": "M6",
+      "title": "开放世界代理与持续学习",
+      "status": "upcoming",
+      "progress": 0.05,
+      "goal": "在真实开放环境中闭合接地、长期信用分配和持续学习，而不是停留在静态或受控基准。",
+      "evidence": [
+        "当前只有 toy 和结构化多步任务的收益证据",
+        "还没有开放世界环境里的稳定长期闭环"
+      ],
+      "next_gate": "把机制链推进到更真实的多模态代理任务，并测长期保留与副作用。"
+    }
+  ],
+  "next_plan": [
+    {
+      "priority": "P0",
+      "title": "双层状态与超长程门控律",
+      "description": "在超长程链上引入段级摘要 + 阶段级隐变量，继续解决 L=24..32 的退化区。"
+    },
+    {
+      "priority": "P0",
+      "title": "关系分型与真实任务联动",
+      "description": "把 relation topology bridge 分数与长程任务收益联动，比较哪类协议场最容易转成行为优势。"
+    },
+    {
+      "priority": "P1",
+      "title": "概念编码分解",
+      "description": "围绕 apple / king / queen / fruit 等概念，实测共享基底、个体偏移和关系模板。"
+    },
+    {
+      "priority": "P1",
+      "title": "连续输入接地",
+      "description": "把文本内部机制推进到连续输入和多模态概念形成，不再依赖预置 token。"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "timestamp": "2026-03-08 20:06:07",
+    "source_json": "tests/codex_temp/gpt2_qwen3_relation_protocol_mesofield_scale_20260308.json"
+  },
+  "models": {
+    "gpt2": {
+      "global_summary": {
+        "k_values": [
+          1,
+          3,
+          8,
+          16
+        ],
+        "classification_histogram": {
+          "distributed_none": 1,
+          "compact_boundary": 5
+        },
+        "mean_causal_margin_by_k": {
+          "1": 0.01622845966819272,
+          "3": 0.05928340453092129,
+          "8": -0.08867118273403711,
+          "16": -0.1497757911792816
+        }
+      },
+      "relations": {
+        "gender": {
+          "minimal_positive_margin_k": null,
+          "minimal_stronger_than_control_k": null,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": -0.15882627767305954,
+          "classification": "distributed_none"
+        },
+        "hypernym": {
+          "minimal_positive_margin_k": 1,
+          "minimal_stronger_than_control_k": 1,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.12134321017654291,
+          "classification": "compact_boundary"
+        },
+        "antonym": {
+          "minimal_positive_margin_k": 1,
+          "minimal_stronger_than_control_k": 1,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.16283336806738533,
+          "classification": "compact_boundary"
+        },
+        "synonym": {
+          "minimal_positive_margin_k": 1,
+          "minimal_stronger_than_control_k": 1,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.14373090564576563,
+          "classification": "compact_boundary"
+        },
+        "meronym": {
+          "minimal_positive_margin_k": 16,
+          "minimal_stronger_than_control_k": 16,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": -0.44367530702101915,
+          "classification": "compact_boundary"
+        },
+        "cause_effect": {
+          "minimal_positive_margin_k": 1,
+          "minimal_stronger_than_control_k": 1,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": -0.09337135203609194,
+          "classification": "compact_boundary"
+        }
+      }
+    },
+    "qwen3_4b": {
+      "global_summary": {
+        "k_values": [
+          1,
+          3,
+          8,
+          16
+        ],
+        "classification_histogram": {
+          "compact_boundary": 4,
+          "distributed_none": 1,
+          "layer_cluster_only": 1
+        },
+        "mean_causal_margin_by_k": {
+          "1": -0.0015898663657040268,
+          "3": -0.0067446823103850945,
+          "8": -0.01837477069835314,
+          "16": -0.010316400575385498
+        }
+      },
+      "relations": {
+        "gender": {
+          "minimal_positive_margin_k": 8,
+          "minimal_stronger_than_control_k": 8,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": -0.022343234336809768,
+          "classification": "compact_boundary"
+        },
+        "hypernym": {
+          "minimal_positive_margin_k": null,
+          "minimal_stronger_than_control_k": null,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": -0.2140032385643587,
+          "classification": "distributed_none"
+        },
+        "antonym": {
+          "minimal_positive_margin_k": 8,
+          "minimal_stronger_than_control_k": 8,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.03862742120476448,
+          "classification": "compact_boundary"
+        },
+        "synonym": {
+          "minimal_positive_margin_k": null,
+          "minimal_stronger_than_control_k": null,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.18132473351765743,
+          "classification": "layer_cluster_only"
+        },
+        "meronym": {
+          "minimal_positive_margin_k": 1,
+          "minimal_stronger_than_control_k": 1,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.14066715593139378,
+          "classification": "compact_boundary"
+        },
+        "cause_effect": {
+          "minimal_positive_margin_k": 16,
+          "minimal_stronger_than_control_k": 16,
+          "best_k_by_causal_margin": null,
+          "layer_cluster_margin": 0.012899108863443155,
+          "classification": "compact_boundary"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "timestamp": "2026-03-09 13:58:23"
+  },
+  "models": {
+    "qwen3_4b": {
+      "relations": {
+        "gender": {
+          "classification": "layer_cluster_only",
+          "endpoint_families": [
+            "female",
+            "male"
+          ],
+          "endpoint_words": [
+            "king",
+            "man",
+            "queen",
+            "woman"
+          ],
+          "topology_compactness": 0.49738269920150435,
+          "endpoint_margin_mean": 0.37931741774082184,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.5026173007984956,
+          "family_entropy_mean": 0.3952429783990446,
+          "top4_bridge_share_in_top20": 0.21225811283686694,
+          "top8_bridge_share_in_top20": 0.4146785852945356,
+          "layer_cluster_margin": 0.03176244395136319,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.42414413474611123
+        },
+        "hypernym": {
+          "classification": "distributed_none",
+          "endpoint_families": [
+            "category",
+            "instance"
+          ],
+          "endpoint_words": [
+            "animal",
+            "apple",
+            "cat",
+            "fruit"
+          ],
+          "topology_compactness": 0.44108125722656644,
+          "endpoint_margin_mean": 0.33517478220164776,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.5589187427734336,
+          "family_entropy_mean": 0.39032163261579644,
+          "top4_bridge_share_in_top20": 0.22008636981480326,
+          "top8_bridge_share_in_top20": 0.4224911092457054,
+          "layer_cluster_margin": -0.18893485466497126,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.39926848184860353
+        },
+        "antonym": {
+          "classification": "layer_cluster_only",
+          "endpoint_families": [
+            "descriptor"
+          ],
+          "endpoint_words": [
+            "big",
+            "cold",
+            "hot",
+            "small"
+          ],
+          "topology_compactness": 0.3259316682815552,
+          "endpoint_margin_mean": 0.22590948641300201,
+          "endpoint_support_rate": 0.75,
+          "family_true_residual_mean": 0.6740683317184448,
+          "family_entropy_mean": 0.38524920362979176,
+          "top4_bridge_share_in_top20": 0.21422284959691076,
+          "top8_bridge_share_in_top20": 0.41804455660870576,
+          "layer_cluster_margin": 0.06724814954824028,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.31666243076794165
+        },
+        "synonym": {
+          "classification": "layer_cluster_only",
+          "endpoint_families": [
+            "descriptor"
+          ],
+          "endpoint_words": [
+            "big",
+            "large",
+            "small",
+            "tiny"
+          ],
+          "topology_compactness": 0.3259316682815552,
+          "endpoint_margin_mean": 0.14073099195957184,
+          "endpoint_support_rate": 0.75,
+          "family_true_residual_mean": 0.6740683317184448,
+          "family_entropy_mean": 0.38524920362979176,
+          "top4_bridge_share_in_top20": 0.22732019817428364,
+          "top8_bridge_share_in_top20": 0.43398983651759304,
+          "layer_cluster_margin": 0.05975211859342623,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.30074699540176736
+        },
+        "meronym": {
+          "classification": "compact_boundary",
+          "endpoint_families": [
+            "part",
+            "whole"
+          ],
+          "endpoint_words": [
+            "car",
+            "leaf",
+            "tree",
+            "wheel"
+          ],
+          "topology_compactness": 0.5283517381176353,
+          "endpoint_margin_mean": 0.20726770907640457,
+          "endpoint_support_rate": 0.75,
+          "family_true_residual_mean": 0.47164826188236475,
+          "family_entropy_mean": 0.3905584086767501,
+          "top4_bridge_share_in_top20": 0.21616068359825488,
+          "top8_bridge_share_in_top20": 0.41745407620734915,
+          "layer_cluster_margin": 0.17767134031271944,
+          "minimal_stronger_than_control_k": 1,
+          "bridge_score": 0.37589029422100284
+        },
+        "cause_effect": {
+          "classification": "compact_boundary",
+          "endpoint_families": [
+            "cause",
+            "effect"
+          ],
+          "endpoint_words": [
+            "disease",
+            "fire",
+            "smoke",
+            "virus"
+          ],
+          "topology_compactness": 0.48319814602533984,
+          "endpoint_margin_mean": 0.32688388228416443,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.5168018539746602,
+          "family_entropy_mean": 0.3899329678776363,
+          "top4_bridge_share_in_top20": 0.22298490496230888,
+          "top8_bridge_share_in_top20": 0.4252926825726611,
+          "layer_cluster_margin": 0.15418001556412025,
+          "minimal_stronger_than_control_k": 16,
+          "bridge_score": 0.43744938976718667
+        }
+      },
+      "global_summary": {
+        "classification_bridge_mean": {
+          "layer_cluster_only": 0.3471845203052734,
+          "distributed_none": 0.39926848184860353,
+          "compact_boundary": 0.4066698419940947
+        },
+        "top_relation_order": [
+          {
+            "relation": "cause_effect",
+            "bridge_score": 0.43744938976718667,
+            "classification": "compact_boundary"
+          },
+          {
+            "relation": "gender",
+            "bridge_score": 0.42414413474611123,
+            "classification": "layer_cluster_only"
+          },
+          {
+            "relation": "hypernym",
+            "bridge_score": 0.39926848184860353,
+            "classification": "distributed_none"
+          },
+          {
+            "relation": "meronym",
+            "bridge_score": 0.37589029422100284,
+            "classification": "compact_boundary"
+          },
+          {
+            "relation": "antonym",
+            "bridge_score": 0.31666243076794165,
+            "classification": "layer_cluster_only"
+          },
+          {
+            "relation": "synonym",
+            "bridge_score": 0.30074699540176736,
+            "classification": "layer_cluster_only"
+          }
+        ]
+      }
+    },
+    "deepseek_7b": {
+      "relations": {
+        "gender": {
+          "classification": "compact_boundary",
+          "endpoint_families": [
+            "female",
+            "male"
+          ],
+          "endpoint_words": [
+            "king",
+            "man",
+            "queen",
+            "woman"
+          ],
+          "topology_compactness": 0.48356320460637403,
+          "endpoint_margin_mean": 0.43246567994356155,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.516436795393626,
+          "family_entropy_mean": 0.5297950141368404,
+          "top4_bridge_share_in_top20": 0.21021558494731912,
+          "top8_bridge_share_in_top20": 0.4155544516673043,
+          "layer_cluster_margin": 0.49148116665718466,
+          "minimal_stronger_than_control_k": 1,
+          "bridge_score": 0.5235451272308879
+        },
+        "hypernym": {
+          "classification": "layer_cluster_only",
+          "endpoint_families": [
+            "category",
+            "instance"
+          ],
+          "endpoint_words": [
+            "animal",
+            "apple",
+            "cat",
+            "fruit"
+          ],
+          "topology_compactness": 0.42398933942119277,
+          "endpoint_margin_mean": 0.2393888682126999,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.5760106605788072,
+          "family_entropy_mean": 0.544916419726279,
+          "top4_bridge_share_in_top20": 0.22273390999464643,
+          "top8_bridge_share_in_top20": 0.4292973050417499,
+          "layer_cluster_margin": 0.7760261591598341,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.5324276553576747
+        },
+        "antonym": {
+          "classification": "distributed_none",
+          "endpoint_families": [
+            "descriptor"
+          ],
+          "endpoint_words": [
+            "big",
+            "cold",
+            "hot",
+            "small"
+          ],
+          "topology_compactness": 0.323088139295578,
+          "endpoint_margin_mean": 0.2491469830274582,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.676911860704422,
+          "family_entropy_mean": 0.5283330794778609,
+          "top4_bridge_share_in_top20": 0.21402236035518157,
+          "top8_bridge_share_in_top20": 0.4186318035836444,
+          "layer_cluster_margin": -0.24077021640005025,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.3572514965356436
+        },
+        "synonym": {
+          "classification": "distributed_none",
+          "endpoint_families": [
+            "descriptor"
+          ],
+          "endpoint_words": [
+            "big",
+            "large",
+            "small",
+            "tiny"
+          ],
+          "topology_compactness": 0.323088139295578,
+          "endpoint_margin_mean": 0.18326698243618011,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.676911860704422,
+          "family_entropy_mean": 0.5283330794778609,
+          "top4_bridge_share_in_top20": 0.22736991132702764,
+          "top8_bridge_share_in_top20": 0.4348956791904451,
+          "layer_cluster_margin": -0.6552028948980451,
+          "minimal_stronger_than_control_k": null,
+          "bridge_score": 0.3467450066117571
+        },
+        "meronym": {
+          "classification": "compact_boundary",
+          "endpoint_families": [
+            "part",
+            "whole"
+          ],
+          "endpoint_words": [
+            "car",
+            "leaf",
+            "tree",
+            "wheel"
+          ],
+          "topology_compactness": 0.4834332146371404,
+          "endpoint_margin_mean": 0.17843405902385712,
+          "endpoint_support_rate": 0.75,
+          "family_true_residual_mean": 0.5165667853628596,
+          "family_entropy_mean": 0.5425656949362111,
+          "top4_bridge_share_in_top20": 0.21046407476782558,
+          "top8_bridge_share_in_top20": 0.41242149967978947,
+          "layer_cluster_margin": -0.6221977722431666,
+          "minimal_stronger_than_control_k": 16,
+          "bridge_score": 0.32446626968576464
+        },
+        "cause_effect": {
+          "classification": "compact_boundary",
+          "endpoint_families": [
+            "cause",
+            "effect"
+          ],
+          "endpoint_words": [
+            "disease",
+            "fire",
+            "smoke",
+            "virus"
+          ],
+          "topology_compactness": 0.49761324996749556,
+          "endpoint_margin_mean": 0.5538415312767029,
+          "endpoint_support_rate": 1.0,
+          "family_true_residual_mean": 0.5023867500325044,
+          "family_entropy_mean": 0.5323698511495003,
+          "top4_bridge_share_in_top20": 0.22045231941173007,
+          "top8_bridge_share_in_top20": 0.42799941444709294,
+          "layer_cluster_margin": 0.047425048714909955,
+          "minimal_stronger_than_control_k": 1,
+          "bridge_score": 0.4638664298741677
+        }
+      },
+      "global_summary": {
+        "classification_bridge_mean": {
+          "compact_boundary": 0.4372926089302734,
+          "layer_cluster_only": 0.5324276553576747,
+          "distributed_none": 0.35199825157370035
+        },
+        "top_relation_order": [
+          {
+            "relation": "hypernym",
+            "bridge_score": 0.5324276553576747,
+            "classification": "layer_cluster_only"
+          },
+          {
+            "relation": "gender",
+            "bridge_score": 0.5235451272308879,
+            "classification": "compact_boundary"
+          },
+          {
+            "relation": "cause_effect",
+            "bridge_score": 0.4638664298741677,
+            "classification": "compact_boundary"
+          },
+          {
+            "relation": "antonym",
+            "bridge_score": 0.3572514965356436,
+            "classification": "distributed_none"
+          },
+          {
+            "relation": "synonym",
+            "bridge_score": 0.3467450066117571,
+            "classification": "distributed_none"
+          },
+          {
+            "relation": "meronym",
+            "bridge_score": 0.32446626968576464,
+            "classification": "compact_boundary"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "timestamp": "2026-03-09 22:58:35",
+    "runtime_sec": 0.0010006427764892578,
+    "compression_target": "shared_basis / offset / relation_protocol / gating / topology / integration -> base / adaptive_offset / routing / stabilization"
+  },
+  "mapping": {
+    "base": [
+      "shared_basis",
+      "H_representation",
+      "abstraction_operator"
+    ],
+    "adaptive_offset": [
+      "offset",
+      "protocol_calling",
+      "sparse_offset"
+    ],
+    "routing": [
+      "G_gating",
+      "R_relation",
+      "T_topology",
+      "protocol_routing",
+      "topology_basis",
+      "analogy_path"
+    ],
+    "stabilization": [
+      "integration",
+      "multi_timescale_control",
+      "long_horizon_stability",
+      "grounding_barrier"
+    ]
+  },
+  "views": [
+    {
+      "view_id": "gpt2_dnn_bridge",
+      "model_name": "gpt2",
+      "source": "dnn_brain_puzzle_bridge",
+      "factors": {
+        "base": 0.7379788463238593,
+        "adaptive_offset": 0.4852941276936983,
+        "routing": 0.690754572240551,
+        "stabilization": 0.8489537037037037
+      },
+      "reference_score": 0.8098302379807074,
+      "compressed_score": 0.6907453124904531,
+      "compression_gap": -0.11908492549025429,
+      "stabilization_detail": {
+        "score": 0.398061167227834,
+        "long_horizon_component": 0.38450617283950617,
+        "grounding_component": 0.4116161616161619,
+        "best_d_overall_gain": -0.008838383838383812
+      }
+    },
+    {
+      "view_id": "qwen3_4b_dnn_bridge",
+      "model_name": "qwen3_4b",
+      "source": "dnn_brain_puzzle_bridge",
+      "factors": {
+        "base": 0.7365749099089316,
+        "adaptive_offset": 0.7812716598712128,
+        "routing": 0.6782684023342546,
+        "stabilization": 0.8489537037037037
+      },
+      "reference_score": 0.8152893551778044,
+      "compressed_score": 0.7612671689545256,
+      "compression_gap": -0.05402218622327881,
+      "stabilization_detail": {
+        "score": 0.398061167227834,
+        "long_horizon_component": 0.38450617283950617,
+        "grounding_component": 0.4116161616161619,
+        "best_d_overall_gain": -0.008838383838383812
+      }
+    },
+    {
+      "view_id": "qwen3_4b_mechanism_bridge",
+      "model_name": "qwen3_4b",
+      "source": "qwen3_deepseek7b_mechanism_bridge",
+      "factors": {
+        "base": 0.7135909344154158,
+        "adaptive_offset": 0.41531722476826505,
+        "routing": 0.9394199162221861,
+        "stabilization": 0.398061167227834
+      },
+      "reference_score": 0.7531501201677545,
+      "compressed_score": 0.6165973106584253,
+      "compression_gap": -0.13655280950932924,
+      "stabilization_detail": {
+        "score": 0.398061167227834,
+        "long_horizon_component": 0.38450617283950617,
+        "grounding_component": 0.4116161616161619,
+        "best_d_overall_gain": -0.008838383838383812
+      }
+    },
+    {
+      "view_id": "deepseek_7b_mechanism_bridge",
+      "model_name": "deepseek_7b",
+      "source": "qwen3_deepseek7b_mechanism_bridge",
+      "factors": {
+        "base": 0.9701116557734204,
+        "adaptive_offset": 0.7905731280758181,
+        "routing": 0.8909933271922417,
+        "stabilization": 0.398061167227834
+      },
+      "reference_score": 0.9041073210652278,
+      "compressed_score": 0.7624348195673286,
+      "compression_gap": -0.14167250149789923,
+      "stabilization_detail": {
+        "score": 0.398061167227834,
+        "long_horizon_component": 0.38450617283950617,
+        "grounding_component": 0.4116161616161619,
+        "best_d_overall_gain": -0.008838383838383812
+      }
+    }
+  ],
+  "factor_summary": {
+    "means": {
+      "base": 0.7895640866054068,
+      "adaptive_offset": 0.6181140351022485,
+      "routing": 0.7998590544973083,
+      "stabilization": 0.6235074354657689
+    },
+    "strongest_factor": "routing",
+    "weakest_factor": "adaptive_offset"
+  },
+  "retention": {
+    "reference_mean": 0.8205942585978736,
+    "compressed_mean": 0.7077611529176832,
+    "mean_absolute_gap": 0.1128331056801904,
+    "score_correlation": 0.8173630887060431,
+    "compression_pass": true
+  },
+  "project_readout": {
+    "why_compress": [
+      "把六个对象压成四个对象后，理论表达更接近“最小统一结构”。",
+      "如果压缩后仍能保留桥接分数排序和大部分量级，说明当前六对象里存在可合并冗余。",
+      "后续真正要寻找的，不是更多模块名词，而是更小的更新律。"
+    ],
+    "current_verdict": "当前证据支持先把 shared_basis 与表征层压成 base，把 offset 与 concept calling 压成 adaptive_offset，把 relation / gating / topology 压成 routing，再把长程与接地瓶颈压成 stabilization。",
+    "next_question": "能否进一步把 base / adaptive_offset / routing / stabilization 再写成一条统一更新律？"
+  }
+}

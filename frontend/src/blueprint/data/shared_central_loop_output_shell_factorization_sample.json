@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 08:15:57",
+    "runtime_sec": 2.3181087970733643,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ]
+  },
+  "factorized_shells": {
+    "calibration_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007854044463324151,
+      "score_correlation": 0.9552271480387662,
+      "modality_mean_gap": {
+        "full": 0.010594043261487135,
+        "visual": 0.007939146359789994,
+        "tactile": 0.006239109554623118,
+        "language": 0.006643878677396353
+      },
+      "mean_held_out_gap": 0.008701879068575693,
+      "held_out_score_correlation": 0.9434781124670149,
+      "modality_held_out_gap": {
+        "full": 0.011824846879088302,
+        "visual": 0.008841848330717952,
+        "tactile": 0.006851604200747527,
+        "language": 0.007289216863748995
+      }
+    },
+    "protocol_shell": {
+      "loop_rank": 4,
+      "mean_absolute_gap": 0.0056466004001902576,
+      "score_correlation": 0.9749663081187363,
+      "modality_mean_gap": {
+        "full": 0.012077061828851118,
+        "visual": 0.003545345467471117,
+        "tactile": 0.003993374557143853,
+        "language": 0.002970619747294942
+      },
+      "mean_held_out_gap": 0.007203048051354558,
+      "held_out_score_correlation": 0.9606078286143466,
+      "modality_held_out_gap": {
+        "full": 0.014297695015030514,
+        "visual": 0.004972458435118662,
+        "tactile": 0.005430145013965113,
+        "language": 0.004111893741303943
+      }
+    },
+    "task_readout_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007676866214317966,
+      "score_correlation": 0.9548914948450044,
+      "modality_mean_gap": {
+        "full": 0.01081998370047478,
+        "visual": 0.00807736688536555,
+        "tactile": 0.0057424475765775725,
+        "language": 0.006067666694853963
+      },
+      "mean_held_out_gap": 0.008783715825404211,
+      "held_out_score_correlation": 0.9398290351347712,
+      "modality_held_out_gap": {
+        "full": 0.012152464106425875,
+        "visual": 0.009630653222608549,
+        "tactile": 0.006504489627337786,
+        "language": 0.006847256345244637
+      }
+    }
+  },
+  "winner": "protocol_shell",
+  "hypotheses": {
+    "H1_task_beats_calibration": false,
+    "H2_task_beats_protocol": false,
+    "H3_output_shell_is_readout_heavy": false
+  },
+  "project_readout": {
+    "summary": "如果任务读出壳优于校准壳和协议壳，就说明模态差异主要落在最终任务读出，而不是更浅层的统一校准。",
+    "next_question": "任务读出壳里，差异主要是概念读出、关系读出，还是动作读出？"
+  }
+}

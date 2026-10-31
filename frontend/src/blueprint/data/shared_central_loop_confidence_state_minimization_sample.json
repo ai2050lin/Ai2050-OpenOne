@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 10:12:11",
+    "runtime_sec": 10.061984539031982,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ],
+    "semantic_features": [
+      {
+        "id": "family_mean_confidence",
+        "label": "家族均值置信"
+      },
+      {
+        "id": "worst_case_confidence",
+        "label": "最差情形置信"
+      },
+      {
+        "id": "global_trust_reserve",
+        "label": "全局信任余量"
+      },
+      {
+        "id": "family_concept_margin",
+        "label": "家族-概念边距"
+      }
+    ]
+  },
+  "confidence_minimization_scan": {
+    "family_mean_confidence+worst_case_confidence+global_trust_reserve": {
+      "label": "家族均值置信 + 最差情形置信 + 全局信任余量",
+      "excluded_feature": "family_concept_margin",
+      "excluded_label": "家族-概念边距",
+      "loop_rank": 4,
+      "mean_absolute_gap": 0.006663981137514846,
+      "score_correlation": 0.9648377371364529,
+      "modality_mean_gap": {
+        "full": 0.010477574703299453,
+        "visual": 0.005727269142020453,
+        "tactile": 0.00516035603178798,
+        "language": 0.005290724672951502
+      },
+      "mean_held_out_gap": 0.008006703323814316,
+      "held_out_score_correlation": 0.950361647261827,
+      "modality_held_out_gap": {
+        "full": 0.011802280064815467,
+        "visual": 0.007268878753176336,
+        "tactile": 0.006582772302084069,
+        "language": 0.0063728821751813935
+      }
+    },
+    "family_mean_confidence+worst_case_confidence+family_concept_margin": {
+      "label": "家族均值置信 + 最差情形置信 + 家族-概念边距",
+      "excluded_feature": "global_trust_reserve",
+      "excluded_label": "全局信任余量",
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.005231410905889934,
+      "score_correlation": 0.9729617060352104,
+      "modality_mean_gap": {
+        "full": 0.010435233277970779,
+        "visual": 0.00450730635835023,
+        "tactile": 0.002411199868952746,
+        "language": 0.0035719041182859816
+      },
+      "mean_held_out_gap": 0.006204978004145003,
+      "held_out_score_correlation": 0.964306208922594,
+      "modality_held_out_gap": {
+        "full": 0.011625981424591824,
+        "visual": 0.005690516167868193,
+        "tactile": 0.002933369654913065,
+        "language": 0.00457004476920693
+      }
+    },
+    "family_mean_confidence+global_trust_reserve+family_concept_margin": {
+      "label": "家族均值置信 + 全局信任余量 + 家族-概念边距",
+      "excluded_feature": "worst_case_confidence",
+      "excluded_label": "最差情形置信",
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.004931861417459141,
+      "score_correlation": 0.9731418146753538,
+      "modality_mean_gap": {
+        "full": 0.010472951499715475,
+        "visual": 0.0037288878703606474,
+        "tactile": 0.0021861064768288222,
+        "language": 0.0033394998229316214
+      },
+      "mean_held_out_gap": 0.005744684964207198,
+      "held_out_score_correlation": 0.9654972025618105,
+      "modality_held_out_gap": {
+        "full": 0.011673392402730123,
+        "visual": 0.004435106322828375,
+        "tactile": 0.0027395514177691095,
+        "language": 0.004130689713501184
+      }
+    },
+    "worst_case_confidence+global_trust_reserve+family_concept_margin": {
+      "label": "最差情形置信 + 全局信任余量 + 家族-概念边距",
+      "excluded_feature": "family_mean_confidence",
+      "excluded_label": "家族均值置信",
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.00538705517436942,
+      "score_correlation": 0.9706655995500019,
+      "modality_mean_gap": {
+        "full": 0.010436308017508764,
+        "visual": 0.004982143249628546,
+        "tactile": 0.0029637778766126942,
+        "language": 0.003165991553727676
+      },
+      "mean_held_out_gap": 0.006333541578510138,
+      "held_out_score_correlation": 0.9614088468717629,
+      "modality_held_out_gap": {
+        "full": 0.011631365240021863,
+        "visual": 0.0061351630258156655,
+        "tactile": 0.0036676869335195263,
+        "language": 0.0038999511146835
+      }
+    }
+  },
+  "winner": "family_mean_confidence+global_trust_reserve+family_concept_margin",
+  "winning_label": "家族均值置信 + 全局信任余量 + 家族-概念边距",
+  "winning_excluded_feature": "worst_case_confidence",
+  "winning_excluded_label": "最差情形置信",
+  "project_readout": {
+    "summary": "如果某个 3 维组合稳定胜出，就说明当前语义 4D 状态包还能继续压缩，否则就说明 4 维已经接近最小接口。",
+    "next_question": "3 维最优组合和 4 维最优组合相比，跨域闭环能力是否发生了明显退化？"
+  }
+}

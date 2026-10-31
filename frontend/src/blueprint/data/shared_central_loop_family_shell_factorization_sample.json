@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 09:04:31",
+    "runtime_sec": 2.4343998432159424,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ]
+  },
+  "factorized_family_shells": {
+    "shared_basis_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007508811196219059,
+      "score_correlation": 0.9570941633743064,
+      "modality_mean_gap": {
+        "full": 0.010554481839385298,
+        "visual": 0.007405053048973484,
+        "tactile": 0.0058230882436755785,
+        "language": 0.006252621652841878
+      },
+      "mean_held_out_gap": 0.008505078940810387,
+      "held_out_score_correlation": 0.9438107707815442,
+      "modality_held_out_gap": {
+        "full": 0.011835084501183887,
+        "visual": 0.008576839405131709,
+        "tactile": 0.0065763480416564215,
+        "language": 0.0070320438152695315
+      }
+    },
+    "individual_offset_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007676866214317966,
+      "score_correlation": 0.9548914948450044,
+      "modality_mean_gap": {
+        "full": 0.01081998370047478,
+        "visual": 0.00807736688536555,
+        "tactile": 0.0057424475765775725,
+        "language": 0.006067666694853963
+      },
+      "mean_held_out_gap": 0.008783715825404211,
+      "held_out_score_correlation": 0.9398290351347712,
+      "modality_held_out_gap": {
+        "full": 0.012152464106425875,
+        "visual": 0.009630653222608549,
+        "tactile": 0.006504489627337786,
+        "language": 0.006847256345244637
+      }
+    },
+    "family_hierarchy_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.006944324253336536,
+      "score_correlation": 0.9627710787181728,
+      "modality_mean_gap": {
+        "full": 0.01085433052791696,
+        "visual": 0.005126935684543912,
+        "tactile": 0.005644533983002115,
+        "language": 0.006151496817883154
+      },
+      "mean_held_out_gap": 0.008726859617559962,
+      "held_out_score_correlation": 0.940090671758675,
+      "modality_held_out_gap": {
+        "full": 0.01329478065321053,
+        "visual": 0.006939397027810329,
+        "tactile": 0.007241049877923742,
+        "language": 0.007432210911295245
+      }
+    }
+  },
+  "winner": "shared_basis_shell",
+  "hypotheses": {
+    "H1_basis_beats_offset": true,
+    "H2_basis_beats_hierarchy": true,
+    "H3_family_shell_is_basis_heavy": true
+  },
+  "project_readout": {
+    "summary": "如果共享基底壳优于个体偏移壳和 family 内部层级壳，就说明多模态差异主要先落在共享基底的重写，而不是个体偏移或层级展开。",
+    "next_question": "共享基底壳里，差异主要是家族原型位置，还是家族边界宽度？"
+  }
+}

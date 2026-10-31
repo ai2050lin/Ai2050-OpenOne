@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "timestamp": "2026-03-09 23:19:06",
+    "runtime_sec": 0.16461396217346191,
+    "source": "unified_structure_four_factor_compression_20260309.json"
+  },
+  "law_form": {
+    "effective_offset": "adaptive_offset + route_gain * routing * (1 - adaptive_offset) - stabilize_drag * (1 - stabilization) * adaptive_offset",
+    "unified_score": "mean(base, effective_offset, routing, stabilization)",
+    "intuition": [
+      "routing 足够强时，adaptive_offset 更容易被真正带起来。",
+      "stabilization 不足时，adaptive_offset 更容易被压回去。",
+      "如果两参数律已经能逼近桥接分数，说明下一步该优先压更新律，而不是继续堆对象名词。"
+    ]
+  },
+  "best_law": {
+    "route_gain": 1.3,
+    "stabilize_drag": 0.0,
+    "mean_absolute_gap": 0.027068973419952874,
+    "raw_mean_absolute_gap": 0.1128331056801904,
+    "gap_improvement": 0.08576413226023752,
+    "score_correlation": 0.8091355838568351,
+    "raw_score_correlation": 0.8173630887060431,
+    "correlation_improvement": -0.008227504849207978,
+    "pass": true
+  },
+  "view_results": [
+    {
+      "view_id": "gpt2_dnn_bridge",
+      "reference_score": 0.8098302379807074,
+      "raw_four_factor_score": 0.6907453124904531,
+      "unified_score": 0.8062943287532108,
+      "effective_offset": 0.9474901927447291,
+      "absolute_gap": 0.003535909227496581,
+      "raw_gap": 0.11908492549025429
+    },
+    {
+      "view_id": "qwen3_4b_dnn_bridge",
+      "reference_score": 0.8152893551778044,
+      "raw_four_factor_score": 0.7612671689545256,
+      "unified_score": 0.8094830385409478,
+      "effective_offset": 0.9741351382169015,
+      "absolute_gap": 0.005806316636856601,
+      "raw_gap": 0.05402218622327881
+    },
+    {
+      "view_id": "qwen3_4b_mechanism_bridge",
+      "reference_score": 0.7531501201677545,
+      "raw_four_factor_score": 0.6165973106584253,
+      "unified_score": 0.762768004466359,
+      "effective_offset": 1.0,
+      "absolute_gap": 0.00961788429860444,
+      "raw_gap": 0.13655280950932924
+    },
+    {
+      "view_id": "deepseek_7b_mechanism_bridge",
+      "reference_score": 0.9041073210652278,
+      "raw_four_factor_score": 0.7624348195673286,
+      "unified_score": 0.814791537548374,
+      "effective_offset": 1.0,
+      "absolute_gap": 0.08931578351685387,
+      "raw_gap": 0.14167250149789923
+    }
+  ],
+  "leave_one_out": {
+    "folds": [
+      {
+        "view_id": "gpt2_dnn_bridge",
+        "route_gain": 1.5,
+        "stabilize_drag": 0.1,
+        "held_out_prediction": 0.8194217805670285,
+        "held_out_reference": 0.8098302379807074,
+        "held_out_gap": 0.009591542586321111,
+        "effective_offset": 1.0
+      },
+      {
+        "view_id": "qwen3_4b_dnn_bridge",
+        "route_gain": 1.3,
+        "stabilize_drag": 0.0,
+        "held_out_prediction": 0.8094830385409478,
+        "held_out_reference": 0.8152893551778044,
+        "held_out_gap": 0.005806316636856601,
+        "effective_offset": 0.9741351382169015
+      },
+      {
+        "view_id": "qwen3_4b_mechanism_bridge",
+        "route_gain": 1.3,
+        "stabilize_drag": 0.0,
+        "held_out_prediction": 0.762768004466359,
+        "held_out_reference": 0.7531501201677545,
+        "held_out_gap": 0.00961788429860444,
+        "effective_offset": 1.0
+      },
+      {
+        "view_id": "deepseek_7b_mechanism_bridge",
+        "route_gain": 1.4000000000000001,
+        "stabilize_drag": 0.0,
+        "held_out_prediction": 0.814791537548374,
+        "held_out_reference": 0.9041073210652278,
+        "held_out_gap": 0.08931578351685387,
+        "effective_offset": 1.0
+      }
+    ],
+    "mean_held_out_gap": 0.028582881759659007,
+    "pass": true
+  },
+  "project_readout": {
+    "current_verdict": "四因子结构之上已经存在一条很小的两参数更新律候选。它主要修正 adaptive_offset，而不是重新定义全部对象。",
+    "risk_note": "当前只有 4 个视角点，样本很少。结果更像“低维统一律存在性信号”，还不能写成最终定律。",
+    "next_question": "能否把这条两参数候选律扩到真实任务闭环，而不是只在桥接分数上成立？"
+  }
+}

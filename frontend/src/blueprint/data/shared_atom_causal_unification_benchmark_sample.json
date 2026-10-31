@@ -1,0 +1,389 @@
+{
+  "config": {
+    "d_model": 64,
+    "dict_size": 32,
+    "top_k": 6,
+    "batch_size": 64,
+    "epochs": 18,
+    "lr": 0.003,
+    "train_size": 6000,
+    "val_size": 1200
+  },
+  "systems": {
+    "unified_shared_atoms": {
+      "metrics": {
+        "concept_accuracy": 0.9083333333333333,
+        "relation_accuracy": 1.0,
+        "noisy_concept_accuracy": 0.7383333333333333,
+        "noisy_relation_accuracy": 0.9125,
+        "recovery_accuracy": 0.6708333333333333
+      },
+      "usage": {
+        "concept_usage": [
+          0.0,
+          1.3901615142822266,
+          1.4830142259597778,
+          0.8743242025375366,
+          0.0,
+          0.0,
+          0.058848511427640915,
+          0.011858225800096989,
+          0.037880152463912964,
+          0.0,
+          1.2689249515533447,
+          0.49137938022613525,
+          1.726029872894287,
+          0.0,
+          0.7313169240951538,
+          1.2779059410095215,
+          0.0,
+          0.0,
+          0.004736084956675768,
+          1.1319867372512817,
+          0.7942965626716614,
+          1.3450608253479004,
+          0.0,
+          0.18845880031585693,
+          1.372027039527893,
+          0.002843327820301056,
+          0.4713461399078369,
+          1.1970065832138062,
+          0.8932279348373413,
+          0.0,
+          0.8539670705795288,
+          0.0
+        ],
+        "relation_usage": [
+          0.0,
+          1.2391959428787231,
+          1.410525918006897,
+          0.6763359308242798,
+          0.0,
+          0.0,
+          0.3833494484424591,
+          0.0,
+          0.08239235728979111,
+          0.0,
+          1.3694933652877808,
+          0.32612287998199463,
+          1.629781723022461,
+          0.0,
+          0.5130444169044495,
+          1.2528339624404907,
+          0.0,
+          0.0,
+          0.0,
+          0.9592558145523071,
+          0.8429176211357117,
+          1.3646184206008911,
+          0.0,
+          0.0955575630068779,
+          1.282832384109497,
+          0.006623794324696064,
+          0.8800597190856934,
+          0.8417990207672119,
+          0.8598593473434448,
+          0.0,
+          0.8790366649627686,
+          0.0
+        ],
+        "cross_dim_corr": 0.972962040431822,
+        "top_overlap_ratio": 1.0
+      },
+      "ablations": {
+        "shared_top": {
+          "indices": [
+            12,
+            2,
+            21,
+            24,
+            10,
+            1,
+            15,
+            19,
+            27,
+            28
+          ],
+          "metrics": {
+            "concept_accuracy": 0.6225,
+            "relation_accuracy": 0.7691666666666667,
+            "noisy_concept_accuracy": 0.5358333333333334,
+            "noisy_relation_accuracy": 0.7033333333333334,
+            "recovery_accuracy": 0.36
+          },
+          "drops": {
+            "concept_drop": 0.2858333333333333,
+            "relation_drop": 0.23083333333333333,
+            "recovery_drop": 0.3108333333333333,
+            "joint_drop": 0.2758333333333333,
+            "coupled_drop": 0.38625
+          }
+        },
+        "concept_only": {
+          "indices": [
+            14,
+            3,
+            11,
+            23,
+            7,
+            18,
+            29,
+            31,
+            5,
+            4
+          ],
+          "metrics": {
+            "concept_accuracy": 0.8541666666666666,
+            "relation_accuracy": 0.9716666666666667,
+            "noisy_concept_accuracy": 0.6975,
+            "noisy_relation_accuracy": 0.8833333333333333,
+            "recovery_accuracy": 0.6141666666666666
+          },
+          "drops": {
+            "concept_drop": 0.054166666666666696,
+            "relation_drop": 0.02833333333333332,
+            "recovery_drop": 0.05666666666666664,
+            "joint_drop": 0.04638888888888889,
+            "coupled_drop": 0.05666666666666664
+          }
+        },
+        "relation_only": {
+          "indices": [
+            26,
+            6,
+            20,
+            8,
+            30,
+            25,
+            17,
+            16,
+            4,
+            0
+          ],
+          "metrics": {
+            "concept_accuracy": 0.88,
+            "relation_accuracy": 0.9958333333333333,
+            "noisy_concept_accuracy": 0.7258333333333333,
+            "noisy_relation_accuracy": 0.8983333333333333,
+            "recovery_accuracy": 0.65
+          },
+          "drops": {
+            "concept_drop": 0.02833333333333332,
+            "relation_drop": 0.004166666666666652,
+            "recovery_drop": 0.02083333333333326,
+            "joint_drop": 0.017777777777777743,
+            "coupled_drop": 0.014583333333333282
+          }
+        },
+        "random_control": {
+          "indices": [
+            11,
+            6,
+            26,
+            9,
+            8,
+            30,
+            17,
+            22,
+            31,
+            23
+          ],
+          "metrics": {
+            "concept_accuracy": 0.8875,
+            "relation_accuracy": 0.9941666666666666,
+            "noisy_concept_accuracy": 0.7208333333333333,
+            "noisy_relation_accuracy": 0.8925,
+            "recovery_accuracy": 0.6433333333333333
+          },
+          "drops": {
+            "concept_drop": 0.02083333333333337,
+            "relation_drop": 0.005833333333333357,
+            "recovery_drop": 0.02749999999999997,
+            "joint_drop": 0.018055555555555564,
+            "coupled_drop": 0.01958333333333334
+          }
+        }
+      }
+    },
+    "independent_atoms": {
+      "metrics": {
+        "concept_accuracy": 0.89,
+        "relation_accuracy": 0.9983333333333333,
+        "noisy_concept_accuracy": 0.735,
+        "noisy_relation_accuracy": 0.9316666666666666,
+        "recovery_accuracy": 0.69
+      },
+      "usage": {
+        "concept_usage": [
+          0.0,
+          0.0,
+          0.002706472761929035,
+          1.2221040725708008,
+          0.3185252845287323,
+          1.2761321067810059,
+          2.1101272106170654,
+          0.0,
+          0.0,
+          0.0037379178684204817,
+          0.9535695314407349,
+          0.0,
+          0.2517922520637512,
+          0.6741601824760437,
+          0.16856512427330017,
+          0.14810574054718018,
+          0.0,
+          0.20743177831172943,
+          0.0,
+          0.0,
+          0.4940987229347229,
+          0.16461874544620514,
+          1.4352887868881226,
+          0.0,
+          0.593826949596405,
+          1.1553456783294678,
+          0.8921251893043518,
+          1.9899711608886719,
+          1.7215267419815063,
+          0.3323655128479004,
+          0.955065906047821,
+          0.32188332080841064
+        ],
+        "relation_usage": [
+          0.34192776679992676,
+          0.0,
+          1.1010710000991821,
+          1.1270145177841187,
+          0.13420511782169342,
+          1.0176109075546265,
+          1.8900299072265625,
+          0.10324253886938095,
+          0.0,
+          0.33611977100372314,
+          1.0383827686309814,
+          0.005479150917381048,
+          0.0,
+          1.1668670177459717,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.3635976016521454,
+          0.0026411081198602915,
+          1.139082908630371,
+          0.36495837569236755,
+          1.56671941280365,
+          0.0,
+          0.0,
+          0.8796259164810181,
+          0.5822232365608215,
+          1.7861099243164062,
+          1.7102364301681519,
+          0.18989509344100952,
+          0.0,
+          0.0
+        ]
+      },
+      "ablations": {
+        "paired_dual_topk": {
+          "concept_indices": [
+            30,
+            24,
+            31,
+            26,
+            12
+          ],
+          "relation_indices": [
+            2,
+            18,
+            0,
+            9,
+            21
+          ],
+          "metrics": {
+            "concept_accuracy": 0.8816666666666667,
+            "relation_accuracy": 0.9983333333333333,
+            "noisy_concept_accuracy": 0.73,
+            "noisy_relation_accuracy": 0.9208333333333333,
+            "recovery_accuracy": 0.6708333333333333
+          },
+          "drops": {
+            "concept_drop": 0.008333333333333304,
+            "relation_drop": 0.0,
+            "recovery_drop": 0.019166666666666665,
+            "joint_drop": 0.009166666666666656,
+            "coupled_drop": 0.009583333333333333
+          }
+        },
+        "random_control": {
+          "concept_indices": [
+            11,
+            7,
+            24,
+            10,
+            9
+          ],
+          "relation_indices": [
+            30,
+            16,
+            20,
+            31,
+            21
+          ],
+          "metrics": {
+            "concept_accuracy": 0.8516666666666667,
+            "relation_accuracy": 0.9991666666666666,
+            "noisy_concept_accuracy": 0.7075,
+            "noisy_relation_accuracy": 0.9283333333333333,
+            "recovery_accuracy": 0.6616666666666666
+          },
+          "drops": {
+            "concept_drop": 0.03833333333333333,
+            "relation_drop": -0.0008333333333333526,
+            "recovery_drop": 0.02833333333333332,
+            "joint_drop": 0.021944444444444433,
+            "coupled_drop": 0.013333333333333308
+          }
+        }
+      }
+    },
+    "dense_baseline": {
+      "metrics": {
+        "concept_accuracy": 0.9058333333333334,
+        "relation_accuracy": 1.0,
+        "noisy_concept_accuracy": 0.7508333333333334,
+        "noisy_relation_accuracy": 0.9416666666666667,
+        "recovery_accuracy": 0.7091666666666666
+      }
+    }
+  },
+  "headline_metrics": {
+    "unified_clean_concept_accuracy": 0.9083333333333333,
+    "unified_clean_relation_accuracy": 1.0,
+    "unified_recovery_accuracy": 0.6708333333333333,
+    "shared_joint_drop": 0.2758333333333333,
+    "shared_recovery_drop": 0.3108333333333333,
+    "cross_dim_corr": 0.972962040431822
+  },
+  "gains": {
+    "shared_vs_random_joint_drop": 0.2577777777777778,
+    "shared_vs_concept_only_joint_drop": 0.22944444444444442,
+    "shared_vs_relation_only_joint_drop": 0.2580555555555556,
+    "shared_vs_independent_paired_joint_drop": 0.26666666666666666,
+    "unified_vs_independent_recovery": -0.019166666666666665
+  },
+  "hypotheses": {
+    "H1_shared_ablation_beats_random_joint_drop": true,
+    "H2_shared_ablation_couples_concept_and_relation": true,
+    "H3_shared_ablation_hits_recovery": true,
+    "H4_unified_joint_drop_beats_independent_paired": true
+  },
+  "project_readout": {
+    "summary": "这一版不再停在共享字典相关性，而是直接做共享原子因果消融，检测同一批低层原子是否会同时打掉概念解码、关系解码和噪声恢复。",
+    "next_question": "如果共享原子消融确实造成多维联动下跌，下一步就该把这种同源性因果结构接回真实模型和真实工具闭环。"
+  },
+  "meta": {
+    "timestamp": "2026-03-10 15:37:36",
+    "device": "cuda",
+    "runtime_sec": 22.893549919128418
+  }
+}

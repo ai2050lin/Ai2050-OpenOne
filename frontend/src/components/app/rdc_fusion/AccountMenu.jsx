@@ -33,7 +33,7 @@ function PasswordForm({ onDone }) {
   );
 }
 
-export function MyNodes() {
+function MyNodes() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => {

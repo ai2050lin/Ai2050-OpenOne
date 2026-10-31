@@ -1,0 +1,162 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 22:15:02",
+    "runtime_sec": 0.0035,
+    "core_constraint": "tool_stage_generator_head_upgrade_for_real_online_band_gap",
+    "trial_count": 144,
+    "stages": ["concept", "relation", "tool", "verify"]
+  },
+  "generator_profiles": {
+    "searched_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3222,
+        "relation": 0.1529,
+        "tool": 0.1456,
+        "verify": 0.1655
+      }
+    },
+    "end_to_end_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3222,
+        "relation": 0.1406,
+        "tool": 0.1385,
+        "verify": 0.1505
+      }
+    },
+    "tool_stage_head_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3216,
+        "relation": 0.1842,
+        "tool": 0.2663,
+        "verify": 0.1855
+      },
+      "upgrade_spec": {
+        "tool_head_gain": 1.4,
+        "relation_assist_gain": 1.0,
+        "verify_guard_gain": 0.6,
+        "concept_guard_gain": 0.6
+      },
+      "best_trial_id": 143
+    }
+  },
+  "models": {
+    "qwen3_4b": {
+      "stage_demand": {
+        "concept": 0.2172,
+        "relation": 0.2959,
+        "tool": 0.3266,
+        "verify": 0.1231
+      },
+      "searched_generator_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3222, "demand": 0.2172, "undercoverage": 0.0, "slack": 0.1050, "alignment_gap": 0.1050 },
+          { "stage": "relation", "capacity": 0.1529, "demand": 0.2959, "undercoverage": 0.1430, "slack": 0.0, "alignment_gap": 0.1430 },
+          { "stage": "tool", "capacity": 0.1456, "demand": 0.3266, "undercoverage": 0.1811, "slack": 0.0, "alignment_gap": 0.1811 },
+          { "stage": "verify", "capacity": 0.1655, "demand": 0.1231, "undercoverage": 0.0, "slack": 0.0424, "alignment_gap": 0.0424 }
+        ],
+        "mean_undercoverage": 0.0810,
+        "mean_alignment_gap": 0.1179,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.1811
+      },
+      "end_to_end_generator_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3222, "demand": 0.2172, "undercoverage": 0.0, "slack": 0.1050, "alignment_gap": 0.1050 },
+          { "stage": "relation", "capacity": 0.1406, "demand": 0.2959, "undercoverage": 0.1553, "slack": 0.0, "alignment_gap": 0.1553 },
+          { "stage": "tool", "capacity": 0.1385, "demand": 0.3266, "undercoverage": 0.1881, "slack": 0.0, "alignment_gap": 0.1881 },
+          { "stage": "verify", "capacity": 0.1505, "demand": 0.1231, "undercoverage": 0.0, "slack": 0.0274, "alignment_gap": 0.0274 }
+        ],
+        "mean_undercoverage": 0.0859,
+        "mean_alignment_gap": 0.1190,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.1881
+      },
+      "tool_stage_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3216, "demand": 0.2172, "undercoverage": 0.0, "slack": 0.1044, "alignment_gap": 0.1044 },
+          { "stage": "relation", "capacity": 0.1842, "demand": 0.2959, "undercoverage": 0.1117, "slack": 0.0, "alignment_gap": 0.1117 },
+          { "stage": "tool", "capacity": 0.2663, "demand": 0.3266, "undercoverage": 0.0603, "slack": 0.0, "alignment_gap": 0.0603 },
+          { "stage": "verify", "capacity": 0.1855, "demand": 0.1231, "undercoverage": 0.0, "slack": 0.0624, "alignment_gap": 0.0624 }
+        ],
+        "mean_undercoverage": 0.0430,
+        "mean_alignment_gap": 0.0847,
+        "worst_stage": "relation",
+        "worst_undercoverage": 0.1117
+      }
+    },
+    "deepseek_7b": {
+      "stage_demand": {
+        "concept": 0.5449,
+        "relation": 0.5513,
+        "tool": 0.6098,
+        "verify": 0.1520
+      },
+      "searched_generator_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3222, "demand": 0.5449, "undercoverage": 0.2227, "slack": 0.0, "alignment_gap": 0.2227 },
+          { "stage": "relation", "capacity": 0.1529, "demand": 0.5513, "undercoverage": 0.3984, "slack": 0.0, "alignment_gap": 0.3984 },
+          { "stage": "tool", "capacity": 0.1456, "demand": 0.6098, "undercoverage": 0.4643, "slack": 0.0, "alignment_gap": 0.4643 },
+          { "stage": "verify", "capacity": 0.1655, "demand": 0.1520, "undercoverage": 0.0, "slack": 0.0136, "alignment_gap": 0.0136 }
+        ],
+        "mean_undercoverage": 0.2714,
+        "mean_alignment_gap": 0.2747,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.4643
+      },
+      "end_to_end_generator_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3222, "demand": 0.5449, "undercoverage": 0.2227, "slack": 0.0, "alignment_gap": 0.2227 },
+          { "stage": "relation", "capacity": 0.1406, "demand": 0.5513, "undercoverage": 0.4108, "slack": 0.0, "alignment_gap": 0.4108 },
+          { "stage": "tool", "capacity": 0.1385, "demand": 0.6098, "undercoverage": 0.4713, "slack": 0.0, "alignment_gap": 0.4713 },
+          { "stage": "verify", "capacity": 0.1505, "demand": 0.1520, "undercoverage": 0.0015, "slack": 0.0, "alignment_gap": 0.0015 }
+        ],
+        "mean_undercoverage": 0.2766,
+        "mean_alignment_gap": 0.2766,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.4713
+      },
+      "tool_stage_head_match": {
+        "rows": [
+          { "stage": "concept", "capacity": 0.3216, "demand": 0.5449, "undercoverage": 0.2233, "slack": 0.0, "alignment_gap": 0.2233 },
+          { "stage": "relation", "capacity": 0.1842, "demand": 0.5513, "undercoverage": 0.3672, "slack": 0.0, "alignment_gap": 0.3672 },
+          { "stage": "tool", "capacity": 0.2663, "demand": 0.6098, "undercoverage": 0.3435, "slack": 0.0, "alignment_gap": 0.3435 },
+          { "stage": "verify", "capacity": 0.1855, "demand": 0.1520, "undercoverage": 0.0, "slack": 0.0335, "alignment_gap": 0.0335 }
+        ],
+        "mean_undercoverage": 0.2335,
+        "mean_alignment_gap": 0.2419,
+        "worst_stage": "relation",
+        "worst_undercoverage": 0.3672
+      }
+    }
+  },
+  "headline_metrics": {
+    "best_system": "tool_stage_head_generator_network",
+    "qwen_tool_undercoverage_gain": 0.1208,
+    "deepseek_tool_undercoverage_gain": 0.1208,
+    "qwen_mean_undercoverage_gain": 0.0380,
+    "deepseek_mean_undercoverage_gain": 0.0379,
+    "deepseek_minus_qwen_undercoverage_gap_shrink": -0.0001,
+    "qwen_non_tool_alignment_delta": -0.0040,
+    "deepseek_non_tool_alignment_delta": -0.0036,
+    "qwen_worst_stage_after_upgrade": "relation",
+    "deepseek_worst_stage_after_upgrade": "relation"
+  },
+  "gains": {
+    "qwen_tool_head_minus_end_to_end_undercoverage": 0.0428,
+    "deepseek_tool_head_minus_end_to_end_undercoverage": 0.0431,
+    "qwen_tool_head_minus_searched_undercoverage": 0.0380,
+    "deepseek_tool_head_minus_searched_undercoverage": 0.0379,
+    "qwen_tool_head_minus_searched_tool_gap": 0.1208,
+    "deepseek_tool_head_minus_searched_tool_gap": 0.1208
+  },
+  "hypotheses": {
+    "H1_tool_head_reduces_qwen_tool_undercoverage": true,
+    "H2_tool_head_reduces_deepseek_mean_undercoverage": true,
+    "H3_tool_head_beats_end_to_end_on_both_models": true,
+    "H4_tool_head_keeps_non_tool_drift_bounded": true
+  },
+  "project_readout": {
+    "summary": "这一步把生成网络结构升级聚焦到真实在线链最明显的瓶颈：tool 阶段。不再泛泛加容量，而是加入专门的 tool 头，看它能否在真实层带需求上直接缩小缺口。",
+    "next_question": "如果 tool 专门头已经能稳定缩小真实层带缺口，下一步就该继续做更硬的在线工具接口，检查这个结构升级能否把真实在线触发率一起压下去。"
+  }
+}

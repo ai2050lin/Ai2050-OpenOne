@@ -1,0 +1,282 @@
+/* 简化版控制面板样式 */
+
+.simplified-control-panel {
+  width: 320px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* 控制区块 */
+.control-section {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e9ecef;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.section-header.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+.section-header.clickable:hover {
+  opacity: 0.8;
+}
+
+.section-icon {
+  color: #667eea;
+}
+
+.section-title {
+  flex: 1;
+}
+
+/* 搜索表单 */
+.search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-input::placeholder {
+  color: #adb5bd;
+}
+
+.search-button {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 常用概念快捷选择 */
+.quick-concepts {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.quick-concepts-label {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.quick-concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.quick-concept-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-concept-button:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.concept-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.concept-name {
+  font-size: 11px;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* 模式选择 */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.mode-button:hover {
+  border-color: #667eea;
+  background: #f8f9fa;
+}
+
+.mode-button.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.mode-icon {
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.mode-button.active .mode-icon {
+  color: #667eea;
+}
+
+.mode-info {
+  flex: 1;
+}
+
+.mode-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 2px;
+}
+
+.mode-description {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+.active-indicator {
+  color: #667eea;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* 快速操作 */
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-button {
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.action-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.action-button.secondary {
+  background: white;
+  color: #495057;
+}
+
+.action-button.secondary:hover {
+  background: #f8f9fa;
+  border-color: #667eea;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .simplified-control-panel {
+    width: 100%;
+    max-height: none;
+  }
+
+  .quick-concepts-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .mode-button {
+    padding: 10px 12px;
+  }
+}
+
+/* 滚动条样式 */
+.simplified-control-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.simplified-control-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.simplified-control-panel::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 3px;
+}
+
+.simplified-control-panel::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}

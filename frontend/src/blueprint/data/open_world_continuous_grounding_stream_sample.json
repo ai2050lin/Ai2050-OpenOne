@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 12:59:42",
+    "seed": 42,
+    "num_seeds": 12,
+    "noise": 0.18,
+    "dropout_p": 0.1,
+    "missing_modality_p": 0.25,
+    "drift_scale": 0.06,
+    "runtime_sec": 0.5679101943969727
+  },
+  "systems": {
+    "direct_stream": {
+      "stable_old_family_accuracy": 0.9768518518518516,
+      "stable_old_concept_accuracy": 0.3177083333333333,
+      "novel_family_accuracy": 0.9871031746031745,
+      "novel_concept_accuracy": 0.2996031746031746,
+      "drifted_family_accuracy": 0.9702932098765432,
+      "drifted_concept_accuracy": 0.3333333333333333,
+      "closure_score": 0.5707227103804485,
+      "update_count": 300.0
+    },
+    "shared_offset_stream": {
+      "stable_old_family_accuracy": 0.9716435185185183,
+      "stable_old_concept_accuracy": 0.3269675925925926,
+      "novel_family_accuracy": 0.9821428571428571,
+      "novel_concept_accuracy": 0.2728174603174603,
+      "drifted_family_accuracy": 0.9668209876543208,
+      "drifted_concept_accuracy": 0.33757716049382713,
+      "closure_score": 0.565093537414966,
+      "update_count": 300.0
+    }
+  },
+  "gains_vs_direct": {
+    "stable_old_concept_gain": 0.0092592592592593,
+    "novel_concept_gain": -0.0267857142857143,
+    "drifted_concept_gain": 0.004243827160493818,
+    "closure_score_gain": -0.005629172965482487
+  },
+  "hypotheses": {
+    "H1_shared_offset_beats_direct_on_open_world_closure": false,
+    "H2_shared_offset_beats_direct_on_drifted_concepts": true,
+    "H3_shared_offset_beats_direct_on_old_concept_stability": true
+  },
+  "project_readout": {
+    "summary": "这一版把连续接地从阶段化原型测试推进到连续流环境，开始直接测概念在背景漂移、噪声片段和新旧概念交错出现时能否维持稳定。",
+    "next_question": "如果流式 closure 仍然有正增益，下一步就该把动作回路和长期代理状态接进来，而不是继续停在静态原型层。"
+  }
+}

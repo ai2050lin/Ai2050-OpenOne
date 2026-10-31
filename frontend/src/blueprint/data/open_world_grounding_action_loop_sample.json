@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 13:11:27",
+    "seed": 42,
+    "num_seeds": 12,
+    "noise": 0.18,
+    "dropout_p": 0.1,
+    "missing_modality_p": 0.25,
+    "drift_scale": 0.06,
+    "margin_threshold": 0.035,
+    "runtime_sec": 0.7374017238616943
+  },
+  "systems": {
+    "direct_action": {
+      "action_accuracy": 0.9716666666666667,
+      "corrected_action_accuracy": 0.9744444444444443,
+      "old_concept_retention": 0.3425925925925926,
+      "loop_score": 0.7692047930283225,
+      "update_count": 300.0
+    },
+    "shared_action_base": {
+      "action_accuracy": 0.958611111111111,
+      "corrected_action_accuracy": 0.9616666666666668,
+      "old_concept_retention": 0.33641975308641975,
+      "loop_score": 0.758482207697894,
+      "update_count": 300.0
+    },
+    "shared_action_tuned": {
+      "action_accuracy": 0.958611111111111,
+      "corrected_action_accuracy": 0.9616666666666668,
+      "old_concept_retention": 0.3263888888888889,
+      "loop_score": 0.7552369281045753,
+      "update_count": 300.0
+    }
+  },
+  "gains_vs_direct": {
+    "base_loop_score_gain": -0.010722585330428469,
+    "tuned_loop_score_gain": -0.01396786492374713,
+    "base_corrected_action_gain": -0.012777777777777555,
+    "tuned_corrected_action_gain": -0.012777777777777555,
+    "tuned_old_concept_retention_gain": -0.01620370370370372
+  },
+  "hypotheses": {
+    "H1_tuned_beats_direct_on_loop_score": false,
+    "H2_tuned_beats_direct_on_corrected_action": false,
+    "H3_tuned_beats_base_on_loop_score": false
+  },
+  "project_readout": {
+    "summary": "这一版把连续流接地接上最小动作回路和自纠错环，开始测试正向更新律增益能否真正传到感知-动作-修正闭环。",
+    "next_question": "如果 tuned 流式更新律能在最小动作回路上保持正增益，下一步就该接长期状态和多步目标。"
+  }
+}

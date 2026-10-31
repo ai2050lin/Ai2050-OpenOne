@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 14:42:07",
+    "seed": 42,
+    "num_seeds": 6,
+    "noise": 0.34,
+    "dropout_p": 0.14,
+    "lengths": [24, 28, 32],
+    "runtime_sec": 90.653
+  },
+  "systems": {
+    "single_anchor_beta_086": {
+      "global_summary": {
+        "lengths": [24, 28, 32],
+        "closure_curve": [0.406463945, 0.451175214, 0.429771091],
+        "unified_curve": [0.3665698653, 0.4022768281, 0.380632716],
+        "recovery_curve": [0.0, 0.0, 0.0],
+        "retention_curve": [0.2106481481, 0.3518518519, 0.3680555556],
+        "mean_closure_score": 0.4291367497,
+        "mean_unified_score": 0.3831598032,
+        "mean_recovery_rate": 0.0,
+        "mean_retention_score": 0.3101851852,
+        "closure_relative_drop": -0.023307146,
+        "unified_relative_drop": -0.0140628507
+      },
+      "per_length": {
+        "32": {
+          "summary": {
+            "overall_episode_success": { "mean": 0.2484567901 },
+            "rollback_recovery_rate": { "mean": 0.0 },
+            "retention_after_phase2": { "mean": 0.3680555556 }
+          },
+          "unified_real_task_score": 0.380632716
+        }
+      }
+    },
+    "learnable_state_machine_h12": {
+      "global_summary": {
+        "lengths": [24, 28, 32],
+        "closure_curve": [0.4518058361, 0.4046198731, 0.3707621083],
+        "unified_curve": [0.4488530093, 0.4302939171, 0.349632716],
+        "recovery_curve": [0.0, 0.0, 0.0],
+        "retention_curve": [0.0509259259, 0.1226851852, 0.0],
+        "mean_closure_score": 0.408794072,
+        "mean_unified_score": 0.3696932142,
+        "mean_recovery_rate": 0.0,
+        "mean_retention_score": 0.0578703704,
+        "closure_relative_drop": 0.0810437278,
+        "unified_relative_drop": 0.0992202932
+      },
+      "per_length": {
+        "32": {
+          "summary": {
+            "overall_episode_success": { "mean": 0.3179012346 },
+            "rollback_recovery_rate": { "mean": 0.0 },
+            "retention_after_phase2": { "mean": 0.0 }
+          },
+          "unified_real_task_score": 0.349632716
+        }
+      }
+    },
+    "unified_control_manifold_h12": {
+      "global_summary": {
+        "lengths": [24, 28, 32],
+        "closure_curve": [0.4257435466, 0.4247803894, 0.4142849794],
+        "unified_curve": [0.3960480225, 0.3934339472, 0.3818815874],
+        "recovery_curve": [0.1708233446, 0.155638015, 0.1277636696],
+        "retention_curve": [0.3935185185, 0.3981481481, 0.3703703704],
+        "mean_closure_score": 0.4216029718,
+        "mean_unified_score": 0.390454519,
+        "mean_recovery_rate": 0.1514083431,
+        "mean_retention_score": 0.387345679,
+        "closure_relative_drop": 0.0114585672,
+        "unified_relative_drop": 0.0141664351
+      },
+      "per_length": {
+        "32": {
+          "summary": {
+            "overall_episode_success": { "mean": 0.2391975309 },
+            "rollback_recovery_rate": { "mean": 0.1277636696 },
+            "retention_after_phase2": { "mean": 0.3703703704 },
+            "rollback_trigger_rate": { "mean": 0.8009259259 }
+          },
+          "unified_real_task_score": 0.3818815874
+        }
+      }
+    }
+  },
+  "ranking": [
+    {
+      "system": "unified_control_manifold_h12",
+      "mean_closure_score": 0.4216029718,
+      "mean_unified_score": 0.390454519,
+      "mean_recovery_rate": 0.1514083431,
+      "max_length_unified_score": 0.3818815874
+    },
+    {
+      "system": "single_anchor_beta_086",
+      "mean_closure_score": 0.4291367497,
+      "mean_unified_score": 0.3831598032,
+      "mean_recovery_rate": 0.0,
+      "max_length_unified_score": 0.380632716
+    },
+    {
+      "system": "learnable_state_machine_h12",
+      "mean_closure_score": 0.408794072,
+      "mean_unified_score": 0.3696932142,
+      "mean_recovery_rate": 0.0,
+      "max_length_unified_score": 0.349632716
+    }
+  ],
+  "best_system": {
+    "system": "unified_control_manifold_h12",
+    "mean_closure_score": 0.4216029718,
+    "mean_unified_score": 0.390454519,
+    "mean_recovery_rate": 0.1514083431,
+    "max_length_unified_score": 0.3818815874
+  },
+  "gains": {
+    "unified_vs_single_at_max_length": 0.0012488713,
+    "unified_vs_learnable_at_max_length": 0.0322488713,
+    "unified_recovery_gain_vs_learnable": 0.1277636696,
+    "unified_episode_gain_vs_learnable": -0.0787037037
+  },
+  "headline_metrics": {
+    "max_length_unified_score": 0.3818815874,
+    "max_length_episode_success": 0.2391975309,
+    "max_length_recovery_rate": 0.1277636696,
+    "max_length_retention": 0.3703703704
+  },
+  "hypotheses": {
+    "H1_unified_beats_single_at_max_length": true,
+    "H2_unified_beats_learnable_at_max_length": true,
+    "H3_unified_improves_recovery_vs_learnable": true
+  }
+}

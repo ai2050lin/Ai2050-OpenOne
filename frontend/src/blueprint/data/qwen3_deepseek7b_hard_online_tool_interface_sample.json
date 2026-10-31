@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 22:32:19",
+    "core_constraint": "hard_online_tool_interface_after_joint_head_upgrade",
+    "episodes": 320,
+    "failure_types": ["schema_mismatch", "timeout_pressure", "state_drift", "verify_mismatch"],
+    "runtime_sec": 0.0186
+  },
+  "models": {
+    "qwen3_4b": {
+      "tool_stage_head_online_tool_interface": {
+        "success_rate": 0.7781,
+        "rollback_trigger_rate": 0.4625,
+        "rollback_recovery_rate": 0.5946,
+        "tool_failure_rate": 0.2844,
+        "failure_breakdown": {
+          "schema_mismatch": 0.5203,
+          "timeout_pressure": 0.2027,
+          "state_drift": 0.2095,
+          "verify_mismatch": 0.0676
+        },
+        "task_mix": {
+          "lookup": 0.3594,
+          "compose": 0.3625,
+          "execute": 0.2781
+        }
+      },
+      "relation_tool_joint_head_online_tool_interface": {
+        "success_rate": 0.8656,
+        "rollback_trigger_rate": 0.3125,
+        "rollback_recovery_rate": 0.6600,
+        "tool_failure_rate": 0.1781,
+        "failure_breakdown": {
+          "schema_mismatch": 0.4100,
+          "timeout_pressure": 0.2100,
+          "state_drift": 0.2800,
+          "verify_mismatch": 0.1000
+        },
+        "task_mix": {
+          "lookup": 0.3531,
+          "compose": 0.3250,
+          "execute": 0.3219
+        }
+      }
+    },
+    "deepseek_7b": {
+      "tool_stage_head_online_tool_interface": {
+        "success_rate": 0.3531,
+        "rollback_trigger_rate": 0.8031,
+        "rollback_recovery_rate": 0.3541,
+        "tool_failure_rate": 0.3938,
+        "failure_breakdown": {
+          "schema_mismatch": 0.5992,
+          "timeout_pressure": 0.1790,
+          "state_drift": 0.1829,
+          "verify_mismatch": 0.0389
+        },
+        "task_mix": {
+          "lookup": 0.3188,
+          "compose": 0.3531,
+          "execute": 0.3281
+        }
+      },
+      "relation_tool_joint_head_online_tool_interface": {
+        "success_rate": 0.4094,
+        "rollback_trigger_rate": 0.7563,
+        "rollback_recovery_rate": 0.4339,
+        "tool_failure_rate": 0.3469,
+        "failure_breakdown": {
+          "schema_mismatch": 0.6322,
+          "timeout_pressure": 0.1240,
+          "state_drift": 0.1860,
+          "verify_mismatch": 0.0579
+        },
+        "task_mix": {
+          "lookup": 0.3156,
+          "compose": 0.3625,
+          "execute": 0.3219
+        }
+      }
+    }
+  },
+  "headline_metrics": {
+    "qwen_tool_head_success": 0.7781,
+    "qwen_joint_head_success": 0.8656,
+    "deepseek_tool_head_success": 0.3531,
+    "deepseek_joint_head_success": 0.4094,
+    "qwen_tool_head_trigger_rate": 0.4625,
+    "qwen_joint_head_trigger_rate": 0.3125,
+    "deepseek_tool_head_trigger_rate": 0.8031,
+    "deepseek_joint_head_trigger_rate": 0.7563
+  },
+  "gains": {
+    "qwen_joint_minus_tool_head_success": 0.0875,
+    "deepseek_joint_minus_tool_head_success": 0.0562,
+    "qwen_tool_head_minus_joint_trigger_rate": 0.1500,
+    "deepseek_tool_head_minus_joint_trigger_rate": 0.0469,
+    "qwen_tool_head_minus_joint_tool_failure": 0.1062,
+    "deepseek_tool_head_minus_joint_tool_failure": 0.0469
+  },
+  "hypotheses": {
+    "H1_joint_head_improves_hard_interface_success_on_both_models": true,
+    "H2_joint_head_reduces_trigger_rate_on_both_models": true,
+    "H3_joint_head_reduces_tool_failure_rate_on_both_models": true,
+    "H4_deepseek_keeps_higher_failure_pressure_even_after_joint_head": true
+  },
+  "project_readout": {
+    "summary": "这一轮把在线接口推进成更硬版本，显式加入 schema、timeout、state drift 和 verify mismatch 四类失败。",
+    "next_question": "如果联合头在更硬接口下依然有效，下一步就该把阶段头推进成在线可学习结构。"
+  }
+}

@@ -1,0 +1,38 @@
+export const PERSISTED_MECHANISM_CHAIN_INDEX_V1 = [
+  {
+    id: 'shared_carrier',
+    label: '共享承载',
+    layerKeys: ['static_encoding'],
+    rawEvents: 3,
+    researchRows: 3,
+    visualNodes: 3,
+    totalRecords: 9,
+  },
+  {
+    id: 'bias_deflection',
+    label: '偏置偏转',
+    layerKeys: ['dynamic_route'],
+    rawEvents: 3,
+    researchRows: 3,
+    visualNodes: 3,
+    totalRecords: 9,
+  },
+  {
+    id: 'layerwise_amplification',
+    label: '逐层放大',
+    layerKeys: ['result_recovery', 'propagation_encoding'],
+    rawEvents: 6,
+    researchRows: 6,
+    visualNodes: 6,
+    totalRecords: 18,
+  },
+  {
+    id: 'multispace_roles',
+    label: '多空间角色',
+    layerKeys: ['semantic_roles'],
+    rawEvents: 3,
+    researchRows: 3,
+    visualNodes: 3,
+    totalRecords: 9,
+  },
+];

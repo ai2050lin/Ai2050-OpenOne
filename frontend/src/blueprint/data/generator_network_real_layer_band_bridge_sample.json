@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 21:59:44",
+    "core_constraint": "generator_network_bridge_to_real_online_high_risk_stages",
+    "runtime_sec": 0.0010349750518798828
+  },
+  "generator_profiles": {
+    "searched_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3222099388810816,
+        "relation": 0.15291469997326745,
+        "tool": 0.1455516275695728,
+        "verify": 0.16552628532936908
+      }
+    },
+    "end_to_end_generator_network": {
+      "stage_capacity": {
+        "concept": 0.3222099388810816,
+        "relation": 0.1405767479153075,
+        "tool": 0.1385367155695728,
+        "verify": 0.1504934593466276
+      }
+    }
+  },
+  "models": {
+    "qwen3_4b": {
+      "stage_demand": {
+        "concept": 0.21719535160808612,
+        "relation": 0.29591415851076275,
+        "tool": 0.3266105362819294,
+        "verify": 0.12309566619062268
+      },
+      "searched_generator_match": {
+        "rows": [
+          {
+            "stage": "concept",
+            "capacity": 0.3222099388810816,
+            "demand": 0.21719535160808612,
+            "undercoverage": 0.0,
+            "slack": 0.10501458727299551,
+            "alignment_gap": 0.10501458727299551
+          },
+          {
+            "stage": "relation",
+            "capacity": 0.15291469997326745,
+            "demand": 0.29591415851076275,
+            "undercoverage": 0.1429994585374953,
+            "slack": 0.0,
+            "alignment_gap": 0.1429994585374953
+          },
+          {
+            "stage": "tool",
+            "capacity": 0.1455516275695728,
+            "demand": 0.3266105362819294,
+            "undercoverage": 0.18105890871235658,
+            "slack": 0.0,
+            "alignment_gap": 0.18105890871235658
+          },
+          {
+            "stage": "verify",
+            "capacity": 0.16552628532936908,
+            "demand": 0.12309566619062268,
+            "undercoverage": 0.0,
+            "slack": 0.042430619138746406,
+            "alignment_gap": 0.042430619138746406
+          }
+        ],
+        "mean_undercoverage": 0.08101459181246297,
+        "mean_alignment_gap": 0.11787589341539845,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.18105890871235658
+      },
+      "end_to_end_generator_match": {
+        "rows": [
+          {
+            "stage": "concept",
+            "capacity": 0.3222099388810816,
+            "demand": 0.21719535160808612,
+            "undercoverage": 0.0,
+            "slack": 0.10501458727299551,
+            "alignment_gap": 0.10501458727299551
+          },
+          {
+            "stage": "relation",
+            "capacity": 0.1405767479153075,
+            "demand": 0.29591415851076275,
+            "undercoverage": 0.15533741059545525,
+            "slack": 0.0,
+            "alignment_gap": 0.15533741059545525
+          },
+          {
+            "stage": "tool",
+            "capacity": 0.1385367155695728,
+            "demand": 0.3266105362819294,
+            "undercoverage": 0.18807382071235657,
+            "slack": 0.0,
+            "alignment_gap": 0.18807382071235657
+          },
+          {
+            "stage": "verify",
+            "capacity": 0.1504934593466276,
+            "demand": 0.12309566619062268,
+            "undercoverage": 0.0,
+            "slack": 0.027397793156004935,
+            "alignment_gap": 0.027397793156004935
+          }
+        ],
+        "mean_undercoverage": 0.08585280782695295,
+        "mean_alignment_gap": 0.11895590293420306,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.18807382071235657
+      }
+    },
+    "deepseek_7b": {
+      "stage_demand": {
+        "concept": 0.5449359482132614,
+        "relation": 0.5513472405060558,
+        "tool": 0.6098361028893327,
+        "verify": 0.1519727217547458
+      },
+      "searched_generator_match": {
+        "rows": [
+          {
+            "stage": "concept",
+            "capacity": 0.3222099388810816,
+            "demand": 0.5449359482132614,
+            "undercoverage": 0.2227260093321798,
+            "slack": 0.0,
+            "alignment_gap": 0.2227260093321798
+          },
+          {
+            "stage": "relation",
+            "capacity": 0.15291469997326745,
+            "demand": 0.5513472405060558,
+            "undercoverage": 0.3984325405327883,
+            "slack": 0.0,
+            "alignment_gap": 0.3984325405327883
+          },
+          {
+            "stage": "tool",
+            "capacity": 0.1455516275695728,
+            "demand": 0.6098361028893327,
+            "undercoverage": 0.46428447531975986,
+            "slack": 0.0,
+            "alignment_gap": 0.46428447531975986
+          },
+          {
+            "stage": "verify",
+            "capacity": 0.16552628532936908,
+            "demand": 0.1519727217547458,
+            "undercoverage": 0.0,
+            "slack": 0.013553563574623284,
+            "alignment_gap": 0.013553563574623284
+          }
+        ],
+        "mean_undercoverage": 0.271360756296182,
+        "mean_alignment_gap": 0.2747491471898378,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.46428447531975986
+      },
+      "end_to_end_generator_match": {
+        "rows": [
+          {
+            "stage": "concept",
+            "capacity": 0.3222099388810816,
+            "demand": 0.5449359482132614,
+            "undercoverage": 0.2227260093321798,
+            "slack": 0.0,
+            "alignment_gap": 0.2227260093321798
+          },
+          {
+            "stage": "relation",
+            "capacity": 0.1405767479153075,
+            "demand": 0.5513472405060558,
+            "undercoverage": 0.41077049259074827,
+            "slack": 0.0,
+            "alignment_gap": 0.41077049259074827
+          },
+          {
+            "stage": "tool",
+            "capacity": 0.1385367155695728,
+            "demand": 0.6098361028893327,
+            "undercoverage": 0.47129938731975984,
+            "slack": 0.0,
+            "alignment_gap": 0.47129938731975984
+          },
+          {
+            "stage": "verify",
+            "capacity": 0.1504934593466276,
+            "demand": 0.1519727217547458,
+            "undercoverage": 0.001479262408118187,
+            "slack": 0.0,
+            "alignment_gap": 0.001479262408118187
+          }
+        ],
+        "mean_undercoverage": 0.2765687879127015,
+        "mean_alignment_gap": 0.2765687879127015,
+        "worst_stage": "tool",
+        "worst_undercoverage": 0.47129938731975984
+      }
+    }
+  },
+  "headline_metrics": {
+    "qwen_searched_undercoverage": 0.08101459181246297,
+    "qwen_end_to_end_undercoverage": 0.08585280782695295,
+    "deepseek_searched_undercoverage": 0.271360756296182,
+    "deepseek_end_to_end_undercoverage": 0.2765687879127015,
+    "qwen_worst_stage": "tool",
+    "deepseek_worst_stage": "tool"
+  },
+  "gains": {
+    "qwen_end_to_end_minus_searched_undercoverage": 0.004838216014489985,
+    "deepseek_end_to_end_minus_searched_undercoverage": 0.005208031616519504,
+    "deepseek_minus_qwen_searched_undercoverage": 0.19034616448371905,
+    "deepseek_minus_qwen_end_to_end_undercoverage": 0.19071598008574855
+  },
+  "hypotheses": {
+    "H1_deepseek_has_larger_generator_undercoverage_than_qwen": true,
+    "H2_deepseek_worst_stage_is_relation_or_tool": true,
+    "H3_end_to_end_generator_does_not_fix_real_band_undercoverage": true,
+    "H4_qwen_end_to_end_undercoverage_stays_bounded": true
+  },
+  "project_readout": {
+    "summary": "这一步把当前区域化生成网络的阶段容量直接对齐到真实模型在线高风险段。结果如果成立，就说明生成网络的主要瓶颈并不是抽象存在，而是已经落到真实在线链里的具体阶段缺口上。",
+    "next_question": "如果生成网络的最大缺口已经和真实在线高风险段对齐，下一步就该直接升级生成网络结构，而不是再追加新的代理链。"
+  }
+}

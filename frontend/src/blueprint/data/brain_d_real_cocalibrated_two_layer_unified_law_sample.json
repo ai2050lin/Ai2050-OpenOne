@@ -1,0 +1,1426 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 01:30:28",
+    "runtime_sec": 1.4051125049591064,
+    "row_count": 82,
+    "source_files": [
+      "dnn_brain_puzzle_bridge_20260308.json",
+      "d_problem_atlas_summary_20260309.json",
+      "real_task_driven_two_layer_unified_law_20260310.json"
+    ]
+  },
+  "ranking_layer": {
+    "ridge_lambda": 0.0,
+    "features": [
+      "1",
+      "signal_a",
+      "signal_b",
+      "signal_c",
+      "signal_d",
+      "D_indicator",
+      "real_task_indicator",
+      "brain_indicator"
+    ],
+    "coefficients": [
+      0.3098173008744011,
+      0.25440533584948494,
+      0.7146812578480022,
+      0.24745855801447916,
+      0.7232670193689426,
+      -0.43033728292585294,
+      -0.3119257738889615,
+      -0.33795166015625
+    ],
+    "score_correlation": 0.9996475329969935
+  },
+  "calibration_layer": {
+    "ridge_lambda": 0.0,
+    "features": [
+      "1",
+      "ranking_score",
+      "signal_c",
+      "signal_d",
+      "D_indicator",
+      "real_task_indicator",
+      "brain_indicator"
+    ],
+    "coefficients": [
+      0.1824496284003379,
+      1.0000000000000484,
+      7.0776214211742776e-15,
+      -6.595373470322857e-14,
+      -0.1824496284003393,
+      -0.1824496284003364,
+      -0.18244962840036374
+    ]
+  },
+  "brain_d_real_cocalibrated_two_layer_law": {
+    "mean_absolute_gap": 0.001548590166850568,
+    "score_correlation": 0.9996475329969933,
+    "brain_mean_gap": 0.0071521638667709775,
+    "d_mean_gap": 0.00970681119702808,
+    "real_task_mean_gap": 0.0004864663384997219,
+    "held_out_mean_gap": 0.002187446344200754,
+    "held_out_score_correlation": 0.9991591231282433,
+    "brain_held_out_gap": 0.018357494367106153,
+    "d_held_out_gap": 0.013166742231969456,
+    "real_task_held_out_gap": 0.0005183565782568592
+  },
+  "brain_breakdown": [
+    {
+      "model_name": "gpt2",
+      "ranking_pressure": 0.7101374092591815,
+      "calibration_pressure": 0.680639867910016,
+      "routing_bias": 0.02949754134916549,
+      "bridge_bonus": 0.23603183121739502,
+      "dnn_reverse_score": 0.6722525895105117,
+      "brain_alignment_score": 0.9082844207279067,
+      "overall_bridge_score": 0.8098302379807074,
+      "ranking_score": 0.81698240184748,
+      "calibrated_score": 0.8169824018474784,
+      "absolute_gap": 0.0071521638667709775
+    },
+    {
+      "model_name": "qwen3_4b",
+      "ranking_pressure": 0.7007727818294591,
+      "calibration_pressure": 0.778363087692569,
+      "routing_bias": -0.07759030586310989,
+      "bridge_bonus": 0.16717213293242927,
+      "dnn_reverse_score": 0.71487111444864,
+      "brain_alignment_score": 0.8820432473810693,
+      "overall_bridge_score": 0.8152893551778044,
+      "ranking_score": 0.8081371913110318,
+      "calibrated_score": 0.8081371913110335,
+      "absolute_gap": 0.0071521638667709775
+    }
+  ],
+  "rows": [
+    {
+      "row_id": "brain::gpt2",
+      "domain": "brain",
+      "subdomain": "gpt2",
+      "reference_score": 0.8098302379807074,
+      "ranking_score": 0.81698240184748,
+      "calibrated_score": 0.8169824018474784,
+      "absolute_gap": 0.0071521638667709775
+    },
+    {
+      "row_id": "brain::qwen3_4b",
+      "domain": "brain",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.8152893551778044,
+      "ranking_score": 0.8081371913110318,
+      "calibrated_score": 0.8081371913110335,
+      "absolute_gap": 0.0071521638667709775
+    },
+    {
+      "row_id": "D::residual_gate",
+      "domain": "D",
+      "subdomain": "residual_gate",
+      "reference_score": -0.012626262626262652,
+      "ranking_score": -0.0024496969993221818,
+      "calibrated_score": -0.0024496969993226536,
+      "absolute_gap": 0.010176565626939998
+    },
+    {
+      "row_id": "D::bayes_consolidation",
+      "domain": "D",
+      "subdomain": "bayes_consolidation",
+      "reference_score": -0.012626262626262652,
+      "ranking_score": -0.022878984731143248,
+      "calibrated_score": -0.02287898473114447,
+      "absolute_gap": 0.010252722104881817
+    },
+    {
+      "row_id": "D::learned_controller",
+      "domain": "D",
+      "subdomain": "learned_controller",
+      "reference_score": -0.012626262626262652,
+      "ranking_score": -0.0018211587579611277,
+      "calibrated_score": -0.0018211587579621547,
+      "absolute_gap": 0.010805103868300497
+    },
+    {
+      "row_id": "D::two_phase",
+      "domain": "D",
+      "subdomain": "two_phase",
+      "reference_score": -0.02714646464646464,
+      "ranking_score": -0.018223677000030136,
+      "calibrated_score": -0.01822367700002875,
+      "absolute_gap": 0.008922787646435892
+    },
+    {
+      "row_id": "D::three_phase",
+      "domain": "D",
+      "subdomain": "three_phase",
+      "reference_score": -0.02714646464646464,
+      "ranking_score": -0.018223677000030136,
+      "calibrated_score": -0.01822367700002875,
+      "absolute_gap": 0.008922787646435892
+    },
+    {
+      "row_id": "D::base_offset",
+      "domain": "D",
+      "subdomain": "base_offset",
+      "reference_score": -0.02188552188552184,
+      "ranking_score": -0.030411732765760924,
+      "calibrated_score": -0.030411732765760202,
+      "absolute_gap": 0.00852621088023836
+    },
+    {
+      "row_id": "D::offset_stabilization",
+      "domain": "D",
+      "subdomain": "offset_stabilization",
+      "reference_score": -0.02188552188552184,
+      "ranking_score": -0.030411732765760924,
+      "calibrated_score": -0.030411732765760202,
+      "absolute_gap": 0.00852621088023836
+    },
+    {
+      "row_id": "D::multistage",
+      "domain": "D",
+      "subdomain": "multistage",
+      "reference_score": -0.008838383838383812,
+      "ranking_score": -0.020360484761135555,
+      "calibrated_score": -0.020360484761137637,
+      "absolute_gap": 0.011522100922753825
+    },
+    {
+      "row_id": "qwen3_4b::apple__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.0828282828282828,
+      "ranking_score": 0.0825584241943545,
+      "calibrated_score": 0.08255842419435522,
+      "absolute_gap": 0.0002698586339275888
+    },
+    {
+      "row_id": "qwen3_4b::apple__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.07979797979797976,
+      "ranking_score": 0.07954387318872719,
+      "calibrated_score": 0.07954387318872658,
+      "absolute_gap": 0.00025410660925317963
+    },
+    {
+      "row_id": "qwen3_4b::apple__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.020707070707070674,
+      "ranking_score": 0.020752879315764472,
+      "calibrated_score": 0.020752879315764666,
+      "absolute_gap": 4.580860869399239e-05
+    },
+    {
+      "row_id": "qwen3_4b::apple__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.028282828282828243,
+      "ranking_score": 0.028398102802768166,
+      "calibrated_score": 0.02839810280276836,
+      "absolute_gap": 0.00011527451994011728
+    },
+    {
+      "row_id": "qwen3_4b::apple__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.03787878787878779,
+      "ranking_score": 0.037270683725224796,
+      "calibrated_score": 0.03727068372522557,
+      "absolute_gap": 0.0006081041535622167
+    },
+    {
+      "row_id": "qwen3_4b::apple__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.037878787878787845,
+      "ranking_score": 0.038339434869570865,
+      "calibrated_score": 0.03833943486957089,
+      "absolute_gap": 0.00046064699078304794
+    },
+    {
+      "row_id": "qwen3_4b::fruit__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.03535353535353536,
+      "ranking_score": 0.035453385587028596,
+      "calibrated_score": 0.03545338558702893,
+      "absolute_gap": 9.985023349357025e-05
+    },
+    {
+      "row_id": "qwen3_4b::fruit__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.027272727272727282,
+      "ranking_score": 0.02753618015017184,
+      "calibrated_score": 0.027536180150170925,
+      "absolute_gap": 0.0002634528774436429
+    },
+    {
+      "row_id": "qwen3_4b::fruit__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": -0.003535353535353558,
+      "ranking_score": -0.0037999489079062476,
+      "calibrated_score": -0.0037999489079067195,
+      "absolute_gap": 0.00026459537255316135
+    },
+    {
+      "row_id": "qwen3_4b::fruit__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": -0.0010101010101010166,
+      "ranking_score": -0.0010573798521318345,
+      "calibrated_score": -0.0010573798521322786,
+      "absolute_gap": 4.727884203126198e-05
+    },
+    {
+      "row_id": "qwen3_4b::fruit__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.03333333333333338,
+      "ranking_score": 0.03183820778334884,
+      "calibrated_score": 0.031838207783348726,
+      "absolute_gap": 0.001495125549984655
+    },
+    {
+      "row_id": "qwen3_4b::fruit__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.01717171717171717,
+      "ranking_score": 0.017218464747760787,
+      "calibrated_score": 0.01721846474776012,
+      "absolute_gap": 4.674757604294921e-05
+    },
+    {
+      "row_id": "qwen3_4b::man__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.029797979797979768,
+      "ranking_score": 0.030049129643092254,
+      "calibrated_score": 0.030049129643092698,
+      "absolute_gap": 0.00025114984511293015
+    },
+    {
+      "row_id": "qwen3_4b::man__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": -0.004545454545454575,
+      "ranking_score": -0.0033618788361573504,
+      "calibrated_score": -0.00336187883615785,
+      "absolute_gap": 0.0011835757092967247
+    },
+    {
+      "row_id": "qwen3_4b::man__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.101010101010101,
+      "ranking_score": 0.10028214546607578,
+      "calibrated_score": 0.10028214546607644,
+      "absolute_gap": 0.00072795554402455
+    },
+    {
+      "row_id": "qwen3_4b::man__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.0378787878787879,
+      "ranking_score": 0.03806748017346917,
+      "calibrated_score": 0.03806748017346953,
+      "absolute_gap": 0.0001886922946816305
+    },
+    {
+      "row_id": "qwen3_4b::man__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.07121212121212123,
+      "ranking_score": 0.07014556715502379,
+      "calibrated_score": 0.07014556715502462,
+      "absolute_gap": 0.0010665540570966026
+    },
+    {
+      "row_id": "qwen3_4b::man__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": -0.001515151515151525,
+      "ranking_score": -0.0005251171365723839,
+      "calibrated_score": -0.0005251171365724394,
+      "absolute_gap": 0.0009900343785790855
+    },
+    {
+      "row_id": "qwen3_4b::king__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.04292929292929293,
+      "ranking_score": 0.042820628114070225,
+      "calibrated_score": 0.04282062811407053,
+      "absolute_gap": 0.0001086648152223979
+    },
+    {
+      "row_id": "qwen3_4b::king__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.013636363636363613,
+      "ranking_score": 0.014312274066050068,
+      "calibrated_score": 0.014312274066049374,
+      "absolute_gap": 0.000675910429685761
+    },
+    {
+      "row_id": "qwen3_4b::king__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.0944444444444445,
+      "ranking_score": 0.09393329165525915,
+      "calibrated_score": 0.09393329165525993,
+      "absolute_gap": 0.0005111527891845657
+    },
+    {
+      "row_id": "qwen3_4b::king__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.05757575757575761,
+      "ranking_score": 0.05721242940504534,
+      "calibrated_score": 0.05721242940504548,
+      "absolute_gap": 0.00036332817071213497
+    },
+    {
+      "row_id": "qwen3_4b::king__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.020707070707070674,
+      "ranking_score": 0.02114361979251128,
+      "calibrated_score": 0.021143619792512724,
+      "absolute_gap": 0.0004365490854420506
+    },
+    {
+      "row_id": "qwen3_4b::king__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.0565656565656566,
+      "ranking_score": 0.05588000577234731,
+      "calibrated_score": 0.055880005772346614,
+      "absolute_gap": 0.0006856507933099831
+    },
+    {
+      "row_id": "qwen3_4b::woman__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.05303030303030304,
+      "ranking_score": 0.05253501856909143,
+      "calibrated_score": 0.05253501856909154,
+      "absolute_gap": 0.0004952844612114982
+    },
+    {
+      "row_id": "qwen3_4b::woman__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.027272727272727282,
+      "ranking_score": 0.027458522622931858,
+      "calibrated_score": 0.027458522622930914,
+      "absolute_gap": 0.00018579535020363247
+    },
+    {
+      "row_id": "qwen3_4b::woman__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.08333333333333337,
+      "ranking_score": 0.08305653349911668,
+      "calibrated_score": 0.08305653349911751,
+      "absolute_gap": 0.0002767998342158573
+    },
+    {
+      "row_id": "qwen3_4b::woman__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.07070707070707066,
+      "ranking_score": 0.06986841251880405,
+      "calibrated_score": 0.06986841251880399,
+      "absolute_gap": 0.0008386581882666722
+    },
+    {
+      "row_id": "qwen3_4b::woman__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.03888888888888886,
+      "ranking_score": 0.03870225733749949,
+      "calibrated_score": 0.038702257337500656,
+      "absolute_gap": 0.00018663155138820553
+    },
+    {
+      "row_id": "qwen3_4b::woman__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.022727272727272763,
+      "ranking_score": 0.02294130267567268,
+      "calibrated_score": 0.022941302675672293,
+      "absolute_gap": 0.00021402994839953005
+    },
+    {
+      "row_id": "qwen3_4b::queen__hypernym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.02929292929292926,
+      "ranking_score": 0.029539544818990127,
+      "calibrated_score": 0.02953954481899057,
+      "absolute_gap": 0.0002466155260613112
+    },
+    {
+      "row_id": "qwen3_4b::queen__meronym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.0414141414141414,
+      "ranking_score": 0.04123295710705105,
+      "calibrated_score": 0.04123295710704997,
+      "absolute_gap": 0.00018118430709143651
+    },
+    {
+      "row_id": "qwen3_4b::queen__gender",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.07878787878787874,
+      "ranking_score": 0.07869114658768706,
+      "calibrated_score": 0.078691146587688,
+      "absolute_gap": 9.673220019074114e-05
+    },
+    {
+      "row_id": "qwen3_4b::queen__synonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.05656565656565654,
+      "ranking_score": 0.056187982188038665,
+      "calibrated_score": 0.056187982188038776,
+      "absolute_gap": 0.0003776743776177649
+    },
+    {
+      "row_id": "qwen3_4b::queen__antonym",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": 0.044949494949494906,
+      "ranking_score": 0.044632444731651566,
+      "calibrated_score": 0.044632444731652676,
+      "absolute_gap": 0.00031705021784222964
+    },
+    {
+      "row_id": "qwen3_4b::queen__cause_effect",
+      "domain": "real_task",
+      "subdomain": "qwen3_4b",
+      "reference_score": -0.0005050505050505638,
+      "ranking_score": 0.0004360943686942953,
+      "calibrated_score": 0.00043609436869421203,
+      "absolute_gap": 0.0009411448737447758
+    },
+    {
+      "row_id": "deepseek_7b::apple__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.03030303030303033,
+      "ranking_score": 0.03117971032653516,
+      "calibrated_score": 0.031179710326535187,
+      "absolute_gap": 0.0008766800235048555
+    },
+    {
+      "row_id": "deepseek_7b::apple__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.009595959595959602,
+      "ranking_score": 0.01065081224179798,
+      "calibrated_score": 0.010650812241797813,
+      "absolute_gap": 0.0010548526458382113
+    },
+    {
+      "row_id": "deepseek_7b::apple__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.015151515151515138,
+      "ranking_score": 0.01488561605383204,
+      "calibrated_score": 0.014885616053831346,
+      "absolute_gap": 0.0002658990976837916
+    },
+    {
+      "row_id": "deepseek_7b::apple__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.026767676767676718,
+      "ranking_score": 0.02633999760653405,
+      "calibrated_score": 0.02633999760653369,
+      "absolute_gap": 0.00042767916114302973
+    },
+    {
+      "row_id": "deepseek_7b::apple__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.020707070707070674,
+      "ranking_score": 0.020005292686819665,
+      "calibrated_score": 0.02000529268682011,
+      "absolute_gap": 0.0007017780202505652
+    },
+    {
+      "row_id": "deepseek_7b::apple__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.019191919191919204,
+      "ranking_score": 0.019681593587726476,
+      "calibrated_score": 0.01968159358772556,
+      "absolute_gap": 0.0004896743958063554
+    },
+    {
+      "row_id": "deepseek_7b::fruit__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.02373737373737378,
+      "ranking_score": 0.0245292486333607,
+      "calibrated_score": 0.02452924863336059,
+      "absolute_gap": 0.0007918748959868105
+    },
+    {
+      "row_id": "deepseek_7b::fruit__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.007575757575757569,
+      "ranking_score": 0.008412739536730107,
+      "calibrated_score": 0.008412739536729663,
+      "absolute_gap": 0.0008369819609720941
+    },
+    {
+      "row_id": "deepseek_7b::fruit__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.003535353535353558,
+      "ranking_score": 0.0033324999294281343,
+      "calibrated_score": 0.0033324999294273294,
+      "absolute_gap": 0.0002028536059262287
+    },
+    {
+      "row_id": "deepseek_7b::fruit__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.007070707070707116,
+      "ranking_score": 0.00694263439216336,
+      "calibrated_score": 0.006942634392162972,
+      "absolute_gap": 0.0001280726785441444
+    },
+    {
+      "row_id": "deepseek_7b::fruit__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.018181818181818243,
+      "ranking_score": 0.017276954538628875,
+      "calibrated_score": 0.017276954538629097,
+      "absolute_gap": 0.0009048636431891466
+    },
+    {
+      "row_id": "deepseek_7b::fruit__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.011616161616161635,
+      "ranking_score": 0.012050601008306072,
+      "calibrated_score": 0.01205060100830499,
+      "absolute_gap": 0.00043443939214335425
+    },
+    {
+      "row_id": "deepseek_7b::man__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.05353535353535355,
+      "ranking_score": 0.053377317169189586,
+      "calibrated_score": 0.05337731716918909,
+      "absolute_gap": 0.00015803636616446015
+    },
+    {
+      "row_id": "deepseek_7b::man__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.00303030303030305,
+      "ranking_score": 0.003922757940198918,
+      "calibrated_score": 0.003922757940198529,
+      "absolute_gap": 0.0008924549098954793
+    },
+    {
+      "row_id": "deepseek_7b::man__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.06767676767676767,
+      "ranking_score": 0.06812710231473418,
+      "calibrated_score": 0.0681271023147349,
+      "absolute_gap": 0.0004503346379672313
+    },
+    {
+      "row_id": "deepseek_7b::man__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.04191919191919191,
+      "ranking_score": 0.04207911433393996,
+      "calibrated_score": 0.042079114333940376,
+      "absolute_gap": 0.00015992241474846458
+    },
+    {
+      "row_id": "deepseek_7b::man__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.0505050505050505,
+      "ranking_score": 0.05012513749711062,
+      "calibrated_score": 0.05012513749711184,
+      "absolute_gap": 0.00037991300793865923
+    },
+    {
+      "row_id": "deepseek_7b::man__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.01313131313131316,
+      "ranking_score": 0.013851380310049899,
+      "calibrated_score": 0.013851380310049122,
+      "absolute_gap": 0.0007200671787359614
+    },
+    {
+      "row_id": "deepseek_7b::king__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.026767676767676718,
+      "ranking_score": 0.02738775872351812,
+      "calibrated_score": 0.027387758723517924,
+      "absolute_gap": 0.0006200819558412063
+    },
+    {
+      "row_id": "deepseek_7b::king__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.027272727272727226,
+      "ranking_score": 0.027450009249944562,
+      "calibrated_score": 0.027450009249943896,
+      "absolute_gap": 0.00017728197721667005
+    },
+    {
+      "row_id": "deepseek_7b::king__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.09848484848484845,
+      "ranking_score": 0.09802780438507802,
+      "calibrated_score": 0.09802780438507841,
+      "absolute_gap": 0.0004570440997700431
+    },
+    {
+      "row_id": "deepseek_7b::king__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.07979797979797981,
+      "ranking_score": 0.07884353260800508,
+      "calibrated_score": 0.07884353260800503,
+      "absolute_gap": 0.0009544471899747831
+    },
+    {
+      "row_id": "deepseek_7b::king__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.06161616161616157,
+      "ranking_score": 0.06090548728565981,
+      "calibrated_score": 0.060905487285660864,
+      "absolute_gap": 0.0007106743305007046
+    },
+    {
+      "row_id": "deepseek_7b::king__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": -0.004040404040404066,
+      "ranking_score": -0.002823134716285647,
+      "calibrated_score": -0.0028231347162862297,
+      "absolute_gap": 0.0012172693241178367
+    },
+    {
+      "row_id": "deepseek_7b::woman__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.061111111111111116,
+      "ranking_score": 0.06075442709885687,
+      "calibrated_score": 0.060754427098856284,
+      "absolute_gap": 0.00035668401225483204
+    },
+    {
+      "row_id": "deepseek_7b::woman__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.037878787878787845,
+      "ranking_score": 0.03777420179850499,
+      "calibrated_score": 0.037774201798504214,
+      "absolute_gap": 0.0001045860802836307
+    },
+    {
+      "row_id": "deepseek_7b::woman__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.07828282828282829,
+      "ranking_score": 0.07844580490313907,
+      "calibrated_score": 0.07844580490313968,
+      "absolute_gap": 0.0001629766203113947
+    },
+    {
+      "row_id": "deepseek_7b::woman__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.05707070707070705,
+      "ranking_score": 0.05681020591045127,
+      "calibrated_score": 0.05681020591045152,
+      "absolute_gap": 0.0002605011602555274
+    },
+    {
+      "row_id": "deepseek_7b::woman__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.06212121212121213,
+      "ranking_score": 0.061424370971761455,
+      "calibrated_score": 0.06142437097176254,
+      "absolute_gap": 0.0006968411494495952
+    },
+    {
+      "row_id": "deepseek_7b::woman__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.04898989898989897,
+      "ranking_score": 0.04868335505460175,
+      "calibrated_score": 0.048683355054600586,
+      "absolute_gap": 0.00030654393529838675
+    },
+    {
+      "row_id": "deepseek_7b::queen__hypernym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.03131313131313135,
+      "ranking_score": 0.03177824434055093,
+      "calibrated_score": 0.03177824434055068,
+      "absolute_gap": 0.0004651130274193338
+    },
+    {
+      "row_id": "deepseek_7b::queen__meronym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.0282828282828283,
+      "ranking_score": 0.028408636765116624,
+      "calibrated_score": 0.028408636765115902,
+      "absolute_gap": 0.00012580848228760377
+    },
+    {
+      "row_id": "deepseek_7b::queen__gender",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.07474747474747473,
+      "ranking_score": 0.07496342518722604,
+      "calibrated_score": 0.0749634251872266,
+      "absolute_gap": 0.00021595043975186634
+    },
+    {
+      "row_id": "deepseek_7b::queen__synonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.028282828282828243,
+      "ranking_score": 0.028814554038391338,
+      "calibrated_score": 0.028814554038391865,
+      "absolute_gap": 0.0005317257555636223
+    },
+    {
+      "row_id": "deepseek_7b::queen__antonym",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.08181818181818185,
+      "ranking_score": 0.08049420163950372,
+      "calibrated_score": 0.08049420163950449,
+      "absolute_gap": 0.001323980178677353
+    },
+    {
+      "row_id": "deepseek_7b::queen__cause_effect",
+      "domain": "real_task",
+      "subdomain": "deepseek_7b",
+      "reference_score": 0.004545454545454575,
+      "ranking_score": 0.005489474445730558,
+      "calibrated_score": 0.005489474445729864,
+      "absolute_gap": 0.0009440199002752891
+    }
+  ],
+  "leave_one_out": {
+    "rows": [
+      {
+        "row_id": "brain::gpt2",
+        "domain": "brain",
+        "held_out_prediction": 0.8281877323478213,
+        "held_out_reference": 0.8098302379807074,
+        "held_out_gap": 0.01835749436711387
+      },
+      {
+        "row_id": "brain::qwen3_4b",
+        "domain": "brain",
+        "held_out_prediction": 0.796931860810706,
+        "held_out_reference": 0.8152893551778044,
+        "held_out_gap": 0.018357494367098437
+      },
+      {
+        "row_id": "D::residual_gate",
+        "domain": "D",
+        "held_out_prediction": 0.0005448713103350933,
+        "held_out_reference": -0.012626262626262652,
+        "held_out_gap": 0.013171133936597745
+      },
+      {
+        "row_id": "D::bayes_consolidation",
+        "domain": "D",
+        "held_out_prediction": -0.02507325896530488,
+        "held_out_reference": -0.012626262626262652,
+        "held_out_gap": 0.012446996339042227
+      },
+      {
+        "row_id": "D::learned_controller",
+        "domain": "D",
+        "held_out_prediction": 0.003370688705768069,
+        "held_out_reference": -0.012626262626262652,
+        "held_out_gap": 0.01599695133203072
+      },
+      {
+        "row_id": "D::two_phase",
+        "domain": "D",
+        "held_out_prediction": -0.01525406342736979,
+        "held_out_reference": -0.02714646464646464,
+        "held_out_gap": 0.01189240121909485
+      },
+      {
+        "row_id": "D::three_phase",
+        "domain": "D",
+        "held_out_prediction": -0.01525406342736979,
+        "held_out_reference": -0.02714646464646464,
+        "held_out_gap": 0.01189240121909485
+      },
+      {
+        "row_id": "D::base_offset",
+        "domain": "D",
+        "held_out_prediction": -0.033237534871427984,
+        "held_out_reference": -0.02188552188552184,
+        "held_out_gap": 0.011352012985906143
+      },
+      {
+        "row_id": "D::offset_stabilization",
+        "domain": "D",
+        "held_out_prediction": -0.033237534871427984,
+        "held_out_reference": -0.02188552188552184,
+        "held_out_gap": 0.011352012985906143
+      },
+      {
+        "row_id": "D::multistage",
+        "domain": "D",
+        "held_out_prediction": -0.026068411676466778,
+        "held_out_reference": -0.008838383838383812,
+        "held_out_gap": 0.017230027838082966
+      },
+      {
+        "row_id": "qwen3_4b::apple__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.08254198816381017,
+        "held_out_reference": 0.0828282828282828,
+        "held_out_gap": 0.0002862946644726361
+      },
+      {
+        "row_id": "qwen3_4b::apple__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.07951951374942112,
+        "held_out_reference": 0.07979797979797976,
+        "held_out_gap": 0.0002784660485586343
+      },
+      {
+        "row_id": "qwen3_4b::apple__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.020754171497205764,
+        "held_out_reference": 0.020707070707070674,
+        "held_out_gap": 4.710079013509061e-05
+      },
+      {
+        "row_id": "qwen3_4b::apple__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.02840026827168351,
+        "held_out_reference": 0.028282828282828243,
+        "held_out_gap": 0.00011743998885526546
+      },
+      {
+        "row_id": "qwen3_4b::apple__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03723549982976623,
+        "held_out_reference": 0.03787878787878779,
+        "held_out_gap": 0.0006432880490215565
+      },
+      {
+        "row_id": "qwen3_4b::apple__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.03835183886670966,
+        "held_out_reference": 0.037878787878787845,
+        "held_out_gap": 0.00047305098792181643
+      },
+      {
+        "row_id": "qwen3_4b::fruit__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03545528304076606,
+        "held_out_reference": 0.03535353535353536,
+        "held_out_gap": 0.00010174768723070216
+      },
+      {
+        "row_id": "qwen3_4b::fruit__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.027546319428199073,
+        "held_out_reference": 0.027272727272727282,
+        "held_out_gap": 0.0002735921554717913
+      },
+      {
+        "row_id": "qwen3_4b::fruit__gender",
+        "domain": "real_task",
+        "held_out_prediction": -0.0038250380791453736,
+        "held_out_reference": -0.003535353535353558,
+        "held_out_gap": 0.0002896845437918155
+      },
+      {
+        "row_id": "qwen3_4b::fruit__synonym",
+        "domain": "real_task",
+        "held_out_prediction": -0.0010605022461069868,
+        "held_out_reference": -0.0010101010101010166,
+        "held_out_gap": 5.040123600597024e-05
+      },
+      {
+        "row_id": "qwen3_4b::fruit__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03155182425707298,
+        "held_out_reference": 0.03333333333333338,
+        "held_out_gap": 0.0017815090762604013
+      },
+      {
+        "row_id": "qwen3_4b::fruit__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.01721999986997351,
+        "held_out_reference": 0.01717171717171717,
+        "held_out_gap": 4.828269825633835e-05
+      },
+      {
+        "row_id": "qwen3_4b::man__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.030055886324865735,
+        "held_out_reference": 0.029797979797979768,
+        "held_out_gap": 0.0002579065268859676
+      },
+      {
+        "row_id": "qwen3_4b::man__meronym",
+        "domain": "real_task",
+        "held_out_prediction": -0.0032727904711122337,
+        "held_out_reference": -0.004545454545454575,
+        "held_out_gap": 0.001272664074342341
+      },
+      {
+        "row_id": "qwen3_4b::man__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.10021340277631963,
+        "held_out_reference": 0.101010101010101,
+        "held_out_gap": 0.0007966982337813677
+      },
+      {
+        "row_id": "qwen3_4b::man__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03807143653553671,
+        "held_out_reference": 0.0378787878787879,
+        "held_out_gap": 0.0001926486567488117
+      },
+      {
+        "row_id": "qwen3_4b::man__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.07007414693146774,
+        "held_out_reference": 0.07121212121212123,
+        "held_out_gap": 0.0011379742806534865
+      },
+      {
+        "row_id": "qwen3_4b::man__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": -0.0004596972396069543,
+        "held_out_reference": -0.001515151515151525,
+        "held_out_gap": 0.0010554542755445706
+      },
+      {
+        "row_id": "qwen3_4b::king__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.04281880739614086,
+        "held_out_reference": 0.04292929292929293,
+        "held_out_gap": 0.00011048553315207155
+      },
+      {
+        "row_id": "qwen3_4b::king__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.01433824052498579,
+        "held_out_reference": 0.013636363636363613,
+        "held_out_gap": 0.0007018768886221764
+      },
+      {
+        "row_id": "qwen3_4b::king__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.09389198378055742,
+        "held_out_reference": 0.0944444444444445,
+        "held_out_gap": 0.0005524606638870749
+      },
+      {
+        "row_id": "qwen3_4b::king__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.057204458796605004,
+        "held_out_reference": 0.05757575757575761,
+        "held_out_gap": 0.00037129877915260956
+      },
+      {
+        "row_id": "qwen3_4b::king__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.021199288438008224,
+        "held_out_reference": 0.020707070707070674,
+        "held_out_gap": 0.0004922177309375497
+      },
+      {
+        "row_id": "qwen3_4b::king__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.055835300240895724,
+        "held_out_reference": 0.0565656565656566,
+        "held_out_gap": 0.0007303563247608724
+      },
+      {
+        "row_id": "qwen3_4b::woman__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.0525231483314538,
+        "held_out_reference": 0.05303030303030304,
+        "held_out_gap": 0.0005071546988492381
+      },
+      {
+        "row_id": "qwen3_4b::woman__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.02746571954301369,
+        "held_out_reference": 0.027272727272727282,
+        "held_out_gap": 0.0001929922702864073
+      },
+      {
+        "row_id": "qwen3_4b::woman__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.08303904757539726,
+        "held_out_reference": 0.08333333333333337,
+        "held_out_gap": 0.000294285757936108
+      },
+      {
+        "row_id": "qwen3_4b::woman__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.06982368681577901,
+        "held_out_reference": 0.07070707070707066,
+        "held_out_gap": 0.0008833838912916531
+      },
+      {
+        "row_id": "qwen3_4b::woman__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03869075402444093,
+        "held_out_reference": 0.03888888888888886,
+        "held_out_gap": 0.0001981348644479325
+      },
+      {
+        "row_id": "qwen3_4b::woman__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.022945653326095286,
+        "held_out_reference": 0.022727272727272763,
+        "held_out_gap": 0.00021838059882252348
+      },
+      {
+        "row_id": "qwen3_4b::queen__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.029546115666048187,
+        "held_out_reference": 0.02929292929292926,
+        "held_out_gap": 0.0002531863731189271
+      },
+      {
+        "row_id": "qwen3_4b::queen__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.04122243754748445,
+        "held_out_reference": 0.0414141414141414,
+        "held_out_gap": 0.00019170386665695593
+      },
+      {
+        "row_id": "qwen3_4b::queen__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.07868481204056114,
+        "held_out_reference": 0.07878787878787874,
+        "held_out_gap": 0.00010306674731759558
+      },
+      {
+        "row_id": "qwen3_4b::queen__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.05617976620233971,
+        "held_out_reference": 0.05656565656565654,
+        "held_out_gap": 0.00038589036331682786
+      },
+      {
+        "row_id": "qwen3_4b::queen__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.04461476421981536,
+        "held_out_reference": 0.044949494949494906,
+        "held_out_gap": 0.0003347307296795443
+      },
+      {
+        "row_id": "qwen3_4b::queen__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.0004934790502777175,
+        "held_out_reference": -0.0005050505050505638,
+        "held_out_gap": 0.0009985295553282814
+      },
+      {
+        "row_id": "deepseek_7b::apple__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03122715920728275,
+        "held_out_reference": 0.03030303030303033,
+        "held_out_gap": 0.0009241289042524192
+      },
+      {
+        "row_id": "deepseek_7b::apple__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.010714486438989868,
+        "held_out_reference": 0.009595959595959602,
+        "held_out_gap": 0.0011185268430302653
+      },
+      {
+        "row_id": "deepseek_7b::apple__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.014871680584317204,
+        "held_out_reference": 0.015151515151515138,
+        "held_out_gap": 0.0002798345671979341
+      },
+      {
+        "row_id": "deepseek_7b::apple__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.026322796685197054,
+        "held_out_reference": 0.026767676767676718,
+        "held_out_gap": 0.00044488008247966365
+      },
+      {
+        "row_id": "deepseek_7b::apple__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.019940481656690573,
+        "held_out_reference": 0.020707070707070674,
+        "held_out_gap": 0.0007665890503801009
+      },
+      {
+        "row_id": "deepseek_7b::apple__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.0197016211346991,
+        "held_out_reference": 0.019191919191919204,
+        "held_out_gap": 0.0005097019427798971
+      },
+      {
+        "row_id": "deepseek_7b::fruit__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.02456153348068,
+        "held_out_reference": 0.02373737373737378,
+        "held_out_gap": 0.00082415974330622
+      },
+      {
+        "row_id": "deepseek_7b::fruit__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.00844962033305574,
+        "held_out_reference": 0.007575757575757569,
+        "held_out_gap": 0.0008738627572981716
+      },
+      {
+        "row_id": "deepseek_7b::fruit__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.003317551484018799,
+        "held_out_reference": 0.003535353535353558,
+        "held_out_gap": 0.00021780205133475894
+      },
+      {
+        "row_id": "deepseek_7b::fruit__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.006935931118540856,
+        "held_out_reference": 0.007070707070707116,
+        "held_out_gap": 0.00013477595216626007
+      },
+      {
+        "row_id": "deepseek_7b::fruit__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.01716613891254376,
+        "held_out_reference": 0.018181818181818243,
+        "held_out_gap": 0.0010156792692744832
+      },
+      {
+        "row_id": "deepseek_7b::fruit__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.012071992842483281,
+        "held_out_reference": 0.011616161616161635,
+        "held_out_gap": 0.00045583122632164574
+      },
+      {
+        "row_id": "deepseek_7b::man__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.05337192371193816,
+        "held_out_reference": 0.05353535353535355,
+        "held_out_gap": 0.00016342982341538415
+      },
+      {
+        "row_id": "deepseek_7b::man__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.003967225574877831,
+        "held_out_reference": 0.00303030303030305,
+        "held_out_gap": 0.0009369225445747809
+      },
+      {
+        "row_id": "deepseek_7b::man__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.06816462795240859,
+        "held_out_reference": 0.06767676767676767,
+        "held_out_gap": 0.0004878602756409195
+      },
+      {
+        "row_id": "deepseek_7b::man__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.04208259133045553,
+        "held_out_reference": 0.04191919191919191,
+        "held_out_gap": 0.000163399411263615
+      },
+      {
+        "row_id": "deepseek_7b::man__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.050103333092962915,
+        "held_out_reference": 0.0505050505050505,
+        "held_out_gap": 0.00040171741208758216
+      },
+      {
+        "row_id": "deepseek_7b::man__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.013882150933301335,
+        "held_out_reference": 0.01313131313131316,
+        "held_out_gap": 0.0007508378019881745
+      },
+      {
+        "row_id": "deepseek_7b::king__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.027406451469454307,
+        "held_out_reference": 0.026767676767676718,
+        "held_out_gap": 0.0006387747017775891
+      },
+      {
+        "row_id": "deepseek_7b::king__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.027454764892275125,
+        "held_out_reference": 0.027272727272727226,
+        "held_out_gap": 0.00018203761954789857
+      },
+      {
+        "row_id": "deepseek_7b::king__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.09798221875137049,
+        "held_out_reference": 0.09848484848484845,
+        "held_out_gap": 0.0005026297334779634
+      },
+      {
+        "row_id": "deepseek_7b::king__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.07877737152857313,
+        "held_out_reference": 0.07979797979797981,
+        "held_out_gap": 0.0010206082694066837
+      },
+      {
+        "row_id": "deepseek_7b::king__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.06086647551045556,
+        "held_out_reference": 0.06161616161616157,
+        "held_out_gap": 0.0007496861057060059
+      },
+      {
+        "row_id": "deepseek_7b::king__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": -0.0027283425350243806,
+        "held_out_reference": -0.004040404040404066,
+        "held_out_gap": 0.0013120615053796858
+      },
+      {
+        "row_id": "deepseek_7b::woman__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.06073710988999506,
+        "held_out_reference": 0.061111111111111116,
+        "held_out_gap": 0.00037400122111605483
+      },
+      {
+        "row_id": "deepseek_7b::woman__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.03777045531011586,
+        "held_out_reference": 0.037878787878787845,
+        "held_out_gap": 0.00010833256867198715
+      },
+      {
+        "row_id": "deepseek_7b::woman__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.07845853996138585,
+        "held_out_reference": 0.07828282828282829,
+        "held_out_gap": 0.0001757116785575663
+      },
+      {
+        "row_id": "deepseek_7b::woman__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.05680482044766985,
+        "held_out_reference": 0.05707070707070705,
+        "held_out_gap": 0.0002658866230371981
+      },
+      {
+        "row_id": "deepseek_7b::woman__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.06138591946543204,
+        "held_out_reference": 0.06212121212121213,
+        "held_out_gap": 0.0007352926557800954
+      },
+      {
+        "row_id": "deepseek_7b::woman__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.04865921257982231,
+        "held_out_reference": 0.04898989898989897,
+        "held_out_gap": 0.00033068641007666377
+      },
+      {
+        "row_id": "deepseek_7b::queen__hypernym",
+        "domain": "real_task",
+        "held_out_prediction": 0.031789585351002986,
+        "held_out_reference": 0.03131313131313135,
+        "held_out_gap": 0.00047645403787163754
+      },
+      {
+        "row_id": "deepseek_7b::queen__meronym",
+        "domain": "real_task",
+        "held_out_prediction": 0.028412183167053517,
+        "held_out_reference": 0.0282828282828283,
+        "held_out_gap": 0.000129354884225219
+      },
+      {
+        "row_id": "deepseek_7b::queen__gender",
+        "domain": "real_task",
+        "held_out_prediction": 0.07497930697672428,
+        "held_out_reference": 0.07474747474747473,
+        "held_out_gap": 0.00023183222924955116
+      },
+      {
+        "row_id": "deepseek_7b::queen__synonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.028836927078559116,
+        "held_out_reference": 0.028282828282828243,
+        "held_out_gap": 0.000554098795730873
+      },
+      {
+        "row_id": "deepseek_7b::queen__antonym",
+        "domain": "real_task",
+        "held_out_prediction": 0.08037373920648139,
+        "held_out_reference": 0.08181818181818185,
+        "held_out_gap": 0.0014444426117004583
+      },
+      {
+        "row_id": "deepseek_7b::queen__cause_effect",
+        "domain": "real_task",
+        "held_out_prediction": 0.005540957258340112,
+        "held_out_reference": 0.004545454545454575,
+        "held_out_gap": 0.0009955027128855376
+      }
+    ],
+    "mean_held_out_gap": 0.002187446344200754,
+    "held_out_score_correlation": 0.9991591231282433,
+    "d_held_out_gap": 0.013166742231969456,
+    "real_task_held_out_gap": 0.0005183565782568592,
+    "brain_held_out_gap": 0.018357494367106153,
+    "pass": true
+  },
+  "project_readout": {
+    "summary": "脑侧候选约束、D 闭环和真实任务收益已经可以被同一套双层统一律共同近似，但脑侧域仍然是当前三域里最弱的一环。",
+    "current_stage": "三域共标定双层统一律",
+    "next_question": "能否把脑侧候选结构也压成可学习排序层，而不是继续依赖手工脑侧分解？"
+  }
+}

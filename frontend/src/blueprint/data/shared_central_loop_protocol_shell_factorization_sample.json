@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 08:58:05",
+    "runtime_sec": 2.495612382888794,
+    "row_count": 80,
+    "modalities": [
+      "full",
+      "visual",
+      "tactile",
+      "language"
+    ]
+  },
+  "factorized_protocol_shells": {
+    "family_protocol_shell": {
+      "loop_rank": 4,
+      "mean_absolute_gap": 0.0056466004001902576,
+      "score_correlation": 0.9749663081187363,
+      "modality_mean_gap": {
+        "full": 0.012077061828851118,
+        "visual": 0.003545345467471117,
+        "tactile": 0.003993374557143853,
+        "language": 0.002970619747294942
+      },
+      "mean_held_out_gap": 0.007203048051354558,
+      "held_out_score_correlation": 0.9606078286143466,
+      "modality_held_out_gap": {
+        "full": 0.014297695015030514,
+        "visual": 0.004972458435118662,
+        "tactile": 0.005430145013965113,
+        "language": 0.004111893741303943
+      }
+    },
+    "relation_protocol_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.00765304004943331,
+      "score_correlation": 0.9551608407314165,
+      "modality_mean_gap": {
+        "full": 0.010802520970623907,
+        "visual": 0.008013447199705547,
+        "tactile": 0.00575506443388954,
+        "language": 0.006041127593514242
+      },
+      "mean_held_out_gap": 0.008749007138318745,
+      "held_out_score_correlation": 0.9403232713789681,
+      "modality_held_out_gap": {
+        "full": 0.012149859449480039,
+        "visual": 0.00956268302391392,
+        "tactile": 0.006482691435628854,
+        "language": 0.006800794644252173
+      }
+    },
+    "action_planning_protocol_shell": {
+      "loop_rank": 3,
+      "mean_absolute_gap": 0.007676866214317966,
+      "score_correlation": 0.9548914948450044,
+      "modality_mean_gap": {
+        "full": 0.01081998370047478,
+        "visual": 0.00807736688536555,
+        "tactile": 0.0057424475765775725,
+        "language": 0.006067666694853963
+      },
+      "mean_held_out_gap": 0.008783715825404211,
+      "held_out_score_correlation": 0.9398290351347712,
+      "modality_held_out_gap": {
+        "full": 0.012152464106425875,
+        "visual": 0.009630653222608549,
+        "tactile": 0.006504489627337786,
+        "language": 0.006847256345244637
+      }
+    }
+  },
+  "winner": "family_protocol_shell",
+  "hypotheses": {
+    "H1_relation_beats_family": false,
+    "H2_relation_beats_action": true,
+    "H3_protocol_shell_is_relation_heavy": false
+  },
+  "project_readout": {
+    "summary": "如果 relation 协议壳优于 family 和 action/planning 协议壳，就说明多模态差异主要落在关系协议的重写，而不是更粗的族级协议或更下游的动作规划代理。",
+    "next_question": "relation 协议壳里，差异主要来自上下位、部分整体、因果，还是更一般的关系绑定项？"
+  }
+}

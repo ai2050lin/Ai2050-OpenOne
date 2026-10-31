@@ -1,0 +1,962 @@
+{
+  "meta": {
+    "timestamp": "2026-03-10 20:16:51",
+    "runtime_sec": 89.4508376121521,
+    "core_constraint": "trainable_low_dim_region_family_generator_without_global_controller",
+    "generator_dim": 5
+  },
+  "systems": {
+    "shared_local_replay": {
+      "same_family_success_rate": 0.6666666666666666,
+      "lesion_recovery_rate": 0.6666666666666666,
+      "encoding_separation": 0.7916666666666666,
+      "transfer_stability": 0.9993774142646547,
+      "regional_specialization": 0.000572782420527397,
+      "local_integration_score": 0.6491472424878851,
+      "baseline_accuracy": 0.6666666666666666,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.01388888888888895,
+          "memory": 0.08333333333333337,
+          "comparator": 0.15972222222222232,
+          "motor": 0.006944444444444531
+        },
+        "comparison_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.16666666666666674,
+          "motor": 0.006944444444444531
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.11805555555555558,
+          "motor": 0.11805555555555558
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.15972222222222232,
+          "upstream_mass": 0.09722222222222232,
+          "downstream_mass": 0.16666666666666685,
+          "memory_comparator_mass": 0.2430555555555557,
+          "sensory_motor_mass": 0.02083333333333348,
+          "rows": {
+            "sensory": 0.01388888888888895,
+            "memory": 0.08333333333333337,
+            "comparator": 0.15972222222222232,
+            "motor": 0.006944444444444531
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.16666666666666674,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.17361111111111127,
+          "memory_comparator_mass": 0.17361111111111127,
+          "sensory_motor_mass": 0.013888888888889062,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.16666666666666674,
+            "motor": 0.006944444444444531
+          }
+        },
+        "recovery_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.23611111111111116,
+          "memory_comparator_mass": 0.1250000000000001,
+          "sensory_motor_mass": 0.1250000000000001,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.11805555555555558,
+            "motor": 0.11805555555555558
+          }
+        },
+        "distinct_top_region_count": 1,
+        "top_region_sequence": [
+          "comparator",
+          "comparator",
+          "comparator"
+        ]
+      },
+      "concept_phase_upstream_advantage": -0.06944444444444453,
+      "comparison_phase_memory_comparator_advantage": 0.1597222222222222,
+      "aggregate_objective": 0.6491472424878851,
+      "concept_score": 0.16851851851851823,
+      "comparison_score": 0.9324074074074074,
+      "recovery_local_score": 0.7999999999999999,
+      "closure_balance_score": 0.16851851851851823,
+      "three_stage_score": 0.46544632331718,
+      "training_epochs": 28
+    },
+    "learned_region_family": {
+      "same_family_success_rate": 0.6805555555555556,
+      "lesion_recovery_rate": 0.6481481481481481,
+      "encoding_separation": 0.6666666666666666,
+      "transfer_stability": 0.998962366179037,
+      "regional_specialization": 0.0015074180102803642,
+      "local_integration_score": 0.6261561282211963,
+      "baseline_accuracy": 0.6611111111111111,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.25000000000000006,
+          "comparator": 0.05555555555555558,
+          "motor": 0.02777777777777779
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.006944444444444531,
+          "comparator": 0.11805555555555558,
+          "motor": 0.02083333333333337
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.13194444444444453,
+          "motor": 0.22916666666666669
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "memory",
+          "top_drop": 0.25000000000000006,
+          "upstream_mass": 0.25000000000000006,
+          "downstream_mass": 0.08333333333333337,
+          "memory_comparator_mass": 0.30555555555555564,
+          "sensory_motor_mass": 0.02777777777777779,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.25000000000000006,
+            "comparator": 0.05555555555555558,
+            "motor": 0.02777777777777779
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.006944444444444531,
+          "downstream_mass": 0.13888888888888895,
+          "memory_comparator_mass": 0.1250000000000001,
+          "sensory_motor_mass": 0.02083333333333337,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.006944444444444531,
+            "comparator": 0.11805555555555558,
+            "motor": 0.02083333333333337
+          }
+        },
+        "recovery_phase": {
+          "top_region": "motor",
+          "top_drop": 0.22916666666666669,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.3611111111111112,
+          "memory_comparator_mass": 0.13888888888888906,
+          "sensory_motor_mass": 0.23611111111111122,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.13194444444444453,
+            "motor": 0.22916666666666669
+          }
+        },
+        "distinct_top_region_count": 3,
+        "top_region_sequence": [
+          "memory",
+          "comparator",
+          "motor"
+        ]
+      },
+      "concept_phase_upstream_advantage": 0.16666666666666669,
+      "comparison_phase_memory_comparator_advantage": 0.10416666666666674,
+      "aggregate_objective": 0.6261561282211963,
+      "concept_score": 0.9555555555555556,
+      "comparison_score": 0.7472222222222225,
+      "recovery_local_score": 0.3138888888888892,
+      "closure_balance_score": 0.3138888888888892,
+      "three_stage_score": 0.5651927388628298,
+      "training_epochs": 24,
+      "law": {
+        "sensory_gain_a": 1.3258806922278736,
+        "sensory_gain_b": 1.170236868906142,
+        "early_memory_gain": 0.30493739643633216,
+        "mid_memory_gain": 0.14635041907575214,
+        "early_comparator_forward_scale": 0.09876170641754364,
+        "comparison_memory_scale": 0.3059723839660702,
+        "comparison_signal_scale": 0.6631401459532512,
+        "comparator_recurrence_scale": 0.09007138287151784,
+        "comparator_feedback_scale": 1.1039797857234084,
+        "motor_release_step": 8,
+        "prerelease_motor_forward_scale": 0.04574162115540195,
+        "motor_teacher_scale": 0.7150054100613455,
+        "replay_memory_scale": 0.46997320655235925,
+        "replay_comparator_scale": 0.37929655367697895
+      },
+      "region_params": [
+        {
+          "leak": 0.18,
+          "threshold": 0.5,
+          "refractory": 1,
+          "inhibition": 0.18299952725368218,
+          "plasticity": 0.02,
+          "feedback_gain": 0.03,
+          "tonic_bias": 0.08
+        },
+        {
+          "leak": 0.9718952311742866,
+          "threshold": 0.34,
+          "refractory": 2,
+          "inhibition": 0.04,
+          "plasticity": 0.04,
+          "feedback_gain": 0.21644048477714273,
+          "tonic_bias": 0.1
+        },
+        {
+          "leak": 0.58,
+          "threshold": 0.4067637158020569,
+          "refractory": 1,
+          "inhibition": 0.16,
+          "plasticity": 0.034,
+          "feedback_gain": 0.18641040795328984,
+          "tonic_bias": 0.07
+        },
+        {
+          "leak": 0.46,
+          "threshold": 0.4414299317010634,
+          "refractory": 1,
+          "inhibition": 0.08,
+          "plasticity": 0.028,
+          "feedback_gain": 0.09,
+          "tonic_bias": 0.05
+        }
+      ]
+    },
+    "fixed_generated_family": {
+      "same_family_success_rate": 0.6805555555555556,
+      "lesion_recovery_rate": 0.6481481481481481,
+      "encoding_separation": 0.6666666666666666,
+      "transfer_stability": 0.9989578459982713,
+      "regional_specialization": 0.0015133155522764558,
+      "local_integration_score": 0.6261562306481533,
+      "baseline_accuracy": 0.6611111111111111,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.2569444444444445,
+          "comparator": 0.04166666666666674,
+          "motor": 0.02083333333333337
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.01388888888888895,
+          "comparator": 0.11805555555555558,
+          "motor": 0.02083333333333337
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.13194444444444453,
+          "motor": 0.22916666666666669
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "memory",
+          "top_drop": 0.2569444444444445,
+          "upstream_mass": 0.2569444444444445,
+          "downstream_mass": 0.06250000000000011,
+          "memory_comparator_mass": 0.2986111111111112,
+          "sensory_motor_mass": 0.02083333333333337,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.2569444444444445,
+            "comparator": 0.04166666666666674,
+            "motor": 0.02083333333333337
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.01388888888888895,
+          "downstream_mass": 0.13888888888888895,
+          "memory_comparator_mass": 0.13194444444444453,
+          "sensory_motor_mass": 0.02083333333333337,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.01388888888888895,
+            "comparator": 0.11805555555555558,
+            "motor": 0.02083333333333337
+          }
+        },
+        "recovery_phase": {
+          "top_region": "motor",
+          "top_drop": 0.22916666666666669,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.3611111111111112,
+          "memory_comparator_mass": 0.13888888888888906,
+          "sensory_motor_mass": 0.23611111111111122,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.13194444444444453,
+            "motor": 0.22916666666666669
+          }
+        },
+        "distinct_top_region_count": 3,
+        "top_region_sequence": [
+          "memory",
+          "comparator",
+          "motor"
+        ]
+      },
+      "concept_phase_upstream_advantage": 0.19444444444444436,
+      "comparison_phase_memory_comparator_advantage": 0.11111111111111116,
+      "aggregate_objective": 0.6261562306481533,
+      "concept_score": 1.0,
+      "comparison_score": 0.7703703703703706,
+      "recovery_local_score": 0.3138888888888892,
+      "closure_balance_score": 0.3138888888888892,
+      "three_stage_score": 0.5753317643209946,
+      "training_epochs": 24,
+      "latent_code": [
+        -0.8532028932231517,
+        -0.8197656540761395,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "law": {
+        "sensory_gain_a": 1.3258806922278736,
+        "sensory_gain_b": 1.170236868906142,
+        "early_memory_gain": 0.30493739643633216,
+        "mid_memory_gain": 0.14635041907575214,
+        "early_comparator_forward_scale": 0.09876170641754364,
+        "comparison_memory_scale": 0.2731817578030246,
+        "comparison_signal_scale": 0.6714136257700064,
+        "comparator_recurrence_scale": 0.09007138287151784,
+        "comparator_feedback_scale": 1.0629915030196013,
+        "motor_release_step": 8,
+        "prerelease_motor_forward_scale": 0.04574162115540195,
+        "motor_teacher_scale": 0.7150054100613455,
+        "replay_memory_scale": 0.4821272677821919,
+        "replay_comparator_scale": 0.3914506149068116
+      },
+      "region_params": [
+        {
+          "leak": 0.18,
+          "threshold": 0.5,
+          "refractory": 1,
+          "inhibition": 0.17050866916477733,
+          "plasticity": 0.02,
+          "feedback_gain": 0.03,
+          "tonic_bias": 0.08
+        },
+        {
+          "leak": 0.888972848859518,
+          "threshold": 0.34,
+          "refractory": 2,
+          "inhibition": 0.04,
+          "plasticity": 0.04,
+          "feedback_gain": 0.19869743721995362,
+          "tonic_bias": 0.1
+        },
+        {
+          "leak": 0.58,
+          "threshold": 0.41080213747350885,
+          "refractory": 1,
+          "inhibition": 0.16,
+          "plasticity": 0.034,
+          "feedback_gain": 0.1680728659529984,
+          "tonic_bias": 0.07
+        },
+        {
+          "leak": 0.46,
+          "threshold": 0.4278169170076557,
+          "refractory": 1,
+          "inhibition": 0.08,
+          "plasticity": 0.028,
+          "feedback_gain": 0.09,
+          "tonic_bias": 0.05
+        }
+      ]
+    },
+    "trainable_generated_family": {
+      "same_family_success_rate": 0.6875,
+      "lesion_recovery_rate": 0.6481481481481481,
+      "encoding_separation": 0.6666666666666666,
+      "transfer_stability": 0.998973993192704,
+      "regional_specialization": 0.0015108287528467674,
+      "local_integration_score": 0.6281029104917868,
+      "baseline_accuracy": 0.6611111111111111,
+      "phase_drop_matrix": {
+        "concept_phase": {
+          "sensory": 0.0,
+          "memory": 0.2569444444444445,
+          "comparator": 0.04166666666666674,
+          "motor": 0.02777777777777779
+        },
+        "comparison_phase": {
+          "sensory": 0.0,
+          "memory": 0.006944444444444531,
+          "comparator": 0.11805555555555558,
+          "motor": 0.02083333333333337
+        },
+        "recovery_phase": {
+          "sensory": 0.006944444444444531,
+          "memory": 0.006944444444444531,
+          "comparator": 0.13888888888888895,
+          "motor": 0.22916666666666669
+        }
+      },
+      "phase_summary": {
+        "concept_phase": {
+          "top_region": "memory",
+          "top_drop": 0.2569444444444445,
+          "upstream_mass": 0.2569444444444445,
+          "downstream_mass": 0.06944444444444453,
+          "memory_comparator_mass": 0.2986111111111112,
+          "sensory_motor_mass": 0.02777777777777779,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.2569444444444445,
+            "comparator": 0.04166666666666674,
+            "motor": 0.02777777777777779
+          }
+        },
+        "comparison_phase": {
+          "top_region": "comparator",
+          "top_drop": 0.11805555555555558,
+          "upstream_mass": 0.006944444444444531,
+          "downstream_mass": 0.13888888888888895,
+          "memory_comparator_mass": 0.1250000000000001,
+          "sensory_motor_mass": 0.02083333333333337,
+          "rows": {
+            "sensory": 0.0,
+            "memory": 0.006944444444444531,
+            "comparator": 0.11805555555555558,
+            "motor": 0.02083333333333337
+          }
+        },
+        "recovery_phase": {
+          "top_region": "motor",
+          "top_drop": 0.22916666666666669,
+          "upstream_mass": 0.013888888888889062,
+          "downstream_mass": 0.36805555555555564,
+          "memory_comparator_mass": 0.14583333333333348,
+          "sensory_motor_mass": 0.23611111111111122,
+          "rows": {
+            "sensory": 0.006944444444444531,
+            "memory": 0.006944444444444531,
+            "comparator": 0.13888888888888895,
+            "motor": 0.22916666666666669
+          }
+        },
+        "distinct_top_region_count": 3,
+        "top_region_sequence": [
+          "memory",
+          "comparator",
+          "motor"
+        ]
+      },
+      "concept_phase_upstream_advantage": 0.18749999999999994,
+      "comparison_phase_memory_comparator_advantage": 0.10416666666666674,
+      "aggregate_objective": 0.6281029104917868,
+      "concept_score": 1.0,
+      "comparison_score": 0.7472222222222225,
+      "recovery_local_score": 0.3486111111111113,
+      "closure_balance_score": 0.3486111111111113,
+      "three_stage_score": 0.5897328930013949,
+      "training_epochs": 24,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "law": {
+        "sensory_gain_a": 1.3258806922278736,
+        "sensory_gain_b": 1.170236868906142,
+        "early_memory_gain": 0.30493739643633216,
+        "mid_memory_gain": 0.14635041907575214,
+        "early_comparator_forward_scale": 0.09876170641754364,
+        "comparison_memory_scale": 0.2659723839660702,
+        "comparison_signal_scale": 0.6714136257700064,
+        "comparator_recurrence_scale": 0.09007138287151784,
+        "comparator_feedback_scale": 1.0539797857234083,
+        "motor_release_step": 8,
+        "prerelease_motor_forward_scale": 0.04574162115540195,
+        "motor_teacher_scale": 0.7150054100613455,
+        "replay_memory_scale": 0.4611272677821919,
+        "replay_comparator_scale": 0.3704506149068116
+      },
+      "region_params": [
+        {
+          "leak": 0.18,
+          "threshold": 0.5,
+          "refractory": 1,
+          "inhibition": 0.1734835518364907,
+          "plasticity": 0.02,
+          "feedback_gain": 0.03,
+          "tonic_bias": 0.08
+        },
+        {
+          "leak": 0.908722041147958,
+          "threshold": 0.34,
+          "refractory": 2,
+          "inhibition": 0.04,
+          "plasticity": 0.04,
+          "feedback_gain": 0.19479643629942847,
+          "tonic_bias": 0.1
+        },
+        {
+          "leak": 0.58,
+          "threshold": 0.41080213747350885,
+          "refractory": 1,
+          "inhibition": 0.16,
+          "plasticity": 0.034,
+          "feedback_gain": 0.16404115899889507,
+          "tonic_bias": 0.07
+        },
+        {
+          "leak": 0.46,
+          "threshold": 0.4278169170076557,
+          "refractory": 1,
+          "inhibition": 0.08,
+          "plasticity": 0.028,
+          "feedback_gain": 0.09,
+          "tonic_bias": 0.05
+        }
+      ]
+    }
+  },
+  "optimization_history": [
+    {
+      "step": 0,
+      "latent_code": [
+        -0.8532028932231517,
+        -0.8197656540761395,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5753317643209946,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261562306481533
+    },
+    {
+      "step": 1,
+      "latent_code": [
+        -1.0,
+        -0.8197656540761395,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5753319100169138,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261563399200926
+    },
+    {
+      "step": 2,
+      "latent_code": [
+        -0.5032028932231517,
+        -0.8197656540761395,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5744515983561524,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281002728411883
+    },
+    {
+      "step": 3,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5753321426373199,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261565143853972
+    },
+    {
+      "step": 4,
+      "latent_code": [
+        -1.0,
+        -0.46976565407613957,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5753314701203205,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261560099976476
+    },
+    {
+      "step": 5,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        -0.18453040366489593,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5600548931865709,
+      "closure_balance_score": 0.2791666666666671,
+      "aggregate_objective": 0.6261569106306687
+    },
+    {
+      "step": 6,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.515469596335104,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5712575438144157,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.628100565268219
+    },
+    {
+      "step": 7,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.8639741597248752,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.4968599204150977,
+      "closure_balance_score": 0.1750000000000003,
+      "aggregate_objective": 0.6261565143853972
+    },
+    {
+      "step": 8,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.16397415972487528,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5686654759706533,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261565143853972
+    },
+    {
+      "step": 9,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5753352007906031,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261588080003596
+    },
+    {
+      "step": 10,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.5525676871638775
+      ],
+      "three_stage_score": 0.5447731798625505,
+      "closure_balance_score": 0.2444444444444445,
+      "aggregate_objective": 0.6261539589709869
+    },
+    {
+      "step": 11,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5753352007906031,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261588080003596
+    },
+    {
+      "step": 12,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5897328930013949,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 13,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5897328930013949,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 14,
+      "latent_code": [
+        -0.65,
+        -0.65,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5897324576368932,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281025839684106
+    },
+    {
+      "step": 15,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        -0.18453040366489593,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5718630645513534,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.626158872487589
+    },
+    {
+      "step": 16,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.515469596335104,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5712601327504299,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281025069702296
+    },
+    {
+      "step": 17,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.8639741597248752,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5265384485569503,
+      "closure_balance_score": 0.2444444444444445,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 18,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.16397415972487528,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5830662263347283,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 19,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.49743231283612244
+      ],
+      "three_stage_score": 0.556587480794559,
+      "closure_balance_score": 0.2791666666666671,
+      "aggregate_objective": 0.6261605180033265
+    },
+    {
+      "step": 20,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5744520513021518,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281006125506878
+    },
+    {
+      "step": 21,
+      "latent_code": [
+        -1.0,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5753352007906031,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6261588080003596
+    },
+    {
+      "step": 22,
+      "latent_code": [
+        -0.30000000000000004,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5744545832077834,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281025114799115
+    },
+    {
+      "step": 23,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5897328930013949,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 24,
+      "latent_code": [
+        -0.65,
+        -0.65,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5897324576368932,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281025839684106
+    },
+    {
+      "step": 25,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        -0.18453040366489593,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5718630645513534,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.626158872487589
+    },
+    {
+      "step": 26,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.515469596335104,
+        -0.5139741597248753,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5712601327504299,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281025069702296
+    },
+    {
+      "step": 27,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.8639741597248752,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5265384485569503,
+      "closure_balance_score": 0.2444444444444445,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 28,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.16397415972487528,
+        -0.14743231283612246
+      ],
+      "three_stage_score": 0.5830662263347283,
+      "closure_balance_score": 0.3486111111111113,
+      "aggregate_objective": 0.6281029104917868
+    },
+    {
+      "step": 29,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        -0.49743231283612244
+      ],
+      "three_stage_score": 0.556587480794559,
+      "closure_balance_score": 0.2791666666666671,
+      "aggregate_objective": 0.6261605180033265
+    },
+    {
+      "step": 30,
+      "latent_code": [
+        -0.65,
+        -1.0,
+        0.16546959633510405,
+        -0.5139741597248753,
+        0.20256768716387752
+      ],
+      "three_stage_score": 0.5744520513021518,
+      "closure_balance_score": 0.3138888888888892,
+      "aggregate_objective": 0.6281006125506878
+    }
+  ],
+  "headline_metrics": {
+    "trainable_best_system": "trainable_generated_family",
+    "trainable_three_stage_gain_vs_fixed": 0.014401128680400221,
+    "trainable_balance_gain_vs_fixed": 0.0347222222222221,
+    "trainable_aggregate_gain_vs_fixed": 0.001946679843633503,
+    "trainable_three_stage_gain_vs_learned": 0.02454015413856503,
+    "trainable_vs_shared_score_gap": -0.021044331996098342,
+    "final_step_size": 0.175
+  },
+  "hypotheses": {
+    "H1_trainable_generator_beats_fixed_generator": true,
+    "H2_trainable_generator_improves_balance": true,
+    "H3_trainable_generator_beats_learned_family": true,
+    "H4_trainable_generator_keeps_aggregate_cost_bounded": true
+  },
+  "project_readout": {
+    "summary": "这一步把低维脑区参数族生成器从离线搜索推进成可训练更新。目标是验证：在同一个 5 维生成坐标里，经过迭代更新后，生成器能否稳定超过固定生成族。",
+    "next_question": "如果可训练生成器已经明显优于固定生成器，下一步就该把它推进成真正端到端的参数族生成网络，再接回真实模型层带。"
+  }
+}
