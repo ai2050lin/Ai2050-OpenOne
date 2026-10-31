@@ -7,8 +7,10 @@
 没有权重、或不是连接本机中心时，端点诚实返回 available=False / 503，前端显示空态，不做任何模拟。
 
 端点：
-  GET  /api/live/status        模型可用性、加载状态与结构参数（首次访问触发后台加载）
-  POST /api/live/run           {text, max_tokens} → 一次前向的逐层观察（live_trace.v1）
+  GET  /api/live/status        模型可用性、加载状态与结构参数（idle = 权重在但未加载，不自动加载）
+  POST /api/live/load          手动加载模型（占 GPU）
+  POST /api/live/unload        手动卸载模型（释放 GPU）
+  POST /api/live/run           {text, max_tokens} → 一次前向的逐层观察（live_trace.v1；未加载时自动后台加载）
   GET  /api/live/block?block=  该块逐头 W_q/W_o 与 MLP gate/up/down 的均值池化参数缩略图
 """
 from __future__ import annotations
@@ -126,13 +128,57 @@ def live_status() -> dict:
         return {'schema': 'live_status.v1', 'available': False, 'status': 'unavailable',
                 'reason': '本机没有找到模型权重（AI2050_LIVE_MODEL_DIR），实时分析需要在本机中心上运行。',
                 'model_dir': '', 'device': '', 'meta': {}}
-    if _state['status'] == 'idle':
-        _load_async()
     with _LOCK:
         snap = {'status': _state['status'], 'progress': _state['progress'], 'error': _state['error'],
                 'device': _state['device'], 'dir': _state['dir'], 'meta': dict(_state['meta'])}
-    return {'schema': 'live_status.v1', 'available': True, 'model_dir': snap['dir'],
-            'model_name': Path(snap['dir']).name if snap['dir'] else '', **snap}
+    out = {'schema': 'live_status.v1', 'available': True, 'model_dir': snap['dir'],
+           'model_name': Path(snap['dir']).name if snap['dir'] else '', **snap}
+    if snap['status'] == 'ready' and snap['device'] == 'cuda':   # 本服务进程当前的显存占用
+        try:
+            import torch
+            out['vram_gb'] = round(torch.cuda.memory_allocated() / 1e9, 1)
+        except Exception:
+            pass
+    return out
+
+
+@router.post('/load')
+def live_load() -> dict:
+    """手动加载模型到 GPU（空间·实时分析界面按钮；加载后才能运行分析）。"""
+    if model_dir() is None:
+        raise HTTPException(503, '本机没有找到模型权重（AI2050_LIVE_MODEL_DIR），无法加载。')
+    st = _state['status']
+    if st == 'ready':
+        return {'ok': True, 'status': 'ready', 'message': '模型已加载。'}
+    if st == 'loading':
+        return {'ok': True, 'status': 'loading', 'message': '模型正在加载中…'}
+    _load_async()
+    return {'ok': True, 'status': _state['status'], 'message': '开始后台加载模型。'}
+
+
+@router.post('/unload')
+def live_unload() -> dict:
+    """手动卸载模型并释放 GPU 显存（前端会同步清掉旧 trace：卸载后参数缩略图无法继续取）。"""
+    st = _state['status']
+    if st == 'loading':
+        raise HTTPException(409, '模型正在加载中，请等加载完成后再卸载。')
+    if st != 'ready':
+        return {'ok': True, 'status': st, 'message': '模型本来就没有加载。'}
+    model = _state.get('model')
+    try:
+        import gc
+        import torch
+        device = _state.get('device')
+        del model
+        _set(model=None, tokenizer=None)
+        gc.collect()
+        if device == 'cuda' and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception as exc:
+        _set(model=None, tokenizer=None)
+        return {'ok': False, 'status': 'idle', 'message': f'卸载时出现问题（引用已清除）：{exc}'}
+    _set(status='idle', progress='模型已卸载（GPU 显存已释放），需要时重新加载。', error='')
+    return {'ok': True, 'status': 'idle', 'message': '模型已卸载，GPU 显存已释放。'}
 
 
 class LiveRun(BaseModel):

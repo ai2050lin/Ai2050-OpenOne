@@ -101,7 +101,8 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
         if (!firstDoc) firstDoc = { base, doc: d };
       }
       if (dead) return;
-      setLiveBase(null);
+      // idle（权重在但未加载）也要记住服务地址：加载/卸载按钮要往那里 POST
+      setLiveBase(firstDoc && firstDoc.doc.available ? firstDoc.base : null);
       if (firstDoc && typeof firstDoc.doc.available === 'boolean') {
         setStatus(firstDoc.doc);                 // 明确不可用：中心有前向服务但权重缺失等
       } else if (firstDoc) {
@@ -140,6 +141,18 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
     }
     return () => { dead = true; };
   }, [b, trace, census, liveBase]);
+
+  /* 手动加载 / 卸载模型：显式控制 GPU 占用（加载约 8 GB 显存，卸载后归零；trace 观察数据保留） */
+  const loadModel = async () => {
+    try { await api(liveBase || API_BASE, '/api/live/load', { method: 'POST' }); }
+    catch (reason) { setRunError(String(reason.message || reason)); }
+    setProbeTick(t => t + 1);
+  };
+  const unloadModel = async () => {
+    try { await api(liveBase || API_BASE, '/api/live/unload', { method: 'POST' }); } catch { /* 已卸载/服务不在了：探针会刷新状态 */ }
+    setTrace(null);                              // 卸载后旧 trace 的逐层步进已无法继续取参数缩略图
+    setProbeTick(t => t + 1);
+  };
 
   const run = async () => {
     setRunning(true);
@@ -196,7 +209,8 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
       <div className="lv-hd">
         <p className="v8-nprog-say">
           输入一段文本，看模型逐块怎么算：每个注意力头写了什么、MLP 哪些单元被点亮、参数长什么样。
-          {st === 'ready' && <>当前 <b>{status.model_name}</b>（{status.device === 'cuda' ? 'GPU' : 'CPU'}）就绪，「▶ 播放」自动逐层推进。</>}
+          {st === 'idle' && <>当前 <b>{status.model_name}</b> 权重在本机但<b>未加载</b>（GPU 零占用）——点「加载模型」后再运行分析。</>}
+          {st === 'ready' && <>当前 <b>{status.model_name}</b>（{status.device === 'cuda' ? 'GPU' : 'CPU'}{status.vram_gb ? ` · 已占 ${status.vram_gb} GB 显存` : ''}）就绪，「▶ 播放」自动逐层推进。</>}
           {st === 'loading' && <>{status.progress || '模型加载中…'}</>}
         </p>
       </div>
@@ -210,6 +224,17 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
               {[8, 16, 24, 32].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
           </label>
+          {st === 'idle' && (
+            <button type="button" className="lv-run" onClick={loadModel}
+                    title="加载模型权重到 GPU（约 8 GB 显存），加载后才能运行分析">⏬ 加载模型</button>
+          )}
+          {st === 'loading' && <button type="button" className="lv-run" disabled>⏬ 加载中…</button>}
+          {st === 'ready' && (
+            <button type="button" className="lv-run" onClick={unloadModel}
+                    title="卸载模型并释放 GPU 显存（观察数据会一并清掉，需要时重新加载）">
+              ⏏ 卸载模型{status.vram_gb ? `（${status.vram_gb} GB）` : ''}
+            </button>
+          )}
           <button type="button" className="lv-run" disabled={running || st !== 'ready' || !text.trim()} onClick={run}>
             {running ? '前向计算中…' : '运行分析'}
           </button>
@@ -228,7 +253,8 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
       </div>
 
       {!trace && st === 'ready' && <Empty>输入文本并点击「运行分析」，从这里开始逐层观察模型怎么算。</Empty>}
-      {st !== 'ready' && !trace && <Empty>模型加载中，请稍候…</Empty>}
+      {!trace && st === 'idle' && <Empty>模型未加载（GPU 零占用）。点「加载模型」把权重载入显存后开始。</Empty>}
+      {!trace && st !== 'ready' && st !== 'idle' && <Empty>模型加载中，请稍候…</Empty>}
 
       {trace && (
         <>
