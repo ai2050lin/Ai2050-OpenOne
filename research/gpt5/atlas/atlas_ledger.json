@@ -824,7 +824,7 @@
    }
   }
  ],
- "ledger_sha256_8": "a6bf3af5",
+ "ledger_sha256_8": "8299f955",
  "linkage": [
   {
    "evidence": "G_mlp/G_attn=4.7 per word; e_ff=-0.23 (~30x OV static 0.0075); rotation layer word-specific",
@@ -9900,6 +9900,17 @@
    "res_sha8": "ce0c400b",
    "note": "P0 consumer attribution v1 (Cammarata-alignment plan; F20 as attack surface). gA anchors reproduced (45.845/73.528/69.823 tol 0.05deg); gB static OV write analysis sane and specific (top heads S_rel~0.042 vs null p95 0.012, layer 23-30 cluster, R_logic x K_entity share top heads); dynamic top-64 late-block share 0.92/0.91 with shared carrier heads (34,15),(35,0),(29,27),(35,22). K-A overlap 9/11 (need both >=10) and K-A2 spearman 0.137/0.179 (need >=0.25) FAIL — dynamic absolute-norm confounded by per-head output magnitude; share-normalized correction preregistered as 3281. Honest BLOCKED.",
    "prev_post": "0ee33c4c"
+  },
+  {
+   "n": 439,
+   "phase": "3281",
+   "name": "g5h44_consumer_attribution_norm",
+   "line": "G",
+   "date": "2026-10-31",
+   "verdict": "consumer_attribution_norm_registered",
+   "res_sha8": "a8f1e066",
+   "note": "Share-normalized consumer attribution (correction preregistered in #432). Static arm identical to 3280 (anchors 45.845/73.528/69.823 reproduced; top8 == 3280). Dynamic D_norm=mean_rows(||proj||/||c||), silent rows <1e-6 excluded (frozen pre-run). K-A overlap 15/15 (>=10 both) and K-A2 spearman 0.340/0.362 (>=0.25 both) PASS — static write strength predicts dynamic share. Arm c confound evidence: spearman(D_abs, mean||c||)=0.973/0.962 vs spearman(S_rel, mean||c||)=0.069/0.097 — the 3280 absolute-norm confound quantified; 3280-style gates recomputed 9/11 + 0.137/0.179 verbatim == #432 (continuity). Share top heads: R_logic ~0.13-0.15 of head output (28,6)/(30,17)/(23,10)/(23,9)/(28,7); K_entity ~0.19-0.24 (35,5)/(29,27)/(30,17)/(23,9)/(35,22) — static relay family confirmed dynamically. Late-block share 0.45/0.61. Next prereg: 3282 PR-integral head screening.",
+   "prev_post": "a6bf3af5"
   }
  ],
  "migration_history": [

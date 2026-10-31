@@ -9,14 +9,11 @@ import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
 
 import AccountMenu from './rdc_fusion/AccountMenu.jsx';
 import AtlasView from './rdc_fusion/AtlasView.jsx';
-import AuditQueue from './rdc_fusion/AuditQueue.jsx';
 import CatalogPanel from './rdc_fusion/CatalogPanel.jsx';
 import CensusPanel from './rdc_fusion/CensusPanel.jsx';
-import ConfigView from './ConfigView.jsx';
-import DispatchPanel from './rdc_fusion/DispatchPanel.jsx';
-import FreezePanel from './rdc_fusion/FreezePanel.jsx';
+import ConfigView, { CFG_SECTIONS } from './ConfigView.jsx';
 import LocalPackView from './rdc_fusion/LocalPackView.jsx';
-import TemplateStudio from './rdc_fusion/TemplateStudio.jsx';
+import TemplatePipeline from './rdc_fusion/TemplatePipeline.jsx';
 import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
 import { useAuth } from './rdc_fusion/authContext.js';
 import { loadLocalPack } from './rdc_fusion/localPack.js';
@@ -25,15 +22,13 @@ import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
+import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
 
 const AiChatDrawer = lazy(() => import('./rdc_fusion/AiChatDrawer.jsx'));
-const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
 const AutoTestPanel = lazy(() => import('./rdc_fusion/AutoTestPanel.jsx'));
-const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 const GoodfireProbePanel = lazy(() => import('./rdc_fusion/GoodfireProbePanel.jsx'));
 const LensSpatial = lazy(() => import('./rdc_fusion/LensSpatial.jsx'));
 
@@ -92,7 +87,6 @@ export default function Workbench() {
   const cfg = useApi('/api/platform/config');
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
-  const [draft, setDraft] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
   // 网页只能浏览：题库只读、贡献算力只给下载入口；测试与管理在桌面客户端，管理工位另需管理员账号（本机开发不限）
   const { user } = useAuth();
@@ -103,12 +97,14 @@ export default function Workbench() {
     : LENSES;
   const lenses = localTools ? [...baseLenses, { id: 'local', label: '本机工具', desc: '读取本机模型权重的空间视图（只在本机中心可用）' }] : baseLenses;
   const lens = lenses.some(l => l.id === st.lens) ? st.lens : 'spatial';
-  const station = stations.some(s => s.id === st.station) ? st.station : 'catalog';
+  const station = stations.some(s => s.id === st.station) ? st.station : (stations[0]?.id || 'catalog');
+  const pstep = PIPE_STEPS.some(s => s.id === st.pstep) ? st.pstep : 'design';
+  const csec = CFG_SECTIONS.some(s => s.id === st.csec) ? st.csec : 'conn';
   // 谱图关系（relations）不在 SPATIAL_VIEWS 导航里（已并入语言图谱入口），但仍是合法视图：入口与旧链接都能进入
   const view = SPATIAL_VIEWS.some(v => v.id === st.view) || st.view === 'relations' ? st.view : 'neuron';
   const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) ? st.rtab : 'neuron';
 
-  useEffect(() => { writeState({ ...st, lens, station, view, rtab }); }, [st, lens, station, view, rtab]);
+  useEffect(() => { writeState({ ...st, lens, station, view, rtab, pstep, csec }); }, [st, lens, station, view, rtab, pstep, csec]);
   const lensLabel = lenses.find(l => l.id === lens)?.label || '';
   useEffect(() => { document.title = `研究工作台 · ${lensLabel} · AI2050`; }, [lensLabel]);
 
@@ -147,28 +143,23 @@ export default function Workbench() {
           {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab} onChange={v => set({ rtab: v })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
           {lens === 'spatial' && <SubNav items={SPATIAL_VIEWS} value={view} onChange={v => set({ view: v })} label="空间视图" onHelp={() => setHelpOpen(true)} />}
           {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
-          {/* 配置是一页到底，没有子页签；保留同一根横条只为了让内容起始高度与其它界面一致、并给出「?」入口 */}
-          {lens === 'config' && <SubNav items={[]} value="" onChange={() => {}} label="配置" onHelp={() => setHelpOpen(true)} />}
+          {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
+          {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
           <main className="wb-main">
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
-              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('studio')} />}
-              {lens === 'process' && station === 'contribute' && <ContributePanel />}
+              {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('pipeline')} />}
               {lens === 'process' && station === 'probe' && <GoodfireProbePanel />}
-              {lens === 'process' && station === 'ai' && <AiSettingsPanel />}
-              {lens === 'process' && station === 'studio' && <TemplateStudio draft={draft} onDraft={setDraft} onNext={() => go('freeze')} />}
-              {lens === 'process' && station === 'freeze' && <FreezePanel draft={draft} onDraft={setDraft} onGo={go} />}
-              {lens === 'process' && station === 'dispatch' && <DispatchPanel onGo={go} />}
-              {lens === 'process' && station === 'audit' && <AuditQueue />}
+              {lens === 'process' && station === 'pipeline' && <TemplatePipeline step={pstep} onStep={v => set({ pstep: v })} onGo={go} canAudit={isAdmin} />}
               {lens === 'process' && station === 'census' && <CensusPanel />}
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
               {lens === 'route' && <RouteLens tab={rtab} onGoSpace={goSpace} onGo={go} />}
-              {lens === 'config' && <ConfigView cfg={cfg} onGo={go} />}
+              {lens === 'config' && <ConfigView cfg={cfg} onGo={go} section={csec} />}
               {lens === 'local' && <LensSpatial on onGo={() => {}} />}
             </Suspense>
           </main>
           {/* 「问 AI」侧栏：只在桌面客户端（Key 在主进程）；网页版不显示 */}
-          {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => go('ai')} /></Suspense>}
+          {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => set({ lens: 'config', csec: 'model' })} /></Suspense>}
         </div>
         {helpOpen && <WorkbenchHelp lens={lens} onClose={() => setHelpOpen(false)} />}
       </div>

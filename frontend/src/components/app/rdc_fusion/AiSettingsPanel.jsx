@@ -1,4 +1,4 @@
-/* 研发 · AI 助手（ai_assist.v1，设计见 design/ai_assistant_v1.md）：配置自己的模型（地址、模型名、API Key）与每日用量上限。
+/* 配置 · AI 助手（ai_assist.v1，设计见 design/ai_assistant_v1.md）：配置自己的模型（地址、模型名、API Key）与每日用量上限。
    配置与 Key 在桌面客户端主进程（Key 用系统加密保存，页面只看到「已设置 · 尾号」）；网页版只显示说明。 */
 import { useCallback, useEffect, useState } from 'react';
 import { aiBridge } from './aiContext.js';

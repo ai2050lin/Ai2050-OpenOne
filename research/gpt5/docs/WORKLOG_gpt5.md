@@ -62,3 +62,9 @@
 - P0 消费方归因 v1（Cammarata 对齐计划启动；F20 变主攻面）。Arm a 静态 OV 写入分析（1152 头 × 2 载荷子空间，零前向）：top 头 S_rel≈0.042 vs null p95 0.012（~9× 特异性），层 23–30 聚集，R_logic×K_entity top8 高度共享（(23,9)/(24,19)/(23,10)/(23,11)/(28,6)/(28,7)）。gA 锚逐值复现（45.845/73.528/69.823）。
 - Arm b 一次 bf16 前向（3157 面板 128 行，o_proj pre-hook 逐头投影）：动态 top-64 末段层占比 0.92/0.91，共享承载头 (34,15)/(35,0)/(29,27)/(35,22)——**载轴中继头地图第一版（K-B 报告制，强信号）**。K-A overlap 9/11（需双≥10）与 K-A2 spearman 0.137/0.179（需 ≥0.25）FAIL——动态绝对范数被头输出幅度混淆，份额归一化修正（D_norm=||proj||/||c||）预注册为 3281。
 - 诚实日志：SMOKE 拦截 main 调用缺失/K_readout tied-embeddings/einsum 下标/hook 签名/null 泄漏共 7 处装置笔误。freeze 8171ded4 / res ce0c400b / ledger #432 post 'a6bf3af5'（n=438）。下一 Phase 预注册：3281 份额归一化修正相。
+
+## Phase 3281 (G5-H44) g5h44_consumer_attribution_norm — 2026-10-31
+- 份额归一化修正相（#432 预注册；同判据）。Arm a 静态与 3280 逐位一致（top8 (24,19)/(23,10)/(23,9)/(23,11)…，gA 锚 45.845/73.528/69.823 复现）。
+- Arm b D_norm=mean_rows(||proj||/||c||)（静默行 <1e-6 剔除，预运行冻结）：**K-A overlap 15/15（需双 ≥10）、K-A2 spearman 0.340/0.362（需 ≥0.25）双过 → verdict consumer_attribution_norm_registered**。静态写入强度预测动态份额——3280 的 FAIL 闭环为度量混淆而非机制缺失。
+- Arm c（报告制）混淆定量：spearman(D_abs, mean||c||)=0.973/0.962 vs spearman(S_rel, mean||c||)=0.069/0.097；3280 旧口径复算 9/11 + 0.137/0.179 与 #432 逐字一致（连续性）。份额 top：R_logic ~0.13–0.15（(28,6)/(30,17)/(23,10)/(23,9)/(28,7)）；K_entity ~0.19–0.24（(35,5)/(29,27)/(30,17)/(23,9)/(35,22)）——静态中继头族动态确认；late_share 0.45/0.61。
+- freeze 7807b62c / res a8f1e066 / ledger #439 post '8299f955'（n=439）。下一 Phase 预注册：3282 路由侧 PR 积分筛选相（G5-DP01 P2 通用筛）。

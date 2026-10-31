@@ -3,7 +3,7 @@
      模块空间=三舱一塔三桥 3D AtlasModuleSpace / 模板空间=模板 3D AtlasTemplateSpace / 卡片=特征卡网格），
      四模共享同一选中态与 FeatureDetail 详情抽屉；registry 版本链 select 移入全景头；底部「专项视图」折叠区
    - v1.10 去重（用户确认执行）：退役 map/gallery/list 三模式；AtlasGallery/AtlasTree 组件已删（留档 git 历史），
-     AtlasPanorama 保留（总览 home 首屏仍引用）但不再进入图谱全景；
+     AtlasPanorama 亦于 2026-10-30 随 v5 驾驶舱清理一并删除；
      gallery3d 派生数据段保留不删
    - 跨线账本：GET /api/ai-rnd/atlas/ledger 分页时间线（append-only 只读；唯一 Phase 时间线，
      全景指标条两卡可点击直达）
@@ -116,7 +116,7 @@ export default function AtlasLens({ on, onGo, initialTab, initialSel }) {
   const normTab = t => ({ tree: 'overview', map: 'overview', features: 'overview', special: 'overview' }[t] || t || 'overview');
   const [tab, setTab] = useState(normTab(initialTab));        // overview | ledger | results | registry
   /* v1.10 去重（design/atlas_lens_dedup_audit_v1.md）：退役 map/gallery/list 三模式
-     （AtlasGallery/AtlasTree 已删，AtlasPanorama 保留供总览首屏）。
+     （AtlasGallery/AtlasTree 已删，AtlasPanorama 于 2026-10-30 删除）。
      v1.11（scheme design/atlas_module_space3d_scheme_v1.md，用户确认落地 module_space.v1）：
      全景默认 = 模块视图（2D 双栏查询工具）；新增「模块空间」模式（module_space.v1，三舱一塔三桥
      3D 关系发现工具，数据 = atlas_tree_v2.module_space 派生段）。「模板空间」保留（模板粒度），

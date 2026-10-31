@@ -24,7 +24,13 @@ from typing import Any, Dict, List, Optional
 import torch
 from fastapi import APIRouter
 
-import live_analysis_service as las
+try:
+    # 必须与 server.server 导入的是同一份模块；裸名导入会造出第二份 _state，
+    # 导致这里以为模型未加载而再加载一份权重（显存翻倍）。
+    from server import live_analysis_service as las
+    from tools.provenance import provenance as _prov
+except ImportError:
+    import live_analysis_service as las
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'data' / 'lang_bench'
@@ -112,6 +118,9 @@ def _run_work() -> None:
         model, tok = las._state['model'], las._state['tokenizer']
         device = las._state['device']
         letter_ids = _letter_token_ids(tok)
+        src_counter: Dict[str, int] = {}
+        for q in questions:
+            src_counter[q['source'].split()[0]] = src_counter.get(q['source'].split()[0], 0) + 1
 
         with _LOCK:
             _run_state.update(state='running', done=0, total=len(questions), started_at=time.perf_counter(),
@@ -148,13 +157,15 @@ def _run_work() -> None:
                 'schema': 'lang_bench_result.v1',
                 'model_name': Path(las._state['dir']).name if las._state['dir'] else '',
                 'device': las._state['device'],
-                'dataset': 'C-Eval val（ceval/ceval-exam，HuggingFace 公开数据集）',
+                'dataset': ' + '.join(f'{k} {v}' for k, v in sorted(src_counter.items())) or 'unknown',
                 'n_questions': n_total, 'correct': n_ok,
                 'acc': round(n_ok / n_total, 4) if n_total else 0.0,
                 'elapsed_s': _run_state['elapsed_s'],
                 'finished_at': time.strftime('%Y-%m-%d %H:%M:%S'),
                 'by_category': by_cat, 'by_subject': by_sub,
                 'per_question': per_question,
+                'provenance': _prov(model_path=las._state['dir'] or None, seed=None,
+                                    tool='server/lang_bench_service.py'),
             }
             RESULTS_PATH.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding='utf-8')
             _run_state.update(state='done', current_subject='')

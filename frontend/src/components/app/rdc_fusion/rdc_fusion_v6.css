@@ -674,3 +674,25 @@ a.fw-tbtn{text-decoration:none}
   .v6-auth{padding:14px 16px}
   .v6-auth-card{padding:18px 22px 16px}
 }
+
+/* ---------- 模板流水线：建模板 → 冻结 → 分发 → 审计（原四工位合并） ---------- */
+.v6-pipe{display:flex;flex-direction:column;gap:2px;min-width:0}
+.v6-pipe-rail{background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:9px 12px 8px}
+.v6-pipe-rail ol{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto}
+.v6-pipe-step{flex:1 1 0;min-width:134px}
+.v6-pipe-step button{display:grid;grid-template-columns:20px minmax(0,1fr);grid-template-rows:auto auto;gap:0 8px;width:100%;text-align:left;
+  border:1px solid transparent;border-radius:8px;padding:6px 9px;background:var(--fw-bg-sub);cursor:pointer;color:var(--fw-text-2);transition:background .12s,border-color .12s}
+.v6-pipe-step b{grid-row:1/3;align-self:center;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;
+  background:#fff;border:1px solid var(--fw-border-strong);color:var(--fw-text-3)}
+.v6-pipe-step span{font-size:12px;font-weight:600;color:var(--fw-text);line-height:1.3}
+.v6-pipe-step small{font-size:10.5px;color:var(--fw-text-3);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v6-pipe-step button:hover{background:#f8fafc;border-color:var(--fw-border-strong)}
+.v6-pipe-step.on button{background:#eff6ff;border-color:#bfdbfe}
+.v6-pipe-step.on b{background:var(--fw-blue);border-color:var(--fw-blue);color:#fff}
+.v6-pipe-step.on span{color:var(--fw-blue)}
+.v6-pipe-note{font-size:10.5px;color:var(--fw-text-3);line-height:1.5;margin:7px 0 0}
+.v6-pipe-body{min-width:0}
+@media (max-width:900px){
+  .v6-pipe-step{min-width:112px}
+  .v6-pipe-step small{display:none}
+}

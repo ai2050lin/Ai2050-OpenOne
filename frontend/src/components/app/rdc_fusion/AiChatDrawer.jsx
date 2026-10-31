@@ -90,7 +90,7 @@ export default function AiChatDrawer({ onSettings }) {
           {cfgErr && <div className="ai-err block">{cfgErr}</div>}
           {cfg && !cfg.profiles.length && (
             <div className="ai-empty">还没有配置 AI 模型。
-              <button type="button" className="fw-tbtn primary" onClick={onSettings}>去「研发 → AI 助手」配置</button>
+              <button type="button" className="fw-tbtn primary" onClick={onSettings}>去「配置 → 模型与 AI 助手」配置</button>
             </div>
           )}
 

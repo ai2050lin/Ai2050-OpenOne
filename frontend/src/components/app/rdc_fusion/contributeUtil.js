@@ -1,4 +1,4 @@
-/* 研发 · 贡献算力：本机节点服务的桥接（非组件）。
+/* 配置 · 贡献算力：本机节点服务的桥接（非组件）。
    桌面客户端的 preload 暴露 window.ai2050Desktop.node，主进程只转发白名单内的本机接口，本机令牌不进页面；
    浏览器里的网页没有这个桥，也就不能操控节点（只显示下载入口）。 */
 import { useCallback, useEffect, useRef, useState } from 'react';

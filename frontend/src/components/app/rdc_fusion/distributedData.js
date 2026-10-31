@@ -117,7 +117,7 @@ export const NEWS = [
 /* 机制可解释性领域 · 阶段时间轴（行业进展 tab 顶部）
    五个阶段：years / title / goal（该阶段的目标）/ outcome（关键成果）/ papers（代表性论文）
    论文链接均为真实官方源（distill.pub / transformer-circuits.pub / arXiv / deepmind.google / neuronpedia.org）；
-   最右「最新节点」不在此登记——由 GET /api/news 实时流填充（LensProgress.jsx EraTimeline） */
+   最右「最新节点」不在此登记——由 GET /api/news 实时流填充（原 LensProgress.jsx 的 EraTimeline，该组件已于 2026-10-30 删除） */
 export const MI_ERAS = [
   {
     id: 'era1', years: '2014–2019', title: '打开黑箱', cat: 'interp',

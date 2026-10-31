@@ -1,4 +1,4 @@
-/* 研发 · ③ 分发与节点：生成式模板的分片覆盖 + 节点命令 + 节点与租约（/api/distributed/summary、/api/tasks，只显示实时数据）。 */
+/* 研发 · 模板流水线 ③ 分发：生成式模板的分片覆盖 + 节点命令 + 节点与租约（/api/distributed/summary、/api/tasks，只显示实时数据）。 */
 import { useState } from 'react';
 import { fmtAgoTs, useApi } from './api.js';
 import { Card, Empty, RefreshButton, StatusPill } from './ui.jsx';

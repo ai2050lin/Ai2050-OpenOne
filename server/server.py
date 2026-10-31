@@ -53,8 +53,13 @@ from server.current_research_progress import build_current_research_progress
 from server.global_workspace_service import global_workspace_controller
 from server.live_analysis_service import router as live_analysis_router
 from server.lang_bench_service import router as lang_bench_router
+from server.lang_atlas_service import router as lang_atlas_router
 from server.neuron_circuit_service import router as neuron_circuit_router
 from server.neuron_bowtie_service import router as neuron_bowtie_router
+from server.mech_service import router as mech_router
+from server.mech_pair_service import router as mech_pair_router
+from server.mech_ablate_service import router as mech_ablate_router
+from server.rule_ledger_service import router as rule_ledger_router
 from server.rag_fiber_service import rag_fiber_manager
 from server.ricci_flow_service import ricci_flow_service
 from server.runtime.run_service import RunService
@@ -261,8 +266,13 @@ app.include_router(ai_rnd_router)
 app.include_router(object_card_router)
 app.include_router(live_analysis_router)
 app.include_router(lang_bench_router)
+app.include_router(lang_atlas_router)
 app.include_router(neuron_circuit_router)
 app.include_router(neuron_bowtie_router)
+app.include_router(mech_router)
+app.include_router(mech_pair_router)
+app.include_router(mech_ablate_router)
+app.include_router(rule_ledger_router)
 app.include_router(neuron_census_router)
 if distributed_router is not None:
     app.include_router(distributed_router)

@@ -1,0 +1,44 @@
+{
+ "schema": "result.v1",
+ "name": "power_plan_v1",
+ "provenance": {
+  "git_sha": "55731f141df380816a3a5ea5cc62308b466adca3",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261031,
+  "tool": "tools/power_analysis.py",
+  "created_at": "2026-10-31T01:49:30"
+ },
+ "payload": {
+  "plan_table": [
+   {
+    "delta_pt": 2.0,
+    "p_d": 0.1,
+    "n_required": 1963,
+    "power_at_n1000": 0.516
+   },
+   {
+    "delta_pt": 3.0,
+    "p_d": 0.1,
+    "n_required": 873,
+    "power_at_n1000": 0.851
+   },
+   {
+    "delta_pt": 5.0,
+    "p_d": 0.1,
+    "n_required": 314,
+    "power_at_n1000": 0.999
+   }
+  ],
+  "phase_check": {
+   "expected_delta_pt": 3.0,
+   "n": 1000,
+   "p_d": 0.1,
+   "n_required": 873,
+   "achieved_power": 0.851,
+   "pass": true
+  }
+ },
+ "sha8": "a5c8a5ae"
+}

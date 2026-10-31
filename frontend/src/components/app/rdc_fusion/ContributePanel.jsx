@@ -1,4 +1,4 @@
-/* 研发 · 贡献算力（贡献算力客户端 P2，设计见 design/contributor_client_v1.md）：
+/* 配置 · 贡献算力（贡献算力客户端 P2，设计见 design/contributor_client_v1.md）：
    桌面客户端里控制本机节点服务——节点服务 → 计算组件（P3）→ 设备 → 绑定账号 → 模型（下载与核对，P3）→ 资源限制 → 运行 → 日志与我的记录。
    界面只和本机节点服务通信（经 Electron 主进程转发）；只有节点服务访问中心（注册 / 领取 / 续租 / 上传 / 站点配置）。
    唯一的例外是「绑定到我的账号」：向中心 /api/auth/node-code 取一次性绑定码，只在点击时。
@@ -26,7 +26,7 @@ function WebOnly() {
   };
   return (
     <Card title="贡献算力" sub="用你的 NVIDIA 显卡运行中心冻结的测试任务，只上传统计结果">
-      <p className="ct-lead">浏览器里的网页不能调用显卡运行模型，也不能控制本机节点。请用桌面客户端（研发 → 贡献算力），或下载命令行一键包：</p>
+      <p className="ct-lead">浏览器里的网页不能调用显卡运行模型，也不能控制本机节点。请用桌面客户端（配置 → 账号与本机节点），或下载命令行一键包：</p>
       <div className="v6-toolbar">
         <button type="button" className="fw-tbtn" onClick={get}>下载命令行一键包{loggedIn ? '（内嵌绑定码）' : '（匿名）'}</button>
         {msg && <span className="v6-note">{msg}</span>}

@@ -1,4 +1,4 @@
-/* 研发 · ① 模板工作室：生成式模板（template_grammar.v1）= 句式框架 × 填充词表 × 因子水平。
+/* 研发 · 模板流水线 ① 建模板：生成式模板（template_grammar.v1）= 句式框架 × 填充词表 × 因子水平。
    左：内置模板族库（shared/dist_protocol/grammars）；中：结构视图 + JSON 编辑；右：生成预览
    （逐格 × 划分计数、功效近似、样例、告警）。预览只计算，不写盘；冻结在「② 试跑与冻结」。 */
 import { useMemo, useState } from 'react';

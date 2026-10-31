@@ -1,0 +1,149 @@
+{
+ "schema": "transcoder.v1",
+ "criteria": {
+  "schema": "transcoder.v1",
+  "atom_compare": "feature wins iff fvu_feature < fvu_neuron and loss_recovered_feature > loss_recovered_neuron at the same k",
+  "dead_after_tokens": 1000000,
+  "concentration_top": 100
+ },
+ "collect": "D:\\ai2050_native\\_transcoder\\6be1034f0b55a6df-bf16\\2ca5f0a756d36c8a-L30",
+ "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+ "layer": 30,
+ "n_eval_tokens_recon": 132928,
+ "n_eval_tokens_ce": 63360,
+ "eval_windows": 128,
+ "ce_clean": 2.7274700684980915,
+ "ce_zero": 2.8099808240177655,
+ "ce_mean": 2.8036022456005365,
+ "conditions": {
+  "tc-m16384-k64-s0": {
+   "fvu": 0.40502654839114527,
+   "ce": 2.7598001248908766,
+   "kl": 0.054551914123573686,
+   "loss_recovered_vs_zero": 0.6081716112140527,
+   "loss_recovered_vs_mean": 0.5753430727551494
+  },
+  "neuron_k16": {
+   "fvu": 0.7626734763083503,
+   "ce": 2.7637889264809963,
+   "kl": 0.059305580878498576,
+   "loss_recovered_vs_zero": 0.5598288034795069,
+   "loss_recovered_vs_mean": 0.5229499619584844
+  },
+  "neuron_k32": {
+   "fvu": 0.6426313793455475,
+   "ce": 2.7551956234556254,
+   "kl": 0.04844754874104201,
+   "loss_recovered_vs_zero": 0.6639764745467275,
+   "loss_recovered_vs_mean": 0.635823432183926
+  },
+  "neuron_k64": {
+   "fvu": 0.5225129350802575,
+   "ce": 2.74743015597565,
+   "kl": 0.03844023286694228,
+   "loss_recovered_vs_zero": 0.7580910833764041,
+   "loss_recovered_vs_mean": 0.7378232406161191
+  },
+  "neuron_k128": {
+   "fvu": 0.41037275061110523,
+   "ce": 2.740875409829496,
+   "kl": 0.028592483187564695,
+   "loss_recovered_vs_zero": 0.8375321950820316,
+   "loss_recovered_vs_mean": 0.8239201630426767
+  },
+  "neuron_k256": {
+   "fvu": 0.30869204598818656,
+   "ce": 2.7362982875168926,
+   "kl": 0.02036571909833436,
+   "loss_recovered_vs_zero": 0.8930052335213906,
+   "loss_recovered_vs_mean": 0.8840408963095627
+  },
+  "neuron_k512": {
+   "fvu": 0.2143663826644879,
+   "ce": 2.734836628461125,
+   "kl": 0.014192210860324628,
+   "loss_recovered_vs_zero": 0.9107200035118211,
+   "loss_recovered_vs_mean": 0.9032398619952653
+  },
+  "neuron_k1024": {
+   "fvu": 0.13117588261219862,
+   "ce": 2.732767850702459,
+   "kl": 0.009014727901479211,
+   "loss_recovered_vs_zero": 0.93579282881364,
+   "loss_recovered_vs_mean": 0.9304133625754745
+  },
+  "neuron_k2048": {
+   "fvu": 0.062317543071588766,
+   "ce": 2.7286006330239654,
+   "kl": 0.004591072898245219,
+   "loss_recovered_vs_zero": 0.9862979738974232,
+   "loss_recovered_vs_mean": 0.9851499777242336
+  }
+ },
+ "atom_compare": {
+  "tc-m16384-k64-s0": {
+   "k": 64,
+   "feature_wins": false,
+   "fvu": [
+    0.40502654839114527,
+    0.5225129350802575
+   ],
+   "loss_recovered_vs_zero": [
+    0.6081716112140527,
+    0.7580910833764041
+   ],
+   "neurons_needed_for_same_fvu": 256
+  }
+ },
+ "monosemanticity_proxy": {
+  "tc-m16384-k64-s0": {
+   "units_with_100_acts": 9327,
+   "concentration_median": 0.09999999403953552,
+   "concentration_ge_0.5": 0.04020585397233837,
+   "concentration_ge_0.9": 0.008577248847432186,
+   "dead_in_eval": 0.01910400390625,
+   "freq_median": 0.001060724607668817
+  },
+  "neurons": {
+   "units_with_100_acts": 9728,
+   "concentration_median": 0.07999999821186066,
+   "concentration_ge_0.5": 0.009251644736842105,
+   "concentration_ge_0.9": 0.0005139802631578947,
+   "positive_freq_median": 0.5010156035423279
+  }
+ },
+ "transcoders": {
+  "tc-m16384-k64-s0": {
+   "schema": "transcoder.v1",
+   "criteria": {
+    "schema": "transcoder.v1",
+    "atom_compare": "feature wins iff fvu_feature < fvu_neuron and loss_recovered_feature > loss_recovered_neuron at the same k",
+    "dead_after_tokens": 1000000,
+    "concentration_top": 100
+   },
+   "collect": {
+    "x_train.npy": "62d2b9831c386673e2dd970b3889ff5c41d89d964b60676a18ea24ac12f859ad",
+    "tok_train.npy": "85a8c82d4d87343aeadeadd15df6b429594363fd2ecf5802ac0a8be255f0e2b9",
+    "x_eval.npy": "91d3a77f063d12b01ea0395ea68adfa235a619f340d2baf9fc3194a295fe0acd",
+    "tok_eval.npy": "565d9827a311cc34b7c28b0da95dc9cb6d4de5882e084d992594e4a00fcffd53",
+    "eval_windows.npy": "6dc7a7f288a6060508091262c8b58bfbdf9759d8fe5f56730767aeeb9b9b6690"
+   },
+   "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+   "layer": 30,
+   "m": 16384,
+   "k": 64,
+   "steps": 6000,
+   "batch": 4096,
+   "lr": 0.0004,
+   "seed": 0,
+   "tokens_seen": 24576000,
+   "train_tokens": 2001856,
+   "epochs": 12.28,
+   "curve": null,
+   "seconds": 1612.4,
+   "torch": "2.13.0+cu130"
+  }
+ },
+ "seconds": 154.9,
+ "torch": "2.13.0+cu130"
+}

@@ -12,6 +12,7 @@ import { API_BASE, postJson, useApi } from '../app/rdc_fusion/api.js';
 import { Card, Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/workbench.css';
 import { LevelChip } from './LangPage.jsx';
+import RuleLedgerPage from './RuleLedgerPage.jsx';
 import { LEVELS, GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, defaultModel, itemLevel, levelMeta, shortModel } from './v8Util.js';
 import './v8.css';
 
@@ -414,6 +415,11 @@ export default function RouteLens({ tab = 'neuron', onGoSpace, onGo }) {
           </Card>
           <RouteBoard onGo={onGo} />
         </>
+      )}
+      {tab === 'rules' && (
+        <Card title="规则账本" sub={`${shortModel(model)} · 已测过的规则与结论：先查重，再决定要不要做新一轮实验`}>
+          <RuleLedgerPage />
+        </Card>
       )}
     </div>
   );

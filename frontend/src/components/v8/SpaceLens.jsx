@@ -12,6 +12,7 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import LangPage from './LangPage.jsx';
+import LangAtlas from './LangAtlas.jsx';
 import LivePane from './LivePane.jsx';
 import NeuronPane from './NeuronPane.jsx';
 import Tower from './Tower.jsx';
@@ -221,8 +222,19 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
         <Suspense fallback={<Empty>加载中…</Empty>}>
           {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} circuit={circuit} circuitNote={circuitNote} circuitLoading={st.unit != null ? circuitApi.loading : null} onRetryCircuit={circuitApi.reload} />
             : <Empty>{census ? (tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…') : `${shortModel(model)} 还没有自然语料普查，没有逐单元数据；左侧只画层结构。`}</Empty>)}
-          {view === 'lang' && tree && <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
-                                                layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />}
+          {view === 'lang' && tree && (
+            <div className="v8-langhost">
+              {/* 入口顺序：先实测（数据集 → 三类型 → 普遍规律），再看单项的模式卡 */}
+              <div className="v8-langtabs">
+                <button type="button" className={st.ltab === 'items' ? '' : 'on'} onClick={() => patchSt({ ltab: 'atlas' })}>数据集实测</button>
+                <button type="button" className={st.ltab === 'items' ? 'on' : ''} onClick={() => patchSt({ ltab: 'items' })}>模式目录（A–F）</button>
+              </div>
+              {st.ltab === 'items'
+                ? <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
+                            layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />
+                : <LangAtlas />}
+            </div>
+          )}
           {view === 'live' && <LivePane census={census} skeleton={skeleton} tower={tower}
                                         trace={liveTrace} setTrace={setLiveTrace} step={liveStep} setStep={setLiveStep} />}
           {view === 'response' && (
