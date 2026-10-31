@@ -2,7 +2,6 @@
 """打包开放平台中心的部署包：release/ai2050-center-<版本>.tar.gz（含已构建的客户端与公开研究数据）。
 
 包含：中心服务与节点程序（deploy/）、协议代码（shared/dist_protocol/）、神经元单元卡端点（server/neuron_census_service.py）、
-机制报告与数据集进度端点（server/mechanism_service.py、server/dataset_progress_service.py；数据 research/mechanism|calibration|transcoder/）、
 客户端构建（frontend/dist/，需先 vite build）、公开研究数据（research/interventions/、research/neurons/：预注册、干预与解释检验结果）、
 许可证与说明。不包含：研究记录（research/claude/docs 等）、模型权重、普查语料与原生全场（体积大，按 README_DEPLOY.md 单独上传）。
 
@@ -30,11 +29,10 @@ INCLUDE = [
     'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/reset_password.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
     'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
-    'server/__init__.py', 'server/neuron_census_service.py', 'server/mechanism_service.py', 'server/dataset_progress_service.py',
+    'server/__init__.py', 'server/neuron_census_service.py',
     'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py', 'scripts/build_circuit_pack.py',
 ]
-INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'research/mechanism', 'research/calibration',
-                'research/transcoder', 'frontend/dist']
+INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'frontend/dist']
 EXCLUDE_PARTS = {'__pycache__', '.pytest_cache'}
 
 
