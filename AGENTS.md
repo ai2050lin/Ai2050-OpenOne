@@ -201,6 +201,8 @@ HiddenState 有统一的数组形式，适合系统观察；这不自动意味�
 
 21. **字典原子与方法校准（transcoder.v1 / calib_ioi.v1）**：引擎 A 的 TopK transcoder 在 `shared/dist_protocol/transcoder.py`（判据 `CRITERIA` 固定并随结果返回：同一 k、同一批留出 token 上 FVU 更低且模型内损失恢复更高，才算特征原子胜过神经元原子；神经元基线为逐 token 保留贡献最大的 k 个中间单元）。采集 / 训练 / 评估脚本为 `scripts/transcoder_collect.py`、`transcoder_train.py`、`transcoder_eval.py`，训练材料只存节点本地 `<AI2050_NATIVE_DIR>/_transcoder/`。新方法先在答案已知的参考模型上校准（`scripts/calib_ioi_gpt2.py`，GPT-2 IOI）；干预结果须同时报告直接作用（DLA 或直接写出路径）与总效应，因为单组件修补会被下游补偿误导（Phase 262）。改动后运行 `tests/dist_protocol/test_transcoder.py`，保留植入找回与负对照。
 
+22. **注意力的模式路由与优先级（conflict_set.v1 / conflict_case.v2 / calib_qk.v1）**：方案见 `design/attention_neuron_plan_v1.md`。「注意力实现全部模式」是假设，按模式分解输出贡献（注意力头 / MLP / 嵌入）逐模式记录；优先级 = 两种模式冲突时的胜者与决出层，层级 = 干预测得的上下游（只消融上游组，看下游组直接作用的变化）。冲突材料放 `shared/dist_protocol/conflict/`（每条带无上下文行为门、按主语哈希切分、cue 维度与否定对照），分析脚本 `scripts/conflict_case.py`，结果 `research/mechanism/`。注意力头的结论同时报告直接作用（DLA，须与实际 logit 差闭合）、逐头总效应与路径修补，头组只在 discovery 上选、heldout 上对照随机同数量头检验；以平均差为分母的比例判据在基线符号不定时失效，改用原始差值 Δ。QK 路径修补先在 GPT-2 已知组合上校准（`scripts/calib_qk_gpt2.py`，Phase 263）。
+
 ## 7. 自回归、采集与数值控制
 
 按生成步连接：当前 token 前缀、位置及历史状态、跨层响应、输出读出，以及追加新 token 后的下一步计算。

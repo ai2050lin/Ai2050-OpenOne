@@ -1,0 +1,249 @@
+{
+ "schema": "conflict_set.v1",
+ "set_id": "CF-v1",
+ "version": 1,
+ "description": "上下文与记忆冲突：句中先给出与事实相反的陈述，再让模型补全同一事实。上下文答案与记忆答案的对数概率差衡量谁赢。",
+ "relation": "capital",
+ "query": "{S}的首都是",
+ "statement": "{S}的首都是{O}。",
+ "negated_statement": "{S}的首都不是{O}。",
+ "cues": {
+  "plain": "{STMT}{QUERY}",
+  "hearsay": "有人说，{STMT}{QUERY}",
+  "assert": "事实上，{STMT}{QUERY}",
+  "fiction": "在这个虚构的故事里，{STMT}{QUERY}",
+  "repeat2": "{STMT}{STMT}{QUERY}",
+  "negated": "{NEG}{QUERY}"
+ },
+ "cue_notes": {
+  "negated": "对照：上下文出现了反事实答案词，但语义是否定；上下文答案胜出说明在复制词而不是理解。"
+ },
+ "counterfactual_rule": "每个国家的反事实首都 = 列表中后移 k 位国家的首都（k 从 7 起，直到首 token 与真实答案不同）",
+ "split_rule": "sha256(set_id + country) 的首字节 < 154 → discovery（约 60%），否则 heldout",
+ "facts": [
+  {
+   "subject": "法国",
+   "answer": "巴黎"
+  },
+  {
+   "subject": "德国",
+   "answer": "柏林"
+  },
+  {
+   "subject": "意大利",
+   "answer": "罗马"
+  },
+  {
+   "subject": "西班牙",
+   "answer": "马德里"
+  },
+  {
+   "subject": "英国",
+   "answer": "伦敦"
+  },
+  {
+   "subject": "日本",
+   "answer": "东京"
+  },
+  {
+   "subject": "韩国",
+   "answer": "首尔"
+  },
+  {
+   "subject": "俄罗斯",
+   "answer": "莫斯科"
+  },
+  {
+   "subject": "埃及",
+   "answer": "开罗"
+  },
+  {
+   "subject": "印度",
+   "answer": "新德里"
+  },
+  {
+   "subject": "泰国",
+   "answer": "曼谷"
+  },
+  {
+   "subject": "越南",
+   "answer": "河内"
+  },
+  {
+   "subject": "希腊",
+   "answer": "雅典"
+  },
+  {
+   "subject": "葡萄牙",
+   "answer": "里斯本"
+  },
+  {
+   "subject": "荷兰",
+   "answer": "阿姆斯特丹"
+  },
+  {
+   "subject": "比利时",
+   "answer": "布鲁塞尔"
+  },
+  {
+   "subject": "奥地利",
+   "answer": "维也纳"
+  },
+  {
+   "subject": "瑞典",
+   "answer": "斯德哥尔摩"
+  },
+  {
+   "subject": "挪威",
+   "answer": "奥斯陆"
+  },
+  {
+   "subject": "芬兰",
+   "answer": "赫尔辛基"
+  },
+  {
+   "subject": "丹麦",
+   "answer": "哥本哈根"
+  },
+  {
+   "subject": "波兰",
+   "answer": "华沙"
+  },
+  {
+   "subject": "匈牙利",
+   "answer": "布达佩斯"
+  },
+  {
+   "subject": "捷克",
+   "answer": "布拉格"
+  },
+  {
+   "subject": "爱尔兰",
+   "answer": "都柏林"
+  },
+  {
+   "subject": "土耳其",
+   "answer": "安卡拉"
+  },
+  {
+   "subject": "伊朗",
+   "answer": "德黑兰"
+  },
+  {
+   "subject": "伊拉克",
+   "answer": "巴格达"
+  },
+  {
+   "subject": "肯尼亚",
+   "answer": "内罗毕"
+  },
+  {
+   "subject": "阿根廷",
+   "answer": "布宜诺斯艾利斯"
+  },
+  {
+   "subject": "秘鲁",
+   "answer": "利马"
+  },
+  {
+   "subject": "古巴",
+   "answer": "哈瓦那"
+  },
+  {
+   "subject": "加拿大",
+   "answer": "渥太华"
+  },
+  {
+   "subject": "澳大利亚",
+   "answer": "堪培拉"
+  },
+  {
+   "subject": "新西兰",
+   "answer": "惠灵顿"
+  },
+  {
+   "subject": "菲律宾",
+   "answer": "马尼拉"
+  },
+  {
+   "subject": "印度尼西亚",
+   "answer": "雅加达"
+  },
+  {
+   "subject": "马来西亚",
+   "answer": "吉隆坡"
+  },
+  {
+   "subject": "蒙古",
+   "answer": "乌兰巴托"
+  },
+  {
+   "subject": "朝鲜",
+   "answer": "平壤"
+  },
+  {
+   "subject": "巴基斯坦",
+   "answer": "伊斯兰堡"
+  },
+  {
+   "subject": "沙特阿拉伯",
+   "answer": "利雅得"
+  },
+  {
+   "subject": "乌克兰",
+   "answer": "基辅"
+  },
+  {
+   "subject": "罗马尼亚",
+   "answer": "布加勒斯特"
+  },
+  {
+   "subject": "保加利亚",
+   "answer": "索非亚"
+  },
+  {
+   "subject": "塞尔维亚",
+   "answer": "贝尔格莱德"
+  },
+  {
+   "subject": "瑞士",
+   "answer": "伯尔尼"
+  },
+  {
+   "subject": "埃塞俄比亚",
+   "answer": "亚的斯亚贝巴"
+  },
+  {
+   "subject": "尼日利亚",
+   "answer": "阿布贾"
+  },
+  {
+   "subject": "摩洛哥",
+   "answer": "拉巴特"
+  },
+  {
+   "subject": "哥伦比亚",
+   "answer": "波哥大"
+  },
+  {
+   "subject": "委内瑞拉",
+   "answer": "加拉加斯"
+  },
+  {
+   "subject": "中国",
+   "answer": "北京"
+  },
+  {
+   "subject": "智利",
+   "answer": "圣地亚哥"
+  },
+  {
+   "subject": "叙利亚",
+   "answer": "大马士革"
+  },
+  {
+   "subject": "黎巴嫩",
+   "answer": "贝鲁特"
+  }
+ ]
+}
