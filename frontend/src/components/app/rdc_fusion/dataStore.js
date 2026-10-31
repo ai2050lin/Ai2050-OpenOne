@@ -52,6 +52,10 @@ export function packHint(path) {
     const mk = new URLSearchParams(q).get('model_key');
     return mk ? `cards:${mk}` : null;
   }
+  if (p === '/api/neurons/circuit') {
+    const mk = new URLSearchParams(q).get('model_key');
+    return mk ? `circuit:${mk}` : null;
+  }
   return null;
 }
 

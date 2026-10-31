@@ -294,8 +294,13 @@ def card_entries(model_key: str, log=print) -> Tuple[Dict[str, Any], List[str]]:
     return entries, notes
 
 
+def circuit_source(data_dir: Path, model_key: str) -> Path:
+    """跨层电路预计算源文件（研发机 scripts/build_circuit_pack.py 生成后上传到 <data_dir>/circuit_sources/）。"""
+    return Path(data_dir) / 'circuit_sources' / (re.sub(r'[^A-Za-z0-9._-]', '_', model_key) + '.circuit.v1.json.gz')
+
+
 def extras_plan() -> List[Dict[str, Any]]:
-    """附加包清单：每个 v3 模式族一个，每个有普查结果的模型一个单元卡包。"""
+    """附加包清单：每个 v3 模式族一个，每个有普查结果的模型一个单元卡包与一个跨层电路包。"""
     import distributed_service as D
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
@@ -304,8 +309,11 @@ def extras_plan() -> List[Dict[str, Any]]:
         if P.is_v3(corpus):
             out.append({'id': f"tm:{t['tm_id']}", 'kind': 'template', 'tm_id': t['tm_id'],
                         'label': f"实验响应 · {t['tm_id']}"})
-    for mk in sorted({r['model_key'] for r in NS.index().get('census', [])}):
+    mks = sorted({r['model_key'] for r in NS.index().get('census', [])})
+    for mk in mks:
         out.append({'id': f'cards:{mk}', 'kind': 'cards', 'model_key': mk, 'label': f'单元卡 · {mk[:8]}'})
+    for mk in mks:
+        out.append({'id': f'circuit:{mk}', 'kind': 'circuit', 'model_key': mk, 'label': f'跨层电路 · {mk[:8]}'})
     return out
 
 
@@ -321,8 +329,19 @@ def build_extras(data_dir: Path, cards_version: str, force: bool = False, log=pr
         extras.pop(gone, None)
     built = []
     for e in plan:
+        src_circuit = None
         try:
-            version = cards_version if e['kind'] == 'cards' else template_version(e['tm_id'])
+            if e['kind'] == 'cards':
+                version = cards_version
+            elif e['kind'] == 'circuit':
+                # 电路在研发机预计算（服务器没有权重）：源文件存在才打包，版本 = 源哈希 + 研究版本
+                src_circuit = circuit_source(data_dir, e['model_key'])
+                if not src_circuit.is_file():
+                    log(f"[datapack] {e['id']} 无源文件（build_circuit_pack.py 产出后上传 circuit_sources/），跳过")
+                    continue
+                version = hashlib.sha256(src_circuit.read_bytes()).hexdigest()[:8] + '-' + cards_version[:8]
+            else:
+                version = template_version(e['tm_id'])
         except Exception as exc:
             log(f"[datapack] {e['id']} 版本计算失败：{type(exc).__name__}: {exc}")
             continue
@@ -337,6 +356,10 @@ def build_extras(data_dir: Path, cards_version: str, force: bool = False, log=pr
         try:
             if e['kind'] == 'template':
                 entries, notes = template_entries(e['tm_id'])
+            elif e['kind'] == 'circuit':
+                with gzip.open(src_circuit, 'rt', encoding='utf-8') as fh:
+                    entries = json.load(fh).get('entries', {})
+                notes = [f'预计算源 {src_circuit.name}（研发机模型权重， scripts/build_circuit_pack.py）']
             else:
                 entries, notes = card_entries(e['model_key'], log=log)
         except Exception as exc:
@@ -371,4 +394,7 @@ def pack_hint(path: str) -> Optional[str]:
     if p.path in ('/api/neurons/unit', '/api/neurons/layer'):
         mk = dict(parse_qsl(p.query)).get('model_key')
         return f'cards:{mk}' if mk else None
+    if p.path == '/api/neurons/circuit':
+        mk = dict(parse_qsl(p.query)).get('model_key')
+        return f'circuit:{mk}' if mk else None
     return None

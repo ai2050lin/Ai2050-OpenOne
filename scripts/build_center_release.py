@@ -30,7 +30,7 @@ INCLUDE = [
     'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
     'server/__init__.py', 'server/neuron_census_service.py',
-    'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py',
+    'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py', 'scripts/build_circuit_pack.py',
 ]
 INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'frontend/dist']
 EXCLUDE_PARTS = {'__pycache__', '.pytest_cache'}
