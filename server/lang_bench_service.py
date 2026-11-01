@@ -43,7 +43,8 @@ def _questions_path() -> Path:
     """运行时动态选择题库：大题库下载完成后无需重启即生效。"""
     return QUESTIONS_PATH_V2 if QUESTIONS_PATH_V2.exists() else QUESTIONS_PATH_V1
 META_PATH = DATA / 'meta.json'
-RESULTS_PATH = DATA / 'results.json'
+RESULTS_PATH = DATA / 'results.json'                # 摘要（无逐题明细）：git 跟踪、进发布包、供离线数据包
+PERQ_PATH = DATA / 'results_per_question.json'      # 逐题明细（41k 行，~7MB）：仅本机留存，gitignore
 
 router = APIRouter(prefix='/api/lang/bench', tags=['lang-bench'])
 
@@ -163,11 +164,14 @@ def _run_work() -> None:
                 'elapsed_s': _run_state['elapsed_s'],
                 'finished_at': time.strftime('%Y-%m-%d %H:%M:%S'),
                 'by_category': by_cat, 'by_subject': by_sub,
-                'per_question': per_question,
                 'provenance': _prov(model_path=las._state['dir'] or None, seed=None,
                                     tool='server/lang_bench_service.py'),
             }
-            RESULTS_PATH.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding='utf-8')
+            summary = {k: v for k, v in result.items() if k != 'per_question'}
+            RESULTS_PATH.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding='utf-8')
+            PERQ_PATH.write_text(json.dumps({'schema': 'lang_bench_per_question.v1',
+                                             'n_questions': n_total, 'items': per_question},
+                                            ensure_ascii=False), encoding='utf-8')
             _run_state.update(state='done', current_subject='')
     except Exception as exc:
         with _LOCK:

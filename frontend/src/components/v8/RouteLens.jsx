@@ -237,9 +237,13 @@ function LangBench({ catColor }) {
     <div className="v8-bench">
       <div className="v8-bench-head">
         <h4 className="v8-h4" style={{ margin: 0 }}>图谱测试题 <small>{srcLabel} · {nQ.toLocaleString()} 道选择题 · {data.meta?.by_category ? `${benchCats.map(c => `${c} ${(data.meta.by_category[c] || 0).toLocaleString()}`).join(' / ')}` : ''}</small></h4>
-        <button type="button" className="v8-bench-btn" disabled={busy || active} onClick={run}>
-          {active ? `实测中 ${st.done}/${st.total}` : result ? '重新实测' : '▶ 运行实测'}
-        </button>
+        {data.model_status !== 'unavailable' ? (
+          <button type="button" className="v8-bench-btn" disabled={busy || active} onClick={run}>
+            {active ? `实测中 ${st.done}/${st.total}` : result ? '重新实测' : '▶ 运行实测'}
+          </button>
+        ) : (
+          <span className="v8-note">实测需本机模型与 GPU：连接研发机中心后可用</span>
+        )}
       </div>
       {active && (
         <div className="v8-bench-runbar">

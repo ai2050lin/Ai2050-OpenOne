@@ -1,0 +1,1371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>界面整理方案 · 静态效果图（v3 · 渐进披露）· AI2050 研究工作台</title>
+<style>
+  :root{
+    --ink:#1e293b; --ink2:#475569; --ink3:#94a3b8;
+    --line:#e2e8f0; --line2:#cbd5e1; --bg:#f8fafc; --panel:#f1f5f9;
+    --brand:#184f95; --brand2:#0d366b; --soft:#eaf2fb; --soft2:#f3f7fd;
+    --ok:#0f766e; --okbg:#e6f5f2; --warn:#b45309; --warnbg:#fef3e2;
+    --bad:#b91c1c; --badbg:#fdeaea; --run:#0369a1; --runbg:#e0f2fe;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:#eef2f7; color:var(--ink);
+    font:13px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .doc{max-width:1260px;margin:0 auto;padding:36px 24px 80px}
+
+  /* ---------- 文档头 ---------- */
+  .doc-head{border-bottom:1px solid #d8e0ea;padding-bottom:20px;margin-bottom:26px}
+  .doc-kicker{font-size:12px;letter-spacing:.12em;color:#64748b;text-transform:uppercase}
+  .doc-head h1{margin:8px 0 6px;font-size:27px;line-height:1.3;letter-spacing:-.2px}
+  .doc-head h1 small{display:block;font-size:14px;font-weight:400;color:var(--ink2);margin-top:8px;letter-spacing:0}
+  .doc-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:12px;color:#475569}
+  .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #d5dee9;background:#fff;border-radius:99px;padding:2px 10px}
+  .pill b{color:var(--brand)}
+
+  /* ---------- 章节 ---------- */
+  .sec{margin:44px 0 0}
+  .sec>h2{font-size:18px;margin:0 0 4px;letter-spacing:-.1px}
+  .sec>h2 span{color:var(--ink3);font-weight:400;font-size:13px;margin-left:8px}
+  .sec>p.sub{margin:0 0 18px;color:var(--ink2);font-size:13px;max-width:960px}
+
+
+  /* ---------- 渐进披露（v4）：一眼层 → 展开层 → 口径层 ---------- */
+  .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .hero.two{grid-template-columns:1.35fr 1fr}
+  .hero .hcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px 12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .hero .hcard.hot{border-color:#9ec5f4;background:linear-gradient(180deg,#f7fbff,#fff)}
+  .hero .hcard.bad{border-color:#f4c7c7;background:#fffafa}
+  .hero .hlab{font-size:11px;color:#64748b;display:flex;align-items:center;gap:6px}
+  .hero .big{font-size:30px;font-weight:700;color:var(--brand2);letter-spacing:-1px;line-height:1.1;margin-top:2px}
+  .hero .big em{font-style:normal;font-size:14px;font-weight:500;color:#94a3b8;margin-left:4px;letter-spacing:0}
+  .hero .big.bad{color:var(--bad);font-size:26px;letter-spacing:-.4px;line-height:1.28}
+  .hero .cap{font-size:11.5px;color:#475569;line-height:1.55}
+  .hero .cap b{color:#0d366b}
+
+  /* 折叠块：整条可点，默认收起 */
+  details.fold{background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:9px 13px;font-size:12px;color:#334155;font-weight:600}
+  details.fold>summary::-webkit-details-marker{display:none}
+  details.fold>summary .arw{width:14px;height:14px;flex-shrink:0;color:#94a3b8;transition:transform .15s;font-size:11px;display:grid;place-items:center}
+  details.fold[open]>summary .arw{transform:rotate(90deg)}
+  details.fold>summary:hover{background:#f8fbff}
+  details.fold>summary .sm{font-weight:400;color:#94a3b8;font-size:11px;margin-left:auto;white-space:nowrap}
+  details.fold[open]>summary{border-bottom:1px solid #eef2f7}
+  details.fold .fbody{padding:10px 13px 12px;display:flex;flex-direction:column;gap:9px}
+  details.fold .fbody.p0{padding:0}
+
+  /* 口径层：更小、更灰，只给要查的人 */
+  .spec{font-size:10.5px;color:#94a3b8;line-height:1.6;border-top:1px dashed #e8eef5;padding-top:6px;margin-top:2px}
+  .spec b{color:#64748b;font-weight:600}
+
+  /* 展开提示条：一排「还能看什么」 */
+  .morebar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11px;color:#94a3b8}
+  .morebar .mb{font-size:11px;color:#475569;border:1px dashed #cbd5e1;background:#fff;border-radius:99px;padding:2px 10px}
+
+  /* 极简流水线（研发页 L0） */
+  .flowmini{display:flex;align-items:center;gap:0;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;overflow:hidden}
+  .flowmini .fs{display:flex;align-items:center;gap:5px;font-size:10.5px;color:#94a3b8;white-space:nowrap}
+  .flowmini .fs i{width:16px;height:16px;border-radius:50%;background:#eef2f7;color:#94a3b8;display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:700}
+  .flowmini .fs.on{color:var(--brand);font-weight:600}
+  .flowmini .fs.on i{background:var(--brand);color:#fff}
+  .flowmini .fs b{font-weight:600;color:#334155}
+  .flowmini .sep{flex:1;height:1px;background:#eef2f7;margin:0 8px;min-width:8px}
+
+  /* 一句话结论里的强调 */
+  .m-lead .hl{background:#fff5d6;border-radius:3px;padding:0 3px;font-weight:600;color:#7c4a03}
+
+  /* ---------- 矩阵图 ---------- */
+  .matrix{display:grid;grid-template-columns:158px repeat(3,1fr);gap:1px;background:#d8e0ea;border:1px solid #d8e0ea;border-radius:10px;overflow:hidden;background-clip:padding-box}
+  .matrix>div{background:#fff;padding:11px 13px;font-size:12px}
+  .matrix .mh{background:#f4f7fb;font-weight:600;color:#334155;font-size:11.5px;display:flex;flex-direction:column;gap:2px}
+  .matrix .mh small{font-weight:400;color:var(--ink3);font-size:10.5px}
+  .matrix .rh{background:#f8fafc;font-weight:600;color:#1e293b;display:flex;flex-direction:column;justify-content:center;gap:2px}
+  .matrix .rh small{font-weight:400;color:var(--ink3);font-size:10.5px}
+  .matrix .cell b{display:block;color:var(--brand2);font-size:12.5px;margin-bottom:2px}
+  .matrix .cell span{color:var(--ink2);font-size:11.5px;line-height:1.55;display:block}
+  .matrix .cell em{font-style:normal;color:var(--ink3);font-size:10.5px;display:block;margin-top:4px}
+
+  /* ---------- 效果图外框 ---------- */
+  .shot{margin:26px 0 0}
+  .shot-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .shot-head .no{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#fff;background:var(--brand);border-radius:5px;padding:2px 7px}
+  .shot-head h3{margin:0;font-size:15px}
+  .shot-head .ask{color:var(--ink3);font-size:12px}
+  .frame{border:1px solid #d5dee9;border-radius:11px;overflow:hidden;box-shadow:0 6px 22px rgba(15,23,42,.07);background:#fff}
+  .m-app{font-size:12px;line-height:1.5;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;height:auto;min-height:452px}
+
+  /* 顶栏 */
+  .m-top{display:flex;align-items:center;gap:14px;padding:7px 14px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0}
+  .m-brand{display:flex;align-items:center;gap:8px}
+  .m-logo{width:28px;height:28px;border-radius:7px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px}
+  .m-brand b{display:block;font-size:13px;line-height:1.25}
+  .m-brand small{display:block;font-size:10.5px;color:var(--ink3);line-height:1.25}
+  .m-title{font-size:13px;font-weight:600;display:flex;align-items:baseline;gap:9px;min-width:0}
+  .m-title small{font-weight:400;font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-topright{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--ink3)}
+  .m-url{font-family:ui-monospace,Menlo,monospace}
+  .m-ava{width:22px;height:22px;border-radius:50%;background:#dbeafe;color:#1e40af;display:grid;place-items:center;font-size:10px;font-weight:600}
+
+  /* 左轨 */
+  .m-body{flex:1;display:flex;min-height:0}
+  .m-rail{width:60px;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;flex-shrink:0}
+  .m-rbtn{width:48px;height:48px;border:0;background:none;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--ink2);cursor:default}
+  .m-rbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .m-rbtn.on{background:var(--soft);color:var(--brand);font-weight:600}
+  .m-rdiv{width:34px;height:1px;background:var(--line);margin:6px 0}
+  .m-col{flex:1;display:flex;flex-direction:column;min-width:0}
+  .m-subnav{display:flex;align-items:center;gap:4px;padding:5px 14px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;min-height:36px}
+  .m-subnav button{border:1px solid transparent;background:none;padding:3px 11px;border-radius:6px;font-size:12px;color:var(--ink2);cursor:default;white-space:nowrap;font-family:inherit}
+  .m-subnav button.on{border-color:#9ec5f4;background:var(--soft);color:var(--brand);font-weight:600}
+  .m-help{margin-left:auto;width:20px;height:20px;border:1px solid var(--line);border-radius:50%;color:var(--ink3);display:grid;place-items:center;font-size:11px}
+  .m-main{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+  /* 通用块 */
+  .m-lead{background:var(--soft2);border:1px solid #d3e4f7;border-left:3px solid var(--brand);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:#1e3a5f;line-height:1.6}
+  .m-lead b{color:var(--brand2)}
+  .m-lead .tag{font-size:10.5px;color:var(--brand);border:1px solid #bcd7f3;background:#fff;border-radius:4px;padding:0 5px;margin-right:6px}
+  .m-card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+  .m-card.pad0{padding:0;overflow:hidden}
+  .m-h{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .m-h b{font-size:12.5px}
+  .m-h .n{width:17px;height:17px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0}
+  .m-h .rt{margin-left:auto;font-size:10.5px;color:var(--ink3)}
+  .m-badge{font-size:10px;border-radius:4px;padding:1px 6px;border:1px solid;white-space:nowrap}
+  .b-ok{color:var(--ok);background:var(--okbg);border-color:#b7e3db}
+  .b-run{color:var(--run);background:var(--runbg);border-color:#bae0f5}
+  .b-warn{color:var(--warn);background:var(--warnbg);border-color:#f3d9ae}
+  .b-bad{color:var(--bad);background:var(--badbg);border-color:#f4c7c7}
+  .b-idle{color:#64748b;background:#f1f5f9;border-color:#dbe3ec}
+  .m-mono{font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+  .m-note{font-size:11px;color:var(--ink3);line-height:1.55;margin:6px 0 0}
+  .m-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .m-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .m-fold{font-size:11px;color:var(--ink3);border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+  .m-fold::before{content:"▸ ";color:var(--line2)}
+  .m-btn{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:4px 11px;border-radius:6px;border:1px solid var(--line2);background:#fff;color:#334155;font-family:inherit}
+  .m-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .m-kv{display:grid;grid-template-columns:64px 1fr;gap:4px 10px;font-size:11.5px}
+  .m-kv dt{color:var(--ink3)}
+  .m-kv dd{margin:0;color:var(--ink)}
+  .m-sq{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+  /* 统计数字 */
+  .m-num{font-size:24px;font-weight:700;color:var(--brand2);line-height:1.15;letter-spacing:-.5px}
+  .m-num small{font-size:11px;font-weight:400;color:var(--ink3);margin-left:5px;letter-spacing:0}
+  .m-num.bad{color:var(--bad)}
+  .m-num .of{font-size:13px;color:var(--ink3);font-weight:500}
+
+  /* 表格 */
+  .m-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+  .m-tbl th{text-align:left;font-weight:600;color:var(--ink3);font-size:10.5px;padding:4px 7px;border-bottom:1px solid var(--line)}
+  .m-tbl td{padding:5px 7px;border-bottom:1px solid #eef2f7}
+  .m-tbl tr:last-child td{border-bottom:0}
+  .m-tbl .r{text-align:right}
+  .m-tbl .c{text-align:center}
+
+  /* 层塔 */
+  .m-tower{width:88px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;padding-right:8px;border-right:1px solid var(--line)}
+  .m-tower .tt{font-size:10px;color:var(--ink3);text-align:center;margin-bottom:2px}
+  .m-band{height:13px;border-radius:2px;background:#e8eef6;font-size:9px;color:#7c8ea6;display:flex;align-items:center;justify-content:flex-end;padding-right:4px}
+  .m-band.hot{background:#184f95;color:#fff;font-weight:600}
+  .m-band.mid{background:#c5d8ee;color:#31547a}
+
+  /* 热力图 */
+  .m-heat{display:grid;grid-template-columns:34px repeat(10,1fr);gap:2px;align-items:center}
+  .m-heat .hl{font-size:9.5px;color:var(--ink3);font-family:ui-monospace,Menlo,monospace}
+  .m-heat .cell{height:15px;border-radius:2px;background:#eef4fa}
+  .m-heat .hd{font-size:9.5px;color:var(--ink3);text-align:center;font-family:ui-monospace,Menlo,monospace}
+  .m-legend{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ink3)}
+  .m-legend .bar{width:70px;height:7px;border-radius:2px;background:linear-gradient(90deg,#eef4fa,#184f95)}
+
+  /* 作业网格 */
+  .m-grid{display:grid;gap:3px;font-size:10.5px}
+  .m-grid .gh{font-size:10px;color:var(--ink3);text-align:center;padding-bottom:2px;font-family:ui-monospace,Menlo,monospace}
+  .m-grid .rh{font-size:10.5px;color:var(--ink2);display:flex;align-items:center;padding-right:4px;line-height:1.25}
+  .m-grid .jc{background:#f8fafc;border:1px solid #e8eef5;border-radius:5px;padding:5px 4px;display:flex;flex-direction:column;gap:3px;align-items:center}
+  .m-grid .jc.sel{background:#eaf2fb;border-color:#9ec5f4;box-shadow:inset 0 0 0 1px #9ec5f4}
+  .m-grid .dots{display:flex;gap:3px}
+  .d{width:7px;height:7px;border-radius:2px;background:#dfe6ee}
+  .d.done{background:#0f766e}
+  .d.run{background:#0284c7}
+  .d.fail{background:#b91c1c}
+  .m-grid .jc small{font-size:9px;color:var(--ink3)}
+
+  /* 流水线带 */
+  .m-flow{display:flex;align-items:stretch;gap:0;background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .m-step{flex:1;padding:7px 8px 7px 14px;position:relative;border-right:1px solid #eef2f7;font-size:11px;min-width:0}
+  .m-step:last-child{border-right:0}
+  .m-step b{display:block;font-size:11.5px;color:#334155;font-weight:600}
+  .m-step span{font-size:10px;color:var(--ink3)}
+  .m-step.on{background:var(--soft)}
+  .m-step.on b{color:var(--brand)}
+  .m-step .cnt{font-family:ui-monospace,Menlo,monospace}
+  .m-step::after{content:"";position:absolute;right:-5px;top:50%;width:8px;height:8px;border-top:1px solid #dbe3ec;border-right:1px solid #dbe3ec;transform:translateY(-50%) rotate(45deg);background:#fff}
+  .m-step.on::after{background:var(--soft)}
+  .m-step:last-child::after{display:none}
+
+  /* 四轴 */
+  .axes{display:grid;gap:5px}
+  .ax{display:grid;grid-template-columns:52px 1fr 34px;gap:7px;align-items:center;font-size:10.5px}
+  .ax .lb{color:var(--ink2)}
+  .ax .tr{height:6px;border-radius:3px;background:#eef2f7;overflow:hidden}
+  .ax .fl{height:100%;border-radius:3px;background:#184f95}
+  .ax .vl{text-align:right;font-family:ui-monospace,Menlo,monospace;color:var(--ink)}
+  .ax .fl.dim{background:#9bb3cf}
+
+
+  /* ---------- 3D 层堆（空间） ---------- */
+  .scene{width:100%;height:auto;display:block;overflow:visible}
+  .m-mini3d{width:106px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;padding-right:6px;border-right:1px solid var(--line)}
+  .m-mini3d svg{width:100px;height:236px;display:block}
+  .m-mini3d .tt{font-size:9.5px;color:var(--ink3);text-align:center;line-height:1.5}
+  .scene-legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:10px;color:#475569;padding:6px 4px 2px;border-top:1px dashed #eef2f7;margin-top:2px}
+  .lg-line{display:inline-block;width:16px;height:0;border-top:2px solid #0f766e;vertical-align:2px;margin-right:4px}
+  .lg-line.down{border-top:2px solid #b45309;border-top-style:solid}
+  .lg-line.up{border-top-style:dashed}
+  .lg-dot{display:inline-block;width:7px;height:7px;border-radius:2px;background:#b45309;margin-right:4px;vertical-align:0}
+  .lg-sep{margin-left:auto;color:#94a3b8}
+
+  /* 紧凑单元 chip（实时分析第 3 步） */
+  .chip{border:1px solid #e2e8f0;border-radius:6px;padding:5px 7px;background:#fbfdff;min-width:0}
+  .chip .cid{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:#0d366b;white-space:nowrap}
+  .chip .bar{height:5px;border-radius:3px;background:#eef2f7;margin:4px 0 3px;overflow:hidden}
+  .chip .bar i{display:block;height:100%;border-radius:3px;background:#184f95}
+  .chip .bar i.dim{background:#9bb3cf}
+  .chip .sc{font-size:9.5px;color:#94a3b8;white-space:nowrap}
+
+  /* 单元阵列 */
+  .m-arr{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));grid-auto-rows:11px;gap:1.5px;width:100%}
+  .m-arr i{display:block;height:11px;border-radius:1px;background:#e4ebf3}
+  .m-arr i.hi{background:#184f95}
+  .m-arr i.mid{background:#b9cde5}
+
+  /* 赛跑曲线 */
+  .curve{width:100%;height:150px;display:block}
+
+  /* 注释 */
+  .notes{margin:12px 0 0;padding:0 0 0 4px;list-style:none;display:grid;gap:7px}
+  .notes li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:12px;color:#334155;line-height:1.62}
+  .notes li i{font-style:normal;width:19px;height:19px;border-radius:50%;background:#e7edf5;color:#475569;display:grid;place-items:center;font-size:10.5px;font-weight:600;margin-top:2px}
+  .notes li b{color:var(--brand2);font-weight:600}
+  .notes li em{font-style:normal;color:var(--ink3)}
+
+  /* 清单表 */
+  table.list{width:100%;border-collapse:collapse;background:#fff;border:1px solid #dfe6ee;border-radius:9px;overflow:hidden;font-size:12px}
+  table.list th{background:#f4f7fb;text-align:left;font-size:11px;color:#475569;padding:9px 12px;border-bottom:1px solid #dfe6ee;font-weight:600}
+  table.list td{padding:9px 12px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.6}
+  table.list tr:last-child td{border-bottom:0}
+  table.list td b{color:var(--brand2)}
+  table.list .no{color:var(--ink3);font-family:ui-monospace,Menlo,monospace;font-size:11px}
+
+  .callout{background:#fff;border:1px solid #dfe6ee;border-left:3px solid var(--brand);border-radius:0 8px 8px 0;padding:12px 14px;font-size:12.5px;color:#334155;line-height:1.7}
+  .callout b{color:var(--brand2)}
+  .callout.warn{border-left-color:#b45309;background:#fffdf7}
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid #d8e0ea;font-size:11.5px;color:#64748b;line-height:1.8}
+  @media print{body{background:#fff}.doc{padding:0}.frame{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<div class="doc-head">
+  <div class="doc-kicker">AI2050 · 界面整理方案 · v3 渐进披露 · 待确认稿</div>
+  <h1>在不动骨架的前提下，把工作台改成「先看三个数，其余点开再给」
+    <small>左轨四项（进展 / 空间 / 研发 / 配置）与全部子导航项一字不动。这一版只做一件事：每屏首屏只留一句话和最多三个数，其余全部折进可点开的行——上一版把它们同时铺开，看起来密密麻麻。</small>
+  </h1>
+  <div class="doc-meta">
+    <span class="pill">基线 <b>6cafd8b0d</b>（已 revert 的四项左轨）</span>
+    <span class="pill">新增菜单项 <b>0</b></span>
+    <span class="pill">改动界面 <b>6</b></span>
+    <span class="pill">首屏元素 <b>6–9 块 → 3–4 块</b></span>
+    <span class="pill">数据为示例，用于判断版式</span>
+  </div>
+</div>
+
+<!-- ============ 一、先把三个目标落到四个界面上 ============ -->
+<section class="sec" id="map">
+  <h2>一、把三个研究目标落到现有四个界面上 <span>不新增一级菜单的理由</span></h2>
+  <p class="sub">上一版曾把界面改成「数据集 / 例句 / 模式与优先级 / 神经元图谱 / 进展」五项，那套改动已经被 revert。其实那五项里没有一项需要新的左轨入口——它们各自对应现有界面的一个面。四个界面本来就构成一张整齐的表：三行是三个目标，三列是「看什么 / 到哪了 / 怎么生产」，配置是横切。</p>
+
+  <div class="matrix">
+    <div class="mh">研究目标<small>本项目要回答的三个问题</small></div>
+    <div class="mh">空间<small>看什么：个案显微镜</small></div>
+    <div class="mh">进展<small>到哪了：只放结论与证据</small></div>
+    <div class="mh">研发<small>怎么生产：材料到入账</small></div>
+
+    <div class="rh">① 模式怎么排先后<small>注意力把上下文组织成层级与优先级</small></div>
+    <div class="cell"><b>空间 · 语言图谱</b><span>在「冲突模式」一类里看：两种线索打架时，胜负在第几层决出、谁参与。</span><em>原本无此内容，作为树内一类新增，不是新 tab</em></div>
+    <div class="cell"><b>进展 · 语言图谱</b><span>做了几个冲突族、每个族的决出层与证据等级。</span><em>沿用现有 tab</em></div>
+    <div class="cell"><b>研发 · 模板流水线</b><span>冲突材料怎么造：模板 → 冻结 → 分发到各模型。</span><em>沿用现有工位</em></div>
+
+    <div class="rh">② 神经元图谱<small>MLP 单元的逆向分析与四轴证据</small></div>
+    <div class="cell"><b>空间 · 神经元</b><span>三维层堆：点开任一层看内部（注意力头 / 残差流 / MLP 单元），并画出跨层单元关联。</span><em>层塔已有，补「可展开 + 可连边」</em></div>
+    <div class="cell"><b>进展 · 神经元逆向分析</b><span>普查规模、分型、解释检验通过率、删除检验通过数。</span><em>沿用现有 tab</em></div>
+    <div class="cell"><b>研发 · 神经元测试</b><span>单点深挖 S1–S9；普查作业跑批量。</span><em>沿用现有工位</em></div>
+
+    <div class="rh">③ 联合破解<small>语言到底怎么被编码</small></div>
+    <div class="cell"><b>空间 · 实时分析</b><span>一句话走完：行为 → 注意力路由 → 神经元 → 归因与保真度。</span><em>该页职责本就是「输入一段文本逐层观察」</em></div>
+    <div class="cell"><b>进展（首页）</b><span>唯一的进度数字：谱图预测保真度，按模式分开报。</span><em>新增一个数字，不新增页面</em></div>
+    <div class="cell"><b>研发 · 作业网格</b><span>数据集 × 模型 × 机制 的完成度，谁在跑、谁失败、谁入账。</span><em>新增一条流水线带，在工位之上</em></div>
+  </div>
+
+  <h3 style="margin:26px 0 8px;font-size:14px">另外那五项去哪了（逐条对账）</h3>
+  <table class="list">
+    <thead><tr><th style="width:170px">上一版设想的页面</th><th style="width:250px">落在现有界面的哪里</th><th>为什么不需要新入口</th></tr></thead>
+    <tbody>
+      <tr><td><b>数据集</b></td><td>研发 · 题库（材料面）；进展 · 语言图谱（覆盖矩阵）</td><td>「数据集」本身不是一个动作，它是材料与覆盖度两个面，分居研发和进展更准确。</td></tr>
+      <tr><td><b>例句</b></td><td>空间 · 实时分析</td><td>该页的既定职责就是「输入一段文本，逐层观察每个头与单元」，缺的是层次，不是入口。</td></tr>
+      <tr><td><b>模式与优先级</b></td><td>空间 · 语言图谱 → 树内一类「冲突模式」</td><td>模式是语言图谱的一个大类，做成并列的一级页会与「语言图谱」重复。</td></tr>
+      <tr><td><b>神经元图谱</b></td><td>空间 · 神经元（已存在）</td><td>已存在，只需补单元卡四轴与证据等级。</td></tr>
+      <tr><td><b>进展</b></td><td>进展（已存在）</td><td>已存在，改为「记分板」：只放结论、口径与未通过的检验。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 二、三条原则 ============ -->
+<section class="sec" id="rules">
+  <h2>二、先显示主要数据，其余收起来 <span>三层规则：一眼层 / 展开层 / 口径层</span></h2>
+  <p class="sub">上一版的问题是「每屏都塞满」：一眼看过去有表、有图、有口径，读者要先做一次汇总才知道该看哪。这一版只改一件事——<b>每屏第一眼只留一句话和最多三个数，其余全部折进可点开的行</b>。折叠不是隐藏：标题上写明里面有几条、什么口径，不点开也知道有多少。</p>
+
+  <div class="matrix" style="grid-template-columns:120px repeat(3,1fr)">
+    <div class="mh"><small>层</small></div>
+    <div class="mh"><small>①</small>L0 一眼层</div>
+    <div class="mh"><small>②</small>L1 展开层</div>
+    <div class="mh"><small>③</small>L2 口径层</div>
+    <div class="rh">放什么<small>不滚动就能看完</small></div>
+    <div class="cell"><b>一句话 + ≤3 个大数字</b><span>结论在前，数字在后；没有数就写「未计算」，不许写「进行中」。</span></div>
+    <div class="cell"><b>表格 / 图 / 清单</b><span>只在「要动手查」时才需要的东西。默认收起，一次只展开一块。</span></div>
+    <div class="cell"><b>n、模型、留出、账本编号</b><span>最小、最灰的一行。要引用这个数字的人才看。</span></div>
+    <div class="rh">长什么样<small>这一页的三层实例</small></div>
+    <div class="cell"><span>三个白底大卡，卡内只有：标签 / 大数字 / 一句人话。</span></div>
+    <div class="cell"><span>一个可点的整行，右侧写明条数与口径；点开在原地展开，不跳页。</span></div>
+    <div class="cell"><span>卡底一条虚线以上的灰字，或折叠内的最后一行。</span></div>
+  </div>
+
+  <div class="m-3" style="gap:12px;margin-top:12px">
+    <div class="m-card">
+      <div class="m-h"><span class="n">1</span><b>一个数字一句话</b></div>
+      <p style="margin:0;font-size:12px;color:#334155;line-height:1.7">每个大数字下面只给一句人话，说清它意味着什么。<b>不放大数字，不放两张表，不并列三套口径。</b>口径收进同一张卡最下面的灰行。</p>
+    </div>
+    <div class="m-card">
+      <div class="m-h"><span class="n">2</span><b>折叠标题必须带数量</b></div>
+      <p style="margin:0;font-size:12px;color:#334155;line-height:1.7">写「未通过的检验 · 4 项」，不写「未通过的检验」。<b>收起不等于藏起来</b>——项目已发生 5 次同族判据复发，靠的就是让失败在标题上就有计数。</p>
+    </div>
+    <div class="m-card">
+      <div class="m-h"><span class="n">3</span><b>每屏只默认展开一块</b></div>
+      <p style="margin:0;font-size:12px;color:#334155;line-height:1.7">默认展开的那一块就是这一页的主任务（实时分析页 = 注意力热力图；其余页全收起）。<b>别让读者一进来就面对三个展开。</b></p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:12px">
+    <b>这一版和上一版的差别，可以用一个字概括：删。</b>数字一样多、结论一样硬，但每屏首屏的元素从 6–9 块降到 3–4 块。代价是「一眼看全」变成了「一眼看重点」——所以每个折叠标题都带了数量和口径，让人知道没被瞒着。
+  </div>
+</section>
+
+<section class="sec" id="shots">
+  <h2>三、六个界面的静态效果图 <span>先看版式，确认后再动代码</span></h2>
+  <p class="sub">每张图下面是改动点与理由，以及<b>这一版删掉了什么</b>。折叠行都可以直接点开看展开后的样子；数字都是示例值，用来判断「信息该放多显眼」，真实数字接上去时口径会更硬。</p>
+
+  <!-- ---------- S1 进展 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s1"><span class="no">S1</span><h3>进展（默认落点）</h3><span class="ask">普通人打开工作台，五秒内要知道「这事做到哪了」</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">进展<small>三条研究线的进度、口径与未通过的检验</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn on"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button class="on">神经元逆向分析</button><button>语言图谱</button><button>规则账本</button><span class="m-help">?</span></div>
+            <div class="m-main">
+
+              <div class="m-lead" style="padding:8px 11px">
+                <span class="tag">一句话</span><span class="hl">神经元读得出一部分，也控得住一部分；语言到底被破解了多少，还没有数字。</span>
+              </div>
+
+              <div class="hero">
+                <div class="hcard hot">
+                  <div class="hlab">① 模式怎么排先后</div>
+                  <div class="big">1<em>/ 6 族</em></div>
+                  <div class="cap">上下文 vs 记忆<b>做完</b>；语法 vs 语义、否定、疑问还没开始。</div>
+                </div>
+                <div class="hcard">
+                  <div class="hlab">② 神经元图谱</div>
+                  <div class="big">87<em>/ 1,263 张卡</em></div>
+                  <div class="cap">只有这 87 张<b>删掉后行为真的变</b>；其余只是「读得出」。</div>
+                </div>
+                <div class="hcard bad">
+                  <div class="hlab">③ 语言怎么编码</div>
+                  <div class="big bad">未计算</div>
+                  <div class="cap">缺「谱图保真度」。没有它，不能说语言被破解。</div>
+                </div>
+              </div>
+
+              <div class="morebar">
+                <span>下面三项点开再看：</span>
+                <span class="mb">▸ 跨模型 × 机制矩阵</span>
+                <span class="mb">▸ 未通过的检验 4 项</span>
+                <span class="mb">▸ 最近三次结论变更</span>
+              </div>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>跨模型 · 跨机制的完成度<span class="sm">3 个模型 × 3 个数据集，格内三点 = 注意力 / 神经元 / 联合</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <thead><tr><th style="width:42%">数据集</th><th class="c">qwen3-4b</th><th class="c">ds-7b</th><th class="c">glm4-9b</th></tr></thead>
+                    <tbody>
+                      <tr><td>KN-ATTR 上下文 vs 记忆</td><td class="c">●●○</td><td class="c">●●○</td><td class="c">●○○</td></tr>
+                      <tr><td>GR-NEG 否定</td><td class="c">●●○</td><td class="c">●○○</td><td class="c">●○○</td></tr>
+                      <tr><td>GR-Q 疑问</td><td class="c">○○○</td><td class="c">○○○</td><td class="c">○○○</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="spec" style="padding:0 13px 10px">● 有结论　○ 未做　✕ 已否证　·　点任一格进入该作业。这张表是分布式研发的结果面：<b>一格 = 一个数据集在一个模型上的三种机制</b>。</div>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>未通过的检验<span class="sm">4 项 · 与「已完成」同权，标红留在原地</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <tbody>
+                      <tr><td style="color:#b91c1c;width:22px">✕</td><td>单点消融判必要性</td><td class="r m-mono" style="color:#94a3b8;width:86px">R-MET-12</td></tr>
+                      <tr><td style="color:#b91c1c">✕</td><td>二分路径 = 最小充分集</td><td class="r m-mono" style="color:#94a3b8">R-MET-10</td></tr>
+                      <tr><td style="color:#b91c1c">✕</td><td>随机对照只报数量、不报身份</td><td class="r m-mono" style="color:#94a3b8">R-MET-11</td></tr>
+                      <tr><td style="color:#b91c1c">✕</td><td>「3 个单元」是二分下限的产物</td><td class="r m-mono" style="color:#94a3b8">R-MLP-22</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="spec" style="padding:0 13px 10px">同族判据错误已复发 5 次。这四条折叠起来会丢，所以标题里直接写数字；点开看原文，每条都能追到账本条目。</div>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>最近三次结论变更<span class="sm">按时间倒序，被推翻的不删</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <tbody>
+                      <tr><td class="m-mono" style="width:56px;color:#94a3b8">10-31</td><td style="width:52px"><span class="m-badge b-ok">新增</span></td><td><b style="color:#0d366b">L23#767 是格式承载单元，不是知识单元</b></td></tr>
+                      <tr><td class="m-mono" style="color:#94a3b8">10-31</td><td><span class="m-badge b-bad">否证</span></td><td>用「答对 / 答错」当因变量测单元必要性　<span class="m-mono" style="color:#64748b">R-MET-12</span></td></tr>
+                      <tr><td class="m-mono" style="color:#94a3b8">10-31</td><td><span class="m-badge b-warn">回退</span></td><td>QK 校准与上下文冲突案例（Phase 263）复核未过，整批撤下</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <div class="m-card" style="display:flex;align-items:center;gap:12px;background:#fbfdff;padding:9px 12px">
+                <div style="flex:1;font-size:11px;color:#64748b">这一页只看三件事：<b style="color:#334155">有没有「未计算」→ 数字配什么口径 → 下面折叠里哪条被否证</b>。</div>
+                <span class="m-btn">看规则账本</span>
+                <span class="m-btn primary">开始第一个完整案例 →</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>首屏只剩一句话 + 三个数字。</b>原来一进来是四张表并列，读者得自己汇总才知道「做到哪了」。现在第三个数直接写「未计算」，不用点开就看见缺口。<em>理由：普通人第一眼要的是判断，不是数据。</em></div></li>
+      <li><i>2</i><div><b>矩阵、未通过检验、结论变更全部折起来。</b>三样都是「要查的时候才看」的东西，不是打开就要看的。<em>理由：它们在上一版里占掉了首屏三分之二，把三个主数字挤成了小字。</em></div></li>
+      <li><i>3</i><div><b>折叠标题里带数量：4 项、3 次、3 个模型。</b>收起不等于藏起来，标题上就写着里面有多少。<em>理由：失败最容易被下次重犯；一收起就没人记得它存在过。</em></div></li>
+      <li><i>4</i><div><b>本页不预设展开任何一块。</b>进展页的主任务是「看结论」，不是「查细节」。<em>理由：默认展开会诱导人去读细节，而不是先形成判断。</em></div></li>
+    </ol>
+  </div>
+
+  <!-- ---------- S2 研发 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s2"><span class="no">S2</span><h3>研发（分布式流程主界面）</h3><span class="ask">一个作业 = 数据集 × 模型 × 机制 × 口径；谁在跑、跑到哪、能不能入账</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">研发<small>神经元测试、模板流水线、题库；管理员另有普查作业与自动测试</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn on"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button>神经元测试</button><button>模板流水线</button><button>题库</button><button class="on">普查作业</button><button>自动测试</button><span class="m-help">?</span></div>
+            <div class="m-main">
+
+              <div class="m-lead" style="padding:8px 11px">
+                <span class="tag">一句话</span>一个作业 = <b>数据集 × 模型 × 机制 × 口径</b>。现在 5 个在跑、9 个待跑、<span class="hl">2 个跑完了但复核没过，不能入账</span>。
+              </div>
+
+              <div class="flowmini">
+                <div class="fs"><i>1</i><b>材料</b></div><div class="sep"></div>
+                <div class="fs"><i>2</i><b>模板</b></div><div class="sep"></div>
+                <div class="fs"><i>3</i><b>冻结</b></div><div class="sep"></div>
+                <div class="fs"><i>4</i><b>分发</b></div><div class="sep"></div>
+                <div class="fs on"><i>5</i><b>运行</b></div><div class="sep"></div>
+                <div class="fs"><i>6</i><b>复核</b></div><div class="sep"></div>
+                <div class="fs"><i>7</i><b>入账</b></div>
+              </div>
+
+              <div class="hero">
+                <div class="hcard hot">
+                  <div class="hlab">正在跑</div>
+                  <div class="big">5<em>个作业</em></div>
+                  <div class="cap">跨 3 个节点、2 个队列；最快的一个 62%。</div>
+                </div>
+                <div class="hcard">
+                  <div class="hlab">排队中</div>
+                  <div class="big">9<em>个</em></div>
+                  <div class="cap">其中 <b>3 个</b>缺预注册，起不来。</div>
+                </div>
+                <div class="hcard bad">
+                  <div class="hlab">跑完但不能入账</div>
+                  <div class="big bad">2<em>个待复核</em></div>
+                  <div class="cap">一个缺模型修订哈希，一个等换进程重算。</div>
+                </div>
+              </div>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>作业网格<span class="sm">4 数据集 × 3 模型 · 格内三点 = 注意力 / 神经元 / 联合 · 点格进详情</span></summary>
+                <div class="fbody">
+                  <div id="jobgrid"></div>
+                  <div style="display:flex;gap:14px;font-size:10.5px;color:#64748b">
+                    <span><i class="d done" style="display:inline-block;vertical-align:-1px"></i> 有结论</span>
+                    <span><i class="d run" style="display:inline-block;vertical-align:-1px"></i> 在跑</span>
+                    <span><i class="d" style="display:inline-block;vertical-align:-1px"></i> 未跑</span>
+                    <span><i class="d fail" style="display:inline-block;vertical-align:-1px"></i> 已否证</span>
+                  </div>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>KN-ATTR-zh × qwen3-4b<span class="sm">运行中 62% · 四元组 / 预注册三栏 / provenance</span></summary>
+                <div class="fbody">
+                  <dl class="m-kv" style="margin:0">
+                    <dt>数据集</dt><dd>KN-ATTR 上下文 vs 记忆 · 中文实体改写 · 120 组</dd>
+                    <dt>模型</dt><dd>qwen3-4b · 36 层 · 修订 <span class="m-mono">c4f2a1</span></dd>
+                    <dt>机制</dt><dd>注意力路由 + 神经元归因（联合）</dd>
+                    <dt>口径</dt><dd>留出 40 组；答案位置 logit；两侧都有效才计入分母</dd>
+                  </dl>
+                  <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:7px;padding:8px 10px">
+                    <b style="font-size:11px;color:#475569">预注册（跑之前必须填满）</b>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;font-size:10.5px">
+                      <div><span style="color:#94a3b8">预期</span><div>L23 附近决出</div></div>
+                      <div><span style="color:#94a3b8">判据</span><div>留出集 Δ≥0.10</div></div>
+                      <div><span style="color:#94a3b8">功效</span><div style="color:#b45309">n=120 → 0.71</div></div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <span class="m-btn">看分片（8 / 12）</span>
+                    <span class="m-btn">暂停</span>
+                    <span class="m-btn" style="color:#94a3b8">入账（未复核）</span>
+                  </div>
+                  <div class="spec">provenance 随作业走：git <b>6cafd8b0</b> · seed 20261101 · 设备本机 GPU。缺任一项，作业不允许入账。</div>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>最近失败与待复核<span class="sm">3 失败 / 2 待复核 · 每条写清哪个判据没过</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <thead><tr><th style="width:150px">作业</th><th style="width:66px">结果</th><th>原因 / 下一步</th><th class="c" style="width:54px">账本</th></tr></thead>
+                    <tbody>
+                      <tr><td>KN-ISA × glm4-9b</td><td><span class="m-badge b-bad">失败</span></td><td>留出集 Δ=0.04，未达 0.10；n=60 功效只有 0.44，先扩样</td><td class="c m-mono" style="color:#94a3b8">F-18</td></tr>
+                      <tr><td>GR-Q × qwen3-4b</td><td><span class="m-badge b-warn">待复核</span></td><td>已完成，等换进程重算同一 seed</td><td class="c m-mono" style="color:#94a3b8">—</td></tr>
+                      <tr><td>KN-ATTR × ds-7b</td><td><span class="m-badge b-warn">待复核</span></td><td>缺模型修订哈希，provenance 不齐</td><td class="c m-mono" style="color:#94a3b8">—</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <div class="m-card" style="background:#fffdf7;border-color:#f3d9ae;padding:7px 12px">
+                <span style="font-size:11px;color:#7c5a2a"><b style="color:#92400e">跑之前的硬门</b>　预注册三栏没填满的作业不能启动；跑完无论成败都入账，失败也占一条。</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>一句话 + 三个数：在跑 / 排队 / 卡住。</b>卡住那格是红的，因为「跑完但入不了账」才是分布式流程真正会卡住人的地方。<em>理由：原来首屏七个面板，没人看得出哪个数字该先处理。</em></div></li>
+      <li><i>2</i><div><b>七步流水线压成一行窄带，只留序号和当前步。</b>上一版每一步都带说明，占掉整条横幅。<em>理由：流水线是用来定位「这事现在在哪一段」，不是用来读文档的；说明可以放进折叠。</em></div></li>
+      <li><i>3</i><div><b>作业网格、作业详情、失败表全部折叠。</b>网格是「要派活 / 要查漏」时才打开的工具，不是常驻视图。<em>理由：12 个格子的网格加上详情卡，会把首屏变成控制台。</em></div></li>
+      <li><i>4</i><div><b>「跑之前的硬门」保留成一行，不折。</b>它是动手前必须看见的约束，折起来就等于没有。<em>理由：把流程约束放在按钮旁边，比写在文档里有效。</em></div></li>
+    </ol>
+  </div>
+
+  <!-- ---------- S3 实时分析 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s3"><span class="no">S3</span><h3>空间 · 实时分析</h3><span class="ask">核心页：一句话从「答什么」走到「为什么」</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">空间<small>LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button class="on">实时分析</button><button>神经元</button><button>语言图谱</button><button>响应点云</button><button>本地包</button><span class="m-help">?</span></div>
+            <div class="m-main" style="flex-direction:row;gap:12px">
+
+              <div class="m-mini3d">
+                <svg id="mini3d" viewBox="0 0 100 236" role="img" aria-label="三维层堆缩略"></svg>
+                <div class="tt">36 层 · 可旋转</div>
+                <div class="tt" style="color:#184f95">深色 = 本句起作用</div>
+              </div>
+
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">
+
+                <div class="m-lead" style="padding:8px 11px">
+                  <span class="tag">这句话</span>「<b>法国的首都是哪里？</b>」——模型答 <b>巴黎</b>，概率 <b>0.94</b>；第二候选里昂只有 0.02。<span class="hl">这不是记忆题，口诀在 L23 就决出了。</span>
+                </div>
+
+                <div class="hero">
+                  <div class="hcard hot">
+                    <div class="hlab">模型答什么</div>
+                    <div class="big">0.94<em>巴黎</em></div>
+                    <div class="cap">第二候选 0.02，差距 47 倍。</div>
+                  </div>
+                  <div class="hcard">
+                    <div class="hlab">在哪一层决出</div>
+                    <div class="big">L23</div>
+                    <div class="cap">L17 之前仍是「国家名」占优。</div>
+                  </div>
+                  <div class="hcard">
+                    <div class="hlab">能信几分</div>
+                    <div class="big bad">未算</div>
+                    <div class="cap">保真度要先有基线，别急着引用。</div>
+                  </div>
+                </div>
+
+                <details class="fold" open>
+                  <summary><span class="arw">▸</span>看哪里：注意力路由<span class="sm">10 头 × 6 层 · 直接作用与总效应并列</span></summary>
+                  <div class="fbody">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:10.5px;color:#94a3b8">
+                      <span>行 = 层，列 = 头</span>
+                      <span style="margin-left:auto">越深 = 越用力</span>
+                      <span class="m-legend"><span class="bar"></span>0 → 1</span>
+                    </div>
+                    <div class="m-heat">
+                      <span class="hl"></span><span class="hd">H1</span><span class="hd">H2</span><span class="hd">H3</span><span class="hd">H4</span><span class="hd">H5</span><span class="hd">H6</span><span class="hd">H7</span><span class="hd">H8</span><span class="hd">H9</span><span class="hd">H10</span>
+                      <span class="hl">L14</span><span class="cell"></span><span class="cell" style="background:#dbe8f6"></span><span class="cell" style="background:#eef4fa"></span><span class="cell" style="background:#cfe0f2"></span><span class="cell"></span><span class="cell"></span><span class="cell" style="background:#e8f0f9"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span>
+                      <span class="hl">L17</span><span class="cell"></span><span class="cell" style="background:#e8f0f9"></span><span class="cell" style="background:#9fc0e2"></span><span class="cell" style="background:#e0ecf7"></span><span class="cell"></span><span class="cell" style="background:#d3e4f4"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span>
+                      <span class="hl">L20</span><span class="cell" style="background:#eef4fa"></span><span class="cell"></span><span class="cell" style="background:#e2edf8"></span><span class="cell" style="background:#6f9ecb"></span><span class="cell"></span><span class="cell"></span><span class="cell" style="background:#dbe8f6"></span><span class="cell" style="background:#eaf2fa"></span><span class="cell"></span><span class="cell"></span>
+                      <span class="hl">L23</span><span class="cell" style="background:#dbe8f6"></span><span class="cell"></span><span class="cell" style="background:#c9dcf0"></span><span class="cell" style="background:#3f77b5"></span><span class="cell" style="background:#e6eff9"></span><span class="cell"></span><span class="cell" style="background:#9fc0e2"></span><span class="cell" style="background:#476f9e"></span><span class="cell"></span><span class="cell" style="background:#eef4fa"></span>
+                      <span class="hl">L26</span><span class="cell"></span><span class="cell" style="background:#eef4fa"></span><span class="cell" style="background:#dbe8f6"></span><span class="cell" style="background:#8fb3d9"></span><span class="cell"></span><span class="cell"></span><span class="cell" style="background:#e2edf8"></span><span class="cell"></span><span class="cell" style="background:#d3e4f4"></span><span class="cell"></span>
+                      <span class="hl">L30</span><span class="cell"></span><span class="cell" style="background:#eaf2fa"></span><span class="cell"></span><span class="cell" style="background:#c9dcf0"></span><span class="cell"></span><span class="cell" style="background:#f2f7fc"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span>
+                    </div>
+                    <div class="spec">直接作用 = 只换这一个头；总效应 = 换掉后让下游自由补偿。两者符号相反时以后者为准（C1 校准教训：单头消融会把真正的搬运头排错，甚至符号相反）。</div>
+                  </div>
+                </details>
+
+                <details class="fold">
+                  <summary><span class="arw">▸</span>哪些单元在动<span class="sm">6 个 · 格式单元单独标出</span></summary>
+                  <div class="fbody">
+                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">
+                      <div class="chip"><div class="cid">L23#1567</div><div class="bar"><i style="width:66%"></i></div><div class="sc">控制 0.66</div></div>
+                      <div class="chip"><div class="cid">L21#880</div><div class="bar"><i style="width:58%"></i></div><div class="sc">控制 0.58</div></div>
+                      <div class="chip"><div class="cid">L24#3012</div><div class="bar"><i style="width:41%"></i></div><div class="sc">控制 0.41</div></div>
+                      <div class="chip" style="border-color:#f3d9ae;background:#fffdf7"><div class="cid" style="color:#b45309">L23#767</div><div class="bar"><i class="dim" style="width:88%"></i></div><div class="sc">格式 0.88</div></div>
+                      <div class="chip"><div class="cid">L18#455</div><div class="bar"><i style="width:22%"></i></div><div class="sc">控制 0.22</div></div>
+                      <div class="chip"><div class="cid">L30#1201</div><div class="bar"><i style="width:14%"></i></div><div class="sc">控制 0.14</div></div>
+                    </div>
+                    <div class="spec">橙色那个是<b>格式单元</b>：删掉它，答案会漂，但不是知识丢了，是「分析：」后换了行。它必须与知识单元分开标，否则第一眼就会把它当成最重要的知识。</div>
+                  </div>
+                </details>
+
+                <details class="fold">
+                  <summary><span class="arw">▸</span>能不能信：保真度与基线<span class="sm">把 MLP 换成图谱，保留注意力</span></summary>
+                  <div class="fbody">
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:#475569">
+                      <span class="m-badge b-bad">未计算</span>
+                      <span>损失恢复 —　KL —　对照 token 身份 —</span>
+                    </div>
+                    <div class="spec">定义见 AGENTS §5.4。必须先有基线（词身份 / 位置 / n-gram），否则数字没有意义。这一行空着，是本项目现在最大的缺口。</div>
+                  </div>
+                </details>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>首屏三件事：答什么（0.94）、哪层决出（L23）、能信几分（未算）。</b>上一版是四个编号步骤一次性铺开，读的人不知道该先看哪一步。<em>理由：机制解释天然是链条，但链条的第一步应该只有「结论」。</em></div></li>
+      <li><i>2</i><div><b>注意力热力图默认展开，另两块收起。</b>这是本页唯一的「主任务」：看见模型在看哪里。默认展开它，别的等读者要了再给。<em>理由：每屏只默认展开一块，才不会一进来就面对三张图。</em></div></li>
+      <li><i>3</i><div><b>单元 chips 与保真度折起来，但标题写明「6 个 · 格式单元单独标」。</b>格式单元那条结论（删掉它会漂、但不是知识丢了）在标题上就能看见。<em>理由：这条是本项目最贵的教训，不能因为折叠就消失。</em></div></li>
+      <li><i>4</i><div><b>左侧三层堆只做定位，不承载数据。</b>它回答「这句话在第几层有反应」，不回答「反应多大」。<em>理由：真正的大小关系要留给热力图；一张图只讲一件事。</em></div></li>
+    </ol>
+  </div>
+
+  <!-- ---------- S4 神经元 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s4"><span class="no">S4</span><h3>空间 · 神经元</h3><span class="ask">三维层堆：能看见层、打开层、看见层与层之间</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">空间<small>LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button>实时分析</button><button class="on">神经元</button><button>语言图谱</button><button>响应点云</button><button>本地包</button><span class="m-help">?</span></div>
+            <div class="m-main">
+
+              <div class="m-lead" style="padding:8px 11px">
+                <span class="tag">一句话</span>三维层堆里每块板是 4 层。点开一层看内部；<span class="hl">L23 这一层的作用集中在极少数单元上，其余 9,718 个基本是冗余</span>。
+              </div>
+
+              <div class="m-card pad0" style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid #eef2f7">
+                    <b style="font-size:12.5px">三维层堆</b>
+                    <span class="m-badge b-idle">拖动旋转 · 滚轮缩放</span>
+                    <span class="rt" style="margin-left:auto">qwen3-4b · 36 层</span>
+                  </div>
+                  <div style="padding:0 6px 4px">
+                    <svg id="scene" viewBox="0 0 1040 492" class="scene" role="img" aria-label="三维层堆、层内结构与跨层关联"></svg>
+                    <div class="scene-legend">
+                      <span><i class="lg-line down"></i>下游：被它影响</span>
+                      <span><i class="lg-line up"></i>上游：把信息送进来</span>
+                      <span><i class="lg-dot"></i>选中的单元</span>
+                      <span class="lg-sep">左侧 = 选中层抽出的剖面：① 头　② 残差流　③ 单元</span>
+                    </div>
+                  </div>
+                </div>
+
+                              <div class="m-card" style="display:flex;align-items:center;gap:16px;padding:9px 13px;background:#fbfdff">
+                <div style="display:flex;flex-direction:column;gap:1px">
+                  <span style="font-size:10.5px;color:#94a3b8">当前选中</span>
+                  <b class="m-mono" style="font-size:13px;color:#0d366b">L23#1567</b>
+                </div>
+                <div style="width:1px;height:26px;background:#e2e8f0"></div>
+                <div style="display:flex;flex-direction:column;gap:1px">
+                  <span style="font-size:10.5px;color:#94a3b8">控制力</span>
+                  <b style="font-size:15px;color:#0d366b">0.66</b>
+                </div>
+                <div style="width:1px;height:26px;background:#e2e8f0"></div>
+                <div style="display:flex;flex-direction:column;gap:1px">
+                  <span style="font-size:10.5px;color:#94a3b8">证据</span>
+                  <b style="font-size:15px;color:#0f766e">E2</b>
+                </div>
+                <div style="width:1px;height:26px;background:#e2e8f0"></div>
+                <div style="display:flex;flex-direction:column;gap:1px">
+                  <span style="font-size:10.5px;color:#94a3b8">删掉它 · 答对率</span>
+                  <b style="font-size:13px;color:#334155">92% → 61%<em style="font-style:normal;font-size:11px;color:#94a3b8;margin-left:6px">n=120 · 跨模型 3/4</em></b>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:6px">
+                  <span class="m-btn">加入子空间</span>
+                  <span class="m-btn">跑 S1–S9</span>
+                </div>
+              </div>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>四轴细节与跨层关联<span class="sm">可读 / 读出 / 控制 / 连接 + 4 条边</span></summary>
+                <div class="fbody" style="display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:start">
+                  <div class="axes" style="display:flex;flex-direction:column;gap:6px">
+                    <div class="ax"><span class="lb">可读</span><span class="tr"><span class="fl" style="width:72%"></span></span><span class="vl">0.72</span></div>
+                    <div class="ax"><span class="lb">读出</span><span class="tr"><span class="fl dim" style="width:41%"></span></span><span class="vl">0.41</span></div>
+                    <div class="ax"><span class="lb">控制</span><span class="tr"><span class="fl" style="width:66%"></span></span><span class="vl">0.66</span></div>
+                    <div class="ax"><span class="lb">连接</span><span class="tr"><span class="fl" style="width:58%"></span></span><span class="vl">0.58</span></div>
+                  </div>
+                  <table class="m-tbl">
+                    <thead><tr><th style="width:78px">关联单元</th><th class="c" style="width:52px">方向</th><th class="c" style="width:52px">强度</th><th>证据</th><th class="c" style="width:56px">跨模型</th></tr></thead>
+                    <tbody>
+                      <tr><td class="m-mono">L19#311</td><td class="c"><span class="m-badge b-ok">上游</span></td><td class="c">0.71</td><td>去掉它，本单元响应降到 0.21</td><td class="c">3 / 4</td></tr>
+                      <tr><td class="m-mono">L14#205</td><td class="c"><span class="m-badge b-ok">上游</span></td><td class="c">0.46</td><td>只在实体被改写的那一侧出现</td><td class="c">2 / 4</td></tr>
+                      <tr><td class="m-mono">L30#1201</td><td class="c"><span class="m-badge b-warn">下游</span></td><td class="c">0.52</td><td>本单元被消融后它的响应降 0.34</td><td class="c">2 / 4</td></tr>
+                      <tr><td class="m-mono">L33#88</td><td class="c"><span class="m-badge b-warn">下游</span></td><td class="c">0.31</td><td style="color:#94a3b8">只有 12 组支持，与格式材料混淆</td><td class="c">1 / 4</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>本层还有哪些单元值得看<span class="sm">9,728 个里 140 个 · 按「删掉后的变化」排序</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <thead><tr><th style="width:70px">单元</th><th>一句话</th><th class="c" style="width:50px">控制</th><th class="c" style="width:50px">证据</th><th class="c" style="width:70px">跨模型</th></tr></thead>
+                    <tbody>
+                      <tr><td class="m-mono">#1567</td><td>国名 → 首都名</td><td class="c">0.66</td><td class="c"><span class="m-badge b-ok">E2</span></td><td class="c">3 / 4</td></tr>
+                      <tr><td class="m-mono">#880</td><td>「不是」后的极性翻转</td><td class="c">0.58</td><td class="c"><span class="m-badge b-ok">E2</span></td><td class="c">2 / 4</td></tr>
+                      <tr><td class="m-mono">#3012</td><td>量词与名词的搭配偏好</td><td class="c">0.41</td><td class="c"><span class="m-badge b-run">E1</span></td><td class="c">1 / 4</td></tr>
+                      <tr><td class="m-mono">#767</td><td style="color:#b45309">输出格式（换行 / 分段）</td><td class="c">0.88</td><td class="c"><span class="m-badge b-warn">格式</span></td><td class="c">4 / 4</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="spec" style="padding:0 13px 10px">剩下 9,588 个不做卡，理由写在队列标题上而不是藏进文档：<b>删掉它们，行为几乎不变</b>。做满 9,728 张卡既做不到，也没用。</div>
+                </div>
+              </details>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>首屏是一句话 + 一张 3D 图 + 一条选中信息。</b>上一版把四轴卡、关联表、优先队列全放在图上，图文互相挤。<em>理由：三维图本身已经是信息量最大的一块，旁边不该再堆三块。</em></div></li>
+      <li><i>2</i><div><b>剖面卡只保留结构三件：① 头　② 残差流　③ 单元。</b>原来的第四段「因果账单」挪到图下的信息条，因为那条已经在写「92% → 61%」。<em>理由：同一个数字在一屏里出现两次，读者会以为它们不一样。</em></div></li>
+      <li><i>3</i><div><b>四轴、跨层关联表、本层队列全部折叠，标题带数量。</b>「4 条边」「140 个里」都写在标题上。<em>理由：这三样是复核时才查的，不是打开就要看的。</em></div></li>
+      <li><i>4</i><div><b>层堆仍然占满整行。</b>它是这一屏的主视图，不缩成缩略图。<em>理由：3D 只有在够大时才看得出「层与层的先后」；缩小之后它就退化成一张装饰图。</em></div></li>
+    </ol>
+  </div>
+
+  <!-- ---------- S5 语言图谱 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s5"><span class="no">S5</span><h3>空间 · 语言图谱 → 冲突模式</h3><span class="ask">目标一的落地页：谁赢、第几层决出、什么线索能翻盘</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">空间<small>LLM 多层结构：神经元逆向分析结果与语言图谱的有效神经元</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button>实时分析</button><button>神经元</button><button class="on">语言图谱</button><button>响应点云</button><button>本地包</button><span class="m-help">?</span></div>
+            <div class="m-main" style="flex-direction:row;gap:10px">
+
+              <div style="width:170px;flex-shrink:0;align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 6px;font-size:11.5px">
+                <div style="font-size:10px;color:#94a3b8;padding:2px 6px 5px">大类</div>
+                <div style="padding:3px 7px;color:#334155">词汇 · 层级</div>
+                <div style="padding:3px 7px;color:#334155">语法 · 句式</div>
+                <div style="padding:3px 7px;color:#334155">推理 · 多步</div>
+                <div style="padding:3px 7px;color:#0d366b;background:#eaf2fb;border-radius:5px;font-weight:600">冲突模式</div>
+                <div style="padding:2px 7px 3px 18px;font-size:11px;color:#b45309">上下文 vs 记忆</div>
+                <div style="padding:2px 7px 3px 18px;font-size:11px;color:#64748b">语法 vs 语义</div>
+                <div style="padding:2px 7px 3px 18px;font-size:11px;color:#64748b">指令 vs 常识</div>
+                <div class="spec" style="margin:8px 6px 0">这一类比别处多一列：<b>谁赢、第几层决出</b>。</div>
+              </div>
+
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">
+
+                <div class="m-lead" style="padding:8px 11px">
+                  <span class="tag">结论</span>上下文和记忆打架时，<span class="hl">模型在第 23 层倒向上下文</span>，而不是相信自己记的：这是 120 组里 108 组的共同行为。
+                </div>
+
+                <div class="hero two">
+                  <div class="hcard hot">
+                    <div class="hlab">决出层</div>
+                    <div class="big">L23<em>108 / 120 组</em></div>
+                    <div class="cap">L17 之前记忆占优，L23 之后上下文反超并锁住。</div>
+                  </div>
+                  <div class="hcard">
+                    <div class="hlab">能翻转胜负的线索</div>
+                    <div class="big">3<em>条</em></div>
+                    <div class="cap">否定词、引号、时间标记——都能把胜负推回去。</div>
+                  </div>
+                </div>
+
+                <div class="m-card pad0">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid #eef2f7">
+                    <b style="font-size:12px">两个答案的赛跑</b>
+                    <span class="rt" style="margin-left:auto"><b style="color:#184f95">— 上下文答案</b>　<b style="color:#b45309">┄ 记忆答案</b>　·　纵轴 = logit 排名，横轴 = 层</span>
+                  </div>
+                  <div style="padding:4px 10px 8px">
+                    <svg viewBox="0 0 560 132" style="width:100%;height:132px;display:block">
+                      <line x1="42" y1="112" x2="548" y2="112" stroke="#e2e8f0"/>
+                      <line x1="42" y1="12" x2="42" y2="112" stroke="#e2e8f0"/>
+                      <text x="38" y="116" font-size="9" fill="#94a3b8" text-anchor="end">L1</text>
+                      <text x="248" y="126" font-size="9" fill="#94a3b8" text-anchor="middle">L14</text>
+                      <text x="356" y="126" font-size="9" fill="#94a3b8" text-anchor="middle">L23</text>
+                      <text x="540" y="126" font-size="9" fill="#94a3b8" text-anchor="end">L35</text>
+                      <line x1="356" y1="12" x2="356" y2="112" stroke="#f3d9ae" stroke-dasharray="3 3"/>
+                      <text x="361" y="22" font-size="9" fill="#b45309">决出</text>
+                      <polyline points="42,86 120,74 200,58 280,46 356,26 440,20 540,17" fill="none" stroke="#184f95" stroke-width="2.1"/>
+                      <polyline points="42,92 120,88 200,74 280,62 356,64 440,74 540,82" fill="none" stroke="#b45309" stroke-width="2.1" stroke-dasharray="5 3"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <details class="fold">
+                  <summary><span class="arw">▸</span>优先级表<span class="sm">每种冲突一行：哪层决出、靠哪些头、什么线索能翻盘</span></summary>
+                  <div class="fbody p0">
+                    <table class="m-tbl">
+                      <thead><tr><th style="width:96px">冲突</th><th class="c" style="width:50px">决出层</th><th style="width:130px">负责的头</th><th>能翻转的线索</th><th class="c" style="width:50px">证据</th></tr></thead>
+                      <tbody>
+                        <tr><td>上下文 vs 记忆</td><td class="c">L23</td><td class="m-mono">L23H4 · L23H8</td><td>否定词、引号、时间标记</td><td class="c"><span class="m-badge b-ok">E2</span></td></tr>
+                        <tr><td>语法 vs 语义</td><td class="c">L19</td><td class="m-mono">L19H2 · L19H6</td><td>主谓一致被强语义劫持</td><td class="c"><span class="m-badge b-run">E1</span></td></tr>
+                        <tr><td>指令 vs 常识</td><td class="c">待跑</td><td style="color:#94a3b8">—</td><td style="color:#94a3b8">—</td><td class="c"><span class="m-badge b-idle">未做</span></td></tr>
+                        <tr><td>否定覆盖</td><td class="c">L17</td><td class="m-mono">L17H3 · L17H8</td><td>双重否定</td><td class="c"><span class="m-badge b-run">E1</span></td></tr>
+                      </tbody>
+                    </table>
+                    <div class="spec" style="padding:0 13px 10px">「决出层」= 两个答案的 logit 差第一次跨过 0 且之后不再回头的那一层。方向由路径修补确认，不靠共现顺序。</div>
+                  </div>
+                </details>
+
+                <details class="fold">
+                  <summary><span class="arw">▸</span>这批材料长什么样<span class="sm">记忆版 / 冲突版 / 对照版 三句一组</span></summary>
+                  <div class="fbody p0">
+                    <table class="m-tbl">
+                      <thead><tr><th style="width:70px">版本</th><th>句子</th><th style="width:96px">模型答什么</th></tr></thead>
+                      <tbody>
+                        <tr><td style="color:#64748b">记忆版</td><td>法国的首都是哪里？</td><td>巴黎 · 0.94</td></tr>
+                        <tr><td><span class="m-badge b-warn">冲突版</span></td><td>（前文写）法国的首都是里昂。法国的首都是哪里？</td><td style="color:#b45309">里昂 · 0.71</td></tr>
+                        <tr><td style="color:#64748b">对照版</td><td>（前文写）法国的首都是里昂。这段话里提到的城市是？</td><td>里昂 · 0.88</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="spec" style="padding:0 13px 10px">对照版是关键：它证明模型<b>读到了</b>前文，不是没看见。只有对照版也答对，冲突版的答案才说明「优先级」，而不是「理解失败」。</div>
+                  </div>
+                </details>
+
+                <div class="morebar" style="margin-top:2px">
+                  <span>没做的部分：</span>
+                  <span class="mb">语法 vs 语义 0 / 2</span>
+                  <span class="mb">指令 vs 常识 0 / 2</span>
+                  <span class="mb">跨模型复现 1 / 4</span>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>一句话结论 + 两个数 + 一张赛跑曲线。</b>曲线是唯一能让人一眼看懂「谁赢、第几层翻盘」的形式，所以它留在首屏，表格让位。<em>理由：优先级这件事的本质是两条线的交叉，不是一张四列表。</em></div></li>
+      <li><i>2</i><div><b>优先级表与材料样本折叠。</b>表格是复核用的，材料样本是「怀疑数据造假」时才看的。<em>理由：上一版把三张表 + 一个树塞在一屏，读者第一眼看到的是密集表格。</em></div></li>
+      <li><i>3</i><div><b>左树只做分类导航，高度跟着内容走。</b>它不拉伸、不填空，收起时只占一列。<em>理由：树是「我在哪」的指示器，不该跟内容抢高度。</em></div></li>
+      <li><i>4</i><div><b>没做的部分用一行小标签留在页尾：0 / 2、1 / 4。</b>折起来的东西里，缺口必须还在页面上。<em>理由：进度页最怕「看起来都做完了」。</em></div></li>
+    </ol>
+  </div>
+
+  <!-- ---------- S6 配置 ---------- -->
+  <div class="shot">
+    <div class="shot-head" id="s6"><span class="no">S6</span><h3>配置（第一次进来的人）</h3><span class="ask">三步以内要能开始看数据；地址端口收进「高级」</span></div>
+    <div class="frame">
+      <div class="m-app">
+        <div class="m-top">
+          <div class="m-brand"><span class="m-logo">A2</span><span><b>研究工作台</b><small>返回首页</small></span></div>
+          <div class="m-title">配置<small>当前连接的中心与运行形态、账号、被测模型与平台信息</small></div>
+          <div class="m-topright"><span class="m-url">127.0.0.1:8000</span><span class="m-ava">管</span></div>
+        </div>
+        <div class="m-body">
+          <nav class="m-rail"><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>进展</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间</button><button class="m-rbtn"><svg viewBox="0 0 24 24"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发</button><div class="m-rdiv"></div><button class="m-rbtn on"><svg viewBox="0 0 24 24"><path d="M3 7.5h3.5M11 7.5h10M3 16.5h10M17.5 16.5h3.5"/><circle cx="9" cy="7.5" r="2.1"/><circle cx="15" cy="16.5" r="2.1"/></svg>配置</button></nav>
+          <div class="m-col">
+            <div class="m-subnav"><button class="on">连接</button><button>账号与节点</button><button>模型与 AI</button><button>平台</button><span class="m-help">?</span></div>
+            <div class="m-main">
+
+              <div class="m-lead" style="padding:8px 11px">
+                <span class="tag">从这开始</span>想看懂数据只要三步。地址、端口、代理这些技术项收在下面「高级」里，平时不用碰。
+              </div>
+
+              <div class="hero">
+                <div class="hcard hot">
+                  <div class="hlab"><span class="n" style="width:16px;height:16px;border-radius:50%;background:#184f95;color:#fff;display:inline-grid;place-items:center;font-size:9px">1</span> 连上中心</div>
+                  <div class="big" style="font-size:19px;letter-spacing:0">已连接</div>
+                  <div class="cap">127.0.0.1:8000 · 本机 GPU</div>
+                </div>
+                <div class="hcard">
+                  <div class="hlab"><span class="n" style="width:16px;height:16px;border-radius:50%;background:#184f95;color:#fff;display:inline-grid;place-items:center;font-size:9px">2</span> 选被测模型</div>
+                  <div class="big" style="font-size:19px;letter-spacing:0">qwen3-4b</div>
+                  <div class="cap">另可选 ds-7b、glm4-9b</div>
+                </div>
+                <div class="hcard">
+                  <div class="hlab"><span class="n" style="width:16px;height:16px;border-radius:50%;background:#184f95;color:#fff;display:inline-grid;place-items:center;font-size:9px">3</span> 开始看</div>
+                  <div class="big" style="font-size:19px;letter-spacing:0">有数据</div>
+                  <div class="cap">6 个数据集 · 7,410 题可用</div>
+                  <div style="margin-top:4px"><span class="m-btn primary">进空间 →</span></div>
+                </div>
+              </div>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>我能做什么<span class="sm">按运行形态区分，不用猜按钮为什么是灰的</span></summary>
+                <div class="fbody p0">
+                  <table class="m-tbl">
+                    <thead><tr><th style="width:130px">能力</th><th class="c" style="width:76px">网页版</th><th class="c" style="width:76px">桌面版</th><th>说明</th></tr></thead>
+                    <tbody>
+                      <tr><td>看数据与图谱</td><td class="c" style="color:#0f766e">可以</td><td class="c" style="color:#0f766e">可以</td><td>只读，不需要 GPU</td></tr>
+                      <tr><td>贡献算力</td><td class="c" style="color:#0f766e">可以</td><td class="c" style="color:#0f766e">可以</td><td>网页版走浏览器沙盒</td></tr>
+                      <tr><td>本机跑单元测试</td><td class="c" style="color:#94a3b8">不行</td><td class="c" style="color:#0f766e">可以</td><td>要读本机权重</td></tr>
+                      <tr><td>管理模板与普查</td><td class="c" style="color:#94a3b8">不行</td><td class="c" style="color:#0f766e">可以</td><td>需要管理员身份</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>数据从哪来<span class="sm">数据包版本 1.0.23 · git 6cafd8b0</span></summary>
+                <div class="fbody">
+                  <div class="m-kv">
+                    <dt>数据包</dt><dd>本地 research/ 目录，只读；版本 <span class="m-mono">1.0.23</span></dd>
+                    <dt>来源</dt><dd>研究脚本写入的报告 json，不经过手工填表</dd>
+                    <dt>缺数据时</dt><dd>显示「这里还没有这项数据」，<b>不回退演示数字</b></dd>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <span class="m-btn">下载研究包</span>
+                    <span class="m-btn">打开数据目录</span>
+                  </div>
+                </div>
+              </details>
+
+              <details class="fold">
+                <summary><span class="arw">▸</span>高级：地址、端口、代理、合成沙盒<span class="sm">平时不用动</span></summary>
+                <div class="fbody">
+                  <div class="m-kv">
+                    <dt>中心地址</dt><dd class="m-mono">http://127.0.0.1:8000</dd>
+                    <dt>代理</dt><dd>不走代理（localhost 直连）</dd>
+                    <dt>合成沙盒</dt><dd>关</dd>
+                  </div>
+                  <div class="spec">改错了页面会连不上，右上角有「恢复默认」。</div>
+                </div>
+              </details>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ol class="notes">
+      <li><i>1</i><div><b>三步三张卡，每张只留一个状态词：已连接 / qwen3-4b / 有数据。</b>地址、端口、版本全部下沉。<em>理由：第一次进来的人只想知道「能不能开始」。默认给他一个词，不是一串配置。</em></div></li>
+      <li><i>2</i><div><b>能力矩阵、数据来源、高级项三块折叠。</b>「我能做什么」按运行形态分，解决「为什么这个按钮是灰的」；「数据从哪来」解决「这数字是不是编的」。<em>理由：这两个疑问是真的会有人问，但不是在打开配置页的第一秒。</em></div></li>
+      <li><i>3</i><div><b>「高级」永远是最后一个折叠，标题直接写「平时不用动」。</b><em>理由：让人敢不点开。</em></div></li>
+      <li><i>4</i><div><b>固定显示数据包版本与 git。</b><em>理由：排查问题时第一句话永远是「你连的是哪个中心、哪个包」。</em></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 四、分布式研发流程 ============ -->
+<section class="sec" id="flow">
+  <h2>四、分布式研发流程：一个作业长什么样 <span>这是「基于不同数据集和模型找普遍规律」的工程定义</span></h2>
+  <p class="sub">现在的流程散在五个工位、四份文档、两套账本里。把它压成一个对象、五个状态、三道门，才能做到「换任何数据集和模型，走的都是同一条流水线」。</p>
+
+  <div class="m-2" style="gap:14px;align-items:start">
+    <div class="m-card">
+      <div class="m-h"><b>作业 = 四元组 + 五状态 + 三闸门</b></div>
+      <dl class="m-kv" style="grid-template-columns:56px 1fr;font-size:12px">
+        <dt>四元组</dt><dd>数据集 × 模型 × 机制 × 口径（口径含留出方式与分母定义）</dd>
+        <dt>五状态</dt><dd>待跑 → 运行 → 完成 → 复核 → 入账；另有「失败」直接入账</dd>
+        <dt>闸门一</dt><dd>启动前：预注册三栏填满（预期 / 判据 / 功效）</dd>
+        <dt>闸门二</dt><dd>完成前：provenance 五字段齐全（git / seed / 模型修订 / 设备 / 数据包哈希）</dd>
+        <dt>闸门三</dt><dd>入账前：独立复核（换人或多进程重算，不接受自我复核）</dd>
+      </dl>
+      <p class="m-note">这三道门全部落在界面上（S2），不写在文档里——写在文档里的门，迟早会被绕过。</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-h"><b>为什么这套能得出「普遍规律」</b></div>
+      <p style="margin:0;font-size:12px;color:#334155;line-height:1.75">
+        单个数据集上的一条结论，可能只是那个数据集的产物；单个模型上的一条结论，可能只是那个模型的偶然。<b>只有当同一个机制在 ≥3 个模型上以同一口径复现，才写进「规律」。</b>
+      </p>
+      <p class="m-note">所以每个结论都有两个附加字段：<b>复现模型数</b>与<b>跨数据集一致性</b>。界面上（S4、S5）这一列是常驻的，不是可选项。</p>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="m-badge b-ok">3 / 4 复现 → 规律</span>
+        <span class="m-badge b-run">2 / 4 → 待扩</span>
+        <span class="m-badge b-idle">1 / 4 → 个案</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 五、改动清单 ============ -->
+<section class="sec" id="list">
+  <h2>五、改动清单与验收标准 <span>确认后按这个顺序做，每步可单独回退</span></h2>
+  <table class="list">
+    <thead><tr><th style="width:44px">序</th><th style="width:210px">改什么</th><th style="width:190px">涉及文件</th><th>验收标准（可执行）</th></tr></thead>
+    <tbody>
+      <tr><td class="no">1</td><td><b>共用件：结论条 / 口径徽标 / 折叠 / 术语</b></td><td>新增 <span class="m-mono">components/common/*</span></td><td>四种元素各一处实现；全站不出现第二套写法；<span class="m-mono">vitest</span> 覆盖术语解析与空态文案。</td></tr>
+      <tr><td class="no">2</td><td><b>进展首页：一句结论 + 三卡 + 矩阵 + 未通过清单</b></td><td><span class="m-mono">v8/RouteLens.jsx</span></td><td>不新增 tab；三个数字都带口径折叠；「未计算」必须显式出现而不能显示为 0。</td></tr>
+      <tr><td class="no">3</td><td><b>研发：流水线带 + 作业网格 + 作业详情</b></td><td><span class="m-mono">rdc_fusion/CensusPanel.jsx</span>、<span class="m-mono">AutoTestPanel.jsx</span></td><td>七个阶段计数来自同一接口；作业详情缺 provenance 时「入账」不可点。</td></tr>
+      <tr><td class="no">4</td><td><b>空间 · 实时分析：四步链条</b></td><td><span class="m-mono">v8/LivePane.jsx</span></td><td>四步顺序固定；注意力两种口径并列；保真度未计算时显示「未计算」。</td></tr>
+      <tr><td class="no">5</td><td><b>空间 · 神经元：层堆可展开 + 层内结构 + 跨层关联</b></td><td><span class="m-mono">v8/Tower.jsx</span>、<span class="m-mono">v8/NeuronPane.jsx</span>、<span class="m-mono">v8/SpaceLens.jsx</span></td><td>层堆与展开层同屏；展开层内三件东西（头 / 残差流 / 单元）可点；跨层边默认按强度取前 4，方向必须由路径修补给出（不接受共现顺序）；WebGL 不可用时回落到现有 canvas 投影，不白屏。</td></tr>
+      <tr><td class="no">6</td><td><b>空间 · 语言图谱：新增「冲突模式」类</b></td><td><span class="m-mono">v8/LangAtlas.jsx</span>、<span class="m-mono">LangPage.jsx</span></td><td>树内新增一类，tab 数量不变；优先级表五列齐全；未做的族显示「未做」。</td></tr>
+      <tr><td class="no">7</td><td><b>配置：三步 + 高级折叠</b></td><td><span class="m-mono">ConfigView.jsx</span></td><td>第一屏不含地址/端口；三步都能点到落到。</td></tr>
+      <tr><td class="no">8</td><td><b>请求归一（只做新改动的页）</b></td><td><span class="m-mono">rdc_fusion/api.js</span></td><td>改过的页面里裸 <span class="m-mono">fetch</span> 为 0；全站 208 处列为后续任务，不混在这一轮。</td></tr>
+    </tbody>
+  </table>
+  <div class="callout" style="margin-top:12px">
+    <b>这三条不是从零画三维。</b>现有的 <span class="m-mono">v8/Tower.jsx</span> 已经是一个 canvas 投影的三维层塔：支持拖动旋转、滚轮缩放、点击选层，并且已有 <span class="m-mono">edges</span>（跨层连线，带端点与方向箭头）和 <span class="m-mono">target</span>（选中单元在层板上的位置）两个参数；<span class="m-mono">SpaceLens</span> 目前只在选中单元时用它画「相邻一层」的写入者与读取者。
+    所以第 5 条的实际工作是三件：<b>①</b> 把 edges 从相邻层扩到任意层并带强度；<b>②</b> 在选中的层板上画出层内结构（现在只是一个点）；<b>③</b> 把关联从图上一条线，变成下面那张有方向、有证据、有跨模型复现的表。项目里 three / r3f 已在依赖中，但这一页不需要引入——canvas 投影够用，也保住了「无 WebGL 也能看」。
+  </div>
+<div class="callout warn" style="margin-top:12px">
+    <b>这一轮明确不做</b>：不动左轨四项与任何子导航项；不改 URL 键；不删 <span class="m-mono">blueprint/</span> 等不可达代码（刚经历四次 revert，先只做「零引用清单」，稳定一个迭代再决定）；不引入新依赖；不把 mock 数字写进代码。
+  </div>
+</section>
+
+<!-- ============ 六、附：对另一份方案的判断 ============ -->
+<section class="sec" id="review">
+  <h2>六、附：对上一份「三目标」方案（长文）的判断 <span>哪些能用、哪些要改</span></h2>
+  <table class="list">
+    <thead><tr><th style="width:230px">长文的说法</th><th style="width:90px">判断</th><th>理由与本项目的实测</th></tr></thead>
+    <tbody>
+      <tr><td>目标一（注意力如何组织模式的层级与优先级）是行业缺口</td><td><span class="m-badge b-ok">成立</span></td><td>归因图类工作把注意力图样当既定输入，主要解释 MLP / transcoder 侧。但要说清：QK 侧不是空白（虚拟权重、组合分数、路径修补都有），缺的是「按模式组织、可跨层解释」的那一层。别把「没人做过」写进立项书。</td></tr>
+      <tr><td>「全部基于注意力机制实现」应改成可证伪假设</td><td><span class="m-badge b-ok">成立</span></td><td>本项目自己的结果就是反例：影响 10 道题的那个单元坏的是输出格式（换行），不是知识；而格式是全模型瓶颈，只需极少单元。属性存储的经典结论也在 MLP 侧。应当按「注意力头 / MLP / 嵌入直连」三分量归因，按模式分别记录。</td></tr>
+      <tr><td>「层级」「优先级」必须先有操作定义</td><td><span class="m-badge b-ok">成立</span></td><td>长文给的定义可直接用：优先级 = 冲突时谁赢、第几层决出；层级 = A 的输出成为 B 的输入，用路径修补或归因图的边测。S5 就是按这两个定义做的界面。</td></tr>
+      <tr><td>不能只用单头消融，要并列直接作用与总效应</td><td><span class="m-badge b-ok">成立</span></td><td>与本项目踩过的坑同构：单点消融会把「份额受害者」排到前面，也会把真正的搬运头排错。界面上已做成并列开关（S3）。</td></tr>
+      <tr><td>神经元图谱要接受「读得出 ≠ 控得住」</td><td><span class="m-badge b-ok">成立</span></td><td>但长文引用的几个具体数字（解释检验通过率、单坐标方差占比、神经元 vs transcoder 的损失恢复）来自另一条线，<b>我在当前这棵树上没有复核到</b>——HEAD 连续四次 revert 已把 Phase 263 与相关报告回退。结论方向可取，数字必须按本项目口径重算后再写进文档。</td></tr>
+      <tr><td>提出五个新页面（数据集 / 例句 / 模式与优先级 / 神经元图谱 / 进展）</td><td><span class="m-badge b-warn">改</span></td><td>五项内容都有价值，但没有一项需要新的一级入口，且这套改动已经被 revert 过一次。全部并入现有四个界面（见第一节对账表）。</td></tr>
+      <tr><td>「删掉约 40% 不可达代码」</td><td><span class="m-badge b-warn">缓</span></td><td>比例是真的（不可达部分约占前端行数 40%），但在连续 revert 之后立刻删代码风险过高。先出「零引用清单 + 从构建排除」，观察一个迭代再删。</td></tr>
+      <tr><td>执行顺序：先校准 → 一个冲突做透 → 上线 → 扩容</td><td><span class="m-badge b-ok">成立</span></td><td>顺序正确，且应当与界面同步：第一个完整案例（KN-ATTR × qwen3-4b）正好把 S3、S5、S2 三页一次性填上真实数据。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="foot">
+  静态效果图 · 版式与信息层次用示例数据表达，不含任何研究结论；真实数字接上去时按「口径徽标」规则补齐 n、模型数、留出。<br>
+  基线 commit 6cafd8b0d（HEAD，含四次 revert）· 左轨四项与子导航项集保持不变 · 确认后再改代码。
+</div>
+
+</div>
+
+<script>
+/* ---- 作业网格：6 数据集 × 4 模型，格内三点 = 注意力 / 神经元 / 联合 ---- */
+(function(){
+  var el = document.getElementById('jobgrid');
+  if(!el) return;
+  var models = ['qwen3-4b','ds-7b','glm4-9b','qwen3-14b'];
+  var rows = [
+    ['KN-ATTR 上下文 vs 记忆', [['done','done','run'],['done','done','run'],['run','run','wait'],['wait','wait','wait']]],
+    ['KN-ISA 指令 vs 常识',   [['done','run','wait'],['run','wait','wait'],['fail','wait','wait'],['wait','wait','wait']]],
+    ['GR-NEG 否定覆盖',       [['done','run','wait'],['done','run','wait'],['done','wait','wait'],['wait','wait','wait']]],
+    ['GR-Q 疑问覆盖',         [['run','wait','wait'],['wait','wait','wait'],['wait','wait','wait'],['wait','wait','wait']]],
+    ['C-Eval 广度',           [['done','done','run'],['done','run','wait'],['done','run','wait'],['run','run','wait']]],
+    ['CMMLU 广度',            [['done','run','wait'],['run','wait','wait'],['run','wait','wait'],['wait','wait','wait']]]
+  ];
+  var cls = {done:'done', run:'run', fail:'fail', wait:''};
+  var html = '<div class="m-grid" style="grid-template-columns:132px repeat(4,1fr)">';
+  html += '<div></div>';
+  models.forEach(function(m){ html += '<div class="gh">' + m.replace('qwen3-','q3-') + '</div>'; });
+  rows.forEach(function(r, ri){
+    html += '<div class="rh">' + r[0] + '</div>';
+    r[1].forEach(function(cell, ci){
+      var sel = (ri === 0 && ci === 0) ? ' sel' : '';
+      html += '<div class="jc' + sel + '"><div class="dots">';
+      cell.forEach(function(s){ html += '<i class="d ' + cls[s] + '"></i>'; });
+      html += '</div></div>';
+    });
+  });
+  html += '</div>';
+  el.innerHTML = html;
+})();
+
+/* ---- 热力图：8 个采样层 × 10 个头，两个热点 ---- */
+(function(){
+  var el = document.getElementById('heat');
+  if(!el) return;
+  var layers = [5,9,13,17,19,21,23,27];
+  var html = '<div class="hd"></div>';
+  for(var h = 0; h < 10; h++) html += '<div class="hd">H' + h + '</div>';
+  for(var r = 0; r < layers.length; r++){
+    html += '<div class="hl">L' + layers[r] + '</div>';
+    for(var c = 0; c < 10; c++){
+      var v = 0.86 * Math.exp(-(Math.pow(r-6,2) + Math.pow(c-5,2)) / 2.6)
+            + 0.62 * Math.exp(-(Math.pow(r-4,2) + Math.pow(c-1.4,2)) / 2.2)
+            + 0.22 * Math.exp(-(Math.pow(r-2,2) + Math.pow(c-8,2)) / 3.0)
+            + 0.05 * ((r*7 + c*3) % 5) / 5;
+      v = Math.min(0.98, Math.max(0.02, v));
+      var a = (0.04 + v * 0.92).toFixed(2);
+      html += '<div class="cell" style="background:rgba(24,79,149,' + a + ')"></div>';
+    }
+  }
+  el.innerHTML = html;
+})();
+
+/* ---- 单元阵列：32 × 32，前若干格高亮 ---- */
+(function(){
+  var el = document.getElementById('arr');
+  if(!el) return;
+  var hot = {17:1,52:1,88:1,131:1,164:1,207:1,248:1,291:1,333:1,372:1,404:1,451:1,487:1,62:1,119:1,283:1,418:1,470:1,9:1,505:1};
+  var html = '';
+  for(var i = 0; i < 576; i++){
+    var c = '';
+    if(hot[i]) c = 'hi';
+    else if(i % 11 === 3 || i % 17 === 5) c = 'mid';
+    html += '<i class="' + c + '"></i>';
+  }
+  el.innerHTML = html;
+})();
+
+/* ================= 空间 3D（v3）：厚板层堆 + 剖面卡 + 扇形连线 ================= */
+(function(){
+  var svg = document.getElementById('scene'); if (!svg) return;
+
+  var K = 0.866, M = 0.5;
+  var NX = 272, NY = 378;
+  var S = 68, DY = 26, NB = 9, TH = 9;
+
+  function P(x, y, z){ return [NX + (x - z) * K, NY - y - (x + z) * M]; }
+  function f(q){ return q[0].toFixed(1) + ',' + q[1].toFixed(1); }
+  function quad(cx, cz, y, s){
+    return [[-s,-s],[s,-s],[s,s],[-s,s]].map(function(d){
+      return f(P(cx + d[0], y, cz + d[1]));
+    }).join(' ');
+  }
+
+  var SEL = 5;
+  var CARD = {
+    4: { id: 'L19#311',  dir: 'up', b: 22, k: 0 },
+    7: { id: 'L30#1201', dir: 'dn', b: 38, k: 1 },
+    3: { id: 'L14#205',  dir: 'up', b: 38, k: 2 },
+    8: { id: 'L33#88',   dir: 'dn', b: 54, k: 3 }
+  };
+
+  var o = [];
+  o.push('<defs>'
+    + '<marker id="arUp" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">'
+    + '<path d="M0 1.2 L10 5 L0 8.8 z" fill="#0f766e"/></marker>'
+    + '<marker id="arDn" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">'
+    + '<path d="M0 1.2 L10 5 L0 8.8 z" fill="#c2410c"/></marker>'
+    + '</defs>');
+
+  o.push('<ellipse cx="' + (NX + 10) + '" cy="' + (NY + S + 34) + '" rx="' + (1.45 * S) + '" ry="' + (0.24 * S)
+    + '" fill="#0f172a" opacity=".055"/>');
+
+  for (var i = 0; i < NB; i++){
+    var y = i * DY;
+    var isSel = (i === SEL), isTgt = (CARD[i] !== undefined);
+    var top = isSel ? '#fde3b8' : '#ffffff';
+    var cR = isSel ? '#e9bc7c' : (isTgt ? '#e7eef6' : '#d6e2ef');
+    var cL = isSel ? '#d19e58' : (isTgt ? '#d6e3ef' : '#bed0e3');
+    var st = isSel ? '#b8730f' : (isTgt ? '#d9922e' : '#a9c0d6');
+    var sw = isSel ? 1.7 : (isTgt ? 1.2 : 0.8);
+
+    var pR = P(S, y, -S), pB = P(S, y, S), pL = P(-S, y, S);
+    o.push('<polygon points="' + f(pR) + ' ' + f(pB) + ' ' + pB[0].toFixed(1) + ',' + (pB[1] + TH).toFixed(1)
+      + ' ' + pR[0].toFixed(1) + ',' + (pR[1] + TH).toFixed(1) + '" fill="' + cR + '"/>');
+    o.push('<polygon points="' + f(pL) + ' ' + f(pB) + ' ' + pB[0].toFixed(1) + ',' + (pB[1] + TH).toFixed(1)
+      + ' ' + pL[0].toFixed(1) + ',' + (pL[1] + TH).toFixed(1) + '" fill="' + cL + '"/>');
+    o.push('<polygon points="' + quad(0, 0, y, S) + '" fill="' + top + '" stroke="' + st
+      + '" stroke-width="' + sw + '"/>');
+  }
+
+  var sp = P(S * 0.52, SEL * DY, -S * 0.34);
+  o.push('<circle cx="' + sp[0].toFixed(1) + '" cy="' + sp[1].toFixed(1) + '" r="5.6" fill="#c2410c" stroke="#fff" stroke-width="1.8"/>');
+
+  o.push('<text x="' + NX + '" y="' + (NY - (NB - 1) * DY - S - 14) + '" font-size="10" fill="#94a3b8" text-anchor="middle">L36</text>');
+  o.push('<text x="' + NX + '" y="' + (NY + S + TH + 20) + '" font-size="10" fill="#94a3b8" text-anchor="middle">L1</text>');
+  /* 选中层也放进左侧注释列 */
+  var lx0 = NX - 1.732 * S - 14;
+  var sy = NY - SEL * DY;
+  o.push('<text x="' + lx0.toFixed(1) + '" y="' + (sy + 3.6).toFixed(1) + '" font-size="9.5" text-anchor="end" fill="#b8730f" font-weight="bold">L23 选中 →</text>');
+
+  var src = P(S, SEL * DY, -S);
+  Object.keys(CARD).forEach(function(k){
+    var i2 = parseInt(k, 10), c = CARD[i2];
+    var tp = P(S, i2 * DY, -S);
+    var midy = NY - i2 * DY;
+    var b = c.b;
+    var sx = src[0] + c.k * 7, sy = src[1] + c.k * 5;
+    var d = 'M' + sx.toFixed(1) + ',' + sy.toFixed(1)
+      + ' C' + (sx + b * 0.5).toFixed(1) + ',' + sy.toFixed(1)
+      + ' ' + (tp[0] + b).toFixed(1) + ',' + tp[1].toFixed(1)
+      + ' ' + (tp[0] + 2).toFixed(1) + ',' + tp[1].toFixed(1);
+    var col = (c.dir === 'up') ? '#0f766e' : '#c2410c';
+    o.push('<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="1.6" opacity=".9"'
+      + (c.dir === 'up' ? ' stroke-dasharray="6 3"' : '')
+      + ' marker-end="url(#' + (c.dir === 'up' ? 'arUp' : 'arDn') + ')"/>');
+
+    var hp = P(S * 0.84, i2 * DY, -S * 0.84);
+    o.push('<circle cx="' + hp[0].toFixed(1) + '" cy="' + hp[1].toFixed(1) + '" r="4.2" fill="' + col + '" stroke="#fff" stroke-width="1.3"/>');
+
+    o.push('<text x="' + lx0.toFixed(1) + '" y="' + (tp[1] + 3.6).toFixed(1) + '" font-size="9.5" text-anchor="end" fill="' + col
+      + '" font-family="ui-monospace,Menlo,monospace">' + c.id + '</text>');
+  });
+
+  /* 剖面卡 */
+  var PX = 572, PY = 26, PW = 452, PH = 424;
+  o.push('<rect x="' + (PX + 11) + '" y="' + (PY + 13) + '" width="' + PW + '" height="' + PH + '" rx="8" fill="#0f172a" opacity=".07"/>');
+  o.push('<rect x="' + (PX - 8) + '" y="' + (PY + 5) + '" width="' + PW + '" height="' + PH + '" rx="8" fill="#c6d6e8"/>');
+  o.push('<rect x="' + PX + '" y="' + PY + '" width="' + PW + '" height="' + PH + '" rx="8" fill="#fff" stroke="#a6bfd8" stroke-width="1.2"/>');
+
+  o.push('<path d="M' + PX + ',' + (PY + 30) + ' V' + (PY + 8) + ' a8,8 0 0 1 8,-8 H' + (PX + PW - 8)
+    + ' a8,8 0 0 1 8,8 V' + (PY + 30) + ' Z" fill="#f1f7fd"/>');
+  o.push('<line x1="' + PX + '" y1="' + (PY + 30) + '" x2="' + (PX + PW) + '" y2="' + (PY + 30) + '" stroke="#dbe7f3"/>');
+  o.push('<text x="' + (PX + 14) + '" y="' + (PY + 20) + '" font-size="11.5" font-weight="bold" fill="#18487f">L23 剖面</text>');
+  o.push('<text x="' + (PX + 84) + '" y="' + (PY + 20) + '" font-size="9.5" fill="#64748b">← 从层堆的 L23 抽出；点任一层切换</text>');
+
+  var gx = PX + 26, gw = PW - 52;
+
+  var y1 = PY + 50;
+  o.push('<text x="' + gx + '" y="' + y1 + '" font-size="10.5" font-weight="bold" fill="#334155">① 注意力头 · 12 个</text>');
+  o.push('<text x="' + (gx + 118) + '" y="' + y1 + '" font-size="9" fill="#94a3b8">本句只有 3 个明显发力</text>');
+  var hot = { 1: 1, 4: 1, 8: 1 };
+  for (var h = 0; h < 12; h++){
+    var hx = gx + 16 + (h % 6) * 66, hy = y1 + 22 + Math.floor(h / 6) * 26;
+    var on = hot[h] === 1;
+    o.push('<circle cx="' + hx + '" cy="' + hy + '" r="7" fill="' + (on ? '#18487f' : '#e6eff9')
+      + '" stroke="' + (on ? '#0f366b' : '#c9dbee') + '" stroke-width="1"/>');
+    o.push('<text x="' + hx + '" y="' + (hy + 3) + '" font-size="7" text-anchor="middle" fill="' + (on ? '#fff' : '#a8b7c7') + '">' + (h + 1) + '</text>');
+  }
+
+  var y2 = y1 + 86;
+  o.push('<text x="' + gx + '" y="' + y2 + '" font-size="10.5" font-weight="bold" fill="#334155">② 残差流 · 2,560 维</text>');
+  o.push('<text x="' + (gx + 152) + '" y="' + y2 + '" font-size="9" fill="#94a3b8">本单元在这里写入（橙段）</text>');
+  o.push('<rect x="' + gx + '" y="' + (y2 + 12) + '" width="' + gw + '" height="15" rx="7.5" fill="#eaf7f4" stroke="#0f766e" stroke-width="1"/>');
+  o.push('<rect x="' + (gx + 140) + '" y="' + (y2 + 12) + '" width="56" height="15" rx="7.5" fill="#f59e0b"/>');
+  o.push('<text x="' + (gx + 168) + '" y="' + (y2 + 42) + '" font-size="9" fill="#b45309" text-anchor="middle">#1567 写入位置</text>');
+
+  var y3 = y2 + 62;
+  o.push('<text x="' + gx + '" y="' + y3 + '" font-size="10.5" font-weight="bold" fill="#334155">③ MLP 单元 · 9,728 个</text>');
+  o.push('<text x="' + (gx + 140) + '" y="' + y3 + '" font-size="9" fill="#94a3b8">显示 144 个 · 只给有证据的做卡</text>');
+
+  var COLS = 18, ROWS = 10, CW = 19, CH = 16, GAP = 2;
+  var gx0 = gx + (gw - (COLS * (CW + GAP) - GAP)) / 2, gy0 = y3 + 12;
+  var HI = 6 + 3 * COLS;
+  for (var r = 0; r < ROWS; r++){
+    for (var c2 = 0; c2 < COLS; c2++){
+      var idx = r * COLS + c2;
+      var ux = gx0 + c2 * (CW + GAP), uy = gy0 + r * (CH + GAP);
+      if (idx === HI){
+        o.push('<rect x="' + (ux - 1.5) + '" y="' + (uy - 1.5) + '" width="' + (CW + 3) + '" height="' + (CH + 3)
+          + '" rx="2.5" fill="#f59e0b" stroke="#8a3f07" stroke-width="1.4"/>');
+      } else {
+        var sh = ((r * 5 + c2 * 3) % 4);
+        var fill = ['#eef4fa','#e0ebf7','#cfdff0','#bed2e8'][sh];
+        if ((r * COLS + c2) % 13 === 5) fill = '#a7c3e0';
+        o.push('<rect x="' + ux + '" y="' + uy + '" width="' + CW + '" height="' + CH + '" rx="1.5" fill="' + fill + '"/>');
+      }
+    }
+  }
+  var legY = gy0 + ROWS * (CH + GAP) + 12;
+  o.push('<rect x="' + gx + '" y="' + (legY - 9) + '" width="9" height="9" rx="2" fill="#f59e0b"/>');
+  o.push('<text x="' + (gx + 13) + '" y="' + legY + '" font-size="8.5" fill="#b45309">本页这个单元</text>');
+  o.push('<text x="' + (gx + 84) + '" y="' + legY + '" font-size="8.5" fill="#94a3b8">越深 = 删掉后答案变化越大</text>');
+
+  svg.innerHTML = o.join('');
+})();
+
+/* ================= 空间 3D：实时分析页的窄层堆 ================= */
+(function(){
+  var svg = document.getElementById('mini3d'); if (!svg) return;
+  var K = 0.866, M = 0.5;
+  var NX = 50, NY = 196, S = 27, DY = 8.2, NB = 9, TH = 4, SEL = 5;
+  function P(x, y, z){ return [NX + (x - z) * K, NY - y - (x + z) * M]; }
+  function f(q){ return q[0].toFixed(1) + ',' + q[1].toFixed(1); }
+  function quad(y, s){
+    return [[-s,-s],[s,-s],[s,s],[-s,s]].map(function(d){ return f(P(d[0], y, d[1])); }).join(' ');
+  }
+  var o = [];
+  for (var i = 0; i < NB; i++){
+    var y = i * DY, sel = (i === SEL);
+    var top = sel ? '#fde3b8' : '#ffffff';
+    var cR = sel ? '#e9bc7c' : '#d6e2ef', cL = sel ? '#d19e58' : '#bed0e3';
+    var st = sel ? '#b8730f' : '#a9c0d6', sw = sel ? 1.2 : 0.6;
+    var pR = P(S, y, -S), pB = P(S, y, S), pL = P(-S, y, S);
+    o.push('<polygon points="' + f(pR) + ' ' + f(pB) + ' ' + pB[0].toFixed(1) + ',' + (pB[1] + TH).toFixed(1)
+      + ' ' + pR[0].toFixed(1) + ',' + (pR[1] + TH).toFixed(1) + '" fill="' + cR + '"/>');
+    o.push('<polygon points="' + f(pL) + ' ' + f(pB) + ' ' + pB[0].toFixed(1) + ',' + (pB[1] + TH).toFixed(1)
+      + ' ' + pL[0].toFixed(1) + ',' + (pL[1] + TH).toFixed(1) + '" fill="' + cL + '"/>');
+    o.push('<polygon points="' + quad(y, S) + '" fill="' + top + '" stroke="' + st + '" stroke-width="' + sw + '"/>');
+  }
+  var sp = P(S * 0.5, SEL * DY, -S * 0.34);
+  o.push('<circle cx="' + sp[0].toFixed(1) + '" cy="' + sp[1].toFixed(1) + '" r="2.8" fill="#c2410c" stroke="#fff" stroke-width="1"/>');
+  o.push('<text x="' + NX + '" y="' + (NY - (NB - 1) * DY - S - 6) + '" font-size="8" fill="#94a3b8" text-anchor="middle">L36</text>');
+  o.push('<text x="' + NX + '" y="' + (NY + S + TH + 12) + '" font-size="8" fill="#94a3b8" text-anchor="middle">L1</text>');
+  svg.innerHTML = o.join('');
+})();
+
+</script>
+</body>
+</html>

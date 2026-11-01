@@ -90,6 +90,8 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
             plan.append((f'/api/model/skeleton?model_key={mk}', (lambda m=mk: PS.model_skeleton_ep(m))))
         for mk in sorted(data['overlays']):
             plan.append((f'/api/space/overlay?model_key={mk}', (lambda m=mk: PS.space_overlay_ep(m))))
+    if (Path(__file__).resolve().parents[1] / 'data' / 'lang_bench' / 'meta.json').is_file():
+        plan.append(('/api/lang/bench/overview', _lang_bench_overview))
     idx = NS.index()
     model_keys = sorted({r['model_key'] for r in idx.get('census', [])})
     for mk in model_keys:
@@ -111,6 +113,28 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
         for r in db.execute("SELECT sha FROM results WHERE tm_id=? AND kind='real' ORDER BY uploaded_at DESC LIMIT 50", (tm,)):
             plan.append((f"/api/results/{r['sha']}", (lambda s=r['sha']: _legacy_detail(D, s))))
     return plan
+
+
+def _lang_bench_overview() -> Dict[str, Any]:
+    """图谱测试题总览（离线版）：只读 data/lang_bench 的 meta 与结果摘要，与在线端点同形。
+
+    数据包场景没有模型权重，model_status 恒为 unavailable（客户端据此隐藏「运行实测」）。
+    不导入 server.lang_bench_service：它顶层 import torch，中心服务器可能没装。
+    """
+    lb = Path(__file__).resolve().parents[1] / 'data' / 'lang_bench'
+    meta_path, res_path = lb / 'meta.json', lb / 'results.json'
+    meta = json.loads(meta_path.read_text(encoding='utf-8')) if meta_path.is_file() else {}
+    result = None
+    if res_path.is_file():
+        try:
+            r = json.loads(res_path.read_text(encoding='utf-8'))
+            result = {k: r[k] for k in ('model_name', 'n_questions', 'correct', 'acc',
+                                        'elapsed_s', 'finished_at', 'by_category', 'by_subject')}
+        except (KeyError, ValueError):
+            pass
+    return {'schema': 'lang_bench_overview.v1', 'available': True, 'meta': meta,
+            'model_status': 'unavailable', 'model_dir': None, 'run_state': 'idle',
+            'last_result': result}
 
 
 def _legacy_detail(D, sha: str) -> Dict[str, Any]:
