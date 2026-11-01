@@ -304,3 +304,31 @@ def confirm_operator(disc_layers, Y_disc, cat_disc, conf_layers, Y_conf, cat_con
         out['supported_xlang'] = bool(out['R2_xlang'] >= crit['xlang_ratio_min'] * out['R2_operator']
                                       and out['R2_xlang'] - out['R2_category_mean'] >= crit['xlang_margin_min'])
     return out
+
+
+# ---------------- EA-v3：沿属性算子方向的双向干预（读出方向能否写入）----------------
+# 在属性问题提示里，于实体名的 token 位置、算子选定层的残差上加 k·σ·v（v = 算子方向的单位向量，σ = 发现集中性编码在 v 上投影的标准差），
+# k 取对称网格；对照 = 同样绝对大小的随机方向。效应 Δ(k) = 目标量(k) − 目标量(0)；颜色的目标量 = 目标色得分（首 token 对数概率减 11 色均值），
+# 二值属性的目标量 = 正向答案 − 反向答案的完整答案对数概率差。
+CRITERIA_V3 = {
+    'schema': 'entity_atlas.v3',
+    'k_grid': [-6, -3, 0, 3, 6],
+    'n_random': 5,
+    'min_swing': 1.0,          # 平均 Δ(+6) − Δ(−6) ≥ 1.0 nat
+    'seed': 0,
+}
+
+
+def steer_verdict(delta_op: np.ndarray, delta_rand: np.ndarray, k_grid, crit=CRITERIA_V3) -> Dict[str, object]:
+    """delta_op：[n_item, n_k]（算子方向）；delta_rand：[n_random, n_item, n_k]（随机方向）。
+    写方向成立 ⇔ 平均效应随 k 严格单调递增、Δ(+max) > 0 > Δ(−max)、摆幅 ≥ min_swing，且摆幅大于每一个随机方向的摆幅。"""
+    k = np.asarray(k_grid)
+    hi, lo = int(np.argmax(k)), int(np.argmin(k))
+    m = delta_op.mean(0)
+    swing = float(m[hi] - m[lo])
+    rand_sw = [float(r.mean(0)[hi] - r.mean(0)[lo]) for r in delta_rand]
+    order = np.argsort(k)
+    mono = bool(np.all(np.diff(m[order]) > 0))
+    ok = bool(mono and m[hi] > 0 > m[lo] and swing >= crit['min_swing'] and swing > max(rand_sw, default=-np.inf))
+    return {'mean_delta_by_k': [float(x) for x in m], 'swing': swing, 'random_swings': rand_sw, 'monotonic': mono,
+            'item_swing_positive_frac': float(np.mean(delta_op[:, hi] - delta_op[:, lo] > 0)), 'supported_write': ok}

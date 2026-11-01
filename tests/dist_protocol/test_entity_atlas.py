@@ -105,5 +105,19 @@ class EntityAtlasV2Tests(unittest.TestCase):
         self.assertLess(out['R2_operator'], 0.1)
 
 
+class EntityAtlasV3Tests(unittest.TestCase):
+    def test_steering_verdict(self):
+        k = E.CRITERIA_V3['k_grid']
+        rng = np.random.default_rng(0)
+        op = np.array([[0.4 * kk + rng.normal(0, 0.2) for kk in k] for _ in range(50)])
+        rnd = np.stack([np.array([[0.02 * kk + rng.normal(0, 0.2) for kk in k] for _ in range(50)]) for _ in range(5)])
+        v = E.steer_verdict(op, rnd, k)
+        self.assertTrue(v['supported_write'])
+        self.assertGreater(v['item_swing_positive_frac'], 0.9)
+        flat = np.array([[rng.normal(0, 0.2) for _ in k] for _ in range(50)])          # 负对照：方向无效
+        self.assertFalse(E.steer_verdict(flat, rnd, k)['supported_write'])
+        self.assertFalse(E.steer_verdict(rnd[0] * 0 + op[:, ::-1], rnd, k)['supported_write'])   # 方向反了也不算
+
+
 if __name__ == '__main__':
     unittest.main()

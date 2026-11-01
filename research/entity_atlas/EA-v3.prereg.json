@@ -1,0 +1,145 @@
+{
+ "id": "EA-v3",
+ "schema": "entity_atlas_prereg.v3",
+ "created": "2026-11-01",
+ "basis": "EA-v2（Phase 265）确认的共享属性算子；本检验问「读出方向能否写入」",
+ "question": "在实体名位置沿属性算子方向加正 / 负扰动，模型对该属性的回答是否随之单调变化，且大于同样大小的随机方向？",
+ "operators": {
+  "color": {
+   "zh": {
+    "layer": 31,
+    "lambda_rel": 1.0
+   },
+   "en": {
+    "layer": 27,
+    "lambda_rel": 1.0
+   }
+  },
+  "size": {
+   "zh": {
+    "layer": 24,
+    "lambda_rel": 1.0
+   },
+   "en": {
+    "layer": 11,
+    "lambda_rel": 1.0
+   }
+  },
+  "weight": {
+   "zh": {
+    "layer": 18,
+    "lambda_rel": 1.0
+   },
+   "en": {
+    "layer": 16,
+    "lambda_rel": 0.001
+   }
+  },
+  "water": {
+   "zh": {
+    "layer": 11,
+    "lambda_rel": 1.0
+   },
+   "en": {
+    "layer": 11,
+    "lambda_rel": 10.0
+   }
+  },
+  "edible": {
+   "zh": {
+    "layer": 33,
+    "lambda_rel": 1.0
+   },
+   "en": {
+    "layer": 20,
+    "lambda_rel": 1.0
+   }
+  }
+ },
+ "operator_source": "EA-v2 发现集编码与目标（重新拟合，层与 λ 取上表）",
+ "entities": [
+  "aquatic.cod",
+  "aquatic.grouper",
+  "aquatic.herring",
+  "aquatic.sea-lion",
+  "aquatic.scallop",
+  "aquatic.crucian-carp",
+  "aquatic.sea-anemone",
+  "aquatic.stingray",
+  "bird.duck",
+  "bird.guinea-fowl",
+  "bird.mandarin-duck",
+  "bird.grosbeak",
+  "bird.grouse",
+  "bird.wren",
+  "bird.titmouse",
+  "bird.cuckoo",
+  "food.spring-roll",
+  "food.oatmeal",
+  "food.cake",
+  "food.pasta",
+  "food.ice-cream",
+  "food.sushi",
+  "food.potato-chips",
+  "food.bacon",
+  "fruit.durian",
+  "fruit.wax-apple",
+  "fruit.olive",
+  "fruit.date",
+  "fruit.salak",
+  "fruit.flat-peach",
+  "fruit.crabapple",
+  "fruit.longan",
+  "mammal.cow",
+  "mammal.kangaroo",
+  "mammal.lemur",
+  "mammal.panda",
+  "mammal.hippo",
+  "mammal.donkey",
+  "mammal.cougar",
+  "mammal.mink",
+  "plant.morning-glory",
+  "plant.gardenia",
+  "plant.eucalyptus",
+  "plant.sugarcane",
+  "plant.clivia",
+  "plant.daffodil",
+  "plant.hydrangea",
+  "plant.alfalfa",
+  "vegetable.watercress",
+  "vegetable.winter-melon",
+  "vegetable.crown-daisy",
+  "vegetable.sweet-potato",
+  "vegetable.burdock",
+  "vegetable.radish",
+  "vegetable.snow-pea",
+  "vegetable.bell-pepper"
+ ],
+ "target_colors": [
+  "red",
+  "yellow",
+  "green",
+  "white",
+  "black",
+  "purple"
+ ],
+ "intervention": "block ℓ 的输入残差（hs[ℓ]）上，实体名全部 token 位置加 k·σ·v；σ = 发现集中性编码在 v 上投影的标准差",
+ "prompts": "EA-v2 预注册中的属性问题提示（颜色用首 token 对数概率，二值属性用完整答案对数概率）",
+ "criteria": {
+  "schema": "entity_atlas.v3",
+  "k_grid": [
+   -6,
+   -3,
+   0,
+   3,
+   6
+  ],
+  "n_random": 5,
+  "min_swing": 1.0,
+  "seed": 0
+ },
+ "decision_rules": {
+  "binary": "每个属性 × 语言：steer_verdict 的 supported_write",
+  "color": "每种语言：6 个目标色中至少 4 个 steer_verdict 成立，记为该语言颜色写方向成立"
+ }
+}
