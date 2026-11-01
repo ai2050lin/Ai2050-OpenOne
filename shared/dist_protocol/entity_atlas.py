@@ -229,3 +229,78 @@ def rsa(A: np.ndarray, B: np.ndarray, n_perm: int = 200, seed: int = 0) -> Dict[
         p = rng.permutation(len(B))
         null.append(float(np.corrcoef(rank(a), rank(SB[p][:, p][iu]))[0, 1]))
     return {'spearman': real, 'null_p95': float(np.quantile(null, 0.95))}
+
+
+# ---------------- EA-v2：连续目标的确认检验（发现集拟合、确认集只评估一次）----------------
+# 目标 Y 是模型自己的回答（颜色 = 11 色对数概率减去该实体 11 色均值；二值属性 = 两组答案的对数概率差），不需要人工标签。
+# 层与 λ 只在发现集（EA-v1 的 210 个实体）上用 5 折交叉验证选定；确认集（新实体）只评估一次。
+CRITERIA_V2 = {
+    'schema': 'entity_atlas.v2',
+    'lambdas_rel': [1e-3, 1e-2, 1e-1, 1.0, 10.0],
+    'cv_folds': 5,
+    'op_margin_min': 0.10,        # 共享算子：确认集 R² 须超过 max(类别均值 R², hs[0] 算子 R²) 这么多
+    'delta_r2_min': 0.10,         # 个体差分：去掉类别均值后的残差 R² ≥ 此值
+    'xlang_ratio_min': 0.6,       # 跨语言：另一语言编码 + 同一算子的 R² ≥ 同语言 R² × 此值
+    'xlang_margin_min': 0.05,     #           且超过类别均值 R² 这么多
+    'g1_acc_min': 0.6, 'g1_over_hs0_min': 0.15,
+    'seed': 0,
+}
+
+
+def r2(Y, P) -> float:
+    Y, P = np.asarray(Y, np.float64), np.asarray(P, np.float64)
+    if Y.ndim == 1:
+        Y, P = Y[:, None], P[:, None]
+    return float(1 - ((Y - P) ** 2).sum() / max(((Y - Y.mean(0)) ** 2).sum(), 1e-30))
+
+
+def select_layer_lambda(X_by_layer: List[np.ndarray], Y: np.ndarray, lams, folds: int, seed: int):
+    """发现集上逐层 × λ 的 k 折交叉验证平方误差，返回 (层, λ, 曲线)。"""
+    Y = np.asarray(Y, np.float64)
+    Y2 = Y if Y.ndim == 2 else Y[:, None]
+    parts = np.array_split(np.random.default_rng(seed).permutation(len(Y2)), folds)
+    best, curve = None, []
+    for l, X in enumerate(X_by_layer):
+        row = []
+        for lam in lams:
+            sse = 0.0
+            for p in parts:
+                tr = np.setdiff1d(np.arange(len(Y2)), p)
+                m = ridge_fit(X[tr], Y2[tr], lam)
+                sse += float(((ridge_predict(m, X[p]) - Y2[p]) ** 2).sum())
+            row.append(sse)
+            if best is None or sse < best[0]:
+                best = (sse, l, lam)
+        curve.append(row)
+    return best[1], best[2], curve
+
+
+def confirm_operator(disc_layers, Y_disc, cat_disc, conf_layers, Y_conf, cat_conf, *, conf_other_layers=None, crit=CRITERIA_V2):
+    """共享算子的确认检验：返回确认集上的 R²（算子 / 类别均值 / hs[0] / 残差 / 跨语言）与判定。"""
+    Yd = np.asarray(Y_disc, np.float64); Yc = np.asarray(Y_conf, np.float64)
+    if Yd.ndim == 1:
+        Yd, Yc = Yd[:, None], Yc[:, None]
+    cat_disc, cat_conf = np.asarray(cat_disc), np.asarray(cat_conf)
+    l, lam, curve = select_layer_lambda(disc_layers, Yd, crit['lambdas_rel'], crit['cv_folds'], crit['seed'])
+    m = ridge_fit(disc_layers[l], Yd, lam)
+    P = ridge_predict(m, conf_layers[l])
+    cm = {c: Yd[cat_disc == c].mean(0) for c in set(cat_disc)}
+    base = np.stack([cm[c] for c in cat_conf])
+    _, lam0, _ = select_layer_lambda([disc_layers[0]], Yd, crit['lambdas_rel'], crit['cv_folds'], crit['seed'])
+    P0 = ridge_predict(ridge_fit(disc_layers[0], Yd, lam0), conf_layers[0])
+    xc = {c: disc_layers[l][cat_disc == c].mean(0) for c in set(cat_disc)}
+    Xr_d = disc_layers[l] - np.stack([xc[c] for c in cat_disc])
+    Xr_c = conf_layers[l] - np.stack([xc[c] for c in cat_conf])
+    Yr_d = Yd - np.stack([cm[c] for c in cat_disc])
+    _, lamr, _ = select_layer_lambda([Xr_d], Yr_d, crit['lambdas_rel'], crit['cv_folds'], crit['seed'])
+    Pr = ridge_predict(ridge_fit(Xr_d, Yr_d, lamr), Xr_c)
+    out = {'layer': int(l), 'lambda_rel': float(lam), 'R2_operator': r2(Yc, P), 'R2_category_mean': r2(Yc, base),
+           'R2_hs0': r2(Yc, P0), 'R2_residual': r2(Yc - base, Pr)}
+    if conf_other_layers is not None:
+        out['R2_xlang'] = r2(Yc, ridge_predict(m, conf_other_layers[l]))
+    out['supported_operator'] = bool(out['R2_operator'] - max(out['R2_category_mean'], out['R2_hs0']) >= crit['op_margin_min'])
+    out['supported_delta'] = bool(out['R2_residual'] >= crit['delta_r2_min'])
+    if 'R2_xlang' in out:
+        out['supported_xlang'] = bool(out['R2_xlang'] >= crit['xlang_ratio_min'] * out['R2_operator']
+                                      and out['R2_xlang'] - out['R2_category_mean'] >= crit['xlang_margin_min'])
+    return out

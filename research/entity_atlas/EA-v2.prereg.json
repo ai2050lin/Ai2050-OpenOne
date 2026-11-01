@@ -1,0 +1,244 @@
+{
+ "id": "EA-v2",
+ "schema": "entity_atlas_prereg.v2",
+ "created": "2026-11-01",
+ "basis": "EA-v1 预注册结果与事后诊断 D2（research/entity_atlas/EA-v1-qwen3-4b/，Phase 264）",
+ "question": "在从未参与拟合、选层与选 λ 的新实体上：一个对全部实体共享的线性算子，能否从不含属性线索的实体编码预测模型自己对颜色、大小、重量、含水、可食的回答（超出类别均值与 token 身份）？属性是否落在个体差分里、能否跨语言复用？新实体的类别能否由旧实体的类别中心预测？",
+ "discovery": {
+  "lexicon": "shared/dist_protocol/lexicon/ENT-XF_nouns.v2.tsv",
+  "sha256": "0a5c2d861df7508250b959799f01361581fe2cf130824187f8b8c9ab16906a57",
+  "n": 210,
+  "codes": "EA-v1 采集（同一模型快照、同一句式）"
+ },
+ "confirmation": {
+  "lexicon": "shared/dist_protocol/lexicon/EA-v2_new_entities.tsv",
+  "sha256": "62ce01ba23a61829acfce235c9a88795fef54d95debb4e931d8a118c20ca7f9e",
+  "n": 197
+ },
+ "frames": {
+  "zh": [
+   "我今天想到了{X}",
+   "这一段说的是{X}",
+   "请看这个{X}"
+  ],
+  "en": [
+   "Today I thought about the {E}",
+   "This passage is about the {E}",
+   "Please look at this {E}"
+  ]
+ },
+ "targets": {
+  "color": {
+   "prompt": {
+    "zh": "问：{X}通常是什么颜色的？\n答：{X}通常是",
+    "en": "Q: What color is the {E} usually?\nA: The {E} is usually"
+   },
+   "palette": [
+    "red",
+    "yellow",
+    "green",
+    "blue",
+    "white",
+    "black",
+    "brown",
+    "orange",
+    "purple",
+    "pink",
+    "gray"
+   ],
+   "forms": {
+    "zh": {
+     "red": [
+      "红色"
+     ],
+     "yellow": [
+      "黄色",
+      "金黄色"
+     ],
+     "green": [
+      "绿色"
+     ],
+     "blue": [
+      "蓝色"
+     ],
+     "white": [
+      "白色"
+     ],
+     "black": [
+      "黑色"
+     ],
+     "brown": [
+      "棕色",
+      "褐色"
+     ],
+     "orange": [
+      "橙色"
+     ],
+     "purple": [
+      "紫色"
+     ],
+     "pink": [
+      "粉色",
+      "粉红色"
+     ],
+     "gray": [
+      "灰色"
+     ]
+    },
+    "en": {
+     "red": [
+      " red"
+     ],
+     "yellow": [
+      " yellow",
+      " golden"
+     ],
+     "green": [
+      " green"
+     ],
+     "blue": [
+      " blue"
+     ],
+     "white": [
+      " white"
+     ],
+     "black": [
+      " black"
+     ],
+     "brown": [
+      " brown"
+     ],
+     "orange": [
+      " orange"
+     ],
+     "purple": [
+      " purple"
+     ],
+     "pink": [
+      " pink"
+     ],
+     "gray": [
+      " gray",
+      " grey"
+     ]
+    }
+   },
+   "definition": "完整答案对数概率，各颜色取表面形式最大值，再减去该实体 11 色均值"
+  },
+  "size": {
+   "zh": {
+    "prompt": "跟成年人相比，{X}的个头通常",
+    "pos": [
+     "更大",
+     "更高"
+    ],
+    "neg": [
+     "更小",
+     "更矮"
+    ]
+   },
+   "en": {
+    "prompt": "Compared with an adult human, the {E} is usually",
+    "pos": [
+     " bigger",
+     " larger",
+     " taller"
+    ],
+    "neg": [
+     " smaller",
+     " shorter"
+    ]
+   }
+  },
+  "weight": {
+   "zh": {
+    "prompt": "问：{X}通常比一公斤重还是轻？\n答：{X}通常比一公斤",
+    "pos": [
+     "重",
+     "更重"
+    ],
+    "neg": [
+     "轻",
+     "更轻"
+    ]
+   },
+   "en": {
+    "prompt": "Q: Is the {E} usually heavier or lighter than one kilogram?\nA: The {E} is usually",
+    "pos": [
+     " heavier"
+    ],
+    "neg": [
+     " lighter"
+    ]
+   }
+  },
+  "water": {
+   "zh": {
+    "prompt": "问：{X}里面的水分通常多还是少？\n答：{X}里面的水分通常",
+    "pos": [
+     "多",
+     "很多"
+    ],
+    "neg": [
+     "少",
+     "很少"
+    ]
+   },
+   "en": {
+    "prompt": "Q: Does the {E} usually contain a lot of water or very little water?\nA: The {E} usually contains",
+    "pos": [
+     " a lot of water"
+    ],
+    "neg": [
+     " very little water"
+    ]
+   }
+  },
+  "edible": {
+   "zh": {
+    "prompt": "问：{X}通常是人们拿来吃的吗？\n答：{X}通常",
+    "pos": [
+     "可以吃",
+     "能吃"
+    ],
+    "neg": [
+     "不能吃",
+     "不可以吃"
+    ]
+   },
+   "en": {
+    "prompt": "Q: Is the {E} something people usually eat?\nA: People usually",
+    "pos": [
+     " eat it"
+    ],
+    "neg": [
+     " do not eat it"
+    ]
+   }
+  },
+  "binary_definition": "max 完整答案对数概率(pos) − max(neg)"
+ },
+ "g1_layers": {
+  "zh": 27,
+  "en": 10
+ },
+ "rsa_layer": 31,
+ "criteria": {
+  "schema": "entity_atlas.v2",
+  "lambdas_rel": [
+   0.001,
+   0.01,
+   0.1,
+   1.0,
+   10.0
+  ],
+  "cv_folds": 5,
+  "op_margin_min": 0.1,
+  "delta_r2_min": 0.1,
+  "xlang_ratio_min": 0.6,
+  "xlang_margin_min": 0.05,
+  "g1_acc_min": 0.6,
+  "g1_over_hs0_min": 0.15,
+  "seed": 0
+ }
+}

@@ -73,5 +73,37 @@ class EntityAtlasTests(unittest.TestCase):
         self.assertGreater(E.participation_ratio(np.random.default_rng(0).normal(size=(200, 20))), 10)
 
 
+def planted_continuous(n, seed, d=48, related=True, A=None, U=None):
+    """类别中心 + 个体差分；连续目标 = 共享算子 A 作用在个体差分上（related）或与编码无关的噪声。"""
+    rng = np.random.default_rng(seed)
+    cats = ['a', 'b', 'c', 'd']
+    U = U if U is not None else {c: np.random.default_rng(100 + i).normal(0, 3, d) for i, c in enumerate(cats)}
+    A = A if A is not None else np.random.default_rng(7).normal(0, 1, (d, 5))
+    cat = np.array([cats[i % 4] for i in range(n)])
+    delta = rng.normal(0, 1, (n, d))
+    X = np.stack([U[c] for c in cat]) + delta
+    Y = delta @ A + rng.normal(0, 0.5, (n, 5)) if related else rng.normal(0, 1, (n, 5))
+    return X, Y, cat, A, U
+
+
+class EntityAtlasV2Tests(unittest.TestCase):
+    def test_shared_operator_confirmed_on_new_entities(self):
+        Xd, Yd, cd, A, U = planted_continuous(200, 1)
+        Xc, Yc, cc, _, _ = planted_continuous(150, 2, A=A, U=U)
+        noise = np.random.default_rng(3).normal(size=Xd.shape)
+        out = E.confirm_operator([noise, Xd], Yd, cd, [np.random.default_rng(4).normal(size=Xc.shape), Xc], Yc, cc,
+                                 conf_other_layers=[None, Xc + np.random.default_rng(5).normal(0, 0.3, Xc.shape)])
+        self.assertEqual(out['layer'], 1)
+        self.assertGreater(out['R2_operator'], 0.7)
+        self.assertTrue(out['supported_operator'] and out['supported_delta'] and out['supported_xlang'])
+
+    def test_unrelated_target_not_confirmed(self):
+        Xd, Yd, cd, A, U = planted_continuous(200, 1, related=False)
+        Xc, Yc, cc, _, _ = planted_continuous(150, 2, related=False, A=A, U=U)
+        out = E.confirm_operator([Xd], Yd, cd, [Xc], Yc, cc)
+        self.assertFalse(out['supported_operator'])
+        self.assertLess(out['R2_operator'], 0.1)
+
+
 if __name__ == '__main__':
     unittest.main()
