@@ -332,3 +332,99 @@ def steer_verdict(delta_op: np.ndarray, delta_rand: np.ndarray, k_grid, crit=CRI
     ok = bool(mono and m[hi] > 0 > m[lo] and swing >= crit['min_swing'] and swing > max(rand_sw, default=-np.inf))
     return {'mean_delta_by_k': [float(x) for x in m], 'swing': swing, 'random_swings': rand_sw, 'monotonic': mono,
             'item_swing_positive_frac': float(np.mean(delta_op[:, hi] - delta_op[:, lo] > 0)), 'supported_write': ok}
+
+
+# ---------------- EA-v5：属性算子图谱（各属性是否各占独立维度、算子与相似查表、写入的串扰）----------------
+# 独立维度：把属性 k 的回答对其他全部属性的回答做线性回归（只在发现集拟合系数），剩下的「独有部分」是否仍能由实体编码读出？
+# 相似查表：用发现集里编码最相似的 k 个实体的回答平均来预测（k 由交叉验证选定），与共享线性算子比较。
+# 串扰：沿属性 i 的方向推动实体位置时，属性 j 的回答变化多少；与线性读出算子自身的预测 w_j·Δh 对照。
+CRITERIA_V5 = {
+    'schema': 'entity_atlas.v5',
+    'knn_k_grid': [1, 3, 5, 10, 20, 40],
+    'unique_r2_min': 0.10,         # 独有部分：确认集 R² ≥ 此值
+    'unique_over_hs0_min': 0.05,   #           且超过 hs[0] 上同样拟合的 R² 这么多
+    'n_perm': 100,                 #           且超过发现集目标打乱后的确认集 R² 的 95% 分位
+    'H1_min_attrs': 3,             # 每种语言 5 个属性中至少 3 个有可读出的独有部分
+    'H2_min_items': 7,             # 10 个属性 × 语言中算子 R² 高于相似查表 R² 的至少 7 个
+    'k': 6, 'n_random': 2,
+    'H3_min_readouts': 5,          # 每种语言 6 个读出中，至少 5 个的最大 |摆幅| 来自对应的方向
+    'H4_spearman_min': 0.6,        # 36 格实测摆幅与线性预测的 Spearman
+    'H4_sign_min': 0.7,            # |预测| ≥ H4_pred_min 的非对角格中实测与预测同号的比例
+    'H4_pred_min': 0.5,
+    'H5_own_min': 1.0,             # 独有方向：本属性摆幅 ≥ 1.0 nat
+    'H5_ratio_min': 2.0,           #           且 ≥ 其他二值属性最大 |摆幅| 的 2 倍
+    'H5_min_attrs': 2,             # 每种语言 4 个二值属性中至少 2 个
+    'seed': 0,
+}
+
+
+def residualize(Y_disc: np.ndarray, O_disc: np.ndarray, Y_conf: np.ndarray, O_conf: np.ndarray):
+    """Y 对其他属性 O 做最小二乘（含截距，系数只在发现集拟合），返回两集的残差。"""
+    A = np.c_[np.ones(len(O_disc)), O_disc]
+    B = np.linalg.lstsq(A, Y_disc, rcond=None)[0]
+    return Y_disc - A @ B, Y_conf - np.c_[np.ones(len(O_conf)), O_conf] @ B
+
+
+def unique_part_eval(disc_layers, R_disc, conf_layers, R_conf, crit=CRITERIA_V5, lams=CRITERIA_V2['lambdas_rel']):
+    """独有部分的读出：发现集选层与 λ，确认集评估一次；对照 = hs[0] 同样拟合、发现集目标行打乱。"""
+    Rd = np.asarray(R_disc, np.float64); Rc = np.asarray(R_conf, np.float64)
+    Rd2 = Rd if Rd.ndim == 2 else Rd[:, None]; Rc2 = Rc if Rc.ndim == 2 else Rc[:, None]
+    l, lam, _ = select_layer_lambda(disc_layers, Rd2, lams, 5, crit['seed'])
+    real = r2(Rc2, ridge_predict(ridge_fit(disc_layers[l], Rd2, lam), conf_layers[l]))
+    _, lam0, _ = select_layer_lambda([disc_layers[0]], Rd2, lams, 5, crit['seed'])
+    r0 = r2(Rc2, ridge_predict(ridge_fit(disc_layers[0], Rd2, lam0), conf_layers[0]))
+    rng = np.random.default_rng(crit['seed'])
+    null = [r2(Rc2, ridge_predict(ridge_fit(disc_layers[l], Rd2[rng.permutation(len(Rd2))], lam), conf_layers[l]))
+            for _ in range(crit['n_perm'])]
+    p95 = float(np.quantile(null, 0.95))
+    return {'layer': int(l), 'lambda_rel': float(lam), 'R2_unique': real, 'R2_unique_hs0': r0, 'null_p95': p95,
+            'supported': bool(real >= crit['unique_r2_min'] and real - r0 >= crit['unique_over_hs0_min'] and real > p95)}
+
+
+def knn_predict(X_disc, Y_disc, X_conf, k: int):
+    """余弦相似（减去发现集均值后）最近的 k 个发现集实体的回答平均。"""
+    mu = X_disc.mean(0)
+    A = X_disc - mu; B = X_conf - mu
+    A = A / np.linalg.norm(A, axis=1, keepdims=True); B = B / np.linalg.norm(B, axis=1, keepdims=True)
+    idx = np.argsort(-(B @ A.T), axis=1)[:, :k]
+    return np.asarray(Y_disc, np.float64)[idx].mean(1)
+
+
+def knn_eval(X_disc, Y_disc, X_conf, Y_conf, crit=CRITERIA_V5):
+    """相似查表基线：k 由发现集 5 折交叉验证选定，确认集评估一次。"""
+    Yd = np.asarray(Y_disc, np.float64)
+    parts = np.array_split(np.random.default_rng(crit['seed']).permutation(len(Yd)), 5)
+    sse = {}
+    for k in crit['knn_k_grid']:
+        sse[k] = sum(float(((knn_predict(X_disc[np.setdiff1d(np.arange(len(Yd)), p)], Yd[np.setdiff1d(np.arange(len(Yd)), p)],
+                                         X_disc[p], k) - Yd[p]) ** 2).sum()) for p in parts)
+    k = min(sse, key=sse.get)
+    return {'k': int(k), 'R2_knn': r2(Y_conf, knn_predict(X_disc, Yd, X_conf, k))}
+
+
+def crosstalk_verdict(S: np.ndarray, P: np.ndarray, S_unique: np.ndarray, binary_idx: Sequence[int], crit=CRITERIA_V5):
+    """S、P：[方向 i, 读出 j] 的实测摆幅与线性预测摆幅（方向与读出同序，对角为同一属性）；
+    S_unique：[独有方向, 读出]，第 a 行对应读出 binary_idx[a]。"""
+    S, P, S_unique = np.asarray(S, float), np.asarray(P, float), np.asarray(S_unique, float)
+    n = S.shape[0]
+    diag_top = [bool(np.argmax(np.abs(S[:, j])) == j) for j in range(n)]
+    rank = lambda a: np.argsort(np.argsort(a)).astype(float)
+    sp = float(np.corrcoef(rank(S.ravel()), rank(P.ravel()))[0, 1])
+    off = ~np.eye(n, dtype=bool) & (np.abs(P) >= crit['H4_pred_min'])
+    sign = float(np.mean(np.sign(S[off]) == np.sign(P[off]))) if off.any() else float('nan')
+    sep = []
+    for a, j in enumerate(binary_idx):
+        own = S_unique[a, j]
+        other = max(abs(S_unique[a, jj]) for jj in binary_idx if jj != j)
+        sep.append({'own': float(own), 'max_other_abs': float(other),
+                    'separable': bool(own >= crit['H5_own_min'] and own >= crit['H5_ratio_min'] * other)})
+    full_sep = []
+    for j in binary_idx:
+        other = max(abs(S[j, jj]) for jj in binary_idx if jj != j)
+        full_sep.append({'own': float(S[j, j]), 'max_other_abs': float(other),
+                         'separable': bool(S[j, j] >= crit['H5_own_min'] and S[j, j] >= crit['H5_ratio_min'] * other)})
+    return {'diag_top': diag_top, 'H3': bool(sum(diag_top) >= crit['H3_min_readouts']),
+            'spearman': sp, 'sign_agree_offdiag': sign, 'n_offdiag_tested': int(off.sum()),
+            'H4': bool(sp >= crit['H4_spearman_min'] and (np.isnan(sign) or sign >= crit['H4_sign_min'])),
+            'unique_separability': sep, 'full_separability_descriptive': full_sep,
+            'H5': bool(sum(s['separable'] for s in sep) >= crit['H5_min_attrs'])}

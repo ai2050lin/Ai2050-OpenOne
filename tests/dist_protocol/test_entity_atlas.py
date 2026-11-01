@@ -119,5 +119,42 @@ class EntityAtlasV3Tests(unittest.TestCase):
         self.assertFalse(E.steer_verdict(rnd[0] * 0 + op[:, ::-1], rnd, k)['supported_write'])   # 方向反了也不算
 
 
+class EntityAtlasV5Tests(unittest.TestCase):
+    def _data(self, n, seed, unique=True):
+        rng = np.random.default_rng(seed)
+        d = 40
+        B = np.random.default_rng(11).normal(size=(d, 3))
+        X = rng.normal(size=(n, d))
+        a = X @ B[:, 0] + 0.3 * rng.normal(size=n)
+        b = 0.7 * a + (X @ B[:, 1] if unique else 0) + 0.3 * rng.normal(size=n)   # b = 共享 a 的部分 + 独有部分（或只有噪声）
+        return X, a, b
+
+    def test_unique_part_found_and_absent(self):
+        for unique, expect in ((True, True), (False, False)):
+            Xd, ad, bd = self._data(200, 1, unique)
+            Xc, ac, bc = self._data(150, 2, unique)
+            Rd, Rc = E.residualize(bd, ad[:, None], bc, ac[:, None])
+            noise = [np.random.default_rng(3).normal(size=Xd.shape), Xd]
+            noise_c = [np.random.default_rng(4).normal(size=Xc.shape), Xc]
+            out = E.unique_part_eval(noise, Rd, noise_c, Rc, crit={**E.CRITERIA_V5, 'n_perm': 20})
+            self.assertEqual(out['supported'], expect)
+
+    def test_operator_beats_knn_on_linear_target(self):
+        Xd, ad, _ = self._data(200, 1)
+        Xc, ac, _ = self._data(150, 2)
+        op = E.r2(ac, E.ridge_predict(E.ridge_fit(Xd, ad, 1e-2), Xc))
+        self.assertGreater(op, E.knn_eval(Xd, ad, Xc, ac)['R2_knn'] + 0.2)
+
+    def test_crosstalk_verdict(self):
+        P = np.array([[3, 1, 0, 0], [1, 3, 0, 0], [0, 0, 3, -1], [0, 0, -1, 3]], float)
+        S = P * 0.9
+        U = np.diag([2.0, 2.0, 2.0, 2.0])
+        crit = {**E.CRITERIA_V5, 'H3_min_readouts': 4}
+        v = E.crosstalk_verdict(S, P, U, [0, 1, 2, 3], crit)
+        self.assertTrue(v['H3'] and v['H4'] and v['H5'])
+        bad = E.crosstalk_verdict(-S[:, ::-1], P, np.ones((4, 4)), [0, 1, 2, 3], crit)   # 负对照：方向错位、独有方向不分离
+        self.assertFalse(bad['H3'] or bad['H4'] or bad['H5'])
+
+
 if __name__ == '__main__':
     unittest.main()

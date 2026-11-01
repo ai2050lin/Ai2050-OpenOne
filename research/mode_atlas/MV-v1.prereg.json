@@ -1,0 +1,129 @@
+{
+ "id": "MV-v1",
+ "schema": "mode_atlas_prereg.v1",
+ "created": "2026-11-01",
+ "basis": "G1–G5 总方案的 G3；G1 / G2 的实体材料（EA-v1 发现集、EA-v2 确认集）",
+ "question": "疑问、否定这类句型模式，在句末状态里是否是与具体内容无关、可以叠加的方向？中英文是否共用？否定与类别真假的组合（真值 = t XOR n）是否被编码？",
+ "discovery": {
+  "n": 210,
+  "lexicon_sha256": "0a5c2d861df7508250b959799f01361581fe2cf130824187f8b8c9ab16906a57"
+ },
+ "confirmation": {
+  "n": 197,
+  "lexicon_sha256": "62ce01ba23a61829acfce235c9a88795fef54d95debb4e931d8a118c20ca7f9e"
+ },
+ "frames": {
+  "zh": {
+   "q0n0": "他说{X}是一种{C}。",
+   "q0n1": "他说{X}不是一种{C}。",
+   "q1n0": "他问{X}是否是一种{C}。",
+   "q1n1": "他问{X}是否不是一种{C}。"
+  },
+  "en": {
+   "q0n0": "He said the {E} is {C}.",
+   "q0n1": "He said the {E} is not {C}.",
+   "q1n0": "He asked whether the {E} is {C}.",
+   "q1n1": "He asked whether the {E} is not {C}."
+  }
+ },
+ "categories": {
+  "aquatic": [
+   "水生动物",
+   "an aquatic animal"
+  ],
+  "bird": [
+   "鸟",
+   "a bird"
+  ],
+  "mammal": [
+   "哺乳动物",
+   "a mammal"
+  ],
+  "fruit": [
+   "水果",
+   "a fruit"
+  ],
+  "vegetable": [
+   "蔬菜",
+   "a vegetable"
+  ],
+  "plant": [
+   "植物",
+   "a plant"
+  ],
+  "food": [
+   "食品",
+   "a food"
+  ]
+ },
+ "false_category_rule": "另一大类中的类别（动物 ↔ 植物 / 食品），按 sha256 确定。",
+ "gate": {
+  "zh": {
+   "statements": {
+    "0": "{X}是一种{C}。",
+    "1": "{X}不是一种{C}。"
+   },
+   "suffix": "这句话是",
+   "true": [
+    "对的"
+   ],
+   "false": [
+    "错的"
+   ]
+  },
+  "en": {
+   "statements": {
+    "0": "The {E} is {C}.",
+    "1": "The {E} is not {C}."
+   },
+   "suffix": " This statement is",
+   "true": [
+    " true"
+   ],
+   "false": [
+    " false"
+   ]
+  }
+ },
+ "readout": "句末 token（「。」/「.」）全部 37 个 hs 层；hs[-1] 为最终归一化之后",
+ "cells": "c = 4q + 2n + t",
+ "examples": {
+  "zh": [
+   "他说香蕉是一种鸟。",
+   "他说香蕉是一种水果。",
+   "他说香蕉不是一种鸟。",
+   "他说香蕉不是一种水果。",
+   "他问香蕉是否是一种鸟。",
+   "他问香蕉是否是一种水果。",
+   "他问香蕉是否不是一种鸟。",
+   "他问香蕉是否不是一种水果。"
+  ],
+  "en": [
+   "He said the banana is a bird.",
+   "He said the banana is a fruit.",
+   "He said the banana is not a bird.",
+   "He said the banana is not a fruit.",
+   "He asked whether the banana is a bird.",
+   "He asked whether the banana is a fruit.",
+   "He asked whether the banana is not a bird.",
+   "He asked whether the banana is not a fruit."
+  ]
+ },
+ "criteria": {
+  "schema": "mode_atlas.v1",
+  "lambdas_rel": [
+   0.001,
+   0.01,
+   0.1,
+   1.0,
+   10.0
+  ],
+  "H1_decouple_r2_min": 0.5,
+  "H2_q_interaction_max": 0.1,
+  "H3_truth_acc_min": 0.75,
+  "H3_gate_min": 0.7,
+  "H4_cos_min": 0.3,
+  "H4_transfer_min": 0.75,
+  "seed": 0
+ }
+}
