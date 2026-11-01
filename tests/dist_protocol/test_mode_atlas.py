@@ -57,6 +57,14 @@ class ModeAtlasTests(unittest.TestCase):
         Xd, yd, gd = truth_data(planted(120, 1, nt=0.0)); Xc, yc, _ = truth_data(planted(100, 2, nt=0.0))
         self.assertLess(M.probe(Xd, yd, gd, Xc, yc)['acc'], 0.65)
 
+    def test_paired_gate(self):
+        rng = np.random.default_rng(0)
+        bias = -8 + rng.normal(0, 1, (200, 1))                      # 整体偏向「错」，绝对口径全错
+        truth = np.array([0, 1, 1, 0])
+        m = bias + 2.0 * truth[None] + rng.normal(0, 0.5, (200, 4))
+        self.assertGreater(M.paired_gate(m)['acc'], 0.9)
+        self.assertLess(M.paired_gate(bias + rng.normal(0, 0.5, (200, 4)))['acc'], 0.65)   # 负对照：不区分真假
+
 
 if __name__ == '__main__':
     unittest.main()

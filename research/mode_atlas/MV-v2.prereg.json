@@ -1,0 +1,196 @@
+{
+ "id": "MV-v2",
+ "schema": "mode_atlas_prereg.v2",
+ "created": "2026-11-01",
+ "basis": "MV-v1（Phase 269）：预注册 H4 因选层规则（浅层）失败，事后诊断显示中层跨语言复用强；中文行为门绝对口径失败、成对口径区分真假",
+ "question": "中文模型是否区分句子真假（成对口径）？真值组合与句型方向是否跨句式框架复现？中层是否跨语言复用？沿真值方向写入句末状态，模型的真假判断是否随之改变？",
+ "mv1_prereg_sha256": "91786ca0a96ac35da58c28e721fcd352216e9ce55a2ebfde96493aaba724095e",
+ "frames_B": {
+  "zh": {
+   "q0n0": "报道称{X}是一种{C}。",
+   "q0n1": "报道称{X}不是一种{C}。",
+   "q1n0": "报道询问{X}是否是一种{C}。",
+   "q1n1": "报道询问{X}是否不是一种{C}。"
+  },
+  "en": {
+   "q0n0": "The report says the {E} is {C}.",
+   "q0n1": "The report says the {E} is not {C}.",
+   "q1n0": "The report asks whether the {E} is {C}.",
+   "q1n1": "The report asks whether the {E} is not {C}."
+  }
+ },
+ "bare_and_gate": {
+  "zh": {
+   "statements": {
+    "0": "{X}是一种{C}。",
+    "1": "{X}不是一种{C}。"
+   },
+   "suffix": "这句话是",
+   "true": [
+    "对的"
+   ],
+   "false": [
+    "错的"
+   ]
+  },
+  "en": {
+   "statements": {
+    "0": "The {E} is {C}.",
+    "1": "The {E} is not {C}."
+   },
+   "suffix": " This statement is",
+   "true": [
+    " true"
+   ],
+   "false": [
+    " false"
+   ]
+  }
+ },
+ "examples": {
+  "zh": {
+   "B": [
+    "报道称香蕉是一种鸟。",
+    "报道称香蕉是一种水果。",
+    "报道称香蕉不是一种鸟。",
+    "报道称香蕉不是一种水果。",
+    "报道询问香蕉是否是一种鸟。",
+    "报道询问香蕉是否是一种水果。",
+    "报道询问香蕉是否不是一种鸟。",
+    "报道询问香蕉是否不是一种水果。"
+   ],
+   "bare": [
+    "香蕉是一种鸟。",
+    "香蕉是一种水果。",
+    "香蕉不是一种鸟。",
+    "香蕉不是一种水果。"
+   ]
+  },
+  "en": {
+   "B": [
+    "The report says the banana is a bird.",
+    "The report says the banana is a fruit.",
+    "The report says the banana is not a bird.",
+    "The report says the banana is not a fruit.",
+    "The report asks whether the banana is a bird.",
+    "The report asks whether the banana is a fruit.",
+    "The report asks whether the banana is not a bird.",
+    "The report asks whether the banana is not a fruit."
+   ],
+   "bare": [
+    "The banana is a bird.",
+    "The banana is a fruit.",
+    "The banana is not a bird.",
+    "The banana is not a fruit."
+   ]
+  }
+ },
+ "steer": {
+  "entities": [
+   "aquatic.crucian-carp",
+   "aquatic.cod",
+   "aquatic.toad",
+   "aquatic.softshell-turtle",
+   "aquatic.mackerel",
+   "aquatic.orca",
+   "aquatic.grouper",
+   "aquatic.seahorse",
+   "bird.wagtail",
+   "bird.duck",
+   "bird.hornbill",
+   "bird.grosbeak",
+   "bird.grebe",
+   "bird.puffin",
+   "bird.chicken",
+   "bird.woodpecker",
+   "food.ham",
+   "food.sushi",
+   "food.mooncake",
+   "food.youtiao",
+   "food.bread",
+   "food.oatmeal",
+   "food.stuffed-bun",
+   "food.sausage",
+   "fruit.salak",
+   "fruit.sapodilla",
+   "fruit.sea-buckthorn",
+   "fruit.durian",
+   "fruit.hawthorn",
+   "fruit.date",
+   "fruit.wax-apple",
+   "fruit.dragonfruit",
+   "mammal.lynx",
+   "mammal.leopard",
+   "mammal.anteater",
+   "mammal.zebra",
+   "mammal.goat",
+   "mammal.donkey",
+   "mammal.raccoon",
+   "mammal.cougar",
+   "plant.plane-tree",
+   "plant.hydrangea",
+   "plant.dahlia",
+   "plant.reed",
+   "plant.azalea",
+   "plant.rosemary",
+   "plant.mimosa",
+   "plant.basil",
+   "vegetable.tomato",
+   "vegetable.amaranth",
+   "vegetable.taro",
+   "vegetable.onion",
+   "vegetable.chayote",
+   "vegetable.water-spinach",
+   "vegetable.jicama",
+   "vegetable.snow-pea"
+  ],
+  "position": "裸陈述句句末 token（「。」/「.」），提示 = ids(陈述句) + ids(后缀)",
+  "direction": "发现集裸陈述句在该层的 mean(真) − mean(假)，单位化；σ = 发现集 4 格投影的标准差",
+  "readout": "「对的 − 错的」（英文 true − false）完整答案对数概率差",
+  "verdict": "entity_atlas.steer_verdict"
+ },
+ "criteria": {
+  "schema": "mode_atlas.v2",
+  "lambdas_rel": [
+   0.001,
+   0.01,
+   0.1,
+   1.0,
+   10.0
+  ],
+  "mid_band": [
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21
+  ],
+  "H1_paired_gate_min": 0.7,
+  "H2_truth_acc_min": 0.75,
+  "H3_xframe_truth_min": 0.75,
+  "H3_xframe_cos_min": 0.5,
+  "H4_cos_min": 0.3,
+  "H4_transfer_min": 0.75,
+  "steer_layers": [
+   13,
+   17,
+   21
+  ],
+  "k_grid": [
+   -6,
+   -3,
+   0,
+   3,
+   6
+  ],
+  "n_random": 2,
+  "min_swing": 1.0,
+  "n_steer_entities": 56,
+  "seed": 0
+ }
+}

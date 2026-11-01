@@ -112,3 +112,28 @@ def probe(X_tr, y_tr, groups_tr, X_te, y_te, crit=CRITERIA, X_te2=None, y_te2=No
 
 def cos(a, b) -> float:
     return float(a @ b / max(np.linalg.norm(a) * np.linalg.norm(b), 1e-30))
+
+
+# ---------------- MV-v2：成对行为门、跨句式框架、中层跨语言、真值方向写入 ----------------
+CRITERIA_V2 = {
+    'schema': 'mode_atlas.v2',
+    'lambdas_rel': CRITERIA['lambdas_rel'],
+    'mid_band': list(range(12, 22)),   # 中层段：MV-v1 事后诊断中跨语言复用最强的层段（第 12–21 层），预注册后不再改
+    'H1_paired_gate_min': 0.7,         # 成对行为门：同一实体、同一 n，真句的「对−错」间隔 > 假句，比例 ≥ 0.7
+    'H2_truth_acc_min': 0.75,          # 新框架确认集真值探针（层由新框架发现集交叉验证在中层段内选定）
+    'H3_xframe_truth_min': 0.75,       # 旧框架（MV-v1）发现集训练的真值探针用于新框架确认集
+    'H3_xframe_cos_min': 0.5,          # 新旧框架同一效应向量（n、t、nt）的 cos
+    'H4_cos_min': 0.3, 'H4_transfer_min': 0.75,
+    'steer_layers': [13, 17, 21], 'k_grid': [-6, -3, 0, 3, 6], 'n_random': 2, 'min_swing': 1.0,
+    'n_steer_entities': 56,
+    'seed': 0,
+}
+
+
+def paired_gate(margin: np.ndarray) -> Dict[str, float]:
+    """margin：[n_entity, 4]，格序 2n + t，值 = 「对」− 「错」的完整答案对数概率差。
+    成对：同一实体、同一 n，真句（t XOR n = 1）的间隔大于假句即判对。"""
+    m = np.asarray(margin, float)
+    aff = m[:, 1] > m[:, 0]                     # 肯定：t=1 为真
+    neg = m[:, 2] > m[:, 3]                     # 否定：t=0 为真
+    return {'affirm': float(aff.mean()), 'negated': float(neg.mean()), 'acc': float(np.concatenate([aff, neg]).mean())}
