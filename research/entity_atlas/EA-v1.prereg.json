@@ -1,0 +1,160 @@
+{
+ "id": "EA-v1",
+ "schema": "entity_atlas_prereg.v1",
+ "created": "2026-11-01",
+ "question": "G1：实体编码是否由「大类 + 类别 + 个体差分」构成（层级共享、差分低维），并能预测未见实体的类别？G2：颜色、大小是否由跨实体共享的线性算子读出（超出类别与 token 身份基线），算子是否落在个体差分里、能否跨语言复用、需要多少维？中英两套编码的实体间相对结构是否一致（RSA）？",
+ "material": {
+  "lexicon": "shared/dist_protocol/lexicon/ENT-XF_nouns.v2.tsv",
+  "lexicon_sha256": "0a5c2d861df7508250b959799f01361581fe2cf130824187f8b8c9ab16906a57",
+  "n_entities": 210
+ },
+ "frames": {
+  "zh": [
+   "我今天想到了{X}",
+   "这一段说的是{X}",
+   "请看这个{X}"
+  ],
+  "en": [
+   "Today I thought about the {E}",
+   "This passage is about the {E}",
+   "Please look at this {E}"
+  ]
+ },
+ "readout": "last token of the entity name (entity at the end of the prompt); mean over 3 frames",
+ "gate": {
+  "color_prompt": {
+   "zh": "问：{X}通常是什么颜色的？\n答：{X}通常是",
+   "en": "Q: What color is the {E} usually?\nA: The {E} is usually"
+  },
+  "color_forms": {
+   "zh": {
+    "red": [
+     "红色"
+    ],
+    "yellow": [
+     "黄色",
+     "金黄色"
+    ],
+    "green": [
+     "绿色"
+    ],
+    "blue": [
+     "蓝色"
+    ],
+    "white": [
+     "白色"
+    ],
+    "black": [
+     "黑色"
+    ],
+    "brown": [
+     "棕色",
+     "褐色"
+    ],
+    "orange": [
+     "橙色"
+    ],
+    "purple": [
+     "紫色"
+    ],
+    "pink": [
+     "粉色",
+     "粉红色"
+    ],
+    "gray": [
+     "灰色"
+    ],
+    "transparent": [
+     "透明"
+    ],
+    "amber": [
+     "琥珀色"
+    ]
+   },
+   "en": {
+    "red": [
+     " red"
+    ],
+    "yellow": [
+     " yellow",
+     " golden"
+    ],
+    "green": [
+     " green"
+    ],
+    "blue": [
+     " blue"
+    ],
+    "white": [
+     " white"
+    ],
+    "black": [
+     " black"
+    ],
+    "brown": [
+     " brown"
+    ],
+    "orange": [
+     " orange"
+    ],
+    "purple": [
+     " purple"
+    ],
+    "pink": [
+     " pink"
+    ],
+    "gray": [
+     " gray",
+     " grey"
+    ],
+    "transparent": [
+     " transparent"
+    ],
+    "amber": [
+     " amber"
+    ]
+   }
+  },
+  "size_prompt": {
+   "zh": "跟成年人相比，{X}的个头通常",
+   "en": "Compared with an adult human, the {E} is usually"
+  },
+  "size_forms": {
+   "zh:L": [
+    "更大",
+    "更高"
+   ],
+   "zh:S": [
+    "更小",
+    "更矮"
+   ],
+   "en:L": [
+    " bigger",
+    " larger",
+    " taller"
+   ],
+   "en:S": [
+    " smaller",
+    " shorter"
+   ]
+  },
+  "rule": "完整答案对数概率强制选择：max(可接受) > max(对照)；颜色可接受 = 主色 ∪ 备选色，对照 = 其余调色板颜色（不含 transparent / amber）；颜色分析只用两种语言都过门的实体，大小同理"
+ },
+ "criteria": {
+  "schema": "entity_atlas.v1",
+  "split": "sha256(\"EA-v1|\" + entity_id)[0] < 154 → discovery（约 60%），否则 heldout",
+  "ridge_lambda_rel": 0.01,
+  "cv_folds": 5,
+  "min_class_n": 6,
+  "G1_category_acc_min": 0.6,
+  "G1_over_hs0_min": 0.15,
+  "G1_orth_abs_cos_max": 0.2,
+  "G2_margin_min": 0.1,
+  "G2_delta_margin_min": 0.1,
+  "G2_xlang_ratio_min": 0.8,
+  "lowrank_frac": 0.9,
+  "rsa_perm": 200,
+  "seed": 0
+ },
+ "analysis": "G1 / G2 的定义见 shared/dist_protocol/entity_atlas.py 文件头；层由 discovery 5 折交叉验证选定，heldout 只评估一次"
+}
