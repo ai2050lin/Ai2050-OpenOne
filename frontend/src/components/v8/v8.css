@@ -602,3 +602,42 @@ a.v8-mainline{text-decoration:none}
 .v8-rules-split li{font-size:11px;color:var(--fw-text-2);line-height:1.45;display:flex;gap:6px;align-items:baseline;background:none;border:0;padding:0;margin:0;min-height:0}
 .v8-rules-split code{font-size:9.5px;color:var(--fw-text-3);font-family:ui-monospace,monospace;flex:0 0 auto}
 .v8-rules-split small{font-size:10.5px;color:var(--fw-text-3);line-height:1.6;margin-top:4px}
+
+/* 类型概览：顶部一屏看完全局，每类一行 + 堆叠条 */
+.v8-rules-ov{display:flex;flex-direction:column;border:1px solid var(--fw-border);border-radius:10px;overflow:hidden;background:#fff}
+.v8-rules-ovlead{display:flex;align-items:baseline;gap:10px;padding:9px 14px;background:var(--fw-bg-panel,#fafbfc);border-bottom:1px solid var(--fw-border)}
+.v8-rules-ovlead span{font-size:12px;font-weight:600;color:var(--fw-text-1)}
+.v8-rules-ovlead small{font-size:11px;color:var(--fw-text-3)}
+.v8-rules-ovrow{display:grid;grid-template-columns:104px minmax(60px,1fr) 44px 158px;gap:14px;align-items:center;width:100%;background:none;border:0;border-top:1px solid var(--fw-border);padding:10px 14px;font:inherit;text-align:left;cursor:pointer}
+.v8-rules-ovrow:hover{background:#f6f8fb}
+.v8-rules-ovrow.on{background:#eef4fc;box-shadow:inset 3px 0 0 #256abf}
+.v8-rules-ovname{font-size:12.5px;font-weight:600;color:var(--fw-text-1)}
+.v8-rules-ovbar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1efe8;min-width:0}
+.v8-rules-ovbar i{display:block;flex:0 0 0;min-width:0}
+.v8-rules-ovnum{font-size:17px;font-weight:700;color:#0d366b;font-variant-numeric:tabular-nums;text-align:right;line-height:1}
+.v8-rules-ovsub{display:flex;gap:8px;justify-content:flex-end;font-size:10.5px;color:var(--fw-text-3);white-space:nowrap}
+.v8-rules-ovsub b{font-weight:600;font-variant-numeric:tabular-nums;margin-right:2px}
+@media (max-width:760px){
+  .v8-rules-ovrow{grid-template-columns:1fr 44px;row-gap:7px}
+  .v8-rules-ovbar{grid-column:1 / -1}
+  .v8-rules-ovsub{grid-column:1 / -1;justify-content:flex-start}
+}
+
+/* 三堆折叠：默认只给数量 + 前三条 */
+.v8-rules-folds{display:flex;flex-direction:column;gap:8px}
+.v8-rules-fold{border:1px solid var(--fw-border);border-left:3px solid;border-radius:9px;padding:10px 14px;background:#fff}
+.v8-rules-foldhead{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer}
+.v8-rules-foldhead b{font-size:12.5px;font-weight:600;color:var(--fw-text-1)}
+.v8-rules-foldcount{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.v8-rules-foldcaret{margin-left:auto;font-size:10.5px;color:var(--fw-text-3);border:1px solid var(--fw-border);border-radius:5px;padding:1px 6px;white-space:nowrap}
+.v8-rules-foldprev{margin:6px 0 0;font-size:11.5px;line-height:1.7;color:var(--fw-text-3)}
+.v8-rules-foldhint{display:block;margin-top:6px;font-size:11px;line-height:1.7;color:var(--fw-text-3)}
+.v8-rules-foldlist{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:3px 12px}
+.v8-rules-foldlist li{display:flex;gap:6px;align-items:baseline;font-size:11.5px;line-height:1.7;color:var(--fw-text-2)}
+.v8-rules-foldlist code{flex:0 0 auto;font-size:10px;color:var(--fw-text-3);font-family:ui-monospace,monospace}
+
+.v8-rules-anchor{scroll-margin-top:14px}
+.v8-rules-filter{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:11.5px;color:var(--fw-text-3)}
+.v8-rules-filter b{color:#0d366b}
+.v8-rules-filter button{font:inherit;font-size:10.5px;color:var(--fw-text-2);background:none;border:1px solid var(--fw-border);border-radius:5px;padding:1px 8px;cursor:pointer}
+.v8-rules-filter button:hover{background:#f6f8fb}

@@ -1,0 +1,77 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2e_additivity",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261107,
+  "tool": "tools/pat_q2e_additivity.py",
+  "created_at": "2026-11-01T02:57:39"
+ },
+ "payload": {
+  "n_trip": 4,
+  "n_cells": 24,
+  "base_acc": 1.0,
+  "reps": 1,
+  "res": {
+   "A128": 0.3333,
+   "B128": 0.3333,
+   "AB256": 0.3333,
+   "A64": 0.2917,
+   "B64": 1.0,
+   "AB128": 0.375,
+   "R128": 0.8333,
+   "R256": 0.5417
+  },
+  "drop": {
+   "A128": 0.6667,
+   "B128": 0.6667,
+   "AB256": 0.6667,
+   "A64": 0.7083,
+   "B64": 0.0,
+   "AB128": 0.625,
+   "R128": 0.1667,
+   "R256": 0.4583
+  },
+  "gap_half": -0.0833,
+  "gap_full": 0.0,
+  "ci_gap_half": [
+   -0.125,
+   0.2917
+  ],
+  "ci_gap_full": [
+   -0.2083,
+   0.1667
+  ],
+  "mcnemar_half": [
+   4,
+   2
+  ],
+  "mcnemar_full": [
+   3,
+   3
+  ],
+  "linearity": [
+   0.941,
+   null
+  ],
+  "fail_sets": {
+   "A": 16,
+   "B": 16,
+   "AB": 16,
+   "union": 19,
+   "inter": 13,
+   "jaccard": 0.6842,
+   "ab_only_new": 2,
+   "ab_equals_union": false
+  },
+  "stronger": [
+   "A64",
+   "A128"
+  ],
+  "verdict": "E1 单通路：两带削的是同一条残差通路的不同段（gap_half=-0.083, gap_full=0.000）"
+ },
+ "sha8": "33633a22"
+}

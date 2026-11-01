@@ -1,0 +1,44 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2g_distribution",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261109,
+  "tool": "tools/pat_q2g_distribution.py",
+  "created_at": "2026-11-01T03:04:38"
+ },
+ "payload": {
+  "n_trip": 4,
+  "n_cells": 24,
+  "base_acc": 1.0,
+  "reps": 1,
+  "n_layers": 36,
+  "arms": [
+   {
+    "k": 2,
+    "n_heads": 72,
+    "coverage": 0.062,
+    "acc": 1.0,
+    "drop": 0.0,
+    "range": 0.0
+   },
+   {
+    "k": 8,
+    "n_heads": 288,
+    "coverage": 0.25,
+    "acc": 0.3333,
+    "drop": 0.6667,
+    "range": 0.0
+   }
+  ],
+  "low_span": 0.6667,
+  "high_span": 0.0,
+  "max_step": 0.6667,
+  "threshold_k": null,
+  "verdict": "K2 提前饱和：k<=8 走完 0.667，k>=12 仅变 0.000"
+ },
+ "sha8": "446d0d4b"
+}

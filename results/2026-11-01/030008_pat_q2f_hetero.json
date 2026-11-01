@@ -1,0 +1,75 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2f_hetero",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261108,
+  "tool": "tools/pat_q2f_hetero.py",
+  "created_at": "2026-11-01T03:00:08"
+ },
+ "payload": {
+  "n_trip": 4,
+  "n_cells": 24,
+  "base_acc": 1.0,
+  "reps": 4,
+  "dist_A64": {
+   "mean": 0.7604,
+   "median": 0.875,
+   "sd": 0.2599,
+   "min": 0.375,
+   "max": 0.9167,
+   "range": 0.5417
+  },
+  "dist_B64": {
+   "mean": 0.8541,
+   "median": 0.8541,
+   "sd": 0.1203,
+   "min": 0.75,
+   "max": 0.9583,
+   "range": 0.2083
+  },
+  "rows": [
+   {
+    "rep": 0,
+    "acc_A": 0.9167,
+    "acc_B": 0.9583,
+    "acc_AB": 1.0,
+    "gap": -0.0833,
+    "subadditive": true
+   },
+   {
+    "rep": 1,
+    "acc_A": 0.8333,
+    "acc_B": 0.75,
+    "acc_AB": 0.625,
+    "gap": 0.125,
+    "subadditive": true
+   },
+   {
+    "rep": 2,
+    "acc_A": 0.9167,
+    "acc_B": 0.9583,
+    "acc_AB": 0.4167,
+    "gap": 0.5,
+    "subadditive": false
+   },
+   {
+    "rep": 3,
+    "acc_A": 0.375,
+    "acc_B": 0.75,
+    "acc_AB": 0.3333,
+    "gap": 0.0417,
+    "subadditive": true
+   }
+  ],
+  "gap_median": 0.0834,
+  "gap_p10": -0.0458,
+  "gap_p90": 0.3875,
+  "n_subadditive": 3,
+  "verdict": "H1 段内高度异质：极差 0.54"
+ },
+ "sha8": "8ac47b72"
+}

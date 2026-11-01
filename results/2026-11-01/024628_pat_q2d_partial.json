@@ -1,0 +1,117 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2d_partial",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261105,
+  "tool": "tools/pat_q2d_partial.py",
+  "created_at": "2026-11-01T02:46:28"
+ },
+ "payload": {
+  "n_trip": 4,
+  "n_cells": 24,
+  "base_acc": 1.0,
+  "reps": 1,
+  "bands": {
+   "hot": {
+    "band": [
+     21,
+     24
+    ],
+    "points": [
+     {
+      "p": 0.0,
+      "n_heads": 0,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.25,
+      "n_heads": 32,
+      "acc": 0.9583,
+      "drop": 0.0417,
+      "sd": 0.0
+     },
+     {
+      "p": 0.5,
+      "n_heads": 64,
+      "acc": 0.7083,
+      "drop": 0.2917,
+      "sd": 0.0
+     },
+     {
+      "p": 0.75,
+      "n_heads": 96,
+      "acc": 0.7917,
+      "drop": 0.2083,
+      "sd": 0.0
+     },
+     {
+      "p": 1.0,
+      "n_heads": 128,
+      "acc": 0.5833,
+      "drop": 0.4167,
+      "sd": 0.0
+     }
+    ],
+    "peak_p": 1.0,
+    "peak_drop": 0.4167,
+    "U_shape": false,
+    "monotone": false
+   },
+   "cold": {
+    "band": [
+     29,
+     32
+    ],
+    "points": [
+     {
+      "p": 0.0,
+      "n_heads": 0,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.25,
+      "n_heads": 32,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.5,
+      "n_heads": 64,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.75,
+      "n_heads": 96,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 1.0,
+      "n_heads": 128,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     }
+    ],
+    "peak_p": 0.0,
+    "peak_drop": 0.0,
+    "U_shape": false,
+    "monotone": true
+   }
+  },
+  "verdict": "U3 非倒 U 非单调：曲线形状不稳定，须加大 REPS 或换带"
+ },
+ "sha8": "df685318"
+}

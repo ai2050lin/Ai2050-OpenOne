@@ -1,0 +1,229 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2h_core",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261109,
+  "tool": "tools/pat_q2h_core.py",
+  "created_at": "2026-11-01T03:24:43"
+ },
+ "payload": {
+  "n_trip": 4,
+  "n_cells": 24,
+  "base_acc": 1.0,
+  "reps": 3,
+  "band": [
+   0,
+   3
+  ],
+  "k_per": [
+   1,
+   2,
+   4,
+   8,
+   12,
+   16
+  ],
+  "rows": [
+   {
+    "k_per": 1,
+    "n_heads": 4,
+    "coverage": 0.0312,
+    "stats": {
+     "mean": 1.0,
+     "median": 1.0,
+     "sd": 0.0,
+     "min": 1.0,
+     "max": 1.0,
+     "range": 0.0
+    },
+    "n_perfect": 3,
+    "n_floor": 0,
+    "accs": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "drops": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "k_per": 2,
+    "n_heads": 8,
+    "coverage": 0.0625,
+    "stats": {
+     "mean": 1.0,
+     "median": 1.0,
+     "sd": 0.0,
+     "min": 1.0,
+     "max": 1.0,
+     "range": 0.0
+    },
+    "n_perfect": 3,
+    "n_floor": 0,
+    "accs": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "drops": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "k_per": 4,
+    "n_heads": 16,
+    "coverage": 0.125,
+    "stats": {
+     "mean": 0.9861,
+     "median": 1.0,
+     "sd": 0.0241,
+     "min": 0.9583,
+     "max": 1.0,
+     "range": 0.0417
+    },
+    "n_perfect": 2,
+    "n_floor": 0,
+    "accs": [
+     1.0,
+     1.0,
+     0.9583
+    ],
+    "drops": [
+     0.0,
+     0.0,
+     0.0417
+    ]
+   },
+   {
+    "k_per": 8,
+    "n_heads": 32,
+    "coverage": 0.25,
+    "stats": {
+     "mean": 0.9583,
+     "median": 1.0,
+     "sd": 0.0722,
+     "min": 0.875,
+     "max": 1.0,
+     "range": 0.125
+    },
+    "n_perfect": 2,
+    "n_floor": 0,
+    "accs": [
+     1.0,
+     1.0,
+     0.875
+    ],
+    "drops": [
+     0.0,
+     0.0,
+     0.125
+    ]
+   },
+   {
+    "k_per": 12,
+    "n_heads": 48,
+    "coverage": 0.375,
+    "stats": {
+     "mean": 0.8889,
+     "median": 0.875,
+     "sd": 0.1049,
+     "min": 0.7917,
+     "max": 1.0,
+     "range": 0.2083
+    },
+    "n_perfect": 1,
+    "n_floor": 0,
+    "accs": [
+     0.875,
+     0.7917,
+     1.0
+    ],
+    "drops": [
+     0.125,
+     0.2083,
+     0.0
+    ]
+   },
+   {
+    "k_per": 16,
+    "n_heads": 64,
+    "coverage": 0.5,
+    "stats": {
+     "mean": 0.6528,
+     "median": 0.75,
+     "sd": 0.2836,
+     "min": 0.3333,
+     "max": 0.875,
+     "range": 0.5417
+    },
+    "n_perfect": 0,
+    "n_floor": 1,
+    "accs": [
+     0.3333,
+     0.75,
+     0.875
+    ],
+    "drops": [
+     0.6667,
+     0.25,
+     0.125
+    ]
+   }
+  ],
+  "enrich_top": [
+   {
+    "k_per": 16,
+    "head": "3-26",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   },
+   {
+    "k_per": 16,
+    "head": "2-9",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   },
+   {
+    "k_per": 16,
+    "head": "2-23",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   },
+   {
+    "k_per": 16,
+    "head": "2-2",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   },
+   {
+    "k_per": 16,
+    "head": "2-0",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   },
+   {
+    "k_per": 16,
+    "head": "1-26",
+    "enrich": 3.0,
+    "in_bad": 1,
+    "in_all": 1
+   }
+  ],
+  "verdict": "N2 阈值型（临界，弱形）：极差 >=0.15 但未检出两极并存，k_per∈{12,16} => 倾向分布式临界"
+ },
+ "sha8": "9e6e2832"
+}

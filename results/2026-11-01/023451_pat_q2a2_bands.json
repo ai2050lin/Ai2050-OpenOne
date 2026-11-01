@@ -1,0 +1,181 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2a2_bands",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261103,
+  "tool": "tools/pat_q2a2_bands.py",
+  "created_at": "2026-11-01T02:34:51"
+ },
+ "payload": {
+  "n_trip": 24,
+  "n_cells": 144,
+  "base_acc": 1.0,
+  "reps": 5,
+  "bands": [
+   {
+    "band": [
+     17,
+     20
+    ],
+    "n_ok": 5,
+    "acc_ok": 1.0,
+    "acc_rand": 1.0,
+    "drop_ok": 0.0,
+    "drop_rand": 0.0,
+    "gap": [
+     0.0,
+     0.0,
+     0.0,
+     0,
+     0
+    ],
+    "rand_reps": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "band": [
+     21,
+     24
+    ],
+    "n_ok": 71,
+    "acc_ok": 0.7778,
+    "acc_rand": 0.8056,
+    "drop_ok": 0.2222,
+    "drop_rand": 0.1944,
+    "gap": [
+     0.0278,
+     -0.0361,
+     0.0944,
+     5,
+     0
+    ],
+    "rand_reps": [
+     0.6597,
+     0.9722,
+     0.9931,
+     0.6528,
+     0.75
+    ]
+   },
+   {
+    "band": [
+     25,
+     28
+    ],
+    "n_ok": 73,
+    "acc_ok": 0.9931,
+    "acc_rand": 0.9972,
+    "drop_ok": 0.0069,
+    "drop_rand": 0.0028,
+    "gap": [
+     0.0042,
+     0.0,
+     0.0125,
+     0,
+     0
+    ],
+    "rand_reps": [
+     1.0,
+     0.9931,
+     0.9931,
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "band": [
+     29,
+     32
+    ],
+    "n_ok": 69,
+    "acc_ok": 1.0,
+    "acc_rand": 1.0,
+    "drop_ok": 0.0,
+    "drop_rand": 0.0,
+    "gap": [
+     0.0,
+     0.0,
+     0.0,
+     0,
+     0
+    ],
+    "rand_reps": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "band": [
+     33,
+     35
+    ],
+    "n_ok": 45,
+    "acc_ok": 1.0,
+    "acc_rand": 1.0,
+    "drop_ok": 0.0,
+    "drop_rand": 0.0,
+    "gap": [
+     0.0,
+     0.0,
+     0.0,
+     0,
+     0
+    ],
+    "rand_reps": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  ],
+  "cumulative": [
+   {
+    "upto": 20,
+    "n": 5,
+    "acc": 1.0,
+    "drop": 0.0
+   },
+   {
+    "upto": 24,
+    "n": 76,
+    "acc": 0.6736,
+    "drop": 0.3264
+   },
+   {
+    "upto": 28,
+    "n": 149,
+    "acc": 0.4306,
+    "drop": 0.5694
+   },
+   {
+    "upto": 32,
+    "n": 218,
+    "acc": 0.7153,
+    "drop": 0.2847
+   },
+   {
+    "upto": 35,
+    "n": 263,
+    "acc": 0.5694,
+    "drop": 0.4306
+   }
+  ],
+  "verdict": "P1' 有单带大掉但不超随机（该带效应可由消融规模解释，非角色跟随性）",
+  "verdict_rule": "P1: 单带 drop>=0.15 且 gap>=0.10 且 CI 下界>0；否则 P1'/P2/P3"
+ },
+ "sha8": "e5c2a798"
+}

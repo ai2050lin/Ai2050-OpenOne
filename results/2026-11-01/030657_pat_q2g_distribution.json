@@ -1,0 +1,92 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2g_distribution",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261109,
+  "tool": "tools/pat_q2g_distribution.py",
+  "created_at": "2026-11-01T03:06:57"
+ },
+ "payload": {
+  "n_trip": 24,
+  "n_cells": 144,
+  "base_acc": 1.0,
+  "reps": 3,
+  "n_layers": 36,
+  "arms": [
+   {
+    "k": 2,
+    "n_heads": 72,
+    "coverage": 0.062,
+    "acc": 0.9606,
+    "drop": 0.0394,
+    "range": 0.0903
+   },
+   {
+    "k": 4,
+    "n_heads": 144,
+    "coverage": 0.125,
+    "acc": 0.8032,
+    "drop": 0.1968,
+    "range": 0.1736
+   },
+   {
+    "k": 6,
+    "n_heads": 216,
+    "coverage": 0.188,
+    "acc": 0.6273,
+    "drop": 0.3727,
+    "range": 0.1597
+   },
+   {
+    "k": 8,
+    "n_heads": 288,
+    "coverage": 0.25,
+    "acc": 0.5694,
+    "drop": 0.4306,
+    "range": 0.3611
+   },
+   {
+    "k": 12,
+    "n_heads": 432,
+    "coverage": 0.375,
+    "acc": 0.3611,
+    "drop": 0.6389,
+    "range": 0.0417
+   },
+   {
+    "k": 16,
+    "n_heads": 576,
+    "coverage": 0.5,
+    "acc": 0.3426,
+    "drop": 0.6574,
+    "range": 0.0694
+   },
+   {
+    "k": 24,
+    "n_heads": 864,
+    "coverage": 0.75,
+    "acc": 0.338,
+    "drop": 0.662,
+    "range": 0.0069
+   },
+   {
+    "k": 32,
+    "n_heads": 1152,
+    "coverage": 1.0,
+    "acc": 0.3333,
+    "drop": 0.6667,
+    "range": 0.0
+   }
+  ],
+  "low_span": 0.3912,
+  "high_span": 0.0278,
+  "max_step": 0.2083,
+  "threshold_k": null,
+  "verdict": "K2 提前饱和：k<=8 走完 0.391，k>=12 仅变 0.028"
+ },
+ "sha8": "4d1f7eb3"
+}

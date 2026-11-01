@@ -1,0 +1,129 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q3t_t3",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261101,
+  "tool": "pat_q3t_t3.py",
+  "created_at": "2026-11-01T06:05:12"
+ },
+ "payload": {
+  "seed": 20261101,
+  "smoke": true,
+  "n_cells": 36,
+  "n_triples": 6,
+  "V": 39,
+  "K_dict": 16,
+  "n_nonzero": 3,
+  "n_split": 2,
+  "behaviour_gate": {
+   "ag": "12/12",
+   "re": "10/12",
+   "th": "12/12"
+  },
+  "cand_mass_median": 1.0,
+  "cos_within_role": 0.9759,
+  "cos_cross_role": 0.962,
+  "eff_dim_raw": 3.99,
+  "eff_dim_centered": 5.55,
+  "r2_holdout_median": 0.5777,
+  "r2_holdout_folds": [
+   0.5792,
+   0.5761
+  ],
+  "r2_insample_median": 1.0,
+  "nnz_max": 3,
+  "random_expectation_jaccard": 0.1195,
+  "reuse_raw": {
+   "ag": {
+    "jacc": 0.1212,
+    "reuse": 1.014,
+    "ci": [
+     1.09,
+     2.371
+    ]
+   },
+   "re": {
+    "jacc": 0.2015,
+    "reuse": 1.686,
+    "ci": [
+     1.445,
+     3.48
+    ]
+   },
+   "th": {
+    "jacc": 0.1348,
+    "reuse": 1.128,
+    "ci": [
+     1.217,
+     2.561
+    ]
+   },
+   "cross": {
+    "jacc": 0.1336,
+    "reuse": 1.118
+   },
+   "same_entity": {
+    "jacc": 0.4167,
+    "reuse": 3.487,
+    "n": 18
+   },
+   "diff_entity": {
+    "jacc": 0.1261,
+    "reuse": 1.055,
+    "n": 180
+   }
+  },
+  "reuse_centered": {
+   "ag": {
+    "jacc": 0.1379,
+    "reuse": 1.154,
+    "ci": [
+     1.255,
+     2.486
+    ]
+   },
+   "re": {
+    "jacc": 0.1379,
+    "reuse": 1.154,
+    "ci": [
+     1.217,
+     2.88
+    ]
+   },
+   "th": {
+    "jacc": 0.1727,
+    "reuse": 1.445,
+    "ci": [
+     1.457,
+     3.057
+    ]
+   },
+   "cross": {
+    "jacc": 0.1141,
+    "reuse": 0.955
+   },
+   "same_entity": {
+    "jacc": 0.3333,
+    "reuse": 2.789,
+    "n": 18
+   },
+   "diff_entity": {
+    "jacc": 0.1311,
+    "reuse": 1.097,
+    "n": 180
+   }
+  },
+  "reuse_raw_median": 1.128,
+  "reuse_centered_median": 1.154,
+  "verdict": "NULL_decomposition",
+  "note": "分解前提不成立（R²=0.578 或 nnz=3），reuse 不可解读",
+  "predicted": "reuse >= 3",
+  "expected": "若 centered≈1 则与 T1/T2 一致：k 侧无结构、输出端复用也非角色列族，下一步全押 Q3-Q 的 q 侧分解",
+  "elapsed_s": 7.6
+ },
+ "sha8": "60a6c0c4"
+}

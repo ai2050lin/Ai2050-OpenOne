@@ -1,0 +1,117 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q2d_partial",
+ "provenance": {
+  "git_sha": "63a2a38cf1d367f773b621d6ada5976b33a19857",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261105,
+  "tool": "tools/pat_q2d_partial.py",
+  "created_at": "2026-11-01T02:49:56"
+ },
+ "payload": {
+  "n_trip": 24,
+  "n_cells": 144,
+  "base_acc": 1.0,
+  "reps": 5,
+  "bands": {
+   "hot": {
+    "band": [
+     21,
+     24
+    ],
+    "points": [
+     {
+      "p": 0.0,
+      "n_heads": 0,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.25,
+      "n_heads": 32,
+      "acc": 0.9778,
+      "drop": 0.0222,
+      "sd": 0.0289
+     },
+     {
+      "p": 0.5,
+      "n_heads": 64,
+      "acc": 0.8833,
+      "drop": 0.1167,
+      "sd": 0.1016
+     },
+     {
+      "p": 0.75,
+      "n_heads": 96,
+      "acc": 0.7611,
+      "drop": 0.2389,
+      "sd": 0.1195
+     },
+     {
+      "p": 1.0,
+      "n_heads": 128,
+      "acc": 0.5486,
+      "drop": 0.4514,
+      "sd": 0.0
+     }
+    ],
+    "peak_p": 1.0,
+    "peak_drop": 0.4514,
+    "U_shape": false,
+    "monotone": true
+   },
+   "cold": {
+    "band": [
+     29,
+     32
+    ],
+    "points": [
+     {
+      "p": 0.0,
+      "n_heads": 0,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.25,
+      "n_heads": 32,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.5,
+      "n_heads": 64,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     },
+     {
+      "p": 0.75,
+      "n_heads": 96,
+      "acc": 0.9986,
+      "drop": 0.0014,
+      "sd": 0.0028
+     },
+     {
+      "p": 1.0,
+      "n_heads": 128,
+      "acc": 1.0,
+      "drop": 0.0,
+      "sd": 0.0
+     }
+    ],
+    "peak_p": 0.75,
+    "peak_drop": 0.0014,
+    "U_shape": false,
+    "monotone": false
+   }
+  },
+  "verdict": "U2 单调增：部分消融不比全消融更伤，Q2-A3 的对比需另找解释"
+ },
+ "sha8": "288a1504"
+}
