@@ -61,3 +61,50 @@ def pooled(decs: Sequence[Dict[str, float]]) -> Dict[str, float]:
 def center_cells(logp: np.ndarray) -> np.ndarray:
     """[8, m] 对数概率按格（行）中心化，去掉各格的归一化常数。"""
     return logp - logp.mean(1, keepdims=True)
+
+
+# ---------------- FU-v2：槽位条件化的专家乘积（2 × 2 × k 设计）----------------
+# 主假设（FU-v1 事后发现，本版预注册确认）：固定语法槽位后，风格与逻辑对下一词对数概率的作用近似相加；
+# 因子之间的交互主要是「因子 × 槽位」，而不是「风格 × 逻辑」。
+CRITERIA_V2 = {
+    'schema': 'fusion.v2',
+    'top_k_per_cell': 20,
+    'H0_within_share_min': 0.1,    # 行为门（每种语言，各槽位合并）：槽位内风格与逻辑各自占槽位内平方和 ≥ 0.1
+    'H1_within_additive_min': 0.8, # 输出：槽位内可加份额 (s + l) / (s + l + sl) ≥ 0.8
+    'H1_min_cells': 5,             #   （槽位 × 语言）6 格中至少 5 格
+    'H2_state_additive_min': 0.8,  # 状态（最终层隐状态）：同一口径，6 格中至少 5 格
+    'H3_slot_over_sl': 3.0,        # 输出（每种语言）：SS(风格×槽位) + SS(逻辑×槽位) ≥ 3 × [SS(风格×逻辑) + SS(三阶)]
+    'seed': 0,
+}
+
+
+def factorial_ss(Y: np.ndarray, k: int) -> Dict[str, float]:
+    """Y：[2·2·k, m]，格序 c = 2k·s + k·l + g。均衡全因子设计（每格一个观测）的效应平方和（按列相加）。"""
+    Y = np.asarray(Y, float).reshape(2, 2, k, -1)
+    mu = Y.mean((0, 1, 2), keepdims=True)
+    ms, ml, mg = Y.mean((1, 2), keepdims=True), Y.mean((0, 2), keepdims=True), Y.mean((0, 1), keepdims=True)
+    msl, msg, mlg = Y.mean(2, keepdims=True), Y.mean(1, keepdims=True), Y.mean(0, keepdims=True)
+    eff = {'s': ms - mu, 'l': ml - mu, 'g': mg - mu,
+           'sl': msl - ms - ml + mu, 'sg': msg - ms - mg + mu, 'lg': mlg - ml - mg + mu,
+           'slg': Y - msl - msg - mlg + ms + ml + mg - mu}
+    out = {e: float((np.broadcast_to(v, Y.shape) ** 2).sum()) for e, v in eff.items()}
+    out['total'] = float(((Y - mu) ** 2).sum())
+    return out
+
+
+def within_slot_ss(Y: np.ndarray, k: int) -> Dict[int, Dict[str, float]]:
+    """每个槽位 g 内的 2×2（风格 × 逻辑）平方和。"""
+    Y = np.asarray(Y, float).reshape(2, 2, k, -1)
+    out = {}
+    for g in range(k):
+        Z = Y[:, :, g]
+        mu = Z.mean((0, 1), keepdims=True)
+        ms, ml = Z.mean(1, keepdims=True), Z.mean(0, keepdims=True)
+        out[g] = {'s': float((np.broadcast_to(ms - mu, Z.shape) ** 2).sum()), 'l': float((np.broadcast_to(ml - mu, Z.shape) ** 2).sum()),
+                  'sl': float(((Z - ms - ml + mu) ** 2).sum())}
+    return out
+
+
+def within_additive(ss: Dict[str, float]) -> float:
+    t = ss['s'] + ss['l'] + ss['sl']
+    return float((ss['s'] + ss['l']) / t) if t > 0 else float('nan')

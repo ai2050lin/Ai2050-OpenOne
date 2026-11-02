@@ -1,0 +1,45 @@
+{
+ "id": "FU-v2",
+ "schema": "fusion_prereg.v2",
+ "created": "2026-11-02",
+ "basis": "FU-v1（Phase 280）事后：槽位内风格与逻辑近似相加，交互集中在「因子 × 槽位」；本版作为主假设预注册",
+ "models": {
+  "qwen3-4b": "bf16",
+  "gemma-3-4b-it": "bf16"
+ },
+ "precision_rule": "不使用任何量化",
+ "materials": {
+  "source": "scripts/fu_materials_v2.py",
+  "n_events": 32,
+  "n_prompts": 768,
+  "sha256": "2c3b1f5a26ed17b0e3471a6310b347220a92da751e42c93729b57d081b4b2db2",
+  "example_en": [
+   "The boss cut everyone's pay, so the workers",
+   "The boss cut everyone's pay, so the workers'",
+   "The boss cut everyone's pay, so the workers were",
+   "The boss cut everyone's pay, but the workers",
+   "The boss cut everyone's pay, but the workers'",
+   "The boss cut everyone's pay, but the workers were"
+  ],
+  "example_zh": [
+   "老板给大家降了工资，所以工人们",
+   "老板给大家降了工资，所以工人们的",
+   "老板给大家降了工资，所以工人们都很",
+   "老板给大家降了工资，但是工人们",
+   "老板给大家降了工资，但是工人们的",
+   "老板给大家降了工资，但是工人们都很"
+  ]
+ },
+ "power_note": "连续量份额阈值；每种语言 32 个事件 × 12 格",
+ "doc": "FU-v2：确认「槽位条件化的专家乘积」——固定语法槽位后，风格与逻辑对下一词的作用近似相加；交互主要是「因子 × 槽位」。\n\nFU-v1（Phase 280）事后发现：同一槽位内风格 × 逻辑可加份额 0.89–0.95（输出），但风格操纵弱（主效应 3%）、只有英文两种槽位。\n本版：32 个新事件；正式风格同时更换前提措辞与连接词（consequently / nevertheless；因此 / 然而）；三种槽位（动词 / 名词 / 形容词）；英文与中文。\n本版没有拟合参数，全部事件都用于判定。读出：末位下一词对数概率（各格前 20 候选的并集，按格中心化）与全部层隐状态。\n  H0  行为门（每种语言，各槽位合并）：槽位内风格与逻辑各自占槽位内平方和 ≥ 0.1。\n  H1  输出：槽位内可加份额 (SS_s + SS_l) / (SS_s + SS_l + SS_sl) ≥ 0.8，在（3 槽位 × 2 语言）6 格中至少 5 格。\n  H2  最终层隐状态：同一口径，6 格中至少 5 格。\n  H3  输出（每种语言）：SS(风格×槽位) + SS(逻辑×槽位) ≥ 3 × [SS(风格×逻辑) + SS(三阶)]。\n  描述：逐层槽位内可加份额；风格 / 逻辑效应方向在不同槽位之间的 cos（同一内部方向还是不同方向）。\n被测模型（bf16，不使用量化）：Qwen3-4B、Gemma-3-4B-it。两模型分别判定。\n用法：python scripts/fusion_v2.py prereg | run --model M | analyze --model M\n",
+ "criteria": {
+  "schema": "fusion.v2",
+  "top_k_per_cell": 20,
+  "H0_within_share_min": 0.1,
+  "H1_within_additive_min": 0.8,
+  "H1_min_cells": 5,
+  "H2_state_additive_min": 0.8,
+  "H3_slot_over_sl": 3.0,
+  "seed": 0
+ }
+}
