@@ -88,6 +88,24 @@ class ModeFieldTests(unittest.TestCase):
         self.assertFalse(r0['pass'])                           # 负对照：无组件恢复
         self.assertTrue(np.isnan(F.restoration(P_, joint, joint - 1)).all())
 
+    def test_v4_units(self):
+        rng = np.random.default_rng(5)
+        n, U = 80, 300
+        layer_of = np.repeat([0, 1, 2], 100)
+        planted = [5, 17, 140, 260]
+        d = rng.normal(0, 0.1, (n, U))
+        d[:, planted] -= 1.0
+        A = np.arange(n) % 2 == 0
+        self.assertEqual(sorted(F.select_units(d, A, 4)), planted)
+        self.assertEqual(F.select_units(np.zeros((n, U)) + rng.normal(0, 0.1, (n, U)), A, 4) == planted, False)   # 负对照
+        rs = F.random_units_matched(planted, layer_of, 5, 0)
+        for s in rs:
+            self.assertEqual([layer_of[i] for i in s], [layer_of[i] for i in planted])
+            self.assertFalse(set(s) & set(planted))
+        self.assertTrue(F.unit_verdict(0.8, 0.6, [0.05, 0.1])['pass'])
+        self.assertFalse(F.unit_verdict(0.8, 0.6, [0.3, 0.1])['pass'])
+        self.assertFalse(F.unit_verdict(0.8, 0.2, [0.01])['pass'])
+
 
 if __name__ == '__main__':
     unittest.main()

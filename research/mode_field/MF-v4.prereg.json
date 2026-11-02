@@ -1,0 +1,51 @@
+{
+ "id": "MF-v4",
+ "schema": "mode_field_prereg.v4",
+ "created": "2026-11-02",
+ "basis": "MF-v3（Phase 277）：代码压过散文由后段 MLP 计算；本版在 MF-v3 选出的层中找单元",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "glm4-9b-chat-hf": "int8（复现）"
+ },
+ "materials": "MF-v1 发现集文本（MF-v3 的 A / B 任务切分）；H3b 用 MF-v1 确认集文本",
+ "unit_definition": "MLP 中间单元 = down_proj 的输入坐标（SwiGLU：A = act(gate) ⊙ up）；W_down 列由 down_proj(I) − down_proj(0) 取得（int8 也适用）",
+ "census": "Qwen3-4B 普查运行 2ca5f0a756d36c8a-20000000（只作描述）",
+ "power_note": "连续量阈值；每组 80 段（A / B 各 40）",
+ "doc": "MF-v4：后段 MLP 中「代码压过散文」的门控单元。\n\nMF-v3（Phase 277）：同时写入代码与中文 / 英文说明时，散文效应被压掉，修补后段 MLP 整层可恢复（Qwen mlp27 / 33 / 35，GLM mlp25 / 38）。\n本版在这些层的中间单元（down_proj 的输入 A）上找门控单元，材料与写入同 MF-v3（发现集文本，按任务分 A / B）。\n  选择（只用 A）：末位直接作用差 Δ_i = (A_同时 − A_只散文)_i · (W_down[:, i] · u)，u = ∂log M_p / ∂(最终归一化输入)（冻结 RMS），\n                三组合并取平均最负的 32 个单元。\n  H1  B 上（三组恢复比例的平均）：只把这 32 个单元的中间激活（全部位置）换回「只写散文」的值，恢复 ≥ 整层修补（这些层全部单元）的 50%，\n      且 ≥ 每个同层随机 32 单元集合的 3 倍。\n  H2  B 上三组各自恢复 ≥ 0.2（同一批单元同时压住中文与英文说明）。\n  H3  这些单元读代码方向：(a) 只写代码时末位激活变化的平均绝对值 ≥ 同层随机单元的 3 倍；\n      (b) 自然文本（MF-v1 确认集共用 token 位置）上，得分 Σ sign_i A_i（sign 取只写代码时的变化方向）区分代码与散文位置的 AUC ≥ 0.7。\n  描述：Qwen 的单元在神经元普查中的直接读出 token 与激活统计。\n用法：python scripts/mode_field_v4.py prereg | run --model M [--int8] | analyze --model M [--int8]\n",
+ "criteria": {
+  "schema": "mode_field.v4",
+  "layers": {
+   "qwen3-4b": [
+    27,
+    33,
+    35
+   ],
+   "glm4-9b-chat-hf": [
+    25,
+    38
+   ]
+  },
+  "groups": [
+   [
+    "zh",
+    "en"
+   ],
+   [
+    "en",
+    "zh"
+   ],
+   [
+    "paper",
+    "zh"
+   ]
+  ],
+  "top_k": 32,
+  "n_random_sets": 5,
+  "H1_frac_of_layers_min": 0.5,
+  "H1_over_random": 3.0,
+  "H2_group_restore_min": 0.2,
+  "H3_read_ratio": 3.0,
+  "H3_auc_min": 0.7,
+  "seed": 0
+ }
+}

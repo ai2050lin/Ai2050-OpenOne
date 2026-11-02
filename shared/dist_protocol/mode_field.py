@@ -216,3 +216,47 @@ def select_component(m_patched, m_joint, m_single, in_A, names, crit=CRITERIA_V3
             'mlp_pos_B': pos(rB, 'mlp'), 'attn_pos_B': pos(rB, 'attn'),
             'top5_B': sorted(((float(v), n) for v, n in zip(rB, names) if v == v), reverse=True)[:5],
             'pass': bool(rB[j] >= crit['H1_restore_min'])}
+
+
+# ---------------- MF-v4：后段 MLP 中的门控单元 ----------------
+# 单元直接作用：末位上单元 i 的写出对散文质量的直接作用 = A_i · (W_down[:, i] · u)，u 为 log M_p 对最终归一化输入的梯度（冻结 RMS）。
+# 选择：A 半任务上「同时写入 − 只写散文」的直接作用差最负的 k 个单元（三组合并）；检验：只把这些单元的中间激活（全部位置）
+# 换回「只写散文」的值，恢复多少（与整层修补、同层随机单元比较）。
+CRITERIA_V4 = {
+    'schema': 'mode_field.v4',
+    'layers': {'qwen3-4b': [27, 33, 35], 'glm4-9b-chat-hf': [25, 38]},   # MF-v3 修补选出的后段 MLP
+    'groups': [['zh', 'en'], ['en', 'zh'], ['paper', 'zh']],               # 去掉退化的「论文→英」
+    'top_k': 32, 'n_random_sets': 5,
+    'H1_frac_of_layers_min': 0.5, 'H1_over_random': 3.0,   # 合并 B：前 32 单元的恢复 ≥ 整层修补的 50%，且 ≥ 每个随机集合的 3 倍
+    'H2_group_restore_min': 0.2,                          # B：三组各自 ≥ 0.2（同一批单元压住中文与英文）
+    'H3_read_ratio': 3.0,                                 # 只写代码时前 32 单元末位激活变化的平均绝对值 ≥ 同层随机单元的 3 倍
+    'H3_auc_min': 0.7,                                    # 自然文本（MF-v1 确认集共用 token 位置）上单元得分区分代码与散文的 AUC
+    'seed': 0,
+}
+
+
+def select_units(delta: np.ndarray, in_A: np.ndarray, k: int) -> List[int]:
+    """delta：[n_text, n_units]（同时 − 只散文 的直接作用）；返回 A 上平均最负的 k 个单元。"""
+    return [int(i) for i in np.argsort(delta[in_A].mean(0))[:k]]
+
+
+def random_units_matched(top: Sequence[int], layer_of: np.ndarray, n_sets: int, seed: int) -> List[List[int]]:
+    """每个前 k 单元换成同层另一个不在前 k 中的单元。"""
+    rng = np.random.default_rng(seed)
+    topset = set(top)
+    out = []
+    for _ in range(n_sets):
+        s = []
+        for i in top:
+            pool = np.where((layer_of == layer_of[i]))[0]
+            pool = [int(j) for j in pool if j not in topset and j not in s]
+            s.append(int(rng.choice(pool)))
+        out.append(s)
+    return out
+
+
+def unit_verdict(r_layers: float, r_top: float, r_rand: Sequence[float], crit=CRITERIA_V4) -> Dict[str, object]:
+    ok = bool(r_layers > 0 and r_top >= crit['H1_frac_of_layers_min'] * r_layers
+              and r_top >= crit['H1_over_random'] * max(max(r_rand), 1e-9))
+    return {'restore_layers': float(r_layers), 'restore_top': float(r_top), 'restore_random': [float(x) for x in r_rand],
+            'frac_of_layers': float(r_top / r_layers) if r_layers > 0 else float('nan'), 'pass': ok}
