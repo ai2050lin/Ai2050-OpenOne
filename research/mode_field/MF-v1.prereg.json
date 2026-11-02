@@ -1,0 +1,81 @@
+{
+ "id": "MF-v1",
+ "schema": "mode_field_prereg.v1",
+ "created": "2026-11-02",
+ "basis": "用户方案：注意力作为语言模式族的底层实体；先检验风格是否为上下文计算出的持续状态（Phase 275 方案 MF-v1）",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "glm4-9b-chat-hf": "int8（复现）"
+ },
+ "materials": {
+  "source": "scripts/mf_materials_v1.py",
+  "split": {
+   "conf": [
+    "count_eq",
+    "dedup",
+    "fib",
+    "gcd",
+    "is_prime",
+    "palindrome",
+    "reverse",
+    "word_count"
+   ],
+   "disc": [
+    "clamp",
+    "contains",
+    "count_gt",
+    "cumsum",
+    "evens",
+    "factorial",
+    "index_of",
+    "max",
+    "mean",
+    "merge",
+    "min",
+    "product",
+    "sort",
+    "squares",
+    "sum",
+    "swap"
+   ]
+  },
+  "n_texts": 480,
+  "sha256_texts": "96740fcb0b8007d5cd602bb856dde5fe9186934e64b712d3cf0ed91137863eb8"
+ },
+ "shared_positions": "同一划分内，某 token 至少出现在两种风格中；H1 的风格对只用两者共有的 token",
+ "mass": "log M_s = log Σ_{w ∈ V_s} p(w | 前缀)，V_s 为发现集的风格专属词表（excl_min_count）",
+ "power_note": "H1 / H4 为连续量阈值；H2 每种来源 40 段确认文本；H3 为 40 段代码文本的连续量配对比较。AGENTS 13 的 McNemar 规划针对逐题二值，不适用",
+ "doc": "MF-v1：风格模式状态与注意力维持（中文 / 英文 / 英文论文 / Python 代码）。\n\n问题：风格是否作为一个由上下文计算出的持续状态存在于残差流？它能否被写入并改变下一个词的风格？由哪些注意力头维持？\n它经 unembedding 是否成为一张「词表分区」偏置？在代码中，一次扰动之后模式能否自行恢复（「整体都是代码」的吸引子迹象）？\n材料：scripts/mf_materials_v1.py，24 个算法任务 × 4 种风格 × 5 组标识符填充（480 段），按任务切分：发现 16 任务 / 确认 8 任务。\n关键控制：只在跨风格共用 token 的位置判定可读出（嵌入层在这些位置完全相同）；写入方向按共用 token 配平求得。\n  H1  确认集共用 token 位置上 6 个风格对的两两准确率都 ≥ 0.8（层与 λ 只按发现集分组交叉验证选定；hs[0] 按构造为机会水平）。\n  H2  在 H1 层、确认集散文前缀（中 / 英 / 论文）全部位置沿「代码方向」写入，末位 log M_code（下一词落在代码专属词表的概率质量）\n      steer_verdict 成立（三种来源都成立）。\n  H3  逐头「代码模式写入」得分（头输出在下一层代码方向上的投影，按共用 token 配平的代码 − 其他差）前 10 头，在确认集代码文本全部位置置零：\n      log M_code 平均下降与 H1 层读出间隔平均下降都 ≥ 同层随机 10 头集合最大下降的 3 倍。\n  H4  H1 层代码方向经最终归一化权重与 unembedding 后，区分代码专属 token 与其他三种风格专属 token 的 AUC ≥ 0.8。\n  H5  描述：确认集代码文本在 40% 处单个位置写入 −6σ 代码方向，log M_code 的变化沿后续 12 个位置的衰减与半衰期；与写入前缀全部位置对照。\n  描述：逐层两两准确率、行为（下一词风格与文本风格一致的比例）、GLM4-9B（int8）复现。\n用法：python scripts/mode_field_v1.py prereg | collect --model M [--int8] | analyze --model M [--int8] | steer ... | heads ... | analyze ...\n",
+ "criteria": {
+  "schema": "mode_field.v1",
+  "layers_stored": "range(0, L + 1, 3) 全部位置；共用 token 位置另存全部层",
+  "lambdas_rel": [
+   0.001,
+   0.01,
+   0.1,
+   1.0
+  ],
+  "excl_min_count": 3,
+  "H1_pair_acc_min": 0.8,
+  "k_grid": [
+   -6,
+   -3,
+   0,
+   3,
+   6
+  ],
+  "n_random": 2,
+  "min_swing": 1.0,
+  "H2_sources": [
+   "zh",
+   "en",
+   "paper"
+  ],
+  "top_k": 10,
+  "n_random_sets": 5,
+  "H3_ratio_min": 3.0,
+  "H4_auc_min": 0.8,
+  "H5": "描述：代码文本中单个位置写入 −6σ 代码方向后，log M_code 变化随后续位置的衰减（半衰期）",
+  "seed": 0
+ }
+}
