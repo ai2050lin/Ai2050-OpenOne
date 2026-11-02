@@ -53,6 +53,25 @@ class ModeFieldTests(unittest.TestCase):
         ex = F.exclusive_vocab({'a': [1, 1, 1, 2, 5, 5, 5], 'b': [2, 2, 2, 3, 3, 3]}, 3)
         self.assertEqual(ex, {'a': [1, 5], 'b': [3]})
 
+    def test_v2_window_band_switch_retain(self):
+        import torch
+        T = 8
+        m = torch.triu(torch.full((1, 1, T, T), torch.finfo(torch.float32).min), 1)
+        w = F.window_mask(m, 3)
+        vis = (w[0, 0] == 0)
+        self.assertTrue(vis[7, 0] and vis[7, 5] and vis[7, 7] and not vis[7, 4] and not vis[7, 1])
+        self.assertTrue(bool(vis[2, :3].all()))
+        self.assertFalse(bool(vis[3, 4]))                      # 仍保持因果
+        self.assertTrue(F.band_localize(0.4, [0.3, 0.05, 0.02])['pass'])
+        self.assertFalse(F.band_localize(0.4, [0.1, 0.1, 0.1, 0.1])['pass'])
+        rng = np.random.default_rng(3)
+        op = np.array([0, 1.5, 3.0])[None] + rng.normal(0, 0.3, (40, 3))
+        rd = rng.normal(0, 0.3, (2, 40, 3))
+        self.assertTrue(F.one_sided_verdict(op, rd)['pass'])
+        self.assertFalse(F.one_sided_verdict(rd[0], rd)['pass'])     # 负对照：随机方向本身
+        self.assertTrue(F.retain(2.0, 3.0, 1.8, 2.5)['pass'])
+        self.assertFalse(F.retain(3.0, 3.0, 0.2, 2.5)['pass'])       # 胜者通吃
+
 
 if __name__ == '__main__':
     unittest.main()

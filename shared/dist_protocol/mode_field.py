@@ -128,3 +128,57 @@ def select_layer(Xs: Dict[int, np.ndarray], y, tok, groups, crit=CRITERIA):
             if best is None or v > best[0]:
                 best = (v, l, lam)
     return {'cv_acc': best[0], 'layer': best[1], 'lambda_rel': best[2], 'table': {f'{l}/{lam}': v for (l, lam), v in table.items()}}
+
+
+# ---------------- MF-v2：风格状态的汇集层段、各风格的单侧开关与叠加 ----------------
+# 汇集：在一段层上把注意力限制为局部窗口（当前及前 w−1 个位置，外加首位置作注意力汇点），看后段读出层上「深共用」位置的风格读出损失多少。
+# 开关：后段（0.5L）每种风格按共用 token 配平的「本风格 − 其他」方向，只在正侧判定（MF-v1 显示负侧有底部效应）。
+# 叠加：同时打开两种风格时，各自的风格质量是否都保留单独打开时的效应（专家乘积式叠加），还是只剩一个（胜者通吃）。
+CRITERIA_V2 = {
+    'schema': 'mode_field.v2',
+    'window': 4,                   # 局部窗口：当前及前 3 个位置 + 首位置
+    'deep_n': 4,                   # 深共用位置：当前与前 3 个 token 都是共用 token
+    'readout_rel': 0.75,           # 读出层 = 网格层中最接近 0.75L 者
+    'n_bands': 6,                  # 读出层之前的层均分为 6 段
+    'H1_drop_min': 0.2,            # 全部前段层局部窗口：深共用位置两两准确率均值下降 ≥ 0.2
+    'H2_band_share_min': 0.5,      # 下降最大的单段 ≥ 全部下降的 50%
+    'switch_rel': 0.5,             # 开关写入层 = round(0.5L)
+    'k_on': [0, 3, 6], 'n_random': 2,
+    'H3_min_combos': 10,           # 12 个（目标风格 × 来源风格）中，Δ(+6) ≥ 1、Δ(+6) > Δ(+3) > 0、Δ(+6) > 每个随机方向 Δ(+6) 的至少 10 个
+    'H4_retain_min': 0.5,          # 叠加：两种目标都保留单独打开效应的 ≥ 50%
+    'H4_min_triples': 8,           # 12 个（来源 c，目标对 {a, b}）中至少 8 个
+    'seed': 0,
+}
+
+
+def window_mask(mask, w: int, q_from: int = 0):
+    """mask：[B, 1, T, T] 加性因果掩码（torch）。返回新掩码：查询位置 q 只看 [q − w + 1, q] 与首位置 0。"""
+    import torch
+    T = mask.shape[-1]
+    q = torch.arange(T, device=mask.device)[:, None]
+    k = torch.arange(T, device=mask.device)[None, :]
+    block = (k < q - w + 1) & (k != 0) & (q >= q_from)
+    out = mask.clone()
+    out[..., block] = torch.finfo(mask.dtype).min
+    return out
+
+
+def band_localize(full_drop: float, band_drops: Sequence[float], crit=CRITERIA_V2) -> Dict[str, object]:
+    b = int(np.argmax(band_drops))
+    share = float(band_drops[b] / full_drop) if full_drop > 0 else float('nan')
+    return {'band': b, 'share': share, 'pass': bool(full_drop > 0 and share >= crit['H2_band_share_min'])}
+
+
+def one_sided_verdict(d_op: np.ndarray, d_rand: np.ndarray) -> Dict[str, object]:
+    """d_op：[n, 3]（k = 0, 3, 6）；d_rand：[n_rand, n, 3]。只看正侧。"""
+    m = d_op.mean(0)
+    r6 = [float(r.mean(0)[2]) for r in d_rand]
+    ok = bool(m[2] >= 1.0 and m[2] > m[1] > 0 and m[2] > max(r6))
+    return {'delta_k3': float(m[1]), 'delta_k6': float(m[2]), 'random_k6': r6, 'pass': ok}
+
+
+def retain(joint_a: float, single_a: float, joint_b: float, single_b: float, crit=CRITERIA_V2) -> Dict[str, object]:
+    ra = joint_a / single_a if single_a > 0 else float('nan')
+    rb = joint_b / single_b if single_b > 0 else float('nan')
+    return {'retain_a': float(ra), 'retain_b': float(rb),
+            'pass': bool(single_a > 0 and single_b > 0 and ra >= crit['H4_retain_min'] and rb >= crit['H4_retain_min'])}

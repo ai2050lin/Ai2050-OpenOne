@@ -1,0 +1,34 @@
+{
+ "id": "MF-v2",
+ "schema": "mode_field_prereg.v2",
+ "created": "2026-11-02",
+ "basis": "MF-v1（Phase 275）：风格是持续的上下文状态（共用 token 位置第 3 层起可读），写入只能单侧打开；H3 读出层在头上游的设计错误在此修正（读出层在被改层之后）",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "glm4-9b-chat-hf": "int8（复现）"
+ },
+ "materials": "MF-v1 材料与确认集（8 个未见任务）；读出器只用发现集训练，λ 取 MF-v1 H1 选定值",
+ "attention": "A 部分用 eager 注意力，在 self_attn 的前向钩子里替换加性因果掩码",
+ "power_note": "连续量阈值与组合计数；深共用位置数沿用 MF-v1（确认集英文 190、论文 102、代码 62，Qwen）",
+ "doc": "MF-v2：风格状态从哪些层的注意力汇集而来；四种风格是否各有一个单侧「打开」开关，同时打开两个时是叠加还是胜者通吃。\n\n材料与采集沿用 MF-v1（scripts/mf_materials_v1.py；MF-v1 的 fields.npz / vocab.json），确认集 = 8 个未见任务。\nA  汇集层段（注意力局部窗口）：在指定层上，把每个查询位置的注意力限制为当前及前 3 个位置（另保留首位置作注意力汇点），\n   在读出层 r（网格层中最接近 0.75L）上，用发现集训练的 4 类读出器读「深共用」位置（当前与前 3 个 token 都是共用 token，\n   因此局部窗口内没有任何风格专属 token）。条件：不改 / r 之前全部层 / r 之前的层均分 6 段、每次只改一段。\n   H1  全部前段层改为局部窗口后，深共用位置（英文 / 论文 / 代码 3 对）两两准确率均值下降 ≥ 0.2。\n   H2  下降最大的单段 ≥ 全部下降的 50%（汇集集中在一段层上；哪一段只描述）。\nB  单侧开关与叠加（层 round(0.5L)，确认集各风格前 60% 前缀，全部前缀位置写入）：\n   方向 v_s = 共用 token 配平的「风格 s − 其他」，σ_s 为发现集共用位置投影标准差。\n   H3  12 个（目标 s × 来源 c ≠ s）中至少 10 个：Δlog M_s(+6σ) ≥ 1、Δ(+6) > Δ(+3) > 0、Δ(+6) 大于每个随机方向的 Δ(+6)。\n   H4  12 个（来源 c，目标对 {a, b} ⊂ 其余三种）中至少 8 个：同时写入 6σ_a v_a + 6σ_b v_b 时，M_a、M_b 的变化都保留单独写入的 ≥ 50%。\n   描述：四个方向的两两 cos；同时写入时第三种风格的变化。\n用法：python scripts/mode_field_v2.py prereg | run --model M [--int8] | analyze --model M [--int8]\n",
+ "criteria": {
+  "schema": "mode_field.v2",
+  "window": 4,
+  "deep_n": 4,
+  "readout_rel": 0.75,
+  "n_bands": 6,
+  "H1_drop_min": 0.2,
+  "H2_band_share_min": 0.5,
+  "switch_rel": 0.5,
+  "k_on": [
+   0,
+   3,
+   6
+  ],
+  "n_random": 2,
+  "H3_min_combos": 10,
+  "H4_retain_min": 0.5,
+  "H4_min_triples": 8,
+  "seed": 0
+ }
+}
