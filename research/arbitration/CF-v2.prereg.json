@@ -1,0 +1,204 @@
+{
+ "id": "CF-v2",
+ "schema": "arbitration_prereg.v1",
+ "created": "2026-11-01",
+ "basis": "G1–G3（Phase 264–270）：实体属性的共享算子与截止层、句型与真值方向；CF-v1（Phase 263）已随 2026-11-01 的回退撤销，本版重新设计",
+ "question": "上下文给出与模型知识冲突的颜色时，模型按提问范围（书里 / 现实）读哪一个？对数几率是否服从「线索强度 + 知识强度」的简单规律？知识强度能否由实体编码（G2 算子）预测？削弱实体位置的先验色方向，仲裁是否按方向改变？",
+ "context": {
+  "zh": {
+   "story": [
+    "在一本童话书里，{X}是{K}的。",
+    "这本童话书里的{X}都是{K}的。",
+    "童话书里又一次写到，{X}是{K}的。"
+   ],
+   "ency": [
+    "一本百科全书写道，{X}是{K}的。",
+    "这本百科全书里说{X}都是{K}的。",
+    "百科全书又一次写到，{X}是{K}的。"
+   ]
+  },
+  "en": {
+   "story": [
+    "In a fairy-tale book, the {E} is {K}.",
+    "In this fairy-tale book, every {E} is {K}.",
+    "The fairy-tale book says again that the {E} is {K}."
+   ],
+   "ency": [
+    "An encyclopedia states that the {E} is {K}.",
+    "This encyclopedia says every {E} is {K}.",
+    "The encyclopedia says again that the {E} is {K}."
+   ]
+  }
+ },
+ "question_templates": {
+  "zh": {
+   "book": "问：在这本书里，{X}是什么颜色的？\n答：在这本书里，{X}是",
+   "world": "问：在现实世界里，{X}通常是什么颜色的？\n答：在现实世界里，{X}通常是"
+  },
+  "en": {
+   "book": "Q: In this book, what color is the {E}?\nA: In this book, the {E} is",
+   "world": "Q: In the real world, what color is the {E} usually?\nA: In the real world, the {E} is usually"
+  }
+ },
+ "conditions": [
+  [
+   "story",
+   1,
+   0
+  ],
+  [
+   "story",
+   1,
+   1
+  ],
+  [
+   "story",
+   2,
+   0
+  ],
+  [
+   "story",
+   2,
+   1
+  ],
+  [
+   "story",
+   3,
+   0
+  ],
+  [
+   "story",
+   3,
+   1
+  ],
+  [
+   "ency",
+   1,
+   0
+  ],
+  [
+   "ency",
+   1,
+   1
+  ],
+  [
+   "ency",
+   2,
+   0
+  ],
+  [
+   "ency",
+   2,
+   1
+  ],
+  [
+   "ency",
+   3,
+   0
+  ],
+  [
+   "ency",
+   3,
+   1
+  ],
+  [
+   "none",
+   0,
+   0
+  ],
+  [
+   "none",
+   0,
+   1
+  ]
+ ],
+ "pk_rule": "P = 首选色；K = 先验最低的 5 种颜色中按 sha256 选 1 种。返回 (P, K, s = score[P] − score[K])。",
+ "colour_source": "EA-v2 颜色目标（完整答案对数概率，分语言）",
+ "context_colour_word": "中文用表面形式首项（如「蓝色」），英文去掉前导空格；LO 用首 token",
+ "s_hat": "EA-v2 报告的颜色算子层与 λ；发现集用 5 折交叉拟合预测，确认集用发现集全量拟合",
+ "steer": {
+  "layer": {
+   "zh": 12,
+   "en": 13
+  },
+  "entities": [
+   "aquatic.cod",
+   "aquatic.grouper",
+   "aquatic.herring",
+   "aquatic.sea-lion",
+   "aquatic.scallop",
+   "aquatic.crucian-carp",
+   "aquatic.sea-anemone",
+   "aquatic.stingray",
+   "bird.duck",
+   "bird.guinea-fowl",
+   "bird.mandarin-duck",
+   "bird.grosbeak",
+   "bird.grouse",
+   "bird.wren",
+   "bird.titmouse",
+   "bird.cuckoo",
+   "food.spring-roll",
+   "food.oatmeal",
+   "food.cake",
+   "food.pasta",
+   "food.ice-cream",
+   "food.sushi",
+   "food.potato-chips",
+   "food.bacon",
+   "fruit.durian",
+   "fruit.wax-apple",
+   "fruit.olive",
+   "fruit.date",
+   "fruit.salak",
+   "fruit.flat-peach",
+   "fruit.crabapple",
+   "fruit.longan",
+   "mammal.cow",
+   "mammal.kangaroo",
+   "mammal.lemur",
+   "mammal.panda",
+   "mammal.hippo",
+   "mammal.donkey",
+   "mammal.cougar",
+   "mammal.mink",
+   "plant.morning-glory",
+   "plant.gardenia",
+   "plant.eucalyptus",
+   "plant.sugarcane",
+   "plant.clivia",
+   "plant.daffodil",
+   "plant.hydrangea",
+   "plant.alfalfa",
+   "vegetable.watercress",
+   "vegetable.winter-melon",
+   "vegetable.crown-daisy",
+   "vegetable.sweet-potato",
+   "vegetable.burdock",
+   "vegetable.radish",
+   "vegetable.snow-pea",
+   "vegetable.bell-pepper"
+  ],
+  "condition": "src = story, r = 1, S ∈ {0, 1}",
+  "positions": "提示中实体名的全部 token",
+  "direction": "−v_P（单位化），σ = 发现集中性编码在 v_P 上投影的标准差"
+ },
+ "dla": "每层 self_attn 与 mlp 在答案位置的输出 / 最终归一化输入的 RMS × norm.weight · (W_U[K] − W_U[P])；嵌入项同理",
+ "criteria": {
+  "schema": "arbitration.v1",
+  "H1_win_min": 0.7,
+  "H2_r2_min": 0.5,
+  "H4_r2_drop_max": 0.1,
+  "n_boot": 1000,
+  "k_grid": [
+   -6,
+   -3,
+   0,
+   3,
+   6
+  ],
+  "n_random": 2,
+  "min_swing": 1.0,
+  "seed": 0
+ }
+}
