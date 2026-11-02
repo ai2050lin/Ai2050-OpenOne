@@ -1,0 +1,34 @@
+{
+ "id": "AM-v1",
+ "schema": "assembly_prereg.v1",
+ "created": "2026-11-01",
+ "basis": "G1–G4（Phase 264–271）的部件；AGENTS.md 5.4 谱图预测保真度",
+ "question": "只用图谱部件（共享属性算子、类别中心、句型 / 真值组合、仲裁规律）与实体的中性编码，能在多大程度上预测留出实体上模型的答案分布？是否胜过词汇身份（hs[0]）与标注类别基线？",
+ "families": [
+  "color",
+  "size",
+  "weight",
+  "water",
+  "edible",
+  "arbitration",
+  "truth"
+ ],
+ "doc": "AM-v1：G5 第一次拼装——只用 G1–G4 的图谱部件预测留出实体上模型的答案分布（谱图预测保真度，AGENTS.md 5.4）。\n\n任务族（确认集 197 个新实体 × 中 / 英；模型真实分布来自已冻结的采集）：\n  color   颜色问答 11 色（EA-v2 目标，softmax）；\n  size / weight / water / edible   二值属性问答（EA-v2 目标间隔，sigmoid）；\n  arbitration   冲突上下文下 K 对 P 的对数几率（CF-v2，r ≥ 1 的 12 个条件）；\n  truth   裸陈述句「这句话是对的 / 错的」间隔（MV-v2 行为门，4 格）。\n预测方法（参数只在发现集 210 个实体上拟合；发现集内需要实体级预测时用 5 折交叉拟合）：\n  atlas      图谱：G2 属性算子作用于实体中性编码（EA-v2 选定层与 λ）；仲裁 = G4 规律（线索 + 由颜色算子预测的知识强度）；\n             真假 = G1 类别中心判定所述类别是否属实，再与否定组合（G3）后按发现集拟合的间隔规则给出；\n  hs0        同样的拟合，但实体编码换成 hs[0]（词汇身份基线）；\n  category   只用实体的标注类别：属性 = 发现集同类均值；仲裁的知识强度 = 同类均值颜色得分之差；真假 = 按标注类别完全已知（相当于知识上限）；\n  uniform    候选上的均匀分布。仲裁另报「只用线索」，真假另报「只用否定」（不含实体知识）。\n预测（assembly.CRITERIA，随预注册冻结）：\n  H1  14 个「任务族 × 语言」中，atlas 的 KL 同时低于 hs0 与 category 的至少 11 个。\n  H2  每种语言：7 个任务族 KL 平均后，atlas 相对 uniform 的恢复比例 ≥ 0.5。\n用法：python scripts/g5_assembly_v1.py prereg|run --model models/hf/qwen3-4b\n",
+ "inputs_allowed": "提示的设计因子；实体在中性句式中的编码（EA-v1 / v2 采集）；发现集拟合的参数",
+ "inputs_forbidden": "被预测提示本身的状态、logits、模型答案",
+ "sources": {
+  "EA-v2": "research/entity_atlas/EA-v2.prereg.json",
+  "CF-v2": "research/arbitration/CF-v2.prereg.json",
+  "MV-v2": "research/mode_atlas/MV-v2.prereg.json"
+ },
+ "g1_layers": {
+  "zh": 27,
+  "en": 10
+ },
+ "criteria": {
+  "schema": "assembly.v1",
+  "H1_min_cells": 11,
+  "H2_recovered_min": 0.5,
+  "seed": 0
+ }
+}
