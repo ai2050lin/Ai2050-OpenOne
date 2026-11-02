@@ -72,6 +72,22 @@ class ModeFieldTests(unittest.TestCase):
         self.assertTrue(F.retain(2.0, 3.0, 1.8, 2.5)['pass'])
         self.assertFalse(F.retain(3.0, 3.0, 0.2, 2.5)['pass'])       # 胜者通吃
 
+    def test_v3_restoration_select(self):
+        rng = np.random.default_rng(4)
+        n = 60
+        joint = rng.normal(0, 0.2, n)
+        single = joint + 3.0
+        names = [f'{k}{l}' for l in range(10) for k in ('attn', 'mlp')]
+        P_ = joint[:, None] + rng.normal(0, 0.2, (n, len(names)))
+        P_[:, names.index('mlp7')] += 2.4                      # 植入：第 7 层 MLP 恢复约 0.8
+        A = np.arange(n) % 2 == 0
+        r = F.select_component(P_, joint, single, A, names)
+        self.assertEqual(r['component'], 'mlp7')
+        self.assertTrue(r['pass'] and r['mlp_pos_B'] > r['attn_pos_B'])
+        r0 = F.select_component(joint[:, None] + rng.normal(0, 0.2, (n, len(names))), joint, single, A, names)
+        self.assertFalse(r0['pass'])                           # 负对照：无组件恢复
+        self.assertTrue(np.isnan(F.restoration(P_, joint, joint - 1)).all())
+
 
 if __name__ == '__main__':
     unittest.main()

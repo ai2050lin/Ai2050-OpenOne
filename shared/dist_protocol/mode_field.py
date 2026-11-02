@@ -182,3 +182,37 @@ def retain(joint_a: float, single_a: float, joint_b: float, single_b: float, cri
     rb = joint_b / single_b if single_b > 0 else float('nan')
     return {'retain_a': float(ra), 'retain_b': float(rb),
             'pass': bool(single_a > 0 and single_b > 0 and ra >= crit['H4_retain_min'] and rb >= crit['H4_retain_min'])}
+
+
+# ---------------- MF-v3：代码压过散文的位置（组件修补）----------------
+# 在「代码 + 散文」同时写入的运行里，把某一层的注意力或 MLP 输出（全部位置）换成「只写散文」运行中的值，
+# 看被压掉的散文效应恢复多少：恢复比例 = (M_p[修补] − M_p[同时]) / (M_p[只散文] − M_p[同时])。
+# 组件只在 A 半（按任务）上选定，在 B 半上检验。
+CRITERIA_V3 = {
+    'schema': 'mode_field.v3',
+    'triples': [['zh', 'en'], ['en', 'zh'], ['paper', 'zh'], ['paper', 'en']],   # [来源, 被压的散文]；与代码同时写入（MF-v2 两模型都压掉的 4 组）
+    'k': 6, 'switch_rel': 0.5,
+    'H0_prose_retain_max': 0.2, 'H0_code_retain_min': 0.7, 'H0_min_triples': 3,   # 发现集文本上复现压制
+    'H1_restore_min': 0.3, 'H1_min_triples': 3,      # A 选出的单个组件在 B 上恢复 ≥ 0.3
+    'H2_min_triples': 3,                             # B 上 MLP 组件的正恢复之和 > 注意力组件的正恢复之和
+    'seed': 0,
+}
+
+
+def restoration(m_patched: np.ndarray, m_joint: np.ndarray, m_single: np.ndarray) -> np.ndarray:
+    """逐条目平均后的恢复比例：m_patched [n, n_comp]，m_joint / m_single [n]。"""
+    gap = float(np.mean(m_single - m_joint))
+    if gap <= 0:
+        return np.full(m_patched.shape[1], np.nan)
+    return (m_patched - m_joint[:, None]).mean(0) / gap
+
+
+def select_component(m_patched, m_joint, m_single, in_A, names, crit=CRITERIA_V3) -> Dict[str, object]:
+    rA = restoration(m_patched[in_A], m_joint[in_A], m_single[in_A])
+    rB = restoration(m_patched[~in_A], m_joint[~in_A], m_single[~in_A])
+    j = int(np.nanargmax(rA))
+    pos = lambda r, kind: float(np.nansum([max(v, 0) for v, n in zip(r, names) if n.startswith(kind)]))
+    return {'component': names[j], 'restore_A': float(rA[j]), 'restore_B': float(rB[j]),
+            'mlp_pos_B': pos(rB, 'mlp'), 'attn_pos_B': pos(rB, 'attn'),
+            'top5_B': sorted(((float(v), n) for v, n in zip(rB, names) if v == v), reverse=True)[:5],
+            'pass': bool(rB[j] >= crit['H1_restore_min'])}

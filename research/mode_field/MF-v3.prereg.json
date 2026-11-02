@@ -1,0 +1,44 @@
+{
+ "id": "MF-v3",
+ "schema": "mode_field_prereg.v3",
+ "created": "2026-11-02",
+ "basis": "MF-v2（Phase 276）：代码与中文 / 英文说明同时写入时，两模型都在同样 4 组中压掉说明文字",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "glm4-9b-chat-hf": "int8（复现）"
+ },
+ "materials": "MF-v1 发现集文本（16 任务 × 5 填充，每种来源 80 段）；按任务 sha256 切 A / B 各 8 任务。注意：风格方向也由发现集共用 token 位置求得，压制现象本身此前只在确认集上观察",
+ "patch": "写入层之后每层的注意力输出与 MLP 输出各为一个组件；全部位置替换为「只写散文」运行中的值",
+ "power_note": "连续量阈值；每组 80 段（A / B 各 40）",
+ "doc": "MF-v3：代码模式在哪里压掉散文？（组件修补）\n\nMF-v2（Phase 276）：在中层同时写入「代码 + 中文 / 英文说明」时，两模型都是代码效应完整保留、说明文字效应被压掉（同样 4 组）。\n本版在**发现集文本**（MF-v2 只用确认集，这里是新任务）上：\n  H0  复现压制：4 组中至少 3 组，散文保留 ≤ 0.2 且代码保留 ≥ 0.7（保留 = 同时写入的效应 / 单独写入的效应，log M 相对不写入）。\n  修补：在「同时写入」运行中，把写入层之后某一层的注意力或 MLP 输出（全部位置）换成「只写散文」运行中的值，\n        恢复比例 = (M_p[修补] − M_p[同时]) / (M_p[只散文] − M_p[同时])。\n  H1  按任务切 A / B：A 上恢复最大的单个组件，在 B 上恢复 ≥ 0.3（4 组中至少 3 组）。\n  H2  B 上 MLP 组件的正恢复之和 > 注意力组件的正恢复之和（4 组中至少 3 组）——压制主要由 MLP 计算。\n  方向与写入同 MF-v2：层 round(0.5L)，共用 token 配平的风格方向，6σ，前 60% 前缀的全部位置。\n用法：python scripts/mode_field_v3.py prereg | run --model M [--int8] | analyze --model M [--int8]\n",
+ "criteria": {
+  "schema": "mode_field.v3",
+  "triples": [
+   [
+    "zh",
+    "en"
+   ],
+   [
+    "en",
+    "zh"
+   ],
+   [
+    "paper",
+    "zh"
+   ],
+   [
+    "paper",
+    "en"
+   ]
+  ],
+  "k": 6,
+  "switch_rel": 0.5,
+  "H0_prose_retain_max": 0.2,
+  "H0_code_retain_min": 0.7,
+  "H0_min_triples": 3,
+  "H1_restore_min": 0.3,
+  "H1_min_triples": 3,
+  "H2_min_triples": 3,
+  "seed": 0
+ }
+}
