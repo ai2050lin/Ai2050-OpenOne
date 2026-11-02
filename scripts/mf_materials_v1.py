@@ -188,3 +188,50 @@ def corpus():
                 for st in STYLES:
                     out.append({'id': f'{t}/{j}/{st}', 'task': t, 'item': f'{t}/{j}', 'style': st, 'split': s, 'fill': f, 'text': render(t, st, f)})
     return out
+
+
+# ---------------- MF-v5：自然切换材料（只用确认集任务）----------------
+CLOSING = {'zh': '以上代码只遍历一次输入，时间复杂度是线性的。', 'en': 'The code above makes a single pass over the input, so it runs in linear time.'}
+
+
+def _first_sentence(text: str, lang: str) -> str:
+    cut = text.find('。') + 1 if lang == 'zh' else text.find('. ') + 1
+    return text[:cut] if cut > 0 else text
+
+
+def _last_sentence(text: str, lang: str) -> str:
+    t = text.rstrip()
+    if lang == 'zh':
+        parts = [p for p in t.split('。') if p]
+        return parts[-1] + '。'
+    parts = [p for p in t.split('. ') if p]
+    return parts[-1] if parts[-1].endswith('.') else parts[-1] + '.'
+
+
+def mixed_corpus():
+    """[{'id', 'task', 'kind', 'lang', 'text', 'spans': [(start, end, segment)]}]，segment ∈ prose / fence / code / comment。
+    md：说明段落 + ```python 代码块 ``` + 结语；cmt：代码在函数头之后与 return 之前各插一行注释（取说明的首句与末句）。"""
+    out = []
+    for t in split()['conf']:
+        for j, f in enumerate(fillers(t)):
+            code = render(t, 'code', f)
+            for lang in ('zh', 'en'):
+                prose = render(t, lang, f)
+                pieces = [(prose + '\n\n', 'prose'), ('```python\n', 'fence'), (code, 'code'), ('```\n\n', 'fence'), (CLOSING[lang], 'prose')]
+                text, spans = '', []
+                for s, seg in pieces:
+                    spans.append((len(text), len(text) + len(s), seg))
+                    text += s
+                out.append({'id': f'{t}/{j}/md/{lang}', 'task': t, 'kind': 'md', 'lang': lang, 'text': text, 'spans': spans})
+                lines = code.split('\n')
+                ret = max(i for i, ln in enumerate(lines) if ln.strip().startswith('return'))
+                c1 = '    # ' + _first_sentence(prose, lang) + '\n'
+                c2 = '    # ' + _last_sentence(prose, lang) + '\n'
+                pieces = [(lines[0] + '\n', 'code'), (c1, 'comment'), ('\n'.join(lines[1:ret]) + '\n', 'code'), (c2, 'comment'),
+                          ('\n'.join(lines[ret:]), 'code')]
+                text, spans = '', []
+                for s, seg in pieces:
+                    spans.append((len(text), len(text) + len(s), seg))
+                    text += s
+                out.append({'id': f'{t}/{j}/cmt/{lang}', 'task': t, 'kind': 'cmt', 'lang': lang, 'text': text, 'spans': spans})
+    return out

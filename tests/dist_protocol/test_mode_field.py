@@ -106,6 +106,22 @@ class ModeFieldTests(unittest.TestCase):
         self.assertFalse(F.unit_verdict(0.8, 0.6, [0.3, 0.1])['pass'])
         self.assertFalse(F.unit_verdict(0.8, 0.2, [0.01])['pass'])
 
+    def test_v5_segments(self):
+        rng = np.random.default_rng(6)
+        segs, Gs = [], []
+        for _ in range(30):
+            s = np.array(['code'] * 10 + ['comment'] * 8 + ['code'] * 10)
+            G = np.where(s == 'code', 2.0, 0.0) + rng.normal(0, 0.3, len(s))
+            G[10:12] = 2.0                                       # 植入：进入注释后 2 个 token 才关门
+            segs.append(s); Gs.append(G)
+        G, S = np.concatenate(Gs), np.concatenate(segs)
+        self.assertGreater(F.segment_auc(G, S, 'code', 'comment'), 0.8)
+        pr = F.boundary_profile(Gs, segs, 'code', 'comment', [-4, 6])
+        self.assertEqual(pr['latency'], 2)
+        self.assertEqual(F.boundary_profile(Gs, segs, 'comment', 'code', [-4, 6])['latency'], 0)
+        Gn = [rng.normal(0, 1, len(s)) for s in segs]                # 负对照
+        self.assertLess(abs(F.segment_auc(np.concatenate(Gn), S, 'code', 'comment') - 0.5), 0.08)
+
 
 if __name__ == '__main__':
     unittest.main()

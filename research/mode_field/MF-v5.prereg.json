@@ -1,0 +1,35 @@
+{
+ "id": "MF-v5",
+ "schema": "mode_field_prereg.v5",
+ "created": "2026-11-02",
+ "basis": "MF-v4（Phase 278）：每个模型 32 个后段 MLP 单元承担人工写入下的「代码压过散文」；本版检验自然切换",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "glm4-9b-chat-hf": "int8（复现）"
+ },
+ "units": "MF-v4 选出的 32 个单元与符号（mf_v4_units.npz），不重新选择",
+ "materials": {
+  "source": "scripts/mf_materials_v1.mixed_corpus",
+  "n_texts": 160,
+  "sha256_texts": "03ff4b02bcf3e3cceac26d6eb8c84e11a6d29d3a29e8d2b0a4c9509ddb9449fb",
+  "generation_prefixes": "MF-v1 确认集代码文本前 50% token（40）；md 文本截到代码块中部（80）"
+ },
+ "power_note": "连续量与比例阈值；160 段混合文本、120 个生成前缀",
+ "doc": "MF-v5：MF-v4 的 32 个门控单元在自然的代码 / 散文切换中做什么？\n\n材料（scripts/mf_materials_v1.mixed_corpus，只用 MF-v1 确认集的 8 个任务）：\n  md   说明段落（中 / 英）+ ```python 代码块 ``` + 结语；\n  cmt  代码在函数头之后、return 之前各插一行中 / 英文注释（取说明的首句与末句）。\n门控得分 G_t = Σ_{i∈G} sign_i A_i(t)；关门 = 32 个单元在全部位置设为自然散文位置（MF-v1 确认集中 / 英 / 论文）上的均值；\n对照 = 5 个幅度匹配集合（同层、自然文本标准差最接近的 10 个之一）做同样处理。\n  H1  G 跟随文本内的切换：md 中代码块 vs 散文位置 AUC ≥ 0.8；cmt 中代码行 vs 注释行 AUC ≥ 0.7（两条都成立）。\n  H2  教师强制：关门后代码位置的 log M_散文（中 ∪ 英 ∪ 论文专属词表的下一词质量）平均上升 ≥ 0.5 nat，且 ≥ 每个幅度匹配集合的 3 倍。\n  H3  自由生成（代码前缀，贪心 24 个 token）：关门后生成 token 中散文 token（散文专属词表或含汉字）的比例上升 ≥ 0.02，且大于每个幅度匹配集合的上升。\n  描述：边界附近 G 的平均曲线与切换潜伏期；注释位置上关门的作用；代码下一词损失的变化；生成样例。\n用法：python scripts/mode_field_v5.py prereg | run --model M [--int8] | analyze --model M [--int8]\n",
+ "criteria": {
+  "schema": "mode_field.v5",
+  "H1_md_auc_min": 0.8,
+  "H1_cmt_auc_min": 0.7,
+  "H2_prose_rise_min": 0.5,
+  "H2_over_matched": 3.0,
+  "H3_rate_rise_min": 0.02,
+  "gen_tokens": 24,
+  "n_matched_sets": 5,
+  "near_k": 10,
+  "latency_window": [
+   -4,
+   12
+  ],
+  "seed": 0
+ }
+}

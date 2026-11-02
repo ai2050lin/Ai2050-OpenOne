@@ -260,3 +260,43 @@ def unit_verdict(r_layers: float, r_top: float, r_rand: Sequence[float], crit=CR
               and r_top >= crit['H1_over_random'] * max(max(r_rand), 1e-9))
     return {'restore_layers': float(r_layers), 'restore_top': float(r_top), 'restore_random': [float(x) for x in r_rand],
             'frac_of_layers': float(r_top / r_layers) if r_layers > 0 else float('nan'), 'pass': ok}
+
+
+# ---------------- MF-v5：自然切换中的门控单元 ----------------
+# 门控得分 G_t = Σ_{i∈G} sign_i · A_i(t)（MF-v4 选出的 32 个单元，sign 取只写代码时的变化方向）。
+# 关门 = 把 32 个单元在全部位置设为自然散文位置上的均值；对照 = 幅度匹配的 32 个随机单元做同样处理。
+CRITERIA_V5 = {
+    'schema': 'mode_field.v5',
+    'H1_md_auc_min': 0.8,          # Markdown：代码块位置 vs 散文位置的 G AUC
+    'H1_cmt_auc_min': 0.7,         # 带注释代码：代码行位置 vs 注释行位置的 G AUC
+    'H2_prose_rise_min': 0.5,      # 教师强制：关门后代码位置的 log M_散文 平均上升（nat）
+    'H2_over_matched': 3.0,        #   且 ≥ 每个幅度匹配集合上升的 3 倍
+    'H3_rate_rise_min': 0.02,      # 自由生成：关门后生成 token 中散文 token 比例上升 ≥ 0.02，且大于每个幅度匹配集合的上升
+    'gen_tokens': 24, 'n_matched_sets': 5, 'near_k': 10,
+    'latency_window': [-4, 12],
+    'seed': 0,
+}
+
+
+def segment_auc(G: np.ndarray, seg: np.ndarray, pos_seg: str, neg_seg: str) -> float:
+    return auc(G[seg == pos_seg], G[seg == neg_seg])
+
+
+def boundary_profile(Gs: Sequence[np.ndarray], segs: Sequence[np.ndarray], frm: str, to: str, window) -> Dict[str, object]:
+    """所有 frm→to 边界（to 段第一个 token 为偏移 0）附近的平均 G；阈值取两段 G 均值的中点，潜伏期 = 偏移 ≥ 0 后首次越过阈值的偏移。"""
+    lo, hi = window
+    rows = []
+    for G, s in zip(Gs, segs):
+        for t in range(1, len(s)):
+            if s[t] == to and s[t - 1] == frm:
+                if t + lo >= 0 and t + hi < len(G):
+                    rows.append(G[t + lo:t + hi + 1])
+    if not rows:
+        return {'n': 0}
+    prof = np.mean(rows, 0)
+    a = np.concatenate([G[s == frm] for G, s in zip(Gs, segs)])
+    b = np.concatenate([G[s == to] for G, s in zip(Gs, segs)])
+    thr = (a.mean() + b.mean()) / 2
+    up = b.mean() > a.mean()
+    lat = next((o for o, v in zip(range(lo, hi + 1), prof) if o >= 0 and ((v > thr) if up else (v < thr))), None)
+    return {'n': len(rows), 'offsets': list(range(lo, hi + 1)), 'profile': [float(x) for x in prof], 'threshold': float(thr), 'latency': lat}
