@@ -1,0 +1,65 @@
+{
+ "id": "XM-v1",
+ "schema": "cross_model_prereg.v1",
+ "created": "2026-11-01",
+ "basis": "Phase 264–272（Qwen3-4B）的核心结论；本版只换模型，不换材料与判据",
+ "models": {
+  "qwen3-4b": {
+   "path": "models/hf/qwen3-4b",
+   "precision": "bf16"
+  },
+  "qwen3-1.7b": {
+   "path": "models/hf/qwen3-1.7b",
+   "precision": "bf16"
+  },
+  "glm4-9b-chat-hf": {
+   "path": "models/hf/glm4-9b-chat-hf",
+   "precision": "int8"
+  }
+ },
+ "precision_note": "GLM4-9B bf16 约 18 GB，16 GB 显存放不下；CPU 卸载实测每次前向约 0.6 s，故用 bitsandbytes LLM.int8（单独分桶，不与 bf16 结果平均）",
+ "materials": {
+  "EA": "research/entity_atlas/EA-v2.prereg.json（提示、实体）",
+  "MV": "research/mode_atlas/MV-v2.prereg.json（框架 B、裸陈述句、行为门）",
+  "CF": "research/arbitration/CF-v2.prereg.json（上下文、问题、条件）"
+ },
+ "collection": "批量前向（右侧补齐，按每行真实长度取末位）；完整答案对数概率逐答案求和；与原单条前向的一致性在 qwen3-4b 上核对",
+ "power_note": "AGENTS.md 13 的 McNemar 规划针对逐题二值的消融对比；本版判据为连续量与比例阈值，沿用原 Phase 的 n（发现 210 / 确认 197 / 干预 56）",
+ "doc": "XM-v1：G1–G5 核心结论的跨模型复现。\n\n同一套材料与提示（EA-v1 / v2 实体与属性问答、MV-v2 框架 B 与裸陈述句、CF-v2 冲突上下文），在每个被测模型上用批量前向重新采集；\n与层号有关的选择一律按规则在该模型的发现集上重新选定（或按相对深度换算），判据在 CRITERIA 中随预注册冻结。\n被测模型：qwen3-4b（驱动一致性核对：批量采集应复现原结果）、qwen3-1.7b（同家族、更小）、glm4-9b-chat-hf（不同厂家；\n16 GB 显存放不下 bf16，按 bitsandbytes LLM.int8 加载，结果单独分桶记为 int8）。\n复现条目（每个模型分别判定）：\n  C1  G1 类别中心：确认集类别准确率 ≥ 0.6 且比 hs[0] 高 0.15（两种语言；层由发现集 5 折最近中心交叉验证选定）。\n  C2  G2 共享算子：颜色两种语言 supported_operator，且 4 个二值属性中至少 2 个两种语言都成立（EA-v2 规则）。\n  C3  截止层：颜色 / 含水 × 中 / 英 4 项中至少 3 项「写入窗口非空且最后可读层 > 最后可写层」（层网格步长 ⌈L/12⌉）。\n  C4  真值组合：成对行为门 ≥ 0.7 的语言上，框架 B 陈述句真值探针（中层段 [L/3, 0.6L] 内交叉验证选层）确认集 ≥ 0.75；至少一种语言过门。\n  C5  中层跨语言：q 与 n 的中英 cos ≥ 0.3 且大于跨因子 |cos|，中文探针读英文确认集 ≥ 0.75（MV-v2 H4 规则，中层段）。\n  C6  真值写入：在相对深度 13/36、17/36、21/36 的层上，句末沿真值方向写入，steer_verdict 至少一层成立（每种语言）。\n  C7  仲裁开关：r = 1 童话来源，书里上下文胜出 ≥ 0.7 且现实先验胜出 ≥ 0.7（两种语言）。\n  C8  知识门控：现实范围 γ 的 95% 区间上界 < 0，且 |γ_书里| ≤ 0.5 |γ_现实|（两种语言）。\n  C9  分工（DLA）：书里注意力直接作用之和 > MLP 之和；现实 MLP 之和 < 注意力之和（两种语言）。\n  C10 仲裁写入：在颜色写入窗口内摆幅最大的层削弱先验色方向，现实范围 steer_verdict 成立，且现实摆幅 > 2 × 书里摆幅（两种语言）。\n  C11 拼装：AM-v1 的 14 格中，图谱 KL 同时低于 hs0 与 category 的至少 11 格。\n用法：python scripts/xm_replicate_v1.py prereg | collect --model M [--int8] | steer --model M [--int8] | analyze --model M [--int8]\n",
+ "criteria": {
+  "schema": "cross_model.v1",
+  "C1_acc_min": 0.6,
+  "C1_over_hs0": 0.15,
+  "C2": "EA-v2 G2_confirmed 规则（CRITERIA_V2）",
+  "C3_min_items": 3,
+  "C3_grid": "range(0, L, ceil(L/12))",
+  "read_margin_min": 0.1,
+  "write_swing_min": 1.0,
+  "k": 6,
+  "n_random": 2,
+  "C4_gate_min": 0.7,
+  "C4_truth_min": 0.75,
+  "band": "[round(L/3), round(0.6L)]",
+  "C5_cos_min": 0.3,
+  "C5_transfer_min": 0.75,
+  "C6_layers_rel": [
+   0.3611111111111111,
+   0.4722222222222222,
+   0.5833333333333334
+  ],
+  "k_grid": [
+   -6,
+   -3,
+   0,
+   3,
+   6
+  ],
+  "min_swing": 1.0,
+  "C7_win_min": 0.7,
+  "C8_book_ratio_max": 0.5,
+  "C10_world_over_book": 2.0,
+  "C11_min_cells": 11,
+  "n_boot": 1000,
+  "seed": 0
+ }
+}
