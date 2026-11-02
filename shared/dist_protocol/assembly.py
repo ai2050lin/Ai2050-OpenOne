@@ -47,3 +47,44 @@ def family_scores(kind: str, true: np.ndarray, preds: Dict[str, np.ndarray]) -> 
 
 def recovered(kl_method: float, kl_uniform: float) -> float:
     return float(1 - kl_method / max(kl_uniform, 1e-30))
+
+
+# ---------------- AM-v2：用「槽位条件化的专家乘积」预测未见组合 ----------------
+# 每个事件 × 槽位是一个 2×2（风格 s × 逻辑 l）；Y[s, l] 为全词表对数概率。
+# P1 事件内补全：Ŷ[s,l] = Y[1−s,l] + Y[s,1−l] − Y[1−s,1−l]（加法补全），对照「两个相邻格的平均」。
+# P2 跨事件迁移：新事件只看到 (日常, 因果) 格 Y00；Ŷ[s,l] = Y00 + s·Δs_g + l·Δl_g，Δ 只在发现集事件上按槽位估计。
+#    对照：只用 Y00；Δ 不分槽位（三槽位平均）；加上发现集估计的交互项 s·l·Δsl_g。
+# KL 在被预测格的候选集（该事件 12 个真实格各自前 20 的并集）上，真分布与预测各自重新归一化。
+CRITERIA_V2 = {
+    'schema': 'assembly.v2',
+    'top_k_cand': 20,
+    'H1_ratio_max': 0.5, 'H1_min_cells': 5,   # P1：加法补全 KL ≤ 0.5 × 相邻平均 KL，（语言 × 槽位）6 格中至少 5 格
+    'H2_recovered_min': 0.5,                  # P2：1 − KL_专家乘积 / KL_只用基础格 ≥ 0.5（每种语言）
+    'H3_slot_gain_min': 0.1,                  # P2：分槽位的 Δ 比不分槽位的 KL 低 ≥ 10%（每种语言）
+    'H4_interaction_gain_max': 0.1,           # P2：加交互项使 KL 降低不超过 10%（可加已足够；每种语言）
+    'seed': 0,
+}
+
+
+def kl_restricted(true_lp: np.ndarray, pred_lp: np.ndarray, cand: np.ndarray) -> float:
+    """真分布与预测都限制到候选集并重新归一化后的 KL(p_true ‖ p_pred)。"""
+    t = log_softmax(np.asarray(true_lp, float)[cand])
+    p = log_softmax(np.asarray(pred_lp, float)[cand])
+    return float((np.exp(t) * (t - p)).sum())
+
+
+def additive_completion(Y: np.ndarray, s: int, l: int) -> np.ndarray:
+    """Y：[2, 2, V]。用另外三格加法补全 (s, l)。"""
+    return Y[1 - s, l] + Y[s, 1 - l] - Y[1 - s, 1 - l]
+
+
+def neighbor_mean(Y: np.ndarray, s: int, l: int) -> np.ndarray:
+    return 0.5 * (Y[1 - s, l] + Y[s, 1 - l])
+
+
+def slot_effects(Yd: np.ndarray):
+    """Yd：[n_disc, 2, 2, V]。返回 (Δs, Δl, Δsl)，均为 [V]。"""
+    ds = (Yd[:, 1] - Yd[:, 0]).mean((0, 1))
+    dl = (Yd[:, :, 1] - Yd[:, :, 0]).mean((0, 1))
+    dsl = (Yd[:, 1, 1] - Yd[:, 1, 0] - Yd[:, 0, 1] + Yd[:, 0, 0]).mean(0)
+    return ds, dl, dsl
