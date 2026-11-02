@@ -1,0 +1,75 @@
+{
+ "id": "FU-v1",
+ "schema": "fusion_prereg.v1",
+ "created": "2026-11-02",
+ "basis": "用户方案：把词嵌入、风格、逻辑、语法融合，破解整体编码；风格线（Phase 275–279）之后的融合检验",
+ "models": {
+  "qwen3-4b": "bf16（主）",
+  "gemma-3-4b-it": "bf16（复现）"
+ },
+ "precision_rule": "不使用任何量化（用户 2026-11-02 指示）",
+ "materials": {
+  "source": "scripts/fu_materials_v1.py",
+  "split": {
+   "conf": [
+    6,
+    8,
+    9,
+    10,
+    11,
+    13,
+    18,
+    22,
+    28,
+    29,
+    31,
+    33,
+    36,
+    37,
+    38,
+    39
+   ],
+   "disc": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    12,
+    14,
+    15,
+    16,
+    17,
+    19,
+    20,
+    21,
+    23,
+    24,
+    25,
+    26,
+    27,
+    30,
+    32,
+    34,
+    35
+   ]
+  },
+  "n_prompts": 320,
+  "sha256": "94882ca02ce7d4df25122abfd7a36cad5ae4532287663725599d94091e8f55d9"
+ },
+ "tokenization": "按各 tokenizer 的默认 add_special_tokens（Gemma 加 BOS，Qwen 不加）；读出位置为最后一个 token",
+ "readout_note": "末位 token 只随语法因子不同（主语名词 vs 撇号）；风格与逻辑只能经上下文影响末位，hs[0] 上只有语法主效应",
+ "power_note": "连续量份额阈值；确认集 16 个事件 × 8 格",
+ "doc": "FU-v1：风格 × 逻辑 × 语法在下一词预测中怎样融合——是各自独立相加（专家乘积），还是相互作用？\n\n材料：scripts/fu_materials_v1.py，40 个事件 × 风格（日常 / 正式前提）× 逻辑（so / but）× 语法槽位（主语后接动词 / 所有格 ' 后接名词），\n英文；按事件切分发现 24 / 确认 16，判定只用确认集（本版没有需要拟合的参数，发现集只作描述）。\n读出：末位（区分全部三个因子的文本都已出现）的下一词对数概率与全部层的隐状态。\n  H0  行为门：输出上三个因子各自的主效应份额（确认集合并）≥ 0.05。\n  H1  输出可加：候选 token（8 个格各自前 20 的并集）的按格中心化对数概率，三个主效应占格间平方和 ≥ 0.8。\n  H2  状态可加：中层段 [L/3, 2L/3] 各层隐状态「去掉语法主效应后」的可加份额 (s + l) / (总 − g) 平均 ≥ 0.8\n      （末位 token 只随语法因子不同，语法主效应主要是 token 身份，不计入）。\n  H3  融合在后段：同一口径下，最终层隐状态的交互份额 ≥ 中层段平均交互份额的 1.5 倍。\n  描述：逐层可加份额曲线、交互在各因子对上的分配、承载交互最多的候选 token。\n被测模型（全部 bf16，不使用任何量化）：Qwen3-4B（主）；Gemma-3-4B-it（复现，不同厂家）。\n用法：python scripts/fusion_v1.py prereg | run --model M | analyze --model M\n",
+ "criteria": {
+  "schema": "fusion.v1",
+  "top_k_per_cell": 20,
+  "H0_main_share_min": 0.05,
+  "H1_out_additive_min": 0.8,
+  "H2_state_additive_min": 0.8,
+  "H3_interaction_growth": 1.5,
+  "seed": 0
+ }
+}
