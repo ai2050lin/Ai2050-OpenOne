@@ -1,0 +1,261 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q8b",
+ "provenance": {
+  "git_sha": "d7fb89bad3deebc2c776d66cfc5d8638ee55e412",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\ZhipuAI\\glm-4-9b-chat-hf",
+  "model_revision": "sha8:8ec64bc0",
+  "seed": 20261101,
+  "tool": "tools/pat_q8b.py",
+  "created_at": "2026-11-01T11:16:08"
+ },
+ "payload": {
+  "config": {
+   "model": "D:/develop/model/ZhipuAI/glm-4-9b-chat-hf",
+   "smoke": false,
+   "seed": 20261101,
+   "folds": 5,
+   "n_perm": 12,
+   "n_pool": 27215,
+   "n_char": 4213,
+   "n_word": 23002,
+   "n_latin": 4842,
+   "n_byte": 1295,
+   "tied": false,
+   "d": 4096,
+   "mu_norm": 0.006961624603718519
+  },
+  "null": {
+   "r2_mean": -0.2290134168403287,
+   "r2_p95": -0.21768527296267387
+  },
+  "B1": {
+   "r2": 0.7214078710752614,
+   "r2_quad": 0.7205413782213473,
+   "r2_bin": 0.6916311433153349,
+   "delta_bin_minus_lin": -0.029776727759926458,
+   "delta_ci": [
+    -0.03269217179274287,
+    -0.026564105473763033
+   ],
+   "slope_median": 1.0002702253126377,
+   "verdict": "LINEAR_LOG_SCALAR",
+   "r2_freq_axis": -0.010990154738084623,
+   "freq_vs_zipf_gap": 0.732398025813346,
+   "r2_gain_vs_null": 0.9504212879155901
+  },
+  "B2": {
+   "coords": [
+    {
+     "k": 1,
+     "r2": 0.25364917177063906
+    },
+    {
+     "k": 2,
+     "r2": 0.2640190758367952
+    },
+    {
+     "k": 4,
+     "r2": 0.2719307796868876
+    },
+    {
+     "k": 8,
+     "r2": 0.43571884306642106
+    },
+    {
+     "k": 16,
+     "r2": 0.49906910907391033
+    },
+    {
+     "k": 32,
+     "r2": 0.5431894720698083
+    },
+    {
+     "k": 64,
+     "r2": 0.5908627276442905
+    },
+    {
+     "k": 128,
+     "r2": 0.6256608704236022
+    },
+    {
+     "k": 256,
+     "r2": 0.6580146446580807
+    },
+    {
+     "k": 512,
+     "r2": 0.6823015218576458
+    },
+    {
+     "k": 1024,
+     "r2": 0.7027893191396488
+    }
+   ],
+   "k_star": 512,
+   "r2_max": 0.7027893191396488,
+   "pls": [
+    {
+     "k": 1,
+     "r2": 0.6185459184681175
+    },
+    {
+     "k": 2,
+     "r2": 0.7058194572345731
+    },
+    {
+     "k": 4,
+     "r2": 0.7361223645823447
+    },
+    {
+     "k": 8,
+     "r2": 0.7330513829732412
+    },
+    {
+     "k": 16,
+     "r2": 0.7208830724663711
+    },
+    {
+     "k": 32,
+     "r2": 0.7221624238491724
+    }
+   ],
+   "pls_k_star": 2,
+   "pls_r2_max": 0.7361223645823447,
+   "density": "LOW_DIM_DENSE",
+   "verdict_coord": "DISTRIBUTED",
+   "verdict": "AMBIGUOUS_DIM"
+  },
+  "B3": {
+   "rho_log_norm_zipf": 0.31465521877139996,
+   "cos_freq_norm": 0.2417297919803382,
+   "r2_full": 0.7214249351242242,
+   "r2_after_removing_norm": 0.741550265808402,
+   "ratio": 1.0278966385888955,
+   "verdict": "FREQ_INDEPENDENT_OF_NORM"
+  },
+  "single_coord": {
+   "coord": 1941,
+   "pearson": -0.5894736356502759,
+   "spearman": -0.5976694545398709
+  },
+  "B5": {
+   "delta_1zipf": 0.9997298476893549,
+   "slope": 1.0002702253126377,
+   "curve": [
+    {
+     "dose": 0.25,
+     "n": 120,
+     "median": 3.2750000000000004,
+     "frac_pos": 0.8583333333333333,
+     "frac_near": 0.11666666666666667
+    },
+    {
+     "dose": 0.5,
+     "n": 120,
+     "median": 3.225,
+     "frac_pos": 0.9583333333333334,
+     "frac_near": 0.075
+    },
+    {
+     "dose": 1.0,
+     "n": 120,
+     "median": 3.075,
+     "frac_pos": 0.9833333333333333,
+     "frac_near": 0.075
+    },
+    {
+     "dose": 2.0,
+     "n": 120,
+     "median": 3.0500000000000003,
+     "frac_pos": 1.0,
+     "frac_near": 0.2916666666666667
+    }
+   ],
+   "monotone": false,
+   "verdict": "KNOB_NOT_LOCAL",
+   "search_set": 28510,
+   "note": "E1 静态预检，非干预；搜索集=可定义频率行+残片"
+  },
+  "B6": {
+   "COLOR": {
+    "n": 52,
+    "within_before": 0.14358434081077576,
+    "within_after": 0.14303623469817714,
+    "retain": 0.9961826887980706,
+    "null_mean": 0.015606106511087339,
+    "null_p95": 0.01662782354769376,
+    "z_vs_null": 173.21200784264363,
+    "verdict": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   },
+   "FRUIT": {
+    "n": 50,
+    "within_before": 0.07719015330076218,
+    "within_after": 0.07729867838782505,
+    "retain": 1.001405944701781,
+    "null_mean": 0.015498349126214792,
+    "null_p95": 0.016940391753013765,
+    "z_vs_null": 56.97840996685054,
+    "verdict": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   }
+  },
+  "B7": {
+   "CHAR_vs_WORD": {
+    "auc": 0.4222468152234278,
+    "auc_direction_free": 0.5777531847765722,
+    "ci": [
+     0.41139807477007057,
+     0.43185012652548244
+    ],
+    "higher_group": "WORD",
+    "n_a": 4213,
+    "n_b": 23002
+   },
+   "CHAR_vs_BYTE": {
+    "auc": 0.5065226496035895,
+    "auc_direction_free": 0.5065226496035895,
+    "ci": [
+     0.49177241768498925,
+     0.5222249057009783
+    ],
+    "higher_group": "CHAR",
+    "n_a": 4213,
+    "n_b": 1295
+   },
+   "WORD_vs_BYTE": {
+    "auc": 0.6097305287201817,
+    "auc_direction_free": 0.6097305287201817,
+    "ci": [
+     0.5953887688168319,
+     0.6250583401917286
+    ],
+    "higher_group": "WORD",
+    "n_a": 23002,
+    "n_b": 1295
+   },
+   "verdict": "TYPE_HAS_FREQ_FREE_PART"
+  },
+  "LATIN": {
+   "n": 1500,
+   "r2_lin": 0.534657520814363,
+   "r2_bin": 0.5408937950444623,
+   "delta": 0.006236274230099315,
+   "verdict": "LINEAR_LOG_SCALAR",
+   "same_shape_as_cjk": true,
+   "note": "单折 80/20，n<=1500（快速对照）"
+  },
+  "verdicts": {
+   "B1": "LINEAR_LOG_SCALAR",
+   "B2": "AMBIGUOUS_DIM",
+   "B3": "FREQ_INDEPENDENT_OF_NORM",
+   "B5": "KNOB_NOT_LOCAL",
+   "B6": {
+    "COLOR": "SEMANTICS_ORTHOGONAL_TO_FREQ",
+    "FRUIT": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   },
+   "B7": "TYPE_HAS_FREQ_FREE_PART"
+  },
+  "runtime_s": 84.4
+ },
+ "sha8": "060de60e"
+}

@@ -1,0 +1,103 @@
+==============================================================================
+Q8-D 频率方向前向干预  model=D:/develop/model/Qwen/Qwen3-4B  SMOKE=False  seed=20261101
+==============================================================================
+方向 ‖w‖=27.4717  ‖u‖=0.036401  median‖e‖=1.1985  预测 t 的 std=0.915
+模型加载 28.5 s  tied=True  显存 8.04 GB
+已解绑 lm_head（否则没有「纯输入」臂）
+词表 151936  d=2560  lm_head dtype=torch.bfloat16
+有 zipf 定义 74560 / 151936 (49.1%)
+head 标定：
+    候选 hs_last   max|Δ|=0.0517
+    候选 hs_last2  max|Δ|=68.3578
+    候选 hs_last3  max|Δ|=55.2998
+    候选 base0     max|Δ|=0.0517
+  head 标定：选用 hs_last（max|Δ|=0.0517）PASS
+模板筛选（闸：p_M≥0.80 且 H≥1.00）：32/36 通过
+  他把{N}                  pM=0.976 H=3.77 ✓
+  她把{N}                  pM=0.977 H=3.79 ✓
+  我昨天把{N}                pM=0.983 H=3.74 ✓
+  妈妈把{N}                 pM=0.972 H=2.11 ✓
+  工人把{N}                 pM=0.984 H=3.10 ✓
+  弟弟把{N}                 pM=0.986 H=3.80 ✓
+  他把书放在{N}               pM=0.995 H=1.54 ✓
+  我从{N}                  pM=0.981 H=2.66 ✓
+  他走到{N}                 pM=0.995 H=1.80 ✓
+  她站在{N}                 pM=0.995 H=1.71 ✓
+  信寄到{N}                 pM=0.895 H=3.78 ✓
+  车停在{N}                 pM=0.976 H=3.12 ✓
+  一棵{N}                  pM=0.932 H=2.02 ✓
+  一片{N}                  pM=0.809 H=3.04 ✓
+  一朵{N}                  pM=0.780 H=3.33 ✗
+  一条{N}                  pM=0.885 H=3.95 ✓
+  一把{N}                  pM=0.699 H=3.83 ✗
+  一张{N}                  pM=0.879 H=3.44 ✓
+  一块{N}                  pM=0.783 H=3.30 ✗
+  一根{N}                  pM=0.827 H=2.95 ✓
+  一座{N}                  pM=0.983 H=2.89 ✓
+  一件{N}                  pM=0.853 H=3.64 ✓
+  一瓶{N}                  pM=0.991 H=1.28 ✓
+  一袋{N}                  pM=0.901 H=1.83 ✓
+  这个比{N}                 pM=0.982 H=3.85 ✓
+  这本书讲的是关于{N}            pM=0.916 H=2.61 ✓
+  他对{N}                  pM=0.980 H=3.06 ✓
+  我们在讨论{N}               pM=0.932 H=3.18 ✓
+  她正在吃                   pM=0.953 H=4.99 ✓
+  他在喝                    pM=0.981 H=4.08 ✓
+  我准备买                   pM=0.985 H=4.01 ✓
+  孩子想要                   pM=0.974 H=6.71 ✓
+  妈妈正在切                  pM=0.998 H=1.50 ✓
+  爷爷喜欢种                  pM=0.999 H=0.56 ✗
+  她昨天丢了一个                pM=0.978 H=5.27 ✓
+  他从包里拿出                 pM=0.987 H=3.27 ✓
+prompt 候选 1536，末位不合规丢弃 0，保留 200
+基线：E[zipf]=4.9885  p_M 中位 0.9790  H 中位 3.983  top1_p 中位 0.243  max|logit| 21.9
+batch 不变性 32 vs 64：max|Δlogit|=3.397e-01  max|ΔE[zipf]|=0.0479  Δ均值=0.0007
+  口径：bf16 下不同 batch 会选到不同 kernel，logit 有位级差异是正常的；关键是主指标 ΔE[zipf] 是否远超它。NOISY —— 效应必须显著大于这个噪声
+δ=0 两臂一致性：E[zipf] max|Δ|=0.000e+00  PASS
+方向：FREQ + 8 个 RAND + 8 个 EMB（位移长度已对齐 ‖u‖）
+  LAST × FREQ 完成（7 次前向，3 s）
+  LAST × RAND0 完成（13 次前向，5 s）
+  LAST × RAND1 完成（19 次前向，7 s）
+  LAST × RAND2 完成（25 次前向，9 s）
+  LAST × RAND3 完成（31 次前向，11 s）
+  LAST × RAND4 完成（37 次前向，13 s）
+  LAST × RAND5 完成（43 次前向，14 s）
+  LAST × RAND6 完成（49 次前向，16 s）
+  LAST × RAND7 完成（55 次前向，18 s）
+  LAST × EMB0 完成（61 次前向，21 s）
+  LAST × EMB1 完成（67 次前向，23 s）
+  LAST × EMB2 完成（73 次前向，26 s）
+  LAST × EMB3 完成（79 次前向，29 s）
+  LAST × EMB4 完成（85 次前向，31 s）
+  LAST × EMB5 完成（91 次前向，34 s）
+  LAST × EMB6 完成（97 次前向，36 s）
+  LAST × EMB7 完成（103 次前向，39 s）
+  ALLPOS × FREQ 完成（109 次前向，42 s）
+  ALLPOS × RAND0 完成（111 次前向，42 s）
+  ALLPOS × RAND1 完成（113 次前向，43 s）
+  ALLPOS × RAND2 完成（115 次前向，44 s）
+  ALLPOS × RAND3 完成（117 次前向，45 s）
+  ALLPOS × RAND4 完成（119 次前向，46 s）
+  ALLPOS × RAND5 完成（121 次前向，47 s）
+  ALLPOS × RAND6 完成（123 次前向，47 s）
+  ALLPOS × RAND7 完成（125 次前向，48 s）
+  ALLPOS × EMB0 完成（127 次前向，49 s）
+  ALLPOS × EMB1 完成（129 次前向，50 s）
+  ALLPOS × EMB2 完成（131 次前向，51 s）
+  ALLPOS × EMB3 完成（133 次前向，52 s）
+  ALLPOS × EMB4 完成（135 次前向，53 s）
+  ALLPOS × EMB5 完成（137 次前向，53 s）
+  ALLPOS × EMB6 完成（139 次前向，54 s）
+  ALLPOS × EMB7 完成（141 次前向，55 s）
+C8 语义副作用：基线命中 0.600，最差下降 -0.075 => SEMANTICS_INTACT
+------------------------------------------------------------------------------
+  C1 = NULL_BOUNDED
+  C2 = NONLINEAR_OTHER
+  C3 = GENERIC_PERTURBATION
+  C4 = INPUT_DRIVEN
+  C5 = GATE_OK
+  C6 = GLOBAL_OFFSET
+  C8 = SEMANTICS_INTACT
+  grade = E1
+  claim = 有耦合但未过方向特异性/归因/语义门
+RESULT D:\AI2050\Ai2050-OpenOne\results\2026-11-01\162208_pat_q8d2.json

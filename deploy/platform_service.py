@@ -494,6 +494,107 @@ def model_skeleton_ep(model_key: str = '') -> dict:
     return {**sk[model_key], 'pending': False}
 
 
+# ---------------- 模型结构参数：词嵌入 / 注意力 / MLP 的形状与参数量 ----------------
+# 只认模型自己的 config.json（本机 models/hf 的登记目录优先，其次是快照里普查保存的那份）。
+# 参数量能从 config 精确算出来，就不该凭印象写死：找不到 config 时返回 available=false 并说明原因。
+_MODELS_DIR_ENV = 'AI2050_MODELS_DIR'
+_ARCH_FOLDERS = {'qwen3-4b': 'qwen3-4b-base', 'qwen3-4b-base': 'qwen3-4b-base',
+                 'qwen3-14b': 'Qwen3-14B', 'glm4-9b': 'glm4-9b-chat-hf'}
+
+
+def _hf_dirs():
+    out = []
+    env = os.environ.get(_MODELS_DIR_ENV, '').strip()
+    if env:
+        out.append(Path(env))
+    out.append(_REPO / 'models' / 'hf')
+    out.append(Path(os.environ.get('AI2050_NATIVE_DIR', 'D:/ai2050_native')) / 'models' / 'hf')
+    return out
+
+
+def _hf_config(model_id: str):
+    """(config 字典, 来源说明)；找不到返回 (None, '')。"""
+    for root in _hf_dirs():
+        for folder in [f for f in (_ARCH_FOLDERS.get(model_id), model_id) if f]:   # 顺序固定：登记目录优先
+            f = Path(root) / folder / 'config.json'
+            try:
+                if not f.is_file():
+                    continue
+                cfg = json.loads(f.read_text(encoding='utf-8'))
+            except (OSError, ValueError):
+                continue
+            try:
+                return cfg, str(f.relative_to(_REPO))
+            except ValueError:
+                return cfg, str(f)
+    return None, ''
+
+
+def _arch_from_config(cfg: Dict[str, Any], n_layers: Optional[int]) -> Optional[Dict[str, Any]]:
+    """按 config.json 推算三块结构的形状与参数量。缺 hidden_size / 头数就返回 None（不猜）。"""
+    d = int(cfg.get('hidden_size') or 0)
+    nh = int(cfg.get('num_attention_heads') or 0)
+    if not d or not nh:
+        return None
+    nkv = int(cfg.get('num_key_value_heads') or nh)
+    hd = int(cfg.get('head_dim') or (d // nh))
+    dff = int(cfg.get('intermediate_size') or 0)
+    vocab = int(cfg.get('vocab_size') or 0)
+    L = int(cfg.get('num_hidden_layers') or n_layers or 0)
+    tied = bool(cfg.get('tie_word_embeddings'))
+    q_out, kv_out = nh * hd, nkv * hd
+
+    attn_mats = [('q_proj', d, q_out), ('k_proj', d, kv_out), ('v_proj', d, kv_out), ('o_proj', q_out, d)]
+    attn = sum(a * b for _, a, b in attn_mats)
+    if cfg.get('attention_bias'):                     # 少数架构带偏置：量很小，但漏了总量就对不上
+        attn += q_out + 2 * kv_out + d
+    mlp_mats = ([('gate_proj', d, dff), ('up_proj', d, dff), ('down_proj', dff, d)] if dff and cfg.get('hidden_act')
+                else ([('fc1', d, dff), ('fc2', dff, d)] if dff else []))
+    mlp = sum(a * b for _, a, b in mlp_mats)
+    norm = 2 * d                                       # 每块两个 RMSNorm（注意力前 / MLP 前）
+    embed = vocab * d
+    lm_head = 0 if tied else vocab * d
+    total = embed + lm_head + L * (attn + mlp + norm) + d
+    return {
+        'n_layers': L, 'd_model': d, 'd_ff': dff, 'n_heads': nh, 'n_kv_heads': nkv, 'head_dim': hd,
+        'vocab_size': vocab, 'tied_embeddings': tied, 'act': cfg.get('hidden_act'),
+        'embed': {'label': '词嵌入', 'params': embed, 'lm_head': lm_head, 'tied': tied,
+                  'shape': [vocab, d], 'shape_text': f'{vocab:,} × {d:,}',
+                  'note': '词表 × 隐宽：一行一个 token。' + ('与输出头共享（tied），不重复计参数。' if tied else '输出头 lm_head 另算。')},
+        'attn': {'label': '注意力', 'params': attn, 'shape_text': f'q {d:,}→{q_out:,} · k/v {d:,}→{kv_out:,} · o {q_out:,}→{d:,}',
+                 'mats': [{'name': n, 'shape': [a, b], 'params': a * b} for n, a, b in attn_mats],
+                 'heads': f'{nh} 个查询头 / {nkv} 个 KV 头 × {hd} 维（GQA {nh // max(1, nkv)}:1）'},
+        'mlp': {'label': 'MLP', 'params': mlp, 'act': cfg.get('hidden_act'),
+                'shape_text': (f'gate/up {d:,}→{dff:,} · down {dff:,}→{d:,}' if len(mlp_mats) == 3 else f'{d:,}→{dff:,}→{d:,}'),
+                'mats': [{'name': n, 'shape': [a, b], 'params': a * b} for n, a, b in mlp_mats]},
+        'norm': {'label': '归一化', 'params': norm},
+        'total': {'params': total, 'embed_share': (embed + lm_head) / total, 'attn_share': L * attn / total,
+                  'mlp_share': L * mlp / total, 'mlp_over_attn': (mlp / attn) if attn else None},
+        'note': '参数量 = 权重矩阵元素数（不含激活与 KV 缓存），由 config.json 的 hidden_size / intermediate_size / 头数 / 词表推算。',
+    }
+
+
+@lang_router.get('/model/arch')
+def model_arch_ep(model_key: str) -> dict:
+    """一个模型的三块结构（词嵌入 / 注意力 / MLP）的形状与参数量；3D 空间按此画体积。"""
+    doc = _lang_atlas()
+    if doc is None:
+        return _lang_pending()
+    sk = (doc.get('data') or {}).get('skeletons', {}).get(model_key)
+    if sk is None:
+        raise HTTPException(404, f'没有模型 {model_key} 的骨架')
+    model_id = sk.get('model_id') or str(model_key).split('|')[0]
+    cfg, src = _hf_config(model_id)
+    if not cfg:
+        cfg, src = (sk.get('config') or {}), 'lang_atlas skeletons[].config'
+    arch = _arch_from_config(cfg or {}, sk.get('n_layers'))
+    if arch is None:
+        return {'schema': 'model_arch.v1', 'pending': False, 'available': False, 'model_key': model_key, 'model_id': model_id,
+                'reason': '本机没有该模型的 config.json，结构参数不凭印象写：把模型目录放进 models/hf 或设 AI2050_MODELS_DIR。'}
+    return {'schema': 'model_arch.v1', 'pending': False, 'available': True, 'model_key': model_key,
+            'model_id': model_id, 'source': src, **arch}
+
+
 @lang_router.get('/space/overlay')
 def space_overlay_ep(model_key: str) -> dict:
     """3D 默认场景的叠加数据：该模型上每个语言项的逐层曲线（路线 T）。"""

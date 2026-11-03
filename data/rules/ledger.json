@@ -1,7 +1,7 @@
 {
  "schema": "rule_ledger.v1",
- "version": 1,
- "updated_at": "2026-11-01T08:04:35",
+ "version": 4,
+ "updated_at": "2026-11-01T09:19:56",
  "model_scope": "Qwen3-4B",
  "policy": "一条规则只在给定模型 + 给定口径下成立；口径不变时不重复测。retest.status=block 表示已有足够证据，再测属于重复劳动；need_n 表示结论方向已知但样本不足，重测必须上到该题量才可能改变判定；allow 表示从未做过或口径已变。",
  "rules": [
@@ -5067,6 +5067,1088 @@
    "supersedes": [],
    "created_at": "2026-11-01T08:04:35",
    "updated_at": "2026-11-01T08:04:35"
+  },
+  {
+   "id": "R-ATT-27",
+   "domain": "attention-free static",
+   "topic": "词表按单位类型分层，生僻字多数无向量",
+   "claim": "词表是一张同质的表，生僻字和其它字一样有自己的一行向量。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "统计词表行的单位类型（整词 / 单字 / 字节残片 / 其它）与 CJK 基本区覆盖率；对字节回退字，其\"词向量\"只能是 2–3 个字节残片的算术平均，均值池化抹掉字节顺序。",
+   "measure": {
+    "qwen_rows": 151936,
+    "qwen_word": 16374,
+    "qwen_char": 8806,
+    "qwen_fragment": 1457,
+    "qwen_other": 125299,
+    "qwen_cjk_missing": 12404,
+    "qwen_cjk_total": 20902,
+    "qwen_rare_fallback": "26/74",
+    "glm_cjk_missing": 16686,
+    "glm_rare_fallback": "73/74",
+    "within_fragment": 0.0298,
+    "within_word": 0.0062,
+    "ratio": 4.8
+   },
+   "evidence": [
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091106_pat_q8a.json",
+     "model": "Qwen3-4B",
+     "note": "CJK 基本区 59.3% 缺行；残片 within 是整词 4.8×（超零分布 p95 0.0064，p<0.005）"
+    },
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091311_pat_q8a.json",
+     "model": "GLM-4-9B",
+     "note": "79.8% 缺行；残片 +0.0100 同样超 p95 0.0088"
+    },
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a_verify.py",
+     "data": "results/2026-11-01/091106_pat_q8a_verify.json",
+     "model": "Qwen3-4B",
+     "note": "15/15 PASS，含覆盖率与 within 复算"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "这是分词器与词表的构造事实，换模型只会换数字不会换结论；换模型必须重报覆盖率"
+   },
+   "why": "「生僻字没有词嵌入」不是修辞：模型拿到的是拼写零件，语义必须在注意力里现拼。任何关于生僻字「语义几何」的结论都必须先报覆盖率，否则测的是字节表。",
+   "tags": [
+    "embedding",
+    "tokenizer",
+    "coverage"
+   ],
+   "keywords": [
+    "生僻字",
+    "字节",
+    "回退",
+    "词表",
+    "分层",
+    "残片"
+   ],
+   "supersedes": [],
+   "created_at": "2026-11-01T09:19:56",
+   "updated_at": "2026-11-01T09:19:56"
+  },
+  {
+   "id": "R-ATT-28",
+   "domain": "attention-free static",
+   "topic": "嵌入表有一根显式频率旋钮",
+   "claim": "频率只能在训练后通过行为间接体现，嵌入表里没有一个可直接读出的频率量。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "对每个嵌入坐标算它与 zipf 的秩相关，取 |ρ| 最大者；再做 top-k 留出分类曲线，对比\"原始坐标\"与\"对 [1,zipf,字节长,log范数] 回归后的残差坐标\"。",
+   "measure": {
+    "qwen_max_abs_rho": 0.802,
+    "qwen_coord": 27,
+    "glm_max_abs_rho": 0.774,
+    "glm_coord": 411,
+    "qwen_top5": [
+     0.804,
+     0.758,
+     0.764,
+     0.698,
+     0.696
+    ],
+    "raw_k1": 0.78,
+    "raw_k32": 0.751,
+    "resid_k32": 0.411,
+    "resid_full": 0.357,
+    "glm_raw_k32": 0.896,
+    "glm_resid_k32": 0.531
+   },
+   "evidence": [
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091106_pat_q8a.json",
+     "model": "Qwen3-4B",
+     "note": "单坐标 |ρ|=0.802；4 分类 k=1 达 0.780（机会 0.25）几乎全是频率"
+    },
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091311_pat_q8a.json",
+     "model": "GLM-4-9B",
+     "note": "0.774，同结构"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "两模型同向同量级；若换非 tied 或更小模型需重测（tied 会让范数与输出端耦合）"
+   },
+   "why": "「单参数承载结构」在标量统计量上成立、在语义类别上不成立。看到单坐标高分必须先查它与频率的相关，否则会把频率轴当成语义轴。",
+   "tags": [
+    "embedding",
+    "frequency"
+   ],
+   "keywords": [
+    "频率",
+    "单坐标",
+    "zipf",
+    "旋钮",
+    "标量"
+   ],
+   "supersedes": [],
+   "created_at": "2026-11-01T09:19:56",
+   "updated_at": "2026-11-01T09:19:56"
+  },
+  {
+   "id": "R-ATT-29",
+   "domain": "attention-free static",
+   "topic": "简繁与中英在静态层近乎复本",
+   "claim": "每个汉字在嵌入表里只占一行，参数预算全部花在语义区分上。",
+   "status": "refuted",
+   "confidence": "medium",
+   "criterion": "对简繁对，算 cos 与\"繁体形式在简体形式近邻里的名次\"；对中英对，算英文对译 token 在全部 151936 行里的名次（排除自身），零基线用随机英文词的名次。",
+   "measure": {
+    "qwen_st_cos_median": 0.797,
+    "qwen_st_rank1_frac": 0.94,
+    "glm_st_cos_median": 0.44,
+    "glm_st_rank1_frac": 0.34,
+    "qwen_trans_median_rank": 1,
+    "qwen_trans_top5": 1.0,
+    "glm_trans_median_rank": 11.5,
+    "glm_trans_top5": 0.17,
+    "random_baseline_rank": 67472
+   },
+   "evidence": [
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091106_pat_q8a.json",
+     "model": "Qwen3-4B",
+     "note": "红→紅 0.835、红→` red` 0.799；苹果→` Apple` 0.718；40/40 对译进前 5"
+    },
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091311_pat_q8a.json",
+     "model": "GLM-4-9B",
+     "note": "近邻是汉语搭配（红的/的红/红了），对译中位名次 11.5"
+    }
+   ],
+   "retest": {
+    "status": "allow",
+    "count": 1,
+    "note": "两模型差异巨大（0.797 vs 0.440），说明这不是通用规律而是模型指纹；需第三架构（DS-7B）与词表规模对照才能定论，材料为手选高频具体词有选择偏差"
+   },
+   "why": "参数不是全花在语义上：Qwen 把多语言折叠到同一个点，这直接解释了 Q6「静态层找不到关系方向」——方向只能从上下文里长出来。",
+   "tags": [
+    "embedding",
+    "multilingual"
+   ],
+   "keywords": [
+    "简繁",
+    "繁体",
+    "对译",
+    "英文",
+    "双语",
+    "复本"
+   ],
+   "supersedes": [],
+   "created_at": "2026-11-01T09:19:56",
+   "updated_at": "2026-11-01T09:19:56"
+  },
+  {
+   "id": "R-MET-32",
+   "domain": "metric",
+   "topic": "语义聚集必须报共享字分解",
+   "claim": "两个语义类之间的 within-cosine 差可以直接解释为语义结构。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "把组内词对按\"是否共享汉字\"二分，分别报 within；共享字对占比与去掉后的下降比例都要列。",
+   "measure": {
+    "color_within": 0.1988,
+    "color_shared_frac": 0.11,
+    "color_shared_pairs_cos": 0.6029,
+    "color_within_no_shared": 0.1504,
+    "color_drop_frac": 0.244,
+    "fruit_within": 0.0975,
+    "fruit_shared_frac": 0.07,
+    "fruit_shared_pairs_cos": 0.4186,
+    "fruit_within_no_shared": 0.0738,
+    "fruit_drop_frac": 0.243,
+    "freq_matched_random": 0.0153
+   },
+   "evidence": [
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091106_pat_q8a.json",
+     "model": "Qwen3-4B",
+     "note": "两族下降比例巧合相同（24.4% / 24.3%），颜色仍是水果 2.0×"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "流程条款，与模型无关"
+   },
+   "why": "共享字的词对 cos 高达 0.60（整体 0.20），不分解就会把词形当语义。本轮预注册只对 FRUIT 做了分解，COLOR 是跑后补的——结论没变属于运气，流程必须固定。",
+   "tags": [
+    "metric",
+    "control"
+   ],
+   "keywords": [
+    "共享字",
+    "词形",
+    "汉字",
+    "控制",
+    "分解"
+   ],
+   "supersedes": [],
+   "created_at": "2026-11-01T09:19:56",
+   "updated_at": "2026-11-01T09:19:56"
+  },
+  {
+   "id": "R-MTH-23",
+   "domain": "method",
+   "topic": "语义类与频率在真实词表上不可分",
+   "claim": "只要类别可分，就说明嵌入里有该类别的语义骨架。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "任何\"少数坐标/子空间承载类别\"的结论，必须先做①逐坐标对 [1, zipf, 字节长, log范数] 回归取残差；②频率分层零假设（只在 zipf 十分位内打乱标签）；③报残差曲线是否随 k 单调。",
+   "measure": {
+    "qwen_sig_coords_raw": 364,
+    "qwen_sig_coords_stratified": 3,
+    "glm_sig_coords_raw": 236,
+    "glm_sig_coords_stratified": 3,
+    "resid_peak_k": 64,
+    "resid_peak_acc": 0.415,
+    "resid_full_acc": 0.357
+   },
+   "evidence": [
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091106_pat_q8a.json",
+     "model": "Qwen3-4B",
+     "note": "频率分层把显著坐标从 364 砍到 3；残差曲线 k=64 见顶后转降"
+    },
+    {
+     "phase": "Q8-A",
+     "script": "tools/pat_q8a.py",
+     "data": "results/2026-11-01/091311_pat_q8a.json",
+     "model": "GLM-4-9B",
+     "note": "236→3，残差 k=32 0.531"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "口径条款；只要材料组的频率分布不同就适用"
+   },
+   "why": "四组材料频率跨 4 个数量级时，一个坐标分开四组等于一个坐标分开频率。判定必须分两级（D27）：绝对水平看残差，相对差值才谈\"还剩多少语义\"。",
+   "tags": [
+    "method",
+    "confound"
+   ],
+   "keywords": [
+    "频率",
+    "混淆",
+    "残差",
+    "分层",
+    "零假设",
+    "坐标"
+   ],
+   "supersedes": [],
+   "created_at": "2026-11-01T09:19:56",
+   "updated_at": "2026-11-01T09:19:56"
+  },
+  {
+   "id": "R-MET-34",
+   "domain": "measurement",
+   "topic": "少数高频差组构成材料时，单坐标结论必须全池复核",
+   "claim": "只要材料分成几个频率量级不同的组，任意能分出组的坐标都会给出高相关，于是\"单坐标 / 单参数承载结构\"的结论是被材料造出来的。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "同一\"最强单坐标相关系数\"在两个池上算：①由少数几个频率量级不同的组拼成的材料集 ②全部有频率定义的 token。若①远高于②，则①的数值不得作为\"单参数\"证据。同时必须报全空间方向的 R² 作上限。",
+   "measure": {
+    "q8a_materials_n": 228,
+    "q8a_single_coord_rho": 0.802,
+    "q8b_pool_n_qwen": 24421,
+    "q8b_pool_n_glm": 27215,
+    "q8b_single_coord_pearson_qwen": -0.52,
+    "q8b_single_coord_pearson_glm": -0.59,
+    "q8b_single_coord_r2": 0.195,
+    "q8b_full_space_r2_qwen": 0.826,
+    "q8b_full_space_r2_glm": 0.721,
+    "gap_x": 4.2
+   },
+   "evidence": [
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b.py",
+     "data": "results/2026-11-01/111407_pat_q8b.json",
+     "model": "Qwen3-4B",
+     "note": "单坐标 0.520/0.548 vs 全空间 0.826；坐标曲线到 1024 维未饱和"
+    },
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b.py",
+     "data": "results/2026-11-01/111608_pat_q8b.json",
+     "model": "GLM-4-9B",
+     "note": "单坐标 0.590/0.598 vs 全空间 0.721；同结论"
+    },
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b_verify.py",
+     "data": "results/2026-11-01/111407_pat_q8b.json",
+     "model": "Qwen3-4B",
+     "note": "20/20 PASS，含 coord_pearson/spearman 逐位复算"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "这是抽样设计问题，不随模型变化；换材料必须重算两个池并同时报"
+   },
+   "why": "Q8-A 的「一根旋钮」就是这条错误的实例：0.802 来自四组材料跨四个数量级的频率差。项目此前也踩过一次同类（Q6-B 的 share 饱和）。凡\"某某只由一个参数承载\"的提法，先问材料是不是分组拼的。",
+   "tags": [
+    "measurement",
+    "sampling",
+    "confound"
+   ],
+   "keywords": [
+    "单坐标",
+    "单参数",
+    "材料",
+    "选择偏差",
+    "全池复核"
+   ],
+   "updated": "2026-11-01T11:18:56",
+   "created": "2026-11-01T11:18:56"
+  },
+  {
+   "id": "R-MTH-24",
+   "domain": "method",
+   "topic": "带折的缓存键必须含折划分指纹",
+   "claim": "按 (命名空间, 折序号) 缓存 Gram 矩阵是安全的，因为同一份数据算出来的 Gram 一样。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "在同一进程里用两套不同的折划分调用同一缓存函数，检查 G_all − G_fold 是否仍等于 G_train。或直接比较两套 key 下的结果：若同 X 同 y 同折却给出不同的 R²，即缓存被污染。",
+   "measure": {
+    "symptom_r2_cached": 0.7757,
+    "symptom_r2_fresh": 0.8261,
+    "culprit": "零分布先用 _f0 调 cv_fast(ns=\"main\")，把 (f,main,j) 写成 _f0[j] 的 Gram",
+    "fix": "key 加折指纹 (len(folds), sum(folds[0]), size(folds[0]))"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b.py",
+     "data": "results/2026-11-01/111407_pat_q8b.json",
+     "model": "Qwen3-4B",
+     "note": "同 X 同 y 同 folds，仅换命名空间即 0.776→0.826，一步定位"
+    },
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b_verify.py",
+     "data": "results/2026-11-01/111407_pat_q8b.json",
+     "model": "Qwen3-4B",
+     "note": "修复后 20/20 PASS，B1 与 B3 的全维 R² 互相对上（0.8263 vs 0.8261）"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "实现层面的陷阱，与模型无关；任何带缓存的重采样流程都适用"
+   },
+   "why": "缓存是为省时间，但它把\"这份 Gram 属于哪套划分\"这一信息丢掉了，出错时表现为R² 莫名其妙偏低，而且只在\"先跑了别的划分\"时才出现 —— 最难查的一类 bug。",
+   "tags": [
+    "method",
+    "caching",
+    "resampling"
+   ],
+   "keywords": [
+    "缓存",
+    "折",
+    "Gram",
+    "污染",
+    "R²偏低"
+   ],
+   "updated": "2026-11-01T11:18:56",
+   "created": "2026-11-01T11:18:56"
+  },
+  {
+   "id": "R-MTH-25",
+   "domain": "method",
+   "topic": "每个 held-out R² 都要有一条独立代码路径复算并报差值",
+   "claim": "主脚本自己算的 held-out R² 可信，只要打印出来就够了。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "用另一套实现（不同求解器 / 不同掩码写法 / 不同折划分重复 5 次）复算同一个 R²，报出\"主脚本值、独立值、5 次划分的极差\"。若差值超过极差，必须先当作 bug 排查，不得解释为\"口径不同\"。",
+   "measure": {
+    "primary_r2_masked_bug": 0.865,
+    "primary_r2_after_fix": 0.8263,
+    "independent_single_split_mean": 0.8343,
+    "independent_range": 0.018,
+    "gap_after_fix": 0.008
+   },
+   "evidence": [
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b.py",
+     "data": "results/2026-11-01/111407_pat_q8b.json",
+     "model": "Qwen3-4B",
+     "note": "独立实现给 0.842，主脚本 0.776（缓存污染）+ 0.865（掩码反）；两次都靠这条抓到"
+    },
+    {
+     "phase": "Q8-B",
+     "script": "tools/pat_q8b.py",
+     "data": "results/2026-11-01/111608_pat_q8b.json",
+     "model": "GLM-4-9B",
+     "note": "修复后主脚本 0.7214 与独立 0.7225 差 0.0011"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "流程纪律，与模型无关"
+   },
+   "why": "本轮两个致命 bug 都不是靠\"看代码\"发现的，是靠\"另一个实现给出不同数字\"发现的。差值超过划分极差 = 有系统性错误，这个判据比任何代码 review 都硬。",
+   "tags": [
+    "method",
+    "verification",
+    "r2"
+   ],
+   "keywords": [
+    "复核",
+    "held-out",
+    "独立实现",
+    "差值",
+    "划分极差"
+   ],
+   "updated": "2026-11-01T11:18:56",
+   "created": "2026-11-01T11:18:56"
+  },
+  {
+   "id": "R-MTH-26",
+   "domain": "method",
+   "topic": "offload/量化加载下手算 head 前必须有设备与数值断言",
+   "claim": "get_output_embeddings().weight 拿来直接用是安全的，transformers 会把权重放对位置。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "用手算 logits @ W.T 与模型原生 logits 逐位比较（同一输入）。断言三点：① W.device 不是 meta；② max|Δ| 小于该模型 bf16 噪声底；③ ‖手算‖ 与 ‖原生‖ 同量级。任一失败立即中止，不得用猜的权重继续跑。",
+   "measure": {
+    "symptom": "GLM offload 时 lm_head 停在 meta device，值是未初始化垃圾",
+    "ref_norm": 764,
+    "manual_norm": 115761,
+    "max_abs_diff": 18000.0,
+    "outcome": "calibrate_head 断言正确中止，零假结论读出",
+    "fix": "从 model.safetensors.index.json 定位 lm_head 并 safetensors 直读"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162016_pat_q8d2.json",
+     "model": "GLM-4-9B(8bit)",
+     "note": "断言触发→中止→修复→重跑，D2 数字全部产自真 head"
+    },
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162208_pat_q8d2.json",
+     "model": "Qwen3-4B",
+     "note": "同断言在 Qwen 常规加载下静默通过（真权重），证明断言不是只拦 GLM"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "实现陷阱，与本机 offload 配置绑定；任何 device_map=auto 的手算路径都适用"
+   },
+   "why": "meta 权重的值是地址垃圾，不会报错、只给错数。若没有\"必须复现原生 logits\"的断言，整轮 D2 会在假 head 上跑完并输出一套看似合理的假 C3/C4 —— 这正是校准断言存在的意义。",
+   "tags": [
+    "method",
+    "loading",
+    "assertion"
+   ],
+   "keywords": [
+    "meta",
+    "offload",
+    "lm_head",
+    "断言",
+    "手算"
+   ],
+   "updated": "2026-11-01T17:28:45",
+   "created": "2026-11-01T17:28:45"
+  },
+  {
+   "id": "R-MET-35",
+   "domain": "measurement",
+   "topic": "方向特异性对照必须含同流形随机方向",
+   "claim": "干预方向的效应超过各向同性随机方向（RAND）即可声明方向特异性。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "对照集必须包含 EMB：随机两个真实 token 嵌入之差（在嵌入流形上、语义随机）。只有当 FREQ 的 |ΔE| 与 KL 同时超过 EMB 分布（≥p95），且超过 RAND，才判 DIRECTION_SPECIFIC；只超过 RAND 不超过 EMB 判 ON_MANIFOLD_ONLY。",
+   "measure": {
+    "qwen_freq_absdE": 0.00114,
+    "qwen_rand_p95": 0.0038,
+    "qwen_emb_p95": 0.0027,
+    "qwen_verdict": "GENERIC_PERTURBATION",
+    "glm_freq_absdE": 0.00426,
+    "glm_rand_p95": 0.002,
+    "glm_emb_p95": 0.0023,
+    "glm_verdict": "DIRECTION_SPECIFIC",
+    "wide_grid_impression": "KL 20x RAND（无 EMB 对照时的过度印象）"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162208_pat_q8d2.json",
+     "model": "Qwen3-4B",
+     "note": "D1 的\"KL 20×\"加 EMB 对照后被击落"
+    },
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162016_pat_q8d2.json",
+     "model": "GLM-4-9B(8bit)",
+     "note": "GLM 过了 EMB 对照 ⇒ 对照有效且可过，不是形同虚设"
+    },
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d_verify.py",
+     "data": "results/2026-11-01/162208_pat_q8d2.json",
+     "model": "Qwen3-4B",
+     "note": "两模型判决词经独立脚本复算"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "对照设计纪律，与模型无关"
+   },
+   "why": "各向同性 RAND 天生\"离开嵌入流形\"，任何在流形上的扰动都显得比它特别。EMB 把\"在流形上\"这个平庸解释单独扣掉，剩下的才是方向本身的功能性。",
+   "tags": [
+    "measurement",
+    "control",
+    "direction-specificity"
+   ],
+   "keywords": [
+    "对照",
+    "同流形",
+    "RAND",
+    "EMB",
+    "方向特异性"
+   ],
+   "updated": "2026-11-01T17:28:45",
+   "created": "2026-11-01T17:28:45"
+  },
+  {
+   "id": "R-MET-36",
+   "domain": "measurement",
+   "topic": "干预实验的材料闸：末位须为有定义内容词且句法不完整",
+   "claim": "用自然的完整句子测\"下一 token 的频率\"是合适的材料。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "闸门只看基线分布、不看干预结果：①p_M（有 zipf 定义 token 上的概率质量）≥0.80；②基线熵 H≥1.00（单峰 0.999 的分布没有位移空间）；③prompt 末位是有频率定义的内容词。候选模板逐条打分打印，通过集在跑前冻结。",
+   "measure": {
+    "syntactic_complete_pM": 0.033,
+    "punct_mass": 0.849,
+    "incomplete_pM": 0.971,
+    "gate": "p_M>=0.80 AND H>=1.00",
+    "kept_qwen": 32,
+    "kept_glm": 25,
+    "n_candidates": 36
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162208_pat_q8d2.json",
+     "model": "Qwen3-4B",
+     "note": "诊断轮逐句打印 top-6 预测，\"，\"占 0.849 的直接证据"
+    },
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162016_pat_q8d2.json",
+     "model": "GLM-4-9B(8bit)",
+     "note": "同一闸门在 GLM 上通过 25 个模板，基线 p_M 0.977"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "材料口径纪律；闸门规则可复用，具体模板随模型/语言重筛"
+   },
+   "why": "句法完整的边界处语言模型输出由标点主导，任何 E[zipf] 类主指标在该处按构造失效——这不是模型性质，是读数位置选错了。不设闸会直接产出\"干预无效\"的假阴性。",
+   "tags": [
+    "measurement",
+    "materials",
+    "readout"
+   ],
+   "keywords": [
+    "材料",
+    "句法",
+    "p_M",
+    "标点",
+    "读出位置"
+   ],
+   "updated": "2026-11-01T17:28:45",
+   "created": "2026-11-01T17:28:45"
+  },
+  {
+   "id": "R-MTH-27",
+   "domain": "method",
+   "topic": "预注册的门限/网格必须写进代码默认值并打日志",
+   "claim": "预注册文档写了阈值，跑的时候照着配就行。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "阈值、网格、剂量等预注册量必须：①作为环境变量默认值写死在代码里；②运行日志打印实际生效值；③主结果 JSON 里记录。发现文档与注册文档比对时，以日志和 JSON 为准，不以\"我记得配过\"为准。",
+   "measure": {
+    "incident": "D2 首跑用了 D1 的门限 0.5/0.75，注册值是 0.30/0.60",
+    "detection": "读 D2 结果明细时发现门限字段对不上",
+    "fix": "GATE_H/GATE_AGREE 改为按 PHASE 取注册默认值，删除错误产物重跑"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/162208_pat_q8d2.json",
+     "model": "Qwen3-4B",
+     "note": "首次 D2 产物已删除，重跑结果 162208_pat_q8d2.json 才是注册口径"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "流程纪律，与模型无关"
+   },
+   "why": "预注册的意义在\"判决规则先于数据\"，而规则躺在文档里、代码里另有一套时，等于没有注册——错误版本跑出的数字一旦进了结论再被引用，纠错成本远高于重跑。",
+   "tags": [
+    "method",
+    "preregistration",
+    "process"
+   ],
+   "keywords": [
+    "预注册",
+    "门限",
+    "默认值",
+    "重跑"
+   ],
+   "updated": "2026-11-01T17:28:45",
+   "created": "2026-11-01T17:28:45"
+  },
+  {
+   "id": "R-MET-37",
+   "domain": "measurement",
+   "topic": "组件归因必须同时报原始写入份额与单位范数效率",
+   "claim": "只报 |proj(attn)|:|proj(mlp)| 的原始份额，会把\"某组件输出范数天然更大\"误读成\"它承载更多语义\"（K-A 混淆的组件版）；反之只报归一化效率会丢掉因果写入份额。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "组件归因（沿某语义轴的 attn_out/mlp_out 投影）必须并列报告：①原始份额 raw share（写入残差流的责任比，因果口径）②单位范数效率 |proj|/‖comp‖（排除范数混淆的口径）。两个口径的判决分开命名；不一致时按 D27 分级表述，不得只引其一。",
+   "measure": {
+    "q9a_mid_band_raw_qwen": "0.39/0.25 (zh/en)",
+    "q9a_mid_band_raw_glm": "0.17/0.11",
+    "q9a_mid_band_normed_qwen": "0.74/0.50",
+    "q9a_mid_band_normed_glm": "0.43/0.33",
+    "q9a_last_band_raw_glm": "0.93/0.80",
+    "q9a_last_band_normed_glm": "1.38/1.37",
+    "q9a_last_band_raw_qwen": "0.32/0.26",
+    "q9a_last_band_normed_qwen": "1.07/0.61"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/191456_pat_q9a_qwen.json",
+     "model": "Qwen3-4B",
+     "note": "中段 MLP 主写在两口径下都成立；末段 GLM 注意力反超也是两口径一致"
+    },
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/192208_pat_q9a_glm.json",
+     "model": "GLM-4-9B",
+     "note": "同；归一化后外围层带比值回到 ~1 量级，只有中段保持 <0.5"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "口径纪律，不随模型变化；新组件归因实验直接沿用双口径"
+   },
+   "why": "Q3280 的 K-A/K-A2 已经在\"静态中继头\"上踩过一次绝对范数混淆；Q9-A 在组件级再次遇到：GLM 末段 raw 0.93 看似注意力强主导，归一化 1.38 才知道是每单位范数效率高而非总量碾压；反过来中段 MLP 的 raw 0.11 若只看归一化会被低估其写入责任。",
+   "tags": [
+    "measurement",
+    "component",
+    "confound"
+   ],
+   "keywords": [
+    "组件归因",
+    "范数",
+    "份额",
+    "attn",
+    "mlp",
+    "双口径"
+   ],
+   "created": "2026-11-01T20:02:59",
+   "updated": "2026-11-01T20:02:59"
+  },
+  {
+   "id": "R-MTH-28",
+   "domain": "method",
+   "topic": "残差流采集必须先用恒等式断言定位 hidden_states 每项的身份",
+   "claim": "transformers 的 output_hidden_states 元组结构随版本/模型变化，想当然地把末项当末层残差输出会静默污染采集。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "任何 hook 采集管线，运行时必须断言 resid_in[l+1] = resid_in[l] + attn_out[l] + mlp_out[l]（逐样本逐层，相对容差按存储精度写明）。断言失败先诊断每项范数与 final-norm 关系，不得放宽阈值硬闯。本机实测：Qwen3-4B/GLM-4-9B 的 hidden_states 元组长 L+1，末项是 final_norm 之后的输出（cos(hss[L], norm(resid_out[L-1]))=0.9999967），不是末层残差输出；fp16 存储下恒等式地板 rel≈5e-3。",
+   "measure": {
+    "q9a_identity_rel_max_qwen": 0.005509,
+    "q9a_identity_rel_max_glm": 0.005718,
+    "hss_last_is_post_final_norm_cos": 0.9999967,
+    "diag_script": "tests/gpt5_temp/q9a_diag.py"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/191456_pat_q9a_qwen.json",
+     "model": "Qwen3-4B",
+     "note": "首跑恒等式 FAIL（rel=7.995）定位到 hss[36]=post-norm；修正后 0.0055"
+    },
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/192208_pat_q9a_glm.json",
+     "model": "GLM-4-9B",
+     "note": "修正后同口径通过 0.0057（8-bit）"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "版本相关的坑：transformers 升级后必须重验，而不是默认仍成立"
+   },
+   "why": "第一次 SMOKE 恒等式 rel=7.995 直接拦截了这个静默错误：若不断言，所有层的\"resid_out\"数据在末层会混入 post-norm 值，P3 组件归因在末段全部失真——恰好是本轮发现 GLM 末段注意力反超的位置，错误会直接制造一条假规律。",
+   "tags": [
+    "method",
+    "collection",
+    "assertion"
+   ],
+   "keywords": [
+    "hidden_states",
+    "残差流",
+    "恒等式",
+    "final_norm",
+    "hook"
+   ],
+   "created": "2026-11-01T20:02:59",
+   "updated": "2026-11-01T20:02:59"
+  },
+  {
+   "id": "R-MET-38",
+   "domain": "measurement",
+   "topic": "迁移/读出层位禁止取 argmax(acc) 的首个饱和层，必须报逐层曲线",
+   "claim": "探针准确率先 saturate 的层不是机制层位；在饱和层上做的迁移/归因结论会系统性偏早。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "任何\"在第 l 层做 X\"的结论，l 必须有独立于准确率饱和的依据（预注册层位、或全剖面曲线上的结构性拐点），并附逐层数值。禁止 argmax(acc_resid) 作为层位选择器（np.argmax 返回首个最大值=首个饱和层）。",
+   "measure": {
+    "q9a_argmax_layer_qwen": 1,
+    "q9a_argmax_layer_glm": 2,
+    "q9a_transfer_abstract_by": "l~8（两模型 NC 曲线）",
+    "q9a_glm_late_decay": "en2zh 1.0→0.5 (l=28..40)",
+    "q9a_lr_at_argmax": "Qwen PARTIAL / GLM ABSTRACT（均错）"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/191456_pat_q9a_qwen.json",
+     "model": "Qwen3-4B",
+     "note": "argmax l=1 处 zh2en=0.500，l=8 起 1.000"
+    },
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/192208_pat_q9a_glm.json",
+     "model": "GLM-4-9B",
+     "note": "argmax l=2 处判 ABSTRACT，漏掉 l>=28 的 en2zh 塌陷"
+    },
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a_verify.py",
+     "data": "tests/gpt5/result/pat_q9a_transfer_curve.json",
+     "model": "both",
+     "note": "逐层迁移曲线是本轮真正可信的 V3 载体"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "与 R-MET-30/D25 同族：剖面必须全层打印并保留"
+   },
+   "why": "主脚本 V3 用 argmax 选层得到 Qwen PARTIAL / GLM ABSTRACT，两个都错：迁移是层依赖量（0.5→1.0→GLM 回落 0.5）。若只看主脚本判决，会得出\"Qwen 语域语言绑定、GLM 抽象\"的假跨模型对比——方向恰好反了一半。",
+   "tags": [
+    "measurement",
+    "layer-selection",
+    "profile"
+   ],
+   "keywords": [
+    "层位选择",
+    "argmax",
+    "饱和层",
+    "迁移曲线",
+    "剖面"
+   ],
+   "created": "2026-11-01T20:02:59",
+   "updated": "2026-11-01T20:02:59"
+  },
+  {
+   "id": "R-MET-39",
+   "domain": "measurement",
+   "topic": "跨语言/跨域迁移结论必须双分类器口径并报分歧",
+   "claim": "判别式线性探针（LR）与生成式最近质心（NC）在同一层同一材料上可以给出相反的迁移结论；单口径的迁移判决不可引用。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "迁移实验（train 域 → test 域）至少用两个口径：判别式（LogisticRegression 类）与生成式（最近质心/余弦到类均值）。两个口径的数值并列报告；分歧 >0.05 时判决记口径依赖，不得取单一数值进结论。",
+   "measure": {
+    "q9a_zh2en_l36_lr": 0.5,
+    "q9a_zh2en_l36_nc": 1.0,
+    "q9a_gap_direction": "LR 在 OOD 语言上把判别面拧向语言方向",
+    "q9a_within_agreement": "语言内两口径一致（均 1.0）"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/191456_pat_q9a_qwen.json",
+     "model": "Qwen3-4B",
+     "note": "l=36（NC 全 1.0）vs 主脚本 l=1（LR zh2en 0.50）"
+    },
+    {
+     "phase": "Q9-A",
+     "script": "tests/gpt5/pat_q9a.py",
+     "data": "results/2026-11-01/192208_pat_q9a_glm.json",
+     "model": "GLM-4-9B",
+     "note": "同形分歧；曲线文件双口径可复算"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "口径纪律；新增迁移类实验直接内置双口径"
+   },
+   "why": "Q9-A 主脚本（LR）与独立复核（NC，R-MTH-25 要求的独立路径）在同一数据上给出相反的 V3 判决（PARTIAL vs ABSTRACT）。这不是谁的 bug：LR 的决策面在 OOD 域上被语言分量主导，NC 的余弦到质心对它稳健。分歧本身就是发现（语言分量在中段仍在线性可分面里占权重），只报一个口径会把它扔掉。",
+   "tags": [
+    "measurement",
+    "transfer",
+    "classifier"
+   ],
+   "keywords": [
+    "迁移",
+    "分类器口径",
+    "最近质心",
+    "逻辑回归",
+    "OOD"
+   ],
+   "created": "2026-11-01T20:02:59",
+   "updated": "2026-11-01T20:02:59"
+  },
+  {
+   "id": "R-MTH-30",
+   "domain": "method",
+   "topic": "噪声地板量的点值不可复现，判决必须用多种子均值加不等式",
+   "claim": "无信号目标（如原始频率轴）的 held-out R^2 点值可以用单次运行报告并逐位复现。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "当判据落在噪声地板上（真值≈0 或求解器受最小特征值方向支配）时：①主脚本报 ≥3 个随机种子（折划分/初始化）的均值；②复核器不做点复现断言，改判不等式（如 r2<0.10 且 gap≥0.30）；③禁止把 cv_fast 与手写正规方程在同折上的差异当 bug——那是代码路径的数值细节。",
+   "measure": {
+    "symptom": "同一折上 raw 轴 held-out R^2：cv_fast -0.10 vs 手写 -0.97",
+    "diagnosis": "因子分离确认差异来自求解器在最小特征值方向的数值细节，非代码错误",
+    "fix": "主脚本 3 种子均值（Q8-E raw 轴 0.023/-0.106），复核改不等式判决"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-E",
+     "script": "tools/pat_q8e.py",
+     "data": "results/2026-11-01/192347_pat_q8e.json",
+     "model": "Qwen3-14B",
+     "note": "LOG_SCALE 判决由不等式承载，两模型 gap 0.804/0.858 远超阈"
+    },
+    {
+     "phase": "Q8-E",
+     "script": "tools/pat_q8e_verify.py",
+     "data": "results/2026-11-01/192347_pat_q8e.json",
+     "model": "Qwen3-14B",
+     "note": "复核器 float32 点复现断言被判为类别错误后重写"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "任何以 R^2≈0 为预期值的对照轴/零假设轴都适用；点显著判据禁用于噪声地板量"
+   },
+   "why": "点值在这类量上不是数据性质而是求解器指纹；把点复现写进复核会把数值细节当回归 bug，或把 -0.10 vs -0.97 的差异误判为主脚本出错。",
+   "tags": [
+    "method",
+    "statistics",
+    "verify"
+   ],
+   "keywords": [
+    "噪声地板",
+    "多种子",
+    "不等式",
+    "R2",
+    "零假设轴"
+   ],
+   "updated_at": "2026-11-01T20:04:15",
+   "created_at": "2026-11-01T20:03:13"
+  },
+  {
+   "id": "R-MTH-31",
+   "domain": "method",
+   "topic": "特征/缓存键必须含数据身份（模型名、维度、折指纹）",
+   "claim": "Gram 矩阵缓存键只含折指纹与样本数即可跨脚本/跨模型共享。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "一切以 X 为输入派生的缓存（Gram、投影、统计量）键必须含 X 的完整身份：模型名 + 维度 + 构造参数。跨模型共用 ns 的脚本，ns 必须带模型名前缀；否则先注入一次跨模型缓存冲突（如 2560 维 G 塞给 5120 维 solve）再修。",
+   "measure": {
+    "symptom": "诊断脚本两模型共用 ns，缓存中 2560 维 Gram 被喂给 5120 维 solve，维度报错",
+    "fix": "ns = f\"{model_name}|{...}\" 前缀；Q8-B 的 R-MTH-24（折指纹）是该规则在折维度的特例"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-E",
+     "script": "tools/pat_q8e.py",
+     "data": "results/2026-11-01/192347_pat_q8e.json",
+     "model": "Qwen3-14B",
+     "note": "14B (d=5120) 与 4B (d=2560) 同池构造，缓存键补模型名后干净"
+    },
+    {
+     "phase": "Q8-E",
+     "script": "tools/pat_q8e_verify.py",
+     "data": "results/2026-11-01/192347_pat_q8e.json",
+     "model": "Qwen3-14B",
+     "note": "独立复核器不复用缓存，天然免疫；主脚本修复后无冲突"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "R-MTH-24（缓存键缺折指纹）的同族扩展：身份缺失类缓存键一律视为已证伪模式"
+   },
+   "why": "缓存键缺身份维度时冲突是静默的或以误导性报错出现；维度恰好相容时会更隐蔽——错误的 Gram 值直接进 solve，产出看起来合理的错数。",
+   "tags": [
+    "method",
+    "caching"
+   ],
+   "keywords": [
+    "缓存键",
+    "Gram",
+    "模型名",
+    "跨模型",
+    "R-MTH-24"
+   ],
+   "updated_at": "2026-11-01T20:04:15",
+   "created_at": "2026-11-01T20:03:13"
+  },
+  {
+   "id": "R-MET-40",
+   "domain": "measurement",
+   "topic": "复核器与主脚本必须共享唯一编码入口",
+   "claim": "复核器可以自己实现一份输入编码（模板包装/位移拼接），只要语义等价。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "输入编码入口必须唯一：复核器 import 主脚本的编码函数（或反之），禁止在复核器里重写 wrap/apply_chat_template 路径。任何位移/扰动 dE() 必须经过同一入口构造对比串。",
+   "measure": {
+    "symptom": "Q8-D3 复核 dE() 在裸串上位移、基线在包装串上，恒定 -0.55 偏移，max|dE|=0.60",
+    "fix": "dE 改走 wrap() 后逐剂量偏差降到 0.004-0.012；chat 模板陷阱 (<think> 强制 / 缺尾换行) 也只修一处"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D3",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/185433_pat_q8d3.json",
+     "model": "Qwen3-4B",
+     "note": "修复后 Qwen 复核 21 PASS / 0 FAIL"
+    },
+    {
+     "phase": "Q8-D3",
+     "script": "tools/pat_q8d.py",
+     "data": "results/2026-11-01/193015_pat_q8d3.json",
+     "model": "GLM-4-9B(8bit)",
+     "note": "同管线 GLM 复核通过（含 8-bit 饱和区翻转规则 p_M>=0.90）"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "双实现\"语义等价\"在模板层几乎不可保证——一处 enable_thinking 或尾换行差异就是系统性偏移"
+   },
+   "why": "编码差异不是噪声而是系统性偏移（-0.55 全局常数），会把所有判据推向 FAIL 并掩盖真实差异；唯一入口让模板陷阱只需修一次、复核自动继承。",
+   "tags": [
+    "measurement",
+    "verify",
+    "encoding"
+   ],
+   "keywords": [
+    "复核器",
+    "编码入口",
+    "chat模板",
+    "偏移",
+    "wrap"
+   ],
+   "updated_at": "2026-11-01T20:04:15",
+   "created_at": "2026-11-01T20:03:13"
+  },
+  {
+   "id": "R-MTH-32",
+   "domain": "method",
+   "topic": "账本写入前必须有备份，新条目 ID 必须从账本现算最大号取",
+   "claim": "新规则编号可以按记忆里的编号续排；覆盖式 upsert 前不需要备份。",
+   "status": "refuted",
+   "confidence": "high",
+   "criterion": "①任何账本 JSON 写入前先落一份 .bak（cp 即可）；②新条目 ID 用代码从账本现算 max(编号)+1，禁止凭记忆续排；③upsert 脚本遇到\"按 id 覆盖\"时必须先 diff 打印旧条目 topic，topic 不同立即中止（那是撞号不是更新）。",
+   "measure": {
+    "symptom": "Q8-D3 收尾时凭记忆编 R-MTH-28/R-MET-37，撞掉 Q9-A 线两条 confirmed 规则；恢复时一次 json.dump(kwarg) 错误又把整个 ledger.json 截断为空",
+    "fix": "从 ledger.json.bak_q9a（116 条）恢复 + 重放 q9a ingest + 重编号 30/31/40；零规则丢失，但多耗一整轮排查"
+   },
+   "evidence": [
+    {
+     "phase": "Q8-D3",
+     "script": "tools/rules_ingest_q8d3e.py",
+     "data": "data/rules/ledger.json.bak_q9a",
+     "model": "-",
+     "note": "备份文件是唯一救命绳；HEAD 里的版本（104 条）不含当天未提交的 12 条"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "一切 JSON 账本（rules/ledger/atlas）都适用；幂等 upsert 不等于可安全覆盖"
+   },
+   "why": "撞号静默覆盖 confirmed 规则，且恢复路径上的任何写错误都可能把损失放大成整文件截断；备份 + 现算编号 + topic diff 三道闸成本几乎为零。",
+   "tags": [
+    "method",
+    "ledger",
+    "process"
+   ],
+   "keywords": [
+    "编号冲突",
+    "备份",
+    "upsert",
+    "截断",
+    "账本"
+   ],
+   "updated_at": "2026-11-01T20:04:15",
+   "created_at": "2026-11-01T20:04:15"
   }
- ]
+ ],
+ "updated": "2026-11-01T20:02:59"
 }

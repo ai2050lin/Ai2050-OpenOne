@@ -12,6 +12,7 @@ import AtlasView from './rdc_fusion/AtlasView.jsx';
 import CatalogPanel from './rdc_fusion/CatalogPanel.jsx';
 import CensusPanel from './rdc_fusion/CensusPanel.jsx';
 import ConfigView, { CFG_SECTIONS } from './ConfigView.jsx';
+import Gctx from './Gctx.jsx';
 import LocalPackView from './rdc_fusion/LocalPackView.jsx';
 import TemplatePipeline from './rdc_fusion/TemplatePipeline.jsx';
 import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, useApi } from './rdc_fusion/api.js';
@@ -145,9 +146,17 @@ export default function Workbench() {
           {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
           {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
           {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
+          {/* 全局维度条：数据集 / 被测模型。只在真读这两维的界面显示——研发工位读的是模板族与本地模型登记，
+              与题库口径不是同一批数据；给一个不起作用的下拉比不给更糟。 */}
+          {(lens === 'route' || lens === 'spatial') && (
+            <Gctx ds={st.ds || ''} mdl={st.mdl || ''} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
+                  scope={lens === 'spatial' ? '神经元普查读自然语料（1,900 万 token），不随此项改变' : '影响语言图谱的实测口径'} />
+          )}
           <main className="wb-main">
             <Suspense fallback={<Empty>加载中…</Empty>}>
-              {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })} localPack={<LocalPack />} />}
+              {lens === 'spatial' && <SpaceLens view={view} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })}
+                                                  model={st.mdl || ''} ds={st.ds || ''} onDs={v => set({ ds: v })}
+                                                  localPack={<LocalPack />} />}
               {lens === 'process' && station === 'catalog' && <CatalogPanel onGo={go} onAutotest={!(ADMIN_LIVE && isAdmin) ? null : () => go(localTools ? 'autotest' : 'dispatch')} onStudio={!(ADMIN_LIVE && isAdmin) ? null : () => go('pipeline')} />}
               {lens === 'process' && station === 'probe' && <GoodfireProbePanel />}
               {lens === 'process' && station === 'pipeline' && <TemplatePipeline step={pstep} onStep={v => set({ pstep: v })} onGo={go} canAudit={isAdmin} />}

@@ -1,5 +1,7 @@
-/* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &rtab= &tm=（空间内部的
-   语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。 */
+/* 研究工作台（v8）的导航配置与跳转归一（非组件）。URL 即状态：?lens= &view= &station= &rtab= &tm= &ds= &mdl=
+   （空间内部的语言项、块、单元等状态由 v8/v8Util.js 记录在同一个地址栏里，键名不重叠）。
+   ds / mdl 是全局维度（数据集 / 被测模型）：所有一级界面共用一条上下文条，不再是某个面板的内部状态——
+   原来数据集选择困在 LangAtlas 的 useState 里，换一页就丢，导致"换个数据集结论还成立吗"在工作台上无法回答。 */
 
 /* 一级界面：前三个是研究对象（进展 / 空间）与实验生产（研发），同属一组、排在左轨分隔线之上；
    分隔线之下是本机形态相关的界面（配置、本机工具）。 */
@@ -78,16 +80,17 @@ export function readState() {
       station = old[1] || station;
       pstep = old[2] || 'design';
     }
-    return { lens, view, station, rtab: q.get('rtab') || 'neuron', tm: q.get('tm') || '', pstep, csec: q.get('csec') || 'conn' };
+    return { lens, view, station, rtab: q.get('rtab') || 'neuron', tm: q.get('tm') || '', pstep, csec: q.get('csec') || 'conn',
+             ds: q.get('ds') || '', mdl: q.get('mdl') || '' };
   } catch {
-    return { lens: 'spatial', view: 'neuron', station: 'probe', rtab: 'neuron', tm: '', pstep: 'design', csec: 'conn' };
+    return { lens: 'spatial', view: 'neuron', station: 'probe', rtab: 'neuron', tm: '', pstep: 'design', csec: 'conn', ds: '', mdl: '' };
   }
 }
 
 export function writeState(st) {
   try {
     const url = new URL(window.location.href);
-    for (const k of ['lens', 'view', 'station', 'rtab', 'tm', 'pstep', 'csec', 'obj', 'atlasTab', 'atlasSel']) url.searchParams.delete(k);
+    for (const k of ['lens', 'view', 'station', 'rtab', 'tm', 'pstep', 'csec', 'obj', 'atlasTab', 'atlasSel', 'ds', 'mdl']) url.searchParams.delete(k);
     url.searchParams.set('lens', st.lens);
     if (st.lens === 'spatial') url.searchParams.set('view', st.view);
     if (st.lens === 'process') url.searchParams.set('station', st.station);
@@ -97,6 +100,9 @@ export function writeState(st) {
     if (st.lens === 'config' && st.csec && st.csec !== 'conn') url.searchParams.set('csec', st.csec);
     if (st.lens === 'route' && st.rtab && st.rtab !== 'neuron') url.searchParams.set('rtab', st.rtab);
     if (st.tm) url.searchParams.set('tm', st.tm);
+    /* 全局维度：空 = 自动（不写进地址栏），保持默认链接短 */
+    if (st.ds) url.searchParams.set('ds', st.ds);
+    if (st.mdl) url.searchParams.set('mdl', st.mdl);
     window.history.replaceState(null, '', url);
   } catch { /* 地址栏不可写时只保留页面状态 */ }
 }

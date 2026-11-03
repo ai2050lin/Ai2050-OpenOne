@@ -196,3 +196,6 @@ export function pickItem(tree, st, model) {
 
 /* 层塔的层序号：hs[0] = 嵌入层，块 b 的输出 = hs[b+1] */
 export const hsLabel = hs => (hs === 0 ? '嵌入层 hs[0]' : `块 ${hs - 1}（输出 hs[${hs}]）`);
+
+/* 参数量/规模的短写（4.02B / 26.2M / 389K）：3D 标签与结构卡共用，别处不要各自写一份 */
+export const fmtP = n => (!n ? '—' : n >= 1e9 ? `${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(0)}K` : String(n));

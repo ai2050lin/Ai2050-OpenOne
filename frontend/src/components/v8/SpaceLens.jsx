@@ -1,12 +1,15 @@
 /* 研究工作台 · 空间：需要层结构的 tab（神经元、语言图谱、响应点云）左侧显示 LLM 多层结构（3D 层塔），右侧按 tab 显示内容。
    层塔共用，含义属于 tab——每个 tab 自己决定「颜色是什么、标记是什么、点击做什么」，点击层塔从不切换 tab；
    跨 tab 只走显式按钮（如「在神经元中查看 →」）。各 tab 的选中层分开记录（block / lblock / rlayer）。
-     神经元   颜色 = 神经元叠加量（选择性 / 已解释 / T1 / 强激活率）；点击 = 选中该块（右侧块结构、单元阵列、单元卡）
+     神经元   颜色 = 神经元叠加量（选择性 / 已解释 / T1 / 强激活率）；点击层 = 结束「只看结构」、展开右侧详情；
+              每层板面另有 Attn（蓝，后半）/ MLP（橙，前半）两个模块盒，点盒 = 选中 (块, 模块)
      语言图谱 颜色 = 当前语言项在各块的有效神经元（模板选择性单元数）；绿色边 = 未见词表上可读出（路线 T），粗边 = 峰值层；
               点击 = 在文章上方打开「该层」面板，并在 C / E 节高亮该层
      响应点云 颜色 = 所选模式族的逐层留出投影间隔；绿色边 = 可读出；点击 = 点云切到该层
      谱图关系、本地包：不显示层塔（谱图关系视图自带层选择与 3D 谱图；本地包在打开研究包之前没有模型数据），内容占满宽度
-   层序号统一用 hs：hs[0] = 嵌入层，块 b 的输出 = hs[b+1]。全部读取来自本机数据包（只读数据包模式）。 */
+   层序号统一用 hs：hs[0] = 嵌入层，块 b 的输出 = hs[b+1]。全部读取来自本机数据包（只读数据包模式）。
+   渐进披露：神经元 tab 默认只画结构（无选中层、不渲染详情），点一层或一个模块后才展开右栏——
+   默认界面回答「模型长什么样」，操作之后才回答「这一层里有什么」。 */
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
@@ -16,7 +19,7 @@ import LangAtlas from './LangAtlas.jsx';
 import LivePane from './LivePane.jsx';
 import NeuronPane from './NeuronPane.jsx';
 import Tower from './Tower.jsx';
-import { OVERLAYS, READOUT_LABEL, defaultModel, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
+import { OVERLAYS, READOUT_LABEL, defaultModel, fmtP, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
@@ -24,6 +27,9 @@ const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
 
 const hsOf = tag => { const m = /@L(\d+)$/.exec(tag || ''); return m ? Number(m[1]) : null; };
 const toHs = (blockValues, n) => (blockValues ? [null, ...Array.from({ length: n }, (_, b) => blockValues[b] ?? null)] : null);
+
+/* 层内模块的开关对象：引用稳定，避免每次渲染都重绘层塔 */
+const MODS = { attn: 1, mlp: 1 };
 
 function itemSelectivity(item, census, st) {
   const runs = (item?.selectivity || []).filter(s => s.census_key === census);
@@ -49,12 +55,14 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
-export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
+export default function SpaceLens({ view, setView, tm, setTm, localPack, model: gModel, ds = '', onDs }) {
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
   const skeletons = useMemo(() => Object.fromEntries((skApi.data?.models || []).map(s => [s.model, s])), [skApi.data]);
   const [st, setSt] = useState(readState);
+  /* 右栏常驻展开：块细节是这一页的主体，不做「展开 / 收起」。
+     层塔与细节必须同时可见——选中块在塔上是高亮的，右栏讲的就是那一块。 */
   useEffect(() => { writeState(st); }, [st]);
   const patchSt = patch => setSt(prev => ({ ...prev, ...patch }));
 
@@ -62,9 +70,16 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const [liveTrace, setLiveTrace] = useState(null);
   const [liveStep, setLiveStep] = useState(0);
 
-  const model = st.model && tree?.models?.includes(st.model) ? st.model : defaultModel(tree, skeletons);
+  /* 模型来源优先级：全局条（mdl）> 本页旧链接（model）> 自动挑一个普查最全的。
+     全局条是权威：页顶换模型，空间里跟着换，不再出现「两处各选一个」的矛盾。 */
+  const ownModel = st.model && tree?.models?.includes(st.model) ? st.model : '';
+  const model = (gModel && tree?.models?.includes(gModel) ? gModel : '') || ownModel || defaultModel(tree, skeletons);
   const skeleton = skeletons[model];
   const census = skeleton?.census_run ? skeleton.census_key : null;
+  /* 结构参数（三块：词嵌入 / 注意力 / MLP）：形状与参数量来自模型自己的 config.json，
+     层塔按它把模块盒画成有体积的实体。取不到就退回平面色带，不猜数字。 */
+  const archApi = useApi(model ? `/api/model/arch?model_key=${encodeURIComponent(model)}` : null);
+  const arch = archApi.data && archApi.data.available ? archApi.data : null;
   const tw = useApi(census ? `/api/neurons/tower?model_key=${encodeURIComponent(census)}` : null);
   const tower = tw.data && !tw.data.pending ? tw.data : null;
   const nLayersCensus = tower?.n_layers || skeleton?.n_layers || 0;
@@ -93,10 +108,17 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
   const cfg = useMemo(() => {
     const n = nLayers;
     if (view === 'neuron') {
-      return { values: tower ? toHs(towerValues(tower, st.ov, st.sel, st.ro), n) : null, selected: block + 1, allowEmbedding: false,
-               onPick: hs => patchSt({ block: hs - 1, unit: null, mod: 'mlp' }),
+      /* 点层或点模块都算「开始看这一层」：右栏展开。点层复位到 MLP（默认模块），点模块保留模块 */
+      const pick = (hs, mod) => patchSt({ block: hs - 1, unit: null, ...(mod ? { mod } : {}) });
+      return { values: tower ? toHs(towerValues(tower, st.ov, st.sel, st.ro), n) : null,
+               selected: block + 1, allowEmbedding: false,
+               onPick: hs => pick(hs, null),
+               onPickModule: (hs, mod) => pick(hs, mod),
+               selModule: { hs: block + 1, mod: st.mod },
+               modules: MODS,
                valueLabel: (OVERLAYS.find(o => o[0] === st.ov) || [])[1] || '叠加量',
-               color: `颜色 = ${(OVERLAYS.find(o => o[0] === st.ov) || [])[1] || '无'}（每块）`, click: '点击 = 选中该块：右侧显示块结构、单元阵列与单元卡' };
+               color: `颜色 = ${(OVERLAYS.find(o => o[0] === st.ov) || [])[1] || '无'}（每块）`,
+               click: '点击一层 = 展开该块；点板面上的 Attention（后半，蓝）/ MLP（前半，橙）盒 = 只看该模块' };
     }
     if (view === 'lang') {
       const d = itemApi.data;
@@ -174,20 +196,24 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
 
   const showTower = view === 'neuron' || view === 'lang' || view === 'response' || view === 'live';   // 谱图关系、本地包不需要层结构
 
+  /* 布局：需要层结构的 tab 一律左右分栏（塔在左，内容在右）。神经元页右栏常驻，
+     不再有「只有塔」的单列态——单列时右边是空白，而块细节本来就是这一页要看的东西。 */
+  const split = showTower;
+
   return (
-    <div className={'v8-space' + (showTower ? '' : ' wide')}>
+    <div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
       {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">
           <div className="v8-tower-title">
             <b>LLM 多层结构</b>
-            <select value={model} onChange={e => patchSt({ model: e.target.value, block: null, unit: null, lblock: null, rlayer: null })} aria-label="模型">
-              {(tree?.models || []).map(m => <option key={m} value={m} title={m}>{shortModel(m)}{skeletons[m]?.census_run ? '' : '（未普查）'}</option>)}
-            </select>
+            {/* 模型不在这里选：页顶的全局条是唯一入口，避免同一页两处各选一个 */}
+            <span className="v8-tower-model" title={model}>{shortModel(model)}{skeletons[model]?.census_run ? '' : ' · 未普查'}</span>
           </div>
           {view === 'neuron' && census && tower && (
             <>
               <span className="v8-seg">{OVERLAYS.map(([k, t]) => <button key={k} type="button" className={st.ov === k ? 'on' : ''} onClick={() => patchSt({ ov: k })}>{t}</button>)}</span>
+              {/* 选择性运行 / 读出轴是细节：展开详情后才给，默认界面只留一层着色口径 */}
               {st.ov === 'sel' && selRun && (
                 <div className="v8-tools">
                   <select value={selRun.file} onChange={e => patchSt({ sel: e.target.value })} aria-label="选择性运行">
@@ -207,20 +233,66 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
             {cfg.selected != null && <span>当前选中：{hsLabel(cfg.selected)}</span>}
           </div>
         </div>
+        {/* 塔的读法放在塔上方：默认态整页要在一屏内说完，说明行不能掉到最底部被浮动按钮压住 */}
+        <p className="v8-note v8-note-top">每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。拖动旋转、滚轮缩放。
+          {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
         {nLayers ? (
           <Tower nLayers={nLayers} selected={cfg.selected} values={cfg.values} marks={cfg.marks} peak={cfg.peak} onPick={cfg.onPick}
+                 modules={cfg.modules} selModule={cfg.selModule} onPickModule={cfg.onPickModule} arch={arch}
                  allowEmbedding={cfg.allowEmbedding} valueLabel={cfg.valueLabel} markLabel={cfg.markLabel}
-                 edges={edges} target={target} height={edges ? 780 : 600} focusKey={edges ? `${block}:${st.unit}` : ''}
+                 edges={edges} target={target} height={edges ? 820 : 740}
+                 focusKey={edges ? `${block}:${st.unit}` : ''}
                  caption={`${view === 'live' && liveTrace ? liveTrace.model_name : shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
         ) : <Empty>没有模型骨架数据。</Empty>}
-        <p className="v8-note">每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。拖动旋转、滚轮缩放。
-          {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
+        {arch && (
+          <div className="v8-archbox" title={arch.source ? `结构参数来源：${arch.source}` : ''}>
+            <div className="v8-arch">
+            <div className="v8-arch-c emb">
+              <span className="v8-arch-k">词嵌入</span>
+              <span className="v8-arch-p">{fmtP(arch.embed.params)}</span>
+              <span className="v8-arch-s">{arch.embed.shape_text}</span>
+              <span className="v8-arch-s">{arch.embed.tied ? '与输出头共享' : `输出头另算 ${fmtP(arch.embed.lm_head)}`}</span>
+            </div>
+            <div className="v8-arch-c attn">
+              <span className="v8-arch-k">注意力 · 每层</span>
+              <span className="v8-arch-p">{fmtP(arch.attn.params)}</span>
+              <span className="v8-arch-s">{arch.attn.shape_text}</span>
+              <span className="v8-arch-s">{arch.attn.heads}</span>
+            </div>
+            <div className="v8-arch-c mlp">
+              <span className="v8-arch-k">MLP · 每层</span>
+              <span className="v8-arch-p">{fmtP(arch.mlp.params)}</span>
+              <span className="v8-arch-s">{arch.mlp.shape_text}</span>
+              <span className="v8-arch-s">{arch.mlp.act} 激活</span>
+            </div>
+            </div>
+            <p className="v8-arch-sum">
+              全模型 <b>{fmtP(arch.total.params)}</b> 参数 · {arch.n_layers} 层 ×（注意力 + MLP + 归一化）+
+              词嵌入{arch.embed.tied ? '（共享输出头）' : '与输出头'} · 每层 MLP 是注意力的 <b>{arch.total.mlp_over_attn?.toFixed(2)}×</b>
+            </p>
+          </div>
+        )}
+        {archApi.data && archApi.data.available === false && (
+          <p className="v8-note">{archApi.data.reason}</p>
+        )}
       </aside>
       )}
       <section className="v8-space-main">
+        {view === 'neuron' && (
+          <div className="v8-detail-hd">
+            <b>{hsLabel(block + 1)} 的细节</b>
+            <span title={arch ? (st.mod === 'attn' ? `${arch.attn.shape_text} · ${arch.attn.heads}` : st.mod === 'mlp' ? arch.mlp.shape_text : '') : ''}>
+              {st.mod === 'attn' ? '注意力' : st.mod === 'norm' ? '归一化层' : 'MLP'}
+              {arch && st.mod === 'attn' ? ` · ${fmtP(arch.attn.params)} 参数/层` : ''}
+              {arch && st.mod === 'mlp' ? ` · ${fmtP(arch.mlp.params)} 参数/层` : ''}
+              {st.mod === 'attn' ? ' · 本层暂无逐头分析数据' : ''}
+              {st.unit != null ? ` · U${st.unit}` : ''}
+            </span>
+          </div>
+        )}
         {!tree && <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
         <Suspense fallback={<Empty>加载中…</Empty>}>
-          {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} circuit={circuit} circuitNote={circuitNote} circuitLoading={st.unit != null ? circuitApi.loading : null} onRetryCircuit={circuitApi.reload} />
+          {view === 'neuron' && (census && tower ? <NeuronPane census={census} tower={tower} skeleton={skeleton} block={block} st={st} set={set} arch={arch} circuit={circuit} circuitNote={circuitNote} circuitLoading={st.unit != null ? circuitApi.loading : null} onRetryCircuit={circuitApi.reload} />
             : <Empty>{census ? (tw.error ? `层塔数据不在本机数据包里：${tw.error}` : '读取层塔…') : `${shortModel(model)} 还没有自然语料普查，没有逐单元数据；左侧只画层结构。`}</Empty>)}
           {view === 'lang' && tree && (
             <div className="v8-langhost">
@@ -232,7 +304,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack }) {
               {st.ltab === 'items'
                 ? <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
                             layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />
-                : <LangAtlas />}
+                : <LangAtlas ds={ds} onDs={onDs} />}
             </div>
           )}
           {view === 'live' && <LivePane census={census} skeleton={skeleton} tower={tower}

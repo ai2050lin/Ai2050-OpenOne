@@ -1,0 +1,44 @@
+==============================================================================
+Q8-B 频率旋钮量纲化  model=D:/develop/model/Qwen/Qwen3-4B  SMOKE=True  seed=20261101  folds=2 perm=5
+==============================================================================
+E (151936, 2560) tied True
+‖μ‖=0.3125  平均‖e‖=1.0974
+全表解码：CHAR 8049 / WORD 16372 / 残片或无文本 1724 / 拉丁候选 66841
+池：CHAR 1500 / WORD 1500 / LATIN 4909 / 残片 1724
+POOL n=3000  d=2560  zipf 范围 [1.01, 7.17]
+零分布（打乱 y）R² 均 -1.6816 p95 -1.5792 —— 显著为负 ⇒ 本设计 d/n 比下有过拟合，R² 需与零分布并列读（§8）
+------------------------------------------------------------------------------
+B1 线性 M1 R²=0.9002 | 二次 M2 0.9027 | 12箱 M3 0.8850 | Δ(M3−M1)=-0.0152 CI[-0.0216,-0.0096] => LINEAR_LOG_SCALAR
+B1 原始频率轴 R²=-0.6733（vs zipf 轴 0.9002，差 +1.5735）=> 刻度是对数
+B1 校准增益 R²_obs − R²_null = 2.5818（零分布 -1.6816）
+B2 坐标曲线（机会 0）：k=1:0.221 k=2:0.258 k=4:0.381 k=8:0.465 k=16:0.532 k=32:0.602 k=64:0.629 k=128:0.680 k=256:0.683 k=512:0.664 k=1024:0.336
+B2 k*(95% 饱和) = 128（max R²=0.6832）
+B2 PLS-1 曲线（80/20）：k=1:0.577 k=2:0.654 k=4:0.681 k=8:0.665 k=16:0.662 k=32:0.664
+B2 PLS k* = 2（max R²=0.6810）
+B2 密度标签 => LOW_DIM_DENSE（PLS 低维但坐标分散 = 频率方向是稠密投影，不是某个物理坐标）
+B2 判决 => AMBIGUOUS_DIM（坐标 DISTRIBUTED / PLS k*=2）
+B3 ρ(log‖e‖,zipf)=+0.0343 | cos(w_freq,w_norm)=-0.3832 | R²_full 0.4381 → 扣范数后 0.5505 (保留 1.26) => FREQ_INDEPENDENT_OF_NORM
+B4 单坐标 27：Pearson -0.5283 / Spearman -0.5497（Q8-A 报的是 Spearman 0.802 量级）
+------------------------------------------------------------------------------
+B5 δ=1.413 向高频：Δzipf 中位 +0.140（符号正确 0.54，|Δzipf−1|≤0.5 占 0.32，n=136）
+B5 δ=1.413 向低频：Δzipf 中位 +0.000（符号正确 0.31，|Δzipf−1|≤0.5 占 0.34，n=138）
+B5 判决 => KNOB_NOT_LOCAL
+B6 COLOR n=52 within 0.1988 → 扣频率 0.1989（保留 1.00，同规模随机 0.0042±0.0017）=> SEMANTICS_ORTHOGONAL_TO_FREQ
+B6 FRUIT n=50 within 0.0975 → 扣频率 0.0975（保留 1.00，同规模随机 0.0032±0.0007）=> SEMANTICS_ORTHOGONAL_TO_FREQ
+B7 字节残片投影 t 中位 nan（CHAR -0.526 / WORD 0.407）
+B7 AUC(CHAR_vs_WORD) = 0.279 CI[0.261, 0.294]  n=1500/1500
+B7 AUC(CHAR_vs_BYTE) = nan CI[nan, nan]  n=1500/0
+B7 AUC(WORD_vs_BYTE) = nan CI[nan, nan]  n=1500/0
+B7 判决 => TYPE_HAS_FREQ_FREE_PART
+------------------------------------------------------------------------------
+B1 线性 M1 R²=0.5239 | 二次 M2 0.5269 | 12箱 M3 0.5414 | Δ(M3−M1)=+0.0175 CI[+0.0148,+0.0202] => LINEAR_LOG_SCALAR
+LATIN 对照 n=4909：形状判决 LINEAR_LOG_SCALAR（与 CJK 一致）
+------------------------------------------------------------------------------
+B1 LINEAR_LOG_SCALAR
+B2 AMBIGUOUS_DIM
+B3 FREQ_INDEPENDENT_OF_NORM
+B5 KNOB_NOT_LOCAL
+B6 {'COLOR': 'SEMANTICS_ORTHOGONAL_TO_FREQ', 'FRUIT': 'SEMANTICS_ORTHOGONAL_TO_FREQ'}
+B7 TYPE_HAS_FREQ_FREE_PART
+耗时 41.1 s
+RESULT D:\AI2050\Ai2050-OpenOne\results\2026-11-01\094120_pat_q8b.json

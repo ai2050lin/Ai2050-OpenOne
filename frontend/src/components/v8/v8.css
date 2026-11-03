@@ -39,8 +39,8 @@ body:has(.fw-root.v8-root){display:block;overflow-x:hidden;overflow-y:auto}
 .v8-two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;align-items:start}
 .v8-lg{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--fw-text-2);margin-top:6px}
 .v8-lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.v8-tip{position:absolute;pointer-events:none;background:#0f172a;color:#f8fafc;font-size:11.5px;border-radius:7px;padding:6px 9px;max-width:260px;z-index:6;line-height:1.5;transform:translate(8px,8px)}
-.v8-tip small{display:block;color:#cbd5e1;font-size:10.5px}
+.v8-tip{position:absolute;pointer-events:none;background:#0f172a;color:#f8fafc;font-size:12px;border-radius:7px;padding:6px 9px;max-width:300px;z-index:6;line-height:1.55;transform:translate(8px,8px)}
+.v8-tip small{display:block;color:#cbd5e1;font-size:11.5px;margin-top:1px}
 /* ---- 主线 ①：语言图谱 ---- */
 .v8-lang{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;align-items:start}
 .v8-side{background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:10px;position:sticky;top:68px;max-height:calc(100vh - 84px);overflow:auto}
@@ -183,12 +183,45 @@ body:has(.fw-root.v8-root){display:block;overflow-x:hidden;overflow-y:auto}
 a.v8-mainline{text-decoration:none}
 .v8-home-route{margin:-4px 4px 0;font-size:12.5px}
 .v8-home-route a{color:var(--fw-blue);text-decoration:none;font-weight:600}
-/* ---- 研究工作台 · 空间：左侧常驻层塔 ---- */
-.v8-space{display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:14px;align-items:start}
+/* ---- 研究工作台 · 空间：层塔是主画布，不是侧栏 ----
+   三档布局：默认（语言图谱/实时/点云）塔占 34% 但不是 330px 死宽；.split（神经元已展开详情）塔在左主位；
+   .solo（神经元默认态）塔独占整宽。旧版把塔钉在 330px 侧栏，层板窄到看不出层内结构。 */
+.v8-space{display:grid;grid-template-columns:minmax(380px,34%) minmax(0,1fr);gap:16px;align-items:start}
+.v8-space.split{grid-template-columns:minmax(0,1.3fr) minmax(440px,1fr)}
+.v8-space.solo{grid-template-columns:minmax(0,1fr)}
 .v8-space .v8-tower{top:12px}
 .v8-space-main{min-width:0;display:flex;flex-direction:column;gap:12px}
-.v8-tower-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.v8-tower-title{display:flex;align-items:center;justify-content:flex-start;gap:10px}
 .v8-tower-title select{font:inherit;font-size:12px;border:1px solid var(--fw-border-strong);border-radius:6px;padding:3px 6px;max-width:170px}
+.v8-tower-model{font-size:11.5px;color:var(--fw-text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 结构参数：三块（词嵌入 / 注意力 / MLP）的形状与参数量。放在层塔卡里，与 3D 的盒子一一对应：
+   灰 = 词嵌入板、蓝 = Attention 盒、橙 = MLP 盒，盒子大小按这里的参数量定。 */
+.v8-note-top{margin:0 0 2px}
+.v8-arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:8px;margin-top:10px}
+.v8-arch-c{display:flex;flex-direction:column;gap:1px;background:#f8fafc;border:1px solid var(--fw-border);border-left:3px solid #94a3b8;border-radius:8px;padding:7px 9px;min-width:0}
+.v8-arch-c.emb{border-left-color:#64748b}
+.v8-arch-c.attn{border-left-color:#2a78d6}
+.v8-arch-c.mlp{border-left-color:#eb6834}
+.v8-arch-k{font-size:12.5px;color:var(--fw-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v8-arch-p{font-size:16px;font-weight:600;color:var(--fw-text);font-variant-numeric:tabular-nums;line-height:1.25}
+.v8-arch-s{font-size:12px;line-height:1.5;color:var(--fw-text-3);word-break:break-word}
+.v8-arch-sum{margin:8px 0 0;font-size:12px;line-height:1.7;color:var(--fw-text-3)}
+.v8-arch-sum b{color:var(--fw-text-2)}
+@media (max-width:620px){.v8-arch{grid-template-columns:minmax(0,1fr)}}
+/* 单列时的引导条：默认界面只说「怎么开始」，不铺数据。压成一行放在塔上方，把高度留给层塔 */
+.v8-solo{order:-1;background:#f4f8fd;border:1px solid #cde2fb;border-radius:10px;padding:8px 14px;display:flex;flex-direction:row;align-items:center;gap:14px;flex-wrap:wrap}
+.v8-solo b{font-size:13px;color:#184f95;white-space:nowrap}
+.v8-solo p{margin:0;flex:1;min-width:300px;font-size:12px;line-height:1.6;color:var(--fw-text-2)}
+.v8-solo em{font-style:normal;font-weight:600}
+.v8-k-attn{color:#2a78d6}
+.v8-k-mlp{color:#eb6834}
+.v8-k-emb{color:#475569}
+.v8-solo-act{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* 展开后的详情头：一行说清在看什么，另一行收起 */
+.v8-detail-hd{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:8px 12px}
+.v8-detail-hd b{font-size:13.5px}
+.v8-detail-hd span{font-size:12px;color:var(--fw-text-2)}
+.v8-detail-hd .fw-tbtn{margin-left:auto}
 /* ---- 研究工作台 · 路线 ---- */
 .v8-route{display:flex;flex-direction:column;gap:12px}
 .v8-route-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:10px}
@@ -212,8 +245,8 @@ a.v8-mainline{text-decoration:none}
 .v8-matrix tr.first th,.v8-matrix tr.first td{border-top:2px solid var(--fw-border-strong)}
 .v8-matrix td .v8-chip{min-width:34px;text-align:center;display:inline-block}
 .v8-levels-legend{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
-@media (max-width:860px){
-  .v8-space{grid-template-columns:minmax(0,1fr)}
+@media (max-width:1180px){
+  .v8-space,.v8-space.split{grid-template-columns:minmax(0,1fr)}
   .v8-space .v8-tower{position:static}
 }
 /* ---- 空间 · 语言图谱：该层面板 ---- */

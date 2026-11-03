@@ -114,7 +114,7 @@ function HeadRow({ h, cats, nLayers }) {
   );
 }
 
-export default function LangAtlas() {
+export default function LangAtlas({ ds = '', onDs }) {
   const dsApi = useApi('/api/lang/atlas/datasets');
   const { status, setStatus, busy, setBusy, poll } = useStatusPoll();
   const [picked, setPicked] = useState(null);
@@ -130,7 +130,11 @@ export default function LangAtlas() {
   }, [setStatus]);
 
   const datasets = dsApi.data?.datasets || [];
-  const active = picked || (layoutsDefault(datasets, status?.last));
+  /* 数据集来源优先级：页顶全局条（ds）> 本页点击 > 上次结果 / 题量默认。
+     全局条是权威：页顶换了数据集，这里的实测口径跟着换，不再出现「两处各选一个」。 */
+  const gDs = ds && datasets.some(d => d.id === ds) ? ds : '';
+  const active = gDs || picked || (layoutsDefault(datasets, status?.last));
+  const pickDs = v => { setPicked(v); if (onDs) onDs(v); };
   const cur = datasets.find(d => d.id === active);
   const last = status?.last || null;
   const running = ['loading', 'running'].includes(status?.state) || busy;
@@ -186,7 +190,7 @@ export default function LangAtlas() {
           三大类型在 C-Eval 只有 169 题，在 CMMLU 能映射出 2300 题。</p>
         {!datasets.length && <Empty>{dsApi.error ? `读取数据集失败：${dsApi.error}` : '读取数据集…'}</Empty>}
         <div className="v8-atlas-dsrow">
-          {datasets.map(d => <DatasetCard key={d.id} d={d} active={d.id === active} onPick={setPicked} />)}
+          {datasets.map(d => <DatasetCard key={d.id} d={d} active={d.id === active} onPick={pickDs} />)}
         </div>
         {cur && (
           <details className="v8-atlas-map">

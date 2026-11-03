@@ -10,7 +10,7 @@ import { useApi } from '../app/rdc_fusion/api.js';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import Bowtie3D from './Bowtie3D.jsx';
-import { GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, unitColors } from './v8Util.js';
+import { GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, fmtP, unitColors } from './v8Util.js';
 
 const COLOR_MODES = [['type', '分型'], ['dens', '强激活率'], ['regime', '主导符号区'], ['expl', '解释等级'], ['sel', '选择性']];
 
@@ -96,18 +96,18 @@ function PickedUnits({ layer, selRun, unit, onPick }) {
 }
 
 /* ── 结构图：MLP 为主角；注意力 / 归一化注明「无单元级分析」，不再做成死胡同按钮 ── */
-function BlockStructure({ block, cfg, skeleton }) {
+function BlockStructure({ block, cfg, skeleton, arch, src }) {
   const h = cfg?.hidden_size ?? skeleton?.d_model, ff = cfg?.intermediate_size ?? skeleton?.d_ff;
   const heads = cfg?.num_attention_heads, kv = cfg?.num_key_value_heads, hd = cfg?.head_dim;
   return (
     <section className="v8-card">
-      <h3>块 {block} 的内部结构 <small>输入 hs[{block}] → 输出 hs[{block + 1}]；维度来自 {cfg ? 'config.json' : '结果摘要（未找到 config.json，部分字段留空）'}</small></h3>
+      <h3>块 {block} 的内部结构 <small>输入 hs[{block}] → 输出 hs[{block + 1}]；维度来自 {src || '结果摘要（未找到 config.json，部分字段留空）'}</small></h3>
       <div className="v8-block">
         <div className="v8-blk res"><b>输入残差</b><span>{h ?? '—'} 维（hs[{block}]）</span></div><div className="v8-arrow">↓</div>
         <div className="v8-blk plan"><b>RMSNorm</b><span>逐位置归一化 × γ</span><em>只有 γ 参数，无单元级分析</em></div><div className="v8-arrow">↓</div>
-        <div className="v8-blk plan"><b>自注意力</b><span>{heads ? `${heads} 个查询头 / ${kv} 组 KV（${kv && kv < heads ? 'GQA' : 'MHA'}）· 每头 ${hd} 维` : '头数未记录'}</span><em>逐头分析在研究计划中（想看逐头实时计算，切到「实时分析」输入文本）</em></div><div className="v8-arrow">↓ ＋残差</div>
+        <div className="v8-blk plan"><b>自注意力</b><span>{heads ? `${heads} 个查询头 / ${kv} 组 KV（${kv && kv < heads ? 'GQA' : 'MHA'}）· 每头 ${hd} 维${arch ? ` · ${fmtP(arch.attn.params)} 参数/层` : ''}` : '头数未记录'}</span><em>逐头分析在研究计划中（想看逐头实时计算，切到「实时分析」输入文本）</em></div><div className="v8-arrow">↓ ＋残差</div>
         <div className="v8-blk plan"><b>RMSNorm</b><span>逐位置归一化 × γ</span><em>同上</em></div><div className="v8-arrow">↓</div>
-        <div className="v8-blk has on"><b>MLP ↓ 本页主体</b><span>{`gate / up ${h ?? '—'}→${ff ?? '—'} · SwiGLU A = silu(G)⊙V · down ${ff ?? '—'}→${h ?? '—'}`}</span><em>{ff?.toLocaleString?.() ?? '—'} 个中间单元 · 已普查</em></div>
+        <div className="v8-blk has on"><b>MLP ↓ 本页主体</b><span>{`gate / up ${h ?? '—'}→${ff ?? '—'} · SwiGLU A = silu(G)⊙V · down ${ff ?? '—'}→${h ?? '—'}`}</span><em>{ff?.toLocaleString?.() ?? '—'} 个中间单元 · 已普查{arch ? ` · ${fmtP(arch.mlp.params)} 参数/层` : ''}</em></div>
         <div className="v8-arrow">↓ ＋残差</div>
         <div className="v8-blk res"><b>输出残差</b><span>{h ?? '—'} 维（hs[{block + 1}]）</span></div>
       </div>
@@ -228,14 +228,18 @@ function LanguageLinks({ layer, unit, set }) {  const hits = (layer.selectivity 
   );
 }
 
-export default function NeuronPane({ census, tower, skeleton, block, st, set, circuit, circuitNote, circuitLoading, onRetryCircuit }) {
+export default function NeuronPane({ census, tower, skeleton, block, st, set, circuit, circuitNote, circuitLoading, onRetryCircuit, arch }) {
   const ly = useApi(`/api/neurons/layer?model_key=${encodeURIComponent(census)}&block=${block}&run=${encodeURIComponent(tower.run)}`);
   const layer = ly.data && !ly.data.pending ? ly.data : null;
   const selRuns = tower.selectivity || [];
   const selRun = selRuns.find(s => s.file === st.sel) || selRuns[0];
   const ros = Object.keys(selRun?.by_readout || {});
   const ro = ros.includes(st.ro) ? st.ro : ros[0];
-  const cfg = skeleton?.config;
+  /* 结构参数：优先快照里普查保存的 config，其次 /api/model/arch（读模型自己的 config.json）。
+     以前只认快照，快照没存 config 时头数就显示「未记录」——数字其实在模型目录里躺着。 */
+  const cfg = skeleton?.config || (arch ? { hidden_size: arch.d_model, intermediate_size: arch.d_ff,
+                                           num_attention_heads: arch.n_heads, num_key_value_heads: arch.n_kv_heads, head_dim: arch.head_dim } : null);
+  const cfgSrc = skeleton?.config ? 'config.json（普查快照）' : arch ? `config.json（${arch.source || arch.model_id}）` : '';
   const unit = st.mod === 'mlp' ? st.unit : null;
   useAiContext(useMemo(() => neuronUnitContext(layer, unit, {                        // 「问 AI」侧栏附带选中单元的数据
     census, block, links: (layer?.selectivity || []).flatMap(s => Object.entries(s.top || {}).flatMap(([r, tops]) =>
@@ -243,7 +247,7 @@ export default function NeuronPane({ census, tower, skeleton, block, st, set, ci
   }), [layer, unit, census, block]));
   return (
     <div className="v8-layerp">
-      <BlockStructure block={block} cfg={cfg} skeleton={skeleton} />
+      <BlockStructure block={block} cfg={cfg} skeleton={skeleton} arch={arch} src={cfgSrc} />
       {st.mod === 'attn' && <Empty>自注意力目前没有逐头分析数据（研究计划：注意力头是否作为第二类节点）。逐头实时计算可切到「实时分析」输入文本观察。</Empty>}
       {st.mod === 'norm' && <Empty>归一化层只有 γ 参数，没有单元级分析。单元分析看 MLP（默认视图）。</Empty>}
       {st.mod === 'mlp' && (ly.error ? <Empty>该层摘要不可用：{ly.error}<ExtraPackPrompt pack={ly.missingPack} /></Empty>

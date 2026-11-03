@@ -1,0 +1,66 @@
+==============================================================================
+Q8-A 静态嵌入解剖  model=D:/develop/model/Qwen/Qwen3-4B  SMOKE=True  seed=20261101
+==============================================================================
+E (151936, 2560) tied True dtype torch.bfloat16
+μ‖=0.3125  平均范数 1.0974
+set COLOR   n=52  单 token=12
+set FRUIT   n=50  单 token=17
+set RARE    n=74  单 token=48
+set COMMON  n=65  单 token=65
+P1 word     n= 16374  med‖e‖=1.1915  within_cos(centered)=0.0060  (raw 0.0815)
+P1 char     n=  8806  med‖e‖=1.2061  within_cos(centered)=0.0058  (raw 0.0874)
+P1 fragment n=  1457  med‖e‖=1.0229  within_cos(centered)=0.0298  (raw 0.1342)
+P1 other    n=125299  med‖e‖=1.1128  within_cos(centered)=0.0006  (raw 0.0899)
+P1 残片−整词 = +0.0238  (word 子集零分布 30 次：均 0.0062, p95 0.0064)  => NO_BYTE_COLLAPSE
+P2 n=8049  ρ_s(log‖e‖,zipf)=+0.2720 (perm p=0, MDE 0.029)  留出 ρ=+0.2568  8 段 ρ=+0.5476  => PEAK_AT_MID_FREQUENCY
+P2 八段 (zipf_lo, lognorm_med, n): (1.01,0.091,1014) (1.76,0.162,1015) (2.18,0.197,1040) (2.61,0.211,1033) (3.08,0.222,1022) (3.60,0.220,1024) (4.09,0.216,1036) (4.63,0.176,1018)
+频率匹配池 n=11487（双字纯汉字 token）
+P3 within(FRUIT)=0.0975 within(COLOR)=0.1988 between=0.0668  ctrl=0.0152(±)  Δ=+0.0823 p=0.0000 => PASS
+P3 2AFC FRUIT_vs_COLOR             n=50 acc=0.9600 CI[0.865,0.989] MDEρ=0.37
+P3 2AFC COLOR_vs_FRUIT             n=52 acc=1.0000 CI[0.931,1.000] MDEρ=0.36
+P3 2AFC FRUIT_vs_COLOR_singletoken n=17 acc=1.0000 CI[0.816,1.000] MDEρ=0.61
+P3 2AFC COLOR_vs_FRUIT_singletoken n=12 acc=1.0000 CI[0.757,1.000] MDEρ=0.71
+P3 共享字 词对 84/1225 (7%)  去共享字后 within=0.0738  下降 24.3% => SEMANTIC_RESIDUAL
+P4 色相 n=45  Mantel ρ=+0.1687 p=0.007984 (MDEρ=0.386) => PENDING_power
+P4 明度 ρ(L*,‖e‖)=-0.0365 p=0.8200 => NO_LIGHTNESS_LINK
+P4 单 token 稳健 n=9 ρ=-0.0839  上下文 L20 ρ=+0.0302
+P5 覆盖：26/74 字节回退 (35.1%)；全 CJK 普查 0x4E00–0x9FA5 中 0 字不在词表
+P5 子群 within：字节回退(n=26) 0.1093  vs  在表单字(n=48) 0.0277
+P5 塌缩 within(RARE)=0.0188 within(COMMON)=0.1433 Δ=-0.1245 (随机 0.0003) => FAIL
+P5 判决 => NOT_BYTE_COMPOSED  ({'cov': True, 'codepoint': False, 'collapse': False, 'nn': False})
+形旁零分布池 n=8692（在表单字，剔除 8 组本身）
+P6 氵  n=16 within=0.0762 Δ=0.0580 (null 0.0055±) z=+12.4 p=0.0000 同质
+P6 木  n=17 within=0.0757 Δ=0.0576 (null 0.0054±) z=+16.0 p=0.0000 同质
+P6 火  n=14 within=0.0844 Δ=0.0663 (null 0.0060±) z=+12.0 p=0.0000 同质
+P6 讠  n=18 within=0.0674 Δ=0.0492 (null 0.0051±) z=+13.6 p=0.0000 异质
+P6 忄  n=16 within=0.0543 Δ=0.0362 (null 0.0055±) z=+8.3 p=0.0000 异质
+P6 石  n=10 within=0.0433 Δ=0.0251 (null 0.0063±) z=+3.9 p=0.0050 异质
+P6 虫  n=13 within=0.0740 Δ=0.0559 (null 0.0057±) z=+10.6 p=0.0000 同质
+P6 鸟  n=10 within=0.1174 Δ=0.0993 (null 0.0066±) z=+12.4 p=0.0000 同质
+P6 同质组 Δ 均 +0.0674  异质组 Δ 均 +0.0369  比值 0.55 => ORTHOGRAPHIC_CONTRIBUTES
+P7 频率轴：单坐标 |ρ(坐标, zipf)| 最大 = -0.802（坐标 27）；前五 [0.802 0.761 0.754 0.705 0.673]
+P7 坐标普查 d=2560  raw max η²=0.8572（perm-max 0.1132, 均值 0.0768）⇒ 超阈 445 个
+P7 残差坐标 max η²=0.1961（perm-max 0.1036, 均值 0.0800）⇒ 超阈 61 个
+P7 top坐标    27 η²=0.8572 组均 -0.004 0.014 0.042 -0.026  ρ(zipf)=-0.804 ρ(字节长)=-0.042
+P7 top坐标   270 η²=0.7724 组均 -0.005 0.004 0.031 -0.030  ρ(zipf)=-0.758 ρ(字节长)=-0.033
+P7 top坐标    56 η²=0.7196 组均 0.049 0.043 0.024 0.059  ρ(zipf)=+0.764 ρ(字节长)=+0.100
+P7 top坐标     3 η²=0.6123 组均 -0.004 0.013 0.038 -0.034  ρ(zipf)=-0.698 ρ(字节长)=+0.008
+P7 top坐标    12 η²=0.6052 组均 0.009 -0.007 -0.029 0.028  ρ(zipf)=+0.696 ρ(字节长)=-0.001
+P7 top-k 留出曲线[raw]（机会 0.25）：k=1:0.772 k=2:0.764 k=4:0.759 k=8:0.739 k=16:0.726 k=32:0.730 k=64:0.768 k=128:0.855 k=256:0.913 k=512:0.946 k=2560:0.959
+P7 top-k 留出曲线[resid]（机会 0.25）：k=1:0.328 k=2:0.295 k=4:0.361 k=8:0.394 k=16:0.444 k=32:0.469 k=64:0.523 k=128:0.486 k=256:0.444 k=512:0.428 k=2560:0.365
+P7 频率分层零假设 max η² 上界 = 0.6053 ⇒ 超阈坐标 4 个（对照 raw 445）
+P7 主干重叠（残差坐标）COLOR∩FRUIT top-32 = 4（期望 0.40，超几何 p=0.000566）=> SEPARATE_COORDINATES
+P7 k=32 留出 raw 0.730 / 去频率 0.469 => FAIL
+P8 FRUIT n=50  偏ρ(cos,logprob|zipf)=+0.3618 p=0.0150  原始ρ=+0.3264  ρ(logprob,zipf)=+0.5540  单token n=17 ρ=+0.4590 => PASS
+P8 COLOR n=52  偏ρ(cos,logprob|zipf)=+0.0395 p=0.8000  原始ρ=+0.0455  ρ(logprob,zipf)=+0.1613  单token n=12 ρ=-0.0683 => FAIL
+------------------------------------------------------------------------------
+P1 {'verdict': 'NO_BYTE_COLLAPSE'}
+P2 {'verdict': 'PEAK_AT_MID_FREQUENCY'}
+P3 {'verdict_gap': 'PASS', 'verdict_afc': 'PASS', 'verdict_share': 'SEMANTIC_RESIDUAL'}
+P4 {'verdict': 'PENDING_power', 'verdict_L': 'NO_LIGHTNESS_LINK'}
+P5 {'verdict': 'NOT_BYTE_COMPOSED'}
+P6 {'verdict': 'ORTHOGRAPHIC_CONTRIBUTES'}
+P7 {'verdict': 'FAIL'}
+P8 {}
+耗时 24.7 s
+RESULT D:\AI2050\Ai2050-OpenOne\results\2026-11-01\090603_pat_q8a.json

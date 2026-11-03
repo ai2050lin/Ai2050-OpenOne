@@ -1,0 +1,259 @@
+{
+ "schema": "result.v1",
+ "name": "pat_q8b",
+ "provenance": {
+  "git_sha": "d7fb89bad3deebc2c776d66cfc5d8638ee55e412",
+  "git_dirty": true,
+  "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 20261101,
+  "tool": "tools/pat_q8b.py",
+  "created_at": "2026-11-01T09:51:02"
+ },
+ "payload": {
+  "config": {
+   "model": "D:/develop/model/Qwen/Qwen3-4B",
+   "smoke": true,
+   "seed": 20261101,
+   "folds": 2,
+   "n_perm": 5,
+   "n_pool": 3000,
+   "n_char": 1500,
+   "n_word": 1500,
+   "n_latin": 4909,
+   "n_byte": 1724,
+   "tied": true,
+   "d": 2560,
+   "mu_norm": 0.3124662935733795
+  },
+  "null": {
+   "r2_mean": -1.6246725639581954,
+   "r2_p95": -1.5684957853008168
+  },
+  "B1": {
+   "r2": 0.8846536772766039,
+   "r2_quad": 0.8891280378193536,
+   "r2_bin": 0.8759177849930235,
+   "delta_bin_minus_lin": -0.008735892283580404,
+   "delta_ci": [
+    -0.014216721519327439,
+    -0.003097518207255544
+   ],
+   "slope_median": 0.6799423331356552,
+   "verdict": "LINEAR_LOG_SCALAR",
+   "r2_freq_axis": -0.7067008326472526,
+   "freq_vs_zipf_gap": 1.5913545099238564,
+   "r2_gain_vs_null": 2.5093262412347994
+  },
+  "B2": {
+   "coords": [
+    {
+     "k": 1,
+     "r2": 0.22049945163069062
+    },
+    {
+     "k": 2,
+     "r2": 0.2572856302948192
+    },
+    {
+     "k": 4,
+     "r2": 0.37980390550313325
+    },
+    {
+     "k": 8,
+     "r2": 0.46762222723706703
+    },
+    {
+     "k": 16,
+     "r2": 0.5330231745137203
+    },
+    {
+     "k": 32,
+     "r2": 0.6018325542885334
+    },
+    {
+     "k": 64,
+     "r2": 0.627404224381999
+    },
+    {
+     "k": 128,
+     "r2": 0.6635387420682184
+    },
+    {
+     "k": 256,
+     "r2": 0.6653378377563592
+    },
+    {
+     "k": 512,
+     "r2": 0.650419334872304
+    },
+    {
+     "k": 1024,
+     "r2": 0.36897150333184703
+    }
+   ],
+   "k_star": 128,
+   "r2_max": 0.6653378377563592,
+   "pls": [
+    {
+     "k": 1,
+     "r2": 0.5041052677262443
+    },
+    {
+     "k": 2,
+     "r2": 0.6075322509299474
+    },
+    {
+     "k": 4,
+     "r2": 0.6272176654924899
+    },
+    {
+     "k": 8,
+     "r2": 0.6205078173927572
+    },
+    {
+     "k": 16,
+     "r2": 0.6164746177090463
+    },
+    {
+     "k": 32,
+     "r2": 0.6129840588445907
+    }
+   ],
+   "pls_k_star": 2,
+   "pls_r2_max": 0.6272176654924899,
+   "density": "LOW_DIM_DENSE",
+   "verdict_coord": "DISTRIBUTED",
+   "verdict": "AMBIGUOUS_DIM"
+  },
+  "B3": {
+   "rho_log_norm_zipf": 0.03426584959857171,
+   "cos_freq_norm": -0.38315194133080455,
+   "r2_full": 0.4017414039459185,
+   "r2_after_removing_norm": 0.5281761913364238,
+   "ratio": 1.314716845584394,
+   "verdict": "FREQ_INDEPENDENT_OF_NORM"
+  },
+  "single_coord": {
+   "coord": 27,
+   "pearson": -0.5282566408983658,
+   "spearman": -0.5497094817349386
+  },
+  "B5": {
+   "delta_1zipf": 1.4707129579479943,
+   "slope": 0.6799423331356552,
+   "curve": [
+    {
+     "dose": 0.25,
+     "n": 146,
+     "median": 0.0,
+     "frac_pos": 0.4657534246575342,
+     "frac_near_1": 0.5616438356164384
+    },
+    {
+     "dose": 0.5,
+     "n": 144,
+     "median": 0.0,
+     "frac_pos": 0.4930555555555556,
+     "frac_near_1": 0.5555555555555556
+    },
+    {
+     "dose": 1.0,
+     "n": 130,
+     "median": 0.009999999999999898,
+     "frac_pos": 0.5076923076923077,
+     "frac_near_1": 0.23846153846153847
+    },
+    {
+     "dose": 2.0,
+     "n": 75,
+     "median": 0.0,
+     "frac_pos": 0.30666666666666664,
+     "frac_near_1": 0.09333333333333334
+    }
+   ],
+   "monotone": false,
+   "verdict": "KNOB_NOT_LOCAL",
+   "note": "E1 静态预检，非干预；只说明方向是否接在邻域结构上"
+  },
+  "B6": {
+   "COLOR": {
+    "n": 52,
+    "within_before": 0.19882184267044067,
+    "within_after": 0.1988588201940102,
+    "retain": 1.0001859832052296,
+    "null_mean": 0.004140732391496305,
+    "null_p95": 0.005145961796899204,
+    "z_vs_null": 262.5888363932028,
+    "verdict": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   },
+   "FRUIT": {
+    "n": 50,
+    "within_before": 0.09747223556041718,
+    "within_after": 0.09746041720955383,
+    "retain": 0.9998787516178798,
+    "null_mean": 0.004362162012513197,
+    "null_p95": 0.00584885752049506,
+    "z_vs_null": 84.71375646447632,
+    "verdict": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   }
+  },
+  "B7": {
+   "CHAR_vs_WORD": {
+    "auc": 0.2789711111111111,
+    "auc_direction_free": 0.7210288888888889,
+    "ci": [
+     0.2641941066970024,
+     0.2994334389890458
+    ],
+    "higher_group": "WORD",
+    "n_a": 1500,
+    "n_b": 1500
+   },
+   "CHAR_vs_BYTE": {
+    "auc": 0.43346,
+    "auc_direction_free": 0.56654,
+    "ci": [
+     0.4110983541860303,
+     0.4723350932007977
+    ],
+    "higher_group": "BYTE",
+    "n_a": 1500,
+    "n_b": 300
+   },
+   "WORD_vs_BYTE": {
+    "auc": 0.6640888888888888,
+    "auc_direction_free": 0.6640888888888888,
+    "ci": [
+     0.6257042388203437,
+     0.7024570365532165
+    ],
+    "higher_group": "WORD",
+    "n_a": 1500,
+    "n_b": 300
+   },
+   "verdict": "TYPE_PARTLY_FREQUENCY"
+  },
+  "LATIN": {
+   "n": 4909,
+   "r2_lin": 0.54663197601415,
+   "r2_bin": 0.5698594944591111,
+   "delta": 0.02322751844496107,
+   "verdict": "WEAKLY_NONLINEAR",
+   "same_shape_as_cjk": false
+  },
+  "verdicts": {
+   "B1": "LINEAR_LOG_SCALAR",
+   "B2": "AMBIGUOUS_DIM",
+   "B3": "FREQ_INDEPENDENT_OF_NORM",
+   "B5": "KNOB_NOT_LOCAL",
+   "B6": {
+    "COLOR": "SEMANTICS_ORTHOGONAL_TO_FREQ",
+    "FRUIT": "SEMANTICS_ORTHOGONAL_TO_FREQ"
+   },
+   "B7": "TYPE_PARTLY_FREQUENCY"
+  },
+  "runtime_s": 78.6
+ },
+ "sha8": "9d2ebc59"
+}

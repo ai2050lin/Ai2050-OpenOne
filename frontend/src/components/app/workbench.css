@@ -20,9 +20,22 @@
 .wb-subnav button { border: 1px solid transparent; background: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12.5px; color: var(--fw-text-2); white-space: nowrap; }
 .wb-subnav button:hover { background: var(--fw-bg-panel); }
 .wb-subnav button.on { border-color: #9ec5f4; background: #eaf2fb; color: #184f95; font-weight: 600; }
-.wb-main { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 24px; }
+.wb-main { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 64px; }
 .wb-main > .fw-view { position: static; display: grid; }
 .wb-local { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- 全局上下文条：数据集 + 模型。所有一级界面共用一条，状态进地址栏（ds / mdl） ---- */
+/* 维度条不是导航：它给的是「这次分析在什么条件下做」，所以放在子导航之下、内容之上 */
+.wb-gctx { display: flex; align-items: center; gap: 14px; padding: 6px 16px; background: #f7fafd; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; overflow-x: auto; min-height: 36px; box-sizing: border-box; }
+.wb-gctx-hd { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--fw-text-3); white-space: nowrap; }
+.wb-gctx-f { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.wb-gctx-f > span { font-size: 11.5px; color: var(--fw-text-3); }
+.wb-gctx-f select { font: inherit; font-size: 12.5px; border: 1px solid var(--fw-border-strong); border-radius: 6px; padding: 3px 6px; background: #fff; color: var(--fw-text); max-width: 210px; }
+.wb-gctx-f select:hover { border-color: #9ec5f4; }
+.wb-gctx-f option:disabled { color: #94a3b8; }
+.wb-gctx-st { font-size: 12px; color: var(--fw-text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wb-gctx-scope { margin-left: auto; font-size: 11px; color: var(--fw-text-3); white-space: nowrap; }
+@media (max-width: 900px) { .wb-gctx-scope { display: none; } }
 
 /* ---- 「?」页面说明按钮与弹窗 ---- */
 .wb-subnav .wb-help-btn { margin-left: auto; width: 22px; height: 22px; padding: 0; border: 1px solid var(--fw-border); border-radius: 50%; color: var(--fw-text-3); font-size: 12.5px; line-height: 1; display: grid; place-items: center; flex-shrink: 0; }

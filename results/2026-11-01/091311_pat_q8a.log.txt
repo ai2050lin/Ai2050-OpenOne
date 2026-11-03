@@ -1,0 +1,86 @@
+==============================================================================
+Q8-A 静态嵌入解剖  model=D:/develop/model/ZhipuAI/glm-4-9b-chat-hf  SMOKE=False  seed=20261101
+==============================================================================
+E (151552, 4096) tied False dtype torch.bfloat16
+μ‖=0.0070  平均范数 0.0993
+set COLOR   n=52  单 token=14
+set FRUIT   n=50  单 token=21
+set RARE    n=74  单 token= 1
+set COMMON  n=65  单 token=65
+P0 「红」(1 token) 近邻: 红的 0.397 (zipf 4.0) | 的红 0.348 (zipf 4.0) |  红 0.327 (zipf 0.0) | 红了 0.200 (zipf 4.0) | 红色 0.199 (zipf 4.8) | 红色的 0.196 (zipf 3.8) | 白 0.171 (zipf 4.9) | 大红 0.166 (zipf 3.3)
+P0 「苹果」(1 token) 近邻:  apple 0.180 (zipf 0.0) |  Apple 0.169 (zipf 0.0) |  � 0.167 (zipf 0.0) | Apple 0.149 (zipf 3.9) | 小米 0.145 (zipf 4.2) |  apples 0.141 (zipf 0.0) |  яблок 0.124 (zipf 0.0) | 苹 0.124 (zipf 3.0)
+P0 「江」(1 token) 近邻:  江 0.349 (zipf 0.0) | 江县 0.314 (zipf 3.4) | 江区 0.256 (zipf 3.4) | 江市 0.235 (zipf 3.4) | 江河 0.169 (zipf 3.5) | 江北 0.158 (zipf 3.4) | 河 0.148 (zipf 4.7) | 长江 0.142 (zipf 4.4)
+P0 「破」(1 token) 近邻: 破了 0.394 (zipf 3.8) | 打破 0.150 (zipf 4.7) | 突破 0.148 (zipf 4.8) | 跌破 0.141 (zipf 3.3) | 打破了 0.126 (zipf 3.6) | 破碎 0.125 (zipf 3.9) | 碎 0.123 (zipf 4.0) | 破裂 0.117 (zipf 4.0)
+P0 「龘」(2 token) 近邻: � 0.717 (zipf 0.0) | � 0.701 (zipf 0.0) | � 0.136 (zipf 0.0) | unehmen 0.117 (zipf 0.8) | � 0.117 (zipf 0.0) | 	RTLU 0.116 (zipf 0.0) | 上帝亿次 0.115 (zipf 2.0) | ewnętrz 0.115 (zipf 0.0)
+P0 「的」(1 token) 近邻:  的 0.364 (zipf 0.0) | 的的 0.234 (zipf 6.5) | 了 0.224 (zipf 7.1) | の 0.172 (zipf 4.4) | 之 0.169 (zipf 6.1) | 的一 0.161 (zipf 5.3) | 和 0.152 (zipf 6.9) | 地 0.149 (zipf 6.1)
+P0 「爱」(1 token) 近邻: 愛 0.443 (zipf 5.9) | 爱的 0.342 (zipf 4.8) |  爱 0.335 (zipf 0.0) | 的爱 0.331 (zipf 4.8) | 爱和 0.233 (zipf 4.8) | 不爱 0.221 (zipf 4.8) | 爱与 0.217 (zipf 4.8) | 我爱 0.208 (zipf 4.8)
+P0 「三」(1 token) 近邻:  三 0.460 (zipf 0.0) | 四 0.351 (zipf 5.2) | 二 0.333 (zipf 5.4) | 的三 0.329 (zipf 5.0) | 五 0.290 (zipf 5.1) | 在三 0.275 (zipf 5.0) | 六 0.255 (zipf 5.0) | 一 0.246 (zipf 6.3)
+P9 中英对译秩 n=40：中位名次 11.5（随机英文词基线 64128）；top1 0.00 / top5 0.17 / top10 0.45 / top100 0.93
+P9 最好 8 个: 树→tree #2 | 猫→cat #3 | 鸟→bird #3 | 冷→cold #3 | 鱼→fish #4 | 血→blood #4 | 雪→snow #5 | 蓝→Blue #6
+P9 名次 >1000 的 0 个: 
+P10 简繁对 n=29：cos 中位 0.4404 [0.261, 0.575]；繁体形式排第 1 的比例 0.34
+P10 最不像的 5 对: 电/電 0.261 #3 | 买/買 0.322 #3 | 后/後 0.324 #3 | 过/過 0.337 #2 | 开/開 0.364 #3
+P1 word     n= 23017  med‖e‖=0.1031  within_cos(centered)=0.0085  (raw 0.0170)
+P1 char     n=  4216  med‖e‖=0.1079  within_cos(centered)=0.0156  (raw 0.0165)
+P1 fragment n=  1086  med‖e‖=0.1016  within_cos(centered)=0.0186  (raw 0.0184)
+P1 other    n=123233  med‖e‖=0.1009  within_cos(centered)=0.0004  (raw 0.0044)
+P1 残片−整词 = +0.0100  (word 子集零分布 200 次：均 0.0085, p95 0.0088)  => NO_BYTE_COLLAPSE
+P2 n=4213  ρ_s(log‖e‖,zipf)=+0.2440 (perm p=0, MDE 0.041)  留出 ρ=+0.2433  8 段 ρ=+0.3333  => PEAK_AT_MID_FREQUENCY
+P2 八段 (zipf_lo, lognorm_med, n): (1.01,-2.286,529) (2.71,-2.249,542) (3.16,-2.222,542) (3.49,-2.211,539) (3.78,-2.205,549) (4.10,-2.210,545) (4.45,-2.221,538) (4.93,-2.253,532)
+频率匹配池 n=15431（双字纯汉字 token）
+P3d 频率匹配 2AFC（zipf∈[1.86,5.00]，每折 45 vs 45，200 次）：0.988 [0.955, 1.000] => PASS_FREQ_MATCHED
+P3 within(FRUIT)=0.0772 within(COLOR)=0.1436 between=0.0560  ctrl=0.0169(±)  Δ=+0.0603 p=0.0000 => PASS
+P3 2AFC FRUIT_vs_COLOR             n=50 acc=0.9600 CI[0.865,0.989] MDEρ=0.37
+P3 2AFC COLOR_vs_FRUIT             n=52 acc=0.9808 CI[0.899,0.997] MDEρ=0.36
+P3 2AFC FRUIT_vs_COLOR_singletoken n=21 acc=1.0000 CI[0.845,1.000] MDEρ=0.55
+P3 2AFC COLOR_vs_FRUIT_singletoken n=14 acc=0.9286 CI[0.685,0.987] MDEρ=0.66
+P3 共享字 词对 84/1225 (7%)  去共享字后 within=0.0614  下降 20.5% => SEMANTIC_RESIDUAL
+P4 色相 n=45  Mantel ρ=+0.1574 p=0.005499 (MDEρ=0.386) => PENDING_power
+P4 明度 ρ(L*,‖e‖)=+0.1078 p=0.4765 => NO_LIGHTNESS_LINK
+P4 单 token 稳健 n=11 ρ=+0.0065  上下文 L20 ρ=+0.0453
+P5 覆盖：73/74 字节回退 (98.6%)；全 CJK 普查 0x4E00–0x9FA5 中 16686 字不在词表
+P5 码位 n=400 对 79800  ρ_s(码位距离, cos)=-0.1016 p=0 (MDE 0.009)
+P5 码位八段 cos: 0.097 0.080 0.074 0.073 0.072 0.070 0.072 0.072
+P5 子群 within：字节回退(n=73) 0.0878  vs  在表单字(n=1) nan
+P5 塌缩 within(RARE)=0.0856 within(COMMON)=0.0680 Δ=+0.0176 (随机 0.0000) => FAIL
+P5 邻居构成：生僻字 10 近邻中生僻字占 1.00（池基线 0.33，富集 2.99×）
+P5 判决 => NOT_BYTE_COMPOSED  ({'cov': True, 'codepoint': False, 'collapse': False, 'nn': True})
+形旁零分布池 n=4102（在表单字，剔除 8 组本身）
+P6 氵  n=16 within=0.0548 Δ=0.0352 (null 0.0156±) z=+17.9 p=0.0000 同质
+P6 木  n=17 within=0.0614 Δ=0.0418 (null 0.0156±) z=+21.3 p=0.0000 同质
+P6 火  n=14 within=0.0558 Δ=0.0361 (null 0.0156±) z=+16.4 p=0.0000 同质
+P6 讠  n=18 within=0.0622 Δ=0.0426 (null 0.0155±) z=+23.4 p=0.0000 异质
+P6 忄  n=16 within=0.0471 Δ=0.0275 (null 0.0157±) z=+14.2 p=0.0000 异质
+P6 石  n=10 within=0.0379 Δ=0.0183 (null 0.0155±) z=+6.5 p=0.0000 异质
+P6 虫  n=13 within=0.0589 Δ=0.0393 (null 0.0155±) z=+16.3 p=0.0000 同质
+P6 鸟  n=10 within=0.0732 Δ=0.0536 (null 0.0156±) z=+16.6 p=0.0000 同质
+P6 同质组 Δ 均 +0.0412  异质组 Δ 均 +0.0295  比值 0.72 => ORTHOGRAPHIC_CONTRIBUTES
+P7 频率轴：单坐标 |ρ(坐标, zipf)| 最大 = 0.774（坐标 411）；前五 [0.774 0.652 0.643 0.599 0.596]
+P7 坐标普查 d=4096  raw max η²=0.6900（perm-max 0.1395, 均值 0.0813）⇒ 超阈 236 个
+P7 残差坐标 max η²=0.1997（perm-max 0.1202, 均值 0.0814）⇒ 超阈 36 个
+P7 top坐标  1380 η²=0.6900 组均 -0.002 -0.002 -0.001 0.002  ρ(zipf)=+0.493 ρ(字节长)=-0.399
+P7 top坐标  1941 η²=0.6640 组均 0.001 0.002 0.000 -0.002  ρ(zipf)=-0.413 ρ(字节长)=+0.588
+P7 top坐标   328 η²=0.6577 组均 0.001 0.001 0.002 0.004  ρ(zipf)=+0.266 ρ(字节长)=-0.644
+P7 top坐标  3046 η²=0.6412 组均 -0.002 -0.001 0.000 0.002  ρ(zipf)=+0.224 ρ(字节长)=-0.618
+P7 top坐标   411 η²=0.6207 组均 0.001 0.001 -0.000 0.004  ρ(zipf)=+0.726 ρ(字节长)=-0.033
+P7 top-k 留出曲线[raw]（机会 0.25）：k=1:0.651 k=2:0.755 k=4:0.813 k=8:0.830 k=16:0.876 k=32:0.896 k=64:0.892 k=128:0.909 k=256:0.925 k=512:0.929 k=4096:0.946
+P7 top-k 留出曲线[resid]（机会 0.25）：k=1:0.349 k=2:0.415 k=4:0.394 k=8:0.453 k=16:0.515 k=32:0.531 k=64:0.498 k=128:0.469 k=256:0.399 k=512:0.386 k=4096:0.311
+P7 频率分层零假设 max η² 上界 = 0.6483 ⇒ 超阈坐标 3 个（对照 raw 236）
+P7 主干重叠（残差坐标）COLOR∩FRUIT top-32 = 9（期望 0.25，超几何 p=7.9e-13）=> SHARED_BACKBONE
+P7 k=32 留出 raw 0.896 / 去频率 0.531 => CONFOUNDED_BY_FREQUENCY
+P8 FRUIT n=50  偏ρ(cos,logprob|zipf)=+0.3513 p=0.0130  原始ρ=+0.2843  ρ(logprob,zipf)=+0.5623  单token n=21 ρ=+0.3249 => PASS
+P8 COLOR n=52  偏ρ(cos,logprob|zipf)=+0.1502 p=0.3050  原始ρ=+0.0870  ρ(logprob,zipf)=+0.4177  单token n=14 ρ=-0.1901 => FAIL
+------------------------------------------------------------------------------
+P0 {}
+P1 {'verdict': 'NO_BYTE_COLLAPSE'}
+P2 {'verdict': 'PEAK_AT_MID_FREQUENCY'}
+P3 {'verdict_gap': 'PASS', 'verdict_afc': 'PASS', 'verdict_share': 'SEMANTIC_RESIDUAL'}
+P4 {'verdict': 'PENDING_power', 'verdict_L': 'NO_LIGHTNESS_LINK'}
+P5 {'verdict': 'NOT_BYTE_COMPOSED'}
+P6 {'verdict': 'ORTHOGRAPHIC_CONTRIBUTES'}
+P7 {'verdict': 'CONFOUNDED_BY_FREQUENCY'}
+P8 {}
+P9 {}
+P10 {}
+耗时 106.4 s
+RESULT D:\AI2050\Ai2050-OpenOne\results\2026-11-01\091311_pat_q8a.json

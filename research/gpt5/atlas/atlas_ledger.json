@@ -536,6 +536,25 @@
    "corrects": "M2906_amplitude_law_neuron_attribution",
    "note": "the 2906 prereg TEXT froze sigma_hat_c = sqrt(tr(Sigma_c)/d) (RMS) but the implementation used B[m].std(0).mean() (mean-std, a downward-biased proxy; ratio rms/mean-std measured 1.06-1.34 across groups, Jensen inequality). The 2906 coverage audit used the same mean-std estimator, so the drift was self-consistent and passed. Recomputing M1 intervals under the preregistered RMS definition (diag_2907b 2x2x2 grid; both recheck anchors reproduce registered intervals to 9e-7): glm4 attn flips to INSIDE in 4/4 combos; qwen attn is borderline (inside 2/4, MC-noise level). The 2906 frozen verdict amplitude_law_not_established remains on record per discipline, but its attn-below-M1 reading is not robust to the sigma definition; M2907 implements the preregistered definition and finds both attn groups at level M1. Lesson: prereg text-vs-implementation drift must be caught by an independent audit read of the implementation itself, not by an audit whose estimator shares the drifted definition.",
    "phase": 2907
+  },
+  {
+   "corrects": "Q8-A",
+   "phase": "Q8-A",
+   "note": "Write gates as \"N x the null p95\" or as an MDE-relative quantity, never as a bare cosine gap."
+  },
+  {
+   "corrects": "Q8-A",
+   "phase": "Q8-B",
+   "date": "2026-11-01",
+   "note": "Q8-A P7 reported |rho(single coordinate, zipf)| = 0.802 (GLM 0.774) and concluded \"frequency is one explicit knob\" and \"the category backbone is mostly frequency\". Q8-B shows both numbers are materials artefacts: on the full pool of frequency-bearing tokens the single-coordinate correlation is 0.520-0.590 (R^2 0.195) and the full-space direction gives 0.826/0.721; the type-separability AUC is 0.748 in Qwen but 0.578 in GLM. Q8-A wording is narrowed to: frequency is a 4-16 dimensional dense subspace with a logarithmic scale; \"mostly frequency\" holds to about 3/4 and only in Qwen."
+  },
+  {
+   "date": "2026-11-02",
+   "kind": "erratum",
+   "phase": "Q9-A",
+   "name": "pat_q9a_v1_glm_relabel",
+   "line": "G",
+   "note": "Disk verify (tests/gpt5_temp/q9a_disk_verify.py, 109 checks) relabels GLM v1 to AMBIGUOUS: max_increment 0.33333 < 3*null_sd 0.33545 (margin 0.0021, frozen V1 gate); qwen v1 STYLE_HAS_COMPUTED_INCREMENT stands (3*null_sd 0.30416). Transfer-curve precision: glm l8 0.983/0.983, first double-1.000 at l20; qwen l8 1.000/1.000. Frozen artifacts unchanged; prose-only overclaim corrected in MEMO erratum."
   }
  ],
  "format": "tma-atlas-ledger",
@@ -824,7 +843,7 @@
    }
   }
  ],
- "ledger_sha256_8": "d65a3b90",
+ "ledger_sha256_8": "38b4bd0b",
  "linkage": [
   {
    "evidence": "G_mlp/G_attn=4.7 per word; e_ff=-0.23 (~30x OV static 0.0075); rotation layer word-specific",
@@ -10161,6 +10180,71 @@
    "res_sha8": "378498be",
    "note": "Is the relation between two clauses (sequence / contrast / cause) represented as a rule that can be PREDICTED from the residual stream independently of what the clauses are about? This is the first phase in the project that abandons the location question entirely: twelve earlier rounds all asked \"where is X stored\" and all returned NULL, so Q7-A asks \"what rule is executed\" with a predictive criterion whose error cannot be rescued by slicing (D24). DESIGN (frozen, PAT_Q7A_PREREG_v1.md): 3 relations x 18 contents x 3 surface forms = 162 sentences. Each content has two topic words that appear in clause A and in ALL THREE clause-B variants, so the topic is matched and only the predicate stance varies; the 18 topic pairs are pairwise disjoint, machine-asserted (0 conflicts). Surface S1 = explicit connective + comma, S2 = connective + period, S3 = implicit, NO connective at all. Connectives rotate by content index so train and test folds never share a connective for the same relation. MEASURED at 3 positions x 37 layers: P_END (sequence final token, primary), P_CONN (connective first token, explicit only), P_AE (end of clause A). PROTOCOL: linear ridge on standardised hidden states, 6 folds by content (135 train / 27 test), alpha frozen from an inner 5-fold on layer 17, l* selected by inner 5-fold INSIDE each outer training set, cluster bootstrap over content (18 units). ALIGNMENT GATE J0 PASSES EXACTLY: at P_AE the three relation variants of a (content, surface) cell have a byte-identical prefix, so accuracy must be exactly 1/3 - measured 0.333333 on all three surfaces, deviation 0.00e+00. RESULT J1: held-out-content 3-class accuracy 0.9136, cluster CI [0.8272, 0.9815], +0.5802 above the three-way floor 0.3333. Per relation: sequence 0.9815, contrast 0.8889, cause 0.8704. Per surface: S1 0.9074, S2 0.9444, S3 0.8889. Selected layers per fold: 15/13/16/17/20/14. RESULT J2 (surface decoupling): train on S1+S2 (with connectives), test on S3 (connectives removed), same content folds -> 0.8889, CI [0.7778, 0.9815]. Reverse 0.9167. Punctuation minimal pair S1->S2 = 0.9444. So the code is NOT the connective token: removing every connective costs 2.5 points, while changing only a comma to a period costs nothing. P_CONN itself is 1.0000, as it must be (the token IS the marker), which is exactly why P_CONN cannot be the evidence. RESULT J3 (reuse structure): truncating the fitted probe W (d x 3) to rank 1 gives 0.6111, rank 2 gives 0.9136 = full rank 3. One axis carries 61% of the 91%, a SECOND dimension is required for the rest. Verdict PARTIAL_SHARING. NULL: 10 permutations that re-assign labels independently per content (so no consistent relabeling exists) give mean 0.3265, p95 0.4318 - the pipeline collapses to the floor as it should. SURFACE BASELINES, added after the fact and reported in full: character bag over the whole sentence reaches 0.8025 with the same folds; a two-number length baseline reaches 0.3704 (so length is not the cue); a SINGLE binary \"clause B contains a negation character\" reaches 0.6481. PAIRED TEST: hidden state 148 correct vs char bag 130 correct, discordant 28 vs 10, McNemar exact p = 0.0051. The residual stream carries real information beyond surface lexicon, but only 11 points of it. LAYER PROFILE (all 37 values recorded, D25): layer 0 = 0.3333, layer 1 already 0.7840, peak 0.9506 at layers 16 and 22, still 0.8951 at layer 35. The relation is largely available from layer 1, which is consistent with the char-bag baseline; the compositional gain over the raw bag is concentrated in layers 2-16 (+0.17). GEOMETRY (descriptive, full-fit, layer 16): the three class centroids sit at the vertices of an EQUILATERAL triangle - pairwise cosines relative to the centroid -0.501/-0.499/-0.500, first-axis variance share 0.501. The three relations are symmetric and equidistant; none sits \"between\" the others, and there is no ordering axis. This is the geometric counterpart of J3 rank-2. NOTE: this -0.5 is the signature of a centred equilateral triple and must NOT be conflated with Q6-B2's -0.5 isotropic baseline for difference vectors; same number, unrelated quantity. VERDICT: DECODABLE_NOT_SHARED. A content-invariant, surface-invariant, predictive linear readout of discourse relation exists; it is NOT a single shared direction (one axis stops at 0.61) but a two-dimensional, three-pole arrangement.",
    "prev_post": "4d3ea0ba"
+  },
+  {
+   "phase": "Q8-A",
+   "name": "pat_q8a",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "vocab_is_not_one_table_and_category_backbone_is_mostly_one_frequency_scalar",
+   "res_sha8": "1b9ec38c",
+   "note": "First direct measurement of the embedding table itself (Q1-Q7 all measured the residual stream after context; hs[0] had only ever served as a free baseline). Ten pre-registered criteria (PAT_Q8A_PREREG_v1.md), 48 s on Qwen3-4B (d=2560, tied), 106 s on GLM-4-9B (d=4096, untied), independent verify 15/15 on both. STRUCTURE: the table is not homogeneous - 151936 rows = 16374 whole words / 8806 single chars / 1457 BYTE FRAGMENTS / 125299 other. 12404 of the 20902 CJK basic-block characters (59.3%) have NO embedding row at all (GLM 79.8%); 26/74 hand-picked rare characters in Qwen and 73/74 in GLM are split into 2-3 byte fragments, so \"the embedding of a rare character\" mostly does not exist. The one rare character that does (龘) has its own two byte fragments as nearest neighbours (0.717 / 0.699), third neighbour 龟 at 0.369. P1 fragment-vs-word within-cosine 0.0298 vs 0.0062 = 4.8x the matched-resample p95 (0.0064), p<0.005, but the absolute gap +0.0237 misses the pre-registered 0.15 gate => NO_BYTE_COLLAPSE (direction right, threshold mis-calibrated; see the threshold lesson). Anisotropy is nearly zero in this model (raw mean pairwise cos 0.0916, centred 0.0005, ||mu||=0.31 vs mean norm 1.10), unlike GPT-2-class models. P2 norm-vs-frequency is an INVERTED U, not monotone: rho(log||e||,zipf)=+0.272 (n=8049), held-out +0.264, but the 8 frequency bands are 0.091 0.162 0.197 0.211 0.222 0.220 0.216 0.176 - mid-frequency content words are largest, both tails smaller. Same shape in GLM. P3 colour vs fruit PASSES with three separate controls: within(COLOR)=0.1988, within(FRUIT)=0.0975, between 0.0668, frequency-matched random two-character words 0.0153 => +0.0822 (p=0); leave-one-out 2AFC 0.96 / 1.00; shared-character decomposition (added after the run, the pre-registration only did it for FRUIT) drops colour to 0.1504 (-24.4%) and fruit to 0.0738 (-24.3%), so colour stays 2.0x fruit; frequency-matched 2AFC 0.992 [0.955,1.000]. Colour is a STAR: same-modifier families have within-family cos 0.558 (red) / 0.585 (green) / 0.553 (yellow) / 0.536 (blue). P4 hue is weak-but-real and vanishes in context: Mantel rho=+0.169 p=0.0046 (GLM +0.157), but MDE at n=45 is 0.386 > the 0.30 gate, so D23 forces PENDING_power, NOT refuted; contextual readout (colour template, L20 last token) rho=0.030. Lightness-vs-norm rho=-0.037 => NO_LIGHTNESS_LINK. P5 byte composition refuted on both counts: codepoint distance vs cosine rho=-0.091 over 79800 pairs (mean pooling destroys the byte ORDER, which is where UTF-8 information lives), and the collapse prediction has the WRONG SIGN - within(byte-fallback 26)=0.109, within(in-vocab rare 48)=0.028, within(high-frequency single chars 65)=0.143, i.e. the function words are the tightest cluster, not the rare characters. Only neighbour enrichment holds (0.99 vs pool base 0.33). P6 radicals are in the embedding and HALF OF IT IS NOT SEMANTIC: all 8 groups z=5.0-15.2, and the semantically incoherent 石 group (硬碰碗破碎砖砂码磁) still sits at +0.0251 (z=5.0); heterogeneous/homogeneous ratio 0.55 in Qwen, 0.72 in GLM. This is the only positive reuse result of the round. P7 SINGLE COORDINATE IS FREQUENCY: raw top-k held-out 4-way accuracy k=1 already 0.780 (chance 0.25) and k=32 0.751, which looks like a one-parameter backbone, but the top coordinate correlates with zipf at |rho|=0.802 (GLM 0.774) and the four groups span four orders of magnitude of frequency. After per-coordinate residualisation on [1, zipf, byte-length, log-norm] the same curve gives k=32 0.411 (GLM 0.531) and it DEGRADES with more coordinates (full 0.357) => category information survives frequency removal by about +0.16 but is diffuse, not concentrated. Frequency-stratified null (shuffle labels inside zipf deciles) drops the count of significant coordinates from 364 to 3 (GLM 236 to 3). Main verdict (absolute level) CONFOUNDED_BY_FREQUENCY; attribution (relative gap) +0.16 diffuse. Colour/fruit top-32 coordinate overlap is 4 in Qwen (hypergeometric p=5.7e-4, below the 8 threshold) and 9 in GLM (p=7.9e-13) => inconsistent, no claim. P8 embedding-versus-output (readout only, tied embedding means the same-table effect cannot be excluded): partial rho(cos, logprob | zipf) for fruit +0.362 p=0.013 (GLM +0.351), for colour +0.040 (GLM +0.150 n.s.). EXPLORATORY (post-hoc, E0 candidates, not part of the verdict): P9 - for 40 Chinese/English pairs the translation token ranks median 1 of 151936 (top-5 40/40) against a random-English baseline of 67472, i.e. Qwen static embeddings are cross-lingually folded (红-> red 0.799, 苹果-> Apple 0.718); GLM is completely different (median rank 11.5, top-5 17%, neighbours are Chinese collocations 红的/的红/红了). P10 - 36 simplified/traditional pairs have median cos 0.797 and in 94% of cases the traditional form is the FIRST neighbour of the simplified one (GLM 0.440 / 34%). These two give the Q6 puzzle a new reading: in Qwen the static layer already folds meaning onto a cross-lingual point, so relational directions can only grow in context. CROSS-MODEL: 8 of 8 pre-registered verdicts coincide between Qwen3-4B and GLM-4-9B, but the two exploratory results do not, so the structure replicates while the organisation strategy is a model fingerprint. All E1: no intervention, nothing here says the model USES these structures.",
+   "prev_post": "d65a3b90"
+  },
+  {
+   "phase": "Q8-B",
+   "name": "pat_q8b",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "frequency_is_a_low_dim_dense_subspace_with_log_scale_and_orthogonal_to_norm_and_semantics",
+   "res_sha8": "318259ee",
+   "res_sha8_glm": "060de60e",
+   "note": "Dimensionalising the \"frequency knob\" that Q8-A left as a rank correlation. Seven pre-registered criteria (PAT_Q8B_PREREG_v1.md), pure static, no forward pass: Qwen3-4B 63 s (n=24421, d=2560) and GLM-4-9B 84 s (n=27215, d=4096); independent verify 20/20 on both. POOL = 8049 single CJK chars + 16372 whole CJK words that have a wordfreq zipf (1724 byte fragments excluded from every regression because zipf is undefined for them). CORRECTION OF Q8-A (the main product of this round): the single-coordinate |rho|=0.802 was a MATERIALS artefact. It came from merging four hand-picked sets (52 colour + 50 fruit + 74 rare + 52 common, n~228) whose between-set frequencies span four orders of magnitude, so any coordinate that merely separates the groups scores high. On the full pool the best single coordinate is 0.520 (Pearson) / 0.548 (Spearman) in Qwen and 0.590 / 0.598 in GLM, i.e. R^2 0.195 against 0.826 for the full-space direction - a 4.2x gap. \"One knob\" is a group label read as a coordinate. New rule R-MET-34. B1 SCALE: linear fit of zipf on the frequency direction gives held-out R^2 0.8263 (Qwen) / 0.7214 (GLM); the same X and folds fitted on RAW FREQUENCY give 0.0312 / 0.0365, a gap of 0.795 / 0.685. The scale is LOGARITHMIC - the table does not order by probability, it orders by log-probability. Quadratic 0.8268/0.7205 and 12-bin 0.8118/0.6916 both fail to beat linear by the pre-registered 0.02 (delta -0.0144 / -0.0298) => LINEAR_LOG_SCALAR on both models. B2 DIMENSION: two instruments disagree and both are reported. Coordinate-sparse curve needs k=512-1024 coordinates to reach 0.69-0.77 and never saturates; the Krylov subspace (PLS-1 equivalent) saturates at k=4 already (0.805 Qwen / 0.736 GLM) and is flat afterwards (0.827 at k=32). Verdict AMBIGUOUS_DIM with sub-label LOW_DIM_DENSE: the frequency direction is a 4-16 dimensional DENSE subspace - energy concentrated in a few combinations, but no single coordinate carries it. B3 NOT NORM: rho(log||e||, zipf)=+0.011 (GLM +0.315), cos(w_freq,w_norm)=+0.083 (+0.242), and after regressing log||e|| out of X the R^2 KEEPS 1.00 (Qwen 0.8261->0.8268) / 1.03 (GLM 0.7214->0.7416). The \"norm predicts readability\" result of the project concerns the CONTEXTUAL residual stream (Q5-A pos0 register), not the static table: here frequency is a direction, not a magnitude. B6 SEMANTICS IS NOT THE FREQUENCY RESIDUAL: colour within 0.1988->0.1982 and fruit 0.0975->0.0975 after removing the frequency component (retain 100%; random CJK null 0.0040/0.0037); GLM 0.1436->0.1430 and 0.0772->0.0773 (null 0.0156/0.0155). Static embeddings carry a statistical structure and a semantic structure in nearly orthogonal subspaces. B5 TURNING THE KNOB IS A MODEL FINGERPRINT, NOT A UNIVERSAL: pushing a token along w_freq by 0.25/0.5/1/2 zipf units and reading the nearest neighbour (search set = rows that have a defined frequency + fragments) gives a monotone dose-response in Qwen (+0.085/+0.330/+0.670/+1.440, sign-correct 0.53/0.59/0.65/0.72) => SMOOTH_KNOB (one unit of push moves you 0.67 units), but in GLM every dose lands at +3.0~3.3 zipf with sign correctness 0.86-1.00 => KNOB_NOT_LOCAL: GLM frequency direction is DECOUPLED from neighbourhood structure, it points at the high-frequency wall (function-word band) regardless of dose. B7 TYPE IS ONLY PARTLY FREQUENCY, AND ONLY IN QWEN: a single scalar t separates CHAR from WORD with AUC 0.748 in Qwen (=> about 3/4 of the distinction is frequency) but only 0.578 in GLM (=> essentially none of it is). Q8-A said \"the category backbone is mostly frequency\"; that sentence must be narrowed to \"about 3/4, and only in Qwen\". CROSS-MODEL: B1/B2/B3/B6 all isomorph (same verdicts, |dR^2|<0.15) => SHAPE_ISOMORPHIC; B5 and B7 diverge => post-hoc label FUNCTION_MODEL_SPECIFIC. How the table is laid out is shared; whether the knob can be turned is each model own business. LATIN control (n=1500, 80/20 single split): R^2 0.5102 (Qwen) / 0.5347 (GLM), same LINEAR_LOG_SCALAR shape => the log scale is not CJK-specific, but it is 0.6-0.7x weaker. TWO SELF-INFLICTED BUGS FOUND BY THE VERIFIER and both fixed before the numbers above (see errata): (1) B1/Krylov had the train-test mask inverted, so every B1 R^2 was in-sample (0.8650 -> 0.8263 after the fix); (2) the Gram cache key did not include the fold assignment, so the null distribution (which uses a different fold split) poisoned ('f','main',j) and the full-dimensional R^2 read 0.776 instead of 0.826. New rules R-MTH-24 (cache keys must carry the fold fingerprint) and R-MTH-25 (every held-out R^2 needs an independent recomputation through a different code path, and the gap must be reported). All E1.",
+   "prev_post": "af0e1258"
+  },
+  {
+   "phase": "Q8-D",
+   "name": "pat_q8d",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "static_frequency_subspace_is_not_used_by_the_forward_pass_null_bounded_in_both_models",
+   "res_sha8": "ca7fcc07",
+   "res_sha8_glm": "401a884c",
+   "note": "Causal test of the frequency direction that Q8-B found in the static table (held-out R^2 0.826/0.721). Two-phase design: Q8-D wide grid (delta up to +-8 zipf units) exposed the tolerance window (|delta|=8, 24% of median token norm, breaks the model: top-1 agreement 0.055-0.17, entropy +1.96) and exposed the RAND-control flaw; Q8-D2 narrow grid (delta in {-2,-1,-0.5,0,0.5,1,2}) is the registered test (PAT_Q8D2_PREREG_v1.md). Dose calibration measured BEFORE freezing: 1 zipf unit of displacement is 3.0% (Qwen) / 4.9% (GLM) of median token norm. Materials: 36 candidate templates x 50 nouns, template gate (baseline only: p_M>=0.80, H>=1.00, syntax-incomplete prompts ending in a frequency-bearing content word - full syntactic prompts collapse to predicting punctuation, p_M 0.033) keeps 32 (Qwen) / 25 (GLM) templates, first 200 prompts, LAST-position readout, n_forward=141 (Qwen) / 77 (GLM 8-bit). MAIN RESULT C1 NULL_BOUNDED IN BOTH MODELS: deltaE[zipf](+2) = -0.00114 (Qwen, CI [-0.0074,+0.0058], MDE 0.00948, rho_dose=-0.107) and +0.00426 (GLM, CI [-0.0013,+0.0106], MDE 0.00856, rho_dose=+0.25). The exact zero is BOUNDED, not just undetected. The R^2-0.8 static frequency subspace is NOT used by the forward pass to set output frequency. C3 DIRECTION-SPECIFICITY SPLIT BY THE MANIFOLD CONTROL: with isotropic RAND only, FREQ looks special (KL 20x RAND in the wide-grid run); adding the ON-MANIFOLD control EMB (difference of two random real token embeddings) kills it in Qwen (FREQ |dE| 0.00114 is below the RAND p95 0.0038 and the EMB p95 0.0027 => GENERIC_PERTURBATION) but not in GLM (|dE| 0.00426 > RAND med 0.0015, EMB p95 0.0023; KL 0.0297 vs 0.0151/0.0155 => DIRECTION_SPECIFIC). GLM w_freq is a REAL sensitivity direction of the output distribution that does not push frequency. Sensitive is not load-bearing. C4 INPUT_DRIVEN both models (IN/OUT effect ratio 21x Qwen, 1847x GLM): the displacement only propagates from the input embedding, not applied to the pre-head hidden state - consistent with Q2-C1 (ablation measures capacity, patch measures readout). C6 GLOBAL_OFFSET both models (ALLPOS/LAST effect ratio 6.2x / 3.4x, dE still zero). C8 semantic probe (40 knowledge questions, forced choice): Qwen SEMANTICS_INTACT (0.600 -> worst 0.525 at delta=8), GLM SEMANTICS_HURT (0.575 -> 0.45 at delta=8; delta=8 is a breaking dose; 8-bit background may amplify). C5 gate 7/7 both models. CONVERGENCE WITH Q8-B: the full proposition is now \"frequency structure is written into the static geometry (B1) but computation does not route through it (D1)\". Q2 family already hit this wall twice (Q2-L injection = readout not mechanism; Q2-C1 ablate/patch split); Q8-D is the third independent instance, now on the STATIC side: geometric symmetry is not computational dependence. Because the subspace is unused, its cross-model isomorphism (Q8-B SHAPE_ISOMORPHIC) points to a shared TRAINING-GEOMETRY property (a fossil record), not a functional constraint. All E1 (null causal result with quantitative bounds). PROCESS: D2 gate thresholds were first implemented with D1 defaults (0.5/0.75) and re-run with the registered 0.30/0.60 (stale results deleted; new rule R-MTH-27). GLM full-precision offload segfaulted repeatedly under external memory pressure; switched to bitsandbytes 8-bit full-GPU with lm_head/embed_tokens skipped (material change recorded). GLM offload also leaves lm_head on the meta device with garbage values (|o2|=115761 vs |ref|=764) - calibrate_head assertion correctly aborted that run before any numbers were read; fixed by safetensors direct read (new rule R-MTH-26). Independent verify: Qwen 21 PASS / 0 FAIL; GLM verify re-run after fixing a hardcoded model path in the verifier itself (its 8 FAILs were verifier error, not result error).",
+   "prev_post": "e9139de4"
+  },
+  {
+   "phase": "Q9-A",
+   "name": "pat_q9a",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "register_style_is_partly_token_identity_at_hs0_2of3_with_early_computed_increment_mid_band_mlp_dominantly_writes_the_style_increment_and_register_axis_becomes_language_abstract_by_l8_glm_late_band_rewires_language_specific",
+   "res_sha8": "3f470a5b",
+   "res_sha8_glm": "6df1b476",
+   "note": "First component-localization phase of the three-block integration (embedding / MLP / attention). 60 facts x 6 register renderings (zh/en x colloquial/academic/code-comment), deterministic fact-level disc/conf split; per layer captured resid_in, self_attn module output and mlp module output at last-token position A and control position B=A-1; residual identity asserted on all samples/layers both positions (fp16 storage floor rel<=0.0057, float64 verify identical). Qwen3-4B sha8 3f470a5b (143.6s), GLM-4-9B 8-bit sha8 6df1b476 (340.8s). Independent verify pat_q9a_verify.py: float64 accumulation, nearest-centroid classifier, norm-normalized component ratios; A-position numbers reproduce bit-identically across two runs and two npz versions. P1/V1: hs[0] 3-way 0.667 both models (null 0.32-0.34), saturates by l=1-2 (LR) / l=8 (NC curve); position B l=0 0.833 both models -> the last token (sentence punctuation) carries NO register at hs[0], style must be COMPUTED; verdict STYLE_HAS_COMPUTED_INCREMENT concentrated in first ~8 layers. Char 2-gram bag = 1.000 both models: probe absolutes are uninformative, all conclusions rest on within-stream decomposition and transfer curves. P3/V2 component attribution (style axis = discovery mean difference, confirm projections): raw share |attn|:|mlp| in the mid band (1/2..3/4 depth) is 0.39/0.25 (Qwen zh/en) and 0.17/0.11 (GLM zh/en), all p<=0.01 paired permutation; norm-normalized efficiency still 0.33-0.74 i.e. MLP writes more register per unit norm there too. Periphery is MODEL-SPECIFIC: GLM final quarter flips to attention (raw 0.80-0.93, normed 1.37-1.38) while Qwen keeps MLP (0.26-0.49). Verdict narrowed per D27 to MID_BAND_MLP_CARRIES + PERIPHERY_MODEL_SPECIFIC. P4/V3 transfer (nearest-centroid per-layer curves): register axis becomes LANGUAGE-ABSTRACT by l~8 in BOTH models (zh2en and en2zh reach 1.0); GLM late band (l>=28) shows en2zh decay 1.0->0.5 while zh2en stays 1.0 - late-layer re-language-specialization coinciding with its attention flip. Main-script V3 (LR at argmax-first-saturated layer l=1/2) is SUPERSEDED by the curves: transfer is layer-dependent, LR zh2en 0.50 vs NC 1.00 at the same layer - classifier choice reverses the verdict (new rules R-MET-38, R-MET-39). E1 profile, no intervention: \"MLP writes\" is a share of the write-increment, not computational necessity (Q2-C1 lesson). Consequence for the SAE program: mount the first dictionary on mid-band MLP outputs (Qwen L18-27 / GLM L20-30).",
+   "prev_post": "4524aa96"
+  },
+  {
+   "phase": "Q8-D3",
+   "name": "pat_q8d3",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "pos0_register_is_distribution hotspot_but_carries_no_frequency_knob_weak_inverse_coupling_both_models",
+   "res_sha8": "4a59421f",
+   "res_sha8_glm": "ce5d7dbb",
+   "prev_post": "5944a2d0",
+   "note": "Closes the Q8-D open item: the frequency direction was tested at LAST (content) and ALLPOS but never at pos0, the format/register position where Q5-A found 46% of the next-token competition. Chat-templated prompts (pos0 = <|im_start|> for Qwen, [gMASK] for GLM), same w_freq and dose calibration as Q8-D2, template gate re-evaluated on baseline only (15/36 Qwen, 24/36 GLM), 200 prompts, n_forward 25/77. MAIN RESULT D3-1 WEAK_COUPLING IN BOTH MODELS with the SAME INVERSE SIGN: pushing the format token toward high frequency makes the output slightly LOWER frequency. Qwen rho_dose=-0.857, dE(+2)=-0.0089 (MDE 0.0257); GLM rho_dose=-0.964, dE(+2)=-0.0142 (MDE 0.0241). Magnitude 0.01-0.06 zipf per 2-zipf push (~2% efficiency), Qwen curve non-monotone (+2 bounces back to -0.009). Per D10 this is a CLUE, not a law; the defensible statement is \"pos0 responds to the perturbation (KL) but the response is not organized along the frequency axis\". D3-2 REGISTER_SENSITIVE IS A MODEL FINGERPRINT: KL(pos0)/KL(LAST) at delta=+2 is 19.2x in Qwen (0.0625 vs 0.0032) but 1.93x in GLM (0.0398 vs 0.0206) => REGISTER_SENSITIVE vs POSITION_NEUTRAL. Q5-A pos0-dominance reproduces under perturbation in Qwen only; the register structure is a Qwen-family training product, not a universal architectural property (third instance of the FUNCTION_MODEL_SPECIFIC pattern: Q8-B/B5 knob-turning, Q8-D2/C3 direction specificity, now D3/C4 position sensitivity). KL SHAPE DIFFERS: Qwen KL is monotone in |delta| (0.006->0.06, symmetric U); GLM KL is dose-flat (0.034-0.040) - GLM is equally perturbed however you push. C3 with the EMB control: GENERIC_PERTURBATION both models (Qwen |dE| 0.0089 below RAND p95; GLM 0.0142 < p95 0.0236). C5 gate 7/7 both. Q8-D LINE CLOSED: LAST + ALLPOS + POS0, two models, input arm - the static frequency subspace is not an input-side frequency control anywhere. MATERIAL TRAPS (both template-completion, baseline-only): Qwen3 default chat template forces <think> at 1.000 (p_M=0) - needs enable_thinking=False (top1 becomes ni 0.776); HF GLM-4 template ends at <|assistant|> where the model predicts \\n at 1.000 (official format is <|assistant|>\\n) - appending \\n gives top1 zhejuhua 0.468. VERIFY: Qwen 21/0; verifier itself had a dE() that bypassed the wrap() (shift on raw, baseline on wrapped => constant -0.55 offset) and needed chat-template kernel-noise calibration (per-prompt max|dE|=0.147 mean 0.0019 from the batch-invariance check; dE tolerance 0.02, gate p_M tolerance 0.10 with a saturation rule: flips of candidates with p_M>=0.90 are legal because 8-bit/kernel noise can push a 0.963 p_M below gate - GLM measured max|dp_M|=0.0934 flipping yi-zhang). GLM verify re-run final."
+  },
+  {
+   "phase": "Q8-E",
+   "name": "pat_q8e",
+   "line": "G",
+   "date": "2026-11-01",
+   "verdict": "freq_subspace_shape_is_scale_stable_third_point_but_scalar_content_is_only_weakly_shared",
+   "res_sha8": "ca6a7f94",
+   "res_sha8_glm": null,
+   "prev_post": "7a2535aa",
+   "note": "Cross-scale stability of the frequency subspace, pure static (no forward). Qwen3-14B (d=5120) newly downloaded (hf-mirror; shards validated - 3 shards needed a size-checked resume loop after two silent curl truncations). Same pool construction as Q8-B (n=24421, CHAR 8049 + WORD 16372). Runtime 114 s. E1 PRESENT: 14B full-space held-out R^2 0.7515 (verify 0.7493) vs 4B 0.8266. E2 LOG_SCALE: raw-frequency axis gives 0.023 (4B) / -0.106 (14B) => gap 0.804 / 0.858. The raw axis is a NOISE-FLOOR quantity: its point value depends on solver numerics (cv_fast -0.10 vs hand-written normal equations -0.97 on the same folds); reported as 3-seed mean with the verdict set by INEQUALITY (r2<0.10 and gap>=0.30), not point reproduction. New rule R-MTH-30. E3 LOW_DIM_DENSE: Krylov k*=2 both models (4B k1 0.529->k2 0.740; 14B k1 0.629->k2 0.736). With Q8-B this makes the shape family (log scale, 2-4 dim dense subspace, orthogonal to norm and semantics, no single-coordinate carrier: best coord -0.4414 4B / +0.4990 14B against R^2 0.83/0.75 full-space) a THREE-MODEL TWO-FAMILY reference-grade regularity spanning a 3.5x parameter gap. E4 SCALAR_WEAKLY_SHARED (the new cross-model instrument): coordinates do not align across models, so cos(w_freq) is meaningless; the only clean shared object is the per-token scalar t=(E-mu)@w on the shared 151936 rows. Raw Spearman 0.9141 is trivial (both predict zipf); after regressing zipf out of each t, the residual correlation is 0.4268 against a shuffle null p99 of 0.0175 (24x) - significantly non-zero but below the pre-registered 0.50 SHARED threshold. The two models put genuinely shared but minority structure on the same tokens. E5 SEM_ORTHOGONAL: COLOR/FRUIT within-set similarity retains 1.00 after removing the frequency component in 14B (0.1825->0.1823, 0.0973->0.0973; nulls 0.013/0.014). SYNTHESIS with Q8-D2: the frequency subspace is a universal by-product (attractor) of training, not a functional component - shape universal, usage null, token-level content majority-accidental with a real shared minority (0.43). VERIFY 18/0 after two verifier bugs were caught: (1) the verifier hanzi class missed CJK extension A (200 chars; pool 24221 vs 24421 - every number drifted), (2) it tried to point-reproduce the noise-floor raw-axis R^2 in float32 Gram. Cache-collision hazard empirically confirmed: the diagnostic hit a Gram cache poisoned across models (2560-dim G served to a 5120-dim solve) because the key lacks X identity - ns must carry the model name (extension of R-MTH-24)."
   }
  ],
  "migration_history": [
@@ -10537,6 +10621,126 @@
    "claim_refuted": "If a hidden-state linear probe beats a character-bag baseline on held-out content, the relation must be encoded abstractly, decoupled from the words.",
    "why_refuted": "The margin is 0.9136 vs 0.8025 = 11 points (McNemar p=0.005), while layer 1 ALREADY reads 0.7840 and a single binary \"clause B contains a negation character\" reads 0.6481 (contrast variants contain a negation in 94.4% of cases). Most of the decodability is present before any compositional processing. The defensible claim is \"real information beyond surface lexicon\", not \"abstract relation code\".",
    "fix": "Every predictive probe result must ship with (a) a bag-of-words baseline on the same folds, (b) a length baseline, (c) the dominant single-feature baseline, and (d) the layer-1 value."
+  },
+  {
+   "name": "pat_q8a_neg_hue_ring_in_static_embedding",
+   "phase": "Q8-A",
+   "date": "2026-11-01",
+   "claim_refuted": "The hue circle of colour words is legible in the static embedding: circular hue distance predicts embedding distance at rho >= 0.30.",
+   "why_refuted": "Mantel rho = +0.169 (Qwen, p=0.0046) and +0.157 (GLM, p=0.0055) on n=45 chromatic colour words whose Lab hue was computed from explicit sRGB codes. The signal is real but less than half the pre-registered effect size, and at n=45 the 80%-power MDE is 0.386, so the 0.30 line is undecidable (D23 => PENDING_power, not refuted). In context the signal disappears entirely (template readout at L20: rho=0.030 / 0.045).",
+   "what_stands": "Colour words do cluster far more tightly than fruit (0.199 vs 0.098) and the clustering is organised as modifier-root stars, not as a hue ring."
+  },
+  {
+   "name": "pat_q8a_neg_codepoint_order_in_byte_composition",
+   "phase": "Q8-A",
+   "date": "2026-11-01",
+   "claim_refuted": "Rare characters assembled from byte fragments inherit a geometry ordered by Unicode codepoint, because UTF-8 bytes are codepoint-ordered.",
+   "why_refuted": "Over 79800 pairs of 400 byte-fallback CJK characters, rho(codepoint distance, cosine) = -0.091 (Qwen) / -0.102 (GLM), with eight distance bands flat at 0.131 -> 0.107 (MDE 0.009, so 0.09 is a real but negligible effect). The mechanism fails by construction: mean-pooling 2-3 byte embeddings destroys the ORDER of the bytes, and UTF-8 carries all of its information in the order.",
+   "what_stands": "Byte-fallback characters are more mutually similar than whole words (0.109 vs 0.006) and 99% of their ten nearest neighbours are other fallback characters."
+  },
+  {
+   "name": "pat_q8a_neg_rare_char_collapse",
+   "phase": "Q8-A",
+   "date": "2026-11-01",
+   "claim_refuted": "Rare characters, having no dedicated vector, collapse into one blob so that within(RARE) exceeds within(COMMON) by at least 0.10.",
+   "why_refuted": "The sign is opposite and the ordering is the reverse of the intuition: within(RARE)=0.0188, within(high-frequency single chars)=0.1433, and splitting RARE gives 0.109 for the 26 byte-fallback members vs 0.028 for the 48 members that do have a row. The tightest cluster in the vocabulary is the function-word class (的/一/是/不/了), whose members are used in identical contexts, not the rare characters. Pre-registered delta -0.125 against a +0.10 gate.",
+   "what_stands": "Rare characters have no semantic neighbours (neighbour enrichment 0.99 against a 0.33 base rate) but they are not similar to each other."
+  },
+  {
+   "name": "pat_q8a_neg_one_coordinate_carries_category",
+   "phase": "Q8-A",
+   "date": "2026-11-01",
+   "claim_refuted": "The four-way category structure (colour / fruit / rare / common) is carried by a small number of single embedding coordinates, i.e. by single parameters.",
+   "why_refuted": "Raw single coordinates look decisive (k=1 held-out accuracy 0.780, k=32 0.751, chance 0.25) but the winning coordinate correlates with zipf at |rho|=0.802 (GLM 0.774) and the four material sets span four orders of magnitude of frequency. After residualising every coordinate on [1, zipf, byte-length, log-norm], k=32 falls to 0.411 (GLM 0.531) and full-dimensional accuracy is WORSE than k=64 (0.357 vs 0.415), i.e. the residual category information is diffuse and does not concentrate. A frequency-stratified null removes 361 of 364 apparently significant coordinates.",
+   "what_stands": "Frequency itself IS a single-coordinate scalar (|rho|=0.80) - the single-parameter claim is true for a scalar statistic, false for semantic categories."
+  },
+  {
+   "name": "pat_q8b_neg_single_coordinate_carries_frequency",
+   "phase": "Q8-B",
+   "date": "2026-11-01",
+   "claim_refuted": "Frequency is carried by a single embedding coordinate (|rho|~0.80), so the table has a one-parameter frequency backbone.",
+   "why_refuted": "The 0.802 of Q8-A came from four hand-picked material sets whose between-set frequencies span four orders of magnitude. On the full pool of tokens that actually have a wordfreq entry (24421 Qwen / 27215 GLM) the best single coordinate reaches Pearson -0.520 / -0.590 (Spearman -0.548 / -0.598), R^2 0.195, against 0.826 / 0.721 for the full-space direction. Coordinate curves need 512-1024 coordinates to reach 0.69-0.77 and never saturate.",
+   "what_stands": "A frequency direction exists and is strongly linear in log frequency (B1); it is just not sparse in the coordinate basis."
+  },
+  {
+   "name": "pat_q8b_neg_knob_turns_in_every_model",
+   "phase": "Q8-B",
+   "date": "2026-11-01",
+   "claim_refuted": "Because the embedding encodes frequency as a direction, translating a token along that direction moves it to a frequency neighbour, in any model.",
+   "why_refuted": "Dose-response (0.25/0.5/1/2 zipf units) gives a monotone, sign-correct response in Qwen (+0.085/+0.330/+0.670/+1.440) but a DOSE-INDEPENDENT constant +3.0~3.3 zipf in GLM with sign correctness 0.86-1.00. GLM lands on the high-frequency wall no matter how far it is pushed, so the direction is not attached to the neighbourhood structure there.",
+   "what_stands": "In Qwen one unit of push moves the nearest neighbour about 0.67 zipf, which is the only positive evidence that a causal intervention (Q8-D) is worth trying."
+  },
+  {
+   "name": "pat_q8b_neg_semantics_is_frequency_residual",
+   "phase": "Q8-B",
+   "date": "2026-11-01",
+   "claim_refuted": "Once the frequency direction is removed, what is left of the categorical structure (colour, fruit) is small - semantics is the residual of a statistical scalar.",
+   "why_refuted": "Removing the frequency component leaves the within-set similarity essentially untouched: colour 0.1988 -> 0.1982 and fruit 0.0975 -> 0.0975 in Qwen (retain 100%), 0.1436 -> 0.1430 and 0.0772 -> 0.0773 in GLM. Random CJK subsets of the same size sit at 0.0040/0.0037 and 0.0156/0.0155.",
+   "what_stands": "Statistical and semantic structure occupy nearly orthogonal subspaces in the static table, so \"the category backbone is mostly frequency\" is a statement about separability (AUC 0.748), not about content."
+  },
+  {
+   "name": "pat_q8d_neg_forward_pass_uses_freq_direction",
+   "phase": "Q8-D",
+   "date": "2026-11-01",
+   "claim_refuted": "Because the static table encodes frequency as a strongly linear direction (Q8-B B1, R^2 0.826/0.721), the model uses that direction during the forward pass to set the frequency of the next token.",
+   "why_refuted": "Shifting token embeddings along w_freq at the input (LAST position, dose-calibrated, healthy prompts p_M~0.98, tolerance-gated |delta|<=2) moves E[zipf of next token] by |delta|<=0.004 with CI excluding nothing but bounded by MDE 0.0095/0.0086 in BOTH models (NULL_BOUNDED, not PENDING_POWER). The dose-response shape is noise (linear R^2 0.26-0.29).",
+   "what_stands": "The static subspace exists and is isomorphic across models; Qwen turning the knob moves static neighbours (Q8-B B5). What is refuted is only the route into computation: geometric encoding without functional use."
+  },
+  {
+   "name": "pat_q8d_neg_isotropic_rand_control_suffices",
+   "phase": "Q8-D",
+   "date": "2026-11-01",
+   "claim_refuted": "A direction whose KL effect on the output distribution exceeds isotropic random directions is direction-specific (functionally distinguished).",
+   "why_refuted": "With the on-manifold control EMB (random difference of two real token embeddings), the apparent specificity of FREQ in Qwen disappears (|dE| 0.00114 below both the RAND p95 0.0038 and EMB p95 0.0027); in the wide grid the \"KL 20x RAND\" impression was just the perturbation living on the embedding manifold.",
+   "what_stands": "GLM FREQ passes even the EMB control (|dE| 0.00426 vs EMB p95 0.0023, KL 0.030 vs 0.015), so on-manifold specificity is achievable and meaningful; the rule is that the control set must CONTAIN an on-manifold member."
+  },
+  {
+   "name": "pat_q8d_neg_syntax_complete_prompts_for_freq_readout",
+   "phase": "Q8-D",
+   "date": "2026-11-01",
+   "claim_refuted": "Natural complete sentences (\"她很喜欢吃苹果\") are the right material for reading output frequency after an embedding intervention.",
+   "why_refuted": "At a syntactically complete boundary the model predicts punctuation with mass 0.849 and mass over frequency-bearing tokens p_M collapses to 0.033; E[zipf] over the full vocabulary is then dominated by punctuation and cannot register any frequency shift. Baseline-healthy incomplete prompts (\"他把苹果\") hold p_M=0.97.",
+   "what_stands": "With the material gate (p_M>=0.80, H>=1.00, final token a frequency-bearing content word), the readout is well-posed; the gate looks only at the BASELINE distribution, never at intervention results."
+  },
+  {
+   "name": "pat_q9a_neg_attention_is_the_register_carrier",
+   "phase": "Q9-A",
+   "date": "2026-11-01",
+   "claim_refuted": "Attention is the underlying carrier of language-pattern families, specifically register/style (colloquial vs academic vs code) is written into the residual stream mainly by attention.",
+   "why_refuted": "In the mid band (1/2..3/4 depth) the attention write-increment projects onto the register axis only 0.11-0.39 of what the MLP increment does (raw share), p<=0.01 paired permutation, in BOTH models and BOTH languages; norm-normalized the ratio is still 0.33-0.74. Attention dominance appears only in periphery bands and is model-specific (GLM final quarter).",
+   "what_stands": "A narrower reading survives: attention may carry conditional READING (fetching register cues from context) while MLP carries WRITING. This read/write split is the preregistered next test (Q9-B), not a finding of this phase."
+  },
+  {
+   "name": "pat_q9a_neg_style_is_pure_token_identity",
+   "phase": "Q9-A",
+   "date": "2026-11-01",
+   "claim_refuted": "Register/style is fully present in the token embeddings (hs[0]); no dedicated computation is needed to represent it.",
+   "why_refuted": "hs[0] 3-way register probe is 0.667 (both models, null 0.32-0.34) and only 0.833 at the content position B; saturation needs the first ~8 layers (+0.333 increment, 3x null sd). At position A the final token is punctuation whose hs[0] carries no register at all (0.667) yet later layers reach 1.000, so the missing information is computed, not stored.",
+   "what_stands": "Token identity does carry a large register prior (2/3); the claim refuted is only completeness. Char 2-gram bag-of-words also reaches 1.000, so register is lexically visible - the computed increment is about binding it into the residual stream, not about lexical knowledge."
+  },
+  {
+   "name": "pat_q9a_neg_register_axis_language_abstract_at_every_layer",
+   "phase": "Q9-A",
+   "date": "2026-11-01",
+   "claim_refuted": "Once a register axis is readable, cross-language transfer of that axis is a layer-uniform property (STYLE_ABSTRACT can be decided at any convenient layer).",
+   "why_refuted": "Transfer is strongly layer-dependent: both models start at 0.5 at l=0 and reach 1.0 by l~8, and GLM then DECAYS back to 0.5 for en2zh over l=28..40 while zh2en stays 1.0. The main script picked the first saturated layer (l=1/2) and got PARTIAL/ABSTRACT - both wrong about the profile. LR vs nearest-centroid also reverses single-layer verdicts (0.50 vs 1.00 at the same layer).",
+   "what_stands": "The layer-uniform claim is refuted, not the abstraction itself: by l~8 both models DO transfer perfectly; GLM late-band re-specialization is a model fingerprint pending full-precision re-check (8-bit caveat)."
+  },
+  {
+   "name": "pat_q8d3_neg_pos0_carries_freq_knob",
+   "phase": "Q8-D3",
+   "date": "2026-11-01",
+   "claim_refuted": "If the static frequency direction is used anywhere, it is at the format/register position (pos0), where next-token competition concentrates (Q5-A: 46%).",
+   "why_refuted": "Shifting pos0 embedding along w_freq (chat-templated prompts, dose-calibrated) gives WEAK_COUPLING in both models with INVERSE sign (Qwen rho=-0.857 dE(+2)=-0.0089; GLM rho=-0.964 dE(+2)=-0.0142), an order of magnitude below the causal threshold 0.10, and the direction specificity fails the EMB control in both (GENERIC_PERTURBATION). With Q8-D2 (LAST, ALLPOS) this closes every input-side entry point.",
+   "what_stands": "pos0 IS the distributional hotspot in Qwen (KL ratio 19.2x vs LAST) - the register concentrates perturbation response, it just does not organize that response along the frequency axis."
+  },
+  {
+   "name": "pat_q8e_neg_freq_scalar_shared_across_scale",
+   "phase": "Q8-E",
+   "date": "2026-11-01",
+   "claim_refuted": "The frequency subspace is a shared functional structure: same family, larger scale, same tokens get the same frequency scalar.",
+   "why_refuted": "After removing zipf from each model scalar t, the 4B-14B residual Spearman is 0.4268 - above the shuffle null (p99 0.0175) but below the pre-registered SHARED threshold 0.50; the majority of token-level variance is model-specific. Shape invariants (log scale, k*=2, semantic orthogonality) DO reproduce, so the claim is refuted only at the content level.",
+   "what_stands": "A real shared minority component exists (24x null) - the attractor has structure worth dissecting (Q8-F); shape is reference-grade across three models and two families."
   }
  ],
  "protocol_family": "LPF v5.3",

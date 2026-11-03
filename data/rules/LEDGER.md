@@ -4,7 +4,7 @@
 
 > 由 `python tools/rules_export_md.py` 从 `data/rules/ledger.json` 生成，不要手改。
 
-## 已证实（23）
+## 已证实（28）
 
 ### R-ATT-01 注意力头对答案的贡献集中在晚期层、在"答案位"读出；问题位与选项位几乎没有显著头。
 
@@ -61,6 +61,48 @@
 - 复查：**只对属性类（颜色/大小）成立**；反义族 within 仅 0.134，分类族只有 L13–L24 窄带
 - 证据：Q6-A ｜ `tools/pat_q6a.py` ｜ `results/2026-11-01/072150_pat_q6a.json`
 
+### R-MET-34 只要材料分成几个频率量级不同的组，任意能分出组的坐标都会给出高相关，于是"单坐标 / 单参数承载结构"的结论是被材料造出来的。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：同一"最强单坐标相关系数"在两个池上算：①由少数几个频率量级不同的组拼成的材料集 ②全部有频率定义的 token。若①远高于②，则①的数值不得作为"单参数"证据。同时必须报全空间方向的 R² 作上限。
+- 关键数字：q8a_materials_n=228，q8a_single_coord_rho=0.802，q8b_pool_n_qwen=24421，q8b_pool_n_glm=27215，q8b_single_coord_pearson_qwen=-0.52，q8b_single_coord_pearson_glm=-0.59，q8b_single_coord_r2=0.195，q8b_full_space_r2_qwen=0.826，q8b_full_space_r2_glm=0.721，gap_x=4.2
+- 为什么：Q8-A 的「一根旋钮」就是这条错误的实例：0.802 来自四组材料跨四个数量级的频率差。项目此前也踩过一次同类（Q6-B 的 share 饱和）。凡"某某只由一个参数承载"的提法，先问材料是不是分组拼的。
+- 复查：这是抽样设计问题，不随模型变化；换材料必须重算两个池并同时报
+- 证据：Q8-B ｜ `tools/pat_q8b.py` ｜ `results/2026-11-01/111407_pat_q8b.json`
+- 证据：Q8-B ｜ `tools/pat_q8b.py` ｜ `results/2026-11-01/111608_pat_q8b.json`
+- 证据：Q8-B ｜ `tools/pat_q8b_verify.py` ｜ `results/2026-11-01/111407_pat_q8b.json`
+
+### R-MET-37 只报 |proj(attn)|:|proj(mlp)| 的原始份额，会把"某组件输出范数天然更大"误读成"它承载更多语义"（K-A 混淆的组件版）；反之只报归一化效率会丢掉因果写入份额。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：组件归因（沿某语义轴的 attn_out/mlp_out 投影）必须并列报告：①原始份额 raw share（写入残差流的责任比，因果口径）②单位范数效率 |proj|/‖comp‖（排除范数混淆的口径）。两个口径的判决分开命名；不一致时按 D27 分级表述，不得只引其一。
+- 关键数字：q9a_mid_band_raw_qwen=0.39/0.25 (zh/en)，q9a_mid_band_raw_glm=0.17/0.11，q9a_mid_band_normed_qwen=0.74/0.50，q9a_mid_band_normed_glm=0.43/0.33，q9a_last_band_raw_glm=0.93/0.80，q9a_last_band_normed_glm=1.38/1.37，q9a_last_band_raw_qwen=0.32/0.26，q9a_last_band_normed_qwen=1.07/0.61
+- 为什么：Q3280 的 K-A/K-A2 已经在"静态中继头"上踩过一次绝对范数混淆；Q9-A 在组件级再次遇到：GLM 末段 raw 0.93 看似注意力强主导，归一化 1.38 才知道是每单位范数效率高而非总量碾压；反过来中段 MLP 的 raw 0.11 若只看归一化会被低估其写入责任。
+- 复查：口径纪律，不随模型变化；新组件归因实验直接沿用双口径
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/191456_pat_q9a_qwen.json`
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/192208_pat_q9a_glm.json`
+
+### R-MET-38 探针准确率先 saturate 的层不是机制层位；在饱和层上做的迁移/归因结论会系统性偏早。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：任何"在第 l 层做 X"的结论，l 必须有独立于准确率饱和的依据（预注册层位、或全剖面曲线上的结构性拐点），并附逐层数值。禁止 argmax(acc_resid) 作为层位选择器（np.argmax 返回首个最大值=首个饱和层）。
+- 关键数字：q9a_argmax_layer_qwen=1，q9a_argmax_layer_glm=2，q9a_transfer_abstract_by=l~8（两模型 NC 曲线），q9a_glm_late_decay=en2zh 1.0→0.5 (l=28..40)，q9a_lr_at_argmax=Qwen PARTIAL / GLM ABSTRACT（均错）
+- 为什么：主脚本 V3 用 argmax 选层得到 Qwen PARTIAL / GLM ABSTRACT，两个都错：迁移是层依赖量（0.5→1.0→GLM 回落 0.5）。若只看主脚本判决，会得出"Qwen 语域语言绑定、GLM 抽象"的假跨模型对比——方向恰好反了一半。
+- 复查：与 R-MET-30/D25 同族：剖面必须全层打印并保留
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/191456_pat_q9a_qwen.json`
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/192208_pat_q9a_glm.json`
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a_verify.py` ｜ `tests/gpt5/result/pat_q9a_transfer_curve.json`
+
+### R-MET-39 判别式线性探针（LR）与生成式最近质心（NC）在同一层同一材料上可以给出相反的迁移结论；单口径的迁移判决不可引用。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：迁移实验（train 域 → test 域）至少用两个口径：判别式（LogisticRegression 类）与生成式（最近质心/余弦到类均值）。两个口径的数值并列报告；分歧 >0.05 时判决记口径依赖，不得取单一数值进结论。
+- 关键数字：q9a_zh2en_l36_lr=0.5，q9a_zh2en_l36_nc=1.0，q9a_gap_direction=LR 在 OOD 语言上把判别面拧向语言方向，q9a_within_agreement=语言内两口径一致（均 1.0）
+- 为什么：Q9-A 主脚本（LR）与独立复核（NC，R-MTH-25 要求的独立路径）在同一数据上给出相反的 V3 判决（PARTIAL vs ABSTRACT）。这不是谁的 bug：LR 的决策面在 OOD 域上被语言分量主导，NC 的余弦到质心对它稳健。分歧本身就是发现（语言分量在中段仍在线性可分面里占权重），只报一个口径会把它扔掉。
+- 复查：口径纪律；新增迁移类实验直接内置双口径
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/191456_pat_q9a_qwen.json`
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/192208_pat_q9a_glm.json`
+
 ### R-MTH-03 分布剖面（E1）可以独立作为「规律」；干预实验（E2）单独只能作为「线索」。
 
 - 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
@@ -78,6 +120,16 @@
 - 为什么：这是本线第一个不含任何旧混杂的测量。前提是**必须先扣掉所有词共有的方向**再取身份方向，否则身份项会吃掉全部能量（share_id 假性 = 1.00）。
 - 复查：同步前向的代数分解，无消融/注入/移植，三种旧混杂均不适用；份额和 1.05 说明三项略正相关
 - 证据：Q3-T2 ｜ `tools/pat_q3t_t2.py` ｜ `results/2026-11-01/055903_pat_q3t_t2.json`
+
+### R-MTH-28 transformers 的 output_hidden_states 元组结构随版本/模型变化，想当然地把末项当末层残差输出会静默污染采集。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：任何 hook 采集管线，运行时必须断言 resid_in[l+1] = resid_in[l] + attn_out[l] + mlp_out[l]（逐样本逐层，相对容差按存储精度写明）。断言失败先诊断每项范数与 final-norm 关系，不得放宽阈值硬闯。本机实测：Qwen3-4B/GLM-4-9B 的 hidden_states 元组长 L+1，末项是 final_norm 之后的输出（cos(hss[L], norm(resid_out[L-1]))=0.9999967），不是末层残差输出；fp16 存储下恒等式地板 rel≈5e-3。
+- 关键数字：q9a_identity_rel_max_qwen=0.005509，q9a_identity_rel_max_glm=0.005718，hss_last_is_post_final_norm_cos=0.9999967，diag_script=tests/gpt5_temp/q9a_diag.py
+- 为什么：第一次 SMOKE 恒等式 rel=7.995 直接拦截了这个静默错误：若不断言，所有层的"resid_out"数据在末层会混入 post-norm 值，P3 组件归因在末段全部失真——恰好是本轮发现 GLM 末段注意力反超的位置，错误会直接制造一条假规律。
+- 复查：版本相关的坑：transformers 升级后必须重验，而不是默认仍成立
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/191456_pat_q9a_qwen.json`
+- 证据：Q9-A ｜ `tests/gpt5/pat_q9a.py` ｜ `results/2026-11-01/192208_pat_q9a_glm.json`
 
 ### R-MET-05 分组消融的效应近似可加（各组 KL 之和 ≈ 整层 KL）。
 
@@ -226,7 +278,56 @@
 - 证据：H20 ｜ `tools/mech_prefix_scan.py` ｜ `tempdata/prefix_scan_L34.json`
 - 证据：H21 ｜ `tools/mech_head_tokens.py` ｜ `tempdata/head_tokens_L34.json`
 
-## 已否证（72）
+## 已否证（93）
+
+### R-ATT-25 句间关系（顺承/转折/因果）在模型内部若被编码，必然依附于显式连接词这类表面标记。
+
+- 领域：attention ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：关系码在**序列末位**即可线性读出，且**去掉全部连接词**只掉 2.5 点（0.9136 → 0.8889）；只换一个标点（逗号→句号）0.9444。连接词位置本身 1.0000 恰恰说明它不能当证据
+- 关键数字：content_heldout=0.9136，connective_removed=0.8889，punct_swap=0.9444，connective_position=1.0，floor=0.3333
+- 为什么：推广：**测量关系类量的位置必须在"关系已完全确定"处**（此处是第二句末），而不是关系标记处。在标记处测得的高准确率是同义反复。
+- 复查：若码绑连接词，S1S2->S3 迁移会塌到 1/3；实测只掉 2.5 点，差 0.56
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-ATT-26 若干语义关系（顺承/转折/因果）可以排在同一条「关系轴」上，像颜色-大小那样是一支方向。
+
+- 领域：attention ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：三关系在判别平面里构成**等边三角形**（两两 cos ≈ −0.50、第一轴方差占比 0.501）；秩压缩曲线 rank-1 只到 0.6111、rank-2 即满血 0.9136 ⇒ 存在一条共享轴但它只承载 2/3
+- 关键数字：rank1=0.6111，rank2=0.9136，rank3=0.9136，centroid_cos=[-0.501, -0.499, -0.5]，axis1_share=0.501
+- 为什么：与 Q6-A/B2 合看：属性类是「一支方向」（颜色 0.323、大小 0.376），层级是「区域」，句间关系是「三点二维」。**三类模式的几何形态各不相同**，所以不存在一张统一的地图。⚠ 此处的 −0.5 是正三角形签名，与 Q6-B2 的 −0.5 无关。
+- 复查：一条轴装不下三个等距点；rank-1 与 rank-2 差 0.30，远超内容级 CI 宽度的一半
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-ATT-27 词表是一张同质的表，生僻字和其它字一样有自己的一行向量。
+
+- 领域：attention-free static ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：统计词表行的单位类型（整词 / 单字 / 字节残片 / 其它）与 CJK 基本区覆盖率；对字节回退字，其"词向量"只能是 2–3 个字节残片的算术平均，均值池化抹掉字节顺序。
+- 关键数字：qwen_rows=151936，qwen_word=16374，qwen_char=8806，qwen_fragment=1457，qwen_other=125299，qwen_cjk_missing=12404，qwen_cjk_total=20902，qwen_rare_fallback=26/74，glm_cjk_missing=16686，glm_rare_fallback=73/74，within_fragment=0.0298，within_word=0.0062，ratio=4.8
+- 为什么：「生僻字没有词嵌入」不是修辞：模型拿到的是拼写零件，语义必须在注意力里现拼。任何关于生僻字「语义几何」的结论都必须先报覆盖率，否则测的是字节表。
+- 复查：这是分词器与词表的构造事实，换模型只会换数字不会换结论；换模型必须重报覆盖率
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091106_pat_q8a.json`
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091311_pat_q8a.json`
+- 证据：Q8-A ｜ `tools/pat_q8a_verify.py` ｜ `results/2026-11-01/091106_pat_q8a_verify.json`
+
+### R-ATT-28 频率只能在训练后通过行为间接体现，嵌入表里没有一个可直接读出的频率量。
+
+- 领域：attention-free static ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：对每个嵌入坐标算它与 zipf 的秩相关，取 |ρ| 最大者；再做 top-k 留出分类曲线，对比"原始坐标"与"对 [1,zipf,字节长,log范数] 回归后的残差坐标"。
+- 关键数字：qwen_max_abs_rho=0.802，qwen_coord=27，glm_max_abs_rho=0.774，glm_coord=411，qwen_top5=[0.804, 0.758, 0.764, 0.698, 0.696]，raw_k1=0.78，raw_k32=0.751，resid_k32=0.411，resid_full=0.357，glm_raw_k32=0.896，glm_resid_k32=0.531
+- 为什么：「单参数承载结构」在标量统计量上成立、在语义类别上不成立。看到单坐标高分必须先查它与频率的相关，否则会把频率轴当成语义轴。
+- 复查：两模型同向同量级；若换非 tied 或更小模型需重测（tied 会让范数与输出端耦合）
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091106_pat_q8a.json`
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091311_pat_q8a.json`
+
+### R-ATT-29 每个汉字在嵌入表里只占一行，参数预算全部花在语义区分上。
+
+- 领域：attention-free static ｜ 置信：medium ｜ 已测 1 次 ｜ 可以重测
+- 判据：对简繁对，算 cos 与"繁体形式在简体形式近邻里的名次"；对中英对，算英文对译 token 在全部 151936 行里的名次（排除自身），零基线用随机英文词的名次。
+- 关键数字：qwen_st_cos_median=0.797，qwen_st_rank1_frac=0.94，glm_st_cos_median=0.44，glm_st_rank1_frac=0.34，qwen_trans_median_rank=1，qwen_trans_top5=1.0，glm_trans_median_rank=11.5，glm_trans_top5=0.17，random_baseline_rank=67472
+- 为什么：参数不是全花在语义上：Qwen 把多语言折叠到同一个点，这直接解释了 Q6「静态层找不到关系方向」——方向只能从上下文里长出来。
+- 复查：两模型差异巨大（0.797 vs 0.440），说明这不是通用规律而是模型指纹；需第三架构（DS-7B）与词表规模对照才能定论，材料为手选高频具体词有选择偏差
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091106_pat_q8a.json`
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091311_pat_q8a.json`
 
 ### R-ATT-02 用头的权重几何（写方向对答案字母的投影 / 能量 / 有效秩）可以预测该头的 DLA 显著性。
 
@@ -394,6 +495,37 @@
 - 复查：interaction 占 58% 方差却一格都外推不了；真实数据在各秩均优于打乱零分布 ⇒ 结构为真但**不是低秩**，是稀疏
 - 证据：Q6-B ｜ `tools/pat_q6b.py` ｜ `results/2026-11-01/074005_pat_q6b.json`
 
+### R-MET-35 干预方向的效应超过各向同性随机方向（RAND）即可声明方向特异性。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：对照集必须包含 EMB：随机两个真实 token 嵌入之差（在嵌入流形上、语义随机）。只有当 FREQ 的 |ΔE| 与 KL 同时超过 EMB 分布（≥p95），且超过 RAND，才判 DIRECTION_SPECIFIC；只超过 RAND 不超过 EMB 判 ON_MANIFOLD_ONLY。
+- 关键数字：qwen_freq_absdE=0.00114，qwen_rand_p95=0.0038，qwen_emb_p95=0.0027，qwen_verdict=GENERIC_PERTURBATION，glm_freq_absdE=0.00426，glm_rand_p95=0.002，glm_emb_p95=0.0023，glm_verdict=DIRECTION_SPECIFIC，wide_grid_impression=KL 20x RAND（无 EMB 对照时的过度印象）
+- 为什么：各向同性 RAND 天生"离开嵌入流形"，任何在流形上的扰动都显得比它特别。EMB 把"在流形上"这个平庸解释单独扣掉，剩下的才是方向本身的功能性。
+- 复查：对照设计纪律，与模型无关
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162208_pat_q8d2.json`
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162016_pat_q8d2.json`
+- 证据：Q8-D ｜ `tools/pat_q8d_verify.py` ｜ `results/2026-11-01/162208_pat_q8d2.json`
+
+### R-MET-36 用自然的完整句子测"下一 token 的频率"是合适的材料。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：闸门只看基线分布、不看干预结果：①p_M（有 zipf 定义 token 上的概率质量）≥0.80；②基线熵 H≥1.00（单峰 0.999 的分布没有位移空间）；③prompt 末位是有频率定义的内容词。候选模板逐条打分打印，通过集在跑前冻结。
+- 关键数字：syntactic_complete_pM=0.033，punct_mass=0.849，incomplete_pM=0.971，gate=p_M>=0.80 AND H>=1.00，kept_qwen=32，kept_glm=25，n_candidates=36
+- 为什么：句法完整的边界处语言模型输出由标点主导，任何 E[zipf] 类主指标在该处按构造失效——这不是模型性质，是读数位置选错了。不设闸会直接产出"干预无效"的假阴性。
+- 复查：材料口径纪律；闸门规则可复用，具体模板随模型/语言重筛
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162208_pat_q8d2.json`
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162016_pat_q8d2.json`
+
+### R-MET-40 复核器可以自己实现一份输入编码（模板包装/位移拼接），只要语义等价。
+
+- 领域：measurement ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：输入编码入口必须唯一：复核器 import 主脚本的编码函数（或反之），禁止在复核器里重写 wrap/apply_chat_template 路径。任何位移/扰动 dE() 必须经过同一入口构造对比串。
+- 关键数字：symptom=Q8-D3 复核 dE() 在裸串上位移、基线在包装串上，恒定 -0.55 偏移，max|dE|=0.60，fix=dE 改走 wrap() 后逐剂量偏差降到 0.004-0.012；chat 模板陷阱 (<think> 强制 / 缺尾换行) 也只修一处
+- 为什么：编码差异不是噪声而是系统性偏移（-0.55 全局常数），会把所有判据推向 FAIL 并掩盖真实差异；唯一入口让模板陷阱只需修一次、复核自动继承。
+- 复查：双实现"语义等价"在模板层几乎不可保证——一处 enable_thinking 或尾换行差异就是系统性偏移
+- 证据：Q8-D3 ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/185433_pat_q8d3.json`
+- 证据：Q8-D3 ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/193015_pat_q8d3.json`
+
 ### R-MTH-04 对照组可以随着实验推进逐轮补充——每轮发现新混杂就加一个新对照。
 
 - 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
@@ -543,6 +675,102 @@
 - 为什么：配套要求：**参照线必须在同一次运行、同一估计器下测得**（本轮 F3 +0.323 / F4 +0.376 即如此），不得从历史结果里搬。
 - 复查：把两级压成一级会产出「显著 ⇒ 成立」的 M1 式误读；且**必须同报参照线**，否则 −0.25 与 +0.40 无法在同一刻度比较
 - 证据：Q6-B2 ｜ `tools/pat_q6b2.py` ｜ `results/2026-11-01/073538_pat_q6b2.json`
+
+### R-MTH-21 把 C 类探针的权矩阵截断到 rank-k，若需要 k=C 才满血，就说明 C 个类各自有独立方向。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：C 个类质心最多张 **C−1 维**判别子空间，rank-C 与 rank-(C−1) 恒等（除非类协方差不同）。故「需要 rank-C」这一行**在数学上不可达**，判决表被结构性地压向中间档
+- 关键数字：n_classes=3，rank2=0.9136，rank3=0.9136，equal=True
+- 为什么：修正：秩曲线的饱和秩必须显式写成 **C−1**；若确实需要「各自独立」这个备择，类数须 ≥ 4，或改用「两两转移矩阵 + 共享子空间残差」的问法。
+- 复查：三个质心张 2 维是线性代数恒等式，不是经验发现；把它当成「三支私有方向」的判据等于预置了一个永假的备择
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-MTH-22 可以用一个行为读数（元语言判断、似然比较等）给手写刺激材料发"确实表达了该语义"的合格证，并据此设一道跑前硬闸。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：同一批 54 个句对的三种行为口径互相打架：元语言三选一 0.5926（但转折仅 0.278）、全序列似然 0.4444、B 条件似然去偏 0.4815（转折 0.611）。**行为读数只能作为诊断，不能作为闸**；多口径不一致本身就是证据
+- 关键数字：meta_label=0.5926，meta_label_contrast_only=0.278，full_seq_likelihood=0.4444，cond_likelihood_debiased=0.4815，cond_likelihood_contrast=0.611，floor=0.3333
+- 为什么：处置范式：行为闸只在结果为 NULL/WEAK 时启用，用来区分「模型不编码」与「材料没表达」；**永远不能用来认证 PASS**。所有口径必须同时入账，否则就是 gate shopping。
+- 复查：标签先验使模型几乎不吐"转折"；「然后」约束最弱故似然最高。两者都是方言偏差，不是材料缺陷
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-MTH-23 只要类别可分，就说明嵌入里有该类别的语义骨架。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：任何"少数坐标/子空间承载类别"的结论，必须先做①逐坐标对 [1, zipf, 字节长, log范数] 回归取残差；②频率分层零假设（只在 zipf 十分位内打乱标签）；③报残差曲线是否随 k 单调。
+- 关键数字：qwen_sig_coords_raw=364，qwen_sig_coords_stratified=3，glm_sig_coords_raw=236，glm_sig_coords_stratified=3，resid_peak_k=64，resid_peak_acc=0.415，resid_full_acc=0.357
+- 为什么：四组材料频率跨 4 个数量级时，一个坐标分开四组等于一个坐标分开频率。判定必须分两级（D27）：绝对水平看残差，相对差值才谈"还剩多少语义"。
+- 复查：口径条款；只要材料组的频率分布不同就适用
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091106_pat_q8a.json`
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091311_pat_q8a.json`
+
+### R-MTH-24 按 (命名空间, 折序号) 缓存 Gram 矩阵是安全的，因为同一份数据算出来的 Gram 一样。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：在同一进程里用两套不同的折划分调用同一缓存函数，检查 G_all − G_fold 是否仍等于 G_train。或直接比较两套 key 下的结果：若同 X 同 y 同折却给出不同的 R²，即缓存被污染。
+- 关键数字：symptom_r2_cached=0.7757，symptom_r2_fresh=0.8261，culprit=零分布先用 _f0 调 cv_fast(ns="main")，把 (f,main,j) 写成 _f0[j] 的 Gram，fix=key 加折指纹 (len(folds), sum(folds[0]), size(folds[0]))
+- 为什么：缓存是为省时间，但它把"这份 Gram 属于哪套划分"这一信息丢掉了，出错时表现为R² 莫名其妙偏低，而且只在"先跑了别的划分"时才出现 —— 最难查的一类 bug。
+- 复查：实现层面的陷阱，与模型无关；任何带缓存的重采样流程都适用
+- 证据：Q8-B ｜ `tools/pat_q8b.py` ｜ `results/2026-11-01/111407_pat_q8b.json`
+- 证据：Q8-B ｜ `tools/pat_q8b_verify.py` ｜ `results/2026-11-01/111407_pat_q8b.json`
+
+### R-MTH-25 主脚本自己算的 held-out R² 可信，只要打印出来就够了。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：用另一套实现（不同求解器 / 不同掩码写法 / 不同折划分重复 5 次）复算同一个 R²，报出"主脚本值、独立值、5 次划分的极差"。若差值超过极差，必须先当作 bug 排查，不得解释为"口径不同"。
+- 关键数字：primary_r2_masked_bug=0.865，primary_r2_after_fix=0.8263，independent_single_split_mean=0.8343，independent_range=0.018，gap_after_fix=0.008
+- 为什么：本轮两个致命 bug 都不是靠"看代码"发现的，是靠"另一个实现给出不同数字"发现的。差值超过划分极差 = 有系统性错误，这个判据比任何代码 review 都硬。
+- 复查：流程纪律，与模型无关
+- 证据：Q8-B ｜ `tools/pat_q8b.py` ｜ `results/2026-11-01/111407_pat_q8b.json`
+- 证据：Q8-B ｜ `tools/pat_q8b.py` ｜ `results/2026-11-01/111608_pat_q8b.json`
+
+### R-MTH-26 get_output_embeddings().weight 拿来直接用是安全的，transformers 会把权重放对位置。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：用手算 logits @ W.T 与模型原生 logits 逐位比较（同一输入）。断言三点：① W.device 不是 meta；② max|Δ| 小于该模型 bf16 噪声底；③ ‖手算‖ 与 ‖原生‖ 同量级。任一失败立即中止，不得用猜的权重继续跑。
+- 关键数字：symptom=GLM offload 时 lm_head 停在 meta device，值是未初始化垃圾，ref_norm=764，manual_norm=115761，max_abs_diff=18000.0，outcome=calibrate_head 断言正确中止，零假结论读出，fix=从 model.safetensors.index.json 定位 lm_head 并 safetensors 直读
+- 为什么：meta 权重的值是地址垃圾，不会报错、只给错数。若没有"必须复现原生 logits"的断言，整轮 D2 会在假 head 上跑完并输出一套看似合理的假 C3/C4 —— 这正是校准断言存在的意义。
+- 复查：实现陷阱，与本机 offload 配置绑定；任何 device_map=auto 的手算路径都适用
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162016_pat_q8d2.json`
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162208_pat_q8d2.json`
+
+### R-MTH-27 预注册文档写了阈值，跑的时候照着配就行。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：阈值、网格、剂量等预注册量必须：①作为环境变量默认值写死在代码里；②运行日志打印实际生效值；③主结果 JSON 里记录。发现文档与注册文档比对时，以日志和 JSON 为准，不以"我记得配过"为准。
+- 关键数字：incident=D2 首跑用了 D1 的门限 0.5/0.75，注册值是 0.30/0.60，detection=读 D2 结果明细时发现门限字段对不上，fix=GATE_H/GATE_AGREE 改为按 PHASE 取注册默认值，删除错误产物重跑
+- 为什么：预注册的意义在"判决规则先于数据"，而规则躺在文档里、代码里另有一套时，等于没有注册——错误版本跑出的数字一旦进了结论再被引用，纠错成本远高于重跑。
+- 复查：流程纪律，与模型无关
+- 证据：Q8-D ｜ `tools/pat_q8d.py` ｜ `results/2026-11-01/162208_pat_q8d2.json`
+
+### R-MTH-30 无信号目标（如原始频率轴）的 held-out R^2 点值可以用单次运行报告并逐位复现。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：当判据落在噪声地板上（真值≈0 或求解器受最小特征值方向支配）时：①主脚本报 ≥3 个随机种子（折划分/初始化）的均值；②复核器不做点复现断言，改判不等式（如 r2<0.10 且 gap≥0.30）；③禁止把 cv_fast 与手写正规方程在同折上的差异当 bug——那是代码路径的数值细节。
+- 关键数字：symptom=同一折上 raw 轴 held-out R^2：cv_fast -0.10 vs 手写 -0.97，diagnosis=因子分离确认差异来自求解器在最小特征值方向的数值细节，非代码错误，fix=主脚本 3 种子均值（Q8-E raw 轴 0.023/-0.106），复核改不等式判决
+- 为什么：点值在这类量上不是数据性质而是求解器指纹；把点复现写进复核会把数值细节当回归 bug，或把 -0.10 vs -0.97 的差异误判为主脚本出错。
+- 复查：任何以 R^2≈0 为预期值的对照轴/零假设轴都适用；点显著判据禁用于噪声地板量
+- 证据：Q8-E ｜ `tools/pat_q8e.py` ｜ `results/2026-11-01/192347_pat_q8e.json`
+- 证据：Q8-E ｜ `tools/pat_q8e_verify.py` ｜ `results/2026-11-01/192347_pat_q8e.json`
+
+### R-MTH-31 Gram 矩阵缓存键只含折指纹与样本数即可跨脚本/跨模型共享。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：一切以 X 为输入派生的缓存（Gram、投影、统计量）键必须含 X 的完整身份：模型名 + 维度 + 构造参数。跨模型共用 ns 的脚本，ns 必须带模型名前缀；否则先注入一次跨模型缓存冲突（如 2560 维 G 塞给 5120 维 solve）再修。
+- 关键数字：symptom=诊断脚本两模型共用 ns，缓存中 2560 维 Gram 被喂给 5120 维 solve，维度报错，fix=ns = f"{model_name}|{...}" 前缀；Q8-B 的 R-MTH-24（折指纹）是该规则在折维度的特例
+- 为什么：缓存键缺身份维度时冲突是静默的或以误导性报错出现；维度恰好相容时会更隐蔽——错误的 Gram 值直接进 solve，产出看起来合理的错数。
+- 复查：R-MTH-24（缓存键缺折指纹）的同族扩展：身份缺失类缓存键一律视为已证伪模式
+- 证据：Q8-E ｜ `tools/pat_q8e.py` ｜ `results/2026-11-01/192347_pat_q8e.json`
+- 证据：Q8-E ｜ `tools/pat_q8e_verify.py` ｜ `results/2026-11-01/192347_pat_q8e.json`
+
+### R-MTH-32 新规则编号可以按记忆里的编号续排；覆盖式 upsert 前不需要备份。
+
+- 领域：实验方法 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：①任何账本 JSON 写入前先落一份 .bak（cp 即可）；②新条目 ID 用代码从账本现算 max(编号)+1，禁止凭记忆续排；③upsert 脚本遇到"按 id 覆盖"时必须先 diff 打印旧条目 topic，topic 不同立即中止（那是撞号不是更新）。
+- 关键数字：symptom=Q8-D3 收尾时凭记忆编 R-MTH-28/R-MET-37，撞掉 Q9-A 线两条 confirmed 规则；恢复时一次 json.dump(kwarg) 错误又把整个 ledger.json 截断为空，fix=从 ledger.json.bak_q9a（116 条）恢复 + 重放 q9a ingest + 重编号 30/31/40；零规则丢失，但多耗一整轮排查
+- 为什么：撞号静默覆盖 confirmed 规则，且恢复路径上的任何写错误都可能把损失放大成整文件截断；备份 + 现算编号 + topic diff 三道闸成本几乎为零。
+- 复查：一切 JSON 账本（rules/ledger/atlas）都适用；幂等 upsert 不等于可安全覆盖
+- 证据：Q8-D3 ｜ `tools/rules_ingest_q8d3e.py` ｜ `data/rules/ledger.json.bak_q9a`
 
 ### R-MET-01 KL 散度可以作为 MLP 单元「重要性 / 必要性」的度量。
 
@@ -781,6 +1009,35 @@
 - 证据：Q6-B ｜ `tools/pat_q6b.py` ｜ `results/2026-11-01/074005_pat_q6b.json`
 - 证据：Q3-T1 ｜ `tools/pat_q3t_t1.py` ｜ `results/2026-11-01/055514_pat_q6t_t1.json`
 - 证据：Q3-T3 ｜ `tools/pat_q3t_t3.py` ｜ `results/2026-11-01/061142_pat_q3t_t3.json`
+
+### R-MET-30 隐藏态线性探针在留出条件下准确率高于随机地板，就说明该属性被「编码」了。
+
+- 领域：指标与对照 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：任何隐藏态探针结果必须同时报四条基线：**字符词袋**（同折同 alpha）、**长度**、**主导单特征**、以及**第 1 层同口径值**。缺任何一条都不可归因
+- 关键数字：hidden=0.9136，char_bag=0.8025，length=0.3704，single_neg_bit=0.6481，layer1=0.784，mcnemar_p=0.0051，floor=0.3333
+- 为什么：措辞纪律：只允许说「**超出词法的真实信息 +X 点**」，不允许说「已找到抽象码」。若 X < 0.05，一律判 NOT_BEYOND_LEXICON。
+- 复查：没有词袋基线时 0.91 看起来像"抽象码"，有基线后只剩 +11 点，且 L1 已 0.78 ⇒ 大部分可读性在任何组合加工之前就存在
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+- 证据：Q7-A ｜ `tools/pat_q7a_verify.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-MET-31 位置对齐可以靠肉眼核对渲染文本与 token 下标来保证。
+
+- 领域：指标与对照 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：构造刺激时让同一单元内除目标因子外的**前缀逐字相同**，则任意探针在该位置上的预测必然相同，准确率**必须精确等于 1/C**。这条恒等式是最省的位置对齐断言
+- 关键数字：n_classes=3，expected=0.333333，measured_S1=0.333333，measured_S2=0.333333，measured_S3=0.333333，max_dev=0.0
+- 为什么：推广：任何「同单元多条件」的实验都应预留一个**理论上必须等于地板的测量点**，一旦偏离即 PIPELINE_LEAK，不解释数据。
+- 复查：过去三轮的位置 bug（token offset、下标当值、抽样漏层）都是肉眼核对漏掉的；恒等式断言不依赖核对者的注意力
+- 证据：Q7-A ｜ `tools/pat_q7a.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+- 证据：Q7-A ｜ `tools/pat_q7a_verify.py` ｜ `results/2026-11-01/080226_pat_q7a.json`
+
+### R-MET-32 两个语义类之间的 within-cosine 差可以直接解释为语义结构。
+
+- 领域：指标与对照 ｜ 置信：high ｜ 已测 1 次 ｜ 不要重测
+- 判据：把组内词对按"是否共享汉字"二分，分别报 within；共享字对占比与去掉后的下降比例都要列。
+- 关键数字：color_within=0.1988，color_shared_frac=0.11，color_shared_pairs_cos=0.6029，color_within_no_shared=0.1504，color_drop_frac=0.244，fruit_within=0.0975，fruit_shared_frac=0.07，fruit_shared_pairs_cos=0.4186，fruit_within_no_shared=0.0738，fruit_drop_frac=0.243，freq_matched_random=0.0153
+- 为什么：共享字的词对 cos 高达 0.60（整体 0.20），不分解就会把词形当语义。本轮预注册只对 FRUIT 做了分解，COLOR 是跑后补的——结论没变属于运气，流程必须固定。
+- 复查：流程条款，与模型无关
+- 证据：Q8-A ｜ `tools/pat_q8a.py` ｜ `results/2026-11-01/091106_pat_q8a.json`
 
 ### R-MLP-04 高杠杆 MLP 单元是成对正反编码（差分对）：删掉它们时，破坏正确计算与修复错误计算同时发生，净效应接近零。
 

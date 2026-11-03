@@ -1,13 +1,31 @@
 # -*- coding: utf-8 -*-
 """ENT-XF 词表 v1 → v2 + 改动记录（Phase 250）。备选色清单 ALT / ALT2 / ALT3 即复核结论；v1 行为与自由回答只写入来源列。
 
-    python scripts/make_ent_lexicon_v2.py   # 需要 ~/.ai2050_agent/tasks 下 v1 的 behavior.json 与自由回答 JSON
+    python scripts/make_ent_lexicon_v2.py   # 需要 D:/ai2050_native/_behavior/_legacy_agent/tasks 下 v1 的 behavior.json 与自由回答 JSON
 """
 import json, os, sys
 from pathlib import Path
 from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# 旧节点客户端（~/.ai2050_agent，2026-10-19 退役）的 behavior.json 已于 2026-11-01 迁至本地数据根，
+# 旧路径保留为回退；迁移记录见 design/DATA_LAYOUT_v1_BEHAVIOR_MIGRATION_20261101.md
+BEHAVIOR_ROOT = Path(os.environ.get('AI2050_BEHAVIOR_DIR',
+                                    r'D:/ai2050_native/_behavior/_legacy_agent/tasks'))
+LEGACY_BEHAVIOR_ROOT = Path(os.path.expanduser('~/.ai2050_agent/tasks'))
+
+
+def behavior_path(task_id):
+    """某 task 的 behavior.json：新位置优先，旧位置回退，都没有则报错（不静默跳过）。"""
+    for base in (BEHAVIOR_ROOT, LEGACY_BEHAVIOR_ROOT):
+        p = base / task_id / 'outputs' / 'behavior.json'
+        if p.is_file():
+            return p
+    raise FileNotFoundError(
+        f'behavior.json 缺失：{task_id}（已查 {BEHAVIOR_ROOT} 与 {LEGACY_BEHAVIOR_ROOT}）')
+
+
 V1 = ROOT / 'shared/dist_protocol/lexicon/ENT-XF_nouns.v1.tsv'
 V2 = ROOT / 'shared/dist_protocol/lexicon/ENT-XF_nouns.v2.tsv'
 CH = ROOT / 'shared/dist_protocol/lexicon/ENT-XF_nouns.v2.changes.tsv'
@@ -114,7 +132,7 @@ PALETTE = {'red', 'yellow', 'green', 'blue', 'white', 'black', 'brown', 'orange'
 def v1_behavior():
     per = defaultdict(dict)
     for t in TASKS:
-        p = Path(os.path.expanduser(f'~/.ai2050_agent/tasks/{t}/outputs/behavior.json'))
+        p = behavior_path(t)
         for it in json.loads(p.read_text(encoding='utf-8'))['items']:
             fr, noun = it['id'].split(':')[1:]
             lang, _, task, _ = fr.split('-')
