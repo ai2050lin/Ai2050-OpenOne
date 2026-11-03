@@ -113,5 +113,18 @@ class WeightReadTests(unittest.TestCase):
         self.assertTrue(W.monotone([1, 1, 2, 3]) and not W.monotone([1, 3, 2]) and W.monotone([3, 2, 2], False))
 
 
+    def test_v5_neutral_and_persistence(self):
+        a = W.neutral_segment('x', 6)
+        self.assertEqual(a, W.neutral_segment('x', 6))
+        self.assertEqual(len(a.split(', ')), 6)
+        self.assertTrue(all(c.isdigit() for c in a.split(', ')))
+        self.assertNotEqual(a, W.neutral_segment('y', 6))
+        gaps = {4: 0.8, 16: 0.7, 64: 0.6}                                   # 植入：自持（几乎不衰减）
+        self.assertGreaterEqual(W.persistence(gaps, 4, 64), 0.5)
+        decay = {L: 0.8 * 0.5 ** ((L - 4) / 8) for L in (4, 16, 64)}        # 负对照：半衰期 8 个 token 的单稳态衰减
+        self.assertLess(W.persistence(decay, 4, 64), 0.5)
+        self.assertTrue(np.isnan(W.persistence({4: 0.0, 64: 0.1}, 4, 64)))
+
+
 if __name__ == '__main__':
     unittest.main()

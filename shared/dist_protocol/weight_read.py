@@ -229,3 +229,30 @@ def z_vs(v: float, null) -> float:
 def monotone(seq, increasing: bool = True) -> bool:
     d = np.diff(np.asarray(seq, float))
     return bool(np.all(d >= 0) if increasing else np.all(d <= 0))
+
+
+# ---- WS-v5：模式状态的自持（同样内容、不同顺序 + 中性段） ----
+CRITERIA_V5 = {
+    'schema': 'weight_read.v5',
+    'neutral_lengths': [4, 16, 64],     # 中性段（数字列表）token 数
+    'H1_gap_min': 0.2,                  # 中性段末位：模式投影差（先散文后代码 − 先代码后散文）/ 自然文本代码—散文均值差 ≥ 0.2（L = 4）
+    'H1_persist_min': 0.5,              #   且 gap(64) / gap(4) ≥ 0.5
+    'H2_select_ratio_min': 2.0,         # L = 16 末位：8 个头对代码 token 的质量比 PC / CP ≥ 2，且高于随机头的同一比值
+    'H3_select_gain_min': 1.5,          # CP 顺序、L = 16：中性段位置上 8 个头查询 +4σ 代码移动后，末位代码质量比 ≥ 1.5 × 原始，
+    'H3_state_frac_min': 0.1,           #   且末位模式投影向代码移动 ≥ 0.1 × 该长度下 PC − CP 的差；随机方向的移动 ≤ 1/3
+    'H3_control_max_frac': 1 / 3,
+    'seed': 0,
+}
+
+
+def neutral_segment(seed_text: str, n_numbers: int) -> str:
+    """确定性的数字列表「d, d, d, …」（在代码与散文中都常见）。"""
+    import hashlib
+    h = hashlib.sha256(seed_text.encode()).digest()
+    digits = [str(h[i % len(h)] % 10) for i in range(n_numbers)]
+    return ', '.join(digits)
+
+
+def persistence(gaps_by_len: Dict[int, float], short: int, long: int) -> float:
+    g0 = gaps_by_len[short]
+    return float(gaps_by_len[long] / g0) if g0 > 0 else float('nan')
