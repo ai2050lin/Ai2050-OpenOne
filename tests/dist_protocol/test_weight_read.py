@@ -31,6 +31,12 @@ class WeightReadTests(unittest.TestCase):
         self.assertLess(np.abs((W2 * gamma) @ v).max(), 1e-9)
         ortho = lambda M: (M * gamma) - np.outer((M * gamma) @ v, v)
         self.assertTrue(np.allclose(ortho(W2), ortho(Wg[:20])))
+        g0 = gamma.copy()
+        g0[:5] = 0.0                                                   # γ 为 0 的维度：权重不动，读出仍与方向正交
+        W3 = W.remove_direction(Wg[:20], g0, v)
+        self.assertTrue(np.all(np.isfinite(W3)))
+        self.assertTrue(np.allclose(W3[:, :5], Wg[:20, :5]))
+        self.assertLess(np.abs((W3 * g0) @ v).max(), 1e-9)
 
     def test_composition_and_verdict(self):
         rng = np.random.default_rng(1)

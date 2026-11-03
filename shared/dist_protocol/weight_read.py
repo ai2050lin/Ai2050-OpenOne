@@ -62,10 +62,13 @@ def composition_lowrank(R: np.ndarray, Wo: np.ndarray, Wv: np.ndarray) -> float:
 
 def remove_direction(W_rows: np.ndarray, gamma: np.ndarray, v: np.ndarray) -> np.ndarray:
     """在残差读出空间里移除方向 v：a = γ ⊙ w，a' = a − (a·v̂) v̂，返回 w' = a' / γ。"""
-    vh = unit(v)
+    ok = np.abs(gamma) > 1e-8                           # γ = 0 的维度（Gemma 的 1 + w 可为 0）读不到输入：方向限制在支撑上，这些维度的权重不动
+    vh = unit(np.where(ok, v, 0.0))
     A = W_rows * gamma[None, :]
     A2 = A - np.outer(A @ vh, vh)
-    return A2 / gamma[None, :]
+    out = np.array(W_rows, dtype=float, copy=True)
+    out[:, ok] = A2[:, ok] / gamma[None, ok]
+    return out
 
 
 def rankdata(x: np.ndarray) -> np.ndarray:
@@ -310,3 +313,23 @@ def fit_linear(x: np.ndarray, y: np.ndarray):
 
 def r2(y: np.ndarray, p: np.ndarray) -> float:
     return float(1 - ((y - p) ** 2).sum() / ((y - y.mean()) ** 2).sum())
+
+
+# ---- GC-v1：Gemma-3-4B 复现门控链（Phase 278–287 的方法，沿用上面的函数） ----
+CRITERIA_GC = {
+    'schema': 'weight_read.gc1',
+    'unit_pool_from_frac': 2 / 3,        # 候选单元：块 ≥ round(2/3 · L) 的全部 MLP 中间单元
+    'top_k': 32, 'n_random_sets': 5, 'n_random_sets_read': 200,
+    'inject_k': 6,                       # 写入强度 6σ（同 MF-v4）
+    'H1_patch_restore_min': 0.2,         # 单元激活修补：B 任务三组平均恢复 ≥ 0.2，且 ≥ 3 × 随机单元集合平均
+    'H1_over_random': 3.0,
+    'H2_read_ratio_min': 3.0, 'H2_p_max': 0.01,   # 读代码方向：≥ 3 倍随机集合，p ≤ 0.01
+    'H3_restore_frac_min': 0.5,          # 封闭式编辑恢复 ≥ 0.5 × 修补恢复；随机方向 / 随机单元编辑 ≤ 1/3
+    'H3_control_max_frac': 1 / 3,
+    'H4_nll_rise_max': 0.01,             # 编辑后确认集 NLL 上升 ≤ 1%（全部与代码文本）
+    'n_heads': 8,
+    'H5_query_ratio_min': 1.5,           # 8 个头查询 +4σ 代码：md 结语位置代码 key 质量比 ≥ 1.5 × 原始，|log| ≥ 3 × 随机方向
+    'H6_key_ratio_max': 0.8,             # 代码 key −4σ：代码位置代码 key 质量比 ≤ 0.8 × 原始，|log| ≥ 3 × 随机方向
+    'over_random_log': 3.0,
+    'seed': 0,
+}
