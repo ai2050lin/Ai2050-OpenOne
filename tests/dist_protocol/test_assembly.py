@@ -64,6 +64,32 @@ class AssemblyTests(unittest.TestCase):
         Yt2 = event_rand()
         self.assertGreater(S.kl_restricted(Yt2[1, 1], Yt2[0, 0] + ds2 + dl2, cand), 0.8 * S.kl_restricted(Yt2[1, 1], Yt2[0, 0], cand))
 
+    def test_v3_content_conditioned(self):
+        rng = np.random.default_rng(2)
+        a, b, c = rng.normal(0, 1, (3, 7))
+        Z = np.stack([np.stack([a + s_ * b + l_ * c for l_ in (0, 1)]) for s_ in (0, 1)])
+        ds, dl = S.own_effects(Z)
+        self.assertTrue(np.allclose(ds, b) and np.allclose(dl, c))
+        n, d, m = 16, 50, 80
+        A = rng.normal(0, 1, (d, m))
+        t0 = rng.normal(0, 1, m)
+        X = rng.normal(0, 1, (n, d))
+        Xt = rng.normal(0, 1, (16, d))
+        def tgt(X_):
+            Xc = X_ - X.mean(0)
+            return t0 + (Xc / np.linalg.norm(Xc, axis=1, keepdims=True)) @ A
+        T = tgt(X) + rng.normal(0, 0.05, (n, m))
+        mdl = S.kr_fit(X, T)
+        err_kr = ((S.kr_predict(mdl, Xt) - tgt(Xt)) ** 2).mean()
+        err_mean = ((T.mean(0) - tgt(Xt)) ** 2).mean()
+        self.assertLess(err_kr, 0.9 * err_mean)            # 植入：效应随内容线性变化 → 核岭回归优于平均效应
+        # 负对照：效应与内容无关 → 留一选大 λ，预测接近平均效应，不比平均效应差多少
+        Tn = t0 + rng.normal(0, 1, (n, m))
+        mn = S.kr_fit(X, Tn)
+        self.assertGreaterEqual(mn['lam'], 1.0)
+        Tt = t0 + rng.normal(0, 1, (16, m))
+        self.assertLess(((S.kr_predict(mn, Xt) - Tt) ** 2).mean(), 1.05 * ((Tn.mean(0) - Tt) ** 2).mean())
+
 
 if __name__ == '__main__':
     unittest.main()

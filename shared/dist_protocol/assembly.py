@@ -88,3 +88,59 @@ def slot_effects(Yd: np.ndarray):
     dl = (Yd[:, :, 1] - Yd[:, :, 0]).mean((0, 1))
     dsl = (Yd[:, 1, 1] - Yd[:, 1, 0] - Yd[:, 0, 1] + Yd[:, 0, 0]).mean(0)
     return ds, dl, dsl
+
+
+# ---- assembly.v3（AM-v3）：内容条件化的效应 ----
+# 新事件仍只看到 (日常, 因果) 格。比较三种预测：
+#   B1 对数概率空间加法（AM-v2 的专家乘积）：Ŷ = Y00 + s·Δs_g + l·Δl_g
+#   C2 状态空间加法：ĥ = h00 + s·Δh_s,g + l·Δh_l,g（h = 末层块输出、最终归一化之前），再经最终归一化 + unembedding 读出
+#   C3 内容条件化的状态加法：Δh 由该事件中层状态（只来自 (0,0,g) 提示）经核岭回归预测；λ 在发现集内留一选择，λ 大时退化为 C2
+CRITERIA_V3 = {
+    'schema': 'assembly.v3',
+    'top_k_cand': 20,
+    'key_layer_frac': 0.5,                   # 内容键 = hs[L // 2]（L 为块数），(0,0,g) 提示末位
+    'lambda_grid': [1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0, 1e4],  # 相对 tr(K) / n
+    'n_shuffle': 20,
+    'H1_state_ratio_max': 0.9,               # KL(C2) ≤ 0.9 × KL(B1)（每种语言）：状态空间加法优于对数概率加法
+    'H2_content_ratio_max': 0.9,             # KL(C3) ≤ 0.9 × KL(C2)（每种语言），且
+    'H2_shuffle_p_max': 0.05,                # 打乱发现集内容键的 20 次 C3 中 KL ≤ 真实 C3 的个数 + 1 / 21 ≤ 0.05
+    'H3_recovered_min': 0.6,                 # 1 − KL(C3) / KL(只用 Y00) ≥ 0.6（每种语言）
+    'seed': 0,
+}
+
+
+def own_effects(Z: np.ndarray):
+    """Z：[2, 2, ...]（同一事件同一槽位的四格）。返回该事件自己的 (Δs, Δl)。"""
+    return 0.5 * (Z[1, 0] - Z[0, 0] + Z[1, 1] - Z[0, 1]), 0.5 * (Z[0, 1] - Z[0, 0] + Z[1, 1] - Z[1, 0])
+
+
+def _kr_core(X: np.ndarray, T: np.ndarray, lam: float):
+    mu = X.mean(0)
+    Xc = X - mu
+    Xn = Xc / (np.linalg.norm(Xc, axis=1, keepdims=True) + 1e-12)
+    K = Xn @ Xn.T
+    tb = T.mean(0)
+    a = np.linalg.solve(K + lam * np.trace(K) / len(X) * np.eye(len(X)), T - tb)
+    return {'mu': mu, 'Xn': Xn, 'alpha': a, 'tbar': tb, 'lam': lam}
+
+
+def kr_predict(m, x: np.ndarray) -> np.ndarray:
+    xc = np.atleast_2d(x) - m['mu']
+    xn = xc / (np.linalg.norm(xc, axis=1, keepdims=True) + 1e-12)
+    return m['tbar'] + (xn @ m['Xn'].T) @ m['alpha']
+
+
+def kr_fit(X: np.ndarray, T: np.ndarray, grid=None):
+    """余弦核岭回归（键先按样本均值中心化）。λ 由留一（每次重新中心化）在 T 空间的平方误差选择。"""
+    grid = CRITERIA_V3['lambda_grid'] if grid is None else grid
+    n = len(X)
+    loo = []
+    for lam in grid:
+        e = 0.0
+        for i in range(n):
+            k = np.arange(n) != i
+            e += float(((kr_predict(_kr_core(X[k], T[k], lam), X[i])[0] - T[i]) ** 2).sum())
+        loo.append(e / n)
+    m = _kr_core(X, T, grid[int(np.argmin(loo))])
+    m['loo'] = loo
+    return m
