@@ -126,5 +126,30 @@ class WeightReadTests(unittest.TestCase):
         self.assertTrue(np.isnan(W.persistence({4: 0.0, 64: 0.1}, 4, 64)))
 
 
+    def test_v6_local_integration(self):
+        lo = W.unigram_logodds({1: 9, 2: 1}, {2: 9, 3: 1})
+        self.assertGreater(lo[1], 0)
+        self.assertLess(lo[2], 0)
+        rng = np.random.default_rng(6)
+        e = np.repeat(rng.choice([-2.0, 2.0], 12), 15) + rng.normal(0, 0.5, 180)
+        self.assertTrue(np.allclose(W.window_feature(e, 1), e))
+        self.assertAlmostEqual(W.window_feature(e, 4)[10], e[7:11].mean())
+        f0 = W.matched_feature(e, 8.0, 0.0, np.zeros(len(e)))
+        w = np.exp(-np.arange(11)[::-1] / 8.0)
+        self.assertAlmostEqual(f0[10], (w * e[:11]).sum() / w.sum())
+        y = 0.3 + 0.5 * f0 + rng.normal(0, 0.05, len(e))                 # 植入：τ = 8 的局部积分
+        fits = {tau: W.r2(y, np.stack([np.ones_like(e), W.matched_feature(e, tau, 0.0, np.zeros(len(e)))], 1)
+                          @ W.fit_linear(W.matched_feature(e, tau, 0.0, np.zeros(len(e))), y)) for tau in (1, 8, 64)}
+        self.assertEqual(max(fits, key=fits.get), 8)
+        self.assertGreater(fits[8] - fits[1], 0.1)
+        yo = 0.3 + 0.5 * e + rng.normal(0, 0.05, len(e))                  # 负对照：只依赖本 token
+        r_own = W.r2(yo, np.stack([np.ones_like(e), e], 1) @ W.fit_linear(e, yo))
+        r_int = W.r2(yo, np.stack([np.ones_like(e), f0], 1) @ W.fit_linear(f0, yo))
+        self.assertGreater(r_own, r_int)
+        m_hat = np.sign(f0)
+        fm = W.matched_feature(e, 8.0, 1.0, m_hat)
+        self.assertGreater(np.abs(fm).mean(), np.abs(f0).mean())         # 模式匹配加权放大与当前模式同号的证据
+
+
 if __name__ == '__main__':
     unittest.main()

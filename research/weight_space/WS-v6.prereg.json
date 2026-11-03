@@ -1,0 +1,52 @@
+{
+ "id": "WS-v6",
+ "schema": "weight_space_prereg.v6",
+ "created": "2026-11-02",
+ "basis": "Phase 288（WS-v5）：模式状态不自持；本版拟合单稳态局部积分模型并做留出预测（AGENTS 5.4 预测保真度）",
+ "models": {
+  "qwen3-4b": "bf16"
+ },
+ "precision_rule": "不使用任何量化",
+ "materials": "发现：WS-v3 的发现集混合文本；确认：mf_materials_v1.mixed_corpus（确认集任务）；词汇证据只用 MF-v1 发现集单风格文本",
+ "inputs_at_prediction": "只用 token 序列与发现集拟合的参数；不用被预测位置的状态或输出",
+ "power_note": "确认集 320 段混合文本的全部位置；连续量阈值",
+ "doc": "WS-v6：拟合单稳态局部积分模型，在留出的混合文本上预测逐位置的模式状态与代码倾向。\n\n接 Phase 288（WS-v5）：模式状态不自持，证据中断后约 20 个 token 内消退；候选式为单稳态局部积分\n  m_t ≈ m_0 + η Σ_{j≤t} A_tj e_j，A_tj ∝ exp(−(t−j)/τ + β m_t e_j)。\n  证据 e_j：token 的词汇证据 = MF-v1 发现集单风格文本中 log P(token | 代码) − log P(token | 散文)（加 1 平滑；未见 token 为 0）。\n  目标：混合文本（md / cmt）逐位置的 m_t = hs[33]·v_33 / Δμ_33（同 WS-v5），以及下一 token 的代码专有词对数质量。\n  模型（发现集混合文本 = MF-v1 发现集任务；确认集 = MF-v5 的确认集任务混合文本）：\n    M1 本 token：a + b·e_t\n    M2 窗口平均：a + b·mean(e_{t−k+1..t})，k 在发现集上选\n    M3 指数衰减：a + b·Σ w_tj e_j / Σ w_tj，w = exp(−(t−j)/τ)，τ 在发现集上选\n    M4 模式匹配加权：同 M3 但 w = exp(−(t−j)/τ + β m̂_t e_j)，m̂ 先取 M3 的预测、再迭代 2 次；(τ, β) 在发现集上选（β = 0 即 M3）\n  H1 确认集 R²：max(M2, M3)（发现集选出的较好者）− M1 ≥ 0.10。\n  H2 M4 比 M3 高 ≥ 0.02，且发现集选出的 β > 0。\n  H3 M3 选出的半衰期 τ·ln2 ∈ [4, 32] 个 token。\n  H4 用 M3 / M4 中发现集较好者的超参数，重新拟合 (a, b) 预测代码专有词质量，确认集 R² ≥ 0.5。\n被测模型：Qwen3-4B（bf16，不使用量化）。\n用法：python scripts/weight_space_v6.py prereg | run | analyze\n",
+ "criteria": {
+  "schema": "weight_read.v6",
+  "windows": [
+   1,
+   2,
+   4,
+   8,
+   16,
+   32,
+   64
+  ],
+  "taus": [
+   1,
+   2,
+   4,
+   8,
+   16,
+   32,
+   64
+  ],
+  "betas": [
+   0.0,
+   0.25,
+   0.5,
+   1.0,
+   2.0
+  ],
+  "n_iter": 2,
+  "H1_context_gain_min": 0.1,
+  "H2_matched_gain_min": 0.02,
+  "H3_halflife_range": [
+   4,
+   32
+  ],
+  "H4_mass_r2_min": 0.5,
+  "smooth": 1.0,
+  "seed": 0
+ }
+}

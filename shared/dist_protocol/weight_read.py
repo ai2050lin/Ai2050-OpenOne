@@ -256,3 +256,57 @@ def neutral_segment(seed_text: str, n_numbers: int) -> str:
 def persistence(gaps_by_len: Dict[int, float], short: int, long: int) -> float:
     g0 = gaps_by_len[short]
     return float(gaps_by_len[long] / g0) if g0 > 0 else float('nan')
+
+
+# ---- WS-v6：单稳态局部积分模型的拟合与留出预测 ----
+CRITERIA_V6 = {
+    'schema': 'weight_read.v6',
+    'windows': [1, 2, 4, 8, 16, 32, 64],
+    'taus': [1, 2, 4, 8, 16, 32, 64],
+    'betas': [0.0, 0.25, 0.5, 1.0, 2.0],
+    'n_iter': 2,
+    'H1_context_gain_min': 0.10,         # 确认集：积分模型（窗口或指数衰减中发现集选出的较好者）R² − 只用本 token 的 R² ≥ 0.10
+    'H2_matched_gain_min': 0.02,         # 模式匹配加权（β > 0）比纯指数衰减 R² 高 ≥ 0.02，且发现集选出的 β > 0
+    'H3_halflife_range': [4, 32],        # 发现集选出的指数衰减半衰期（token）在 [4, 32] 内
+    'H4_mass_r2_min': 0.5,               # 同一积分模型预测下一 token 代码专有词质量的确认集 R² ≥ 0.5
+    'smooth': 1.0,
+    'seed': 0,
+}
+
+
+def unigram_logodds(code_counts: Dict[int, int], prose_counts: Dict[int, int], smooth: float = 1.0) -> Dict[int, float]:
+    """token 的词汇证据：log P(token | 代码) − log P(token | 散文)，加性平滑。"""
+    vocab = set(code_counts) | set(prose_counts)
+    nc, npr = sum(code_counts.values()), sum(prose_counts.values())
+    V = len(vocab)
+    return {t: float(np.log((code_counts.get(t, 0) + smooth) / (nc + smooth * V))
+                     - np.log((prose_counts.get(t, 0) + smooth) / (npr + smooth * V))) for t in vocab}
+
+
+def window_feature(e: np.ndarray, k: int) -> np.ndarray:
+    c = np.concatenate([[0.0], np.cumsum(e)])
+    t = np.arange(len(e))
+    lo = np.maximum(0, t - k + 1)
+    return (c[t + 1] - c[lo]) / (t + 1 - lo)
+
+
+def matched_feature(e: np.ndarray, tau: float, beta: float, m_hat: np.ndarray) -> np.ndarray:
+    """f_t = Σ_{j≤t} w_tj e_j，w_tj ∝ exp(−(t−j)/τ + β·m̂_t·e_j)。β = 0 时为归一化指数衰减平均。"""
+    T = len(e)
+    out = np.zeros(T)
+    for t in range(T):
+        d = t - np.arange(t + 1)
+        lw = -d / tau + beta * m_hat[t] * e[:t + 1]
+        w = np.exp(lw - lw.max())
+        out[t] = (w * e[:t + 1]).sum() / w.sum()
+    return out
+
+
+def fit_linear(x: np.ndarray, y: np.ndarray):
+    A = np.stack([np.ones_like(x), x], 1)
+    coef, *_ = np.linalg.lstsq(A, y, rcond=None)
+    return coef
+
+
+def r2(y: np.ndarray, p: np.ndarray) -> float:
+    return float(1 - ((y - p) ** 2).sum() / ((y - y.mean()) ** 2).sum())
