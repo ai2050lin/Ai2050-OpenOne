@@ -77,5 +77,17 @@ class WeightReadTests(unittest.TestCase):
         self.assertAlmostEqual(W.locality(np.r_[5.0, np.ones(24)], 24, 4), 4 / 24)
 
 
+    def test_v3_syntax_and_mass_ratio(self):
+        for t in ['):\n', ':\n', ' return', ' if', ' +=', ' ==', ' =']:
+            self.assertTrue(W.is_syntax(t), t)
+        for t in [' acc', ' x', 'append', ' the', '\n', '1', ' returned']:
+            self.assertFalse(W.is_syntax(t), t)
+        cls = np.r_[False, np.array([True, False] * 10)]
+        a = np.r_[50.0, np.where(cls[1:], 3.0, 1.0)]                     # 植入：类别上 3 倍注意力
+        self.assertAlmostEqual(W.mass_ratio(a, 20, cls), 1.5)              # (30/40) / 0.5
+        self.assertAlmostEqual(W.mass_ratio(np.r_[50.0, np.ones(20)], 20, cls), 1.0)   # 负对照：均匀注意力
+        self.assertTrue(np.isnan(W.mass_ratio(a, 20, np.zeros(21, bool))))
+
+
 if __name__ == '__main__':
     unittest.main()

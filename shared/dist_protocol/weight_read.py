@@ -149,3 +149,33 @@ def locality(attn_row: np.ndarray, t: int, window: int) -> float:
     if a.sum() <= 0:
         return float('nan')
     return float(a[max(0, t - window):].sum() / a.sum())
+
+
+# ---- WS-v3：上游头的 QK 侧（看哪里、敲掉会怎样） ----
+CRITERIA_V3 = {
+    'schema': 'weight_read.v3',
+    'H1_lookback_min': 1.5,           # md 文本结语散文位置：代码段 token 的注意力质量 / 代码段占可见 token 份额 ≥ 1.5，且高于随机头集合平均
+    'H2_syntax_min': 2.0,             # 代码位置：语法骨架 token 的注意力质量 / 其份额 ≥ 2，且高于随机头集合平均
+    'H3_drop_min': 0.10,              # 只禁止 8 个头注意语法 token：确认集门控得分差下降 ≥ 10%，
+    'H3_over_control': 2.0,           #   且 ≥ 2 × 等数随机 token 禁止的下降、≥ 2 × 随机头禁止语法 token 的下降（5 组平均）
+    'min_pos': 8,
+    'seed': 0,
+}
+KEYWORDS = {'return', 'if', 'while', 'for', 'def', 'else', 'elif', 'in', 'and', 'or', 'not', 'import', 'from', 'class', 'True',
+            'False', 'None', 'break', 'continue', 'pass', 'lambda', 'yield', 'with', 'as', 'try', 'except'}
+OPERATORS = {'=', '+=', '-=', '*=', '/=', '==', '!=', '<=', '>=', '<', '>', '+', '-', '*', '/', '//', '%', '**'}
+
+
+def is_syntax(tok_str: str) -> bool:
+    """预注册的代码语法骨架 token：块头（含冒号且以换行结尾）、Python 关键字、运算符（去掉首尾空白后比较）。"""
+    s = tok_str.strip(' \t')
+    return (':' in s and tok_str.endswith('\n')) or s.strip() in KEYWORDS or s.strip() in OPERATORS
+
+
+def mass_ratio(attn_row: np.ndarray, t: int, cls: np.ndarray) -> float:
+    """位置 t 的注意力行；cls：长度 ≥ t+1 的布尔类别。去掉位置 0 后，类别上的注意力比例 / 类别在 1..t 中的份额。"""
+    a = np.asarray(attn_row[1:t + 1], float)
+    c = np.asarray(cls[1:t + 1], bool)
+    if a.sum() <= 0 or not c.any() or c.all():
+        return float('nan')
+    return float((a[c].sum() / a.sum()) / c.mean())
