@@ -348,6 +348,23 @@ CRITERIA_GC2 = {
 }
 
 
+# ---- GL-v1：GLM4-9B（bf16）上复现门控链（GC-v1 的单元与 QK + GC-v2 的传播方向编辑） ----
+CRITERIA_GL = {
+    'schema': 'weight_read.gl1',
+    'unit_pool_from_frac': 2 / 3, 'top_k': 32, 'n_random_sets': 5, 'n_random_sets_read': 200,
+    'inject_k': 6,
+    'H1_patch_restore_min': 0.2, 'H1_over_random': 3.0,           # 单元修补（同 GC-v1 H1）
+    'H2_read_ratio_min': 3.0, 'H2_p_max': 0.01,                   # 读自然代码方向 v_l（同 GC-v1 H2）
+    'H3_read_ratio_min': 3.0, 'H3_p_max': 0.01,                   # 读冲突差值方向 d_l（同 GC-v2 H1）
+    'H4_restore_frac_min': 0.5, 'H4_control_max_frac': 1 / 3,     # 移除 d_l 的编辑（同 GC-v2 H2，参照本次 H1 的修补恢复）
+    'H5_nll_rise_max': 0.01,                                      # 移除 d_l 后确认集 NLL（同 GC-v2 H3）
+    'n_heads': 8,
+    'H6_query_ratio_min': 1.5, 'H7_key_ratio_max': 0.8, 'over_random_log': 3.0,   # 同模式 QK（同 GC-v1 H5 / H6）
+    'sub_rank': 4,                                                # 描述性：移除冲突差值前 4 个主方向
+    'seed': 0,
+}
+
+
 def remove_subspace(W_rows: np.ndarray, gamma: np.ndarray, V: np.ndarray) -> np.ndarray:
     """在读出空间里移除 span(V)（V：[k, d]，先限制到 γ ≠ 0 的支撑上再正交化），γ = 0 维度的权重不动。"""
     ok = np.abs(gamma) > 1e-8

@@ -1,0 +1,37 @@
+{
+ "id": "GL-v1",
+ "schema": "glm_chain_prereg.v1",
+ "created": "2026-11-03",
+ "basis": "门控链在 Qwen3-4B（Phase 278 / 284 / 285 / 287）与 Gemma-3-4B（Phase 290 / 291）上的结果；本版在第三个架构上复现拼图 17、22、25",
+ "models": {
+  "glm4-9b-chat-hf": "bf16"
+ },
+ "precision_rule": "不使用任何量化；显存不足部分用 CPU 锁页内存逐块搬运",
+ "materials": "MF-v1 语料（发现 / 确认），MF-v4 的三组写入范式与 A / B 任务切分，WS-v3 的发现集混合文本",
+ "differences": "GC-v2 的 H2 参照 GC-v1 的修补恢复；本版 H4 参照同一次运行的 H1 修补恢复。旧 GLM int8 结果（Phase 273–279）不与本版合并",
+ "power_note": "每组 B 任务约 40 段；随机集合 5 / 200 组；混合文本 md 约 160 段；连续量阈值",
+ "doc": "GL-v1：在 GLM4-9B（bf16）上复现「代码压过散文」的门控链（第三个架构；GC-v1 + GC-v2 的方法合并为一次运行）。\n\nGLM 与 Qwen / Gemma 的结构差异：注意力与 MLP 之前各一个 RMSNorm（权重即缩放，无 1 + w，无后置归一化），\ngate 与 up 合并为 gate_up_proj（前 I 行 gate、后 I 行 up），SwiGLU；32 个头、2 个 KV 组（每组 16 头），头维 128，部分 RoPE。\nbf16 约 18.7 GB，16 GB 显存放不下：嵌入表与前若干块的权重留在 CPU（锁页内存），执行该块时搬上 GPU、执行完换回 CPU 副本；\n后三分之一的块（单元池）始终在 GPU。不使用任何量化。文本不加特殊前缀（与 MF-v1 / MF-v4 的 GLM 运行一致）。\n材料同 MF-v1；写入范式同 MF-v4（块 round(L/2) 写入 6σ，文本前 60%，A / B 任务切分）；混合文本同 WS-v3 发现集。\n  S0 方向：发现集共用 token 位置上的 token 配平代码方向 v_l（单元所在块的 hs[l]）。\n  S1 单元：候选为块 ≥ round(2L/3) 的全部 MLP 中间单元；直接作用差 Δ_i = (A_同时 − A_只散文)_i ·（W_down 列对 log M_p 的梯度），\n      A 任务上取最负 32 个。H1：B 任务上只把这 32 个单元换回「只散文」的值，散文恢复（三组平均）≥ 0.2，且 ≥ 3 × 同层随机 32 单元（5 组）。\n  S2 读与编辑：读出向量 a_i = γ_post_attn ⊙ W_gate[i]（up 同理）。\n      H2：对 v_l 的读分数 ≥ 同层随机集合（200 组）3 倍，p ≤ 0.01。\n      H3：对冲突差值方向 d_l 的读分数 ≥ 3 倍，p ≤ 0.01（d_l：A 任务上块 l MLP 输入逐位置 RMS 归一化后「散文 + 代码」− 「只散文」的平均，位置 0 除外）。\n      H4：从 32 个单元的 gate 与 up 行移除 d_l，B 任务恢复 ≥ 0.5 × H1 的修补恢复；同一单元移除随机方向、5 组随机单元移除 d_l，各 ≤ 编辑的 1/3。\n      H5：该编辑后确认集自然文本 NLL 相对上升 ≤ 1%（全部与代码文本）。\n      描述：移除 v_l 的编辑恢复（GC-v1 H3 的形式）、移除冲突差值前 4 个主方向的恢复、cos(d_l, v_l)。\n  S3 上游头与同模式 QK：门控得分 G = Σ s_i g_i（s_i 由发现集自然文本定号），头的直接贡献经单元所在块的 MLP 输入归一化线性化；\n      发现集上推向代码最大的 8 个头。在 WS-v3 发现集混合文本（md）上：\n      H6：这 8 个头的查询加 +4σ 代码分量，结语位置对代码 key 的质量比 ≥ 1.5 × 原始，且 |log 效应| ≥ 3 × 随机方向。\n      H7：代码段 key 移动 −4σ，代码位置对代码 key 的质量比 ≤ 0.8 × 原始，且 |log 效应| ≥ 3 × 随机方向。\n被测模型：GLM4-9B-chat-hf（bf16）。与 Qwen / Gemma 的方向、单元、头不作跨模型对应，只比较规律是否成立。\n用法：python scripts/glm_chain_v1.py prereg | run | analyze\n",
+ "criteria": {
+  "schema": "weight_read.gl1",
+  "unit_pool_from_frac": 0.6666666666666666,
+  "top_k": 32,
+  "n_random_sets": 5,
+  "n_random_sets_read": 200,
+  "inject_k": 6,
+  "H1_patch_restore_min": 0.2,
+  "H1_over_random": 3.0,
+  "H2_read_ratio_min": 3.0,
+  "H2_p_max": 0.01,
+  "H3_read_ratio_min": 3.0,
+  "H3_p_max": 0.01,
+  "H4_restore_frac_min": 0.5,
+  "H4_control_max_frac": 0.3333333333333333,
+  "H5_nll_rise_max": 0.01,
+  "n_heads": 8,
+  "H6_query_ratio_min": 1.5,
+  "H7_key_ratio_max": 0.8,
+  "over_random_log": 3.0,
+  "sub_rank": 4,
+  "seed": 0
+ }
+}
