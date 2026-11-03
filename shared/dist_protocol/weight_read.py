@@ -101,3 +101,51 @@ def head_verdict(cs: np.ndarray, base: np.ndarray, truth: np.ndarray, crit=CRITE
     ov = topk_overlap(cs, truth, crit['H2_top_k'], crit['n_perm'], crit['seed'])
     return {'spearman': rho, 'spearman_norm_baseline': rho_b, 'overlap': ov,
             'pass': bool(rho >= crit['H2_spearman_min'] and rho > rho_b and ov['p'] <= crit['H2_p_max'])}
+
+
+# ---- WS-v2：上游头的封闭式写出编辑 ----
+CRITERIA_V2 = {
+    'schema': 'weight_read.v2',
+    'n_heads': 8,                       # 发现集上直接贡献（推向代码）最大的 8 个头（块 ≤ 34）
+    'n_random_sets': 5,                 # 同层随机头集合
+    'H1_reduction_min': 0.2,            # 确认集门控得分「代码 − 散文」差的下降比例 ≥ 0.2，且 ≥ 随机集合平均的 3 倍
+    'H1_over_random': 3.0,
+    'H2_restore_min': 0.1,              # MF-v4 写入范式下恢复 ≥ 0.1，且 ≥ 随机集合平均的 3 倍
+    'H2_over_random': 3.0,
+    'H3_nll_rise_max': 0.01,            # 自然文本 NLL 相对上升 ≤ 1%（全部与代码文本分别）
+    'locality_window': 16,
+    'seed': 0,
+}
+
+
+def remove_write(Wo_h: np.ndarray, V: np.ndarray) -> np.ndarray:
+    """从头的写出矩阵 Wo_h：[d, r] 中移除写向子空间 span(V) 的分量（V：[k, d]，行可不正交）。"""
+    Q, _ = np.linalg.qr(np.atleast_2d(V).T)
+    return Wo_h - Q @ (Q.T @ Wo_h)
+
+
+def matched_heads(sel, n_heads: int, n_sets: int, seed: int):
+    """sel：[(块, 头)]；每个头换成同块另一个未被选中的头。"""
+    rng = np.random.default_rng(seed)
+    out = []
+    for _ in range(n_sets):
+        s = []
+        for lam, h in sel:
+            pool = [x for x in range(n_heads) if (lam, x) not in sel and (lam, x) not in s]
+            s.append((lam, int(rng.choice(pool))))
+        out.append(s)
+    return out
+
+
+def over_random(v: float, rand, ratio: float, vmin: float) -> Dict[str, object]:
+    rm = float(np.mean(rand))
+    return {'value': float(v), 'random': [float(x) for x in rand], 'random_mean': rm,
+            'pass': bool(v >= vmin and v >= ratio * max(rm, 0.0))}
+
+
+def locality(attn_row: np.ndarray, t: int, window: int) -> float:
+    """位置 t 的注意力行（长度 ≥ t+1）：去掉位置 0（汇聚点）后，落在最近 window 个位置（含自身）的比例。"""
+    a = np.asarray(attn_row[1:t + 1], float)
+    if a.sum() <= 0:
+        return float('nan')
+    return float(a[max(0, t - window):].sum() / a.sum())

@@ -56,5 +56,26 @@ class WeightReadTests(unittest.TestCase):
         self.assertAlmostEqual(W.spearman(np.array([1, 2, 2, 3.]), np.array([1, 2, 2, 3.])), 1.0)
 
 
+    def test_v2_remove_write_and_controls(self):
+        rng = np.random.default_rng(3)
+        d, r = 64, 8
+        V = rng.normal(0, 1, (2, d))
+        Wo = rng.normal(0, 1, (d, r))
+        Wo2 = W.remove_write(Wo, V)
+        self.assertLess(np.abs(V @ Wo2).max(), 1e-9)                 # 写出与 span(V) 正交
+        Q, _ = np.linalg.qr(V.T)
+        self.assertTrue(np.allclose(Wo2 - Wo, -Q @ (Q.T @ Wo)))       # 只改该子空间
+        sel = [(3, 1), (3, 2), (5, 0)]
+        for s_ in W.matched_heads(sel, 4, 5, 0):
+            self.assertEqual([l for l, _ in s_], [3, 3, 5])
+            self.assertFalse(set(s_) & set(sel))
+            self.assertEqual(len(set(s_)), 3)
+        self.assertTrue(W.over_random(0.3, [0.01, 0.05], 3, 0.2)['pass'])
+        self.assertFalse(W.over_random(0.3, [0.2, 0.15], 3, 0.2)['pass'])   # 负对照：随机集合同样有效
+        a = np.r_[10.0, np.zeros(20), np.ones(4)]
+        self.assertAlmostEqual(W.locality(a, 24, 4), 1.0)
+        self.assertAlmostEqual(W.locality(np.r_[5.0, np.ones(24)], 24, 4), 4 / 24)
+
+
 if __name__ == '__main__':
     unittest.main()

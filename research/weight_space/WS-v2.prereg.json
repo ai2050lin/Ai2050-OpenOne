@@ -1,0 +1,27 @@
+{
+ "id": "WS-v2",
+ "schema": "weight_space_prereg.v2",
+ "created": "2026-11-02",
+ "basis": "Phase 284（WS-v1）：门控得分差约一半由注意力头直接写入（块 32 KV 组 6 等）；本版对上游头做封闭式写出编辑",
+ "models": {
+  "qwen3-4b": "bf16"
+ },
+ "precision_rule": "不使用任何量化",
+ "units_and_signs": "MF-v4 的 32 个单元；符号沿用 research/weight_space/WS-v1-qwen3-4b/report.json 的 unit_signs（发现集定号）",
+ "selection": "WS-v1 的确认集逐头贡献已公开；本版重新只在发现集上选头，确认集只用于判定",
+ "mf_v4_paradigm": "与 WS-v1 H3 相同的 B 任务文本与写入强度",
+ "power_note": "H1：确认集 160 段文本的共用 token 位置；H2：三组 B 任务；5 组随机头对照；连续量阈值",
+ "doc": "WS-v2：门控单元的上游注意力头——封闭式写出编辑的总效应与注意力模式。\n\n接 Phase 284（WS-v1）：门控得分「代码 − 散文」差约一半由注意力头直接写入，集中在块 32 的少数头。\n  选择（只用发现集）：按 WS-v1 的直接贡献分解（门控得分 G = Σ s_i g_i，s_i 沿用 WS-v1 由发现集定的号），\n      在 MF-v1 发现集自然文本上取「代码 − 散文」直接贡献最大（推向代码）的 8 个头（块 ≤ 34）。\n  编辑：从这 8 个头的写出矩阵 W_O^h 中移除写向代码方向 v_{λ+1}（hs[λ+1] 的 token 配平方向）的分量，W_O' = (I − v vᵀ) W_O。\n      对照：5 组同块随机头做同样编辑。描述性：改为移除写向门控读出方向 span{S_l}（l ≥ λ）的分量。\n  H1（自然文本，总效应）：确认集门控得分「代码 − 散文」差下降 ≥ 20%，且 ≥ 随机头集合平均下降的 3 倍。\n  H2（MF-v4 写入范式，B 任务）：散文质量恢复 ≥ 0.1，且 ≥ 随机头集合平均的 3 倍。\n  H3（损伤）：确认集自然文本平均 NLL 相对上升 ≤ 1%（全部与代码文本分别）。\n  描述：选中头的直接贡献（确认集）与总效应对照；注意力局部性（代码位置 t ≥ 24，去掉位置 0 后落在最近 16 个位置的比例）与选中头最关注的 token。\n被测模型：Qwen3-4B（bf16，不使用量化）。\n用法：python scripts/weight_space_v2.py prereg | run | analyze\n",
+ "criteria": {
+  "schema": "weight_read.v2",
+  "n_heads": 8,
+  "n_random_sets": 5,
+  "H1_reduction_min": 0.2,
+  "H1_over_random": 3.0,
+  "H2_restore_min": 0.1,
+  "H2_over_random": 3.0,
+  "H3_nll_rise_max": 0.01,
+  "locality_window": 16,
+  "seed": 0
+ }
+}
