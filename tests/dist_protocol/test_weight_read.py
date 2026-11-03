@@ -89,5 +89,29 @@ class WeightReadTests(unittest.TestCase):
         self.assertTrue(np.isnan(W.mass_ratio(a, 20, np.zeros(21, bool))))
 
 
+    def test_v4_rope_and_alignment(self):
+        rng = np.random.default_rng(4)
+        hd = 16
+        inv = 1.0 / (10000 ** (np.arange(0, hd, 2) / hd))
+        q, k = rng.normal(0, 1, (2, hd))
+        rope = lambda x, p_: x * np.cos(p_ * np.r_[inv, inv]) + W.rotate_half(x) * np.sin(p_ * np.r_[inv, inv])
+        self.assertTrue(np.allclose(W.rope_matrix(inv, 3.0) @ q, rope(q, 3.0)))
+        B = W.rope_avg(inv, range(1, 9))
+        self.assertAlmostEqual(q @ B @ k, np.mean([rope(q, d) @ rope(k, 0.0) for d in range(1, 9)]), places=9)
+        self.assertAlmostEqual(q @ B @ k, np.mean([rope(q, d + 5) @ rope(k, 5.0) for d in range(1, 9)]), places=9)  # 只依赖相对位置
+        d = 32
+        v = W.unit(rng.normal(0, 1, d))
+        Wq = rng.normal(0, 1, (hd, d))
+        Wk = rng.normal(0, 1, (hd, d))
+        Wk_planted = Wk - np.outer(Wk @ v, v) + np.outer(np.linalg.solve(B, Wq @ v), v)   # 植入：v 写入的 key 与查询对齐
+        ones = np.ones(hd)
+        a_pl = W.qk_alignment(Wq, ones, Wk_planted, ones, np.ones(d), v, B)
+        self.assertGreater(a_pl, 0.99)
+        null = [W.qk_alignment(Wq, ones, Wk, ones, np.ones(d), W.unit(rng.normal(0, 1, d)), B) for _ in range(200)]
+        self.assertGreater(W.z_vs(a_pl, null), 2)
+        self.assertLess(abs(W.z_vs(W.qk_alignment(Wq, ones, Wk, ones, np.ones(d), v, B), null)), 3)   # 负对照：未植入
+        self.assertTrue(W.monotone([1, 1, 2, 3]) and not W.monotone([1, 3, 2]) and W.monotone([3, 2, 2], False))
+
+
 if __name__ == '__main__':
     unittest.main()

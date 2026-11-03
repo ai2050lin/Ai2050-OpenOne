@@ -179,3 +179,53 @@ def mass_ratio(attn_row: np.ndarray, t: int, cls: np.ndarray) -> float:
     if a.sum() <= 0 or not c.any() or c.all():
         return float('nan')
     return float((a[c].sum() / a.sum()) / c.mean())
+
+
+# ---- WS-v4：模式匹配的 QK ----
+CRITERIA_V4 = {
+    'schema': 'weight_read.v4',
+    'rope_deltas': list(range(1, 33)),   # 相对距离 1..32 上平均 RoPE 的双线性作用
+    'n_random_dirs': 200,
+    'H1_z_min': 2.0,                     # 8 个头代码—代码 QK 对齐相对随机方向的平均 z ≥ 2，且高于随机头的平均 z
+    'shift_k': [-4, -2, 0, 2, 4],        # 查询端沿代码方向的移动（单位：自然文本上该方向投影的标准差）
+    'H2_ratio_min': 1.5,                 # 散文位置对代码 key 的质量比：+4 / 0 ≥ 1.5，且在 shift_k 上单调（散文与代码位置都单调不减）
+    'H2_over_random': 3.0,               #   且 |log 效应| ≥ 3 × 随机方向同样移动的 |log 效应|
+    'H3_key_ratio_max': 0.8,             # 代码位置对代码 key 的质量比：代码 key 移动 −4 后 / 原始 ≤ 0.8，且 |log 效应| ≥ 3 × 随机方向
+    'seed': 0,
+}
+
+
+def rotate_half(x: np.ndarray) -> np.ndarray:
+    h = x.shape[-1] // 2
+    return np.concatenate([-x[..., h:], x[..., :h]], -1)
+
+
+def rope_matrix(inv_freq: np.ndarray, pos: float) -> np.ndarray:
+    """HF 约定的 RoPE：rope(x, p) = x·cos(pθ) + rotate_half(x)·sin(pθ)，返回矩阵 P(p)，rope(x, p) = P(p) x。"""
+    ang = pos * np.concatenate([inv_freq, inv_freq])
+    d = len(ang)
+    I = np.eye(d)
+    return (I * np.cos(ang)[:, None]) + rotate_half(I.T).T * np.sin(ang)[:, None]
+
+
+def rope_avg(inv_freq: np.ndarray, deltas) -> np.ndarray:
+    """查询在位置 Δ、key 在位置 0 时 q·k = qᵀ P(Δ)ᵀ P(0) k；对 Δ 取平均，P(0) = I。"""
+    return np.mean([rope_matrix(inv_freq, d).T for d in deltas], 0)
+
+
+def qk_alignment(Wq_h, gq, Wk_g, gk, gin, v, B) -> float:
+    """方向 v（残差空间）写入的查询与写入的 key 在平均 RoPE 双线性形式下的余弦：cos(γ_q⊙W_q(γ_in⊙v), B (γ_k⊙W_k(γ_in⊙v)))。"""
+    u = gin * v
+    q = gq * (Wq_h @ u)
+    k = B @ (gk * (Wk_g @ u))
+    return float(q @ k / (np.linalg.norm(q) * np.linalg.norm(k) + 1e-12))
+
+
+def z_vs(v: float, null) -> float:
+    n = np.asarray(null, float)
+    return float((v - n.mean()) / (n.std() + 1e-12))
+
+
+def monotone(seq, increasing: bool = True) -> bool:
+    d = np.diff(np.asarray(seq, float))
+    return bool(np.all(d >= 0) if increasing else np.all(d <= 0))
