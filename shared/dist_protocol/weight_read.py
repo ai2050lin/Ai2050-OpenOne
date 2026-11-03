@@ -333,3 +333,26 @@ CRITERIA_GC = {
     'over_random_log': 3.0,
     'seed': 0,
 }
+
+
+# ---- GC-v2：Gemma 门控单元实际读入的方向 ----
+CRITERIA_GC2 = {
+    'schema': 'weight_read.gc2',
+    'sub_rank': 4,                       # 描述性：移除冲突差值的前 4 个主方向
+    'n_random_sets': 5, 'n_random_sets_read': 200,
+    'H1_read_ratio_min': 3.0, 'H1_p_max': 0.01,      # 对冲突差值方向 d_l 的读分数 ≥ 3 × 随机集合，p ≤ 0.01
+    'H2_restore_frac_min': 0.5,          # 移除 d_l 的封闭式编辑恢复 ≥ 0.5 × GC-v1 的修补恢复；对照 ≤ 编辑的 1/3
+    'H2_control_max_frac': 1 / 3,
+    'H3_nll_rise_max': 0.01,
+    'seed': 0,
+}
+
+
+def remove_subspace(W_rows: np.ndarray, gamma: np.ndarray, V: np.ndarray) -> np.ndarray:
+    """在读出空间里移除 span(V)（V：[k, d]，先限制到 γ ≠ 0 的支撑上再正交化），γ = 0 维度的权重不动。"""
+    ok = np.abs(gamma) > 1e-8
+    Q, _ = np.linalg.qr(np.where(ok[None, :], np.atleast_2d(V), 0.0).T)
+    out = np.array(W_rows, dtype=float, copy=True)
+    for k in range(Q.shape[1]):
+        out = remove_direction(out, gamma, Q[:, k])
+    return out

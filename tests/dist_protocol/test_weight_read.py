@@ -157,5 +157,20 @@ class WeightReadTests(unittest.TestCase):
         self.assertGreater(np.abs(fm).mean(), np.abs(f0).mean())         # 模式匹配加权放大与当前模式同号的证据
 
 
+    def test_gc2_remove_subspace(self):
+        rng = np.random.default_rng(7)
+        d = 40
+        gamma = rng.uniform(0.5, 2.0, d)
+        gamma[:3] = 0.0
+        V = rng.normal(0, 1, (3, d))
+        Wr = rng.normal(0, 1, (6, d))
+        W2 = W.remove_subspace(Wr, gamma, V)
+        Vok = np.where(gamma[None, :] != 0, V, 0.0)
+        self.assertLess(np.abs((W2 * gamma) @ Vok.T).max(), 1e-9)       # 读出与支撑上的子空间正交
+        self.assertTrue(np.allclose(W2[:, :3], Wr[:, :3]))               # γ = 0 维度不动
+        W1 = W.remove_subspace(Wr, gamma, V[:1])
+        self.assertTrue(np.allclose(W1, W.remove_direction(Wr, gamma, V[0])))   # 秩 1 与单方向移除一致
+
+
 if __name__ == '__main__':
     unittest.main()

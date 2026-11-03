@@ -1,0 +1,26 @@
+{
+ "id": "GC-v2",
+ "schema": "gemma_chain_prereg.v2",
+ "created": "2026-11-02",
+ "basis": "Phase 290（GC-v1）：Gemma 门控单元可修补（0.84）但不线性读自然代码方向；本版检验它们读的是否是写入后传播的代码方向",
+ "models": {
+  "gemma-3-4b-it": "bf16"
+ },
+ "precision_rule": "不使用任何量化",
+ "units": "research/weight_space/GC-v1-gemma-3-4b-it/report.json 的 top_units 与 random_sets；修补恢复参照 GC-v1 的 H1 值",
+ "materials": "MF-v1 语料；MF-v4 写入范式（A 任务求 d_l，B 任务测恢复）",
+ "power_note": "每组 B 任务约 40 段；200 / 5 组随机集合；连续量阈值",
+ "doc": "GC-v2：Gemma-3-4B 门控单元实际读入的方向——冲突时代码信号传到单元所在层后的方向。\n\n接 Phase 290（GC-v1）：Gemma 的 32 个门控单元修补恢复 0.84，但只弱地读自然文本代码方向（2.45 倍），移除它只得修补效应的 4%。\n  冲突差值方向 d_l：A 任务（选单元用的发现划分）上，同一文本在块 17 只写散文与写散文 + 代码两种条件下，\n      单元所在块 MLP 输入（pre_feedforward_layernorm 的输入，逐位置除以 RMS）之差，在写入的全部位置（BOS 除外）上取平均。\n      它是写入的代码方向经块 17 → l 传播后的样子，只依赖 A 任务。\n  H1（读权重）：32 个单元的读分数（gate 与 up 行 ×(1 + w_pre_ffw) 对 d_l）≥ 同层随机集合（200 组）的 3 倍，p ≤ 0.01。\n  H2（编辑）：从 32 个单元的 gate 与 up 行中移除 d_l（γ = 0 维度不动），B 任务三组平均的散文恢复 ≥ 0.5 × GC-v1 的修补恢复（0.835）；\n      对照：同一单元移除随机方向、5 组随机单元（GC-v1 的 random_sets）移除 d_l，恢复各 ≤ 编辑的 1/3。\n  H3：编辑后 MF-v1 确认集自然文本 NLL 相对上升 ≤ 1%（全部与代码文本）。\n  描述：d_l 与自然代码方向 v_l 的余弦；移除冲突差值前 4 个主方向（逐位置差值的 PCA）的编辑恢复。\n被测模型：Gemma-3-4B-it（bf16，不使用量化）。\n用法：python scripts/gemma_chain_v2.py prereg | run | analyze\n",
+ "criteria": {
+  "schema": "weight_read.gc2",
+  "sub_rank": 4,
+  "n_random_sets": 5,
+  "n_random_sets_read": 200,
+  "H1_read_ratio_min": 3.0,
+  "H1_p_max": 0.01,
+  "H2_restore_frac_min": 0.5,
+  "H2_control_max_frac": 0.3333333333333333,
+  "H3_nll_rise_max": 0.01,
+  "seed": 0
+ }
+}
