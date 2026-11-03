@@ -27,6 +27,7 @@ from typing import Any, Callable, Dict, Optional
 from fastapi import APIRouter, Header, HTTPException, Request, Response
 
 import distributed_service as D
+from shared.dist_protocol import bench_index as BI
 
 router = APIRouter(prefix='/api/platform', tags=['platform'])
 # 需要会话令牌的两个端点放在 /api/auth 下：客户端只给 /api/auth/* 请求带 Authorization 头
@@ -192,6 +193,16 @@ def config(request: Request) -> dict:
         'sandbox_synthetic': os.environ.get('AI2050_DIST_ALLOW_SYNTHETIC') == '1',
         'datapack': _datapack_meta(),                    # 客户端离线数据包的版本与大小；客户端据此提示「有新数据」
         'local_tools': os.environ.get('AI2050_LOCAL_TOOLS') == '1',   # 本机中心：工作台显示自动测试与模型资产
+        # 中心的职责边界，客户端与文档都用这一处，避免「中心能跑一点」这种说法各处不同。
+        # gpu 恒为 false：中心进程不装 torch，也不 import 任何会加载权重的模块（requirements-center.txt 里没有）。
+        'compute': {
+            'gpu': False,
+            'role': ['数据保存', '数据下载', '命令转发', '结果回收'],
+            'local_execution': ['语言图谱实测（/api/lang/bench/run）', '数据集三类实测（/api/lang/atlas/run）',
+                                '自动测试批次（/api/autotest/*）', '普查分片（节点领取后本机跑）', '神经单元卡生成'],
+            'note': '中心不做任何 GPU 计算：涉及前向、训练、消融的功能都在本机或节点执行；'
+                    '中心只落库、分发命令（作业领取 / 任务下发）、回收结果与提供下载。',
+        },
         'public_scope': ['模式族合并结果', '语言谱图', '神经元单元卡（普查摘要、两极片段、解释等级）', '干预与解释检验结果', '预注册文件'],
         'not_public': ['研究记录（memo）', '节点本地原生全场'],
     }
@@ -478,6 +489,38 @@ def lang_item_ep(item_id: str) -> dict:
     if item is None:
         raise HTTPException(404, f'没有语言项 {item_id}')
     return {**item, 'pending': False, 'computed_at': doc.get('computed_at')}
+
+
+# ---------- 题库（lang_bench.v1）：数据集清单与总览 ----------
+# 中心没有 GPU，所以不提供 /api/lang/bench/run 与 /status（实测只能在本机后端跑）；
+# 但「有哪些数据集、各多少题、哪些能映射三类、历史上测过什么」是纯读：题库正文在
+# data/lang_bench/questions.v3.jsonl，解析统一交给 shared/dist_protocol/bench_index.py。
+# 与本机后端同形是关键——同一页面在两处连的机器不同时，不能出现两套题量。
+
+def _bench_dir() -> Path:
+    """题库目录：AI2050_LANG_BENCH 覆盖，缺省 <发布包>/data/lang_bench（题库正文与 meta 都在这里）。"""
+    env = os.environ.get('AI2050_LANG_BENCH', '').strip()
+    return Path(env) if env else _REPO / 'data' / 'lang_bench'
+
+
+@lang_router.get('/lang/atlas/datasets')
+def lang_datasets_ep() -> dict:
+    """数据集清单 + 每个数据集在三类上的可选题量与映射依据（空间/进展·语言图谱的页顶方块用它）。
+
+    capabilities.run 恒为 false：中心没有权重、也不加载权重，实测在本机后端执行。
+    界面据此把「运行实测」换成一句「在本机执行」，而不是放一个点了必然 404 的按钮。
+    """
+    doc = BI.datasets_payload(_bench_dir())
+    doc['capabilities'] = {'run': False, 'gpu': False,
+                           'note': '中心只保存数据与转发命令：实测在本机后端执行，结果按（数据集, 模型）上传'}
+    return doc
+
+
+@lang_router.get('/lang/bench/overview')
+def lang_bench_overview_ep() -> dict:
+    """图谱测试题总览：数据集构成 + 按 (数据集, 模型) 分键的历史结果。
+    模型状态恒为 unavailable（中心没有可测权重），客户端据此隐藏「运行实测」而保留历史读数。"""
+    return BI.overview_payload(_bench_dir(), model_status='unavailable')
 
 
 @lang_router.get('/model/skeleton')

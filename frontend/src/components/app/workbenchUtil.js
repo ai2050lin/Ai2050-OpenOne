@@ -66,6 +66,16 @@ export function visibleStations({ live, admin, localTools }) {
   return STATIONS.filter(s => (!live ? s.web : (!s.admin || admin) && (!s.localOnly || localTools)));
 }
 
+/* 哪些视图真读数据集：只有「语言图谱」两处——
+   进展 · 语言图谱（图谱测试题按数据集取题，换数据集换的是一整批题）
+   空间 · 语言图谱（数据集实测：同一批注意力头在不同题库上重跑，看结论复现）
+   其余视图读的是自然语料普查（1,900 万 token）、已载入权重或规则账本，与题库无关。
+   这条口径写在一处，页顶的数据集方块就按它决定显不显示：留着不工作的方块比不显示更糟，
+   因为换一项数字不动，会被读成「做了实验但没差别」。 */
+export function dsBound(lens, { rtab, view } = {}) {
+  return (lens === 'route' && rtab === 'lang') || (lens === 'spatial' && view === 'lang');
+}
+
 export function readState() {
   try {
     const q = new URLSearchParams(window.location.search);

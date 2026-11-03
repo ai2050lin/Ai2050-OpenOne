@@ -187,8 +187,7 @@ a.v8-mainline{text-decoration:none}
    三档布局：默认（语言图谱/实时/点云）塔占 34% 但不是 330px 死宽；.split（神经元已展开详情）塔在左主位；
    .solo（神经元默认态）塔独占整宽。旧版把塔钉在 330px 侧栏，层板窄到看不出层内结构。 */
 .v8-space{display:grid;grid-template-columns:minmax(380px,34%) minmax(0,1fr);gap:16px;align-items:start}
-.v8-space.split{grid-template-columns:minmax(0,1.3fr) minmax(440px,1fr)}
-.v8-space.solo{grid-template-columns:minmax(0,1fr)}
+.v8-space.split{grid-template-columns:minmax(0,1.5fr) minmax(420px,1fr)}
 .v8-space .v8-tower{top:12px}
 .v8-space-main{min-width:0;display:flex;flex-direction:column;gap:12px}
 .v8-tower-title{display:flex;align-items:center;justify-content:flex-start;gap:10px}
@@ -208,16 +207,10 @@ a.v8-mainline{text-decoration:none}
 .v8-arch-sum{margin:8px 0 0;font-size:12px;line-height:1.7;color:var(--fw-text-3)}
 .v8-arch-sum b{color:var(--fw-text-2)}
 @media (max-width:620px){.v8-arch{grid-template-columns:minmax(0,1fr)}}
-/* 单列时的引导条：默认界面只说「怎么开始」，不铺数据。压成一行放在塔上方，把高度留给层塔 */
-.v8-solo{order:-1;background:#f4f8fd;border:1px solid #cde2fb;border-radius:10px;padding:8px 14px;display:flex;flex-direction:row;align-items:center;gap:14px;flex-wrap:wrap}
-.v8-solo b{font-size:13px;color:#184f95;white-space:nowrap}
-.v8-solo p{margin:0;flex:1;min-width:300px;font-size:12px;line-height:1.6;color:var(--fw-text-2)}
-.v8-solo em{font-style:normal;font-weight:600}
 .v8-k-attn{color:#2a78d6}
 .v8-k-mlp{color:#eb6834}
 .v8-k-emb{color:#475569}
-.v8-solo-act{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-/* 展开后的详情头：一行说清在看什么，另一行收起 */
+/* 右栏常驻：详情头一行说清在看哪一块、哪个模块 */
 .v8-detail-hd{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:8px 12px}
 .v8-detail-hd b{font-size:13.5px}
 .v8-detail-hd span{font-size:12px;color:var(--fw-text-2)}
@@ -351,6 +344,13 @@ a.v8-mainline{text-decoration:none}
 
 /* ---- 进展 · 神经元逆向分析（简洁大气版）：大数字、去框线、大留白 ---- */
 .v8-nprog{display:flex;flex-direction:column;gap:30px;padding-top:4px}
+/* 当前口径卡：模型 / 数据集两个维度各驱动本页哪一块内容（选择在页顶全局条，这里解释） */
+.v8-scope{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;background:#f7fafd;border:1px solid #d9e6f5;border-radius:12px;padding:12px 16px}
+.v8-scope-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;min-width:0}
+.v8-scope-k{font-size:11.5px;font-weight:600;color:#184f95;background:#e4effc;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.v8-scope-item b{font-size:14px;color:var(--fw-text);font-variant-numeric:tabular-nums}
+.v8-scope-v{font-size:12px;line-height:1.65;color:var(--fw-text-2);flex:1 1 220px;min-width:0}
+.v8-scope-note{grid-column:1/-1;margin:0;font-size:12px;line-height:1.7;color:var(--fw-text-3)}
 .v8-nprog-say{margin:0;font-size:15px;line-height:2.05;color:var(--fw-text-1);border-left:3px solid #0d366b;padding-left:18px}
 .v8-nprog-say b{font-variant-numeric:tabular-nums;color:#0d366b;font-weight:700}
 .v8-nprog-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 32px}
@@ -395,6 +395,14 @@ a.v8-mainline{text-decoration:none}
 .v8-bench-acc{font-size:26px;font-weight:700;color:#0d366b;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.15}
 .v8-bench .v8-prog-list{max-height:320px;overflow:auto;padding-right:6px}
 
+.v8-bench-sub{margin:0;font-size:12px;line-height:1.75;color:var(--fw-text-3)}
+/* 题目来源行：比副标题再淡一档，只在需要交代「正文在哪」时出现 */
+.v8-bench-src{margin:3px 0 0;font-size:11px;line-height:1.7;color:#8a97a8}
+.v8-bench-src a{color:#184f95;text-decoration:none;border-bottom:1px solid rgba(24,79,149,.28)}
+.v8-bench-src a:hover{color:#0d366b;border-bottom-color:#0d366b}
+/* 深底按钮必须自己压住 .fw-root button{color:inherit}（那条规则带元素选择器，特异性高于单个类名） */
+.v8-bench .v8-bench-btn{color:#fff}
+.v8-bench .v8-bench-btn:hover{color:#fff}
 /* ---- 简洁大气整理（空间各界面统一视觉语言）：去框线白卡 + 大留白 + 15px 蓝竖线标题句 ---- */
 /* 实时分析 */
 .lv-root{gap:20px}
@@ -516,6 +524,13 @@ a.v8-mainline{text-decoration:none}
 .v8-atlas-ds small{font-size:11px;color:var(--fw-text-3)}
 .v8-atlas-ds-cats{display:flex;gap:5px;flex-wrap:wrap;margin:3px 0}
 .v8-atlas-ds-cats em{font-style:normal;font-size:10.5px;border:1px solid;border-radius:99px;padding:1px 7px;background:#fff}
+/* 数据集来源行：题目正文不随包分发，这里给原始数据地址；和卡片同一视觉层，不抢主按钮 */
+.v8-atlas-src{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px dashed var(--fw-border);font-size:11px;color:var(--fw-text-3)}
+.v8-atlas-src-k{font-weight:600;color:var(--fw-text-2)}
+.v8-atlas-src a{color:#184f95;text-decoration:none;border-bottom:1px solid rgba(24,79,149,.28)}
+.v8-atlas-src a:hover{color:#0d366b;border-bottom-color:#0d366b}
+.v8-atlas-src a em{font-style:normal;color:var(--fw-text-3);font-size:10.5px}
+.v8-atlas-src-n{flex:1 1 280px;min-width:200px;line-height:1.65}
 .v8-atlas-ctrl{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .v8-atlas-catpick{display:flex;gap:8px;flex-wrap:wrap}
 .v8-atlas-chk{display:flex;align-items:center;gap:7px;border:1.5px solid var(--fw-border);border-radius:9px;padding:7px 11px;cursor:pointer;background:#fbfdff}

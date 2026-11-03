@@ -1,6 +1,6 @@
 # 开放平台中心 · 部署指南
 
-中心服务是一个不需要 GPU 的 Python 进程（`deploy/center_app.py`），同时托管 API 和客户端网页。参与者的节点从中心领取冻结的任务包，在自己的 GPU 上运行，再上传统计结果。
+中心服务是一个不需要 GPU 的 Python 进程（`deploy/center_app.py`），同时托管 API 和客户端网页。它不执行任何模型前向：只保存数据、提供下载、转发命令、回收结果；实测与普查都在本机或参与者节点上跑（职责表见 2.2）。参与者的节点从中心领取冻结的任务包，在自己的 GPU 上运行，再上传统计结果。
 
 ```
 浏览器 ──https──> nginx :80/443 ──> center_app 127.0.0.1:5010 ──> /var/lib/ai2050/center   SQLite、结果、普查作业
@@ -15,7 +15,15 @@ cd frontend && npx vite build && cd ..
 python scripts/build_center_release.py          # 递增 VERSION → release/ai2050-center-<新版本>.tar.gz 与 .sha256
 ```
 
-发布包包含：中心与节点程序、协议代码、客户端构建，以及公开研究数据（`research/interventions`、`research/neurons`）。研究记录、模型权重、普查语料和原生全场都不在包里。
+发布包包含：中心与节点程序、协议代码、客户端构建、公开研究数据（`research/interventions`、`research/neurons`）与数据集清单摘要（`data/lang_bench/meta.v3.json`）。研究记录、模型权重、普查语料、原生全场和**题库正文**都不在包里——题库正文按源地址现取，见 2.3。
+
+需要一份「题目齐全」的离线包（例如断网机房）时可以显式带上：
+
+```bash
+python scripts/build_center_release.py --with-questions
+```
+
+这时 C-Eval / M3Exam（CC BY-NC-SA 4.0）会随包分发，接收方同样受非商业与相同方式共享的约束。
 
 ## 2. 安装（在服务器上）
 
@@ -105,6 +113,41 @@ curl -s http://127.0.0.1:5010/api/health        # version 应为 1.0.1，data_di
 ```
 
 需要回退时，把 systemd 指回旧目录后重启即可；数据库没有被改动过。
+
+## 2.2 中心的职责边界：不碰 GPU
+
+中心进程只做四件事：**数据保存、数据下载、命令转发、结果回收**。`deploy/requirements-center.txt` 里没有 torch / transformers，中心也没有任何加载模型权重的代码路径；所有涉及前向、训练、消融的功能都在本机或参与节点上执行。
+
+| 功能 | 在哪执行 | 中心做什么 |
+| --- | --- | --- |
+| 图谱测试题实测 `/api/lang/bench/run` | 本机（有模型的机器） | **不提供该端点**；`/api/lang/bench/overview` 的 `model_status` 恒为 `unavailable` |
+| 数据集三类实测 `/api/lang/atlas/run` | 本机 | 同上；只保留历史的读数与逐头结果 |
+| 自动测试批次 `/api/autotest/*` | 本机中心（`AI2050_LOCAL_TOOLS=1`） | 公开中心一律 `403` + `local_only: true`，**不给管理令牌后门** |
+| 神经元普查分片 | 参与节点 | 派发作业、校验分片、合并结果 |
+| 单元卡生成 | 数据快照子进程（CPU） | 生成、缓存、分发 |
+
+这张表也通过接口下发给客户端：`GET /api/platform/config` 的 `compute` 字段（`gpu: false`、`role`、`local_execution`、`note`）。界面据此把「运行实测」换成「本机执行」的说明，而不是放一个点了必然失败的按钮。
+
+## 2.3 数据集：按源地址引用，不随包分发
+
+数据集清单（`/api/lang/atlas/datasets`、`/api/lang/bench/overview`）只需要 `data/lang_bench/meta.v3.json` 里的 `by_dataset` 摘要：题量、科目、三类可映射题量、许可、源地址。**题目正文 `questions.v3.jsonl` 不在发布包里**，原因是许可（C-Eval / M3Exam 为 CC BY-NC-SA 4.0，MMLU 为 MIT）与体积；正文按下面的地址在本机取。
+
+| 数据集 | 源地址 | 拆分 | 许可 | 题量 / 可映射三类 |
+| --- | --- | --- | --- | --- |
+| C-Eval | `huggingface.co/datasets/ceval/ceval-exam` | val | CC BY-NC-SA 4.0 | 169 / 169 |
+| MMLU | `huggingface.co/datasets/cais/mmlu` | test | MIT | 14,042 / 2,504 |
+| M3Exam | `huggingface.co/datasets/chiayewken/m3exam` | chinese/test | CC BY-NC-SA 4.0 | 682 / 565 |
+
+源地址与许可是唯一真源 `shared/dist_protocol/bench_sources.py`，接口的 `sources` 字段与界面上的「原始数据」链接都从这里来。在本机（有 GPU、要跑实测的那台）取题库：
+
+```bash
+python scripts/download_lang_bench_v3.py                 # 先按源地址下载 parquet，再构建 questions.v3.jsonl
+python scripts/download_lang_bench_v3.py --meta-only     # 只重算 meta 摘要（改了映射表以后用）
+```
+
+本机有正文时接口 `source.mode` 为 `questions`（逐行数出来），没有正文时为 `meta`（读建库时的摘要）；两种模式给出的题量、科目、三类分布完全相同，界面在 `meta` 模式下标注「题量为建库时统计」。
+
+**许可**：本平台是非商业研究项目。使用 C-Eval / M3Exam 数据需保留署名、非商业使用、相同方式共享；MMLU 为 MIT，只需保留版权与许可声明。若将来转商业部署，必须先把 C-Eval / M3Exam 从任何分发渠道移除。
 
 ## 3. 站点配置
 

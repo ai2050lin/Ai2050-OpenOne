@@ -26,16 +26,27 @@
 
 /* ---- 全局上下文条：数据集 + 模型。所有一级界面共用一条，状态进地址栏（ds / mdl） ---- */
 /* 维度条不是导航：它给的是「这次分析在什么条件下做」，所以放在子导航之下、内容之上 */
-.wb-gctx { display: flex; align-items: center; gap: 14px; padding: 6px 16px; background: #f7fafd; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; overflow-x: auto; min-height: 36px; box-sizing: border-box; }
+.wb-gctx { display: flex; align-items: center; gap: 8px 20px; padding: 8px 16px; background: #f7fafd; border-bottom: 1px solid var(--fw-border); flex-shrink: 0; flex-wrap: wrap; box-sizing: border-box; }
+.wb-gctx-grp + .wb-gctx-grp { border-left: 1px solid var(--fw-border); padding-left: 18px; }
+.wb-gctx-grp { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .wb-gctx-hd { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--fw-text-3); white-space: nowrap; }
-.wb-gctx-f { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.wb-gctx-f > span { font-size: 11.5px; color: var(--fw-text-3); }
-.wb-gctx-f select { font: inherit; font-size: 12.5px; border: 1px solid var(--fw-border-strong); border-radius: 6px; padding: 3px 6px; background: #fff; color: var(--fw-text); max-width: 210px; }
-.wb-gctx-f select:hover { border-color: #9ec5f4; }
-.wb-gctx-f option:disabled { color: #94a3b8; }
-.wb-gctx-st { font-size: 12px; color: var(--fw-text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wb-gctx-opts { display: flex; align-items: stretch; flex-wrap: wrap; gap: 6px; }
+/* 方块：两行——名字 + 规模/状态。选项本身就是信息，所以不做成单行小胶囊 */
+.wb-gctx .wb-gopt { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; min-width: 78px; padding: 4px 10px; border: 1px solid var(--fw-border-strong); border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font: inherit; line-height: 1.28; box-shadow: 0 1px 0 rgba(15, 23, 42, .03); transition: border-color .12s, background .12s; }
+.wb-gctx .wb-gopt b { font-size: 13px; font-weight: 600; color: var(--fw-text); white-space: nowrap; }
+.wb-gctx .wb-gopt small { font-size: 11px; color: var(--fw-text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wb-gctx .wb-gopt:hover:not(:disabled) { border-color: #7fb0e8; background: #f2f7fe; }
+.wb-gctx .wb-gopt.on { background: #0d366b; border-color: #0d366b; box-shadow: 0 1px 4px rgba(13, 54, 107, .28); }
+.wb-gctx .wb-gopt.on b { color: #fff; }
+.wb-gctx .wb-gopt.on small { color: #c5dbf6; }
+.wb-gctx .wb-gopt.on:hover { background: #0d366b; border-color: #0d366b; }
+.wb-gctx .wb-gopt.off { background: #f8fafc; border-style: dashed; border-color: #cbd5e1; cursor: not-allowed; }
+.wb-gctx .wb-gopt.off b { color: #94a3b8; }
+.wb-gctx .wb-gopt.off small { color: #b6c1cf; }
+.wb-gctx-st { font-size: 11.5px; color: var(--fw-text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .wb-gctx-scope { margin-left: auto; font-size: 11px; color: var(--fw-text-3); white-space: nowrap; }
-@media (max-width: 900px) { .wb-gctx-scope { display: none; } }
+/* 方块化后一行要装 8 个方块：口径说明留到宽屏，窄屏藏掉，否则它会单独占一行、把 3D 空间压矮 */
+@media (max-width: 1400px) { .wb-gctx-scope { display: none; } }
 
 /* ---- 「?」页面说明按钮与弹窗 ---- */
 .wb-subnav .wb-help-btn { margin-left: auto; width: 22px; height: 22px; padding: 0; border: 1px solid var(--fw-border); border-radius: 50%; color: var(--fw-text-3); font-size: 12.5px; line-height: 1; display: grid; place-items: center; flex-shrink: 0; }
@@ -111,3 +122,12 @@
 .wb-cfg-node > header h4 { margin: 0; font-size: 13px; font-weight: 600; color: var(--fw-text); }
 .wb-cfg-node > header small { display: block; margin-top: 2px; font-size: 11px; color: var(--fw-text-3); line-height: 1.5; }
 .wb-cfg-node-body { background: #fff; border: 1px solid var(--fw-border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+
+/* ---- 深底按钮的白字统一补回 ----
+   `.fw-root button{color:inherit}` 带元素选择器（特异性 0,1,1），会把单类名写的 `color:#fff` 压掉，
+   表现是「按钮底色在、文字看不见」。凡是深底 + 白字的按钮都从这里取色，别再各写一份。 */
+.fw-root .v8-atlas-run,
+.fw-root .v8-bench-btn,
+.fw-root .v8-rules-checkrow button,
+.fw-root .ai-fab { color: #fff; }
+.fw-root .v8-atlas-run:disabled { color: #f1f5f9; }

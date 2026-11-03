@@ -3,7 +3,7 @@
    与 lang_bench（只测正确率）分开：这里测的是「分数怎么来的」。
 
    三个概念：
-     数据集   题库里的 source（C-Eval / CMMLU / CMExam），决定样本量与题型。
+     数据集   题库里的 source（C-Eval / MMLU / M3Exam），决定样本量与题型。
      类型     知识网络 / 功能推理 / 语法规则。类型 ↔ 科目是显式映射表，接口随数据返回，可审阅。
      普遍规律 同一 (层,头) 在 ≥2 个类型上同号且过 Bonferroni 阈值。判据在服务端写死，界面不重算。
 */
@@ -61,7 +61,8 @@ function DatasetCard({ d, active, onPick }) {
           </em>
         ))}
       </div>
-      <small>{testable ? `可测 ${CAT_ORDER.reduce((s, c) => s + d.by_category[c].n, 0)} 题` : '不含三大类型'}</small>
+      <small>{testable ? `可测 ${CAT_ORDER.reduce((s, c) => s + d.by_category[c].n, 0)} 题` : '不含三大类型'}
+        {d.stats_source === 'meta' ? ' · 建库统计' : ''}</small>
     </button>
   );
 }
@@ -130,6 +131,10 @@ export default function LangAtlas({ ds = '', onDs }) {
   }, [setStatus]);
 
   const datasets = dsApi.data?.datasets || [];
+  /* 能不能在这台机器上跑实测：由数据源的能力位决定，不由界面猜。
+     中心（/api/lang/atlas/datasets 的 capabilities.run = false）只存数据、转发命令、回收结果——
+     实测在连着 GPU 的本机后端执行。这里禁用按钮并说明原因，避免点了必然失败。 */
+  const canRun = dsApi.data?.capabilities?.run !== false;
   /* 数据集来源优先级：页顶全局条（ds）> 本页点击 > 上次结果 / 题量默认。
      全局条是权威：页顶换了数据集，这里的实测口径跟着换，不再出现「两处各选一个」。 */
   const gDs = ds && datasets.some(d => d.id === ds) ? ds : '';
@@ -139,11 +144,17 @@ export default function LangAtlas({ ds = '', onDs }) {
   const last = status?.last || null;
   const running = ['loading', 'running'].includes(status?.state) || busy;
 
-  const usable = useMemo(() => (cur ? cats.filter(c => (cur.by_category[c]?.n || 0) > 0) : []), [cur, cats]);
-  const totalPick = useMemo(() => (cur ? usable.reduce((s, c) => s + (nPer > 0 ? Math.min(nPer, cur.by_category[c].n) : cur.by_category[c].n), 0) : 0), [cur, usable, nPer]);
+  /* 这两个量只有 3 个类别、一次 O(3) 计算，不值得 useMemo——
+     而且 cats 来自 useState，React Compiler 会把「数组依赖可能被改」判为无法保留手工 memo，
+     直接算反而干净（原先两个 useMemo 让整个组件被跳过优化，lint 报两条 error）。 */
+  const usable = cur ? cats.filter(c => (cur.by_category[c]?.n || 0) > 0) : [];
+  const totalPick = cur
+    ? usable.reduce((s, c) => s + (nPer > 0 ? Math.min(nPer, cur.by_category[c].n) : cur.by_category[c].n), 0)
+    : 0;
 
   const start = async () => {
     setErr('');
+    if (!canRun) { setErr('中心不做 GPU 计算：实测请在本机后端执行（本机连上后这个按钮可用）。'); return; }
     if (!active || !usable.length) { setErr('先选一个含三大类型的数据集，并至少勾一个类型。'); return; }
     setBusy(true);
     const q = new URLSearchParams({ dataset: active, categories: usable.join(','), n_per_category: String(nPer) });
@@ -187,11 +198,25 @@ export default function LangAtlas({ ds = '', onDs }) {
       <section className="v8-atlas-step">
         <h3><span className="k">1</span>选数据集</h3>
         <p className="v8-q">数据集决定样本量与题型。同一批头在不同数据集上的功效差别很大：
-          三大类型在 C-Eval 只有 169 题，在 CMMLU 能映射出 2300 题。</p>
+          当前三个外部集能映射三类的题量是 {datasets.map(d => `${d.id.split(' ')[0]} ${Object.values(d.by_category || {}).reduce((s, c) => s + (c.n || 0), 0).toLocaleString()}`).join(' / ') || '—'}。</p>
         {!datasets.length && <Empty>{dsApi.error ? `读取数据集失败：${dsApi.error}` : '读取数据集…'}</Empty>}
         <div className="v8-atlas-dsrow">
           {datasets.map(d => <DatasetCard key={d.id} d={d} active={d.id === active} onPick={pickDs} />)}
         </div>
+        {/* 数据集来源：题目正文不随发布包分发（C-Eval / M3Exam 是 CC BY-NC-SA，MMLU 是 MIT），
+            界面给出原始数据地址与拆分，正文按这个地址在本机取；中心只存题量与科目这些元信息。 */}
+        {datasets.some(d => d.source_url) && (
+          <div className="v8-atlas-src">
+            <span className="v8-atlas-src-k">原始数据</span>
+            {datasets.map(d => (d.source_url ? (
+              <a key={d.id} href={d.source_url} target="_blank" rel="noreferrer"
+                 title={`${d.source_full_name || d.prefix} · ${d.license || '许可未记录'}`}>
+                {d.prefix} <em>{d.source_repo}{d.source_split ? ` · ${d.source_split}` : ''}</em> ↗
+              </a>
+            ) : null))}
+            {dsApi.data?.notice && <span className="v8-atlas-src-n">{dsApi.data.notice}</span>}
+          </div>
+        )}
         {cur && (
           <details className="v8-atlas-map">
             <summary>类型 ↔ 科目映射（显式表，可审阅）</summary>
@@ -228,10 +253,14 @@ export default function LangAtlas({ ds = '', onDs }) {
               <option value={40}>40</option>
             </select>
           </label>
-          <button type="button" className="v8-atlas-run" onClick={start} disabled={running || !totalPick}>
-            {running ? '实测中…' : `开始实测${totalPick ? `（${totalPick} 题）` : ''}`}
+          <button type="button" className="v8-atlas-run" onClick={start} disabled={running || !totalPick || !canRun}>
+            {running ? '实测中…' : canRun ? `开始实测${totalPick ? `（${totalPick} 题）` : ''}` : '本机执行'}
           </button>
         </div>
+        {!canRun && (
+          <p className="v8-note">中心不做 GPU 计算：只保存数据集与结果、转发命令。实测在连着 GPU 的本机后端执行，
+            跑完按（数据集, 模型）上传，本页读到后自动显示。</p>
+        )}
         {err && <p className="v8-atlas-err">{err}</p>}
         {running && (
           <div className="v8-atlas-prog">
@@ -245,7 +274,9 @@ export default function LangAtlas({ ds = '', onDs }) {
       {/* ③ 结果 */}
       <section className="v8-atlas-step">
         <h3><span className="k">3</span>结果与普遍规律</h3>
-        {!show && <Empty>{last ? `下面显示的是另一次实测（${last.dataset}）。切换数据集或重新运行后这里会更新。` : '还没有实测记录：选好数据集与类型后点「开始实测」，169 题约 20 秒。'}</Empty>}
+        {!show && <Empty>{last ? `下面显示的是另一次实测（${last.dataset}）。切换数据集或重新运行后这里会更新。`
+          : canRun ? '还没有实测记录：选好数据集与类型后点「开始实测」，169 题约 20 秒。'
+            : '还没有实测记录：中心不跑实测，在本机后端跑完上传后，这里显示逐头结果与普遍规律。'}</Empty>}
         {show && (
           <>
             <div className="v8-atlas-sum">
@@ -338,7 +369,7 @@ export default function LangAtlas({ ds = '', onDs }) {
                 <li><b>dla 是线性化量。</b>头输出经 o_proj 分块到残差，再按该位置 RMSNorm 的 rms 作常数与 unembed 方向点积。RMSNorm 严格非线性，这只是标准的近似，因此只看头间相对大小，不当绝对 logit 用。</li>
                 <li><b>相关性不是因果。</b>贡献大不等于模型必须用它。要判定承载，需消融该头后看正确率与 Δlogit 是否掉——这一步还没做，界面上不写作「承载」。</li>
                 <li><b>单选题只测一种能力用法。</b>选字母依赖「选项文本可读 + 与题干匹配」，不覆盖生成、翻译、多步推理等用法。</li>
-                <li><b>题量与题型会影响结论。</b>C-Eval 三大类共 169 题；换成 CMMLU 切片后重跑，看普遍头是否稳定复现——复现的才算规律。</li>
+                <li><b>题量与题型会影响结论。</b>同一个头要在多个数据集上重跑都能复现，才算规律；只在一个数据集上出现的，只能叫该数据集的观察。</li>
               </ul>
             </details>
           </>

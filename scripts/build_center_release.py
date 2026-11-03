@@ -31,16 +31,35 @@ INCLUDE = [
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
     'server/__init__.py', 'server/neuron_census_service.py',
     'data/lang_bench/meta.json', 'data/lang_bench/results.json',
+    # 数据集清单靠这份摘要：题量、科目、三类分布、许可、源地址都在 by_dataset 里。
+    # 题目正文不进包（见下面 QUESTIONS_ONLY 的说明）——中心没有正文也能回答「有哪些数据集、各多少题」。
+    'data/lang_bench/meta.v3.json',
+    # 本机取题库的入口：随包放一份，拿到中心代码的人能在自己机器上按同一口径重建正文。
+    'scripts/download_lang_bench_v3.py',
     'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py', 'scripts/build_circuit_pack.py',
 ]
 INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'frontend/dist']
+INCLUDE_OPTIONAL = ['data/lang_bench/results.v2.json']
+# 题库正文（questions.v3.jsonl，3.3 MB，14,893 题）默认不进发布包：
+#   ① 它不是中心的运行必需品——中心只用 meta.v3.json 的 by_dataset 回答数据集清单；
+#   ② C-Eval 与 M3Exam 是 CC BY-NC-SA 4.0，随包分发等于再发一份副本，而题目本来就有稳定源地址
+#      （见 shared/dist_protocol/bench_sources.py），需要的人在自己机器上一条命令就能取回来。
+# 需要一份「题目齐全」的离线包时加 --with-questions。
+QUESTIONS_ONLY = ['data/lang_bench/questions.v3.jsonl']
 EXCLUDE_PARTS = {'__pycache__', '.pytest_cache'}
 
 
-def files() -> list:
+def files(with_questions: bool = False) -> list:
     out = [ROOT / p for p in INCLUDE]
     for d in INCLUDE_DIRS:
         out += [p for p in sorted((ROOT / d).rglob('*')) if p.is_file() and not (set(p.relative_to(ROOT).parts) & EXCLUDE_PARTS)]
+    for p in INCLUDE_OPTIONAL + (QUESTIONS_ONLY if with_questions else []):
+        if (ROOT / p).is_file():
+            out.append(ROOT / p)
+        else:
+            print(f'[跳过] {p} 不存在：包里不带这份数据（中心端数据集清单会为空）')
+    if not with_questions and (ROOT / QUESTIONS_ONLY[0]).is_file():
+        print('[不含] data/lang_bench/questions.v3.jsonl：题目正文按源地址在本机取（--with-questions 才打进包）')
     missing = [str(p.relative_to(ROOT)) for p in out if not p.is_file()]
     if missing:
         raise SystemExit(f'缺少文件：{missing}')
@@ -51,6 +70,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('--out', default=str(ROOT / 'release'))
     ap.add_argument('--skip-frontend-check', action='store_true')
+    ap.add_argument('--with-questions', action='store_true',
+                    help='把题库正文 questions.v3.jsonl 也打进包（默认不打：中心只用 meta 摘要，题目按源地址本机取）')
     ap.add_argument('--bump', default='patch', choices=['patch', 'minor', 'major', 'none'],
                     help='打包前递增 VERSION（缺省补丁号）；none = 沿用当前版本（该版本的包已存在时拒绝）')
     args = ap.parse_args()
@@ -81,7 +102,7 @@ def main() -> int:
     name = f'ai2050-center-{PLATFORM_VERSION}'
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    fl = files()
+    fl = files(with_questions=args.with_questions)
     # Windows 上 core.autocrlf=true 的检出会把文本变成 CRLF：服务器上的脚本、unit、VERSION 与预注册哈希都会坏
     crlf = [str(p.relative_to(ROOT).as_posix()) for p in fl
             if (p.name == 'VERSION' or p.suffix in ('.sh', '.service', '.conf', '.sha256', '.tsv') or p.name.endswith('.prereg.json'))
@@ -90,6 +111,8 @@ def main() -> int:
         raise SystemExit(f'这些文件含 CR（Windows 换行），在服务器上会出错：{crlf[:8]}…  用 git -c core.autocrlf=false 检出后再打包')
     manifest = {'name': name, 'version': PLATFORM_VERSION, 'previous_version': cur, 'git_commit': commit,
                 'git_dirty': dirty, 'built_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+                # 包里有没有题目正文：中心不需要它；记录在案，便于核对「这一版是按源地址引用还是自带题目」。
+                'questions_included': args.with_questions,
                 'files': {str(p.relative_to(ROOT).as_posix()): hashlib.sha256(p.read_bytes()).hexdigest() for p in fl}}
     tar_path = out / f'{name}.tar.gz'
     with tarfile.open(tar_path, 'w:gz') as tar:

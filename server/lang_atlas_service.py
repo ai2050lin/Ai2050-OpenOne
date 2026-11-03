@@ -44,7 +44,8 @@ except ImportError:                      # 独立脚本 / 以 server 为根启�
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'data' / 'lang_bench'
-QUESTIONS = DATA / 'questions.v2.jsonl'
+QUESTIONS = DATA / 'questions.v3.jsonl'          # 主口径（C-Eval + MMLU + M3Exam）
+QUESTIONS_V2 = DATA / 'questions.v2.jsonl'       # 旧口径，只读；没有 v3 时退回
 QUESTIONS_V1 = DATA / 'ceval_val.v1.jsonl'
 RESULTS = DATA / 'atlas_last.json'
 
@@ -75,26 +76,14 @@ def _saved_runs() -> List[dict]:
 
 router = APIRouter(prefix='/api/lang/atlas', tags=['lang-atlas'])
 
-# 三个类型 ↔ 各数据集的科目（键是题库里的 subject 英文键，不是显示名）。
-# 这张表是「类型」的唯一真源：改映射必须改这里，接口会把依据一起返回，便于审阅。
-CATEGORY_SUBJECTS: Dict[str, Dict[str, List[str]]] = {
-    '知识网络': {
-        'C-Eval val': ['high_school_biology', 'high_school_geography', 'high_school_history'],
-        'CMMLU test': ['high_school_biology', 'high_school_geography', 'world_history', 'chinese_history',
-                       'global_facts', 'astronomy', 'world_religions', 'high_school_chemistry',
-                       'high_school_physics'],
-    },
-    '功能推理': {
-        'C-Eval val': ['civil_servant', 'logic'],
-        'CMMLU test': ['logical', 'chinese_civil_service_exam'],
-    },
-    '语法规则': {
-        'C-Eval val': ['chinese_language_and_literature', 'high_school_chinese'],
-        'CMMLU test': ['modern_chinese', 'ancient_chinese', 'elementary_chinese'],
-    },
-}
+# 三个类型 ↔ 各数据集的科目：唯一真源在 shared/dist_protocol/bench_categories.py，
+# 下载脚本生成题库的 category 字段与这里用的是同一张表，两边不会各写一份、各漂一点。
+# 表里没有的 (数据集, 学科) 就是「不能映射三类」——接口会据此说明，不给兜底类别。
+from shared.dist_protocol.bench_categories import ALL_CATS, CATEGORY_SUBJECTS, category_of  # noqa: E402,F401
+from shared.dist_protocol import bench_index as BI  # noqa: E402
+from shared.dist_protocol import bench_sources  # noqa: E402
+
 CATEGORY_ALIAS = {'功能推理': '分析推理'}          # 用户口语与分析推理并列，显示用
-ALL_CATS = ['知识网络', '功能推理', '语法规则']
 
 _state: Dict[str, Any] = {'state': 'idle', 'error': '', 'done': 0, 'total': 0,
                           'elapsed_s': 0.0, 'phase': '', 'by_category': {}}
@@ -104,39 +93,18 @@ _THREAD: Optional[threading.Thread] = None
 
 # ---------------------------------------------------------------- 题库与数据集
 def _load_questions() -> List[dict]:
-    p = QUESTIONS if QUESTIONS.exists() else QUESTIONS_V1
+    p = next((x for x in (QUESTIONS, QUESTIONS_V2, QUESTIONS_V1) if x.exists()), QUESTIONS_V1)
     with open(p, encoding='utf-8') as f:
         return [json.loads(line) for line in f if line.strip()]
 
 
 def _datasets_index() -> List[dict]:
-    """按 source 分组，给出每个数据集在三个类型上的可选题量与科目依据。"""
-    rows = _load_questions()
-    by_src: Dict[str, List[dict]] = {}
-    for r in rows:
-        by_src.setdefault(r.get('source') or '未知', []).append(r)
-    out = []
-    for src, rs in sorted(by_src.items(), key=lambda kv: -len(kv[1])):
-        subj_cnt: Dict[str, int] = {}
-        for r in rs:
-            subj_cnt[r['subject']] = subj_cnt.get(r['subject'], 0) + 1
-        cats = {}
-        for cat, per_src in CATEGORY_SUBJECTS.items():
-            want = per_src.get(src) or []
-            have = [s for s in want if s in subj_cnt]
-            n = sum(subj_cnt[s] for s in have)
-            cats[cat] = {
-                'n': n,
-                'subjects': [{'key': s, 'name': next((x['subject_cn'] for x in rs if x['subject'] == s), s),
-                              'n': subj_cnt[s]} for s in have],
-                'missing': [s for s in want if s not in subj_cnt],
-            }
-        out.append({'id': src, 'n_questions': len(rs), 'n_subjects': len(subj_cnt),
-                    'by_category': cats,
-                    'testable': sum(v['n'] for v in cats.values()) > 0,
-                    'reason': '' if sum(v['n'] for v in cats.values()) else
-                              '该数据集没有可映射到三大类型的科目，只能做综合能力基线，不能做类型对比。'})
-    return out
+    """按数据集列出三类各自的可选题量与科目依据（atlas 形状：by_category 带 subjects / missing）。
+
+    解析在 shared/dist_protocol/bench_index.py，与中心服务 / 离线数据包同一份；
+    以前这里自己按 CATEGORY_SUBJECTS 数一遍，题库换到 v3 后与 bench 端点给的题量会对不上。
+    """
+    return BI.datasets_rows(DATA)
 
 
 # ---------------------------------------------------------------- prompt 与位置
@@ -448,10 +416,16 @@ def datasets() -> dict:
     try:
         idx = _datasets_index()
     except Exception as exc:
-        return {'schema': 'lang_atlas_datasets.v1', 'available': False, 'reason': f'{exc}', 'datasets': []}
-    return {'schema': 'lang_atlas_datasets.v1', 'available': bool(idx),
+        return {'schema': 'lang_atlas_datasets.v2', 'available': False, 'reason': f'{exc}', 'datasets': []}
+    return {'schema': 'lang_atlas_datasets.v2', 'available': bool(idx),
             'categories': [{'id': c, 'name': c, 'also': CATEGORY_ALIAS.get(c)} for c in ALL_CATS],
             'datasets': idx,
+            # 本机后端有 GPU 与权重：能直接跑实测。中心侧同一字段为 false（见 deploy/platform_service.py），
+            # 界面据此决定「运行实测」按钮是按钮还是一句「在本机执行」。
+            'capabilities': {'run': True, 'gpu': True,
+                             'note': '本机后端：/api/lang/atlas/run 直接在本机权重上跑'},
+            'sources': bench_sources.public_rows(),
+            'notice': bench_sources.notice(),
             'note': '类型 ↔ 科目的映射是显式表（CATEGORY_SUBJECTS），不是模型推断；'
                     '某数据集若没有可映射科目，只做综合能力基线，不参与类型对比。'}
 

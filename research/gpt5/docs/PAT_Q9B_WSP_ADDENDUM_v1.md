@@ -39,3 +39,16 @@ WSP 的"读"声明在无 ground truth 的网络上无法验收；我们手里恰
 
 - WSP 的"解锁不创造"边界（修 Qwen 成功 / Gemma 数学失败）为我们的"读得出≠控得住"家族（Q2-L/Q2-C1/Q8-B/L30）补了外部实例：**单方向可关闭的故障组件**是控得住成立的已知情形；Q9-B W1/W2/W6 检验语域写入是否属于该类。成败都有信息量：过 ⇒ 语域是 LOCALIZED_WRITE；不过且行为门不过 ⇒ 支持 DISTRIBUTED_WRITE / 累积量观。
 - WSP 为博客、单模型、采样设置可能放大效应：任何引用须带"未经同行评审"限定词，不得作为本项目判据的支撑。
+
+---
+
+## 修订 A1（v1.1）：W6-a 能力保持门数据集更换 [2026-11-02 22:10]
+
+- **原因**：owner 指令（2026-11-02 22:01）——能力保持基准由 MATH-500/GSM8K 子集改为 **C-Eval、MMLU、M3Exam、本地测试数据集** 四个。v1 其余各门不变。
+- **§6.2 W6-a 能力保持门（替换）**：四数据集电池 `data/lang_bench/q9b_capgate.v1.jsonl`（**440 题**，构建脚本 `tests/gpt5/q9b_capgate_data.py`，rng=default_rng(20261102) 消费序固定）：
+  1. **C-Eval val**（本地已有）子采样 n=100；
+  2. **MMLU test**（HF cais/mmlu）子采样 n=100；
+  3. **M3Exam**（HF 镜像 chiayewken/m3exam，zh+en）dev 文本题全量 n=40 + test 子样 n=100（镜像答案未经验证——只用于配对比较）；
+  4. **本地测试数据集**（项目池 questions.v2 剔除 C-Eval-val 重叠 id，保证四集互斥）n=100。CMMLU 不在四个数据集内，不入电池。
+- **判据（统计口径按 D23 诚实条款重写）**：base vs edited 在**同一 440 题上配对**，主判 = McNemar 配对检验（edited 新错题数 b vs 新对题数 c）p<0.05 即判"能力受损"，不得写正例；net drop 与逐数据集分解作描述性报告（单集 n=100 独立口径 95%CI 半宽约 ±10pt，不设单集否决阈，>8pt 记 FLAG）。零样本、四选项强制选择（全选项 logP 最大者），两模型同题同 prompt 同口径。
+- M3Exam options 已去 "A. " 前缀、过滤图像引用题与非 A–D 答案题；manifest 见 `data/lang_bench/q9b_capgate_manifest.v1.json`。

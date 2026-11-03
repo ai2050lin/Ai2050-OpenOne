@@ -23,7 +23,7 @@ import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPATIAL_VIEWS, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
+import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPATIAL_VIEWS, dsBound, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
@@ -104,6 +104,7 @@ export default function Workbench() {
   // 谱图关系（relations）不在 SPATIAL_VIEWS 导航里（已并入语言图谱入口），但仍是合法视图：入口与旧链接都能进入
   const view = SPATIAL_VIEWS.some(v => v.id === st.view) || st.view === 'relations' ? st.view : 'neuron';
   const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) ? st.rtab : 'neuron';
+  const dsOn = dsBound(lens, { rtab, view });
 
   useEffect(() => { writeState({ ...st, lens, station, view, rtab, pstep, csec }); }, [st, lens, station, view, rtab, pstep, csec]);
   const lensLabel = lenses.find(l => l.id === lens)?.label || '';
@@ -146,11 +147,18 @@ export default function Workbench() {
           {lens === 'process' && <SubNav items={stations} value={station} onChange={s => set({ station: s })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
           {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
           {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
-          {/* 全局维度条：数据集 / 被测模型。只在真读这两维的界面显示——研发工位读的是模板族与本地模型登记，
-              与题库口径不是同一批数据；给一个不起作用的下拉比不给更糟。 */}
+          {/* 全局维度条：数据集 / 被测模型。模型条在这两页常驻（所有数字都随权重变）；
+              数据集只在真读题库的视图出现（workbenchUtil.dsBound：两处语言图谱）。
+              神经元页读自然语料普查、规则账本按规则记录，换数据集数字不动——那种方块留着就是假旋钮。 */}
           {(lens === 'route' || lens === 'spatial') && (
-            <Gctx ds={st.ds || ''} mdl={st.mdl || ''} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
-                  scope={lens === 'spatial' ? '神经元普查读自然语料（1,900 万 token），不随此项改变' : '影响语言图谱的实测口径'} />
+            <Gctx ds={st.ds || ''} mdl={st.mdl || ''} dsBound={dsOn} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
+                  scope={lens === 'spatial'
+                    ? (view === 'lang' ? '数据集 → 实测取题来源；模型 → 被测算的那份权重'
+                      : view === 'local' ? '本地包在浏览器内解开，与数据集 / 模型选择都无关'
+                        : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）')
+                    : rtab === 'lang' ? '数据集 → 图谱测试题；模型 → 等级矩阵与实测'
+                      : rtab === 'rules' ? '账本按规则记录：不按题库分列，数据集不参与'
+                        : '本页只随模型变：普查读自然语料（1,900 万 token），不读题库'} />
           )}
           <main className="wb-main">
             <Suspense fallback={<Empty>加载中…</Empty>}>
@@ -162,7 +170,7 @@ export default function Workbench() {
               {lens === 'process' && station === 'pipeline' && <TemplatePipeline step={pstep} onStep={v => set({ pstep: v })} onGo={go} canAudit={isAdmin} />}
               {lens === 'process' && station === 'census' && <CensusPanel />}
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
-              {lens === 'route' && <RouteLens tab={rtab} onGoSpace={goSpace} onGo={go} />}
+              {lens === 'route' && <RouteLens tab={rtab} model={st.mdl || ''} ds={st.ds || ''} onGoSpace={goSpace} onGo={go} />}
               {lens === 'config' && <ConfigView cfg={cfg} onGo={go} section={csec} />}
               {lens === 'local' && <LensSpatial on onGo={() => {}} />}
             </Suspense>

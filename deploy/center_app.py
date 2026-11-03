@@ -25,6 +25,12 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 # 只适合在研究者自己机器上用的端点：读取本机模型权重、下载模型
 LOCAL_TOOL_PREFIXES = ('/api/live/', '/api/models/')
+# 会真的在本机启动进程、加载权重、占显存的端点。中心（公开部署）一律不执行：
+# 自动测试要在有 GPU 的机器上跑，中心只负责保存任务记录、分发命令与回收结果。
+# 这些路径不给「管理员令牌」这个后门——给管理员留后门，等于给「中心偷偷跑 GPU」留了路。
+GPU_ONLY_PREFIXES = ('/api/autotest/',)
+GPU_ONLY_REASON = ('中心不做 GPU 计算：自动测试在本机执行（AI2050_LOCAL_TOOLS=1 的本机中心，'
+                   '或节点从中心领取任务后在本机跑）。中心只保存任务记录、转发命令、回收结果。')
 REPO = HERE.parent
 for p in (str(REPO), str(HERE)):
     if p not in sys.path:
@@ -51,14 +57,21 @@ def create_app():
 
     @app.middleware('http')
     async def guard_local_tools(request, call_next):
-        """本机工具（读取服务器上的模型权重、让服务器下载模型）只在本机中心（AI2050_LOCAL_TOOLS=1）开放；
-        公开中心上需要管理令牌，避免任何访客读取服务器目录或触发大文件下载。"""
+        """两级守卫，区别是「能不能靠令牌放行」：
+
+        GPU_ONLY_PREFIXES  一律拒绝（公开中心没有 GPU，也不该替别人跑）：只回 403 与一句去哪里跑。
+        LOCAL_TOOL_PREFIXES 公开中心要管理令牌——这些是读目录、触发下载这类本机工具，
+                           研发机上的本机中心才开放；公开中心上给管理员留一条受控通道。
+        """
         path = request.url.path
-        if not local_tools and request.method != 'OPTIONS' and path.startswith(LOCAL_TOOL_PREFIXES):
-            try:
-                distributed_service._auth_admin(request.headers.get('x-admin-token', ''))
-            except Exception:
-                return JSONResponse({'detail': '本机工具：公开中心未开放（需要管理令牌）'}, status_code=403)
+        if request.method != 'OPTIONS':
+            if not local_tools and path.startswith(GPU_ONLY_PREFIXES):
+                return JSONResponse({'detail': GPU_ONLY_REASON, 'local_only': True}, status_code=403)
+            if not local_tools and path.startswith(LOCAL_TOOL_PREFIXES):
+                try:
+                    distributed_service._auth_admin(request.headers.get('x-admin-token', ''))
+                except Exception:
+                    return JSONResponse({'detail': '本机工具：公开中心未开放（需要管理令牌）'}, status_code=403)
         return await call_next(request)
 
     app.include_router(distributed_service.router)

@@ -90,8 +90,12 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
             plan.append((f'/api/model/skeleton?model_key={mk}', (lambda m=mk: PS.model_skeleton_ep(m))))
         for mk in sorted(data['overlays']):
             plan.append((f'/api/space/overlay?model_key={mk}', (lambda m=mk: PS.space_overlay_ep(m))))
-    if (Path(__file__).resolve().parents[1] / 'data' / 'lang_bench' / 'meta.json').is_file():
-        plan.append(('/api/lang/bench/overview', _lang_bench_overview))
+    if (Path(__file__).resolve().parents[1] / 'data' / 'lang_bench' / 'meta.v3.json').is_file():
+        # 两个读接口一起进包：数据集清单（页顶方块与语言图谱选数据集用）与图谱测试题总览。
+        # 包里不带题库正文，bench_index 走 meta 摘要那条路；题量、科目、三类分布与源地址
+        # 都是建库时按正文数出来的（by_dataset），和在线接口给的是同一份数字。
+        plan.append(('/api/lang/atlas/datasets', lambda: PS.lang_datasets_ep()))
+        plan.append(('/api/lang/bench/overview', lambda: PS.lang_bench_overview_ep()))
     idx = NS.index()
     model_keys = sorted({r['model_key'] for r in idx.get('census', [])})
     for mk in model_keys:
@@ -115,26 +119,10 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     return plan
 
 
-def _lang_bench_overview() -> Dict[str, Any]:
-    """图谱测试题总览（离线版）：只读 data/lang_bench 的 meta 与结果摘要，与在线端点同形。
-
-    数据包场景没有模型权重，model_status 恒为 unavailable（客户端据此隐藏「运行实测」）。
-    不导入 server.lang_bench_service：它顶层 import torch，中心服务器可能没装。
-    """
-    lb = Path(__file__).resolve().parents[1] / 'data' / 'lang_bench'
-    meta_path, res_path = lb / 'meta.json', lb / 'results.json'
-    meta = json.loads(meta_path.read_text(encoding='utf-8')) if meta_path.is_file() else {}
-    result = None
-    if res_path.is_file():
-        try:
-            r = json.loads(res_path.read_text(encoding='utf-8'))
-            result = {k: r[k] for k in ('model_name', 'n_questions', 'correct', 'acc',
-                                        'elapsed_s', 'finished_at', 'by_category', 'by_subject')}
-        except (KeyError, ValueError):
-            pass
-    return {'schema': 'lang_bench_overview.v1', 'available': True, 'meta': meta,
-            'model_status': 'unavailable', 'model_dir': None, 'run_state': 'idle',
-            'last_result': result}
+# 题库总览与数据集清单不再在数据包里另算一份：这两个端点由 platform_service 提供，
+# 解析统一在 shared/dist_protocol/bench_index.py（题库正文 → 数据集清单 → 接口响应）。
+# 这里原有一份「只读 meta、by_category 留空」的离线实现；题库换成 v3 后它与在线端点
+# 会给出不同的题量与类别，是同一件事的两份真源，已删除。
 
 
 def _legacy_detail(D, sha: str) -> Dict[str, Any]:

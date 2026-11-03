@@ -154,6 +154,15 @@ fi
 if [ $LAYOUT = versioned ]; then
   mv "$SRC" "$NEW_DIR"
   chown -R "$SVC_USER:$SVC_GROUP" "$NEW_DIR"
+  # 题库正文不在发布包里（按源地址在本机取），但服务器上可能单独放过一份：
+  # 换目录时把它带过去，否则升级后中心会从「按正文统计」退化成「按 meta 摘要」
+  # （题量与三类分布一样，但没有逐题能力，界面会标注「建库时统计」）。
+  for f in "$OLD_DIR"/data/lang_bench/questions*.jsonl; do
+    [ -f "$f" ] || continue
+    mkdir -p "$NEW_DIR/data/lang_bench"
+    cp -p "$f" "$NEW_DIR/data/lang_bench/"
+    ok "题库正文随版本目录带过去：$(basename "$f")"
+  done
   for f in "${UNIT_FILES[@]}"; do sed -i "s#$OLD_DIR_RAW#$NEW_DIR_RAW#g" "$f"; done
   grep -q "$NEW_DIR_RAW" "${UNIT_FILES[@]}" || rollback "systemd 配置里没找到 $OLD_DIR_RAW，无法改指新目录"
   ok "程序 → $NEW_DIR；systemd 已改指新目录"
@@ -161,9 +170,11 @@ else
   command -v rsync >/dev/null || die "需要 rsync"
   rm -rf "$OLD_DIR.bak-$OLD_VER"
   cp -a "$OLD_DIR" "$OLD_DIR.bak-$OLD_VER"
-  rsync -a --delete --exclude '__pycache__' "$SRC/" "$OLD_DIR/"
+  # --delete 会删掉包里没有的文件，所以显式排除题库正文：它可能被单独放在服务器上，
+  # 属于数据而不是程序，升级不该动它。
+  rsync -a --delete --exclude '__pycache__' --exclude 'data/lang_bench/questions*.jsonl' "$SRC/" "$OLD_DIR/"
   chown -R "$SVC_USER:$SVC_GROUP" "$OLD_DIR"
-  ok "程序已同步到 $OLD_DIR（旧程序 → $OLD_DIR.bak-$OLD_VER）"
+  ok "程序已同步到 $OLD_DIR（旧程序 → $OLD_DIR.bak-$OLD_VER；题库正文保留）"
 fi
 
 # ---------- 5. 重启与检查 ----------

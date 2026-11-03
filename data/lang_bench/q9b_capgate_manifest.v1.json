@@ -1,0 +1,25 @@
+{
+ "schema": "q9b_capgate.v1",
+ "seed": 20261102,
+ "n_total": 440,
+ "counts": {
+  "C-Eval val": 100,
+  "MMLU test": 100,
+  "M3Exam dev": 40,
+  "M3Exam test": 100,
+  "local pool": 100
+ },
+ "datasets": [
+  "C-Eval val",
+  "MMLU test",
+  "M3Exam",
+  "lang_bench questions.v2 (local)"
+ ],
+ "notes": [
+  "M3Exam 镜像 chiayewken/m3exam；官方 test 答案未公开，镜像答案未经验证——门判据只用 base vs edited 配对比较",
+  "M3Exam 已过滤图像引用题与非常规答案；options 去除 'A. ' 前缀",
+  "本地池剔除 ceval- 前缀 id 保证与 C-Eval val 互斥；CMMLU 不在四个数据集内（用户指定四集）",
+  "子采样 rng=default_rng(20261102)，消费序见脚本头部；n=100 各集 + M3Exam test 每语言 50"
+ ],
+ "script": "tests/gpt5/q9b_capgate_data.py"
+}
