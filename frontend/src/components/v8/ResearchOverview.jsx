@@ -7,13 +7,14 @@ import { countMeasuredLanguageItems, languageCatalogCount } from './LanguageCata
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import ResearchLibrary from './ResearchLibrary.jsx';
 import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
+import { Ev, LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
-  ['language', '外部语言图谱', '已有分析记录 / 语言目录总数'],
-  ['internal', '内部模型图谱', '已完成解释检验 / 全部 MLP 神经元'],
-  ['relations', '两图谱的关联与验证', '查看语言与模型之间的证据、验证范围及反例。'],
+  ['language', '语言图谱', '语言里有哪些知识、推理和语法现象', '第一部分'],
+  ['internal', 'LLM 内部图谱', '模型的参数是什么，运行时信息怎样流动', '第二部分'],
+  ['relations', '两图谱的关联', '某种语言能力，由模型内部的什么负责', '第三部分'],
 ];
 const FULL_SNAPSHOT = /^[0-9a-f]{64}$/;
 const reportRef = work => work.stages?.registration_validated?.report_sha256;
@@ -182,6 +183,10 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   const analyzedLanguageCount = tree?.models?.includes(analysisModel)
     ? countMeasuredLanguageItems(new Set(tree.items.filter(item => itemLevel(item, analysisModel) >= 1).map(item => item.id)))
     : null;
+  const measured = new Set((tree?.models?.includes(analysisModel) ? tree.items : []).filter(item => itemLevel(item, analysisModel) >= 1).map(item => item.id));
+  const sections = languageSections(measured);
+  const space = useApi('/api/traces/research-space');
+  const relations = relationCounts(space.data?.objects, skeleton?.model_snapshot || snapshot);
   const layers = skeleton?.n_layers;
   const width = skeleton?.d_ff;
   const neuronTotal = Number.isInteger(layers) && layers > 0 && Number.isInteger(width) && width > 0 ? layers * width : null;
@@ -200,12 +205,10 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   const scoped = works.filter(work => !snapshot || work.model_snapshot === snapshot);
   const internal = scoped.filter(work => FULL_SNAPSHOT.test(work.model_snapshot));
   const reports = scoped.filter(work => reportRef(work) || graphRef(work));
-  const holdoutRecords = reports.filter(work => ['done', 'not_supported', 'inconclusive'].includes(stageState(work.stages?.validation)));
   const summaries = {
     language: coverageLabel(analyzedLanguageCount, languageCatalogCount, '项'),
     internal: coverageLabel(validChecks ? checked.length : null, neuronTotal, '个'),
-    relations: holdoutRecords.length ? `${holdoutRecords.length} 个工作包记录了留出结果`
-      : packages.data ? `${reports.length} 个工作包可查报告或图谱` : '报告与图谱证据',
+    relations: space.data ? `${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条连接` : '读取连接…',
   };
   const scope = { snapshot, model: analysisModel, dataset };
   const related = (open === 'internal' ? internal : open === 'relations' ? reports : scoped)
@@ -214,10 +217,11 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   return <div className="v8-route v8-overview">
     <header className="v8-overview-heading">
       <div>
-        <h2>语言机制研究总览</h2>
-        <p className="v8-note">{analysisModel ? `覆盖统计 · ${[shortModel(analysisModel), analysisModel.split('|')[2]].filter(Boolean).join(' · ')}` : '当前范围暂无可核对的统计模型。'}</p>
+        <h2>我们在破解什么</h2>
+        <p>大模型怎样用有限的参数学会语言？我们把问题分成三部分：语言里有什么、模型里有什么、两边怎样对应。</p>
+        <p className="v8-note wb-pro">{analysisModel ? `覆盖统计 · ${[shortModel(analysisModel), analysisModel.split('|')[2]].filter(Boolean).join(' · ')}` : '当前范围暂无可核对的统计模型。'}</p>
       </div>
-      <details className="v8-overview-scope">
+      <details className="v8-overview-scope wb-pro">
         <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}</summary>
         <label>模型快照 <select aria-label="总览模型快照" value={snapshot} onChange={event => {
           const next = event.target.value;
@@ -230,12 +234,16 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
     </header>
     {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
     <div className="v8-direction-cards v8-overview-cards">
-      {CARDS.map(([id, title, description]) => <Fragment key={id}>
+      {CARDS.map(([id, title, description, part]) => <Fragment key={id}>
         <button type="button" className="v8-card v8-direction v8-overview-card" aria-label={title} aria-expanded={open === id}
           aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => onGo('route', null, null, { rtab: 'overview', opane: open === id ? '' : id })}>
+          <small>{part}</small>
           <strong>{title}</strong>
-          <span className={`v8-overview-metric${id !== 'relations' ? ' v8-overview-ratio' : ''}`}>{summaries[id]}</span>
           <span className="v8-note">{description}</span>
+          <span className={`v8-overview-metric${id !== 'relations' ? ' v8-overview-ratio' : ''}`}>{summaries[id]}</span>
+          {id === 'language' && <span className="v8-note">{sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}</span>}
+          {id === 'internal' && <span className="v8-note">静态参数和动态机制分别在“空间”查看</span>}
+          {id === 'relations' && <span className="v8-overview-evidence"><Ev kind="observation">看到过 {relations.observation || 0}</Ev> <Ev kind="heldout">新材料也成立 {relations.heldout || 0}</Ev> <Ev kind="intervention">改动后输出变了 {relations.intervention || 0}</Ev><br/><small>三类分开计数；另有 {relations.negative || 0} 条未成立</small></span>}
           <span className="v8-overview-action">{open === id ? '收起 ↑' : '查看详情 →'}</span>
         </button>
         {open === id && <section id="overview-detail" className="v8-card v8-overview-detail" aria-label={`${title}详情`}>
@@ -273,11 +281,13 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
         </section>}
       </Fragment>)}
     </div>
-    <details className="v8-card v8-overview-fold" open={plan} onToggle={event => setPlan(event.currentTarget.open)}>
+    <LatestFindings onGo={onGo}/>
+    <NextStep onGo={onGo}/>
+    <details className="v8-card v8-overview-fold wb-pro" open={plan} onToggle={event => setPlan(event.currentTarget.open)}>
       <summary>阶段任务与历史分片</summary>
       {plan && <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} />}
     </details>
-    <details className="v8-card v8-overview-fold" open={archive} onToggle={event => setArchive(event.currentTarget.open)}>
+    <details className="v8-card v8-overview-fold wb-pro" open={archive} onToggle={event => setArchive(event.currentTarget.open)}>
       <summary>研究归档与原始来源</summary>
       {archive && <ResearchLibrary compact />}
     </details>

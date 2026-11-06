@@ -11,6 +11,7 @@ import { useAuth } from './rdc_fusion/authContext.js';
 import { Card, Empty, StatusPill } from './rdc_fusion/ui.jsx';
 import { siteHref } from '../v8/v8Util.js';
 import { clearErrors, errorCount, exportDiagnostics, getErrors } from '../../diagnostics.js';
+import { PermissionTable } from '../v8/ClientGuide.jsx';
 
 const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
 const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
@@ -76,6 +77,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
 
       {sec === 'conn' && (
         <>
+          <p>一切正常时不用管这里。连接失败时，这里会显示原因。</p>
           <Card title="连接与运行形态" sub="决定哪些界面可读、哪些可写">
             <KV rows={[
               ['中心服务', <span key="c" className="wb-cfg-mono">{center || '（同源，未配置地址）'}</span>],
@@ -119,6 +121,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
         </>
       )}
 
+      {sec === 'account' && <Card title="不同身份能做什么" sub="不登录也能浏览全部公开研究；实际权限由服务端校验"><PermissionTable/></Card>}
       {sec === 'account' && (
         <>
           <Card title="账号" sub={offline ? '中心服务暂不可达，显示的是本机保存的登录信息' : '登录后可领题测试、绑定节点、署名贡献'}
@@ -148,7 +151,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
       {sec === 'node' && (
           <section className="wb-cfg-node">
             <header>
-              <h4>本机节点与贡献</h4>
+              <h4>本机算力</h4>
               <small>{DESKTOP
                 ? '控制本机节点服务：设备、模型、资源限制、运行与日志；只有节点服务访问中心'
                 : '网页可控制本人已授权的托管节点；运行本机算力请用桌面客户端'}</small>
@@ -161,6 +164,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
           </section>
       )}
 
+      {sec === 'model' && <p>被测模型是研究对象；AI 助手帮你读结果。AI 的回答只算未检验假设，不会进入证据。</p>}
       {sec === 'model' && (
         <>
           <Card title="被测模型" sub="中心登记、且带完整快照校验的模型"

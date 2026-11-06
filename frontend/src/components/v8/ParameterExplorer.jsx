@@ -22,13 +22,13 @@ export function useParameters(path){
   return local?{data:state.path===path?state.data:null,error:state.path===path?state.error:'',loading:!!path&&state.path!==path,reload:()=>setVersion(n=>n+1)}:api;
 }
 
-export function ArrayCanvas({ count, selected, onPick, color, label,values,columns=128,maxAbs }) {
+export function ArrayCanvas({ count, selected, onPick, color, label,values,colors,columns=128,maxAbs }) {
   const ref=useRef(null);const cols=columns,cell=5,rows=Math.ceil(count/cols);
   useEffect(()=>{
     const c=ref.current;if(!c)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
     const max=values?(maxAbs||Math.max(1e-12,...values.map(Math.abs))):1;
-    for(let i=0;i<count;i++){const a=values?Math.abs(values[i])/max:0;ctx.fillStyle=values?(values[i]>=0?`rgba(42,120,214,${.06+.84*a})`:`rgba(235,104,52,${.06+.84*a})`):i===selected?'#e34948':color;ctx.fillRect(i%cols*cell,Math.floor(i/cols)*cell,4,4);if(values&&i===selected){ctx.strokeStyle='#111827';ctx.strokeRect(i%cols*cell,Math.floor(i/cols)*cell,4,4)}}
-  },[count,selected,color,values,cols,rows,maxAbs]);
+    for(let i=0;i<count;i++){const a=values?Math.abs(values[i])/max:0;ctx.fillStyle=colors&&i!==selected?colors[i]:values?(values[i]>=0?`rgba(42,120,214,${.06+.84*a})`:`rgba(235,104,52,${.06+.84*a})`):i===selected?'#e34948':color;ctx.fillRect(i%cols*cell,Math.floor(i/cols)*cell,4,4);if(values&&i===selected){ctx.strokeStyle='#111827';ctx.strokeRect(i%cols*cell,Math.floor(i/cols)*cell,4,4)}}
+  },[count,selected,color,values,colors,cols,rows,maxAbs]);
   return <div className="v8-gridwrap"><canvas ref={ref} width={cols*cell} height={rows*cell} aria-label={`${label}全部${count}个索引；${values?'已载入完整采集响应，蓝正橙负':'灰色表示未加载状态'}`}
     onClick={onPick?e=>{const r=e.currentTarget.getBoundingClientRect();const x=(e.clientX-r.left)*e.currentTarget.width/r.width,y=(e.clientY-r.top)*e.currentTarget.height/r.height;const i=Math.floor(y/cell)*cols+Math.floor(x/cell);if(x>=0&&x<cols*cell&&i>=0&&i<count)onPick(i)}:undefined} /></div>;
 }

@@ -1,3 +1,4 @@
+import { CatalogSummary } from './ClientGuide.jsx';
 import { useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { CatalogItemDetails } from '../app/rdc_fusion/CatalogPanel.jsx';
@@ -87,6 +88,7 @@ function DatasetDetails({ entry, archive, onGo }) {
 export default function ResearchCatalog({ runFilter = '', template, onGo, onAutotest, onStudio }) {
   const catalog = useApi(runFilter ? null : '/api/catalog');
   const research = useApi('/api/research-library/catalog');
+  const skeleton = useApi('/api/model/skeleton');
   const [query, setQuery] = useState('');
   const [type, setType] = useState('');
   const [limit, setLimit] = useState(FIRST_PAGE);
@@ -119,6 +121,8 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
 
   return <section className="v8-card v8-rnd" aria-label="材料与数据">
     <h2>材料与数据</h2>
+    <p>所有实验用到的句子、语料和模型，都能在这里查到来源。</p>
+    <CatalogSummary templates={catalog.data?.items?.length} models={skeleton.data?.models?.length} tokens="1,904 万"/>
     <div className="v8-rnd-search">
       <input type="search" aria-label="搜索材料" placeholder="搜索数据集或模板" value={query}
         onChange={event => { setQuery(event.target.value); setLimit(FIRST_PAGE); }}/>

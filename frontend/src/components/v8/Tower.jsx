@@ -219,10 +219,12 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       ctx.fillStyle = cells.kind === 'attn' ? '#2a78d6' : '#ac6446';
       const size = cells.kind === 'attn' ? 4 : Math.max(.6, Math.min(1.9, view.zoom * .65));
       const overlay = cells.values?.length===cells.count ? cells.values : null;
+      const colors = cells.colors?.length===cells.count ? cells.colors : null;
       const scale = overlay ? Math.max(1e-12,...overlay.map(Math.abs)) : 1;
       for (let index = 0; index < cells.count; index += 1) {
         const x = ((index % cols) + .5) / cols, zPos = (Math.floor(index / cols) + .5) / rows;
-        if(overlay)ctx.fillStyle=`rgba(${overlay[index]<0?'235,104,52':'42,120,214'},${.1+.85*Math.abs(overlay[index])/scale})`;
+        if(colors)ctx.fillStyle=colors[index];
+        else if(overlay)ctx.fillStyle=`rgba(${overlay[index]<0?'235,104,52':'42,120,214'},${.1+.85*Math.abs(overlay[index])/scale})`;
         ctx.fillRect(origin[0] + a[0] * x + b[0] * zPos - size / 2, origin[1] + a[1] * x + b[1] * zPos - size / 2, size, size);
       }
     }
@@ -233,7 +235,7 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       const c = P((x1 + x2) / 2 * 0.72, (yOf(e.hs1) + yOf(e.hs2)) / 2, (z1 + z2) / 2 * 0.72);
       ctx.globalAlpha = 0.9;
       ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]);
-      ctx.lineWidth = 1.8; ctx.strokeStyle = e.color; ctx.setLineDash(e.dash || []); ctx.stroke(); ctx.setLineDash([]);
+      ctx.lineWidth = e.width || 1.8; ctx.strokeStyle = e.color; ctx.setLineDash(e.dash || []); ctx.stroke(); ctx.setLineDash([]);
       const t = 0.75, u = 1 - t;
       const q = [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
       const tx = 2 * u * (c[0] - a[0]) + 2 * t * (b[0] - c[0]), ty = 2 * u * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
@@ -242,7 +244,7 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       ctx.moveTo(q[0] - ah * nx - ah * 0.5 * -ny, q[1] - ah * ny - ah * 0.5 * nx);
       ctx.lineTo(q[0], q[1]);
       ctx.lineTo(q[0] - ah * nx + ah * 0.5 * -ny, q[1] - ah * ny + ah * 0.5 * nx);
-      ctx.lineWidth = 1.8; ctx.strokeStyle = e.color; ctx.stroke();
+      ctx.lineWidth = e.width || 1.8; ctx.strokeStyle = e.color; ctx.stroke();
       for (const p of [a, b]) { ctx.beginPath(); ctx.arc(p[0], p[1], 2.6, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); }
       ctx.globalAlpha = 1;
     }

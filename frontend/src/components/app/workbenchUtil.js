@@ -27,9 +27,9 @@ export const SPATIAL_VIEWS = [
   /* 谱图关系（跨模式族共享编码轴 / 概念假设）不再是一级 tab：作为语言图谱里的入口进入（SpaceLens 仍渲染该视图，旧链接 ?view=relations|atlas 照常可用） */
 ];
 export const SPATIAL_MODES = [
-  { id: 'graph', label: '结构', desc: '全模型层塔、原生索引与所选对象的参数和证据' },
-  { id: 'live', label: '运行与路径', desc: '按样本、生成步和读出位置查看实际响应' },
-  { id: 'response', label: '响应对照', desc: '对齐两个样本的原生响应和实验汇总' },
+  { id: 'graph', label: '结构', desc: '3D 模型空间：全部层、Head 和神经元，以及语言图谱' },
+  { id: 'live', label: '运行与路径', desc: '信息流、单句归因图和实际运行响应' },
+  { id: 'response', label: '响应对照', desc: '语言到内部的对应、保真看板和公开基准' },
 ];
 export const GRAPH_LAYERS = [
   {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
@@ -41,7 +41,7 @@ export const GRAPH_LAYERS = [
    （见 TemplatePipeline.jsx）；「AI 助手」与「贡献算力」是配置与账号属性，迁到「配置」界面，不再占研发工位。
    旧链接 ?station=studio|freeze|dispatch|audit 由 OLD_STATIONS 重定向到 pipeline 的对应步骤。 */
 export const STATIONS = [
-  { id: 'plan', label: '当前研发', web: true, desc: '研究进度与一键参与' },
+  { id: 'plan', label: '当前研发', web: true, desc: '选择参与方式，查看研究进度和缺口' },
   { id: 'catalog', label: '材料与数据', web: true, desc: '语料、题目、模式族、数据版本与来源' },
   { id: 'execution', label: '实验与队列', web: true, desc: '实验类型、分片、节点与执行审计' },
   { id: 'probe', label: '神经元测试', desc: '本机 GPU 对一个 MLP 单元跑 S1–S9 找特征流程；结果只存本机' },

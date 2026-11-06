@@ -9,6 +9,7 @@ import ResearchInterventionReport from './ResearchInterventionReport.jsx';
 import ResearchParticipation from './ResearchParticipation.jsx';
 import ResearchBundleUpload from './ResearchBundleUpload.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
+import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
 
 const STAGE = {
   freeze: '冻结材料', collection: '原场采集', client_acceptance: '客户端回查', validation: '留出验证',
@@ -169,7 +170,9 @@ function ResearchPlans({ onGo }) {
     children={all.filter(child => child !== focused && !ongoing.includes(child) && child.body.parent_run_id === entry.body.run_id)}/>;
 
   return <section className="v8-card v8-rnd v8-rnd-current" aria-label="当前研发">
-    <h2>当前研发</h2>
+    <h2>参与研究</h2>
+    <p>选一种适合你的方式。不用懂模型，也不一定要有显卡。</p>
+    <ParticipationWays onGo={onGo}/>
     <div className="v8-rnd-dashboard">
       <section className="v8-rnd-progress" aria-label="研究进度">
         <h3>研究进度</h3>
@@ -192,6 +195,8 @@ function ResearchPlans({ onGo }) {
         publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
         onTaskChanged={refreshJobs}/>
     </div>
+    <ResearchGaps/>
+    <AutoExplainCard/>
     {ongoing.length > 0 && <ResearchDisclosure title="进行中的研究详情"><div className="v8-rnd-list">{ongoing.map(row)}</div></ResearchDisclosure>}
     {archiveRows.length > 0 && <ResearchDisclosure key={run} title={archiveLabel ? `研究历史 · ${archiveLabel}` : `研究历史（${archiveRows.length}）`}>
       <div className="v8-rnd-list">{archiveRows.map(row)}</div>
@@ -296,6 +301,7 @@ function ResearchQueue({ onGo, tools }) {
 
   return <section className="v8-card v8-rnd" aria-label="实验与队列">
     <h2>实验与队列</h2>
+    <p>每个实验回答一个问题。这里看任务进度、待处理事项和研究结果。</p>
     <dl className="v8-rnd-metrics">
       <div><dt>运行中</dt><dd>{tasks.data ? stats.claimed ?? 0 : '—'}</dd></div>
       <div><dt>排队</dt><dd>{tasks.data ? stats.queued ?? 0 : '—'}</dd></div>
@@ -307,6 +313,7 @@ function ResearchQueue({ onGo, tools }) {
     </div>
     <SourceNotice source={tasks} loading="读取调度队列…"/>
     {catalog.error && <p className="v8-note">{catalog.error}</p>}
+    <AiLoopCard/>
     <ResearchBundleUpload/>
     {run && <ArchivedExperiment key={run} run={run} onGo={onGo}/>}
     <div className="v8-rnd-list" aria-label="当前任务">

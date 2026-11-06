@@ -15,6 +15,8 @@ const GROUPS = [
 const RETEST = { block: '同范围直接引用', need_n: '复测需补样本', allow: '按范围判断复测' };
 const DOMAINS = { measurement: '指标与对照', attention: '注意力头', 'attention-free static': '静态结构' };
 const ruleTitle = rule => rule.title || rule.claim;
+const RULE_PARTS = [['', '全部'], ['neuron', '神经元'], ['attention', '注意力'], ['method', '方法与测量']];
+const rulePart = rule => rule.domain === 'mlp' ? 'neuron' : /^att/.test(rule.domain) ? 'attention' : 'method';
 
 function RuleCheck({ rules, snapshot, disabled, onRule, prepared }) {
   const [query, setQuery] = useState('');
@@ -150,12 +152,13 @@ export default function RuleLedgerPage({ children }) {
   const [pendingOpen, setPendingOpen] = useState(false);
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [domain, setDomain] = useState('');
+  const [part, setPart] = useState('');
   const focusRule = useRef('');
   const rules = ledger.data?.rules || [];
   const byId = new Map(rules.map(rule => [rule.id, rule]));
   const labels = ledger.data?.labels?.domain || {};
   const pending = rules.filter(rule => !GROUPS.some(item => item.id === rule.status));
-  const active = rules.filter(rule => rule.status === group && (!domain || rule.domain === domain));
+  const active = rules.filter(rule => rule.status === group && (!domain || rule.domain === domain) && (!part || rulePart(rule) === part));
   const ordered = [...active].sort((a, b) => Number(Boolean(b.title)) - Number(Boolean(a.title)));
   const visible = ordered.slice(0, limit);
   const selectedRule = byId.get(selected);
@@ -190,15 +193,18 @@ export default function RuleLedgerPage({ children }) {
   }
 
   return <section className="v8-route v8-rule-ledger" aria-labelledby="rules-title">
-    <header className="v8-overview-heading"><h2 id="rules-title">成果与证据</h2></header>
+    <header className="v8-overview-heading"><div><h2 id="rules-title">成果与证据</h2>
+      <p>{ledger.data ? `已登记 ${rules.length} 条规则：${rules.filter(rule => rule.status === 'confirmed').length} 条成立，${rules.filter(rule => rule.status === 'refuted').length} 条未成立，${pending.length} 条待定。` : '读取规则账本…'}未成立的结论能帮后来者少走弯路，所以和成立的放在一起。</p></div></header>
     <RuleCheck key={snapshot} rules={rules} snapshot={snapshot} disabled={!rules.length} onRule={openRule}
       prepared={prepared?.snapshot === snapshot ? prepared.item : null} />
+    <div className="v6-toolbar" role="group" aria-label="研究对象">{RULE_PARTS.map(([id, label]) => <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={part === id}
+      onClick={() => { setPart(id); setLimit(PAGE_SIZE); }}>{label}{ledger.data ? ` ${id ? rules.filter(rule => rulePart(rule) === id).length : rules.length}` : ''}</button>)}</div>
     <div className="v8-rules-groups" role="group" aria-label="规则分类">
       {GROUPS.map(item => <button key={item.id} type="button" className="v8-card v8-direction v8-rule-group"
         aria-expanded={group === item.id} aria-controls={group === item.id ? 'rule-results' : undefined}
         onClick={() => choose(group === item.id ? '' : item.id)}>
         <strong>{item.label}</strong>
-        <span>{ledger.data ? rules.filter(rule => rule.status === item.id).length : '—'} 条</span>
+        <span>{ledger.data ? rules.filter(rule => rule.status === item.id && (!part || rulePart(rule) === part)).length : '—'} 条</span>
         <span className="v8-rule-group-caret" aria-hidden="true">{group === item.id ? '▴' : '▾'}</span>
         <small>{item.note}</small>
       </button>)}
