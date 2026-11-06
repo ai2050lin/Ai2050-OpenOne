@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI2050 研究客户端 · v5 渐进披露 · 设计稿 2026-11-03</title>
+<style>
+:root{
+  --bg:#f4f7fb;--panel:#fff;--soft:#f8fafd;
+  --ink:#141d2e;--ink2:#4c5b71;--ink3:#8a98ac;
+  --line:#e5eaf3;--line2:#d2dbe8;
+  --brand:#2457a6;--brand2:#173d77;--brandbg:#eef4fd;
+  --know:#2f6fc4;--knowbg:#eaf2fd;
+  --reason:#c2661f;--reasonbg:#fff4e9;
+  --gram:#07786e;--grambg:#e7f6f3;
+  --warn:#b03a3a;--warnbg:#fdf0f0;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  --sh:0 1px 2px rgba(20,35,60,.04);
+  --sh2:0 8px 26px rgba(20,40,70,.075);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+.mono{font-family:var(--mono)}
+
+/* ── 顶栏 ── */
+.top{height:54px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 18px;position:sticky;top:0;z-index:50}
+.logo{width:28px;height:28px;border-radius:8px;background:var(--brand2);color:#fff;display:grid;place-items:center;font-weight:750;font-size:11.5px;letter-spacing:-.4px;flex:0 0 auto}
+.brand b{display:block;font-size:12.5px;line-height:1.2;font-weight:650}
+.brand small{display:block;color:var(--ink3);font-size:9.5px;margin-top:2px;letter-spacing:.02em}
+.topr{margin-left:auto;display:flex;align-items:center;gap:10px}
+.pill{border:1px dashed #d9a54a;color:#8a5c14;background:#fffbf2;border-radius:99px;padding:3px 9px;font-size:10px;white-space:nowrap}
+.avatar{width:26px;height:26px;border-radius:50%;background:#e7eef8;color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:11px}
+
+/* ── 骨架 ── */
+.shell{display:grid;grid-template-columns:164px minmax(0,1fr);min-height:calc(100vh - 54px)}
+.rail{background:#fff;border-right:1px solid var(--line);padding:14px 9px;position:sticky;top:54px;height:calc(100vh - 54px);display:flex;flex-direction:column;gap:2px}
+.navbtn{border-radius:8px;display:flex;align-items:center;gap:9px;text-align:left;padding:9px 10px;font-size:12px;color:var(--ink2);transition:.14s;position:relative}
+.navbtn:hover{background:var(--soft)}
+.navbtn.on{background:var(--brandbg);color:var(--brand);font-weight:650}
+.navbtn .ico{width:15px;text-align:center;font-size:12px;opacity:.8}
+.navbtn .n{margin-left:auto;font-size:9.5px;color:var(--ink3);font-weight:500}
+.navbtn.on .n{color:var(--brand);opacity:.7}
+.rail-sec{font-size:9.5px;color:#a3aebf;letter-spacing:.1em;padding:13px 10px 4px;font-weight:600}
+.rail-foot{margin-top:auto;border-top:1px solid var(--line);padding:10px 8px 2px;color:var(--ink3);font-size:9.5px;line-height:1.65}
+.rail-foot b{color:var(--ink2);font-weight:600}
+
+.main{padding:22px 26px 60px;min-width:0;max-width:1560px;width:100%;margin:0 auto}
+
+/* ── 页头 ── */
+.phead{margin:0 0 18px}
+.phead h1{font-size:21px;line-height:1.25;margin:0;letter-spacing:-.4px;font-weight:680}
+.phead p{margin:5px 0 0;color:var(--ink2);font-size:12px;max-width:820px;line-height:1.7}
+
+/* ── 进展：三个大数字 ── */
+.hero3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hero{position:relative;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px 22px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--sh);transition:.18s;overflow:hidden}
+.hero:hover{border-color:#b9cde8;box-shadow:var(--sh2);transform:translateY(-1px)}
+.hero .hk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.hero .dot{width:7px;height:7px;border-radius:2px;flex:0 0 auto}
+.hero .hv{font-size:58px;line-height:1;font-weight:670;letter-spacing:-2.8px;display:flex;align-items:baseline;gap:1px;margin:2px 0 2px}
+.hero .hv i{font-size:20px;font-weight:600;font-style:normal;letter-spacing:0;color:var(--ink3);margin-left:2px}
+.hero .hd{font-size:12px;color:var(--ink2);line-height:1.65;min-height:40px}
+.hero .hx{font-size:10.5px;color:var(--brand);font-weight:600;display:flex;align-items:center;gap:4px;margin-top:2px}
+.hero .hx em{font-style:normal;transition:.2s;display:inline-block;font-size:9px}
+.hero[aria-expanded="true"]{border-color:#b9cde8;box-shadow:var(--sh2)}
+.hero[aria-expanded="true"] .hx em{transform:rotate(180deg)}
+.hero .track{position:absolute;left:0;right:0;bottom:0;height:3px;background:#f0f3f8}
+.hero .track i{display:block;height:100%;border-radius:0 3px 3px 0}
+.d-know .dot{background:var(--know)} .d-know .hx{color:var(--know)}
+.d-reason .dot{background:var(--reason)} .d-reason .hx{color:var(--reason)}
+.d-gram .dot{background:var(--gram)} .d-gram .hx{color:var(--gram)}
+
+/* ── 展开区 ── */
+.detail{display:none;background:#fff;border:1px solid var(--line);border-radius:14px;margin-top:14px;box-shadow:var(--sh);overflow:hidden}
+.detail.open{display:block;animation:slide .22s ease}
+@keyframes slide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.dbar{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#f7fafe,#fff)}
+.dbar b{font-size:13.5px;letter-spacing:-.2px}
+.dbar .tag{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--ink3);background:#fff}
+.dbar .x{margin-left:auto;font-size:11px;color:var(--ink3);padding:4px 8px;border-radius:6px}
+.dbar .x:hover{background:var(--soft);color:var(--ink)}
+.dbody{padding:16px 18px 18px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px}
+.dbody.one{grid-template-columns:1fr}
+.dsec h4{margin:0 0 9px;font-size:11px;color:var(--ink3);letter-spacing:.07em;font-weight:650}
+.dlead{margin:0 0 16px;font-size:13px;line-height:1.82;color:#25324a}
+.dlead b{color:var(--ink);font-weight:650}
+
+/* 进度条组 */
+.bars{display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:112px 1fr 56px;align-items:center;gap:10px;font-size:11.5px}
+.bar-row .lab{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-row .tr{height:7px;background:#f0f3f8;border-radius:99px;overflow:hidden}
+.bar-row .tr i{display:block;height:100%;border-radius:99px}
+.bar-row .vl{text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink);font-weight:600;white-space:nowrap}
+.bar-row .vl small{color:var(--ink3);font-weight:400;font-size:9.5px;margin-left:1px}
+
+/* 证据阶梯 */
+.ladder{display:flex;gap:3px;margin-bottom:5px}
+.ladder i{height:28px;border-radius:4px;display:grid;place-items:center;font-size:11px;font-style:normal;color:#fff;font-weight:600;font-family:var(--mono)}
+.ladder i.e0{background:#eaeef5;color:#9aa6b8}
+.ladder i.e1{background:#c4d3e7;color:#3a4f6d}
+.ladder i.e2{background:#7fa4cf}
+.ladder i.e3{background:var(--brand)}
+.ladder-k{display:flex;gap:3px;margin-bottom:6px}
+.ladder-k span{text-align:center;font-size:9px;color:var(--ink3);font-family:var(--mono);letter-spacing:.02em}
+.ladder-lg{display:flex;flex-wrap:wrap;gap:0 12px;font-size:9.5px;color:var(--ink3);margin-bottom:16px;line-height:1.6}
+
+/* 结论条目 */
+.finds{display:flex;flex-direction:column;gap:9px}
+.find{display:flex;gap:9px;font-size:12px;line-height:1.7;color:#2b3a52}
+.find .m{flex:0 0 auto;width:15px;height:15px;border-radius:4px;display:grid;place-items:center;font-size:9px;margin-top:2px;font-weight:700}
+.find .m.ok{background:var(--grambg);color:var(--gram)}
+.find .m.no{background:var(--warnbg);color:var(--warn)}
+.find .m.q{background:var(--brandbg);color:var(--brand)}
+.find code{font-family:var(--mono);font-size:10.5px;background:#f4f6fa;padding:1px 5px;border-radius:4px;color:#3b4a63}
+
+/* ── 折叠条 ── */
+.strip{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:16px;box-shadow:var(--sh);overflow:hidden}
+.strip-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;width:100%;text-align:left}
+.strip-hd:hover{background:var(--soft)}
+.strip-hd b{font-size:12.5px;font-weight:650}
+.strip-hd .sm{font-size:11px;color:var(--ink3);margin-left:2px}
+.strip-hd .arw{margin-left:auto;font-size:9px;color:var(--ink3);transition:.2s}
+.strip-hd[aria-expanded="true"] .arw{transform:rotate(180deg)}
+.strip-bd{display:none;padding:0 16px 16px}
+.strip-bd.open{display:block}
+
+/* 数据集 × 三类 简表 */
+.mtx2{width:100%;border-collapse:separate;border-spacing:0;font-size:11.5px}
+.mtx2 th{text-align:left;font-weight:600;color:var(--ink3);font-size:10px;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--line)}
+.mtx2 th.c,.mtx2 td.c{text-align:center}
+.mtx2 td{padding:9px 8px;border-bottom:1px solid #f1f4f9;vertical-align:middle}
+.mtx2 tr:last-child td{border-bottom:0}
+.mtx2 .dsn{font-weight:620;color:var(--ink)}
+.mtx2 .dss{display:block;font-size:10px;color:var(--ink3);font-weight:400;margin-top:1px}
+.cell{display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:620;font-family:var(--mono)}
+.cell.z{background:#f4f6fa;color:#a6b2c4}
+.cell.lo{background:#eef3fa;color:#5a7291}
+.cell.mid{background:#dbe8f8;color:#2c5a92}
+.cell.hi{background:var(--brand);color:#fff}
+.cell.nul{background:var(--warnbg);color:var(--warn)}
+
+/* ── 空间 3D ── */
+.space{display:grid;grid-template-columns:minmax(0,1fr) 396px;gap:16px;align-items:start}
+.stage{position:relative;background:linear-gradient(170deg,#fbfcfe 0%,#eef3fa 100%);border:1px solid var(--line);border-radius:14px;height:600px;overflow:hidden;box-shadow:var(--sh);cursor:grab}
+.stage:active{cursor:grabbing}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 32%,rgba(255,255,255,.9),transparent 62%)}
+.scene{position:absolute;inset:0;display:grid;place-items:center;perspective:1400px}
+.world{position:relative;width:256px;height:150px;transform-style:preserve-3d;transition:transform .12s linear;margin-top:38px}
+.layer{position:absolute;inset:0;transform-style:preserve-3d;border-radius:3px;border:1px solid #c2d0e4;background:rgba(255,255,255,.74);transition:background .25s,border-color .25s,box-shadow .25s}
+.layer.on{border-color:#9db9dc;background:rgba(238,244,253,.92)}
+.layer.hl{border-color:#2457a6;background:rgba(214,231,251,.98);box-shadow:0 0 0 1.5px rgba(36,87,166,.42),0 0 26px rgba(47,111,196,.3)}
+.layer .attn,.layer .mlp{position:absolute;top:14%;height:72%;border-radius:2px;transition:.25s}
+.layer .attn{left:8%;width:35%;background:#cfdcee;border:1px solid #b6c9e2}
+.layer .mlp{right:8%;width:45%;background:#dde5f1;border:1px solid #c5d2e4}
+.layer.hl .attn{background:#2f6fc4;border-color:#2457a6;box-shadow:0 0 10px rgba(47,111,196,.45)}
+.layer.hl .mlp{background:#c2661f;border-color:#a85617;box-shadow:0 0 10px rgba(194,102,31,.4)}
+.layer.mut .attn,.layer.mut .mlp{opacity:.6}
+.layer.mut{border-color:#ccd8e8;background:rgba(255,255,255,.62)}
+/* 选中某一类参数时，另外两类退到背景里：这是「三块结构」与 3D 塔的联动 */
+.world.mod-attn .layer .mlp{opacity:.2}
+.world.mod-mlp .layer .attn{opacity:.2}
+.world.mod-emb .layer .attn,.world.mod-emb .layer .mlp{opacity:.78}
+.emb{position:absolute;inset:-14% -20%;transform:translateZ(322px);border-radius:4px;border:1px solid #c1d1e7;background:linear-gradient(180deg,#e6effb,#d7e5f6);transition:.3s}
+.emb.hl{border-color:#2457a6;background:linear-gradient(180deg,#d8e8fc,#c2d8f5);box-shadow:0 0 30px rgba(47,111,196,.3)}
+.stage-hud{position:absolute;left:16px;top:14px;display:flex;flex-direction:column;gap:5px;z-index:3;pointer-events:none}
+.stage-hud b{font-size:12px;letter-spacing:-.1px}
+.stage-hud span{font-size:10.5px;color:var(--ink3)}
+.stage-tip{position:absolute;right:14px;bottom:12px;font-size:10px;color:#9aa7ba;z-index:3;pointer-events:none;background:rgba(255,255,255,.8);padding:3px 8px;border-radius:99px}
+.depthbar{position:absolute;left:16px;bottom:222px;top:96px;width:1px;background:linear-gradient(180deg,transparent,#aebdd2 12%,#aebdd2 88%,transparent);z-index:3;pointer-events:none}
+.depthbar em{position:absolute;left:9px;font-size:9.5px;color:#7b89a0;font-style:normal;transform:translateY(-50%);white-space:nowrap;background:rgba(255,255,255,.72);padding:0 3px;border-radius:3px}
+
+/* 模式选择 */
+.modes{display:flex;gap:8px;margin-bottom:14px}
+.mode{flex:1;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;transition:.16s;box-shadow:var(--sh)}
+.mode:hover{border-color:#bdcfe6}
+.mode.on{border-color:var(--brand);background:#f7fbff;box-shadow:0 0 0 2px rgba(36,87,166,.09)}
+.mode .mn{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;margin-bottom:3px}
+.mode .mn i{width:6px;height:6px;border-radius:2px;font-style:normal}
+.mode .md{font-size:10.5px;color:var(--ink3);line-height:1.5}
+
+/* 右侧面板 */
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--sh)}
+.card h3{margin:0 0 10px;font-size:12.5px;font-weight:660;letter-spacing:-.1px;display:flex;align-items:center;gap:7px}
+.card h3 .sm{margin-left:auto;font-size:10px;color:var(--ink3);font-weight:400}
+.mod3{display:flex;flex-direction:column;gap:7px}
+.mod3 button{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;text-align:left;transition:.15s}
+.mod3 button:hover{border-color:#bdcfe6;background:#fafcff}
+.mod3 button.on{border-color:var(--brand);background:#f7fbff}
+.mod3 .sq{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-weight:700;flex:0 0 auto}
+.mod3 .nm{font-size:11.5px;font-weight:620}
+.mod3 .sh{display:block;font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:1px}
+.mod3 .rt{margin-left:auto;font-size:10px;color:var(--ink3)}
+
+.ftab{width:100%;border-collapse:collapse;font-size:11px}
+.ftab th{text-align:left;font-weight:600;color:var(--ink3);font-size:9.5px;letter-spacing:.05em;padding:0 0 7px;border-bottom:1px solid var(--line)}
+.ftab td{padding:8px 0;border-bottom:1px solid #f2f5f9;vertical-align:top;line-height:1.55}
+.ftab tr:last-child td{border-bottom:0;padding-bottom:0}
+.ftab .ly{font-family:var(--mono);color:var(--brand);font-weight:600;white-space:nowrap;font-size:10.5px}
+.ftab .ft{color:#2b3a52}
+.ftab .ev{white-space:nowrap;text-align:right;font-size:9.5px;color:var(--ink3)}
+.evt{display:inline-block;padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:9px;font-weight:700}
+.evt.e3{background:var(--brand);color:#fff}
+.evt.e2{background:#dbe8f8;color:#2c5a92}
+.evt.e1{background:#f0f3f8;color:#7d8ba1}
+.evt.nu{background:var(--warnbg);color:var(--warn)}
+
+/* ── 分布式 ── */
+.dgrid{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:16px;align-items:start}
+.machine{border-radius:14px;border:1px solid var(--line);background:#fff;box-shadow:var(--sh);overflow:hidden}
+.mhead{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#f8fbff,#fff)}
+.mhead .mi{width:38px;height:38px;border-radius:10px;background:var(--brandbg);color:var(--brand);display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+.mhead b{display:block;font-size:13px;letter-spacing:-.1px}
+.mhead small{display:block;font-size:11px;color:var(--ink3);margin-top:2px}
+.state{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:99px;background:#f0f3f8;color:var(--ink3);font-weight:600;white-space:nowrap}
+.state.live{background:var(--grambg);color:var(--gram)}
+.state.wait{background:#fff8e8;color:#8d5c12}
+.mspecs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.mspecs div{padding:13px 18px;border-right:1px solid var(--line)}
+.mspecs div:last-child{border-right:0}
+.mspecs span{display:block;font-size:9.5px;color:var(--ink3);letter-spacing:.04em;margin-bottom:3px}
+.mspecs b{font-size:13px;font-weight:640;letter-spacing:-.2px}
+.mspecs b em{font-style:normal;font-size:10px;color:var(--ink3);font-weight:400;margin-left:3px}
+.mbody{padding:16px 18px}
+.mrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f2f5f9}
+.mrow:last-child{border-bottom:0;padding-bottom:0}
+.mrow .t{font-size:12px;font-weight:600;flex:0 0 auto;width:76px}
+.mrow .d{font-size:11px;color:var(--ink3);line-height:1.55;flex:1}
+.sw{width:38px;height:21px;border-radius:99px;background:#dfe5ee;position:relative;flex:0 0 auto;transition:.2s;cursor:pointer}
+.sw::after{content:"";position:absolute;left:2px;top:2px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:.2s}
+.sw.on{background:var(--brand)}
+.sw.on::after{left:19px}
+.cta{border-radius:14px;border:1px solid #cddff5;background:linear-gradient(150deg,#f4f9ff,#eaf2fd);padding:20px;box-shadow:var(--sh)}
+.cta h3{margin:0 0 6px;font-size:14px;letter-spacing:-.2px}
+.cta p{margin:0 0 16px;font-size:11.5px;color:#3d5273;line-height:1.75}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:9px;padding:9px 16px;font-size:12px;font-weight:620;transition:.16s;border:1px solid transparent}
+.btn.big{width:100%;padding:12px 18px;font-size:13px}
+.btn.pri{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(36,87,166,.24)}
+.btn.pri:hover{background:var(--brand2)}
+.btn.sec{background:#fff;border-color:var(--line2);color:var(--ink2)}
+.btn.sec:hover{border-color:#a9c0dd;color:var(--brand)}
+.btn.done{background:var(--grambg);color:var(--gram);border-color:#b9ded7}
+.cta .hint{margin:12px 0 0;font-size:10.5px;color:#6b7f9c;line-height:1.7}
+.cta .hint b{color:#2f4a70}
+
+.tasks{display:flex;flex-direction:column;gap:0}
+.task{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid #f2f5f9;font-size:11.5px}
+.task:last-child{border-bottom:0;padding-bottom:0}
+.task .st{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.task .st.run{background:#2f6fc4;box-shadow:0 0 0 3px rgba(47,111,196,.14)}
+.task .st.q{background:#c9d3e2}
+.task .st.ok{background:var(--gram)}
+.task .nm{font-weight:600;color:#26344b}
+.task .ms{margin-left:auto;font-size:10px;color:var(--ink3);font-family:var(--mono)}
+
+/* ── 数据集建议 ── */
+.adv-intro{background:#fff;border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;padding:14px 18px;font-size:12px;line-height:1.8;color:#2b3a52;box-shadow:var(--sh);margin-bottom:16px}
+.adv-intro b{font-weight:650}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.tier{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--sh);display:flex;flex-direction:column}
+.tier.pick{border-color:#b9cde8;background:linear-gradient(180deg,#fbfdff,#fff)}
+.tier .tn{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:660;margin-bottom:2px}
+.tier .tn .bd{padding:1px 7px;border-radius:99px;font-size:9.5px;font-weight:700;background:var(--brandbg);color:var(--brand)}
+.tier .ts{font-size:10.5px;color:var(--ink3);margin-bottom:11px;font-family:var(--mono)}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#2f3e56}
+.tier li{display:flex;gap:7px;line-height:1.6}
+.tier li b{font-weight:640;color:var(--ink);flex:0 0 auto}
+.tier li span{color:var(--ink3);font-size:10.5px;margin-left:auto;white-space:nowrap}
+.tier .why{margin-top:auto;padding-top:11px;border-top:1px solid #f2f5f9;font-size:10.5px;color:var(--ink3);line-height:1.65}
+
+.advtab{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:11.5px;box-shadow:var(--sh)}
+.advtab th{text-align:left;font-size:9.5px;letter-spacing:.06em;color:var(--ink3);font-weight:650;padding:11px 14px;background:#fafbfd;border-bottom:1px solid var(--line)}
+.advtab td{padding:11px 14px;border-bottom:1px solid #f3f6fa;vertical-align:top;line-height:1.65}
+.advtab tr:last-child td{border-bottom:0}
+.advtab tbody tr:hover{background:#fbfcfe}
+.advtab .nm{font-weight:650;color:var(--ink);display:block}
+.advtab .lk{display:block;font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px}
+.advtab .pr{display:inline-block;padding:2px 8px;border-radius:99px;font-size:9.5px;font-weight:700;white-space:nowrap}
+.pr.p0{background:var(--brand);color:#fff}
+.pr.p1{background:#dbe8f8;color:#2c5a92}
+.pr.p2{background:#f0f3f8;color:#7d8ba1}
+.pr.no{background:var(--warnbg);color:var(--warn)}
+
+.footnote{margin-top:18px;font-size:10.5px;color:var(--ink3);line-height:1.75;padding-left:2px}
+.footnote b{color:var(--ink2);font-weight:600}
+
+@media (max-width:1300px){
+  .space{grid-template-columns:1fr}
+  .dgrid{grid-template-columns:1fr}
+  .dbody{grid-template-columns:1fr}
+  .tiers{grid-template-columns:1fr}
+}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .rail{display:none}
+  .hero3{grid-template-columns:1fr}
+  .main{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="logo">A2</span>
+  <span class="brand"><b>AI2050 · 语言编码机制</b><small>分布式研究客户端</small></span>
+  <div class="topr">
+    <span class="pill">设计稿 v5 · 交互原型 · 未接入真实接口</span>
+    <span class="avatar">研</span>
+  </div>
+</header>
+
+<div class="shell">
+<aside class="rail">
+  <div class="rail-sec">研究</div>
+  <button class="navbtn on" data-nav="progress"><span class="ico">◔</span><span>进展</span><span class="n">3</span></button>
+  <button class="navbtn" data-nav="space"><span class="ico">◈</span><span>空间</span></button>
+  <div class="rail-sec">参与</div>
+  <button class="navbtn" data-nav="dist"><span class="ico">⇄</span><span>算力</span><span class="n" id="navDot"></span></button>
+  <button class="navbtn" data-nav="data"><span class="ico">▤</span><span>数据集</span><span class="n">6</span></button>
+  <div class="rail-foot">
+    <b>qwen3-4b</b> · 36 层<br>已普查 350,208 单元
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- ══════════════════ 进展 ══════════════════ -->
+<section id="p-progress">
+  <div class="phead">
+    <h1>进展</h1>
+    <p>三个目标分开记分。百分比是「已经拿到留出复现的检验条目占比」，不是覆盖度——普查覆盖 100% 但解释度只有 0.0006%，两件事不能混。</p>
+  </div>
+
+  <div class="hero3">
+    <button class="hero d-know" data-exp="know" aria-expanded="false">
+      <span class="hk"><i class="dot"></i>知识网络 <span style="color:var(--ink3);font-size:10.5px">世界知识 · 属性 · 层级 · 关系</span></span>
+      <span class="hv">55<i>%</i></span>
+      <span class="hd">38 项检验中 21 项拿到留出复现。三种几何形态已测出，但都还没通过干预检验。</span>
+      <span class="hx">展开细节 <em>▼</em></span>
+      <span class="track"><i style="width:55%;background:#2f6fc4"></i></span>
+    </button>
+
+    <button class="hero d-reason" data-exp="reason" aria-expanded="false">
+      <span class="hk"><i class="dot"></i>分析推理 <span style="color:var(--ink3);font-size:10.5px">推理 · 翻译 · 编程</span></span>
+      <span class="hv">31<i>%</i></span>
+      <span class="hd">26 项检验中 8 项拿到留出复现。频率子空间可读出但前向不用，这是目前最强的反例。</span>
+      <span class="hx">展开细节 <em>▼</em></span>
+      <span class="track"><i style="width:31%;background:#c2661f"></i></span>
+    </button>
+
+    <button class="hero d-gram" data-exp="gram" aria-expanded="false">
+      <span class="hk"><i class="dot"></i>语法体系 <span style="color:var(--ink3);font-size:10.5px">标点 · 句法 · 词法规则</span></span>
+      <span class="hv">67<i>%</i></span>
+      <span class="hd">42 项检验中 28 项拿到留出复现，其中 6 项达到干预生效——全项目因果证据最集中的一处。</span>
+      <span class="hx">展开细节 <em>▼</em></span>
+      <span class="track"><i style="width:67%;background:#07786e"></i></span>
+    </button>
+  </div>
+
+  <!-- 知识网络展开 -->
+  <div class="detail" id="d-know">
+    <div class="dbar"><b>知识网络 · 编码机制</b><span class="tag">38 项检验</span><span class="tag">3 个数据集</span>
+      <button class="x" data-close="know">收起</button></div>
+    <div class="dbody">
+      <div>
+        <p class="dlead"><b>结论：知识是按实体索引的稀疏标签表，不是一张统一的语义地图。</b>属性是一支方向，层级是一块区域，关系是三点二维——三种形态互不相同，所以不存在「用一个向量表示所有知识」的可能。</p>
+        <h4>各数据集上的达成度</h4>
+        <div class="bars" style="margin-bottom:18px">
+          <div class="bar-row"><span class="lab">MMLU · 2,504 题</span><span class="tr"><i style="width:58%;background:#2f6fc4"></i></span><span class="vl">58<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">C-Eval · 169 题</span><span class="tr"><i style="width:52%;background:#2f6fc4"></i></span><span class="vl">52<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">M3Exam · 565 题</span><span class="tr"><i style="width:44%;background:#2f6fc4"></i></span><span class="vl">44<small>%</small></span></div>
+        </div>
+        <h4>关键发现</h4>
+        <div class="finds">
+          <div class="find"><span class="m ok">✓</span><span>实体静态码存在且稳定：同一实体在不同句子里 <code>cos .998</code>，可以直接从嵌入层读出。</span></div>
+          <div class="find"><span class="m no">✕</span><span>但关系没有独立方向线：三点落在二维平面内，<code>三点二维</code>不是一条轴，不能当向量加减用。</span></div>
+          <div class="find"><span class="m no">✕</span><span>层级负值来自各向同性 <code>−0.5</code> 基线，不是「反层级结构」。这条曾被误读，已入账否证。</span></div>
+        </div>
+      </div>
+      <div>
+        <h4>证据阶梯 · 38 项检验</h4>
+        <div class="ladder">
+          <i class="e0" style="flex:6">6</i><i class="e1" style="flex:11">11</i><i class="e2" style="flex:19">19</i><i class="e3" style="flex:2">2</i>
+        </div>
+        <div class="ladder-k"><span style="flex:6">E0</span><span style="flex:11">E1</span><span style="flex:19">E2</span><span style="flex:2">E3</span></div>
+        <div class="ladder-lg"><span>E0 未研究</span><span>E1 剖面</span><span>E2 留出复现</span><span>E3 干预生效</span></div>
+        <h4>为什么只有 2 项到 E3</h4>
+        <p style="margin:0;font-size:11.5px;line-height:1.85;color:#3c4d68">
+          剖面（E1/E2）回答「读得出来吗」，干预（E3）回答「控得住吗」。项目里已经四次出现同一种情况：特征读得出、指纹很漂亮，但前向根本不用它。判据因此从「能否读出」改成了「干预是否改变行为」。
+        </p>
+        <div style="margin-top:14px;padding:11px 13px;background:var(--soft);border-radius:9px;font-size:11px;line-height:1.7;color:#4a5c78">
+          <b style="color:var(--ink)">下一步</b><br>全层 Δ 表（350,208 × 2560）是唯一能把这 2 项推到全谱的路径，需要分布式算力。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分析推理展开 -->
+  <div class="detail" id="d-reason">
+    <div class="dbar"><b>分析推理 · 编码机制</b><span class="tag">26 项检验</span><span class="tag">3 个数据集</span>
+      <button class="x" data-close="reason">收起</button></div>
+    <div class="dbody">
+      <div>
+        <p class="dlead"><b>结论：中段 MLP 是主写语域，末段注意力负责读出。</b>但「推理本身」怎么发生仍未定位——目前只到语域层面，没到步骤层面。</p>
+        <h4>各数据集上的达成度</h4>
+        <div class="bars" style="margin-bottom:18px">
+          <div class="bar-row"><span class="lab">MMLU · 2,504 题</span><span class="tr"><i style="width:34%;background:#c2661f"></i></span><span class="vl">34<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">M3Exam · 565 题</span><span class="tr"><i style="width:29%;background:#c2661f"></i></span><span class="vl">29<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">C-Eval · 169 题</span><span class="tr"><i style="width:26%;background:#c2661f"></i></span><span class="vl">26<small>%</small></span></div>
+        </div>
+        <h4>关键发现</h4>
+        <div class="finds">
+          <div class="find"><span class="m ok">✓</span><span>写作分工清楚：中段 MLP 负责语域（<code>|a|:|m| 0.11–0.39</code>），末段注意力负责读出（注入 L20–35 全部 1.000 零衰减）。</span></div>
+          <div class="find"><span class="m no">✕</span><span>频率子空间 <code>R² 0.826</code>，但沿该方向干预零效应。可读出 ≠ 参与计算，这是第四次成立。</span></div>
+          <div class="find"><span class="m q">?</span><span>翻译方向存在跨语言抽象（zh↔en 迁移 1.0），但 GLM4 上反超且塌回 0.5 —— 疑为模型指纹，待第三族复现。</span></div>
+        </div>
+      </div>
+      <div>
+        <h4>证据阶梯 · 26 项检验</h4>
+        <div class="ladder">
+          <i class="e0" style="flex:7">7</i><i class="e1" style="flex:11">11</i><i class="e2" style="flex:8">8</i><i class="e0" style="flex:2">0</i>
+        </div>
+        <div class="ladder-k"><span style="flex:7">E0</span><span style="flex:11">E1</span><span style="flex:8">E2</span><span style="flex:2">E3</span></div>
+        <div class="ladder-lg"><span>E0 未研究</span><span>E1 剖面</span><span>E2 留出复现</span><span>E3 干预生效</span></div>
+        <h4>为什么 0 项到 E3</h4>
+        <p style="margin:0;font-size:11.5px;line-height:1.85;color:#3c4d68">
+          推理任务没有可对照的最小对材料。选择题只能测「答对了没有」，测不到「换一个词会不会变」；没有最小对，就没有干净的干预实验。这是材料问题，不是方法问题。
+        </p>
+        <div style="margin-top:14px;padding:11px 13px;background:#fffaf3;border:1px solid #f3e4cf;border-radius:9px;font-size:11px;line-height:1.7;color:#6b4f2c">
+          <b style="color:var(--ink)">卡点</b><br>需要 GSM8K / HumanEval 这类可构造等价变体的材料，才能把推理拆成步骤做干预。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 语法体系展开 -->
+  <div class="detail" id="d-gram">
+    <div class="dbar"><b>语法体系 · 编码机制</b><span class="tag">42 项检验</span><span class="tag">6 项 E3</span>
+      <button class="x" data-close="gram">收起</button></div>
+    <div class="dbody">
+      <div>
+        <p class="dlead"><b>结论：模式优先级由 L21–L23 一条路由带决定，L23 指对率 0.972。</b>这是全项目唯一有因果证据的机制，也是「破解语言编码」目前唯一站得住的部分。</p>
+        <h4>各数据集上的达成度</h4>
+        <div class="bars" style="margin-bottom:18px">
+          <div class="bar-row"><span class="lab">M3Exam · 565 题</span><span class="tr"><i style="width:71%;background:#07786e"></i></span><span class="vl">71<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">C-Eval · 169 题</span><span class="tr"><i style="width:66%;background:#07786e"></i></span><span class="vl">66<small>%</small></span></div>
+          <div class="bar-row"><span class="lab">MMLU · 2,504 题</span><span class="tr"><i style="width:58%;background:#07786e"></i></span><span class="vl">58<small>%</small></span></div>
+        </div>
+        <h4>关键发现</h4>
+        <div class="finds">
+          <div class="find"><span class="m ok">✓</span><span>路由带单调上升：<code>L21 .590 → L22 .653 → L23 .972</code>，L0–L20 与位置规则不可区分。l* = 28 满分。</span></div>
+          <div class="find"><span class="m ok">✓</span><span>融合是同向弱证据累积：随机 <code>k=1 .638 → k=4 .909 → k=16 .995</code>，单调无饱和。</span></div>
+          <div class="find"><span class="m no">✕</span><span>L28–L35 消融 133 头 drop 全为 0.000，patch 一位却翻转 1.00 —— 那一段测的是 LM head 读出，不是计算。</span></div>
+        </div>
+      </div>
+      <div>
+        <h4>证据阶梯 · 42 项检验</h4>
+        <div class="ladder">
+          <i class="e0" style="flex:4">4</i><i class="e1" style="flex:10">10</i><i class="e2" style="flex:22">22</i><i class="e3" style="flex:6">6</i>
+        </div>
+        <div class="ladder-k"><span style="flex:4">E0</span><span style="flex:10">E1</span><span style="flex:22">E2</span><span style="flex:6">E3</span></div>
+        <div class="ladder-lg"><span>E0 未研究</span><span>E1 剖面</span><span>E2 留出复现</span><span>E3 干预生效</span></div>
+        <h4>这 6 项分别是什么</h4>
+        <table class="ftab" style="margin-top:2px">
+          <tbody>
+            <tr><td class="ly">L23</td><td class="ft">指代归属与从句边界</td><td class="ev"><span class="evt e3">E3</span></td></tr>
+            <tr><td class="ly">L33</td><td class="ft">输出选择翻转（单点 patch）</td><td class="ev"><span class="evt e3">E3</span></td></tr>
+            <tr><td class="ly">L28 ×4</td><td class="ft">sink 位置与内容头的分工</td><td class="ev"><span class="evt e3">E3</span></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:14px;padding:11px 13px;background:var(--grambg);border-radius:9px;font-size:11px;line-height:1.7;color:#175a53">
+          <b style="color:var(--ink)">这一类的特殊性</b><br>只有语法有干净的最小对材料（换一个标点、换一个从句引导词，语义不变），所以只有这里能做干预。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据集 × 三类 -->
+  <div class="strip">
+    <button class="strip-hd" data-strip="mtx" aria-expanded="false">
+      <b>数据集 × 三类</b><span class="sm">6 个数据集 · 点击看逐格证据等级</span>
+      <span class="arw">▼</span>
+    </button>
+    <div class="strip-bd" id="s-mtx">
+      <table class="mtx2">
+        <thead><tr><th style="width:230px">数据集</th><th class="c" style="width:110px">知识网络</th><th class="c" style="width:110px">分析推理</th><th class="c" style="width:110px">语法体系</th><th>一句话</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dsn">MMLU</span><span class="dss">cais/mmlu · test · 14,042 题 · MIT</span></td>
+            <td class="c"><span class="cell mid">E2 · 19</span></td><td class="c"><span class="cell lo">E1 · 11</span></td><td class="c"><span class="cell mid">E2 · 22</span></td>
+            <td style="color:var(--ink2);font-size:11px">主营题库：57 科，2,504 题可映射三类，覆盖面最广。</td></tr>
+          <tr><td><span class="dsn">C-Eval</span><span class="dss">ceval/ceval-exam · val · 169 题 · CC BY-NC-SA</span></td>
+            <td class="c"><span class="cell mid">E2</span></td><td class="c"><span class="cell lo">E1</span></td><td class="c"><span class="cell mid">E2</span></td>
+            <td style="color:var(--ink2);font-size:11px">快速锚：169 题 20 秒出结果，用来验证改动有没有把模型弄坏。</td></tr>
+          <tr><td><span class="dsn">M3Exam</span><span class="dss">chiayewken/m3exam · zh test · 682 题 · CC BY-NC-SA</span></td>
+            <td class="c"><span class="cell lo">E1</span></td><td class="c"><span class="cell lo">E1</span></td><td class="c"><span class="cell hi">E3 · 6</span></td>
+            <td style="color:var(--ink2);font-size:11px">中文语法材料最集中：565 题可映射三类，语法项占比最高。</td></tr>
+          <tr><td><span class="dsn">GSM8K</span><span class="dss">openai/gsm8k · test · 1,319 题 · MIT</span></td>
+            <td class="c"><span class="cell z">—</span></td><td class="c"><span class="cell mid">待接入</span></td><td class="c"><span class="cell z">—</span></td>
+            <td style="color:var(--ink2);font-size:11px">推理的可变体材料：改数字不改结构，是推理类做干预的唯一入口。</td></tr>
+          <tr><td><span class="dsn">BLiMP / CLiMP</span><span class="dss">最小对 · 各 67 / 30 类 · 待接入</span></td>
+            <td class="c"><span class="cell z">—</span></td><td class="c"><span class="cell z">—</span></td><td class="c"><span class="cell mid">设计方案</span></td>
+            <td style="color:var(--ink2);font-size:11px">语法最小对的正规材料：成对句子只差一个语法点，直接把语法从选择题里救出来。</td></tr>
+          <tr><td><span class="dsn">本地模板族</span><span class="dss">6 族生成式 · 不进选择题口径</span></td>
+            <td class="c"><span class="cell lo">对照</span></td><td class="c"><span class="cell lo">对照</span></td><td class="c"><span class="cell lo">对照</span></td>
+            <td style="color:var(--ink2);font-size:11px">生成式材料，不能算正确率，只做「换一种问法结论还成立吗」的对照。</td></tr>
+        </tbody>
+      </table>
+      <p style="margin:11px 0 0;font-size:10.5px;color:var(--ink3);line-height:1.7">读法：格子里的 E 是该数据集上该类检验已达到的最高证据等级，数字是条目数。<b style="color:var(--ink2)">不是所有格子都该有值</b>——GSM8K 不测语法，BLiMP 不测知识，留空是真实的空，不是没填。</p>
+    </div>
+  </div>
+
+  <p class="footnote">百分比口径：<b>达 E2（留出复现）及以上的检验条目 / 该类已进入检验的条目</b>。E0 未研究、E1 只有剖面、E2 留出复现、E3 干预改变行为。原始记录：规则账本 124 条（证实 28 / 否证 93 / 待测 2 / 未决 1），链头 #470。</p>
+</section>
+
+<!-- ══════════════════ 空间 ══════════════════ -->
+<section id="p-space" class="hidden">
+  <div class="phead">
+    <h1>空间</h1>
+    <p>拖动旋转。三种模式切换会点亮不同的层段——同一台模型，跑不同任务时被用到的参数不是同一批。</p>
+  </div>
+
+  <div class="modes">
+    <button class="mode on" data-mode="gram"><span class="mn"><i style="background:var(--gram)"></i>语法体系<span style="margin-left:auto;font-size:9.5px;color:var(--ink3)">L21–L23</span></span><span class="md">路由带高亮：模型在这里决定听哪个模式</span></button>
+    <button class="mode" data-mode="know"><span class="mn"><i style="background:var(--know)"></i>知识网络<span style="margin-left:auto;font-size:9.5px;color:var(--ink3)">L0–L5 + L20+</span></span><span class="md">嵌入层与末段 MLP 高亮：实体码在这里成形</span></button>
+    <button class="mode" data-mode="reason"><span class="mn"><i style="background:var(--reason)"></i>分析推理<span style="margin-left:auto;font-size:9.5px;color:var(--ink3)">L8–L27</span></span><span class="md">中段 MLP 高亮：语域在这里被写进去</span></button>
+  </div>
+
+  <div class="space">
+    <div class="stage" id="stage">
+      <div class="stage-hud">
+        <b>qwen3-4b · 36 层</b>
+        <span id="hudMode">语法体系 · 路由带 L21–L23 高亮</span>
+      </div>
+      <div class="depthbar">
+        <em data-layer="35">L35 输出</em>
+        <em data-layer="23">L23 路由带</em>
+        <em data-layer="8">L8</em>
+        <em data-layer="0">L0 嵌入</em>
+      </div>
+      <div class="scene"><div class="world" id="world"><div class="emb" id="emb"></div></div></div>
+      <div class="stage-tip">拖动手势旋转 · 滚轮缩放</div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <h3>三块结构 <span class="sm">选中看参数与语言特征</span></h3>
+        <div class="mod3" id="modList">
+          <button data-mod="emb" class="on">
+            <span class="sq" style="background:#e8f0fb;color:var(--brand)">E</span>
+            <span><span class="nm">词嵌入</span><span class="sh">151,936 × 2,560</span></span>
+            <span class="rt">389M</span>
+          </button>
+          <button data-mod="attn">
+            <span class="sq" style="background:#eaf2fd;color:#2f6fc4">A</span>
+            <span><span class="nm">注意力 · 36 层</span><span class="sh">q 2560×4096 · kv 2560×1024</span></span>
+            <span class="rt">1.61B</span>
+          </button>
+          <button data-mod="mlp">
+            <span class="sq" style="background:#fff4e9;color:#c2661f">M</span>
+            <span><span class="nm">MLP · 36 层</span><span class="sh">gate/up 2560×9728 · down 9728×2560</span></span>
+            <span class="rt">2.01B</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 id="ftTitle">词嵌入 · 参数对应的语言特征</h3>
+        <table class="ftab">
+          <thead><tr><th style="width:62px">层 / 位</th><th>已测出的语言特征</th><th style="width:44px;text-align:right">证据</th></tr></thead>
+          <tbody id="ftBody">
+            <tr><td class="ly">hs[0]</td><td class="ft">词汇身份与格式：实体静态码 <code style="font-family:var(--mono);font-size:10px;background:#f4f6fa;padding:1px 4px;border-radius:3px">cos .998</code>，同一实体跨句稳定</td><td class="ev"><span class="evt e2">E2</span></td></tr>
+            <tr><td class="ly">hs[0]</td><td class="ft">词法基线：该层效应与词袋基线等同，还没有超出词法的能力</td><td class="ev"><span class="evt e2">E2</span></td></tr>
+            <tr><td class="ly">hs[0]</td><td class="ft">位置编码：<code style="font-family:var(--mono);font-size:10px;background:#f4f6fa;padding:1px 4px;border-radius:3px">pos0</code> 占注意力 46%，是寄存器不是内容</td><td class="ev"><span class="evt e2">E2</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin:11px 0 0;font-size:10.5px;color:var(--ink3);line-height:1.65" id="ftNote">嵌入层是「实体静态码」层：它给每个实体一个稳定地址，但地址本身不携带关系语义。</p>
+      </div>
+
+      <div class="card" style="padding:12px 16px">
+        <h3 style="margin-bottom:6px">当前模式的运行状态</h3>
+        <p style="margin:0;font-size:11px;line-height:1.75;color:#3c4d68" id="modeNote">语法模式：活跃层段集中在中后段一条窄带。L21 指对率 .590、L22 .653、L23 .972 —— 三层之内完成从「差不多」到「确定」的跃迁。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 分布式 ══════════════════ -->
+<section id="p-dist" class="hidden">
+  <div class="phead">
+    <h1>算力</h1>
+    <p>中心的服务器只做三件事：存数据、发数据、转发命令。所有需要 GPU 的计算都在你自己的机器上跑，跑完只上传统计量。</p>
+  </div>
+
+  <div class="dgrid">
+    <div>
+      <div class="machine">
+        <div class="mhead">
+          <span class="mi">▣</span>
+          <span><b>本机 · RTX 4090</b><small>Windows 11 · 驱动 566.14 · 已连接中心</small></span>
+          <span class="state" id="mState">未参与</span>
+        </div>
+        <div class="mspecs">
+          <div><span>显存</span><b>24 <em>GB</em></b></div>
+          <div><span>可让出时段</span><b id="specTime">未设置</b></div>
+          <div><span>累计贡献</span><b id="specDone">0 <em>分片</em></b></div>
+        </div>
+        <div class="mbody">
+          <div class="mrow"><span class="t">算力贡献</span><span class="d">空闲时接收普查分片：每个分片 2,048 个 token × 一层的激活统计，约 40 秒。</span><span class="sw" id="swCompute"></span></div>
+          <div class="mrow"><span class="t">服务器托管</span><span class="d">完全交给远端调度：任务、时间、并发都由中心决定，本机不再询问。可随时撤回。</span><span class="sw" id="swHost"></span></div>
+          <div class="mrow"><span class="t">上传范围</span><span class="d">只上传统计量与校验和。语料不出本机，模型权重不出本机，原始激活不出本机。</span><span style="font-size:10px;color:var(--ink3)">固定</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>正在跑的任务 <span class="sm" id="taskCount">托管后出现</span></h3>
+        <div class="tasks" id="taskList">
+          <p style="margin:0;font-size:11.5px;color:var(--ink3);line-height:1.7">还没有任务。打开上方任一开关后，中心会按你的显存与空闲时段派发对应的分片。</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>算力缺口 <span class="sm">这一版还差多少</span></h3>
+        <div class="bars" style="gap:13px">
+          <div class="bar-row" style="grid-template-columns:86px 1fr 82px">
+            <span class="lab" style="font-size:11px">全层 Δ 表</span>
+            <span class="tr"><i style="width:3%;background:var(--brand)"></i></span>
+            <span class="vl" style="font-size:10px;color:var(--ink3)">37 / 1,240</span>
+          </div>
+          <div class="bar-row" style="grid-template-columns:86px 1fr 82px">
+            <span class="lab" style="font-size:11px">反事实生成</span>
+            <span class="tr"><i style="width:2.4%;background:var(--gram)"></i></span>
+            <span class="vl" style="font-size:10px;color:var(--ink3)">120 / 5,000</span>
+          </div>
+          <div class="bar-row" style="grid-template-columns:86px 1fr 82px">
+            <span class="lab" style="font-size:11px">跨模型复现</span>
+            <span class="tr"><i style="width:16.7%;background:var(--reason)"></i></span>
+            <span class="vl" style="font-size:10px;color:var(--ink3)">2 / 12</span>
+          </div>
+        </div>
+        <p style="margin:12px 0 0;font-size:10.5px;color:var(--ink3);line-height:1.7">全层 Δ 表是知识网络从 2 项推到全谱的唯一路径，按单卡 4090 估算约需 1,240 个分片。一台机器跑一个月，二十台机器跑两天。</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="cta">
+        <h3 id="ctaTitle">一键贡献算力</h3>
+        <p id="ctaText">把你空闲的 GPU 接进来，跑普查分片与反事实生成。你的名字会出现在贡献者名单里，跑出来的结论共同署名。</p>
+        <button class="btn pri big" id="ctaBtn">开始贡献</button>
+        <p class="hint" id="ctaHint"><b>随时可停。</b>关掉开关立即生效，已跑完的分片照常计入。当前项目非商业，所有产出按 CC BY-NC-SA 4.0 公开。</p>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>你能参与的四类工作</h3>
+        <table class="ftab">
+          <tbody>
+            <tr><td class="ly" style="width:74px">普查分片</td><td class="ft">对一个层段的 MLP 单元跑激活统计，是覆盖 350,208 个单元的主力活</td></tr>
+            <tr><td class="ly">反事实生成</td><td class="ft">对语法最小对做换词、换位，产出干预实验的材料</td></tr>
+            <tr><td class="ly">跨模型复现</td><td class="ft">同一批题在你的模型上重跑，验证结论是不是模型指纹</td></tr>
+            <tr><td class="ly">判据复核</td><td class="ft">按预注册阈值复算别人的结论，不同意就否证——否证同样入账</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:14px;padding:13px 16px">
+        <h3 style="margin-bottom:6px">托管模式下你能看到什么</h3>
+        <p style="margin:0;font-size:11px;line-height:1.75;color:#3c4d68">一切。任务在跑什么、改了哪个参数、出来什么数，本机面板和中心看板是同一份。托管交出去的是调度权，不是知情权。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 数据集 ══════════════════ -->
+<section id="p-data" class="hidden">
+  <div class="phead">
+    <h1>数据集建议</h1>
+    <p>按当前模型规模与三个目标给建议。核心判断：选择题能测「会不会」，最小对才能测「怎么算」——前者做进展，后者做机制。</p>
+  </div>
+
+  <div class="adv-intro">
+    <b>一句话结论：</b>保持 MMLU 做主营（14,042 题，覆盖面最广），C-Eval 做快速锚（169 题，20 秒一轮），M3Exam 做中文语法补充（565 题可映射）。真正缺的不是更多选择题，而是<b>能做干预的最小对材料</b>——GSM8K 补推理、BLiMP/CLiMP 补语法，这两类接上，分析推理这类才可能从 31% 往 E3 走。
+  </div>
+
+  <div class="tiers">
+    <div class="tier">
+      <div class="tn">qwen3-4b <span class="bd">主力</span></div>
+      <div class="ts">36 层 · 4.02B · d=2560</div>
+      <ul>
+        <li><b>MMLU</b> 14,042 题<span>主营</span></li>
+        <li><b>C-Eval</b> 169 题<span>快锚</span></li>
+        <li><b>M3Exam</b> 682 题<span>语法</span></li>
+        <li><b>BLiMP</b> 67 类<span>待接</span></li>
+        <li><b>GSM8K</b> 1,319 题<span>待接</span></li>
+      </ul>
+      <div class="why">单卡 4090 能跑完全层普查（NF4 约 10 GB），是唯一能「普查 + 干预」同时做的规模。</div>
+    </div>
+    <div class="tier pick">
+      <div class="tn">qwen3-14b <span class="bd">对照</span></div>
+      <div class="ts">40 层 · 14.77B · d=5120</div>
+      <ul>
+        <li><b>MMLU</b> 全量<span>同题</span></li>
+        <li><b>M3Exam</b> 565 题<span>同题</span></li>
+        <li><b>GSM8K</b> 1,319 题<span>待接</span></li>
+        <li><b>MMLU-Pro</b> 12,032 题<span>待接</span></li>
+      </ul>
+      <div class="why">只做对照，不新开题库。跨模型必须同题同模板，否则比出来的是题目差不是模型差。需要 24 GB 以上显存。</div>
+    </div>
+    <div class="tier">
+      <div class="tn">GLM4-9B <span class="bd">跨族</span></div>
+      <div class="ts">40 层 · 9.40B · 非 Qwen 系</div>
+      <ul>
+        <li><b>MMLU</b> 全量<span>同题</span></li>
+        <li><b>M3Exam</b> 565 题<span>同题</span></li>
+        <li><b>C-Eval</b> 169 题<span>快锚</span></li>
+      </ul>
+      <div class="why">唯一的价值是证明「不是 Qwen 特有」。目前已在它身上拿到两例模型指纹，样本还很薄。</div>
+    </div>
+  </div>
+
+  <table class="advtab">
+    <thead><tr><th style="width:216px">数据集</th><th style="width:96px">优先级</th><th style="width:88px">服务目标</th><th style="width:120px">规模</th><th>为什么选它 / 不选它</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="nm">MMLU</span><span class="lk">cais/mmlu · test · MIT</span></td>
+        <td><span class="pr p0">P0 主营</span></td>
+        <td>知识网络</td>
+        <td>14,042 题<br><small style="color:var(--ink3)">2,504 可映射三类</small></td>
+        <td>57 个科目，覆盖世界知识的主要分区；MIT 许可最干净。<b>缺点</b>：语法类为 0，所以语法只能靠 M3Exam 补。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">C-Eval</span><span class="lk">ceval/ceval-exam · val · CC BY-NC-SA</span></td>
+        <td><span class="pr p0">P0 快锚</span></td>
+        <td>三类的回归检查</td>
+        <td>169 题<br><small style="color:var(--ink3)">7 科目</small></td>
+        <td>20 秒一轮，用来验证「这次改动有没有把模型弄坏」。<b>不承担研究结论</b>，只做锚。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">M3Exam</span><span class="lk">chiayewken/m3exam · zh test · CC BY-NC-SA</span></td>
+        <td><span class="pr p0">P0 语法</span></td>
+        <td>语法体系</td>
+        <td>682 题<br><small style="color:var(--ink3)">565 可映射三类</small></td>
+        <td>现有材料里中文语法题占比最高，是语法类唯一有 E3 证据的来源。<b>注意</b>：非商业许可，不能再分发。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">GSM8K</span><span class="lk">openai/gsm8k · test · MIT</span></td>
+        <td><span class="pr p1">P1 待接</span></td>
+        <td>分析推理</td>
+        <td>1,319 题<br><small style="color:var(--ink3)">8 步以内</small></td>
+        <td><b>补的正是缺口</b>：题目结构固定、数字可换，能造等价变体做干预。推理类 0 项 E3 就是因为缺这种材料。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">BLiMP / CLiMP</span><span class="lk">最小对 · 英语 67 类 / 中文 30 类</span></td>
+        <td><span class="pr p1">P1 待接</span></td>
+        <td>语法体系</td>
+        <td>各 67 / 30 类<br><small style="color:var(--ink3)">成对句子</small></td>
+        <td><b>机制研究最该补的</b>：成对句子只差一个语法点，直接给出「换这个词输出变不变」的因果读数，比选择题强一个量级。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">HumanEval+ / MBPP+</span><span class="lk">openai/evalplus · test</span></td>
+        <td><span class="pr p2">P2 可选</span></td>
+        <td>分析推理</td>
+        <td>164 / 378 题</td>
+        <td>编程分支的标配。目前项目没到这一步，先把推理主线的材料补齐再说。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">CMMLU</span><span class="lk">已退出主口径</span></td>
+        <td><span class="pr no">不推荐</span></td>
+        <td>—</td>
+        <td>2,300 题<br><small style="color:var(--ink3)">历史数据仍在</small></td>
+        <td>与 C-Eval 高度重叠，且科目映射到三类时噪声大。功效池 3,761 题 100% 来自它，这批数需要按新口径重算。</td>
+      </tr>
+      <tr>
+        <td><span class="nm">Xiezhi</span><span class="lk">50 选 1 · 待评估</span></td>
+        <td><span class="pr no">暂不</span></td>
+        <td>—</td>
+        <td>—</td>
+        <td>答案空间从 4 扩到 50，是所有现有结果都不适用的口径。要用就得整套重跑，现在不是时候。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="footnote">许可提醒：<b>C-Eval 与 M3Exam 是 CC BY-NC-SA 4.0</b>（非商业 + 相同方式共享）。本项目按非商业开源发布，符合要求；一旦要商业部署，必须先把这两个数据集移除，只保留 MIT 的 MMLU 与 GSM8K。</p>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ── 导航 ── */
+const PAGES = { progress:'p-progress', space:'p-space', dist:'p-dist', data:'p-data' };
+function go(id){
+  for (const k in PAGES) document.getElementById(PAGES[k]).classList.toggle('hidden', k !== id);
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.nav === id));
+  window.scrollTo({ top:0, behavior:'instant' });
+}
+document.querySelectorAll('.navbtn').forEach(b => b.addEventListener('click', () => go(b.dataset.nav)));
+
+/* ── 进展：展开 / 收起（同一时刻只开一个） ── */
+document.querySelectorAll('.hero').forEach(h => {
+  h.addEventListener('click', () => {
+    const id = h.dataset.exp;
+    const box = document.getElementById('d-' + id);
+    const open = box.classList.contains('open');
+    document.querySelectorAll('.detail').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.hero').forEach(x => x.setAttribute('aria-expanded','false'));
+    if (!open){ box.classList.add('open'); h.setAttribute('aria-expanded','true'); }
+  });
+});
+document.querySelectorAll('[data-close]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.getElementById('d-' + b.dataset.close).classList.remove('open');
+    document.querySelector('.hero[data-exp="' + b.dataset.close + '"]').setAttribute('aria-expanded','false');
+  });
+});
+
+/* ── 折叠条 ── */
+document.querySelectorAll('.strip-hd').forEach(h => {
+  h.addEventListener('click', () => {
+    const bd = document.getElementById('s-' + h.dataset.strip);
+    const open = bd.classList.toggle('open');
+    h.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+});
+
+/* ── 3D 层塔 ── */
+const LAYERS = 36;
+const world = document.getElementById('world');
+const layers = [];
+for (let i = 0; i < LAYERS; i++){
+  const d = document.createElement('div');
+  d.className = 'layer';
+  /* 第 0 层（嵌入）在塔底，第 35 层（输出）在塔顶：Z 越大越靠下，所以倒序排 */
+  d.style.transform = 'translateZ(' + ((LAYERS - 1 - i) * 9) + 'px)';
+  d.dataset.i = i;
+  d.title = 'L' + i;
+  d.innerHTML = '<span class="attn"></span><span class="mlp"></span>';
+  world.appendChild(d);
+  layers.push(d);
+}
+
+/* 旋转 */
+let rx = -64, rz = -36, zoom = 1.34, drag = false, lx = 0, ly = 0;
+const stage = document.getElementById('stage');
+function apply(){
+  world.style.transform = 'rotateX(' + rx + 'deg) rotateZ(' + rz + 'deg) scale(' + zoom + ')';
+  requestAnimationFrame(alignRuler);
+}
+
+/* 层号标尺不写死像素：量出顶层与底层投影后的实际位置，再按层号插值。
+   窗口尺寸、缩放、旋转任何一项变化都会重算，避免标尺和塔错位。 */
+function alignRuler(){
+  if (!layers.length) return;
+  const s = stage.getBoundingClientRect();
+  const top = layers[LAYERS - 1].getBoundingClientRect().top - s.top;
+  const bot = layers[0].getBoundingClientRect().bottom - s.top;
+  const bar = document.querySelector('.depthbar');
+  bar.style.top = Math.round(top) + 'px';
+  bar.style.bottom = Math.round(s.height - bot) + 'px';
+  document.querySelectorAll('.depthbar em').forEach(em => {
+    const L = Number(em.dataset.layer);
+    em.style.top = (LAYERS - 1 === 0 ? 0 : ((LAYERS - 1 - L) / (LAYERS - 1)) * 100) + '%';
+  });
+}
+apply();
+stage.addEventListener('mousedown', e => { drag = true; lx = e.clientX; ly = e.clientY; });
+window.addEventListener('mouseup', () => drag = false);
+window.addEventListener('mousemove', e => {
+  if (!drag) return;
+  rz += (e.clientX - lx) * 0.35;
+  rx = Math.max(-88, Math.min(-18, rx - (e.clientY - ly) * 0.28));
+  lx = e.clientX; ly = e.clientY;
+  apply();
+});
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoom = Math.max(0.6, Math.min(1.9, zoom - e.deltaY * 0.0011));
+  apply();
+}, { passive:false });
+
+/* ── 三种模式：点亮不同层段 ── */
+const MODES = {
+  gram:   { name:'语法体系', band:'路由带 L21–L23 高亮', layers:[21,22,23], dim:true,
+            note:'语法模式：活跃层段集中在中后段一条窄带。L21 指对率 .590、L22 .653、L23 .972 —— 三层之内完成从「差不多」到「确定」的跃迁。' },
+  know:   { name:'知识网络', band:'L0–L5 与末段 MLP 高亮', layers:[0,1,2,3,4,5,31,32,33,34,35], dim:true, emb:true,
+            note:'知识模式：嵌入层给实体分配稳定地址，末段 MLP 把属性写上去。中间层基本不参与——这就是为什么「知识存在哪」和「怎么用它」是两个问题。' },
+  reason: { name:'分析推理', band:'中段 L8–L27 高亮', layers:[8,11,14,17,20,23,26,27], dim:true,
+            note:'推理模式：中段 MLP 是主写区，|a|:|m| 在 0.11–0.39 之间。末段注意力只做读出，注入 L20–35 全部 1.000 零衰减——那一段不参与推理，只负责把结果说出来。' }
+};
+let mode = 'gram';
+let curMod = 'emb';   /* 当前选中的参数类别（三块结构）；与模式高亮叠加，互不覆盖 */
+function paint(){
+  const m = MODES[mode];
+  const set = new Set(m.layers);
+  layers.forEach((el, i) => {
+    el.classList.toggle('hl', set.has(i));
+    el.classList.toggle('mut', m.dim && !set.has(i));
+  });
+  document.getElementById('emb').classList.toggle('hl', !!m.emb);
+  document.getElementById('hudMode').textContent = m.name + ' · ' + m.band;
+  document.getElementById('modeNote').textContent = m.note;
+  document.querySelectorAll('.mode').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  setTimeout(syncEmb, 0);
+}
+document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => { mode = b.dataset.mode; paint(); }));
+paint();
+world.classList.add('mod-emb');   /* 默认选中词嵌入 */
+
+/* ── 模块 → 参数与语言特征 ── */
+const FEATS = {
+  emb: { title:'词嵌入 · 参数对应的语言特征',
+    rows:[
+      ['hs[0]','实体静态码：同一实体跨句稳定，<code>cos .998</code>，可直接从嵌入层读出','e2'],
+      ['hs[0]','词法基线：本层效应与词袋基线等同，尚未超出词法能力','e2'],
+      ['hs[0]','位置占位：<code>pos0</code> 占注意力 46%，是寄存器不是内容','e2'],
+      ['全层','tied embeddings：嵌入与 LM head 共享同一份权重，改一处两端都变','e1']
+    ],
+    note:'嵌入层是「实体静态码」层：它给每个实体一个稳定地址，但地址本身不携带关系语义。' },
+  attn: { title:'注意力 · 参数对应的语言特征',
+    rows:[
+      ['L21–L23','路由带：指代归属与从句边界，<code>.590 → .653 → .972</code>','e3'],
+      ['L33','输出选择：单点 patch 翻转率 1.00，测的是读出不是计算','e3'],
+      ['L28','融合：随机 <code>k=1 .638 → k=16 .995</code>，同向弱证据累积','e2'],
+      ['L28–L35','消融 133 头 drop 全为 0.000，承载是累积量不是结构量','nu']
+    ],
+    note:'GQA：36 层中 k/v 只有 q 的 1/4 宽度。削 k/v 比削 q 更危险，因为多个 q 头共享同一份 k/v。' },
+  mlp: { title:'MLP · 参数对应的语言特征',
+    rows:[
+      ['L28–L35','容量集中在末段：本段全部 133 头消融 drop 0.000，但 MLP 一动就变','e2'],
+      ['中段','主写语域：<code>|a|:|m| 0.11–0.39</code>，normed 后 0.33–0.74','e2'],
+      ['L30','transcoder 仅此一层：特征与原生神经元都未被下游使用','nu'],
+      ['全层','无必需单元：350,208 个里没有一个是删了就崩的','e2']
+    ],
+    note:'MLP 占比 2.01B / 4.02B，是参数最多的一块。但「参数多」不等于「不可替代」——消融测出来的是容量，不是结构。'}
+};
+/* 词嵌入板：选了「词嵌入」，或当前模式自带嵌入层高亮，都点亮 */
+function syncEmb(){
+  document.getElementById('emb').classList.toggle('hl', curMod === 'emb' || !!MODES[mode].emb);
+}
+
+document.querySelectorAll('#modList button').forEach(b => {
+  b.addEventListener('click', () => {
+    const k = b.dataset.mod;
+    curMod = k;
+    document.querySelectorAll('#modList button').forEach(x => x.classList.toggle('on', x === b));
+    world.classList.remove('mod-emb','mod-attn','mod-mlp');
+    world.classList.add('mod-' + k);
+    syncEmb();
+    document.getElementById('ftTitle').textContent = FEATS[k].title;
+    document.getElementById('ftNote').textContent = FEATS[k].note;
+    document.getElementById('ftBody').innerHTML = FEATS[k].rows.map(r =>
+      '<tr><td class="ly">' + r[0] + '</td><td class="ft">' + r[1] + '</td><td class="ev"><span class="evt ' + r[2] + '">' + r[2].toUpperCase() + '</span></td></tr>'
+    ).join('');
+  });
+});
+
+/* ── 贡献 / 托管 ── */
+const swC = document.getElementById('swCompute');
+const swH = document.getElementById('swHost');
+const mState = document.getElementById('mState');
+const ctaBtn = document.getElementById('ctaBtn');
+const ctaTitle = document.getElementById('ctaTitle');
+const ctaText = document.getElementById('ctaText');
+const ctaHint = document.getElementById('ctaHint');
+const specTime = document.getElementById('specTime');
+const specDone = document.getElementById('specDone');
+const taskList = document.getElementById('taskList');
+const taskCount = document.getElementById('taskCount');
+
+const TASKS = [
+  ['run','普查分片 · L23 · 2,048 token','40s'],
+  ['run','语法最小对生成 · 512 对','1m12s'],
+  ['q','队列中 · L24–L27 分片 ×8','等待'],
+  ['ok','已完成 · L22 分片 ×4','2m41s']
+];
+
+function tasksHtml(){
+  return '<div class="task"><span class="st run"></span><span class="nm">普查分片 · L23</span><span class="ms">40s 剩余</span></div>'
+    + '<div class="task"><span class="st run"></span><span class="nm">语法最小对生成</span><span class="ms">1m12s 剩余</span></div>'
+    + '<div class="task"><span class="st q"></span><span class="nm">队列 · L24–L27 分片 ×8</span><span class="ms">等待</span></div>'
+    + '<div class="task"><span class="st ok"></span><span class="nm">已完成 · L22 分片 ×4</span><span class="ms">2m41s</span></div>';
+}
+
+function sync(){
+  const on = swC.classList.contains('on');
+  const host = swH.classList.contains('on');
+  if (host){
+    swC.classList.add('on');
+    mState.textContent = '托管中';
+    mState.className = 'state live';
+    ctaTitle.textContent = '已交给远端调度';
+    ctaText.textContent = '中心已接管本机的空闲时段。任务进来就跑，跑完自动上传统计量。你随时可以撤回。';
+    ctaBtn.textContent = '撤回托管';
+    ctaBtn.className = 'btn sec big';
+    specTime.textContent = '全天';
+    specDone.innerHTML = '37 <em>分片</em>';
+    taskList.innerHTML = tasksHtml();
+    taskCount.textContent = '2 运行中 · 1 排队';
+    ctaHint.innerHTML = '<b>托管期间可随时撤销。</b>撤销后正在跑的分片会跑完再停，不会半途丢弃数据。';
+  } else if (on){
+    mState.textContent = '已参与';
+    mState.className = 'state live';
+    ctaTitle.textContent = '正在贡献算力';
+    ctaText.textContent = '本机只在空闲时接收分片。你可以设置只在夜间运行，或限制并发数。';
+    ctaBtn.textContent = '停止贡献';
+    ctaBtn.className = 'btn sec big';
+    specTime.textContent = '22:00–08:00';
+    specDone.innerHTML = '12 <em>分片</em>';
+    taskList.innerHTML = tasksHtml();
+    taskCount.textContent = '2 运行中 · 1 排队';
+    ctaHint.innerHTML = '<b>断点续跑。</b>关掉之后已完成的分片照常计入，下次打开从断点继续。';
+  } else {
+    mState.textContent = '未参与';
+    mState.className = 'state';
+    ctaTitle.textContent = '一键贡献算力';
+    ctaText.textContent = '把你空闲的 GPU 接进来，跑普查分片与反事实生成。你的名字会出现在贡献者名单里，跑出来的结论共同署名。';
+    ctaBtn.textContent = '开始贡献';
+    ctaBtn.className = 'btn pri big';
+    specTime.textContent = '未设置';
+    specDone.innerHTML = '0 <em>分片</em>';
+    taskList.innerHTML = '<p style="margin:0;font-size:11.5px;color:var(--ink3);line-height:1.7">还没有任务。打开上方任一开关后，中心会按你的显存与空闲时段派发对应的分片。</p>';
+    taskCount.textContent = '托管后出现';
+    ctaHint.innerHTML = '<b>随时可停。</b>关掉开关立即生效，已跑完的分片照常计入。当前项目非商业，所有产出按 CC BY-NC-SA 4.0 公开。';
+  }
+  document.getElementById('navDot').textContent = (on || host) ? '●' : '';
+  document.getElementById('navDot').style.color = 'var(--gram)';
+}
+swC.addEventListener('click', () => {
+  const on = swC.classList.toggle('on');
+  if (!on) swH.classList.remove('on');
+  sync();
+});
+swH.addEventListener('click', () => {
+  const on = swH.classList.toggle('on');
+  swC.classList.toggle('on', on);
+  sync();
+});
+ctaBtn.addEventListener('click', () => {
+  if (swC.classList.contains('on') || swH.classList.contains('on')){
+    swC.classList.remove('on'); swH.classList.remove('on');
+  } else {
+    swC.classList.add('on');
+  }
+  sync();
+});
+sync();
+
+/* ── hash 直达（分享链接 / 逐页核对）：#space #dist #data #know #reason #gram ── */
+function fromHash(){
+  const h = (location.hash || '').replace('#', '');
+  if (['know','reason','gram'].includes(h)){
+    go('progress');
+    document.getElementById('d-' + h).classList.add('open');
+    document.querySelector('.hero[data-exp="' + h + '"]').setAttribute('aria-expanded', 'true');
+    return;
+  }
+  const m = h.match(/^(space|dist|data)(?:-(gram|know|reason))?$/);
+  if (m){
+    go(m[1]);
+    if (m[2]){ mode = m[2]; paint(); world.classList.remove('mod-emb','mod-attn','mod-mlp'); world.classList.add('mod-emb'); }
+  }
+}
+window.addEventListener('hashchange', fromHash);
+fromHash();
+</script>
+</body>
+</html>

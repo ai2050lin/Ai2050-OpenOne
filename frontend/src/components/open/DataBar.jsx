@@ -45,11 +45,11 @@ export default function DataBar({ remote }) {
       : `更新数据${remote?.bytes ? `（${fmtMB(remote.bytes)}）` : ''}`;
   return (
     <div className={'op-databar' + (!info.version ? ' none' : fresh ? ' fresh' : ' stale')}
-         title={OFFLINE_CLIENT ? '页面只读取本机保存的数据包，使用中不连接服务器；服务器有新数据时手动更新'
+         title={OFFLINE_CLIENT ? '公开研究证据可在线浏览。下载数据包可离线回查，并为其他页面提供数据'
            : '页面优先读取本机保存的数据包，不会定时访问服务器；单元卡与管理类页面打开时在线读取'}>
       <span className="op-databar-dot" aria-hidden="true" />
       <span className="op-databar-text">
-        {!info.version ? (OFFLINE_CLIENT ? (busy ? '正在下载数据包（只下载一次，之后页面都读本机数据）' : '还没有本地数据，下载后各页面显示内容') : '未下载本地数据（页面临时在线读取）')
+        {!info.version ? (OFFLINE_CLIENT ? (busy ? '正在下载离线数据包' : '未下载离线数据包') : '未下载本地数据（页面临时在线读取）')
           : fresh ? `本地数据 · ${fmtTime(info.createdAt)}`
             : remote?.version ? `本地数据 ${fmtTime(info.createdAt)} · 服务器有新数据` : `本地数据 · ${fmtTime(info.createdAt)}`}
       </span>
@@ -83,7 +83,7 @@ export function ExtraPackPrompt({ pack }) {
   const get = async () => {
     setErr(''); setBusy({ got: 0, total: meta?.bytes || 0 });
     try {
-      await downloadExtra(API_BASE, pack, (got, total) => setBusy({ got, total: total || meta?.bytes || 0 }));
+      await downloadExtra(API_BASE, pack, (got, total) => setBusy({ got, total: pack==='research-library'?total:(total || meta?.bytes || 0) }));
     } catch (e) {
       setErr(e.message);
     }
@@ -96,7 +96,7 @@ export function ExtraPackPrompt({ pack }) {
       <span>{meta ? `${stale ? '附加包有新版本' : '需要附加包'}「${meta.label}」（${fmtMB(meta.bytes)}）` : cfg.data ? '服务器还没有生成这个附加包，稍后再试' : '读取附加包清单…'}</span>
       {meta && (
         <button type="button" className="op-databar-btn" onClick={get} disabled={Boolean(busy)}>
-          {busy ? `下载中 ${busy.total ? Math.round((100 * busy.got) / busy.total) : 0}%` : stale ? '更新' : '下载'}
+          {busy ? pack==='research-library'&&!busy.total?`下载并保存 ${fmtMB(busy.got)}`:`下载中 ${busy.total ? Math.round((100 * busy.got) / busy.total) : 0}%` : stale ? '更新' : '下载'}
         </button>
       )}
       {err && <span className="op-databar-err" role="alert">{err}</span>}

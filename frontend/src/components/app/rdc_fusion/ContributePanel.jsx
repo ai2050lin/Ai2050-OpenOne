@@ -1,8 +1,8 @@
 /* 配置 · 贡献算力（贡献算力客户端 P2，设计见 design/contributor_client_v1.md）：
    桌面客户端里控制本机节点服务——节点服务 → 计算组件（P3）→ 设备 → 绑定账号 → 模型（下载与核对，P3）→ 资源限制 → 运行 → 日志与我的记录。
    界面只和本机节点服务通信（经 Electron 主进程转发）；只有节点服务访问中心（注册 / 领取 / 续租 / 上传 / 站点配置）。
-   唯一的例外是「绑定到我的账号」：向中心 /api/auth/node-code 取一次性绑定码，只在点击时。
-   浏览器里的网页不能控制节点，只显示下载入口。上传与中心校验通过只表示结果可以合并，不改变证据等级。 */
+   账号绑定与本人远程节点控制访问中心；本机操作仍只经 IPC。
+   浏览器不能控制本机服务；登录后可控制本人已经授权托管的远端节点。上传与中心校验通过只表示结果可以合并，不改变证据等级。 */
 import { useEffect, useState } from 'react';
 
 import { downloadKit } from '../../open/openUtil.js';
@@ -10,6 +10,7 @@ import { API_BASE, authJson } from './api.js';
 import { useAuth } from './authContext.js';
 import { NODE_STATE, RESULT_LABEL, SUP_STATE, TASK_KIND_LABEL, fmtBytes, fmtTime, nodeBridge, nodeCall, useNode, useRuntime } from './contributeUtil.js';
 import { Card, Empty } from './ui.jsx';
+import ManagedNodes from './ManagedNodes.jsx';
 import './contribute.css';
 
 function Pill({ tone, icon, children, title }) {
@@ -26,7 +27,7 @@ function WebOnly() {
   };
   return (
     <Card title="贡献算力" sub="用你的 NVIDIA 显卡运行中心冻结的测试任务，只上传统计结果">
-      <p className="ct-lead">浏览器里的网页不能调用显卡运行模型，也不能控制本机节点。请用桌面客户端（配置 → 账号与本机节点），或下载命令行一键包：</p>
+      <p className="ct-lead">浏览器里的网页不能调用显卡运行模型，也不能控制本机节点。请用桌面客户端（配置 → 本机算力），或下载命令行一键包：</p>
       <div className="v6-toolbar">
         <button type="button" className="fw-tbtn" onClick={get}>下载命令行一键包{loggedIn ? '（内嵌绑定码）' : '（匿名）'}</button>
         {msg && <span className="v6-note">{msg}</span>}
@@ -260,9 +261,9 @@ function LimitsCard({ live, gpus }) {
   const save = async () => {
     setMsg('');
     try {
-      const { task_kinds, device, node_name, limits } = cfg;
-      setCfg(await nodeCall('PUT', '/config', { task_kinds, device, node_name, limits }));
-      setMsg('已保存；下一次领取任务前生效');
+      const { task_kinds, device, node_name, limits, participation_mode } = cfg;
+      setCfg(await nodeCall('PUT', '/config', { task_kinds, device, node_name, limits, participation_mode }));
+      setMsg('已保存；托管授权在本机点击开始或继续后生效');
     } catch (e) { setMsg(e.message); }
   };
   const kinds = Object.keys(TASK_KIND_LABEL);
@@ -270,6 +271,7 @@ function LimitsCard({ live, gpus }) {
   return (
     <Card title="资源限制" sub="每次领取任务前检查；不满足时等待并显示原因" extra={<button type="button" className="fw-tbtn" onClick={save}>保存</button>}>
       <div className="ct-form">
+        <label>参与方式<select value={cfg.participation_mode || 'self'} onChange={e => setCfg({ ...cfg, participation_mode: e.target.value })}><option value="self">自主贡献</option><option value="managed">服务器托管（仅绑定账号可暂停、继续、停止）</option></select></label>
         <label>任务类型<span>{kinds.map(k => (
           <label key={k} className="ct-check"><input type="checkbox" checked={cfg.task_kinds.includes(k)}
             onChange={e => setCfg({ ...cfg, task_kinds: e.target.checked ? [...cfg.task_kinds, k] : cfg.task_kinds.filter(x => x !== k) })} />{TASK_KIND_LABEL[k]}</label>
@@ -281,7 +283,10 @@ function LimitsCard({ live, gpus }) {
         <label>其他程序占用 GPU 时让出<span><input className="ct-input num" type="number" min="0" max="100" value={lim.yield_gpu_util} onChange={e => setLim({ yield_gpu_util: num(e.target.value) })} /> %（0 = 不让出）</span></label>
         <label>显存上限<span><input className="ct-input num" type="number" min="0" value={lim.max_vram_gib} onChange={e => setLim({ max_vram_gib: num(e.target.value) })} /> GiB（0 = 显卡总显存；按权重 × 1.2 估计）</span></label>
         <label>最少剩余磁盘<span><input className="ct-input num" type="number" min="0" value={lim.min_free_disk_gib} onChange={e => setLim({ min_free_disk_gib: num(e.target.value) })} /> GiB</span></label>
+        <label>本次最长会话<span><input className="ct-input num" type="number" min="0" max="10080" value={lim.max_session_minutes || 0} onChange={e => setLim({ max_session_minutes: num(e.target.value) })} /> 分钟（含暂停时间；0 = 不限）</span></label>
+        <label>任务工作目录上限<span><input className="ct-input num" type="number" min="0" value={lim.max_work_gib || 0} onChange={e => setLim({ max_work_gib: num(e.target.value) })} /> GiB（不含模型；0 = 不限）</span></label>
       </div>
+      <p className="v6-note">托管沿用本机资源限制，不允许远端启动节点、修改限制或执行任意命令。本机暂停、停止会立即撤销本次托管授权；远端继续需要本机重新授权。</p>
       {msg && <p className="v6-note">{msg}</p>}
     </Card>
   );
@@ -297,11 +302,11 @@ function RunCard({ node }) {
   const meta = NODE_STATE[status.state] || { label: status.state, tone: 'muted', icon: '·' };
   const cur = status.current;
   const p = cur?.progress;
-  const btn = (path, label, primary) => <button type="button" className={'fw-tbtn' + (primary ? '' : ' ghost')} onClick={() => act(path)}>{label}</button>;
+  const btn = (path, label, primary, disabled=false) => <button type="button" className={'fw-tbtn' + (primary ? '' : ' ghost')} disabled={disabled} onClick={() => act(path)}>{label}</button>;
   return (
     <Card title="运行" sub="暂停：当前任务做完后不再领取；停止：立即结束运行中的任务，中心在租约到期后重新派发"
           extra={<>
-            {status.state === 'stopped' || status.state === 'error' ? btn('/start', '开始贡献', true) : null}
+            {status.state === 'stopped' || status.state === 'error' ? btn('/start', status.bound?'开始贡献':'请先绑定节点', true,!status.bound) : null}
             {status.state === 'paused' ? btn('/resume', '继续', true) : null}
             {['running', 'waiting'].includes(status.state) ? btn('/pause', '暂停') : null}
             {status.state !== 'stopped' ? btn('/stop', '停止') : null}
@@ -316,6 +321,7 @@ function RunCard({ node }) {
           {p?.total ? <small>{p.done}/{p.total} 窗口 · {Number(p.tokens || 0).toLocaleString()} token · {Math.round(p.tok_per_s || 0)} tok/s</small> : null}
         </> : '—'}</dd>
         <dt>本次计数</dt><dd>完成 {status.counts.done} · 拒收 {status.counts.rejected} · 失败 {status.counts.failed}</dd>
+        <dt>参与方式</dt><dd>{status.participation_mode === 'managed' ? (status.remote_granted ? '服务器托管 · 本次已授权' : '服务器托管 · 本次未授权') : '自主贡献'}</dd>
         {status.last_error && <><dt>最近错误</dt><dd className="ct-err">{status.last_error}</dd></>}
       </dl>
       {err && <p className="v6-note warn">{err}</p>}
@@ -324,7 +330,7 @@ function RunCard({ node }) {
 }
 
 function LogCard({ logs }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   return (
     <Card title="日志" sub="本机节点服务的输出（最近 500 行）" extra={<button type="button" className="fw-tbtn ghost" onClick={() => setOpen(!open)}>{open ? '收起' : '展开'}</button>}>
       {open && (logs.length ? <pre className="ct-log">{logs.slice(-200).map(l => `${fmtTime(l.t)}  ${l.msg}`).join('\n')}</pre> : <Empty>还没有日志。</Empty>)}
@@ -358,25 +364,29 @@ function HistoryCard({ live, counts }) {
   );
 }
 
-export default function ContributePanel() {
+export default function ContributePanel({ focusStep }) {
   const node = useNode();
   const [gpus, setGpus] = useState(null);
   useEffect(() => { if (node.live) nodeCall('GET', '/device').then(d => setGpus(d.gpus)).catch(() => {}); }, [node.live]);
-  if (!node.bridge) return <div className="ct-root"><WebOnly /></div>;
+  if (!node.bridge) return <div className="ct-root"><WebOnly /><ManagedNodes /></div>;
+  const steps = {
+    service: <HostCard node={node} />,
+    runtime: <><RuntimeCard /><DeviceCard live={node.live} /></>,
+    account: <AccountCard node={node} />,
+    device: <DeviceCard live={node.live} />,
+    models: <ModelsCard live={node.live} />,
+    resources: <LimitsCard live={node.live} gpus={gpus} />,
+  };
+  if (focusStep && steps[focusStep]) return <div className="ct-root" aria-label="参与准备步骤">{steps[focusStep]}</div>;
   return (
     <div className="ct-root">
       {node.error && node.live && <p className="v6-note warn">{node.error}</p>}
-      <div className="ct-grid">
-        <HostCard node={node} />
-        <RunCard node={node} />
-        <RuntimeCard />
-        <AccountCard node={node} />
-        <DeviceCard live={node.live} />
-      </div>
-      <ModelsCard live={node.live} />
-      <LimitsCard live={node.live} gpus={gpus} />
+      <RunCard node={node} />
+      <details className="v8-disclosure" open={!node.status?.bound}><summary>参与方式与资源预算</summary><LimitsCard live={node.live} gpus={gpus} /></details>
+      <details className="v8-disclosure" open={!node.status?.bound}><summary>设备、账号与运行准备</summary><div className="ct-grid"><HostCard node={node} /><RuntimeCard /><AccountCard node={node} /><DeviceCard live={node.live} /></div><ModelsCard live={node.live} /></details>
+      <ManagedNodes />
       <LogCard logs={node.logs} />
-      <HistoryCard live={node.live} counts={node.status?.counts} />
+      <details className="v8-disclosure"><summary>本机完成记录</summary><HistoryCard live={node.live} counts={node.status?.counts} /></details>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /* 客户端 API 公共层（v6）：统一 API_BASE、读取（本地数据包优先，不轮询）、写操作与管理令牌。
    只读数据包模式（config.js 的 OFFLINE_CLIENT，研究工作台以外的缺省形态）：在线读取的只有站点配置，
    账号操作（/api/auth/*：登录、注销、注册、修改密码、我的节点）与数据包 / 一键包下载照常连接服务器；
-   其余读取一律来自本机数据包与附加包，写操作（postJson）不可用。
+   公开研究索引与按哈希读取的证据可从中心浏览，其余读取来自本机数据包与附加包。
    纪律：读取失败只返回 error，组件显示「未接入」空态，不回退演示数据。 */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
@@ -13,6 +13,9 @@ export { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL }
 
 /* 离线客户端唯一在线读取的接口。 */
 const ONLINE_PATHS = new Set(['/api/platform/config']);
+const RESEARCH_INDEX = '/api/traces/research-space';
+const isResearchArtifact = path => /^\/api\/research-library\/artifacts\/[0-9a-f]{64}$/.test(path);
+const isPublishedResearch = path => path === RESEARCH_INDEX || isResearchArtifact(path);
 
 /* 离线客户端：从本机数据包取一条；没有时抛出带 pack（应下载的附加包 id）的错误。 */
 async function offlineJson(path) {
@@ -46,6 +49,21 @@ function withTimeout(signal, timeoutMs) {
 }
 
 export async function getJson(path, { signal, online = false, timeoutMs } = {}) {
+  if (OFFLINE_CLIENT && isPublishedResearch(path)) {
+    if (isResearchArtifact(path)) {
+      const cached = getLocal(path) ?? await getExtraEntry(path);
+      if (cached !== undefined) return cached;
+    }
+    try {
+      return await fetchJson(path, { signal, timeoutMs: timeoutMs ?? 12000 });
+    } catch (reason) {
+      if (signal?.aborted || reason?.name === 'AbortError') throw reason;
+      return offlineJson(path).catch(missing => {
+        reason.pack = missing.pack;
+        throw reason;
+      });
+    }
+  }
   // online：管理工位显式要求的实时读取（只在 ADMIN_LIVE 时生效），其余在只读数据包模式下一律读本机数据包
   if (OFFLINE_CLIENT && !(online && ADMIN_LIVE) && !ONLINE_PATHS.has(path.split('?')[0])) return offlineJson(path);
   if (OFFLINE_CLIENT && online && ADMIN_LIVE) return fetchJson(path, { signal, timeoutMs });
@@ -112,8 +130,8 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
   const [state, setState] = useState({ key: null, data: null, error: '', pack: null });
   const [nonce, setNonce] = useState(0);
   const live = online && ADMIN_LIVE;                     // 管理工位的实时读取
-  const useLocal = !live && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
-  const needFetch = Boolean(path) && (live || ready) && !useLocal;
+  const useLocal = !live && path !== RESEARCH_INDEX && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
+  const needFetch = Boolean(path) && (live || ready || isPublishedResearch(path)) && !useLocal;
   const extrasKey = OFFLINE_CLIENT && path && !ONLINE_PATHS.has(path.split('?')[0])
     ? JSON.stringify(packInfo().extras) : '';                // 附加包下载后重读（站点配置不受影响）
   useEffect(() => {
@@ -199,13 +217,14 @@ export function setSession(token, user) {
 export function clearSession() { store('del', SESSION_KEY); store('del', USER_KEY); }
 
 /* /api/auth/* 调用：自动带会话令牌 */
-export async function authJson(path, { method = 'GET', body, timeoutMs } = {}) {
+export async function authJson(path, { method = 'GET', body, rawBody, timeoutMs, redirect } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   const token = getSession();
   if (token) headers.Authorization = `Bearer ${token}`;
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', signal: withTimeout(undefined, timeoutMs), body: body === undefined ? undefined : JSON.stringify(body) });
+    response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', redirect,
+      signal: withTimeout(undefined, timeoutMs), body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)) });
   } catch (reason) {
     if (reason?.name === 'TimeoutError') throw new Error(`操作超时（${Math.round((timeoutMs ?? REQUEST_TIMEOUT_MS) / 1000)} 秒无响应），请稍后重试`);
     const error = new Error('中心服务暂时无法连接，请稍后重试');

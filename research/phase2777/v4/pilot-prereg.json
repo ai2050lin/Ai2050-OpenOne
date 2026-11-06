@@ -1,0 +1,32 @@
+{
+  "schema": "natural_pilot.v1",
+  "run_id": "P2777-W6-NATURAL-v4",
+  "kind": "real",
+  "registered_at": 1793769739.9542353,
+  "rows": 32,
+  "families": 8,
+  "frames": [
+    0,
+    1
+  ],
+  "lengths": [
+    384,
+    512
+  ],
+  "generation": "greedy,160 new tokens,batch8,no thinking",
+  "no_future_holdout_access": true,
+  "calibration": "blind original Qwen (both letter orders) AND frozen whole-output linguistic rubric",
+  "pilot_gate": "per-register style agreement >=0.70, automatic content >=0.75 overall, reference both raters >=0.85; failed cells are not positive mechanism evidence",
+  "budget_seconds": 600,
+  "legacy_edit": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "material_sha256": "3d68a17a9349c218094173b430090a22478d48b43e552f027e8ddcb2fea29a0a",
+  "engine_sha256": "0869729055e73f5d741dbaf8815b1a384b6480d5175529fddc53a9d33d5e3f60",
+  "prior_failed_pilot": "v1-v3 user-level pilots retained as failures; v4 explicitly changes to system-conditioned register, never a retrospective rescue",
+  "task": "equal-token SYSTEM register requests; entire USER token sequence and positions identical; verified-result restatement, not arithmetic",
+  "script_sha256": "57047951bb850970f541f23adc694b488bd5dde8651ba3b53f563387b73a2ea8",
+  "scoring_limits": "authored reference, same-base-model judge; no human or external independent model claim"
+}

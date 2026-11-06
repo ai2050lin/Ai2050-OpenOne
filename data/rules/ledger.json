@@ -9,6 +9,13 @@
    "id": "R-MLP-01",
    "domain": "mlp",
    "topic": "单元重要性排序",
+   "title": "一阶归因可在 L24 跨题库筛选候选集合",
+   "scope": {
+    "model": "Qwen3-4B",
+    "data": "C-Eval val → CMMLU test（两套各 169 题）",
+    "protocol": "L24 一阶归因 top-97，比较集合重叠与 Spearman 排名相关"
+   },
+   "related": ["R-MLP-18"],
    "claim": "一阶归因（attribution patching）选出的 top-1% MLP 单元，跨数据集是稳定的：在 C-Eval 上选出的集合拿到 CMMLU 上仍是同一批。",
    "status": "confirmed",
    "confidence": "high",
@@ -804,6 +811,13 @@
    "id": "R-MLP-18",
    "domain": "mlp",
    "topic": "归因有效性",
+   "title": "归因幅度排名不足以判断 L34 单元的行为必要性",
+   "scope": {
+    "model": "Qwen3-4B",
+    "data": "H5–H11 共用的答题材料",
+    "protocol": "L34 按一阶归因 |Δ| 选单元，置零 down_proj 输入，比较完整答案正确率"
+   },
+   "related": ["R-MLP-01", "R-MLP-P2794-H2"],
    "claim": "一阶归因的 |Δ| 排名可以预测单元的行为必要性：|Δ| 越大的单元删掉越痛。",
    "status": "refuted",
    "confidence": "high",
@@ -6148,6 +6162,170 @@
    ],
    "updated_at": "2026-11-01T20:04:15",
    "created_at": "2026-11-01T20:04:15"
+  },
+  {
+   "id": "R-MET-41",
+   "domain": "measurement",
+   "topic": "顶格探针下禁止用 argmax 翻转率作干预判据",
+   "claim": "当读出探针在基线已 1.000 时，\"翻转率\"按构造恒为 0（没有可翻转的样本），会把强干预误报成零效应；反之在低基线格上翻转率又被天花板放大。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "预注册的干预判据不得只用 argmax 翻转率。必须并列报告：①探针决策边际的连续位移 Δmargin（沿目标类的 logit 差）②下一 token 分布的 KL（与基线，逐样本）③top-1 变化率。三者与同族随机方向对照比。翻转率仅在基线 acc ≤ 0.95 的格上作主判。",
+   "measure": {
+    "q9b_probe_base": "1.000 (disc & conf, l=35)",
+    "q9b_flip_at_alpha1": "0.022 (MLP +s) / 0.006 (MLP -s)",
+    "q9b_kl_at_alpha1": "0.095 vs null p95 0.003",
+    "q9b_dmargin_alpha4": "+20.11 / -19.93",
+    "q9b_flip_at_alpha2": "0.333（acc 1.000->0.667）"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-B",
+     "script": "tests/gpt5/pat_q9b.py",
+     "data": "tests/gpt5/result/pat_q9b_qwen_patch.json",
+     "model": "Qwen3-4B",
+     "note": "SMOKE 首版只用翻转率，8 个条件全部报 0.000，与\"干预完全无效\"不可区分；加入 Δmargin/KL 后同一次前向立即显出 30 倍于零分布的效应"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "判据纪律；任何顶格读出（语域/语言/风格类探针常见）直接适用"
+   },
+   "why": "Q9-A 已记录\"顶格 1.0 不比效应大小\"，但只写成了散文告警，没有落成判据；Q9-B 第一版就踩了这个坑，说明告警必须升级为禁令。",
+   "tags": [
+    "measurement",
+    "intervention",
+    "ceiling"
+   ],
+   "keywords": [
+    "翻转率",
+    "顶格",
+    "天花板",
+    "KL",
+    "margin",
+    "干预判据"
+   ],
+   "created": "2026-11-03T11:20:30",
+   "updated": "2026-11-03T11:20:30"
+  },
+  {
+   "id": "R-MET-42",
+   "domain": "measurement",
+   "topic": "组件归因须并列 patch 与 ablation，patch 等强不能推出分担相等",
+   "claim": "残差流是加性信道：把同一方向加到 attention 输出或 MLP 输出，下游读到的几乎是同一件事。因此 patch 效应的组件差异只反映\"注入点离读出多近/该点增益多大\"，不反映该组件在日常前向中分担多少写入。用 patch 大小判读写分离必然误判。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "组件级因果声明必须两条腿：①patch（充分性：加方向能否推动读出）②ablation（必要性：删投影是否损伤读出），并给随机方向零分布。只做 patch 时结论只能写成\"该注入点可推动读出\"，不得写成\"该组件负责写入\"。patch 与 ablation 结论不一致时，以 ablation 为必要性判据、patch 为可及性判据，分开命名。",
+   "measure": {
+    "q9b_patch_mlp_alpha1_dmargin": "+5.69",
+    "q9b_patch_attn_alpha1_dmargin": "+6.20",
+    "q9b_patch_mlp_kl": "0.095",
+    "q9b_patch_attn_kl": "0.129",
+    "q9b_ablate_mlp_dmargin": "-0.92",
+    "q9b_ablate_attn_dmargin": "-0.61",
+    "q9b_ablate_both_acc": "0.989 (base 1.000)"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-B",
+     "script": "tests/gpt5/pat_q9b.py",
+     "data": "tests/gpt5/result/pat_q9b_qwen_patch.json",
+     "model": "Qwen3-4B",
+     "note": "W3 预注册判据要求 MLP 翻转率 > 注意力翻转率，实测注意力更强（0.061 vs 0.022），按判据记 ATT_ALSO_WRITES；W2b 联合消融后 acc 仅降 0.011，证明方向对读出是可读非必需"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "组件归因纪律；后续 SAE 挂载点结论必须同时给 patch 与 ablation"
+   },
+   "why": "Q9-A 的\"中段 MLP 主写\"是写入份额（raw share），Q9-B 的 patch 实验把它误读成\"MLP 是唯一可写入点\"。根因是没意识到加性残差流让 patch 与组件身份解耦。",
+   "tags": [
+    "measurement",
+    "intervention",
+    "component",
+    "residual"
+   ],
+   "keywords": [
+    "patch",
+    "ablation",
+    "读写分离",
+    "残差加性",
+    "组件归因"
+   ],
+   "created": "2026-11-03T11:20:30",
+   "updated": "2026-11-03T11:20:30"
+  },
+  {
+   "id": "R-MTH-33",
+   "domain": "method",
+   "topic": "多选题强制选择必须在 prompt 末位读候选字母 logit",
+   "claim": "把字母 token 追加到 prompt 之后再取末位 logit，读的是\"字母之后的下一个 token\"，不是字母本身；该错误会让任何多选题评测塌到随机水平，且看起来像\"模型不会做题\"。",
+   "status": "confirmed",
+   "confidence": "high",
+   "criterion": "多选题评分：在 prompt 结束位置（如\"答案：\"之后）取 next-token logits，比较候选字母 token（含带空格变体，取较大者）的 logit。追加候选后再读末位属实现错误。上线前用小样本（n≈30）对已知可答题做一次 sanity check：准确率应显著高于 1/选项数，否则先查评分位置。",
+   "measure": {
+    "q9b_wrong_position_acc": "0.327 (144/440) / 0.333 (20/60)",
+    "q9b_correct_position_acc": "0.693 (305/440)",
+    "q9b_gap": "+0.366 绝对准确率"
+   },
+   "evidence": [
+    {
+     "phase": "Q9-B",
+     "script": "tests/gpt5/pat_q9b.py",
+     "data": "tests/gpt5/result/pat_q9b_qwen_patch.json",
+     "model": "Qwen3-4B",
+     "note": "同一批 440 题，仅改评分位置：0.327 -> 0.693；单题诊断显示模型确实在\"答案：\"后直接输出 C/D 等字母"
+    }
+   ],
+   "retest": {
+    "status": "block",
+    "count": 1,
+    "note": "评测实现纪律，所有 MC 基准（C-Eval/MMLU/M3Exam/本地池）通用"
+   },
+   "why": "W6 能力保持门第一版在 440 题上得 0.327，接近随机，若直接采信会得出\"模型能力不足\"的错误结论，并让能力门失去灵敏度（编辑与基线都贴地板，McNemar 无检验力）。",
+   "tags": [
+    "method",
+    "evaluation",
+    "multiple_choice"
+   ],
+   "keywords": [
+    "多选题",
+    "logit 位置",
+    "强制选择",
+    "能力门",
+    "sanity check"
+   ],
+   "created": "2026-11-03T11:20:30",
+   "updated": "2026-11-03T11:20:30"
+  },
+  {
+   "id": "R-MLP-P2794-H2",
+   "domain": "mlp",
+   "topic": "原子序数 · 有参考来源仲裁",
+   "title": "高直接归因的 32 个单元未通过仲裁必要性检验",
+   "claim": "在有参考来源的等长原子序数任务中，移除发现集直接 logit 贡献最高的 32 个候选 MLP 单元会使留出材料的完整整数准确率下降至少 20 个百分点。",
+   "status": "refuted",
+   "scope": {
+    "model": "Qwen3-4B BF16",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "data": "P2794 v4 冻结语料 · F2 的 128 条有参考来源留出输入",
+    "data_sha256": "0677b466e01923dde64b4ab53d26b942a7c7649695a4f39bd6cad6528dec59b3",
+    "protocol": "H2 · 候选 MLP32 逐生成步消融 · 完整整数准确率与同块随机对照",
+    "protocol_id": "P2794-ATOMIC-ARBITRATION-v4/H2",
+    "design_sha256": "c000fe43c1c8b204ee4bbbb608d2310caa9b909c05b463dec36853d3704e9342"
+   },
+   "criterion": "完整整数正确率至少下降 20 个百分点，比随机组多下降至少 10 个百分点，且实体簇置信区间下界大于 0。",
+   "measure": {"原模型": "128/128", "候选组 α=0.25、0.5、1": "各 128/128", "随机对照": "128/128"},
+   "counterexamples": ["三个剂量下完整整数答对数均未下降。首步 logit 间隔仍有变化。", "随机组的 RMS 匹配并不严格。准确率接近天花板，本轮结论限于未达到预注册的效应幅度。"],
+   "why": "本次排除的是该操作在这组材料上达到预注册损伤幅度的预测。较小效应和其他输入条件仍需独立验证。",
+   "evidence": [
+    {"phase": "P2794-ATOMIC-ARBITRATION-v4", "model": "Qwen3-4B BF16", "script": "tests/glm5/phase2794_analyze.py", "data": "tests/glm5/result/phase2794_arbitration_v4/analysis.json", "note": "H2 未通过。归档报告保留剂量曲线、对照和反例。", "run": "P2794-ATOMIC-ARBITRATION-v4", "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c"}
+   ],
+   "retest": {"status": "block", "count": 1, "note": "同一快照、语料和 H2 判据直接引用。若检验小效应、改变随机匹配容差或换独立实体，应冻结新设计。"},
+   "keywords": ["原子序数", "仲裁", "MLP32", "消融", "P2794", "完整整数", "归因"],
+   "related": ["R-MLP-18"]
   }
  ],
  "updated": "2026-11-01T20:02:59"

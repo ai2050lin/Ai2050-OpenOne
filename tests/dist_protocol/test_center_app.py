@@ -52,6 +52,8 @@ class CenterAppTests(unittest.TestCase):
         self.assertEqual(c.get('/api/models/local').status_code, 403)
         self.assertEqual(c.post('/api/models/download', json={'repo_id': 'Qwen/Qwen3-4B'}).status_code, 403)
         self.assertEqual(c.post('/api/live/connect', json={'model_path': '/etc'}).status_code, 403)
+        self.assertEqual(c.get('/api/traces/research-space').json()['schema'], 'research_space_index.v1')
+        self.assertEqual(c.get('/api/traces/raw/not-public').status_code, 403)
         ok = c.get('/api/models/local', headers={'X-Admin-Token': self.D.ADMIN_TOKEN})
         self.assertEqual(ok.status_code, 200)
 

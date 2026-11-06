@@ -1,0 +1,97 @@
+{
+  "behavior_gate": true,
+  "canaries": [
+    {
+      "zero_dose_logit_bitwise_equal": true
+    }
+  ],
+  "capability_input_sha256": "0aeac712fbba3b27df4983721b5b9fce1273f1a3c25ca37609c957d9597c02c5",
+  "capability_offset_from_assistant": 32,
+  "dictionary_sha256": "b1801916dbbd65902a2f2df702e029304c4bfc89771b0511cab35b310b3d1733",
+  "kind": "real",
+  "matched_control": "same-layer writer signed permutation, equal source-vector Euclidean norm before BF16 add",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "n": 2340,
+  "observation_sha256": "373b26f251f54f32f4f312ed10042c05f382b4dcbe106cfb184af79eb07f80a3",
+  "operations": [
+    [
+      "clean",
+      [],
+      [],
+      0.0
+    ],
+    [
+      "functional_sae",
+      [],
+      [],
+      0.0
+    ],
+    [
+      "upstream_joint",
+      [
+        [
+          34,
+          2
+        ],
+        [
+          35,
+          25
+        ]
+      ],
+      [
+        34,
+        33
+      ],
+      1.0
+    ]
+  ],
+  "part": "capability",
+  "prereg_sha256": "12c9d765215e1be050ddb24433264fee0416b75d1758fffe93b1b64f8a16cdd3",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052026
+  },
+  "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+  "schema": "functional_revision_intervention.v2",
+  "seconds": 138.22070121765137,
+  "source_sha256": "ea13620a99a3c8d23aadba5cc2dd6f71c6e02a45268f5737e27d3baaf373d72a",
+  "status": "complete",
+  "summary": {
+    "functional_sae": {
+      "alpha": 0.025,
+      "base_accuracy": 0.6840909090909091,
+      "edited_accuracy": 0.6827272727272727,
+      "gains": 17,
+      "loss_interval": [
+        -0.008923605286205453,
+        0.011636246700796118
+      ],
+      "losses": 20,
+      "margin": 0.02,
+      "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+      "n": 2200,
+      "net_loss": 0.0013636363636363447,
+      "status": "noninferior"
+    },
+    "reference_only_n": 140,
+    "upstream_joint": {
+      "alpha": 0.025,
+      "base_accuracy": 0.6840909090909091,
+      "edited_accuracy": 0.685,
+      "gains": 3,
+      "loss_interval": [
+        -0.004843246368298035,
+        0.003090775546035823
+      ],
+      "losses": 1,
+      "margin": 0.02,
+      "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+      "n": 2200,
+      "net_loss": -0.0009090909090909705,
+      "status": "noninferior"
+    }
+  }
+}

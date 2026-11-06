@@ -1,0 +1,129 @@
+{
+  "schema": "natural_sufficiency_prereg.v1",
+  "run_id": "P2777-W6-NATURAL-CONFIRM-v1",
+  "kind": "real",
+  "registered_at": 1793770518.0776346,
+  "question": "Can the preexisting weight edit induce qualified colloquial free completions from stable written-source long prompts?",
+  "prior_exposure": [
+    {
+      "run_id": "P2777-W6-NATURAL-v1",
+      "path": "tests\\glm5\\result\\phase2777_natural\\pilot-result.json",
+      "sha256": "fe00ae0ff97eafef8db29c02a1d0475122777ca27ebe69e6059a75848d086fef",
+      "passed": false,
+      "style_accuracy": {
+        "acad": 1.0,
+        "colloq": 0.0
+      },
+      "content_accuracy": 0.3125
+    },
+    {
+      "run_id": "P2777-W6-NATURAL-v2",
+      "path": "tests\\glm5\\result\\phase2777_natural_v2\\pilot-result.json",
+      "sha256": "46499d8c334887b8754ac50941303c9dd80f205c10c1ccf5d1233bbe4163a352",
+      "passed": false,
+      "style_accuracy": {
+        "acad": 0.875,
+        "colloq": 0.0
+      },
+      "content_accuracy": 0.90625
+    },
+    {
+      "run_id": "P2777-W6-NATURAL-v3",
+      "path": "tests\\glm5\\result\\phase2777_natural_v3\\pilot-result.json",
+      "sha256": "84267f2c34c7a3341a6ab73a517a8ee7eddc6ae0914dfc31d935e3f24741fb26",
+      "passed": false,
+      "style_accuracy": {
+        "acad": 0.9375,
+        "colloq": 0.3125
+      },
+      "content_accuracy": 0.84375
+    },
+    {
+      "run_id": "P2777-W6-NATURAL-v4",
+      "path": "tests\\glm5\\result\\phase2777_natural_v4\\pilot-result.json",
+      "sha256": "5ff2ce9c460df01e8eca1493a4e0f95897bdf6db9fe8bc87711a2b08cfa8be31",
+      "passed": false,
+      "style_accuracy": {
+        "acad": 0.9375,
+        "colloq": 0.0
+      },
+      "content_accuracy": 0.96875
+    },
+    {
+      "run_id": "P2777-W6-NATURAL-v5",
+      "path": "tests\\glm5\\result\\phase2777_natural_v5\\pilot-result.json",
+      "sha256": "fe2fd2e336693bccc58638d8563841d4c0f06ab799367825cc958655d97a6d98",
+      "passed": false,
+      "style_accuracy": {
+        "acad": 0.5625,
+        "colloq": 0.0
+      },
+      "content_accuracy": 1.0
+    }
+  ],
+  "material_selection": "discovery only: maximize balanced style agreement among written>=.8 and content>=.8; chosen user-request v3",
+  "scope_change": "two-way style contrast failed discovery gate; this is ONE-WAY edit sufficiency, not confirmation of a natural preexisting spoken-vs-written mechanism",
+  "matched_axis": "NOT_RUN: spoken conditions failed behavior calibration, so no new mean-difference axis is extracted",
+  "families": 128,
+  "frames": [
+    2,
+    3
+  ],
+  "lengths": [
+    384,
+    512
+  ],
+  "n_prompts": 512,
+  "pairs": "same facts and all input text outside equal-token style request identical; 64 independent families per length, both frames per family",
+  "heldout": "new records3000..3127 and new source/request frames2/3, not exposed in pilots",
+  "main_edit": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "axis_source": "P2773 frozen discovery direction and actual-contribution columns, no selection on new data",
+  "controls": [
+    "same-column norm-matched random direction seed0",
+    "activation-energy-stratified random columns seed0"
+  ],
+  "generation": "greedy,batch8,max160 new tokens,no thinking; full independent outputs, no answer pool",
+  "style_evaluation": "unchanged v3 original-base-model blinded judge in both A/B letter orders plus frozen linguistic-family rubric; agreement and>=45chars/2sentences",
+  "judge_limit": "same-model rater and authored calibration, not independent human validation",
+  "baseline_gate": "written-source classification>=.70 pooled and>=.60 each frame-length; provided-content agreement>=.75 pooled",
+  "primary": "qualified written->colloquial fraction over ALL written-source inputs >=.20 and 95% family CI lower>.10; positive lower difference vs both own controls; content loss CI upper<=.05; original colloquial-response loss CI upper<=.05; keyed capability NI passes",
+  "qualified": "unedited output written, edited output colloquial under both evaluators, edited content correct, not truncated",
+  "spoken_monitor": "relative retention of whatever spoken outputs baseline actually produced; no absolute70% condition and no use as valid internal-style positive cells",
+  "statistics": "128 family clusters, preserve frames/styles,6000 bootstrap,.025/.975 quantiles; only one primary hypothesis",
+  "power": {
+    "expected_delta_pt": 20.0,
+    "n": 128,
+    "p_d": 0.5,
+    "n_required": 99,
+    "achieved_power": 0.893,
+    "pass": true
+  },
+  "capability": {
+    "formal_n": 2200,
+    "reference_n": 140,
+    "margin": 0.02,
+    "method": "paired simultaneous Clopper-Pearson losses/gains,95% union-bound coverage",
+    "scope": "same frozen monitoring mixture as previous run; repeats disclosed; not a new general ability benchmark"
+  },
+  "raw_fields": "all37 layers/all9728 MLP inputs B18..27, last two visible positions, original BF16 bits; no new feature selection",
+  "resource_budget_seconds": 3600,
+  "software_dependencies": {
+    "tests\\glm5\\phase2777_confirm.py": "df836697cd271116e69108dce0acaf11a46b5c11c64848ab2ba7edb038cb3130",
+    "tests\\glm5\\phase2773_w6_loop.py": "0869729055e73f5d741dbaf8815b1a384b6480d5175529fddc53a9d33d5e3f60",
+    "tests\\glm5\\phase2777_natural_loop_v3.py": "8ebba7e80438bcc2ded431ff31f3b3ce104d542dff981db0c9b8a541d9c09f48",
+    "tests\\glm5\\phase2777_materials_v3.py": "ff1435362cd832823cd7c25af9414816e293b58d658a162bdca5ba0c620c736a",
+    "tests\\glm5\\phase2777_materials_v2.py": "2a9d2d3ae6d93f23ca414180716c80a6b342dd559950a7a8fab6099e5f99da6e",
+    "tests\\glm5\\phase2777_materials.py": "9fa2501d4219cf723cd8f7e11e09127c393ac29ab00c12aca089311f668ec1a9"
+  },
+  "not_measured": [
+    "new matched axis",
+    "cross-language",
+    "other models",
+    "graph-only prediction",
+    "multi-node replication"
+  ]
+}

@@ -1,0 +1,428 @@
+{
+  "acceptance": [
+    "常规用户不再看到含演示数据的本机工具一级入口，真实独有能力有明确新入口。",
+    "报告到对应真实轨迹不超过2次点击，轨迹到准确参数位置不超过1次点击；这是目标，不是当前实测。",
+    "回退/前进/刷新/深链恢复相同模型快照、样本、位置、层与单元；不遗留跨页面无关查询参数。",
+    "负结果、缺失采集、未测、执行失败和演示数据各自有明确状态。",
+    "从冻结材料到节点分片、审计、报告和图谱卡共享run/design/artifact身份，不复制出多份可矛盾状态。",
+    "不同模型快照/精度不跨桶平均，图谱布局不代表模型几何；全部索引与原始值可查询。",
+    "网页/桌面、管理员/成员、在线/离线、本机有/无模型均有测试；网页不能执行的操作说明可去哪里执行。"
+  ],
+  "created_at": "2026-11-04 09:17",
+  "dedicated_stations": [
+    {
+      "id": "probe",
+      "label": "神经元测试",
+      "purpose": "Goodfire式单MLP单元S1–S9测试；本机GPU；当前面板说明结果只保存在本机。"
+    },
+    {
+      "id": "pipeline",
+      "label": "模板流水线",
+      "purpose": "模板设计→试跑/冻结→分发→审计，同一实验流水线而非四类研究对象。"
+    },
+    {
+      "id": "census",
+      "label": "普查作业",
+      "purpose": "原生单元普查任务、切片与层组分片、复算及争议处理。"
+    },
+    {
+      "id": "autotest",
+      "label": "自动测试",
+      "purpose": "登记本机被测模型，选择模式族后顺序自动运行；管理员且本机中心可见。"
+    }
+  ],
+  "hidden_views": [
+    {
+      "id": "neuron",
+      "label": "原生神经元普查与特征卡"
+    },
+    {
+      "id": "relations",
+      "label": "跨模式族谱图关系"
+    },
+    {
+      "id": "local",
+      "label": "导入本地研究包"
+    },
+    {
+      "id": "platform",
+      "label": "高级平台信息"
+    },
+    {
+      "id": "route:neuron",
+      "label": "旧神经元进展直达链接"
+    }
+  ],
+  "issues": [
+    {
+      "change": "真实独有能力迁入正式空间，示意迁至独立学习区；旧实时入口转向运行与路径，历史URL保留。",
+      "finding": "旧本机工具仍暴露数据分析/实时分析以及7种视图，其中包含演示数据。",
+      "priority": "P0"
+    },
+    {
+      "change": "统一选中上下文；不可变trace按自身快照固定，跨快照显示不匹配并要求明确切换，不静默替换。",
+      "finding": "全局模型条与运行样本、研究成果3D、真实参数的内部模型选择各自持有状态。",
+      "priority": "P0"
+    },
+    {
+      "change": "迁移或修复这些入口，并以用户实际到达目标页面作为验收。",
+      "finding": "旧LensSpatial的onGo由Workbench传入空函数；其中部分导航按钮不会完成跳转。",
+      "priority": "P0"
+    },
+    {
+      "change": "计划负责问题/假设/预注册，执行负责队列/运行/审计；报告用同一详情组件。",
+      "finding": "研究计划和执行与审计共用主体，重复工作包、档案和报告。",
+      "priority": "P1"
+    },
+    {
+      "change": "空间设统一图谱浏览，语言/内部/映射作为图层；完整产物版本以证据库列表为主，保留可选3D档案模式。",
+      "finding": "研究成果3D与语言图谱、进展证据库存在入口交叉；档案节点和机制节点易混淆。",
+      "priority": "P1"
+    },
+    {
+      "change": "原生特征卡并入结构与参数；跨族关系成为图谱图层；导入/同步成为全局动作；算力设常驻快捷入口。",
+      "finding": "神经元普查、跨族关系、本地包、平台信息依赖零散按钮；算力贡献埋在账号页。",
+      "priority": "P1"
+    },
+    {
+      "change": "导航说明和页面帮助由同一注册表维护，注明来源、权限和运行形态。",
+      "finding": "旧帮助与注释仍把实时运行视为同一层塔/离线只读，实际新增视图有独立实时API。",
+      "priority": "P1"
+    },
+    {
+      "change": "以问题/外部模式/特征组织图谱，以数据集作为证据来源筛选，按实验ID贯通生产与成果。",
+      "finding": "材料、任务、研究主张、参数和产物版本混用不同组织维度。",
+      "priority": "P2"
+    }
+  ],
+  "kind": "proposal",
+  "layout": "顶栏模型/研究对象/来源与同步状态，左侧对象目录，中间图或表，右侧证据卡，下方按需展开原文/数值/反例。",
+  "local_primary": {
+    "inner_modes": [
+      {
+        "id": "stack",
+        "label": "层平铺",
+        "purpose": "层结构教学/旧权重浏览，含显式示意激活。"
+      },
+      {
+        "id": "neuron",
+        "label": "神经元级",
+        "purpose": "种子生成的神经元激活教学示意。"
+      },
+      {
+        "id": "sealed",
+        "label": "封存激活3D",
+        "purpose": "历史封存实测激活3D与registry回链。"
+      },
+      {
+        "id": "units",
+        "label": "原生神经元",
+        "purpose": "自然语料原生MLP普查、分布和单元卡。"
+      },
+      {
+        "id": "cloud",
+        "label": "特征点云",
+        "purpose": "旧语言模板驱动的示意特征点云。"
+      },
+      {
+        "id": "param",
+        "label": "参数热图",
+        "purpose": "连接时真实权重聚合热图；缺少可用真实数据时可显示标注demo。"
+      },
+      {
+        "id": "fidelity",
+        "label": "保真度曲线",
+        "purpose": "历史封存指标的保真度与缺口曲线，需保留原指标和范围。"
+      }
+    ],
+    "label": "本机工具",
+    "top_modes": [
+      {
+        "id": "data",
+        "label": "数据分析"
+      },
+      {
+        "id": "live",
+        "label": "实时分析"
+      }
+    ],
+    "visibility": "仅platform config.local_tools为真时出现"
+  },
+  "migrations": [
+    [
+      "空间/研究成果3D",
+      "空间/图谱浏览：研究证据图层；版本列表进入进展/成果与证据"
+    ],
+    [
+      "空间/语言图谱与隐藏relations",
+      "空间/图谱浏览：外部模式、内部特征、跨图谱关系"
+    ],
+    [
+      "空间/神经元普查与特征卡按钮",
+      "空间/结构与参数：原生单元、参数、语料统计及特征解释"
+    ],
+    [
+      "空间/导入本地研究包",
+      "全局数据动作：导入、更新、导出；导入后回到对应对象"
+    ],
+    [
+      "研发/任务与数据",
+      "研发/材料与数据；研究主张与AI评审回到同一证据详情"
+    ],
+    [
+      "研发/执行与审计中的四个专门工位",
+      "研发/实验与队列：新建实验时选择类型，详情内进入对应专业面板"
+    ],
+    [
+      "配置/账号与本机节点",
+      "拆成账号与权限、本机算力；顶栏增加贡献算力快捷入口"
+    ],
+    [
+      "本机工具/真实独有视图",
+      "分别并入结构与参数、响应对照、成果与证据，原始范围保持"
+    ],
+    [
+      "本机工具/演示模式",
+      "独立学习/教学区，保留明确演示标识，不进入研究统计"
+    ]
+  ],
+  "pipeline_steps": [
+    {
+      "id": "design",
+      "label": "建模板"
+    },
+    {
+      "id": "freeze",
+      "label": "冻结"
+    },
+    {
+      "id": "dispatch",
+      "label": "分发"
+    },
+    {
+      "id": "audit",
+      "label": "审计"
+    }
+  ],
+  "primary": [
+    {
+      "id": "route",
+      "label": "进展"
+    },
+    {
+      "id": "spatial",
+      "label": "空间"
+    },
+    {
+      "id": "process",
+      "label": "研发"
+    },
+    {
+      "id": "config",
+      "label": "配置"
+    }
+  ],
+  "proposal": [
+    {
+      "children": [
+        "总览",
+        "图谱覆盖",
+        "成果与证据"
+      ],
+      "id": "route",
+      "label": "进展",
+      "question": "研究到了哪里，证据有多强？"
+    },
+    {
+      "children": [
+        "图谱浏览",
+        "结构与参数",
+        "运行与路径",
+        "响应对照"
+      ],
+      "id": "spatial",
+      "label": "空间",
+      "question": "研究对象和实际计算在哪里，如何关联？"
+    },
+    {
+      "children": [
+        "研究计划",
+        "材料与数据",
+        "实验与队列"
+      ],
+      "id": "process",
+      "label": "研发",
+      "question": "下一项研究怎样设计、执行与复算？"
+    },
+    {
+      "children": [
+        "连接与诊断",
+        "账号与权限",
+        "本机算力",
+        "模型与AI"
+      ],
+      "id": "config",
+      "label": "配置",
+      "question": "我连接了什么，如何参与和管理？"
+    }
+  ],
+  "run_id": "WB-NAV-AUDIT-20261104-v1",
+  "schema": "research_navigation_audit.v1",
+  "secondary": {
+    "config": [
+      {
+        "id": "conn",
+        "label": "连接与诊断",
+        "purpose": "中心地址、运行形态、在线/离线模式、连接状态、错误与诊断包。"
+      },
+      {
+        "id": "account",
+        "label": "账号与本机节点",
+        "purpose": "账号、角色、绑定节点、算力贡献、资源预算、托管节点、日志和完成记录；管理员另有账号/数据管理链接。"
+      },
+      {
+        "id": "model",
+        "label": "模型与 AI 助手",
+        "purpose": "中心登记的被测模型，以及桌面AI助手模型与Key配置；科研模型和评审/助手模型用途不同。"
+      }
+    ],
+    "process": [
+      {
+        "id": "plan",
+        "label": "研究计划",
+        "purpose": "整体研究路线、计划和工作包阶段；当前同时渲染研究档案和报告。"
+      },
+      {
+        "id": "execution",
+        "label": "执行与审计",
+        "purpose": "工作包阶段、报告、真实任务队列以及专门执行工位；与计划页共用ResearchExecution主体。"
+      },
+      {
+        "id": "catalog",
+        "label": "任务与数据",
+        "purpose": "研究主张、数据版本、AI/人工评审档案和题目/模式族清单。"
+      }
+    ],
+    "route": [
+      {
+        "id": "overview",
+        "label": "总览",
+        "purpose": "三方向冻结分片执行进展、模型身份桶、研究库摘要与工作单；执行率不等于破解率。"
+      },
+      {
+        "id": "lang",
+        "label": "图谱覆盖",
+        "purpose": "语言项和模式族覆盖、数据集行为评测、证据等级矩阵及可展开的神经元普查覆盖。"
+      },
+      {
+        "id": "rules",
+        "label": "证据与规则",
+        "purpose": "不可变产物、特征卡、图谱边、反例、规则账本及来源登记。"
+      }
+    ],
+    "spatial": [
+      {
+        "id": "parameters",
+        "label": "结构与参数",
+        "purpose": "全部层/Head/MLP索引和真实参数CPU切片，研究卡与权重绑定须完整快照一致。"
+      },
+      {
+        "id": "live",
+        "label": "运行与路径",
+        "purpose": "同一真实样本的Embedding、QK路由、Head写出、MLP G/V/A、生成步和参数贡献；可启动本机长文本采集。"
+      },
+      {
+        "id": "research",
+        "label": "研究成果3D",
+        "purpose": "归档工作包、定位卡及历史产物版本的3D索引，提供报告、反例与真实运行回链；产物架不是语义几何。"
+      },
+      {
+        "id": "lang",
+        "label": "语言图谱",
+        "purpose": "数据集实测与模式目录两种页内视图；语言项的编码层段、特征和跨模式关系入口。"
+      },
+      {
+        "id": "response",
+        "label": "响应对照",
+        "purpose": "模式族分片合并后的响应空间、层间对照和规律统计；区别于单样本实际运行路径。"
+      }
+    ]
+  },
+  "shared_context": [
+    "model_snapshot",
+    "precision",
+    "run_id",
+    "dataset_version",
+    "sample_id",
+    "token_position",
+    "generation_step",
+    "block",
+    "boundary",
+    "head",
+    "unit",
+    "evidence_sha256"
+  ],
+  "source_fingerprints": [
+    {
+      "path": "frontend/src/components/app/workbenchUtil.js",
+      "sha256": "51510af8e25757e0e47a9259bd587c5867abc7753b869f55e06cdde448220aa1"
+    },
+    {
+      "path": "frontend/src/components/app/ConfigView.jsx",
+      "sha256": "d52d77eff2c49c5bd9f22e246c60338b3754118fdc40c5fef658bf0320d771e1"
+    },
+    {
+      "path": "frontend/src/components/app/rdc_fusion/LensSpatial.jsx",
+      "sha256": "1ce235b056a7b624b131dc7ea148e97b7cea5bbe875161a8c4120aa3ae85342b"
+    },
+    {
+      "path": "frontend/src/components/app/Workbench.jsx",
+      "sha256": "3aa358077c4029353d6e9c8728615217ad683ce6ba06c6f649949e518a90209b"
+    },
+    {
+      "path": "frontend/src/components/app/WorkbenchHelp.jsx",
+      "sha256": "558c0ff0452e89799153406d7d7dc4fcfd8c79ee730b5a504d04c3d24042dda8"
+    },
+    {
+      "path": "frontend/src/components/v8/SpaceLens.jsx",
+      "sha256": "0eaa5a91716d15d725f4bb2495730ab274e3eb1aaf541673b84a49a3178fa52d"
+    },
+    {
+      "path": "frontend/src/components/v8/RouteLens.jsx",
+      "sha256": "64d85efabcbc76b3d8410bc6d874246d99f4b06675145f44974d96045e38e660"
+    },
+    {
+      "path": "frontend/src/components/v8/ResearchSpace.jsx",
+      "sha256": "4d638f629a9df41f7bf7c38ef924c611ebea666866494cd78eea528cb9465250"
+    },
+    {
+      "path": "frontend/src/components/v8/ResearchExecution.jsx",
+      "sha256": "71aeccb844b4d43bab8a948918134f3c7356980c8500ee30529a0a410584493d"
+    },
+    {
+      "path": "frontend/src/components/v8/ResearchCatalog.jsx",
+      "sha256": "fd999012bba39b47f0d3eee11a965e2ab5bfe3a3d1e9f06d81582c09350b66bb"
+    },
+    {
+      "path": "frontend/src/components/v8/MechanismTraceExplorer.jsx",
+      "sha256": "9cf0836d0452b0fdf9af1989223a009f10c13f40a5f01f20aca3779a879730c8"
+    },
+    {
+      "path": "frontend/src/components/app/rdc_fusion/ContributePanel.jsx",
+      "sha256": "07313588f21d4e5100d92e0d1943997fe695801eb3e40b050393e0eb59db7c20"
+    },
+    {
+      "path": "frontend/src/components/app/rdc_fusion/GoodfireProbePanel.jsx",
+      "sha256": "83da08154f4c8a833a93885e3b2f4aff189f288ff64c9dfbb18fe8eaed2cbb35"
+    }
+  ],
+  "status": "source_audit_and_proposal_not_implemented",
+  "timezone": "America/Chicago",
+  "validation": {
+    "application_code_changed": false,
+    "basis": "current source registries and rendered component branches; no user study or browser visual acceptance in this task",
+    "legacy_inner_modes": 7,
+    "primary_count": 4,
+    "secondary_visible_count": 14
+  }
+}

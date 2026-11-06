@@ -65,6 +65,10 @@ export default function NeuronUnitCard({ modelKey, block, unit, run }) {
     );
   }
   if (loading || !data) return <div className="nu-empty">读取中…</div>;
+  return <NeuronUnitCardContent data={data} />;
+}
+
+export function NeuronUnitCardContent({ data }) {
   const c = data.census;
   return (
     <article className="nu-card" aria-label={`单元 ${data.id}`}>

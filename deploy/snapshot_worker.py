@@ -124,8 +124,11 @@ def build_datapack(fp: str, guard: 'Guard', force: bool = False, log=print):
     try:
         import datapack as DP
         from server import neuron_census_service as NS
+        from server.rule_ledger_service import LEDGER
+        from deploy.research_library import library
+        rule_stamp = hashlib.sha256(LEDGER.read_bytes()).hexdigest()[:12] if LEDGER.is_file() else 'norules'
         version = (f"{fp}-{DP.research_stamp(NS.research_root())}-{stored_fingerprint('lang_atlas') or 'nolang'}"
-                   f"-{neuron_layer_stamp()}")
+                   f"-{neuron_layer_stamp()}-{library().fingerprint()}-{rule_stamp}-arch1")
         meta = DP.read_meta(D._DATA_DIR)
         if not guard.skip('datapack') and (force or not meta or meta.get('version') != version):
             guard.start('datapack')
@@ -212,6 +215,11 @@ def run_once(force: bool = False, log=print) -> dict:
     import platform_service as PS
     out = {'computed': [], 'skipped': []}
     try:
+        from deploy.research_library import sync
+        out['research_library'] = sync()
+    except Exception as exc:
+        log(f'[snapshots] research library: {type(exc).__name__}: {exc}')
+    try:
         import census_service as CS
         merged = CS.auto_merge()                       # 普查：新完成的切片并入单元卡
         if merged:
@@ -265,8 +273,16 @@ def run_once(force: bool = False, log=print) -> dict:
             log(f'[snapshots] analysis warm-up: {exc}')
     out['lang_atlas'] = build_lang_atlas(fp, guard, force=force, log=log)
     out['neuron_layers'] = build_neuron_layers(guard, log=log)
-    if out['lang_atlas'] == 'computed' or out['neuron_layers']:   # 语言谱图或逐层摘要变了：数据包随之重建（版本含两者）
-        out['datapack'] = build_datapack(fp, guard, log=log)
+    try:
+        # Archive freshly built graphs BEFORE sealing their offline pack version.
+        # Otherwise the next unchanged cycle would discover them and rebuild the same pack again.
+        from deploy.research_library import sync
+        out['research_library_final'] = sync()
+    except Exception as exc:
+        log(f'[snapshots] research library final: {type(exc).__name__}: {exc}')
+    final_pack = build_datapack(fp, guard, log=log)
+    if final_pack != 'skipped':
+        out['datapack'] = final_pack
     try:                                               # 离线客户端的附加包：模式族实验响应、单元卡
         import datapack as DP
         from server import neuron_census_service as NS

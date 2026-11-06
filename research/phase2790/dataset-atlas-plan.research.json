@@ -1,0 +1,332 @@
+{
+  "client_pages": [
+    {
+      "behavior": "第一屏最多三张能力卡，只突出计划执行率。展开后分开显示有效行为格、留出复现、因果主张、反例及预测保真度；无测试显示“未测”，无分母显示“—”。",
+      "page": "进展",
+      "secondary": "总览 → 三种能力卡 → 点击看冻结分母和研究矩阵"
+    },
+    {
+      "behavior": "默认围绕语言模式与候选机制浏览；顶部模型快照、证据范围、语言/长度、数据来源过滤。点击节点开右栏，默认一句主张、证据状态和一个实例，详情再展开。参数页保留所有head/MLP阵列，布局距离不能冒充真实计算关系。",
+      "page": "空间",
+      "secondary": "语言图谱 / 参数结构 / 样本响应"
+    },
+    {
+      "behavior": "数据集列表负责来源、版本、质量、切分、任务队列；详情有“查看关联图谱”反向跳转。统一实时分析入口，通过样本与模型上下文打开空间响应，不再复制一套分析页面。",
+      "page": "研发",
+      "secondary": "计划与执行 / 数据与模板 / 证据审核"
+    },
+    {
+      "behavior": "资源与托管配置留在这里，研究材料和图谱不进入配置。贡献算力只执行注册任务类型、资源门与冻结任务包；本轮本机运行不标成多节点已复算。",
+      "page": "配置",
+      "secondary": "模型与节点 / 算力贡献 / 账号"
+    }
+  ],
+  "contracts": {
+    "artifact": [
+      "sha256",
+      "schema",
+      "producer_version",
+      "model_snapshot",
+      "run_id",
+      "source_lineage",
+      "storage_uri",
+      "size",
+      "available_offline",
+      "recompute_recipe"
+    ],
+    "claim": [
+      "claim_id",
+      "subject_feature_ids",
+      "external_pattern_ids",
+      "operational_scope",
+      "outcome_metric",
+      "design_sha256",
+      "run_ids",
+      "dataset_versions",
+      "independent_source_groups",
+      "split_type",
+      "effect_and_interval",
+      "negative_controls",
+      "content_gate",
+      "capability_gate",
+      "dose_curve",
+      "counterexample_artifacts",
+      "evidence_type",
+      "claim_status",
+      "audit_status"
+    ],
+    "dataset_version": [
+      "dataset_id",
+      "upstream_revision",
+      "source_url",
+      "license",
+      "redistribution_scope",
+      "content_sha256",
+      "schema_version",
+      "label_status",
+      "task_facets",
+      "available_languages"
+    ],
+    "dedup": "same document, translations, paraphrases and derivative datasets share source_group_id; splits and effective evidence counts use groups, not rows or dataset filenames",
+    "feature_identity": [
+      "model_snapshot_sha256",
+      "precision",
+      "layer",
+      "boundary",
+      "native_index",
+      "method_version",
+      "direction_or_dictionary_sha256",
+      "canonical_feature_id",
+      "native_locator_id"
+    ],
+    "migration": "append canonical aliases and claim mappings to existing immutable CAS; never rewrite old CAS or merge different model buckets; original links remain resolvable",
+    "sample_lineage": [
+      "sample_id",
+      "origin_document_id",
+      "source_group_id",
+      "content_sha256",
+      "parent_sample_ids",
+      "transform_version",
+      "raw_split",
+      "research_split",
+      "actual_token_ids",
+      "model_tokenizer_hash",
+      "readout_spans",
+      "factor_labels",
+      "annotation_source"
+    ],
+    "status_semantics": "supported_in_scope / not_supported / inconclusive / not_measured stay separate; execution/audit/evidence are separate dimensions; contradictory requires genuinely incompatible scoped propositions"
+  },
+  "created_at": "2026-11-04 00:06",
+  "current_case": {
+    "report_sha256": "61e9867a12a9a54fb6c21f606f0a8dfae66ed708bc48ee8d7211b246946b8af8",
+    "graph_sha256": "4df42c5b0f32ba1c2ca3715fe632616f1fb60858008f402b81e6786ae6173386",
+    "input_count": 96,
+    "generation_count": 384,
+    "families": 8,
+    "physical_nodes": 1,
+    "independent_intervention_tests": 1,
+    "scope": "exploratory externally AI-rated, not confirmatory mechanism evidence"
+  },
+  "dataset_candidates": [
+    {
+      "id": "CEVAL",
+      "name": "C-Eval",
+      "primary_source": "https://github.com/hkust-nlp/ceval",
+      "role": "综合知识与能力保持；按学科等权汇总，保留每域损伤，不作为内部特征本体。",
+      "status": "本轮复测既有监测题 100 道；未用作图谱发现语料"
+    },
+    {
+      "id": "MMLU",
+      "name": "MMLU",
+      "primary_source": "https://github.com/hendrycks/test",
+      "role": "与中文题池并列分层，不能把考试分数直接等同于语言机制。",
+      "status": "本轮复测既有监测题 100 道；未用作图谱发现语料"
+    },
+    {
+      "id": "GRAMMAR",
+      "name": "CLiMP / BLiMP",
+      "primary_source": "https://aclanthology.org/2021.eacl-main.242/",
+      "role": "中文、英文最小语法对照；原短句作为测量基线。扩成长文必须另建文法、核验含义和行为门，不能只补背景就称自然长文。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "BLIMP",
+      "name": "BLiMP",
+      "primary_source": "https://github.com/alexwarstadt/blimp",
+      "role": "英语语法对照与构式覆盖，结合自主标点、角色、否定和长距离文法。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "REASON",
+      "name": "GSM8K",
+      "primary_source": "https://github.com/openai/grade-school-math",
+      "role": "多步算术行为及内容保持；另建可控组合深度文法，不把现成解题标签当作内部电路。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "CODE",
+      "name": "HumanEval",
+      "primary_source": "https://github.com/openai/human-eval",
+      "role": "执行单元测试的代码行为保持；固定执行环境与沙盒，题目、变体按题族一起切分。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "TRANSLATION",
+      "name": "FLORES+",
+      "primary_source": "https://huggingface.co/datasets/openlanguagedata/flores_plus",
+      "role": "句子对齐的跨语言行为与表征比较；锁定HF revision，不把短句自动当作长篇翻译。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "NLI",
+      "name": "XNLI",
+      "primary_source": "https://github.com/facebookresearch/XNLI",
+      "role": "多语言蕴含、矛盾和中立的受控语义视角；不是因果推理全集。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "LONG",
+      "name": "LongBench v1",
+      "primary_source": "https://github.com/THUDM/LongBench",
+      "role": "自然较长上下文的外部效度补充；按原任务、文档来源、实际token长度和模型能力门筛选。v2很长且为选择题，不替代自然生成语域验收。",
+      "status": "建议接入；本轮未下载或运行"
+    },
+    {
+      "id": "MEDICAL",
+      "name": "CMExam",
+      "primary_source": "https://github.com/williamliujl/CMExam",
+      "role": "医学专业分层监测，限制在综合能力指标中的权重；不以大量医学题制造全域能力保持。",
+      "status": "本轮复测既有监测题 1900 道；未用作图谱发现语料"
+    }
+  ],
+  "decision": "graph-centric navigation with dataset provenance and reverse dataset workflow",
+  "fidelity_definition": {
+    "kl": "mean_t KL(p_model(.|prefix_t) || p_atlas(.|prefix_t)) on heldout source groups",
+    "loss_recovery": "(L_simple_baseline - L_atlas)/(L_simple_baseline - L_model), only defined if denominator>0; no clipping negative values",
+    "no_leakage": "predictor may access prefix and extracted graph only; cannot use target state, future answer tokens or a complete forward replay as explanation"
+  },
+  "implementation_status": "partial",
+  "job_contract_proposal": {
+    "evidence_boundary": "audit/transport success never promotes an intervention into a general language mechanism",
+    "input": [
+      "pinned_model_snapshot",
+      "frozen_corpus",
+      "style_rater_version",
+      "direction_sha256",
+      "selected_columns",
+      "dose_grid",
+      "controls",
+      "capability_monitor",
+      "resource_limits"
+    ],
+    "job_kind": "natural_register_intervention.v1",
+    "merge": "same design,model,precision,method; dedup shard; repeat=replica check, not new sample; disagreement quarantined",
+    "output": [
+      "full_output_text_and_token_ids",
+      "rater_scores",
+      "content_and_capability_scores",
+      "native_manifest",
+      "canary",
+      "edit_manifest",
+      "restoration_verification",
+      "provenance"
+    ],
+    "unit": "whole source family across frames/styles/lengths"
+  },
+  "kind": "proposal",
+  "principles": [
+    {
+      "description": "研究对象是语言规律与内部计算关系；同一规律应承接多种材料。同一数据集又可服务知识、推理、语法多个问题，不能各建一棵互不相连的本体。保留按数据集管理材料、质量与执行进度的反向入口。",
+      "title": "主入口围绕图谱，数据集作为证据维度"
+    },
+    {
+      "description": "外部层：词义、角色、关系、构式、任务、语境。内部层：模型特定的原生位置、字典特征、条件响应与计算路径。证据层：外部变量到内部对象、内部到输出的有类型主张。默认“规律→证据→数据”；研发支持“数据→任务→证据→图谱”。",
+      "title": "三个图层，两个浏览方向"
+    },
+    {
+      "description": "知识网络、分析推理（包括翻译、编程）、语法体系作为稳定导航。语言、语域、文体、领域、上下文长度和组合深度作为可重叠过滤项，不强制给每张卡唯一分类。",
+      "title": "三种能力是主分类，语域等是交叉条件"
+    },
+    {
+      "description": "原生定位对象由完整模型快照、精度、层、边界、原生索引确定；提取特征还须绑定方法、方向或字典内容哈希。运行ID属于证据记录，不应不断生成“同一神经元的新本体”。同一单元可参与多个特征，不能因索引相同就合并语义。",
+      "title": "对象身份与实验声明分离"
+    },
+    {
+      "description": "固定候选偏好与完整自然输出是不同观测目标。本次新主张不覆盖旧偏好结果；以同一候选写入操作关联两者，各自保存任务、指标、对照、反例与状态。联合10层的定位卡按1个独立干预计数。",
+      "title": "保留范围不同的正、负结果"
+    },
+    {
+      "description": "执行率、特征数、数据集数、图谱覆盖都不是破解百分比。最终检验只用提取图谱预测未见前缀的激活及下一token分布，相比词汇身份、位置、n-gram等简单基线增加多少保真度。模型原始输出是核对目标，完整重跑模型不是图谱解释。",
+      "title": "破解程度最终靠留出预测衡量"
+    }
+  ],
+  "revision": "usage-status-corrected-v2",
+  "roles": [
+    {
+      "materials": "经许可的真实长段落、对话、报告、代码及双语文本",
+      "purpose": "A引擎字典学习、激活普查、背景协方差",
+      "role": "自然发现库",
+      "rule": "按原文档与来源组切分；512/1024/2048起步，保留上下文完整性。SAE训练量按激活token预算与复现质量逐步扩大，不能用少量模板替代自然语料。"
+    },
+    {
+      "materials": "本项目生成式文法及经人审的语义等价重述",
+      "purpose": "B引擎变量映射、长度/句式/词汇混杂检验",
+      "role": "受控机制库",
+      "rule": "记录族、词表、构式、领域分别留出；自然语域必须先通过输出行为门，长度在同一家族内交叉，不只跨不同记录比较。"
+    },
+    {
+      "materials": "知识、推理、翻译、编程与语法公开基准",
+      "purpose": "能力保持与外部效度",
+      "role": "外部行为库",
+      "rule": "按任务分别计分、域内配对NI、域间等权宏平均；正式验收题不参与方向或剂量选择。保留污染未知、答案来源和许可状态。"
+    },
+    {
+      "materials": "本轮全部失败、未知判定、原对改错、独立节点复算",
+      "purpose": "驱动新文法与C引擎因果检验",
+      "role": "反例与复算库",
+      "rule": "反例发现后只能形成新版本预注册；同一确认集不能反复改阈值。重复使用的能力监测池明确标注已暴露。"
+    }
+  ],
+  "run_id": "P2790-REGISTER-PIPELINE-v1",
+  "schema": "research_dataset_atlas_plan.v1",
+  "sources_checked_date": "2026-11-04",
+  "stages": [
+    {
+      "stage": "A · 数据、候选操作与主张登记",
+      "status": "部分完成",
+      "work": "已登记11个数据版本；同一联合参数操作连接3个不同范围/指标的主张，保留原CAS及新别名。原文档、改写、翻译和派生数据须共用来源组；当前只完成已接入受控事实与题目哈希的精确去重。",
+      "acceptance": "新增材料必须带内容哈希、来源、许可、标签质量与家族切分。下一步补通用sample_lineage和跨库近重复审计；数据集数量不计破解进度。"
+    },
+    {
+      "stage": "B · 双AI测量与保义可靠性",
+      "status": "发现校准已完成，确认集未运行",
+      "work": "两种外部AI独立盲评84条旧输出/参考、32条语义控制和307条去重真实输出；本轮96输入、384生成。基线两种语域均可识别，但口语保义32/48。100条反例/分歧记录可回查。",
+      "acceptance": "下一版先按语域、领域分别预注册保义与自然性门，再冻结未见内容家族与句式。两位AI一致只表示AI口径可靠性，仍保留共同偏差与不确定性；用户暂无人工资源不阻断探索。"
+    },
+    {
+      "stage": "C · 自然前向特征发现、变量映射与计算边",
+      "status": "生成原场已完成，机制提取待执行",
+      "work": "已保留37层HiddenState、B18..27全部9728单元、5个提示位置和所有有效生成步。先在获许可自然长语料估计背景协方差并训练/接入SAE或transcoder；在等长多句式对照上检验特征，再按需追踪参数路径。",
+      "acceptance": "A字典候选、B留出选择性、C归因/干预各自登记，使用相同冻结快照和语料；hs[0]、位置、词汇、句长及随机标签基线齐全。先采集后重算，不将均值差当唯一发现算法。"
+    },
+    {
+      "stage": "D · 候选更新、自然生成剂量与能力保持",
+      "status": "旧候选已测试，范围未支持",
+      "work": "旧编辑alpha6未产生合格自然书面→口语翻转；原2200题监控在80块BF16编辑哈希逐字节一致后复用。固定候选正结果保留，但不迁移为自然生成成功。",
+      "acceptance": "新候选须从发现材料提取，确认集选剂量，锁箱最终验收；自然生成剂量网格、能量匹配列/范数匹配方向、完整保义与开放任务能力保持同时预注册。128内容家族、delta=.20、p_d=.5、alpha=.025，规划功效约.83；若任务/效应改变重算功效。"
+    },
+    {
+      "stage": "E · 分布式采集与交叉复算",
+      "status": "真实中心/节点闭环已完成，第二节点待测",
+      "work": "natural_register任务已进入选择任务类型、快照匹配、模板冻结、家族分片、CUDA执行、断点文件、分块上传与完成停止派发。此次8分片只有1台物理节点。",
+      "acceptance": "至少另一物理节点按同一快照/精度/runner复算；核对金丝雀、编辑哈希、生成和统计；异构数值差异预注册容差，不自动合并冲突。大原场留在节点，中心存哈希索引。"
+    },
+    {
+      "stage": "F · 图谱预测与跨模型复现",
+      "status": "未执行",
+      "work": "冻结已验证特征与有类型边，仅用图谱预测未见前缀的特征激活及next-token分布，与词汇身份、位置及n-gram基线比较。方法有效后依次扩展GLM4-9B、Qwen3-14B。",
+      "acceptance": "留出KL与损失恢复比例、失效样本和资源成本齐全；不能完整重跑原模型再称图谱解释。各模型坐标独立，不跨精度平均，CUDA模型顺序执行。"
+    }
+  ],
+  "supersedes_sha256": "82aef85571c22b11646b92528caa48683e27202769db427bb8be1eaa5577b1a8",
+  "provenance": {
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "git_dirty": true,
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 27732026,
+    "created_at": 1793776774.1631844
+  },
+  "implementation_artifacts": {
+    "catalog_endpoint": "/api/research-library/catalog",
+    "report_sha256": "61e9867a12a9a54fb6c21f606f0a8dfae66ed708bc48ee8d7211b246946b8af8",
+    "task_kind": "natural_register",
+    "template": "NAT-REGISTER-P2790-v1",
+    "reviews": [
+      "P2790-AI-calibration-v1",
+      "P2790-AI-semantic-controls-v1",
+      "P2790-AI-generation-v1"
+    ]
+  }
+}

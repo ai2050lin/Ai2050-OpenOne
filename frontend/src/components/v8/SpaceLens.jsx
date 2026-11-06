@@ -16,14 +16,25 @@ import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import LangPage from './LangPage.jsx';
 import LangAtlas from './LangAtlas.jsx';
-import LivePane from './LivePane.jsx';
+import LivePane from './MechanismTraceExplorer.jsx';
+import ResearchSpace from './ResearchSpace.jsx';
 import NeuronPane from './NeuronPane.jsx';
+import ParameterExplorer from './ParameterExplorer.jsx';
+import ModelStructure from './ModelStructure.jsx';
 import Tower from './Tower.jsx';
 import { OVERLAYS, READOUT_LABEL, defaultModel, fmtP, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
+import {GRAPH_LAYERS} from '../app/workbenchUtil.js';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
+const HistoricalActivations=lazy(()=>import('../app/rdc_fusion/NeuronSpace.jsx'));
+const HistoricalFidelity=lazy(()=>import('../app/rdc_fusion/FidelityMode.jsx'));
+
+function HistoricalPanel({kind}){
+  const [open,setOpen]=useState(false);
+  return <details className="v8-card" open={open} onToggle={e=>setOpen(e.currentTarget.open)}><summary>{kind==='activation'?'历史封存激活（独立数据源）':'历史图谱预测保真度（封存口径）'}</summary><p className="v8-note">此面板保留原始实验与模型口径，不自动绑定上方当前权重，也不将历史指标当作整体破解率。</p>{open&&<Suspense fallback={<Empty>读取历史实测…</Empty>}>{kind==='activation'?<HistoricalActivations/>:<HistoricalFidelity/>}</Suspense>}</details>;
+}
 
 const hsOf = tag => { const m = /@L(\d+)$/.exec(tag || ''); return m ? Number(m[1]) : null; };
 const toHs = (blockValues, n) => (blockValues ? [null, ...Array.from({ length: n }, (_, b) => blockValues[b] ?? null)] : null);
@@ -55,7 +66,24 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
-export default function SpaceLens({ view, setView, tm, setTm, localPack, model: gModel, ds = '', onDs }) {
+function GraphModes({ graphMode, onGraphMode }) {
+  return <section className="v8-card wb-object-modes"><div className="v6-toolbar" role="group" aria-label="图谱图层">{GRAPH_LAYERS.map(mode =>
+    <button type="button" className={'fw-tbtn' + (graphMode === mode.id ? ' primary' : '')} aria-pressed={graphMode === mode.id}
+      key={mode.id} onClick={() => onGraphMode?.(mode.id)}>{mode.label}</button>)}</div></section>;
+}
+
+export default function SpaceLens(props) {
+  if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
+    return <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
+      onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm}
+      historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/>;
+  }
+  return <SpaceDetailLens {...props} />;
+}
+
+function SpaceDetailLens({ view: routeView, graphMode='language', onGraphMode, paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
+  const view=routeView==='graph'?({language:'lang',internal:'research',relations:'relations'}[graphMode]||'lang'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
+  const modeBar=routeView==='graph'?<GraphModes graphMode={graphMode} onGraphMode={onGraphMode}/>:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
@@ -99,6 +127,13 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
   const set = patch => {
     const { page, tm: nextTm, ...rest } = patch;
     if (Object.keys(rest).length) patchSt(rest);
+    if(page==='neuron'&&Number.isInteger(rest.block)){
+      const url=new URL(window.location.href);
+      url.searchParams.set('sblock',String(rest.block+1));url.searchParams.set('smodule','mlp');
+      if(Number.isInteger(rest.unit))url.searchParams.set('sindex',String(rest.unit));else url.searchParams.delete('sindex');
+      for(const key of ['smode','scoord','prow','pcol'])url.searchParams.delete(key);
+      window.history.replaceState(window.history.state,'',url);
+    }
     if (page === 'neuron' || page === 'lang') setView(page);
     if (page === 'response') { setTm(nextTm || ''); setView('response'); }
     if (page === 'relations') setView('relations');   // 谱图关系：语言图谱内的入口（不再是一级 tab）
@@ -143,7 +178,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
     if (view === 'live') {
       const tr = liveTrace;
       let values = null;
-      if (tr) {
+      if (tr?.layers) {
         // 每块活动量 = 平均每个 token 的注意力总写出能量（Σ_h 头输出范数）；嵌入层 = 残差流入范数
         const act = tr.layers.map(l => l.heads.out_norm.reduce((s, row) => s + row.reduce((a, b) => a + b, 0), 0) / tr.n_tokens);
         const top = Math.max(...act, 1e-9);
@@ -152,7 +187,8 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
       }
       return { values, selected: liveStep, allowEmbedding: true, onPick: hs => setLiveStep(hs),
                valueLabel: '该块活动量',
-               color: tr ? `颜色 = 「${tr.model_name}」对这段输入的逐块活动量（注意力总写出能量，归一化）`
+               modules: MODS, onPickModule: hs => setLiveStep(hs),
+               color: tr?.schema==='mechanism_trace.v1' ? '原生层序索引；右侧显示选定读出的完整计算阵列' : tr ? `颜色 = 「${tr.model_name}」对这段输入的逐块活动量（注意力总写出能量，归一化）`
                          : '颜色 = 运行实时分析后按各块活动量着色',
                click: '点击 = 跳到该层（嵌入层 / 块 / 输出头）' };
     }
@@ -194,14 +230,17 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
   }
   const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
-  const showTower = view === 'neuron' || view === 'lang' || view === 'response' || view === 'live';   // 谱图关系、本地包不需要层结构
+  const showTower = view === 'neuron' || view === 'lang' || view === 'response';   // 原生运行页自带按真实快照绘制的3D结构
 
   /* 布局：需要层结构的 tab 一律左右分栏（塔在左，内容在右）。神经元页右栏常驻，
      不再有「只有塔」的单列态——单列时右边是空白，而块细节本来就是这一页要看的东西。 */
   const split = showTower;
 
+  if (view === 'parameters') return <>{modeBar}<ParameterExplorer researchModel={gModel || model} /><HistoricalPanel kind="activation"/></>;
+  if (view === 'live') return <LivePane/>;
+  if (view === 'research') return <>{modeBar}<ResearchSpace/></>;
   return (
-    <div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
+    <>{modeBar}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
       {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">
@@ -242,7 +281,7 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
                  allowEmbedding={cfg.allowEmbedding} valueLabel={cfg.valueLabel} markLabel={cfg.markLabel}
                  edges={edges} target={target} height={edges ? 820 : 740}
                  focusKey={edges ? `${block}:${st.unit}` : ''}
-                 caption={`${view === 'live' && liveTrace ? liveTrace.model_name : shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
+                 caption={`${view === 'live' && liveTrace ? (liveTrace.model_name||'已核验快照') : shortModel(model)} 的 ${nLayers} 个块：${cfg.color}`} />
         ) : <Empty>没有模型骨架数据。</Empty>}
         {arch && (
           <div className="v8-archbox" title={arch.source ? `结构参数来源：${arch.source}` : ''}>
@@ -304,15 +343,15 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
               {st.ltab === 'items'
                 ? <LangPage compact tree={tree} model={model} skeleton={skeleton} st={st} set={set}
                             layer={st.lblock} onLayer={hs => patchSt({ lblock: hs })} />
-                : <LangAtlas ds={ds} onDs={onDs} />}
+                : <LangAtlas ds={ds} onDs={onDs} researchModel={model} />}
             </div>
           )}
           {view === 'live' && <LivePane census={census} skeleton={skeleton} tower={tower}
                                         trace={liveTrace} setTrace={setLiveTrace} step={liveStep} setStep={setLiveStep} />}
           {view === 'response' && (
-            <ResponseExplorer key={`${respTm}|${model}`} initialTm={respTm || undefined} initialBucket={model || undefined}
+            <><ResponseExplorer key={`${respTm}|${model}`} initialTm={respTm || undefined} initialBucket={model || undefined}
                               syncLayer={syncTag} onLayer={tag => { const h = hsOf(tag); if (h != null) patchSt({ rlayer: h }); }}
-                              onContext={({ tm: t }) => { setTm(t); patchSt({ rlayer: null }); }} />
+                              onContext={({ tm: t }) => { setTm(t); patchSt({ rlayer: null }); }} /><HistoricalPanel kind="fidelity"/></>
           )}
           {view === 'relations' && (
             <div className="v8-atlaswrap">
@@ -321,12 +360,12 @@ export default function SpaceLens({ view, setView, tm, setTm, localPack, model: 
                 <b>谱图关系</b>
                 <span>跨模式族的共享编码轴、概念假设与跨模型一致性；点击一个族回到响应点云看证据</span>
               </div>
-              <AtlasView snapshot onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />
+              <AtlasView snapshot modelKey={model} onModelChange={onModel} onOpenFamily={({ tm: t }) => { setTm(t); setView('response'); }} />
             </div>
           )}
           {view === 'local' && localPack}
         </Suspense>
       </section>
-    </div>
+    </div></>
   );
 }

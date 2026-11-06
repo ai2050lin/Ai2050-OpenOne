@@ -19,17 +19,17 @@ export function CopyButton({ text, label = '复制' }) {
   );
 }
 
-function ItemCard({ item, onGo, onAutotest, onStudio }) {
+export function CatalogItemDetails({ item, onGo, onAutotest, onStudio, embedded = false }) {
   const [open, setOpen] = useState(false);
   const [icon, label] = STATUS_META[item.status] || ['na', item.status_label];
   const concepts = Object.entries(item.concepts || {});
   return (
     <article className={'v6-cat-item ' + item.status}>
-      <header>
+      {!embedded && <header>
         <StatusPill status={icon} label={label} />
         <b><span className="mono">{item.id}</span> {item.name}</b>
         {item.protocol === 'legacy' && <span className="v6-pill muted">legacy</span>}
-      </header>
+      </header>}
       {item.description && <p className="v6-cat-desc">{item.description}</p>}
       <div className="v6-cat-meta">
         {item.factors?.length > 0 && <span>因子 <b>{item.factors.join(' × ')}</b></span>}
@@ -54,7 +54,7 @@ function ItemCard({ item, onGo, onAutotest, onStudio }) {
                 <td>{m.shards_present != null ? <StatusPill status={m.complete ? 'done' : 'partial'} label={`${m.shards_present}/${m.shards_expected}`} /> : '—'}</td>
                 <td className="num">{m.behavior_cells ? `${m.behavior_pass}/${m.behavior_cells} 格` : '—'}</td>
                 <td className="v6-cat-act">
-                  {item.protocol === 'v3' && m.has_agg && <button type="button" className="fw-tbtn ghost" onClick={() => onGo?.('spatial', null, undefined, { tm: item.tm_id, bucket: m.bucket })}>查看 3D</button>}
+                  {item.protocol === 'v3' && m.has_agg && <button type="button" className="fw-tbtn ghost" onClick={() => onGo?.('spatial', 'response', undefined, { tm: item.tm_id, mdl: m.bucket })}>查看 3D</button>}
                   {m.download && m.has_agg && <a className="fw-tbtn ghost" href={packUrl(item.tm_id, m.bucket)} download={packFile(item.tm_id, m.bucket)}>研究包 ↓</a>}
                 </td>
               </tr>
@@ -171,7 +171,7 @@ export default function CatalogPanel({ onGo, onAutotest, onStudio }) {
           </div>
           {!items.length && <Empty>没有符合条件的题目。</Empty>}
           <div className="v6-cat-grid">
-            {items.map(it => <ItemCard key={it.id} item={it} onGo={onGo} onAutotest={onAutotest} onStudio={onStudio} />)}
+            {items.map(it => <CatalogItemDetails key={it.id} item={it} onGo={onGo} onAutotest={onAutotest} onStudio={onStudio} />)}
           </div>
         </div>
       </div>

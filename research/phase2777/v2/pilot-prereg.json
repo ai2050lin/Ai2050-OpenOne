@@ -1,0 +1,32 @@
+{
+  "schema": "natural_pilot.v1",
+  "run_id": "P2777-W6-NATURAL-v2",
+  "kind": "real",
+  "registered_at": 1793769270.311499,
+  "rows": 32,
+  "families": 8,
+  "frames": [
+    0,
+    1
+  ],
+  "lengths": [
+    384,
+    512
+  ],
+  "generation": "greedy,160 new tokens,batch8,no thinking",
+  "no_future_holdout_access": true,
+  "calibration": "blind original Qwen (both letter orders) AND frozen whole-output linguistic rubric",
+  "pilot_gate": "per-register style agreement >=0.70, automatic content >=0.75 overall, reference both raters >=0.85; failed cells are not positive mechanism evidence",
+  "budget_seconds": 600,
+  "legacy_edit": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "material_sha256": "2a9d2d3ae6d93f23ca414180716c80a6b342dd559950a7a8fab6099e5f99da6e",
+  "engine_sha256": "0869729055e73f5d741dbaf8815b1a384b6480d5175529fddc53a9d33d5e3f60",
+  "prior_failed_pilot": "P2777-W6-NATURAL-v1: natural continuation did not instantiate requested register; original files retained",
+  "task": "explicit output-register request with identical neutral source facts and supplied verified result; not an arithmetic task",
+  "script_sha256": "d5f656806cb325d05e12b2296a786ea82dec8d12b156b6d2185c39f008cb4f3b",
+  "scoring_limits": "authored reference, same-base-model judge; no human or external independent model claim"
+}

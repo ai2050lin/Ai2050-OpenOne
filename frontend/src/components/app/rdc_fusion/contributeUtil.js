@@ -47,7 +47,7 @@ export async function nodeCall(method, path, body) {
 }
 
 /* 监护状态（主进程推送）+ 节点状态与日志（每 2 秒读一次本机接口，不访问中心） */
-export function useNode() {
+export function useNode({ withLogs = true } = {}) {
   const bridge = nodeBridge();
   const [sup, setSup] = useState(null);
   const [status, setStatus] = useState(null);
@@ -70,6 +70,7 @@ export function useNode() {
       const s = await nodeCall('GET', '/status');
       setStatus(s);
       setError('');
+      if (!withLogs) return;
       let fresh = false;
       if (port !== lastPort.current || s.log_seq < seq.current) {   // 换了一个服务进程：日志从头读
         lastPort.current = port;
@@ -82,7 +83,7 @@ export function useNode() {
     } catch (e) {
       setError(e.message);
     }
-  }, []);
+  }, [withLogs]);
 
   useEffect(() => {
     if (!live) return undefined;
@@ -108,7 +109,7 @@ export const SUP_STATE = {
   stopped: '已停止', 'no-python': '没有找到 Python', 'no-script': '安装包缺少节点程序', failed: '出错',
 };
 
-export const TASK_KIND_LABEL = { census_shard: '神经元普查分片', family_test: '模式族测试' };
+export const TASK_KIND_LABEL = { census_shard: '神经元普查分片', family_test: '模式族测试', natural_register:'自然生成与语域干预' };
 
 export const RESULT_LABEL = {
   accepted: ['✓', '中心校验通过', 'good'], done: ['✓', '已上传', 'good'],

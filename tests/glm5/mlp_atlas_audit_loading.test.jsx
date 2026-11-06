@@ -1,0 +1,11 @@
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';
+import React,{act} from '../../frontend/node_modules/react/index.js';
+import {createRoot} from '../../frontend/node_modules/react-dom/client.js';
+import Audit from '../../frontend/src/components/v8/MlpParameterAuditReport.jsx';
+const fixture=vi.hoisted(()=>({ready:false}));
+vi.mock('../../frontend/src/components/app/rdc_fusion/api.js',()=>({useApi:(path)=>({data:fixture.ready&&path.includes('/layers/')?{Gate_term_RMS:[Array(9728).fill(.1),Array(9728).fill(.2)]}:null})}));
+let host,root,canvas;
+beforeEach(()=>{fixture.ready=false;globalThis.IS_REACT_ACT_ENVIRONMENT=true;host=document.createElement('div');document.body.append(host);root=createRoot(host);canvas=vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockImplementation(()=>new Proxy({},{get:()=>()=>{}}))});
+afterEach(async()=>{await act(async()=>root.unmount());host.remove();canvas.mockRestore()});
+it('renders real loading state before an asynchronous whole-unit audit arrives',async()=>{await act(async()=>root.render(<Audit doc={{}}/>));expect(host.textContent).toContain('读取当前层全部9728单元');expect(host.querySelector('canvas')).toBeNull()});
+it('then shows every native unit with the real canvas components',async()=>{await act(async()=>root.render(<Audit doc={{}}/>));fixture.ready=true;await act(async()=>root.render(<Audit doc={{}}/>));expect(host.querySelector('canvas[aria-label="全部9728单元参数来源审计，全部9728维，未进行TopK截断"]')).not.toBeNull();expect(host.textContent).not.toContain('读取当前层全部9728单元')});

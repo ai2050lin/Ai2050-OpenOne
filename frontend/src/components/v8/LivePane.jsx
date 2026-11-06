@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { GRADE_COLOR, seq } from './v8Util.js';
+import MechanismTraceExplorer from './MechanismTraceExplorer.jsx';
 
 async function api(base, path, opts) {
   const res = await fetch(`${base}${path}`, {
@@ -60,7 +61,7 @@ function Heatmap({ rows, label }) {
 
 const stepLabel = (step, L) => (step === 0 ? '嵌入层 hs[0]' : step <= L ? `块 ${step - 1}（输出 hs[${step}]）` : '输出头');
 
-export default function LivePane({ census, trace, setTrace, step, setStep }) {
+export function LegacyLivePane({ census, trace, setTrace, step, setStep }) {
   const [text, setText] = useState('The capital of France is');
   const [maxTokens, setMaxTokens] = useState(24);
   const [status, setStatus] = useState(null);
@@ -375,3 +376,5 @@ export default function LivePane({ census, trace, setTrace, step, setStep }) {
     </div>
   );
 }
+
+export default function LivePane(){return <MechanismTraceExplorer/>;}

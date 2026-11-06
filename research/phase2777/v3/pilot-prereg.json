@@ -1,0 +1,32 @@
+{
+  "schema": "natural_pilot.v1",
+  "run_id": "P2777-W6-NATURAL-v3",
+  "kind": "real",
+  "registered_at": 1793769529.4098716,
+  "rows": 32,
+  "families": 8,
+  "frames": [
+    0,
+    1
+  ],
+  "lengths": [
+    384,
+    512
+  ],
+  "generation": "greedy,160 new tokens,batch8,no thinking",
+  "no_future_holdout_access": true,
+  "calibration": "blind original Qwen (both letter orders) AND frozen whole-output linguistic rubric",
+  "pilot_gate": "per-register style agreement >=0.70, automatic content >=0.75 overall, reference both raters >=0.85; failed cells are not positive mechanism evidence",
+  "budget_seconds": 600,
+  "legacy_edit": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "material_sha256": "ff1435362cd832823cd7c25af9414816e293b58d658a162bdca5ba0c620c736a",
+  "engine_sha256": "0869729055e73f5d741dbaf8815b1a384b6480d5175529fddc53a9d33d5e3f60",
+  "prior_failed_pilot": "v1 continuation failed; v2 explicit neutral request still did not yield clear whole-output spoken register; all files retained",
+  "task": "explicit output-register request with identical neutral source facts and supplied verified result; not an arithmetic task",
+  "script_sha256": "8ebba7e80438bcc2ded431ff31f3b3ce104d542dff981db0c9b8a541d9c09f48",
+  "scoring_limits": "authored reference, same-base-model judge; no human or external independent model claim"
+}

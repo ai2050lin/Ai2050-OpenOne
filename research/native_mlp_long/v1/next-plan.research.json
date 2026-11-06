@@ -1,0 +1,49 @@
+{
+  "budget": "Reuse12GiB local raw arrays. A fresh run requires own immutable material/power/resource contract; no unattended infinite loop.",
+  "kind": "proposal",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "previous_negative_results_retained": true,
+  "prospective_size_example": {
+    "expected_delta": 0.2,
+    "max_unit_hypotheses": 16,
+    "n_independent_document_pairs": 512,
+    "power": {
+      "achieved_power": 1.0,
+      "expected_delta_pt": 20.0,
+      "n": 512,
+      "n_required": 109,
+      "p_d": 0.3,
+      "pass": true
+    },
+    "status": "planning_example_not_frozen_experiment"
+  },
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 28112026
+  },
+  "run_id": "NMLP-LONG-20261104-v1",
+  "schema": "research_native_mlp_next_plan.v1",
+  "status": "proposed_not_executed",
+  "tasks": [
+    {
+      "detail": "复用本轮逐token原场，优先在可见前缀≥512处寻找正极、负极、肩部及弱响应，单独保留早位置探索；只用发现集提出8–16个单元假设，按词汇、位置和文档来源控制。AI标签属于未检验假设。",
+      "title": "自然长前缀两极与语义假设"
+    },
+    {
+      "detail": "冻结新文档行组与未见实体/句式；同时含关键词但不满足功能、无关键词但满足功能。先校准模型行为，G、V、A分开预测；重要测试按文档家族分组，正式规模与功效先冻结，不使用本轮确认或锁箱重新选规则。",
+      "title": "功能解释必须预测新例和近似反例"
+    },
+    {
+      "detail": "比较词汇/位置、前缀n-gram、关系/句式因子、原生读方向，以及同预算SAE/transcoder；统一训练和全新测试材料。以留出激活误差、完整词表KL和未解释残差衡量增量，不以标签数量计进度。",
+      "title": "同预算提取方法比较"
+    },
+    {
+      "detail": "沿真实Attention来源、RMS归一化、gate/up/down及下游消费定位；区分当前query与历史位置作用，以剂量、严格能量随机和能力保持复核。先闭合一条小子图，再注册可哈希分片与独立节点复算，最后顺序扩GLM4和Qwen3-14B。",
+      "title": "跨token读写路径与分布式复算"
+    }
+  ],
+  "title": "从可检索两极走向可预测语义与真实读写子图"
+}

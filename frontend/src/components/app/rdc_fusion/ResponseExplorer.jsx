@@ -375,7 +375,7 @@ function LegacyResults({ tm }) {
 }
 
 /* syncLayer（可选）：外部（研究工作台 · 空间的层塔）选中的层标签，变化时同步；onLayer：层选择变化时回报给外部 */
-export default function ResponseExplorer({ initialTm, initialBucket, initialLayer, syncLayer, onLayer, onContext }) {
+export default function ResponseExplorer({ initialTm, initialBucket, initialLayer, syncLayer, onLayer, onContext, strictBucket=false }) {
   const templates = useApi('/api/templates');
   const list = (templates.data?.templates || []).slice().sort((a, b) =>
     (a.protocol === 'v3' ? 0 : 1) - (b.protocol === 'v3' ? 0 : 1) || a.tm_id.localeCompare(b.tm_id));
@@ -386,7 +386,8 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
   const [gate, setGate] = useState(true);
   const agg = useApi(tm && isV3 ? `/api/agg/${encodeURIComponent(tm)}/v2?gate=${gate}` : null);
   const [bucketPick, setBucketPick] = useState(initialBucket || '');
-  const buckets = agg.data?.buckets || [];
+  const allBuckets = agg.data?.buckets || [];
+  const buckets = allBuckets.filter(b => !strictBucket || b.bucket === initialBucket);
   const bucket = buckets.find(b => b.bucket === bucketPick) || buckets.find(b => b.agg && b.complete) || buckets.find(b => b.agg) || buckets[0];
   const [view, setView] = useState('space3d');
   const [method, setMethod] = useState('');
@@ -399,7 +400,9 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
   const [split, setSplit] = useState('discovery');
   const [colorFactor, setColorFactor] = useState('');
   const layers = bucket?.agg?.layers || [];
-  const layerTag = layers.find(l => l.tag === layerPick)?.tag || layers[layers.length - 1]?.tag;
+  const layerSuffix=/@L\d+$/.exec(syncLayer || '')?.[0];
+  const layerTag = layers.find(l => l.tag === layerPick)?.tag ||
+    (strictBucket&&layerSuffix?layers.find(l=>l.tag.endsWith(layerSuffix))?.tag:layers.at(-1)?.tag);
   const layer = layers.find(l => l.tag === layerTag);
   const factors = agg.data?.factors || tpl?.factors || [];
   const wantAnalysis = isV3 && bucket?.agg && (view === 'space3d' || view === 'findings');
@@ -422,19 +425,21 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
       <div className="v6-toolbar">
         <label>模板
           <select value={tm} onChange={event => choose(event.target.value)}>
+            {picked&&!tpl&&<option value={picked}>{picked} · 未找到模板</option>}
             {list.map(t => <option key={t.tm_id} value={t.tm_id}>{t.tm_id} · {t.name}{t.protocol === 'v3' ? '' : '（legacy）'}</option>)}
           </select>
         </label>
         {isV3 && (
           <>
             <label>模型桶
-              <select value={bucket?.bucket || ''} onChange={event => setBucketPick(event.target.value)} disabled={!buckets.length}>
-                {!buckets.length && <option value="">无合并结果</option>}
+              <select value={bucket?.bucket || ''} onChange={event => setBucketPick(event.target.value)} disabled={strictBucket||!buckets.length}>
+                {!buckets.length && <option value="">{strictBucket?'当前模型桶无数据':'无合并结果'}</option>}
                 {buckets.map(b => <option key={b.bucket} value={b.bucket}>{b.bucket}{b.complete ? '' : `（分片 ${b.shards_present.length}/${b.shards_expected}）`}</option>)}
               </select>
             </label>
             <label>层
               <select value={layerTag || ''} onChange={event => setLayerPick(event.target.value)} disabled={!layers.length || (view === 'space3d' && methodV === 'stack')}>
+                {!layerTag&&<option value="">当前层无数据</option>}
                 {layers.map(l => <option key={l.tag} value={l.tag}>{l.tag}</option>)}
               </select>
             </label>
@@ -497,15 +502,21 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
         </div>
       )}
 
-      {!isV3 && tm && <Card title="legacy 结果"><LegacyResults tm={tm} /></Card>}
+      {picked&&!tpl&&<Empty>当前数据源中没有此链接指定的模板。请选择其他模板。</Empty>}
+      {!isV3 && tpl && <Card title="历史单节点结果">
+        {strictBucket&&<p className="v6-note">旧模板未提供可核对的模型桶。下列结果保留各自的模型，不联动上方原生索引。</p>}
+        <LegacyResults key={tm} tm={tm} />
+      </Card>}
       {isV3 && (
         <>
           <Tabs tabs={VIEWS} value={view} onChange={setView} label="实验响应视图" />
           {!agg.data && <Empty>{agg.error ? `合并统计读取失败（${agg.error}）` : '合并统计计算中…'}</Empty>}
           {!agg.data && <ExtraPackPrompt pack={agg.missingPack} />}
-          {agg.data && !bucket && <Empty>该模板还没有 real 结果。去「研发 · 分发」领取分片任务后，这里显示跨节点合并统计。</Empty>}
+          {agg.data && !bucket && <Empty>{strictBucket?'该模板尚无当前模型桶的合并结果。':'该模板还没有 real 结果。去「研发 · 分发」领取分片任务后，这里显示跨节点合并统计。'}</Empty>}
           {bucket && !bucket.agg && <Empty>该桶的结果全部被排除（{bucket.excluded.map(e => e.reason).join('、') || '无可合并统计'}）。</Empty>}
-          {bucket?.agg && (
+          {bucket?.agg && !layerTag && view!=='models' && <Empty>该模板未采集当前层。</Empty>}
+          {view === 'models' && agg.data && <Card><CrossModel buckets={allBuckets} factors={factors} /></Card>}
+          {bucket?.agg && layerTag && (
             <Card>
               {(view === 'space3d' || view === 'findings') && !an && (
                 <>
@@ -534,7 +545,6 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
               {view === 'eta' && <EtaProfile tm={tm} bucket={bucket.bucket} agg={bucket.agg} layerTag={layerTag} split={split} />}
               {view === 'structure' && <ConditionStructure layer={layer} colorFactor={colorFactor || factors[0]} />}
               {view === 'replication' && <Replication agg={bucket.agg} prereg={agg.data.prereg} />}
-              {view === 'models' && <CrossModel buckets={buckets} factors={factors} />}
               {view === 'behavior' && <BehaviorTable bucket={bucket} />}
             </Card>
           )}

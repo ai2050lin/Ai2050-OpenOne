@@ -1,0 +1,153 @@
+{
+  "schema": "research_workpackage.v1",
+  "kind": "real",
+  "run_id": "P2773-W6-REGISTER-v2",
+  "title": "W6 v2 · 语域权重编辑与能力保持真实闭环",
+  "stages": {
+    "freeze": {
+      "state": "done",
+      "time": 1793763684.880281,
+      "families": 300,
+      "samples": 600,
+      "length_range": [
+        284,
+        333
+      ],
+      "capability_n": 2340,
+      "power": {
+        "primary": {
+          "expected_delta_pt": 20.0,
+          "n": 160,
+          "p_d": 0.5,
+          "n_required": 99,
+          "achieved_power": 0.947,
+          "pass": true
+        },
+        "capability_difference_planning": {
+          "expected_delta_pt": 2.0,
+          "n": 2200,
+          "p_d": 0.1,
+          "n_required": 1963,
+          "achieved_power": 0.843,
+          "pass": true
+        },
+        "ni_conservative_zero_gain_design": {
+          "margin": 0.02,
+          "expected_loss": 0.005,
+          "n": 2200,
+          "note": "exact binomial rejection/power computed in statistical verification; CI may remain inconclusive",
+          "loss_cutoff": 31,
+          "power": 0.9999998190657136,
+          "null_type1_upper": 0.0239334820781288
+        }
+      }
+    },
+    "pilot": {
+      "state": "done",
+      "time": 1793764032.6029098,
+      "kind": "real",
+      "n": 8,
+      "seconds": 0.9837002754211426,
+      "scores": [
+        [
+          -53.339683532714844,
+          -25.0707950592041
+        ],
+        [
+          -47.29160690307617,
+          -25.050369262695312
+        ],
+        [
+          -53.543800354003906,
+          -23.342466354370117
+        ],
+        [
+          -49.013938903808594,
+          -24.44301986694336
+        ],
+        [
+          -52.122005462646484,
+          -22.264265060424805
+        ],
+        [
+          -41.03262710571289,
+          -19.002214431762695
+        ],
+        [
+          -50.09868621826172,
+          -20.63832664489746
+        ],
+        [
+          -43.57891845703125,
+          -21.944686889648438
+        ]
+      ],
+      "register_choice_accuracy": 0.5,
+      "env": {
+        "torch": "2.13.0+cu130",
+        "transformers": "5.14.1",
+        "device": "NVIDIA GeForce RTX 5080",
+        "precision": "bf16",
+        "attention": "sdpa",
+        "batch": 4,
+        "padding": "left",
+        "thinking": false,
+        "seed": 27732026
+      },
+      "note": "Readout gate is reported, not used to retune after freeze; both outcomes retained"
+    },
+    "collection": {
+      "state": "done",
+      "time": 1793764033.4438949,
+      "samples": 600,
+      "native_manifest_sha256": "7ccde720c868354e0727bc130ac7c0afab5b5915af38c6c4f95106d7389c3e7f"
+    },
+    "discovery": {
+      "state": "done",
+      "time": 1793764034.6335309,
+      "config": {
+        "k": 9728,
+        "alpha": 6.0,
+        "control": "target"
+      },
+      "candidates": 24
+    },
+    "validation": {
+      "state": "not_supported",
+      "time": 1793764107.9153636,
+      "verdict": "not_supported_in_preregistered_scope",
+      "counterexamples": 260
+    },
+    "capability": {
+      "state": "done",
+      "time": 1793764107.9080229,
+      "n": 2200,
+      "base_accuracy": 0.6854545454545454,
+      "edited_accuracy": 0.6809090909090909,
+      "losses": 55,
+      "gains": 45,
+      "net_loss": 0.004545454545454519,
+      "loss_interval": [
+        -0.008387243309579774,
+        0.01745995595831695
+      ],
+      "margin": 0.02,
+      "status": "noninferior",
+      "method": "Bonferroni simultaneous Clopper-Pearson loss/gain bounds, confidence >=95%"
+    },
+    "registration_validated": {
+      "state": "done",
+      "time": 1793764314.869233,
+      "run_id": "P2773-W6-REGISTER-v2",
+      "report_sha256": "c02c9bbbe1bd10e28fd8a44e4eaa81989d29974e3a67691fcd7e8eab5fe2cd5a",
+      "graph_sha256": "4d7cad4a0910f015397e722f5d9c381acaf2ff511b74acbed8318e135b1bc806",
+      "feature_id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:W6v2:P2773-W6-REGISTER-v2",
+      "client_url": "http://127.0.0.1:5173/workbench?lens=process&station=plan&run=P2773-W6-REGISTER-v2",
+      "features": 10,
+      "edges": 10,
+      "source": "local real CUDA; not remote distributed replication"
+    }
+  },
+  "updated_at": 1793764314.869234,
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+}

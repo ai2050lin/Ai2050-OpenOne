@@ -1,18 +1,22 @@
-/* 研究工作台 · 进展：内容按 tab 渲染（?rtab=neuron|lang；页签本身在 Workbench 的顶部子导航，
+/* 研究工作台 · 进展：内容按 tab 渲染（页签本身在 Workbench 的顶部子导航，
    与空间/研发共用同一个 SubNav 组件与 .wb-subnav 样式）。
    神经元逆向分析进展：数据派生的一句话进展 + 全景剖面图（四条轨道共用同一横轴：分型构成 / 强激活率 /
    已解释 / 模板选择性，一列 = 一个块，点击进入该块）。
-   语言图谱进展：图谱测试题（C-Eval 数据集对本机模型的实测正确率）+ 大类 × 等级的覆盖 +
-   语言项 × 模型的等级矩阵 + 研究缺口。
+   语言图谱覆盖：按模型显示已有数据、留出复现和待补条目，题库实测与矩阵按需展开。
    各来源分开计数，不拼成转化率；全部读取来自本机数据包。 */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
+import { publishResearchContext } from '../app/researchContext.js';
 import RouteBoard from '../app/rdc_fusion/RouteBoard.jsx';
 import { API_BASE, postJson, useApi } from '../app/rdc_fusion/api.js';
 import { Card, Empty } from '../app/rdc_fusion/ui.jsx';
 import '../app/workbench.css';
 import { LevelChip } from './LangPage.jsx';
+import LanguageCatalog from './LanguageCatalog.jsx';
 import RuleLedgerPage from './RuleLedgerPage.jsx';
+import ResearchOverview from './ResearchOverview.jsx';
+import ResearchLibrary from './ResearchLibrary.jsx';
+import ResearchDisclosure from './ResearchDisclosure.jsx';
 import { LEVELS, GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, defaultModel, itemLevel, levelMeta, shortModel } from './v8Util.js';
 import './v8.css';
 
@@ -221,7 +225,7 @@ function LangBench({ dsId, dsRow, model }) {
     return () => { dead = true; window.clearInterval(timer.current); };
   }, [active]);
 
-  if (ov.loading) return null;
+  if (ov.loading) return <p className="v8-note">读取题库与实测记录…</p>;
   if (ov.error) return <Empty>图谱测试题数据读取失败：{ov.error}</Empty>;
   const data = ov.data;
   if (!data || !data.available) {
@@ -269,7 +273,7 @@ function LangBench({ dsId, dsRow, model }) {
       <div className="v8-bench">
         <h4 className="v8-h4" style={{ margin: 0 }}>图谱测试题 <small>生成式模板族不参与这一栏</small></h4>
         <p className="v8-note">模板族（ENT-XF / GR-NEG / GR-Q / GR-ROLE / KN-ATTR / KN-ISA）是生成式对照材料，不是选择题，
-          没有「正确率」这个口径。它的进展看下方每条语言规律的读出等级。要跑题库实测，把上方的数据集换成 C-Eval / MMLU / M3Exam。</p>
+          可从上方覆盖卡片查看逐项读出等级。题库实测使用选择题数据集。</p>
       </div>
     );
   }
@@ -350,9 +354,9 @@ function LangBench({ dsId, dsRow, model }) {
               );
             })}
           </div>
-          <div className="v8-prog-list" style={{ marginTop: 10 }}>
-            <div>
-              <div className="v8-prog-catname">分科目正确率</div>
+          <details>
+            <summary>分科目正确率与评测方法</summary>
+            <div className="v8-prog-list" style={{ marginTop: 10 }}>
               {Object.entries(result.by_subject || {}).map(([name, v]) => (
                 <div key={name} className="v8-prog-row" style={{ cursor: 'default' }}>
                   <span className="v8-prog-name">{name}</span>
@@ -362,9 +366,8 @@ function LangBench({ dsId, dsRow, model }) {
                 </div>
               ))}
             </div>
-          </div>
-          <p className="v8-note">评测方式：零样本，每题一次前向，在「答案：」位置比较各选项字母的 next-token 概率
-            （与官方 loglikelihood 评分同前缀等价）。结果按（数据集, 模型）分开存，换数据集或换模型不会互相覆盖。</p>
+            <p className="v8-note">零样本评测，每题一次前向，在「答案：」位置比较各选项字母的 next-token 概率。结果按数据集与模型分别保存。</p>
+          </details>
         </>
       ) : (
         <p className="v8-note">{running ? '各大类正确率将随实测进度实时出现。'
@@ -383,199 +386,167 @@ function LangBench({ dsId, dsRow, model }) {
   );
 }
 
-function LangProgress({ tree, model, dsId, dsRow, onOpenItem }) {
-  const models = tree.models || [];
-  const lv = it => itemLevel(it, model);
-  const gaps = tree.items.filter(it => lv(it) === 0);
-  const nHas = tree.items.filter(it => lv(it) >= 1).length;
-  const nHeld = tree.items.filter(it => lv(it) >= 3).length;
-  const nItems = tree.items.length || 1;
-  const pct = n => `${Math.round((n / nItems) * 100)}%`;
-  /* 大类置顶排序：知识网络、功能推理、语法规则在最前，其余按原顺序跟随 */
-  const CAT_FIRST = ['知识网络', '功能推理', '语法规则'];
-  const orderedTypes = [
-    ...CAT_FIRST.map(id => tree.types.find(t => t.id === id || t.name === id)).filter(Boolean),
-    ...tree.types.filter(t => !CAT_FIRST.includes(t.id) && !CAT_FIRST.includes(t.name)),
+function DatasetBench({ dataset, model, onDataset }) {
+  const catalog = useApi('/api/lang/atlas/datasets');
+  const options = (catalog.data?.datasets || []).filter(entry => entry.n_questions > 0);
+  const picked = dataset ? options.find(entry => entry.id === dataset) : options.find(entry => entry.testable) || options[0];
+  const dsId = dataset || picked?.id || '';
+  const testableN = picked ? Object.values(picked.by_category || {}).reduce((count, entry) => count + (entry.n || 0), 0) : null;
+  return <>
+    <label className="v8-coverage-model">评测数据集
+      <select aria-label="评测数据集" value={dsId} onChange={event => onDataset(event.target.value)}>
+        {!dsId && <option value="">选择数据集</option>}
+        {dsId && dsId !== 'TPL' && !picked && <option value={dsId}>{dsId}</option>}
+        {options.map(entry => <option key={entry.id} value={entry.id} disabled={!entry.testable && entry.id !== dsId}>
+          {entry.id} · {entry.n_questions.toLocaleString()} 题{entry.testable ? '' : ' · 无三类对照'}
+        </option>)}
+        <option value="TPL">本地生成式模板族</option>
+      </select>
+    </label>
+    <p className="v8-note">这里比较模型在所选题库上的作答表现。上方语言项覆盖来自模板对照实验。</p>
+    {catalog.error && <p className="v8-note">数据集清单读取失败。{catalog.error}</p>}
+    {dsId && <LangBench dsId={dsId} dsRow={testableN == null ? null : { testableN }} model={model} />}
+  </>;
+}
+
+function CoverageMatrix({ tree, onOpenItem }) {
+  return <>
+    <div className="v8-levels-legend">
+      {LEVELS.slice(1).map(level => <LevelChip key={level.level} level={level.level} />)}
+      <LevelChip none="○ 未研究" />
+    </div>
+    <div className="v8-matrix-wrap">
+      <table className="v6-mini-table v8-matrix">
+        <thead><tr><th>语言项</th>{tree.models.map(model => <th key={model} title={model}>{shortModel(model)}</th>)}</tr></thead>
+        <tbody>
+          {tree.types.map(type => tree.items.filter(item => item.type === type.id).map((item, index) => (
+            <tr key={item.id} className={index === 0 ? 'first' : ''}>
+              <th><button type="button" className="v6-linkbtn" onClick={() => onOpenItem(item)}>{item.name}</button><small>{type.name}</small></th>
+              {tree.models.map(model => {
+                const meta = levelMeta(itemLevel(item, model));
+                return <td key={model} title={model}><span className="v8-chip" style={{ background: meta.color, color: meta.ink }} aria-label={meta.label}>{meta.sym}</span></td>;
+              })}
+            </tr>
+          )))}
+        </tbody>
+      </table>
+    </div>
+    <p className="v8-note">{tree.policy}</p>
+  </>;
+}
+
+function LangCoverage({ tree, treeError, model, dataset, onModel, onDataset, onOpenItem, neuron, onGo }) {
+  const [active, setActive] = useState('');
+  const models = tree?.models || [];
+  const items = tree?.items || [];
+  const knownModel = models.includes(model);
+  const level = item => itemLevel(item, model);
+  const groups = [
+    { id: 'measured', label: '已有数据', note: '至少有一次读出测量', items: items.filter(item => level(item) >= 1) },
+    { id: 'heldout', label: '留出复现', note: '已有数据中在留出材料上复现的项', items: items.filter(item => level(item) >= 3) },
+    { id: 'missing', label: '待补数据', note: '当前模型暂无测量记录的项', items: items.filter(item => level(item) === 0) },
   ];
-  const CAT_COLOR = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#7a3fbf', '#008300'];
-  const catItems = t => tree.items.filter(it => it.type === t.id);
-  return (
-    <div className="v8-nprog">
-      <LangBench dsId={dsId} dsRow={dsRow} model={model} />
-      <p className="v8-nprog-say">
-        共 <b>{tree.items.length}</b> 条语言规律，分属 <b>{tree.types.length}</b> 个大类；在 {shortModel(model)} 上有数据 <b>{nHas}</b> 条（{pct(nHas)}），其中留出复现及以上 <b>{nHeld}</b> 条（{pct(nHeld)}）。
-        {gaps.length ? <>还没有数据 <b>{gaps.length}</b> 条（{pct(gaps.length)}），见下方缺口。</> : '每个语言项都已有数据。'}
-      </p>
-      <div className="v8-nprog-cats">
-        {orderedTypes.map((t, i) => {
-          const its = catItems(t);
-          const has = its.filter(it => lv(it) >= 1).length;
-          return (
-            <div key={t.id} style={{ borderLeftColor: CAT_COLOR[i % CAT_COLOR.length] }}>
-              <b>{t.name}</b>
-              <span>{its.length} 条 · {has} 条有数据</span>
-              <small>{its.length - has ? `${its.length - has} 条还没有数据` : '全部有数据'}</small>
-            </div>
-          );
-        })}
-      </div>
-      <div className="v8-nprog-tiles">
-        <div><b>{tree.items.length}</b><span>条语言规律</span><small>分属 {tree.types.length} 个大类 · 全部来自模板对照实验</small></div>
-        <div><b>{nHas}</b><span>有数据 · 占 {pct(nHas)}</span><small>至少完成过一次读出测量</small></div>
-        <div><b>{nHeld}</b><span>留出复现及以上 · 占 {pct(nHeld)}</span><small>证据最强：新数据上也读得出来</small></div>
-        <div><b>{gaps.length}</b><span>还没有数据 · 占 {pct(gaps.length)}</span><small>{gaps.length ? '见下方研究缺口，可点进条目看怎么补' : '当前模型上每个语言项都已有数据'}</small></div>
-      </div>
+  return <div className="v8-route v8-overview v8-coverage">
+    <header className="v8-overview-heading">
       <div>
-        <h4 className="v8-h4">完整列表：逐条进度 <small>进度 = 等级 ÷ 4（每级 25%）；平均 {Math.round((tree.items.reduce((s, it) => s + lv(it), 0) / nItems) / 4 * 100)}%；点行进入该条目的拼图</small></h4>
-        <div className="v8-prog-list">
-          {orderedTypes.map((t, ci) => {
-            const its = catItems(t);
-            return (
-              <div key={t.id}>
-                <div className="v8-prog-catname" style={{ borderLeftColor: CAT_COLOR[ci % CAT_COLOR.length] }}>{t.name}</div>
-                {its.map(it => {
-                  const l = lv(it);
-                  const p = (l / 4) * 100;
-                  const meta = levelMeta(l);
-                  return (
-                    <button key={it.id} type="button" className="v8-prog-row" onClick={() => onOpenItem(it)}>
-                      <span className="v8-prog-name">{it.name}</span>
-                      <span className="v8-prog-track"><i style={{ width: `${p}%`, background: meta.color }} /></span>
-                      <b className="v8-prog-pct">{p}%</b>
-                      <span className="v8-prog-lab">{meta.sym} {meta.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-        <div className="v8-prof-legend" style={{ marginTop: 10 }}>
-          {LEVELS.map(l => <span key={l.level}><i style={{ background: l.color }} />{l.level * 25}% {l.label}</span>)}
-        </div>
+        <h3>实验覆盖摘要</h3>
+        {tree && <p className="v8-note">按已登记的 {items.length} 个实验条目统计。</p>}
       </div>
-      <div>
-        <h4 className="v8-h4">语言项 × 模型明细 <small>每格一个等级（悬停看全称）；各模型分开记录，方向不跨模型比较</small></h4>
-        <div className="v8-levels-legend">
-          {LEVELS.slice(1).map(l => <LevelChip key={l.level} level={l.level} />)}
-          <LevelChip none="○ 未研究" />
-        </div>
-        <div className="v8-matrix-wrap">
-          <table className="v6-mini-table v8-matrix">
-            <thead><tr><th>语言项</th>{models.map(m => <th key={m} title={m}>{shortModel(m)}</th>)}</tr></thead>
-            <tbody>
-              {orderedTypes.map(t => tree.items.filter(it => it.type === t.id).map((it, i) => (
-                <tr key={it.id} className={i === 0 ? 'first' : ''}>
-                  <th><button type="button" className="v6-linkbtn" onClick={() => onOpenItem(it)}>{it.name}</button><small>{t.name}</small></th>
-                  {models.map(m => {
-                    const l = it.status?.by_model?.[m] ?? 0;
-                    const meta = levelMeta(l);
-                    return <td key={m} title={`${it.name} · ${shortModel(m)}：${meta.label}`}><span className="v8-chip" style={{ background: meta.color, color: meta.ink }}>{meta.sym}</span></td>;
-                  })}
-                </tr>
-              )))}
-            </tbody>
-          </table>
-        </div>
+      {models.length > 0 && <label className="v8-coverage-model">模型
+        <select aria-label="覆盖模型" value={model} onChange={event => onModel(event.target.value)}>
+          {!knownModel && <option value={model}>{shortModel(model)} · 暂无覆盖记录</option>}
+          {models.map(key => <option key={key} value={key}>{shortModel(key)}{key.split('|')[2] ? ` · ${key.split('|')[2]}` : ''}</option>)}
+        </select>
+      </label>}
+    </header>
+    {!tree ? <Empty>{treeError || '读取语言模式目录…'}</Empty> : !knownModel ? <Empty>当前模型暂无图谱覆盖记录。</Empty> :
+      <div className="v8-direction-cards v8-overview-cards">
+        {groups.map(group => <Fragment key={group.id}>
+          <button type="button" className="v8-card v8-direction v8-overview-card" aria-label={group.label}
+            aria-expanded={active === group.id} aria-controls={active === group.id ? 'coverage-items' : undefined}
+            onClick={() => setActive(active === group.id ? '' : group.id)}>
+            <strong>{group.label}</strong>
+            <span className="v8-overview-metric v8-coverage-number">{group.items.length} / {items.length} 项</span>
+            <span className="v8-note">{group.note}</span>
+            <span className="v8-overview-action">{active === group.id ? '收起 ↑' : '查看条目 →'}</span>
+          </button>
+          {active === group.id && <section id="coverage-items" aria-label={`${group.label}条目`} className="v8-card v8-overview-detail">
+            <h3>{group.label} · {group.items.length} 项</h3>
+            {group.items.length ? <ul className="v8-coverage-items">
+              {group.items.map(item => <li key={item.id}>
+                <button type="button" className="v6-linkbtn" onClick={() => onOpenItem(item)}>{item.name}</button>
+                <LevelChip level={level(item)} />
+              </li>)}
+            </ul> : <p className="v8-note">当前模型在这一组没有条目。</p>}
+          </section>}
+        </Fragment>)}
+      </div>}
+    <ResearchDisclosure title={`数据集实测${dataset ? ` · ${dataset === 'TPL' ? '本地模板' : dsLabel(dataset)}` : ''}`}>
+      <DatasetBench dataset={dataset} model={model} onDataset={onDataset} />
+    </ResearchDisclosure>
+    {models.length > 0 && <ResearchDisclosure title="跨模型对照">
+      <CoverageMatrix tree={tree} onOpenItem={onOpenItem} />
+    </ResearchDisclosure>}
+    <ResearchDisclosure title="更多研究细节">
+      <div className="v8-route">
+        <ResearchDisclosure title="神经元普查与解释覆盖">{neuron}</ResearchDisclosure>
+        <ResearchDisclosure title="证据门链与预测记分板"><RouteBoard onGo={onGo} /></ResearchDisclosure>
       </div>
-      <p className="v8-note">{tree.policy}</p>
-    </div>
-  );
+    </ResearchDisclosure>
+  </div>;
 }
 
-/* 当前口径卡：顶部全局条负责「选」，这一条负责「解释」——指标各自被哪一维驱动。
-   不写笼统的「全部进展」：神经元页只有模型维度（普查读自然语料，不是题库），规则账本两个维度都不参与
-   （按规则记录，不按题库/模型分列），语言图谱页只有「图谱测试题」跟着数据集变，等级矩阵只跟模型变。
-   页顶的数据集方块同样按这条口径显隐（workbenchUtil.dsBound），这里只说「这一页读什么」，
-   所以神经元页与规则账本不再列「数据集：不参与」那一格——没有可选项，就没有要解释的空维度。 */
-function ScopeCard({ tab, model, census, dsId, dsRow, dsTestable, dsError }) {
-  const tpl = dsId === 'TPL';
-  const dsText = !dsId ? '未选（自动）'
-    : tpl ? '生成式模板族'
-      : `${dsLabel(dsId)} · ${(dsRow?.n_questions || 0).toLocaleString()} 题${dsTestable ? ` · 可映射三类 ${dsTestable.toLocaleString()}` : ' · 无可映射三类科目'}`;
-  const isNeuron = tab === 'neuron';
-  const isRules = tab === 'rules';
-  const modelText = isNeuron
-    ? (census ? '有自然语料普查：逐单元画像可用' : '还没有自然语料普查：本页只有结构，没有单元数据')
-    : isRules ? '决定账本里哪些结论已有本模型的证据'
-      : '决定等级矩阵的列与图谱测试题的实测对象';
-  const dsText2 = tpl
-    ? '不参与：模板族是生成式对照材料，不是选择题，进不了正确率口径'
-    : '只影响「图谱测试题」：题目从这个数据集取；等级矩阵不受影响';
-  return (
-    <div className="v8-scope">
-      <div className="v8-scope-item">
-        <span className="v8-scope-k">模型</span>
-        <b>{shortModel(model) || '—'}</b>
-        <span className="v8-scope-v">{modelText}</span>
-      </div>
-      {!isNeuron && !isRules && (
-        <div className="v8-scope-item">
-          <span className="v8-scope-k">数据集</span>
-          <b>{dsText}</b>
-          <span className="v8-scope-v">{dsText2}</span>
-        </div>
-      )}
-      <p className="v8-scope-note">
-        {isNeuron
-          ? '换模型 → 整页数字全变。本页读自然语料普查（1,900 万 token），不读题库，所以页顶没有数据集可选；神经元进展与语言图谱进展读的不是同一批数据，不能相加、不能拼成转化率。'
-          : isRules
-            ? '账本记的是「这条规则被试过、结论是什么」，不按题库分组，所以页顶没有数据集可选；换模型时变的是证据列。'
-            : '换模型 → 等级矩阵与实测都变；换数据集 → 只有正确率变。两类进展分开记录。'}
-        {dsError ? ` 数据集清单读取失败：${dsError}` : ''}
-      </p>
+function LanguageGraphView({ onOpenMeasurement, coverage }) {
+  const [view, setView] = useState('catalog');
+  const [coverageVisited, setCoverageVisited] = useState(false);
+
+  return <div className="v8-route">
+    <div className="v8-catalog-switch" role="group" aria-label="语言图谱视图">
+      <button type="button" className="fw-tbtn" aria-pressed={view === 'catalog'} onClick={() => setView('catalog')}>语言目录</button>
+      <button type="button" className="fw-tbtn" aria-pressed={view === 'coverage'} onClick={() => {
+        setCoverageVisited(true);
+        setView('coverage');
+      }}>实验覆盖</button>
     </div>
-  );
+    <div hidden={view !== 'catalog'}><LanguageCatalog onOpenMeasurement={onOpenMeasurement} /></div>
+    {coverageVisited && <div hidden={view !== 'coverage'}>{coverage}</div>}
+  </div>;
 }
 
-/* 页签由工作台顶部的子导航（workbenchUtil.ROUTE_VIEWS）提供，这里只按 tab 渲染内容：
-   页签与空间/研发同一层级、同一组件，避免同一页面出现两种页签样式。
-   模型与数据集由页顶的全局条驱动（props model / ds，来自地址栏 mdl / ds）：
-   这一页此前用 defaultModel() 自己挑一个模型，于是页顶换模型时进展数字不动——那是个真缺陷。 */
-export default function RouteLens({ tab = 'neuron', model: gModel, ds = '', onGoSpace, onGo }) {
-  const treeApi = useApi('/api/lang/tree');
-  const skApi = useApi('/api/model/skeleton');
-  const dsApi = useApi('/api/lang/atlas/datasets');
+/* 覆盖模型与题库选择仍由工作台地址栏 mdl / ds 持久化。 */
+export default function RouteLens({ tab = 'overview', openPane = '', model: gModel, ds = '', onGoSpace, onGo }) {
+  const treeApi = useApi(tab === 'rules' ? null : '/api/lang/tree');
+  const skApi = useApi(tab === 'rules' ? null : '/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
   const skeletons = useMemo(() => Object.fromEntries((skApi.data?.models || []).map(s => [s.model, s])), [skApi.data]);
-  const model = (gModel && tree?.models?.includes(gModel) ? gModel : '') || defaultModel(tree, skeletons);
-  const skeleton = skeletons[model];
-  const census = skeleton?.census_run ? skeleton.census_key : null;
+  const model = gModel || defaultModel(tree, skeletons);
   const censused = Object.values(skeletons).filter(s => s.census_run).map(s => s.model);
+  const neuron = key => <NeuronProgress census={skeletons[key]?.census_run ? skeletons[key].census_key : null}
+    skeleton={skeletons[key]} model={key} available={censused}
+    onOpenBlock={block => onGoSpace('neuron', { block, unit: null }, key)} />;
 
-  /* 数据集：URL 里没选就取第一个可测的（与空间页同一口径），模板族（TPL）单独对待 */
-  const dsList = (dsApi.data?.datasets || []).filter(d => d.n_questions > 0);
-  const dsPicked = dsList.find(d => d.id === ds) || dsList.find(d => d.testable) || (ds === 'TPL' ? null : dsList[0]) || null;
-  const dsId = ds === 'TPL' ? 'TPL' : (dsPicked?.id || '');
-  const dsTestable = dsPicked ? Object.values(dsPicked.by_category || {}).reduce((s, c) => s + (c.n || 0), 0) : 0;
-  const dsRow = dsPicked ? { n_questions: dsPicked.n_questions, testableN: dsTestable } : null;
-
+  if (tab === 'overview') return <ResearchOverview onGo={onGo} tree={tree} model={model} dataset={ds}
+    skeletons={skeletons} open={openPane} onOpenUnit={(row, key) => onGoSpace('neuron', { block: row.block, unit: row.unit }, key)}
+    renderLanguage={(key, snapshot) => {
+      const openItem = item => onGoSpace('lang', { item: item.id, type: item.type }, key);
+      return <LanguageGraphView onOpenMeasurement={id => openItem({ id, type: id.split('.')[0] })}
+        coverage={<LangCoverage tree={tree} treeError={treeApi.error} model={key} dataset={ds} onGo={onGo}
+          onModel={mdl => {
+            onGo('route', null, null, { mdl });
+            if (snapshot && skeletons[mdl]?.model_snapshot !== snapshot) {
+              publishResearchContext({ snapshot: skeletons[mdl]?.model_snapshot || '', run: '', trace: '', context_trace: '', pmodel: '' });
+            }
+          }}
+          onDataset={dataset => onGo('route', null, null, { ds: dataset })}
+          onOpenItem={openItem} neuron={neuron(key)} />} />;
+    }} />;
   return (
     <div className="v8-route">
-      {/* 口径卡只在真读这两维的两页出现：规则账本按「规则」记录，不按模型/数据集分列，
-          给它加一条维度说明反而会暗示账本随选择变 */}
-      {tab !== 'rules' && (
-        <ScopeCard tab={tab} model={model} census={census} dsId={dsId} dsRow={dsRow} dsTestable={dsTestable} dsError={dsApi.error} />
-      )}
-      {tab === 'neuron' && (
-        <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 普查 → 分型 → 解释检验 → 模板选择性（各来源分开计数，不拼成转化率）`}>
-          <NeuronProgress census={census} skeleton={skeleton} model={model} available={censused}
-                          onOpenBlock={b => onGoSpace('neuron', { block: b, unit: null })} />
-        </Card>
-      )}
-      {tab === 'lang' && (
-        <>
-          <Card title="语言图谱进展" sub={`${shortModel(model)} · ${dsId === 'TPL' ? '生成式模板族' : dsLabel(dsId)} 实测正确率 + 每条语言规律的读出等级（模板对照实验）`}>
-            {tree ? <LangProgress tree={tree} model={model} dsId={dsId} dsRow={dsRow} onOpenItem={it => onGoSpace('lang', { item: it.id, type: it.type })} />
-              : <Empty>{treeApi.error ? `语言谱图不在本机数据包里：${treeApi.error}` : '读取语言谱图…'}</Empty>}
-          </Card>
-          <RouteBoard onGo={onGo} />
-        </>
-      )}
+      {tab === 'neuron' && <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查与解释检验`}>{neuron(model)}</Card>}
       {tab === 'rules' && (
-        <Card title="规则账本" sub={`${shortModel(model)} · 已测过的规则与结论：先查重，再决定要不要做新一轮实验`}>
-          <RuleLedgerPage />
-        </Card>
+        <RuleLedgerPage>
+          <ResearchDisclosure title="原始报告与版本记录"><ResearchLibrary /></ResearchDisclosure>
+        </RuleLedgerPage>
       )}
     </div>
   );

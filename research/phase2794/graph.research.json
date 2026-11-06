@@ -1,0 +1,5500 @@
+{
+  "feature_cards": [
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1995:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1995
+      },
+      "label": "首位数字答案贡献候选 B34/U1995",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "c68e9f1676bdb7a46e346ba38f759bfe67eb19f3ec391a9b3803361c7224e0a8",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "c68e9f1676bdb7a46e346ba38f759bfe67eb19f3ec391a9b3803361c7224e0a8",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "index": {
+        "head": 29,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B34/Head29",
+      "layer": 34,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1066:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1066
+      },
+      "label": "首位数字答案贡献候选 B34/U1066",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "8bf75210add67a7169342e73f8433db5c12c6a5961336a0318ae939a43dd8850",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2020:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2020
+      },
+      "label": "首位数字答案贡献候选 B34/U2020",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "80b2adece4b581ef4aa0564ed706e9c05c6f860ffc5119a5cba9c9abe336e5ac",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2424:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2424
+      },
+      "label": "首位数字答案贡献候选 B34/U2424",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "af642dfa5b05495f312a9966f34516a287596cadec73313659f2f2f20b5fe4f1",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2445:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2445
+      },
+      "label": "首位数字答案贡献候选 B34/U2445",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "826eafca3c1e7474efc6ff4857ae1d49e7e6205873c2ac60f45d45509340e1fe",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "826eafca3c1e7474efc6ff4857ae1d49e7e6205873c2ac60f45d45509340e1fe",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head15:P2794-parameter-source",
+      "index": {
+        "head": 15,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B34/Head15",
+      "layer": 34,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1787:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1787
+      },
+      "label": "首位数字答案贡献候选 B34/U1787",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "aafb29d7601eacee4d719accc2a129e623c749ac0649fb69cffd488d37f3f541",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1088:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1088
+      },
+      "label": "首位数字答案贡献候选 B33/U1088",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "9c3bf516c3bfda9962d4025b6a4f267f2e08f97cc28aa0a4416a3af73df209d0",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "9c3bf516c3bfda9962d4025b6a4f267f2e08f97cc28aa0a4416a3af73df209d0",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head14:P2794-parameter-source",
+      "index": {
+        "head": 14,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B33/Head14",
+      "layer": 33,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U662:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 662
+      },
+      "label": "首位数字答案贡献候选 B34/U662",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "bca5c05b9dc11252dbae8e3ce563eda3792a2e956903d16c754522b20c4e1c9d",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3621:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 3621
+      },
+      "label": "首位数字答案贡献候选 B34/U3621",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "386d66c061ccba4aa62b0c59003b60f1830e502fbc8825a336c76c4e1c211b93",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2200:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2200
+      },
+      "label": "首位数字答案贡献候选 B35/U2200",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "548655f39e43f9c7fefbb3d31f6e3abe229d0424a918987ff87f13ae5c97ad5f",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "548655f39e43f9c7fefbb3d31f6e3abe229d0424a918987ff87f13ae5c97ad5f",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "index": {
+        "head": 27,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B35/Head27",
+      "layer": 35,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3579:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 3579
+      },
+      "label": "首位数字答案贡献候选 B34/U3579",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "2a48a493baffd5c82b275ba1e6a91766aceee795eab9e57de63e498495259b31",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3250:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 3250
+      },
+      "label": "首位数字答案贡献候选 B33/U3250",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "f48ff1a8d18ade0bbdd153667a9cc827162e588b282f7b54163accd849e8a95d",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "f48ff1a8d18ade0bbdd153667a9cc827162e588b282f7b54163accd849e8a95d",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "index": {
+        "head": 4,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B33/Head4",
+      "layer": 33,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1084:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1084
+      },
+      "label": "首位数字答案贡献候选 B33/U1084",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "3f34f7156479ba1ae42e45b5e45b641dea4f58f418b6efc4b8db4c40d93f4da0",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1139:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1139
+      },
+      "label": "首位数字答案贡献候选 B34/U1139",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "f638ef14c7f0bf504a9c178295faee0bdb7412f2230b076cb167f097ad704219",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "f638ef14c7f0bf504a9c178295faee0bdb7412f2230b076cb167f097ad704219",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head30:P2794-parameter-source",
+      "index": {
+        "head": 30,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B34/Head30",
+      "layer": 34,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4244:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 4244
+      },
+      "label": "首位数字答案贡献候选 B33/U4244",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "ff09cd9cf007bd9ba3ced33e82ccfada0f3fb908fc0f053e9cd6acd0d01a7570",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1057:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1057
+      },
+      "label": "首位数字答案贡献候选 B34/U1057",
+      "layer": 34,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "194149013783c29d3c2fe1dd69494c5f69fb78d0031f1c48cd7dee5d33cd9359",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U789:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 789
+      },
+      "label": "首位数字答案贡献候选 B30/U789",
+      "layer": 30,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "ea0be3453ab5cf19faa9bf54daf9873a5e44ee0dd9dae4539267f805e75a1ac4",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "ea0be3453ab5cf19faa9bf54daf9873a5e44ee0dd9dae4539267f805e75a1ac4",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:Head8:P2794-parameter-source",
+      "index": {
+        "head": 8,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B30/Head8",
+      "layer": 30,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U560:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 560
+      },
+      "label": "首位数字答案贡献候选 B35/U560",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "7b8a3953cef2be6a76deca8491d2dad52d573cd460535234712ff2cb5710c9cb",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:U157:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 157
+      },
+      "label": "首位数字答案贡献候选 B31/U157",
+      "layer": 31,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "296662424f5a9786c3fba3ac02769a1847821cbf37658a78bbf955be4b0cb40a",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "296662424f5a9786c3fba3ac02769a1847821cbf37658a78bbf955be4b0cb40a",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:Head9:P2794-parameter-source",
+      "index": {
+        "head": 9,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B31/Head9",
+      "layer": 31,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U308:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 308
+      },
+      "label": "首位数字答案贡献候选 B30/U308",
+      "layer": 30,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "7a88d617e726c1d512e8781b9957e07991cb7efe16aa41d6f49b2588bd356b55",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U955:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 955
+      },
+      "label": "首位数字答案贡献候选 B35/U955",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "e8d52ddbc368bd8fc9ab982437f2517d2b072f77d3b31ec87dbad93a35c5a44e",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "e8d52ddbc368bd8fc9ab982437f2517d2b072f77d3b31ec87dbad93a35c5a44e",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head8:P2794-parameter-source",
+      "index": {
+        "head": 8,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B35/Head8",
+      "layer": 35,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U1683:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1683
+      },
+      "label": "首位数字答案贡献候选 B35/U1683",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "9234aa96fd6021e92a77e3eef2f1006a60017bc8732153d7962e32270de0967d",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U672:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 672
+      },
+      "label": "首位数字答案贡献候选 B35/U672",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "0663d9e5c04fa1de3fd3ff313e5ed0027181b28479e972dc7eea62b7e0b9fd60",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:U615:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 615
+      },
+      "label": "首位数字答案贡献候选 B29/U615",
+      "layer": 29,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "82bed5ec3355c1a7eb47e5983f5f82a023c4a2263b52b12ea7f7814413e0f41a",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "82bed5ec3355c1a7eb47e5983f5f82a023c4a2263b52b12ea7f7814413e0f41a",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:Head6:P2794-parameter-source",
+      "index": {
+        "head": 6,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B29/Head6",
+      "layer": 29,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3723:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 3723
+      },
+      "label": "首位数字答案贡献候选 B33/U3723",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "c51e8da37bd982b0687ce8b77e7a72bcfd9ce23651f4dd18db41a04909e37084",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "c51e8da37bd982b0687ce8b77e7a72bcfd9ce23651f4dd18db41a04909e37084",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head24:P2794-parameter-source",
+      "index": {
+        "head": 24,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B33/Head24",
+      "layer": 33,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U6199:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 6199
+      },
+      "label": "首位数字答案贡献候选 B33/U6199",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "bf7e172f31e9b448cde70db34c785aef6755eb1b0560131363495cbf354e1a8f",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1520:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 1520
+      },
+      "label": "首位数字答案贡献候选 B33/U1520",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "ebbb91e9f9772fd031c6648b3188136ed6b803706eea13cfa6063429ae0c51b1",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "self_attn.o_proj.input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "ebbb91e9f9772fd031c6648b3188136ed6b803706eea13cfa6063429ae0c51b1",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head26:P2794-parameter-source",
+      "index": {
+        "head": 26,
+        "space": "attention"
+      },
+      "label": "样本局部Gate来源 B33/Head26",
+      "layer": 33,
+      "method": "actual weights and native response with sample RMS fixed; all32 terms retained, displayed largest absolute term",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "position": 1023,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U632:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 632
+      },
+      "label": "首位数字答案贡献候选 B35/U632",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "d2212efe176792ab64cc4369806a83d64b03a32fbf7ca84ac20c53cbac5939d0",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U246:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 246
+      },
+      "label": "首位数字答案贡献候选 B30/U246",
+      "layer": 30,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "18be56bc34553ce1bc176a900baca6a56d64af1a34a4d2aea109a187a8684ed2",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2100:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2100
+      },
+      "label": "首位数字答案贡献候选 B35/U2100",
+      "layer": 35,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "7e76b7e1416cbcec878f2187ac483fdc352a5be194ecf02858fa18e3c5005411",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U2984:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 2984
+      },
+      "label": "首位数字答案贡献候选 B33/U2984",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "091a746da9a88969f6bd3fbed2f2207e39a8702d77e8a91852f33fb958042701",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    },
+    {
+      "boundary": "mlp.down_proj.input",
+      "counterexamples": [
+        {
+          "expected": "1",
+          "generated": "43",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "expected": "17",
+          "generated": "33",
+          "reason": "complete_integer_incorrect",
+          "sample_id": "As:F3:L1024:doc",
+          "scope": "文档",
+          "trace_id": "081efaaa17dfb20b2bfdf8d5299e8c59ffcffd4524b47a941b3b189f41e474e0"
+        },
+        {
+          "alpha": 1.0,
+          "condition": "heads",
+          "correct": false,
+          "family_id": "Tm",
+          "first_token_gap": 4.625,
+          "full_top1": "4",
+          "generated": "49",
+          "reason": "intervention_regression",
+          "sample_id": "Tm:F2:L1024:world",
+          "scope": "现实",
+          "trace_id": "db7785d46860a5b6635ebfd5fe807b84c95cf5317f90fc9349448ef5e24cca9a"
+        },
+        {
+          "actual_first_token_id": 19,
+          "copy_KL": 18.004825592041016,
+          "family_id": "Tc",
+          "graph_KL": 18.004825592041016,
+          "predicted_first_token_id": 16,
+          "prior_KL": 0.2348397970199585,
+          "reason": "graph_first_token_mismatch",
+          "sample_id": "Tc:F3:L1024:doc",
+          "scope": "文档",
+          "scope_blind_KL": 0.6326583623886108,
+          "trace_id": "b9e73a113015535f09bd3cb1a26e948afae49a55fbb7de3ecde61107c63b8975"
+        },
+        {
+          "base": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.25,
+              34.5,
+              51.0
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "E",
+            "choice_logits": [
+              50.75,
+              42.0,
+              34.5,
+              34.5,
+              50.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-11618",
+            "input_tokens": 70,
+            "prediction": "A",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-11618"
+        },
+        {
+          "base": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.125,
+              48.5,
+              48.5
+            ],
+            "correct": true,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "D",
+            "source": "CMExam train"
+          },
+          "edited": {
+            "answer": "D",
+            "choice_logits": [
+              28.25,
+              28.0,
+              29.375,
+              48.5,
+              48.75
+            ],
+            "correct": false,
+            "gate_eligible": true,
+            "id": "cmexam-14383",
+            "input_tokens": 103,
+            "prediction": "E",
+            "source": "CMExam train"
+          },
+          "reason": "capability_regression",
+          "sample_id": "cmexam-14383"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4510:P2794-answer-support",
+      "index": {
+        "space": "mlp",
+        "unit": 4510
+      },
+      "label": "首位数字答案贡献候选 B33/U4510",
+      "layer": 33,
+      "method": "discovery native G/V/A and direct first-digit contribution, joint32-unit doses in heldout",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "scope": {
+        "individual_necessity": "not_tested",
+        "joint_operation": "P2794-ATOMIC-ARBITRATION-v4:MLP32",
+        "parameter_connection_sha256": "6b39631e3c76ae476269b8ba937d3fca6cbc83ef1a31e68112b8a2fa9dda91d6",
+        "position": 1023,
+        "reference_assisted": true,
+        "representative_unit_only": true,
+        "trace_id": "4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd"
+      }
+    }
+  ],
+  "graph_edges": [
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1995:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1995:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "c68e9f1676bdb7a46e346ba38f759bfe67eb19f3ec391a9b3803361c7224e0a8",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1995:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1995:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1066:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1066:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "8bf75210add67a7169342e73f8433db5c12c6a5961336a0318ae939a43dd8850",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1066:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1066:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2020:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2020:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "80b2adece4b581ef4aa0564ed706e9c05c6f860ffc5119a5cba9c9abe336e5ac",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2020:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2020:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2424:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2424:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "af642dfa5b05495f312a9966f34516a287596cadec73313659f2f2f20b5fe4f1",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2424:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2424:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2445:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2445:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "826eafca3c1e7474efc6ff4857ae1d49e7e6205873c2ac60f45d45509340e1fe",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2445:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head15:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U2445:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1787:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1787:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "aafb29d7601eacee4d719accc2a129e623c749ac0649fb69cffd488d37f3f541",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1787:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1787:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1088:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1088:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "9c3bf516c3bfda9962d4025b6a4f267f2e08f97cc28aa0a4416a3af73df209d0",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1088:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head14:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1088:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U662:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U662:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "bca5c05b9dc11252dbae8e3ce563eda3792a2e956903d16c754522b20c4e1c9d",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U662:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head15:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U662:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3621:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3621:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "386d66c061ccba4aa62b0c59003b60f1830e502fbc8825a336c76c4e1c211b93",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3621:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head29:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3621:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2200:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2200:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "548655f39e43f9c7fefbb3d31f6e3abe229d0424a918987ff87f13ae5c97ad5f",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2200:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2200:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3579:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3579:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2a48a493baffd5c82b275ba1e6a91766aceee795eab9e57de63e498495259b31",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3579:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head15:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U3579:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3250:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3250:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "f48ff1a8d18ade0bbdd153667a9cc827162e588b282f7b54163accd849e8a95d",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3250:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3250:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1084:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1084:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f34f7156479ba1ae42e45b5e45b641dea4f58f418b6efc4b8db4c40d93f4da0",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1084:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1084:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1139:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1139:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "f638ef14c7f0bf504a9c178295faee0bdb7412f2230b076cb167f097ad704219",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1139:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head30:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1139:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4244:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4244:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "ff09cd9cf007bd9ba3ced33e82ccfada0f3fb908fc0f053e9cd6acd0d01a7570",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4244:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4244:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1057:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1057:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "194149013783c29d3c2fe1dd69494c5f69fb78d0031f1c48cd7dee5d33cd9359",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1057:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:Head15:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B34:U1057:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U789:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U789:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "ea0be3453ab5cf19faa9bf54daf9873a5e44ee0dd9dae4539267f805e75a1ac4",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U789:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:Head8:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U789:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U560:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U560:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "7b8a3953cef2be6a76deca8491d2dad52d573cd460535234712ff2cb5710c9cb",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U560:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U560:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:U157:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:U157:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "296662424f5a9786c3fba3ac02769a1847821cbf37658a78bbf955be4b0cb40a",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:U157:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:Head9:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B31:U157:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U308:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U308:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "7a88d617e726c1d512e8781b9957e07991cb7efe16aa41d6f49b2588bd356b55",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U308:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:Head8:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U308:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U955:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U955:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "e8d52ddbc368bd8fc9ab982437f2517d2b072f77d3b31ec87dbad93a35c5a44e",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U955:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head8:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U955:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U1683:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U1683:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "9234aa96fd6021e92a77e3eef2f1006a60017bc8732153d7962e32270de0967d",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U1683:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U1683:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U672:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U672:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "0663d9e5c04fa1de3fd3ff313e5ed0027181b28479e972dc7eea62b7e0b9fd60",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U672:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U672:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:U615:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:U615:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "82bed5ec3355c1a7eb47e5983f5f82a023c4a2263b52b12ea7f7814413e0f41a",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:U615:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:Head6:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B29:U615:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3723:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3723:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "c51e8da37bd982b0687ce8b77e7a72bcfd9ce23651f4dd18db41a04909e37084",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3723:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head24:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U3723:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U6199:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U6199:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "bf7e172f31e9b448cde70db34c785aef6755eb1b0560131363495cbf354e1a8f",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U6199:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U6199:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1520:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1520:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "ebbb91e9f9772fd031c6648b3188136ed6b803706eea13cfa6063429ae0c51b1",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1520:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head26:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U1520:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U632:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U632:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "d2212efe176792ab64cc4369806a83d64b03a32fbf7ca84ac20c53cbac5939d0",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U632:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U632:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U246:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U246:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "18be56bc34553ce1bc176a900baca6a56d64af1a34a4d2aea109a187a8684ed2",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U246:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:Head8:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B30:U246:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2100:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2100:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "7e76b7e1416cbcec878f2187ac483fdc352a5be194ecf02858fa18e3c5005411",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2100:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:Head27:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B35:U2100:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U2984:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U2984:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "091a746da9a88969f6bd3fbed2f2207e39a8702d77e8a91852f33fb958042701",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U2984:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head26:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U2984:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "2eac0a9c54680ee04d35747d495fea8f92955e84adf9a2ea0e62b3cb6178d24c",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4510:P2794-answer-support:scope",
+      "relation": "joint32_operation_not_individual_semantics",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "language:reference-assisted-source-arbitration",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4510:P2794-answer-support"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "6b39631e3c76ae476269b8ba937d3fca6cbc83ef1a31e68112b8a2fa9dda91d6",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4510:P2794-answer-support:parameter",
+      "relation": "actual_parameter_local_gate_contribution_not_total_causality",
+      "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:Head4:P2794-parameter-source",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B33:U4510:P2794-answer-support"
+    }
+  ],
+  "independent_primary_joint_tests": 1,
+  "individual_neuron_mechanisms_proven": 0,
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "provenance": {
+    "execution_freeze_sha256": "b57791a32cadcce4f199759d3ba850752099aa3699e5febec373e2ef0a38dd80",
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 27942026
+  },
+  "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+  "schema": "research_graph.v1"
+}

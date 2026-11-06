@@ -115,7 +115,7 @@ function HeadRow({ h, cats, nLayers }) {
   );
 }
 
-export default function LangAtlas({ ds = '', onDs }) {
+export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
   const dsApi = useApi('/api/lang/atlas/datasets');
   const { status, setStatus, busy, setBusy, poll } = useStatusPoll();
   const [picked, setPicked] = useState(null);
@@ -169,7 +169,9 @@ export default function LangAtlas({ ds = '', onDs }) {
   };
 
   const toggle = c => setCats(prev => (prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]));
-  const show = last && last.dataset === active ? last : null;
+  const requestedName=researchModel.split('|')[0].toLowerCase(),actualName=String(last?.model_name||'').toLowerCase();
+  const modelMatches=!requestedName||actualName===requestedName||actualName.startsWith(requestedName+'-');
+  const show = last && last.dataset === active && modelMatches ? last : null;
   // 跨数据集复现：同一批头在另一个数据集上是否也过阈。这条比任何单次运行都更能说明「规律」。
   const repro = useMemo(() => {
     if (!show) return null;
@@ -186,6 +188,7 @@ export default function LangAtlas({ ds = '', onDs }) {
 
   return (
     <div className="v8-atlas-root">
+      <p className="v8-note" role="status">实测运行使用本机服务已加载的权重，不会由模型筛选器自动换权重。{last&&!modelMatches?`已有结果属于 ${last.model_name}，与当前被测模型不一致，未叠加显示。`:'历史数据集实测按报告原始模型身份回查，不自动升级为完整快照机制证据。'}</p>
       <header className="v8-atlas-hd">
         <div>
           <h2>语言图谱 · 数据集实测</h2>

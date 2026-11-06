@@ -1,0 +1,138 @@
+{
+  "schema": "research_workpackage.v1",
+  "kind": "research_plan",
+  "run_id": "P2768-KN-FRUIT-TOOL-v1",
+  "title": "长文本水果/工具类别响应 · 首个图谱拼图闭环",
+  "stages": {
+    "freeze": {
+      "state": "done",
+      "time": 1793713166.0646086,
+      "samples": 192,
+      "entities": 64,
+      "length_range": [
+        303,
+        307
+      ]
+    },
+    "pilot": {
+      "state": "done",
+      "time": 1793713196.7359288,
+      "gate": {
+        "category=tool|frame=catalogue": {
+          "n": 3,
+          "accuracy": 1.0
+        },
+        "category=fruit|frame=catalogue": {
+          "n": 3,
+          "accuracy": 1.0
+        },
+        "category=tool|frame=review": {
+          "n": 3,
+          "accuracy": 1.0
+        },
+        "category=fruit|frame=review": {
+          "n": 3,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "collection": {
+      "state": "done",
+      "time": 1793713339.1561146,
+      "gate": {
+        "category=tool|frame=catalogue": {
+          "n": 32,
+          "accuracy": 0.96875
+        },
+        "category=fruit|frame=catalogue": {
+          "n": 32,
+          "accuracy": 0.96875
+        },
+        "category=tool|frame=review": {
+          "n": 32,
+          "accuracy": 0.96875
+        },
+        "category=fruit|frame=review": {
+          "n": 32,
+          "accuracy": 1.0
+        },
+        "category=tool|frame=heldout": {
+          "n": 32,
+          "accuracy": 0.96875
+        },
+        "category=fruit|frame=heldout": {
+          "n": 32,
+          "accuracy": 0.96875
+        }
+      }
+    },
+    "discovery": {
+      "state": "done",
+      "time": 1793713357.6142614,
+      "unit": 9031,
+      "block": 18,
+      "fwer_p": 0.000999000999000999
+    },
+    "registration_discovery": {
+      "state": "done",
+      "time": 1793713357.9401429,
+      "feature_id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:mlp:9031:final:P2768-KN-FRUIT-TOOL-v1",
+      "graph_sha256": "33beae214f5e4b20cbd6a8520fc3e6c3b2fdfe55fd5a7d43ea9a43457d496b86",
+      "evidence_level": "observation"
+    },
+    "validation": {
+      "state": "not_supported",
+      "time": 1793713366.1544752,
+      "outcome": "not_supported_under_preregistered_gates"
+    },
+    "registration_validated": {
+      "state": "done",
+      "time": 1793713366.4568288,
+      "feature_id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:mlp:9031:final:P2768-KN-FRUIT-TOOL-v1",
+      "graph_sha256": "cf83128ab3298a4be7c869596a2e158fee8801d0ae7502b5c1baf50af7e41ca5",
+      "evidence_level": "negative"
+    },
+    "client_acceptance": {
+      "state": "done",
+      "time": 1793716374.1365218,
+      "browser_verified": true,
+      "desktop_version": "1.0.3",
+      "offline_extra_verified": true,
+      "exact_model_identity_verified": true,
+      "complete_response_array_verified": true,
+      "chronological_stages_verified": true,
+      "research_gate": "not_supported",
+      "software_tests_passed": 343
+    }
+  },
+  "design": {
+    "run_id": "P2768-KN-FRUIT-TOOL-v1",
+    "version": 1,
+    "model": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "precision": "bf16",
+    "primary_block": 18,
+    "readout": "final",
+    "feature": "silu(G)*V",
+    "selection": "largest absolute pooled Cohen d over all 9728 units, discovery entities averaged across frames",
+    "permutations": 1000,
+    "seed": 2768,
+    "min_std": 0.0001,
+    "discovery_fwer_alpha": 0.05,
+    "heldout_min_auc": 0.8,
+    "heldout_min_abs_d": 0.8,
+    "min_behavior_acc": 0.8,
+    "min_tokens": 256,
+    "max_tokens": 768,
+    "splits": "entity-family deterministic SHA256; 50/25/25; third frame never used for selection",
+    "claim": "category-associated single-unit candidate, not a causal mechanism or independent graph predictor",
+    "not_measured": [
+      "necessity",
+      "sufficiency",
+      "natural free generation",
+      "graph-only next-token KL",
+      "other models",
+      "other languages"
+    ]
+  },
+  "updated_at": 1793716374.1365232
+}

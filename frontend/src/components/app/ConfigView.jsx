@@ -18,9 +18,9 @@ const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 /* 页内分段（?csec=）：配置项多，一页到底会太长；分段只是阅读顺序，不是导航层级 */
 export const CFG_SECTIONS = [
   { id: 'conn', label: '连接与诊断', desc: '中心服务、运行形态、本机错误记录' },
-  { id: 'account', label: '账号与本机节点', desc: '登录账号、节点绑定与贡献算力' },
-  { id: 'model', label: '模型与 AI 助手', desc: '被测模型、AI 助手的模型与 Key' },
-  { id: 'platform', label: '平台', desc: '中心自报的公开配置' },
+  { id: 'account', label: '账号与权限', desc: '登录账号、角色和管理权限' },
+  { id: 'node', label: '本机算力', desc: '节点、资源预算、贡献与托管、运行日志' },
+  { id: 'model', label: '模型与AI', desc: '被测模型与AI助手分别配置' },
 ];
 
 /* 全局错误计数订阅（diagnostics.js 在每次入账/清除后派发 ai2050-errors-updated）。 */
@@ -60,7 +60,7 @@ function short(s, n = 12) {
   return v.length > n ? `${v.slice(0, n)}…` : v;
 }
 
-export default function ConfigView({ cfg, onGo, section = 'conn', onSection }) {
+export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
   const { user, guest, offline, logout, enterAuth } = useAuth();
   const d = cfg?.data || null;
   const models = d?.models || [];
@@ -69,7 +69,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', onSection }) {
   const role = guest ? ['na', '访客'] : (user?.role === 'admin' ? ['pass', '管理员'] : ['na', '成员']);
   const conn = cfg?.pending ? ['na', '读取中…'] : (cfg?.error ? ['fail', '连接失败'] : ['pass', '已连接']);
   const errCount = useErrorCount();
-  const sec = CFG_SECTIONS.some(s => s.id === section) ? section : 'conn';
+  const sec = CFG_SECTIONS.some(s => s.id === section) || section === 'platform' ? section : 'conn';
 
   return (
     <div className="wb-cfg">
@@ -82,7 +82,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', onSection }) {
               ['运行形态', MODE[RUNTIME_MODE] || RUNTIME_MODE || '未知'],
               ['连接状态', <span key="s"><StatusPill status={conn[0]} label={conn[1]} />{cfg?.error ? <small className="wb-cfg-warn"> {cfg.error}</small> : null}</span>],
               ['数据模式', OFFLINE_CLIENT
-                ? <>只读数据包<small className="wb-cfg-sub">除登录、下载与配置读取外不联网</small></>
+                ? <>只读数据包<small className="wb-cfg-sub">研究浏览读取本机包；账号、主动托管与成果登记在线</small></>
                 : <>在线<small className="wb-cfg-sub">读取与写操作实时连接中心</small></>],
               ['研发工位', ADMIN_LIVE
                 ? <>可写<small className="wb-cfg-sub">管理工位另需管理员账号</small></>
@@ -142,16 +142,23 @@ export default function ConfigView({ cfg, onGo, section = 'conn', onSection }) {
             )}
           </Card>
 
+        </>
+      )}
+
+      {sec === 'node' && (
           <section className="wb-cfg-node">
             <header>
               <h4>本机节点与贡献</h4>
               <small>{DESKTOP
                 ? '控制本机节点服务：设备、模型、资源限制、运行与日志；只有节点服务访问中心'
-                : '网页不能控制节点；要贡献算力请安装桌面客户端'}</small>
+                : '网页可控制本人已授权的托管节点；运行本机算力请用桌面客户端'}</small>
             </header>
-            <Suspense fallback={<Empty>加载中…</Empty>}><ContributePanel /></Suspense>
+            {nodeStep && <div className="v6-toolbar">
+              <button type="button" className="fw-tbtn primary" onClick={() => onGo('plan')}>返回当前研发</button>
+              <button type="button" className="fw-tbtn" onClick={() => onGo('config', null, null, { csec: 'node', cstep: '' })}>查看全部算力设置</button>
+            </div>}
+            <Suspense fallback={<Empty>加载中…</Empty>}><ContributePanel focusStep={nodeStep} /></Suspense>
           </section>
-        </>
       )}
 
       {sec === 'model' && (

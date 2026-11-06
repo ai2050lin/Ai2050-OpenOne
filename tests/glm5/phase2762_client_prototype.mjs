@@ -1,0 +1,38 @@
+import { Window } from '../../frontend/node_modules/happy-dom/lib/index.js';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import vm from 'node:vm';
+const source = readFileSync(new URL('../../design/client-prototype/index.html', import.meta.url),'utf8');
+const script=source.match(/<script>([\s\S]*?)<\/script>/)[1];
+new vm.Script(script);
+const w=new Window({url:'http://prototype.local/'});
+w.document.write(source.replace(/<script>[\s\S]*?<\/script>/,''));
+// DOM checks use a no-op canvas. They do not validate browser rendering or pixels.
+w.HTMLCanvasElement.prototype.getContext=()=>new Proxy({}, {get:(_,key)=>key==='createRadialGradient'?()=>({addColorStop(){}}):()=>{}});
+w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};
+w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'))};
+w.scrollTo=()=>{};
+w.eval(script);
+const d=w.document, checks=[];
+function check(name,ok){checks.push({name,pass:!!ok});if(!ok)throw Error(name)}
+const click=s=>d.querySelector(s).click();
+check('six navigation pages',d.querySelectorAll('.page').length===6);
+check('default progress page',d.querySelector('#progress').classList.contains('active'));
+check('three direction cards',d.querySelectorAll('[data-area]').length===3);
+check('demo disclosure',d.querySelector('.prototype').textContent.includes('演示'));
+click('[data-area="0"]');check('progress opens details',d.querySelector('#dialog').hasAttribute('open'));
+click('#detailSpace');check('detail navigates to space',d.querySelector('#space').classList.contains('active'));
+click('[data-module="attention"]');check('attention parameter inspector',d.querySelector('#paramIndex').textContent.includes('q_proj'));
+d.querySelector('#layer').value='24';d.querySelector('#layer').dispatchEvent(new w.Event('input'));check('layer inspector update',d.querySelector('#nodeName').textContent.includes('L24'));
+d.querySelector('#spaceMode').value='语法体系';d.querySelector('#spaceMode').dispatchEvent(new w.Event('change'));check('language family inspector',d.querySelector('#featureText').textContent.includes('句法'));
+click('#evidenceBtn');check('evidence card disclosure',d.querySelector('#dialogBody').textContent.includes('未测'));click('.close');
+click('.nav [data-page="progress"]');d.querySelector('#model').value='GLM4-9B';d.querySelector('#model').dispatchEvent(new w.Event('change'));check('model global state',d.querySelector('#nodeModel').textContent==='GLM4-9B');check('model progress changes',d.querySelector('#progressCards').textContent.includes('117 / 250'));
+const empty=d.querySelector('#emptyToggle');empty.checked=true;empty.dispatchEvent(new w.Event('change'));check('empty state',!d.querySelector('#emptyProgress').classList.contains('hide'));
+click('.nav [data-page="datasets"]');check('dataset catalog rows',d.querySelectorAll('#datasetsBody tr').length===9);d.querySelector('#datasetFilter').value='语法体系';d.querySelector('#datasetFilter').dispatchEvent(new w.Event('change'));check('dataset filter',d.querySelectorAll('#datasetsBody tr').length===2);
+click('[data-ds="7"]');check('dataset details',d.querySelector('#dialogTitle').textContent.includes('BLiMP'));click('.close');
+click('.nav [data-page="contribute"]');click('[data-host="remote"]');check('managed mode',d.querySelector('#hostTitle').textContent.includes('托管'));click('#join');check('resource configuration',d.querySelector('#dialogBody').textContent.includes('20 GB'));click('#confirmJoin');check('demo join',d.querySelector('#nodeState').textContent.includes('等待'));click('#control');check('pause',d.querySelector('#nodeState').textContent.includes('暂停'));click('#control');check('resume',d.querySelector('#nodeState').textContent.includes('等待'));click('#revoke');check('revoke',d.querySelector('#nodeState').textContent.includes('未连接'));
+click('.nav [data-page="learn"]');click('#exampleBtn');d.querySelector('#exampleText').value='跨语言属性保持的反例';click('#saveExample');check('local-only draft',w.localStorage.getItem('openone-example').includes('跨语言'));
+click('.nav [data-page="research"]');click('#phaseDetail');check('research plan details',d.querySelector('#dialogBody').textContent.includes('交付与验收'));
+check('no external dependencies',!/<script[^>]+src=|<link[^>]+stylesheet/.test(source));
+const folder=new URL('./result/phase2762_client_prototype/',import.meta.url);mkdirSync(folder,{recursive:true});writeFileSync(new URL('checks.json',folder),JSON.stringify({scope:'DOM interaction simulation; canvas stubbed; not visual/browser QA',checks},null,2));
+console.log(JSON.stringify({checks:checks.length,passed:checks.filter(x=>x.pass).length,visual_browser_QA:'blocked: local networking permissions and app approval timeout'}));
+await w.happyDOM.close();

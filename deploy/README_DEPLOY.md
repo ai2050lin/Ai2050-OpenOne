@@ -285,3 +285,16 @@ python scripts/download_lang_bench_v3.py --meta-only     # 只重算 meta 摘要
 | 健康检查 | `curl http://127.0.0.1:5010/api/health` |
 | 备份 | `/var/lib/ai2050/center`（SQLite 用 `sqlite3 dist.sqlite3 ".backup b.sqlite3"`）与 `/etc/ai2050` |
 | 首次启动 | 后台会计算谱图与总览快照（可能需要几分钟），公开页面先显示「计算中」 |
+
+
+## 8. 持续研究库与节点托管（2026-11-03）
+
+更新中心时一并部署 research_library.py、node_control.py、parameter_service.py、parameter_reader.py；build_center_release.py 已包含这些文件。桌面 extraResources 与命令行一键包也包含 parameter_reader.py，读取参数不依赖中心保有权重。Windows x64 客户端 1.0.1 已打包并在本机启动验收，远端中心尚未部署；旧节点需更新 node_service.py 才能托管。
+
+持久库位于 `<AI2050_DIST_DIR>/research_library/`，随中心数据库、objects/、census/ 一起备份，不能在升级程序目录时清空。后台 snapshot_worker 自动索引公开研究报告、真实分片和审计 / 复核变化；默认每轮结束后等待300秒。新实验输出 `research/**/report.json` 或 `*.research.json`；成员可从 Goodfire 报告主动提交，管理员可登记显式图谱。可用 AI2050_RESEARCH_DIR 指定研究根目录。主包与 research-library 附加包供离线客户端更新，schema 与证据边界见 design/platform_spec_v1.md 第9节。
+
+远程托管只接受本人账号对已在本机授权的节点进行暂停 / 恢复 / 停止；公开中心仍不加载 GPU 模型。公开中心不要设置 AI2050_LOCAL_TOOLS=1。参数浏览默认走桌面本机 IPC。没有完整快照或显式证据的旧报告保留原貌和版本，不自动成为机制结论。
+
+完整本机服务 `server/server.py` 与独立中心都随生命周期启动研究快照后台，退出时停止；已有旧快照也必须继续刷新，不能只在首次缺文件时运行。沿用 `AI2050_SNAPSHOT_DISABLE` 与 `AI2050_SNAPSHOT_SECONDS`。客户端升级不会自动升级远端中心；新增研究库需中心代码和离线数据包同时更新。1.0.1 安装包、blockmap 和 SHA256SUMS.txt 位于 `frontend/dist-installer/1.0.1/`。本轮验收启动的是同包解出的程序，未运行安装向导、未覆盖已有安装。
+
+1.0.2 新增工作包、最近拼图修订与样本完整MLP响应回查。更新 research_library.py、parameter_reader.py、parameter_service.py、node_service.py、datapack.py、语言树与对应前端；保留原有持久库。桌面主进程新增本机 `/parameters/identity` 白名单和完整哈希核验超时，旧节点服务需要重启加载新代码。安装包在 `frontend/dist-installer/1.0.2/`。公开中心仍不能开放本机权重工具；普通客户端只读取研究数据包，核验模型通过本机节点完成。升级后先更新主数据，再按提示下载研究库附加包。

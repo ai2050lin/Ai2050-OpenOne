@@ -1,0 +1,223 @@
+{
+  "fix": "Same inputs, batch4 padding geometry, weights, edits and original SDPA; reconstructed rows mask False to -inf before softmax. All actual hidden/G/V/A/head/output arrays are bitwise equal to earlier capture.",
+  "issue": "Historical recorder added boolean masks as numbers, while SDPA interprets True as allowed. Display reconstruction was invalid on padded audit inputs. Actual model computation was always passed the original correct mask.",
+  "kind": "real",
+  "manifests": [
+    "051aecda537aa52b38c65d96d68b7bdcc67830124551bbe91036c5857c29844a",
+    "3ffaf072b98e5c0ce6af9eaa6018ae330916cd3e04427cfdc7849dcd91e3b084",
+    "9d3a75b682705938250faae15a004fb803b146376079e14a192f4633047f9a9c",
+    "c8303bef4d9131278543075ba79ab159deb3bf2c26d916ff803478c4ed60b1f7",
+    "48ef04f36f3bcbe9a7ae6e355b9501162d5bf068465564f5930589b3d675e4b1",
+    "97bbce1c5d00a6a2ac1eb7e5016b75fb8a1402c40ab6e91ba8cf3412b4bf2444",
+    "f34566594e9766e5c6d9886ae92b7785dd48d0c44cd44b1b5c257b28dce7cda8",
+    "d129c8cf04d5fa34c907e946c269b775e674d34475f1a667c41324daf2ddf2cb",
+    "b452da134bffc65bf997b90f53dae8c38ffb76d68bece8d8ab7f1d838f2e0909",
+    "7d77d512583ffdcfb0484f30b028adb6cf4ff8cc846a03117b7badcb219df2f6",
+    "fc60e4e4b8122bb604290d7c69491fa1f5fee933264bb6c60cbdbf09fb0fb68c",
+    "d573ac57f5591d28fd4d2629686f85518f891085ccd4e809d84017017a75e7e9",
+    "ec034f3f17a5b51248548ab25e45256608621cec58be424a989c744686438bd1",
+    "49ea11f3c63d73285087c063fa2a7bf6e3fd50ebaa48d7b0d6c9bc349e0ac9e0",
+    "24260fc90073264e556dbf2ef67eb28f42bfa134272fbaf24677fa44ed74d65f",
+    "ec5a14065cef1df7835beeee8c32163600c7924d98aa7a076a4f2b1b32607bb2",
+    "c0616bb57424c3ed986e986da92f6b48f47fc9e28a1a4051f0d3e34cee76eb2d",
+    "774da82c6777e5277e22d2e6b5f8bda9698c9e41345237a901413debc9e25ba7",
+    "6d10a063a4e2031ae61add577d5d783986f71a49127df9b7d539c967fa3289c5",
+    "cee77d302297ebcb54e11f784dc308c4e13902b87993f8bfc5b7013f2390f55b"
+  ],
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "new_tensor_bytes": 195992192,
+  "new_tensor_files": 740,
+  "no_new_independent_samples": true,
+  "old_artifacts_retained": true,
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 4112026
+  },
+  "rows": [
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0023376792669296265,
+      "old_trace_id": "ab32c8d754f89a5a204c1984b9b9d22efcafea0cb149d7681e57e2108a105cc3",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:ceval-civil_servant-28:base",
+      "trace_id": "66e2e417e3cf9ef90bb1d5272b17b4f1267953c404e58d1210f46d9ad37a8e5f"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002369686495512724,
+      "old_trace_id": "98472a45c857bc52d522811681352354b32c81b37e53a49237bf6514e314a957",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:ceval-civil_servant-28:edited",
+      "trace_id": "047d86af2b02992c74d68791c143162aba5cc7e4c9f227b49906a4c102f95bc7"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002152153756469488,
+      "old_trace_id": "04b06d66c4910353db762dad8e6b80d9f1e9c08cc1831d8e4cd75d307768e1fb",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:mmlu-management-7039:base",
+      "trace_id": "f7ab44f8282f90c974622c23a725314900e3263515fbde4479cc133ca40b7c5c"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0019752313382923603,
+      "old_trace_id": "0c0831422ee9e7dafb043cdbc9c2323f2a2008a862eb2b736caa28bd92cddcef",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:mmlu-management-7039:edited",
+      "trace_id": "6e6d6d971f1943ce9dc9c7408fab15e101a7b22a42150e397f1342419ff3f9b1"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0020283448975533247,
+      "old_trace_id": "e35bae7a3c7347af50968429bc2fa0dcca403d05fff29913a296982eebd4f448",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-26614:base",
+      "trace_id": "1449100b726fbfbfa39320f0d7699f90ed7deb3c31192566bdb2b3d3b9f2717b"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0022962940856814384,
+      "old_trace_id": "5fb3336e529fd1a82255bacc68517f83e4dd2d50bb3986d3a38e2f0cb2b1e908",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-26614:edited",
+      "trace_id": "e223941fb29fa5d32e7a7d967d6b7da539853be538c3cb52ead9e49fa4958355"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002496075816452503,
+      "old_trace_id": "6c7bed987011246aae0236d701384c51eac9ac5ac173ec2393bfa814e5ebd86c",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-8020:base",
+      "trace_id": "ad6d636dc0ceaecc55b9097791a39c615770cfb3110e5bf96f8a74cd00d75269"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002085222862660885,
+      "old_trace_id": "602757425c2a1f09182c0eb0566ba7e9bed642cbcc1efa5cbca2261804932eeb",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-8020:edited",
+      "trace_id": "45f0c292322d86edf89e02e613be5ae7839b07ffe1e9c32ce7d4670ab1a3684a"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002077219309285283,
+      "old_trace_id": "a53a0b360b176c055ce02bdf872d08f4a8fedcabed8fe30d4d4462e497994ee7",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-6390:base",
+      "trace_id": "12b15b1dcb781ebd3a458819e7f8cb2ae61afc202e54d35555142fa3c24cedcb"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0020994190126657486,
+      "old_trace_id": "61c7ed41f04f4497636237fe8ecea40ba537091ea18530de7ff2b58887a3e57c",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:native:cmexam-6390:edited",
+      "trace_id": "ae36ae33c0c9ecf0bffd9df6bdfe09adb8f64a07cb6e5b869727d794242b7f62"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0023376792669296265,
+      "old_trace_id": "3bbd9262a5b6f3d2eef0c173ce4e71b4348de27c18a81c0cca993fb329936903",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:coordinate:ceval-civil_servant-28:base",
+      "trace_id": "516c73009349318b7f2e5b3b8ebee5d5a188706efa4d0523423c8dcc2313792c"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.002179122529923916,
+      "old_trace_id": "b5cdd8558191aa61ef8cd058c22cbc3c618c86758534beaa2bddf41210605af3",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:coordinate:ceval-civil_servant-28:edited",
+      "trace_id": "f73d16d1990edcfe44565f997a2b57cfc2f58195e1c18600b1bab8a816ad66e7"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0021858843974769115,
+      "old_trace_id": "017b47dd6e4af171ed6fe4604c969018095763c1cdd24a67b738ceb36d341f15",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:coordinate:cmexam-11618:base",
+      "trace_id": "14c8bb20c427591ee66bc1d02188163978f352b3185246dca407ae16dfd684c2"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0022137498017400503,
+      "old_trace_id": "82c038ab84e209815920c17dd7bd8c250a6f75eb9adf903ac14cc5fb9e167ade",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:capability-audit",
+      "sample_id": "cap:coordinate:cmexam-11618:edited",
+      "trace_id": "a173fd1c2a5114c46a937cdeb53c93f131597a20262800e6c1f6f11ffc156863"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0017013370525091887,
+      "old_trace_id": "99762ccd43086056d51cc11168afe84ae9daf46e9f5e231177be8ebdb4db619d",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:1:base",
+      "trace_id": "703b5dc93753e08bd6ac04b3e8a6b3a00e7c475dba3c755b3c3941db894c7b62"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0017090367618948221,
+      "old_trace_id": "d2da0c1f8e313dda3fb34548069299498864c9a0ad503b6b00d13d2eca6bdf75",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:1:native",
+      "trace_id": "b6d31709275cdefd55cf474d01dd476fb51a363336bbf60775b0d099bbb58b1f"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0017212234670296311,
+      "old_trace_id": "349d3a0670dc1872bba1298e4317482f3b171a3ad691433695003e5dee1168e3",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:1:coordinate",
+      "trace_id": "b466ce39eba650bf08940a3ee5ceecbee99354887cbb3251d31154b222c3b988"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0017110294429585338,
+      "old_trace_id": "3dba78fd0dc6360252823ced48f97e394deb02035fb1ad13d9d970572dfa8887",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:0:base",
+      "trace_id": "a6d287c9a9b669c0fd0601af07e4b1c511ce5224171195feb5b1975ad6a4b51b"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.001728983479551971,
+      "old_trace_id": "2ce89f9fcd488666d83b8dacb597aa642d8ee9f7574bf0eb7408c5269d9aebc6",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:0:native",
+      "trace_id": "2982a9fcb049a974590d4cd92f46ebeb10ac95b93f39a03751f82ae3a926d1b1"
+    },
+    {
+      "actual_module_states_bitwise_equal": true,
+      "max_attention_relative_l2": 0.0017110294429585338,
+      "old_trace_id": "852c496419c6da18cbae029fdea9f9d6deb73e07b4b98a008478761a9d67e9e2",
+      "prediction_consistent": true,
+      "run_id": "NMLP-FUNCTION-20261104-v4:operation-audit",
+      "sample_id": "operation:location:288:0:coordinate",
+      "trace_id": "e6937a85884031a8ca970eb086d2993b7794e3843ea2f6cffaa1f41cf1c62fa8"
+    }
+  ],
+  "run_id": "NMLP-FUNCTION-20261104-v4",
+  "schema": "research_native_evidence.v1"
+}

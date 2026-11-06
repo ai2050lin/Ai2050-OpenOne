@@ -1,0 +1,59 @@
+{
+  "H1": {
+    "criterion": "mean paired document-choice difference>=.50 and entity-bootstrap95% lower>.20; majority binary outcome additionally reported; model-specific controlled question-answering, not general language theory",
+    "expected_delta": 0.5,
+    "power_binary_entity_majority": {
+      "achieved_power": 0.873,
+      "expected_delta_pt": 50.0,
+      "n": 32,
+      "n_required": 27,
+      "p_d": 0.7,
+      "pass": true
+    }
+  },
+  "H2": {
+    "criterion": "on32 heldout entities at F2/L1024/doc, ablating8 discovery-selected late heads lowers correct forced-choice by>=.20 and paired entity lowerCI>0; matched-block8 random heads smaller. Failures retained.",
+    "expected_delta": 0.35,
+    "power_binary_entity_vote": {
+      "achieved_power": 0.813,
+      "expected_delta_pt": 35.0,
+      "n": 32,
+      "n_required": 32,
+      "p_d": 0.4,
+      "pass": true
+    }
+  },
+  "behavior_gate": "each scope heldout forced choice>=.80; report all cells and all inputs; prior probes and dataset keys separate; no posthoc row exclusion",
+  "capability": "new head interventions additionally evaluated on frozen previous2200-keyed monitor if an effect is supported; otherwise no capability-preservation claim. Reference-only questions excluded.",
+  "controls": "same-block matched random heads; source-free prior probe for every entity; identity/length controls and hs[0] saved; no reselect on holdout",
+  "corpus_sha256": "317c398af7e1e16cb2efaf91290f763af4beb19055778af46ff19fe5ddaa57d3",
+  "created_at": 1793782128.286762,
+  "deep_ids": [
+    "vegetable.zucchini:F0:L512:doc",
+    "vegetable.zucchini:F0:L512:world",
+    "vegetable.zucchini:F0:L2048:doc",
+    "vegetable.zucchini:F0:L2048:world",
+    "food.sugar:F2:L512:doc",
+    "food.sugar:F2:L512:world",
+    "food.sugar:F2:L2048:doc",
+    "food.sugar:F2:L2048:world"
+  ],
+  "generation": "fixed deep8 actual greedy max24 new tokens, cache continued without teacher forcing; generation fields at every actual step",
+  "kind": "real",
+  "limits": [
+    "authored repeated document background, not natural corpus",
+    "length adds background content",
+    "lexicon colour labels may fail; prior probes distinguish model knowledge errors",
+    "primary restricted forced-choice distribution; free generations descriptive",
+    "one local physical node",
+    "no cross-model generalization"
+  ],
+  "materials_sha256": "767aab2fa6f23eb26eb9d20273cafa758da03991be93e7e54630fede2055ba7c",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "native": "all37 hidden layers at registered readouts, all36 blocks fullMLP G/V/A and head output vectors; fixed deep8 examples also full-token hidden and postRoPE normalized Q/K plus groupedV; noTopK coordinate truncation",
+  "primary": "heldout32 entities: difference of document preference under document versus reality scope, entity means over2 new frames x3 lengths",
+  "readout": "entire scope cue and conflicting fact visible before final readout; same assistant suffix across pairs. Entity/cue earlier positions have causal visibility flags, not tested for future scope encoding.",
+  "run_id": "P2793-ENTITY-ARBITRATION-v1",
+  "schema": "entity_arbitration_prereg.v1",
+  "selection": "only discovery16; choose8 heads in blocks18..35 by mean document-minus-reality direct logit contribution. DLA freezes actual final RMS; it is direct attribution, not total causality."
+}

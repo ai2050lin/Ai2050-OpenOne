@@ -1,0 +1,912 @@
+{
+  "schema": "research_evidence.v1",
+  "kind": "real",
+  "run_id": "P2768-KN-FRUIT-TOOL-v1",
+  "revision": "validated",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "model_name": "Qwen3-4B",
+  "title": "水果与工具 · 长文本类别响应",
+  "design": {
+    "run_id": "P2768-KN-FRUIT-TOOL-v1",
+    "version": 1,
+    "model": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "precision": "bf16",
+    "primary_block": 18,
+    "readout": "final",
+    "feature": "silu(G)*V",
+    "selection": "largest absolute pooled Cohen d over all 9728 units, discovery entities averaged across frames",
+    "permutations": 1000,
+    "seed": 2768,
+    "min_std": 0.0001,
+    "discovery_fwer_alpha": 0.05,
+    "heldout_min_auc": 0.8,
+    "heldout_min_abs_d": 0.8,
+    "min_behavior_acc": 0.8,
+    "min_tokens": 256,
+    "max_tokens": 768,
+    "splits": "entity-family deterministic SHA256; 50/25/25; third frame never used for selection",
+    "claim": "category-associated single-unit candidate, not a causal mechanism or independent graph predictor",
+    "not_measured": [
+      "necessity",
+      "sufficiency",
+      "natural free generation",
+      "graph-only next-token KL",
+      "other models",
+      "other languages"
+    ]
+  },
+  "result": {
+    "unit": 9031,
+    "block": 18,
+    "sign": 1,
+    "d": 3.2066858141536976,
+    "fwer_p": 0.000999000999000999,
+    "entities": [
+      "fruit-01",
+      "fruit-03",
+      "fruit-04",
+      "fruit-05",
+      "fruit-06",
+      "fruit-08",
+      "fruit-09",
+      "fruit-12",
+      "fruit-13",
+      "fruit-15",
+      "fruit-19",
+      "fruit-22",
+      "fruit-23",
+      "fruit-24",
+      "fruit-26",
+      "fruit-28",
+      "tool-03",
+      "tool-04",
+      "tool-05",
+      "tool-06",
+      "tool-07",
+      "tool-09",
+      "tool-11",
+      "tool-15",
+      "tool-17",
+      "tool-19",
+      "tool-21",
+      "tool-23",
+      "tool-26",
+      "tool-27",
+      "tool-29",
+      "tool-31"
+    ],
+    "threshold": -0.037680235470841025,
+    "all_units": 9728,
+    "selection_used_holdout": false,
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "metrics": {
+      "confirm": {
+        "n_entities": 16,
+        "auc": 0.875,
+        "d_oriented": 2.0090520604612014,
+        "threshold_accuracy": 0.9375,
+        "auc_bootstrap_95": [
+          0.625,
+          1.0
+        ],
+        "entities": [
+          "fruit-02",
+          "fruit-10",
+          "fruit-14",
+          "fruit-17",
+          "fruit-20",
+          "fruit-21",
+          "fruit-29",
+          "fruit-30",
+          "tool-01",
+          "tool-08",
+          "tool-10",
+          "tool-12",
+          "tool-13",
+          "tool-18",
+          "tool-25",
+          "tool-30"
+        ]
+      },
+      "lockbox": {
+        "n_entities": 16,
+        "auc": 0.921875,
+        "d_oriented": 2.31515303805823,
+        "threshold_accuracy": 0.875,
+        "auc_bootstrap_95": [
+          0.75,
+          1.0
+        ],
+        "entities": [
+          "fruit-00",
+          "fruit-07",
+          "fruit-11",
+          "fruit-16",
+          "fruit-18",
+          "fruit-25",
+          "fruit-27",
+          "fruit-31",
+          "tool-00",
+          "tool-02",
+          "tool-14",
+          "tool-16",
+          "tool-20",
+          "tool-22",
+          "tool-24",
+          "tool-28"
+        ]
+      },
+      "unseen_frame_and_entities": {
+        "n_entities": 16,
+        "auc": 0.6875,
+        "d_oriented": 0.7123159645610095,
+        "threshold_accuracy": 0.6875,
+        "auc_bootstrap_95": [
+          0.390625,
+          0.9375
+        ],
+        "entities": [
+          "fruit-00",
+          "fruit-07",
+          "fruit-11",
+          "fruit-16",
+          "fruit-18",
+          "fruit-25",
+          "fruit-27",
+          "fruit-31",
+          "tool-00",
+          "tool-02",
+          "tool-14",
+          "tool-16",
+          "tool-20",
+          "tool-22",
+          "tool-24",
+          "tool-28"
+        ]
+      }
+    },
+    "baselines": {
+      "confirm": {
+        "final_embedding_auc": 0.5,
+        "target_token_centroid_auc": 0.90625,
+        "length_auc": 0.5859375
+      },
+      "lockbox": {
+        "final_embedding_auc": 0.5,
+        "target_token_centroid_auc": 0.828125,
+        "length_auc": 0.4375
+      },
+      "unseen_frame_and_entities": {
+        "final_embedding_auc": 0.5,
+        "target_token_centroid_auc": 0.828125,
+        "length_auc": 0.4375
+      }
+    },
+    "passed": false,
+    "counterexamples": [
+      {
+        "id": "KN-LOOP:catalogue:tool-13",
+        "entity": "hatchet",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.018376492513088268
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-18",
+        "entity": "soldering iron",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.010485841095820509
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-25",
+        "entity": "wire cutters",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.01677279159596654
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-08",
+        "entity": "vise",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.0015999433780051974
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-30",
+        "entity": "screw clamp",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.007007308772828801
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-12",
+        "entity": "mallet",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.002098869036154261
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-10",
+        "entity": "rasp",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.022643820192201788
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-01",
+        "entity": "screwdriver",
+        "frame": "catalogue",
+        "split": "confirm",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.010847104150627652
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-22",
+        "entity": "hoe",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.01127033858675065
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-20",
+        "entity": "shovel",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.0024998204268794895
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-28",
+        "entity": "hacksaw",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.0012542158880765424
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-02",
+        "entity": "wrench",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.005266103058985174
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-24",
+        "entity": "pruning shears",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.006162725504178002
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-16",
+        "entity": "ratchet",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.006133325794217023
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-00",
+        "entity": "hammer",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": 0.0003423102715958381
+      },
+      {
+        "id": "KN-LOOP:catalogue:tool-14",
+        "entity": "crowbar",
+        "frame": "catalogue",
+        "split": "lockbox",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.019584679951842737
+      },
+      {
+        "id": "KN-LOOP:review:fruit-29",
+        "entity": "guava",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0713696092417981
+      },
+      {
+        "id": "KN-LOOP:review:fruit-30",
+        "entity": "pomegranate",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.06978472884440876
+      },
+      {
+        "id": "KN-LOOP:review:fruit-14",
+        "entity": "apricot",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07297488787729602
+      },
+      {
+        "id": "KN-LOOP:review:fruit-10",
+        "entity": "mango",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0640790065072885
+      },
+      {
+        "id": "KN-LOOP:review:fruit-02",
+        "entity": "orange",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0657485391579786
+      },
+      {
+        "id": "KN-LOOP:review:fruit-17",
+        "entity": "grapefruit",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07563627066386211
+      },
+      {
+        "id": "KN-LOOP:review:fruit-21",
+        "entity": "cranberry",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07297488787729602
+      },
+      {
+        "id": "KN-LOOP:review:fruit-20",
+        "entity": "blackberry",
+        "frame": "review",
+        "split": "confirm",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07833485073823844
+      },
+      {
+        "id": "KN-LOOP:review:fruit-00",
+        "entity": "apple",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0647756779531537
+      },
+      {
+        "id": "KN-LOOP:review:fruit-25",
+        "entity": "honeydew",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07925277468398692
+      },
+      {
+        "id": "KN-LOOP:review:fruit-27",
+        "entity": "fig",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05546073095032487
+      },
+      {
+        "id": "KN-LOOP:review:fruit-31",
+        "entity": "lychee",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.08040467128221129
+      },
+      {
+        "id": "KN-LOOP:review:fruit-18",
+        "entity": "raspberry",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.06181683263721389
+      },
+      {
+        "id": "KN-LOOP:review:fruit-11",
+        "entity": "papaya",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.06589150624104455
+      },
+      {
+        "id": "KN-LOOP:review:fruit-16",
+        "entity": "tangerine",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07181082902672925
+      },
+      {
+        "id": "KN-LOOP:review:fruit-07",
+        "entity": "grape",
+        "frame": "review",
+        "split": "lockbox",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.07755539948711168
+      },
+      {
+        "id": "KN-LOOP:heldout:tool-06",
+        "entity": "drill",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.016992054205724208
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-24",
+        "entity": "cantaloupe",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04600332312133071
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-26",
+        "entity": "kiwi",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.043253575339880744
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-03",
+        "entity": "pear",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.053983813531034486
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-23",
+        "entity": "watermelon",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04324708955577379
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-22",
+        "entity": "strawberry",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0379870236126104
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-12",
+        "entity": "pineapple",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04010140059239533
+      },
+      {
+        "id": "KN-LOOP:heldout:tool-26",
+        "entity": "bolt cutters",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.03759989558649499
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-04",
+        "entity": "peach",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.043367566086832524
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-05",
+        "entity": "plum",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04302601409704114
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-13",
+        "entity": "coconut",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05178220835777042
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-15",
+        "entity": "nectarine",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.0580123655856508
+      },
+      {
+        "id": "KN-LOOP:heldout:tool-09",
+        "entity": "file",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.012668888323010963
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-06",
+        "entity": "cherry",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05656093778875353
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-08",
+        "entity": "lemon",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05133194726768761
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-09",
+        "entity": "lime",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04891650145883829
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-29",
+        "entity": "guava",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04713963534720166
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-30",
+        "entity": "pomegranate",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04741175342283664
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-14",
+        "entity": "apricot",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.048530211734873034
+      },
+      {
+        "id": "KN-LOOP:heldout:tool-25",
+        "entity": "wire cutters",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "tool",
+        "predicted": "fruit",
+        "activation": -0.03283622240963955
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-17",
+        "entity": "grapefruit",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04636142441701109
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-20",
+        "entity": "blackberry",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.03919493065004433
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-25",
+        "entity": "honeydew",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05177007858335513
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-31",
+        "entity": "lychee",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05520398774559685
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-18",
+        "entity": "raspberry",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04328621590761407
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-11",
+        "entity": "papaya",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.04429491373350635
+      },
+      {
+        "id": "KN-LOOP:heldout:fruit-16",
+        "entity": "tangerine",
+        "frame": "heldout",
+        "split": "lockbox_frame",
+        "expected": "fruit",
+        "predicted": "tool",
+        "activation": -0.05652278009380482
+      }
+    ],
+    "outcome": "not_supported_under_preregistered_gates",
+    "limitations": [
+      "One selected MLP unit is a response association; no causal intervention.",
+      "Entity names carry category information; success above constant final embedding does not eliminate lexical explanations.",
+      "Same source grammar and English only; entity bootstrap does not cover all template uncertainty.",
+      "No graph-only full-vocabulary prediction, no claim of mechanism closure."
+    ]
+  },
+  "raw_artifacts": {
+    "tests/glm5/result/phase2768_knowledge_loop/corpus.json": "d26bcd19541f3e784293c5d297e66d72872de0f9473309f9b00f1a5a4c504242",
+    "tests/glm5/result/phase2768_knowledge_loop/freeze.json": "8c60f190b15a249d36e499b37f23b0b5e511faad965da31fea079d585f80998d",
+    "tests/glm5/result/phase2768_knowledge_loop/discovery.json": "64fe1b8dfa79ad6f5bbba0a5581a3bc34e38f87a2b7b3cc6ee0d8ceef132c05a",
+    "tests/glm5/result/phase2768_knowledge_loop/collection/summary.json": "73f5d00e4fe664aaf34b4215746f41a8067dcf77669abe45075b7f82f04da6c9",
+    "tests/glm5/result/phase2768_knowledge_loop/collection/behavior.json": "8340f2a488c4ea605e57db68f0f2848548ebd8898ca9b847697da0a0be68cbbb",
+    "tests/glm5/result/phase2768_knowledge_loop/validation.json": "8499789b7b222fd2b595031045b49ac5b9079b540e23d607970c24637449fb3e"
+  },
+  "native_field": {
+    "dir": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\phase2768_knowledge_loop\\native\\KN-LOOP\\P2768-KN-FRUIT-TOOL-v1-v1\\14ee8bc6052551a5\\6be1034f0b55a6df-bf16\\shard-0of1",
+    "manifest": "manifest.json",
+    "manifest_sha256": "c06aa97dcee75132471ca81c9f961611433e14e66149fa68d33325e6ac3e8e6f",
+    "n_files": 37,
+    "bytes": 72754432,
+    "dtype": "float16",
+    "uploaded": false,
+    "nonfinite": 0,
+    "note": "原生全场只存于节点本地（不上传）；按 manifest 的 sha256 校验后可按需拉取或用同一语料与模型重算"
+  },
+  "mlp_units": {
+    "readouts": [
+      "target",
+      "final"
+    ],
+    "blocks": [
+      18
+    ],
+    "d_ff": 9728,
+    "act": "silu",
+    "n_items": 192,
+    "double_negative_share_strong": [
+      [
+        0.3087
+      ],
+      [
+        0.3517
+      ]
+    ],
+    "note": "double_negative_share_strong：|A| ≥ 该单元 99 分位的激活中 G<0 且 V<0（−×−）所占比例，按读出 × 块",
+    "check": {
+      "n": 64,
+      "rel_err_mean": 0.002429846670565894,
+      "rel_err_max": 0.0025991564616560936,
+      "note": "‖act(G)⊙V − down_proj 实际输入‖ / ‖down_proj 实际输入‖（bf16 前向，fp32 重算）"
+    },
+    "native": {
+      "dir": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\phase2768_knowledge_loop\\native\\KN-LOOP\\P2768-KN-FRUIT-TOOL-v1-v1\\14ee8bc6052551a5\\6be1034f0b55a6df-bf16\\shard-0of1\\mlp",
+      "manifest_sha256": "bb9d8a5027a128e38e65f936ecdbbfc20f04d8c12e17ef466b7ac8a8104b6b31",
+      "bytes": 14942698,
+      "n_files": 1,
+      "uploaded": false
+    }
+  },
+  "snapshot_manifest": {
+    "sha256": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "files": {
+      "model-00001-of-00003.safetensors": {
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+        "size": 3957900840
+      },
+      "model-00002-of-00003.safetensors": {
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+        "size": 3987450520
+      },
+      "model-00003-of-00003.safetensors": {
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+        "size": 99630640
+      },
+      "config.json": {
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+        "size": 726
+      },
+      "generation_config.json": {
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+        "size": 239
+      },
+      "tokenizer.json": {
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "size": 11422654
+      },
+      "tokenizer_config.json": {
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+        "size": 9732
+      },
+      "vocab.json": {
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "size": 2776833
+      },
+      "merges.txt": {
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "size": 1671853
+      }
+    },
+    "n_files": 9,
+    "note": "权重（*.safetensors 等）、config 与 tokenizer 文件逐个 sha256；sha256 为按文件名排序后的合成哈希"
+  },
+  "parameter_checks": {
+    "gate_proj": {
+      "name": "model.layers.18.mlp.gate_proj.weight",
+      "shape": [
+        9728,
+        2560
+      ],
+      "dtype": "BF16",
+      "start": [
+        9031,
+        0
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          -0.004241943359375
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    },
+    "up_proj": {
+      "name": "model.layers.18.mlp.up_proj.weight",
+      "shape": [
+        9728,
+        2560
+      ],
+      "dtype": "BF16",
+      "start": [
+        9031,
+        0
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          0.0074462890625
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    },
+    "down_proj": {
+      "name": "model.layers.18.mlp.down_proj.weight",
+      "shape": [
+        2560,
+        9728
+      ],
+      "dtype": "BF16",
+      "start": [
+        0,
+        9031
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          -0.014404296875
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    }
+  },
+  "software_only": false,
+  "sample_count": 192,
+  "entity_count": 64,
+  "token_length_range": [
+    303,
+    307
+  ],
+  "model_binding": {
+    "local_model_id": "9a784350de7f8d690b04ffef",
+    "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+  },
+  "reproduction": "tests\\glm5\\phase2768_knowledge_loop.py"
+}

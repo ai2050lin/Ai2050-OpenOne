@@ -2,7 +2,7 @@
   "name": "ai2050-client",
   "productName": "AI2050 语言机制研究平台",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.7",
   "description": "AI2050 语言机制研究平台客户端 — 图谱 / 模板 / 机制查询与可视化",
   "author": "AI2050 Research Platform",
   "main": "electron/main.js",
@@ -68,6 +68,10 @@
     ],
     "asar": true,
     "extraResources": [
+      {
+        "from": "../deploy/parameter_reader.py",
+        "to": "node/parameter_reader.py"
+      },
       {
         "from": "../deploy/node_agent.py",
         "to": "node/node_agent.py"

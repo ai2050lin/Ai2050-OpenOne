@@ -1,0 +1,30 @@
+/* Release only after real browser and actual Electron/IPC acceptance. Offline build. */
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {build,Platform,Arch} from '../../frontend/node_modules/electron-builder/out/index.js';
+const root=fileURLToPath(new URL('../../',import.meta.url)),front=path.join(root,'frontend');
+const proof=path.join(root,'tests/glm5/result/workbench_playwright_20261104');
+const browser=JSON.parse(await fs.readFile(path.join(proof,'browser-acceptance.json'),'utf8'));
+const desktop=JSON.parse(await fs.readFile(path.join(proof,'electron-acceptance.json'),'utf8'));
+const reload=JSON.parse(await fs.readFile(path.join(proof,'electron-reload-acceptance.json'),'utf8'));
+assert.equal(browser.passed,true);assert.equal(desktop.passed,true);assert.equal(reload.passed,true);
+assert(reload.checks.some(c=>c.name==='downloaded_extra_and_graph_selection_survive_reload'&&c.passed));
+for(const name of ['navigation','legacy-links','graph-runtime-parameters','contribution-web','data-sync','narrow-layout'])assert(browser.cases.some(c=>c.name===name&&c.passed),name);
+for(const name of ['actual_electron_preload_and_idle_node','resource_budget_saved_via_real_ipc','complete_research_library_stream_real_download','research_graph_reads_actual_downloaded_extra'])assert(desktop.checks.some(c=>c.name===name&&c.passed),name);
+const pkg=JSON.parse(await fs.readFile(path.join(front,'package.json'),'utf8'));
+assert.equal(Object.keys(pkg.dependencies||{}).length,0);
+const stage=await fs.mkdtemp(path.join(root,'tests/glm5_temp/workbench-app-'+pkg.version+'-'));
+await fs.cp(path.join(front,'dist'),path.join(stage,'dist'),{recursive:true});
+await fs.cp(path.join(front,'electron'),path.join(stage,'electron'),{recursive:true});
+const {build:unused,devDependencies,...runtime}=pkg;
+await fs.writeFile(path.join(stage,'package.json'),JSON.stringify({...runtime,packageManager:'traversal@1'},null,2));
+const files={};
+async function hashTree(dir){for(const e of await fs.readdir(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory())await hashTree(f);else files[path.relative(root,f).replaceAll('\\','/')]=createHash('sha256').update(await fs.readFile(f)).digest('hex')}}
+await hashTree(path.join(front,'dist'));await hashTree(path.join(front,'src'));await hashTree(path.join(front,'electron'));
+await fs.writeFile(path.join(proof,'release-source-manifest.json'),JSON.stringify({schema:'release_source_manifest.v1',version:pkg.version,created_at:new Date().toISOString(),browser_passed:true,desktop_passed:true,files},null,2));
+const config={...pkg.build,npmRebuild:false,electronVersion:pkg.devDependencies.electron.replace('^',''),electronDist:path.join(front,'node_modules/electron/dist'),directories:{output:path.join(front,'dist-installer',pkg.version),buildResources:path.join(front,'electron')},extraResources:pkg.build.extraResources.map(x=>({...x,from:path.resolve(front,x.from)})),win:{...pkg.build.win,signAndEditExecutable:false}};
+process.env.CSC_IDENTITY_AUTO_DISCOVERY='false';process.env.ELECTRON_BUILDER_CACHE='C:/Users/Admin/AppData/Local/electron-builder/Cache';
+await build({projectDir:stage,config,targets:Platform.WINDOWS.createTarget(['nsis'],Arch.x64),publish:'never'});

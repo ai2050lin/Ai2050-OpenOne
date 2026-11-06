@@ -1,0 +1,148 @@
+{
+  "schema": "w6_prereg.v2",
+  "run_id": "P2773-W6-REGISTER-v2",
+  "kind": "real",
+  "seed": 27732026,
+  "model": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+  "precision": "bf16",
+  "question": "Does removal/suppression of a context register direction in selected MLP columns alter heldout continuation while preserving keyed capability?",
+  "hypothesis_status": "unproven; failure does not imply distributed capacity",
+  "prior_results_exposed": [
+    "Q9A/Q9B v1 and Phase2772; new corpus and splits below"
+  ],
+  "layers": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ],
+  "direction": "academic minus colloquial mean at block output, discovery only, normalized per block",
+  "ranking": "mean absolute actual contribution abs((u.T W[:,j])*a_j(x)) over discovery; static abs(u.T W) saved as baseline",
+  "operator": "W_new = W_base - alpha * outer(u, (u.T W)*column_mask)",
+  "k_grid": [
+    32,
+    128,
+    512,
+    9728
+  ],
+  "alpha_grid": [
+    -1.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    6.0
+  ],
+  "controls": [
+    "base alpha0",
+    "same-columns norm-matched random directions seeds 0/1/2",
+    "activation-energy-matched random columns seed0",
+    "wrong layers 0..9 same output directions norm-matched"
+  ],
+  "search_budget": "24 target configurations on confirm only; select max mean colloq-formal logP shift, then fewer parameters, then lower abs(alpha)",
+  "primary_readout": {
+    "colloquial": "说白了，",
+    "formal": "综上所述，",
+    "metric": "full forced continuation sum logP, no length normalization",
+    "scope": "two fixed continuation alternatives; not a complete natural style classifier"
+  },
+  "selection": "confirm only; no lockbox/capability access before selected-edit.json is frozen",
+  "primary_criterion": {
+    "min_flip_fraction": 0.2,
+    "cluster_bootstrap": 3000,
+    "one_sided_alpha": 0.05,
+    "require_baseline_academic_choice_accuracy": 0.6,
+    "require_positive_95pct_lower_effect_vs_all_controls": true
+  },
+  "natural_generation": {
+    "families_per_split": 16,
+    "registers": [
+      "acad",
+      "colloq"
+    ],
+    "max_new_tokens": 96,
+    "do_sample": false,
+    "selection": "first family IDs by frozen SHA order, confirm and lockbox, same prompts per edit",
+    "scoring": "predeclared lexical markers and literal item/decimal quantity preservation; automatic proxies only; no natural-style causal promotion"
+  },
+  "natural_markers": {
+    "colloquial": [
+      "说白了",
+      "咱们",
+      "嘛",
+      "啦",
+      "呀",
+      "呗",
+      "就剩",
+      "这么",
+      "反正"
+    ],
+    "academic": [
+      "综上",
+      "因此",
+      "据此",
+      "表明",
+      "可知",
+      "最终",
+      "数量为",
+      "剩余数量"
+    ]
+  },
+  "capability": {
+    "provided_key_n": 2200,
+    "m3exam_reference_n": 140,
+    "noninferiority_margin": 0.02,
+    "familywise_alpha": 0.05,
+    "method": "paired losses indicator and gains; simultaneous one-sided 97.5% Clopper-Pearson bounds; upper(loss)-lower(gain)",
+    "pass": "upper bound <= 0.02; inconclusive otherwise unless lower bound > 0.02",
+    "per_source": "paired point estimates and intervals; no claim of per-source 2pt preservation",
+    "m3exam": "reference only, excluded due to unverified mirror labels",
+    "prompt": "original benchmark question and all 4 or 5 choices, no artificial padding, chat no thinking; full one-token A..D/E likelihood; no multi-answer items"
+  },
+  "power": {
+    "primary": {
+      "expected_delta_pt": 20.0,
+      "n": 160,
+      "p_d": 0.5,
+      "n_required": 99,
+      "achieved_power": 0.947,
+      "pass": true
+    },
+    "capability_difference_planning": {
+      "expected_delta_pt": 2.0,
+      "n": 2200,
+      "p_d": 0.1,
+      "n_required": 1963,
+      "achieved_power": 0.843,
+      "pass": true
+    },
+    "ni_conservative_zero_gain_design": {
+      "margin": 0.02,
+      "expected_loss": 0.005,
+      "n": 2200,
+      "note": "exact binomial rejection/power computed in statistical verification; CI may remain inconclusive",
+      "loss_cutoff": 31,
+      "power": 0.9999998190657136,
+      "null_type1_upper": 0.0239334820781288
+    }
+  },
+  "raw_fields": "all 37 hidden-state arrays at last two causal-visible positions + all 9728 down_proj input units at layers18..27; uint16 BF16 bit preservation; no full-token field claim",
+  "evidence": "record forced-continuation effects separately from natural generation, capability, parameter provenance; no automatic mechanism claim",
+  "model_files": "read only; edits applied to in-memory CUDA copies and restored exactly; save factors/masks only",
+  "time_budget_seconds": 5400,
+  "resource": "one local CUDA bf16 model, batch4; no quantization or synthetic fallback",
+  "not_measured": [
+    "new vocabulary generalization",
+    "cross-language",
+    "other models",
+    "SAE discovery",
+    "graph-only prediction",
+    "multi-node replication"
+  ]
+}

@@ -1,342 +1,229 @@
-/* 研究工作台 · 进展 · 规则账本
-   目的不是"再展示一次结论"，而是防止重复劳动：每条规则给结论状态、关键数字、证据链，
-   以及明确的重测判定（不要重测 / 重测需加样本 / 可以重测）。
-   查重框可以贴一句"我准备测什么"，先看这件事有没有已经做过。
-   数据来自服务器 /api/rules/overview（本机 data/rules/ledger.json）。 */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { API_BASE } from '../app/rdc_fusion/api.js';
+import { useResearchContext } from '../app/researchContext.js';
+import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
-import '../app/workbench.css';
-import './v8.css';
+import ResearchDisclosure from './ResearchDisclosure.jsx';
+import { checkRules, ruleScope, SCOPE_FIELDS } from './ruleCheck.js';
+import { workbenchHref } from './v8Util.js';
 
-const STATUS_STYLE = {
-  confirmed: { text: '已证实', ink: '#0f6e56', bg: '#e1f5ee', line: '#9fe1cb', sym: '✓' },
-  refuted: { text: '已否证', ink: '#993c1d', bg: '#faece7', line: '#f5c4b3', sym: '✗' },
-  inconclusive: { text: '未决', ink: '#854f0b', bg: '#faeeda', line: '#fac775', sym: '◐' },
-  superseded: { text: '已被修正', ink: '#5f5e5a', bg: '#f1efe8', line: '#d3d1c7', sym: '↻' },
-  open: { text: '待测', ink: '#185fa5', bg: '#e6f1fb', line: '#b5d4f4', sym: '○' },
-};
-
-const RETEST_STYLE = {
-  block: { text: '不要重测', ink: '#993c1d', bg: '#faece7' },
-  need_n: { text: '重测需加样本', ink: '#854f0b', bg: '#faeeda' },
-  allow: { text: '可以重测', ink: '#0f6e56', bg: '#e1f5ee' },
-};
-
-const DOMAINS = [
-  ['', '全部'],
-  ['mlp', 'MLP 单元'],
-  ['attn', '注意力头'],
-  ['metric', '指标与对照'],
-  ['method', '实验方法'],
+const PAGE_SIZE = 6;
+const GROUPS = [
+  { id: 'refuted', label: '负面规则', note: '在已测范围内失败的假设与做法' },
+  { id: 'confirmed', label: '有效规则', note: '有实测支持的规律与方法' },
 ];
+const RETEST = { block: '同范围直接引用', need_n: '复测需补样本', allow: '按范围判断复测' };
+const DOMAINS = { measurement: '指标与对照', attention: '注意力头', 'attention-free static': '静态结构' };
+const ruleTitle = rule => rule.title || rule.claim;
 
-function Pill({ style, children }) {
-  if (!style) return null;
-  return (
-    <span className="v8-rules-pill" style={{ color: style.ink, background: style.bg, borderColor: style.line || style.bg }}>
-      {children}
-    </span>
-  );
-}
-
-function MeasureChips({ measure }) {
-  const entries = Object.entries(measure || {});
-  if (!entries.length) return null;
-  return (
-    <div className="v8-rules-chips">
-      {entries.map(([k, v]) => (
-        <span key={k}>
-          <i>{k}</i>
-          <b>{Array.isArray(v) ? v.join(' / ') : String(v)}</b>
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function RuleCard({ rule, labels }) {
-  const [open, setOpen] = useState(false);
-  const st = STATUS_STYLE[rule.status] || STATUS_STYLE.open;
-  const rt = rule.retest || {};
-  const rts = RETEST_STYLE[rt.status] || RETEST_STYLE.allow;
-  return (
-    <div className={'v8-rules-card' + (rt.status === 'block' ? ' blocked' : '')}>
-      <button type="button" className="v8-rules-head" onClick={() => setOpen(o => !o)}>
-        <span className="v8-rules-id">{rule.id}</span>
-        <span className="v8-rules-claim">{rule.claim}</span>
-        <span className="v8-rules-tags">
-          <Pill style={st}>{st.sym} {st.text}</Pill>
-          <Pill style={rts}>{rts.text}</Pill>
-          <span className="v8-rules-count">测过 {rt.count || 0} 次</span>
-          <span className="v8-rules-caret">{open ? '收起' : '展开'}</span>
-        </span>
-      </button>
-      {open && (
-        <div className="v8-rules-body">
-          <MeasureChips measure={rule.measure} />
-          {rule.criterion && (
-            <p className="v8-rules-line"><b>判据</b>{rule.criterion}</p>
-          )}
-          {rule.why && <p className="v8-rules-line"><b>判读</b>{rule.why}</p>}
-          {rt.note && (
-            <p className="v8-rules-line"><b>复查</b>{rt.note}{rt.need_n ? `（重测至少要 ${rt.need_n} 题量级）` : ''}</p>
-          )}
-          {(rule.evidence || []).length > 0 && (
-            <div className="v8-rules-ev">
-              <b>证据</b>
-              <ul>
-                {rule.evidence.map((e, i) => (
-                  <li key={i}>
-                    <span className="v8-rules-ev-phase">{e.phase}</span>
-                    {e.note}
-                    <code>{e.script}</code>
-                    <code>{e.data}</code>
-                    {e.model && <small>{e.model}</small>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {labels?.domain?.[rule.domain] && (
-            <p className="v8-rules-line dim"><b>领域</b>{labels.domain[rule.domain]} · 置信 {rule.confidence}</p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* 折叠块：默认只给「数量 + 前三条示例」，点开才铺全部。避免一屏密密麻麻。 */
-function Fold({ tone, title, count, hint, items, preview }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="v8-rules-fold" style={{ borderLeftColor: tone }}>
-      <button type="button" className="v8-rules-foldhead" onClick={() => setOpen(o => !o)}>
-        <b>{title}</b>
-        <span className="v8-rules-foldcount" style={{ color: tone }}>{count}</span>
-        <span className="v8-rules-foldcaret">{open ? '收起' : '展开'}</span>
-      </button>
-      {open ? (
-        <ul className="v8-rules-foldlist">
-          {items.map(r => (
-            <li key={r.id}><code>{r.id}</code><span>{r.topic || r.claim.slice(0, 30)}</span></li>
-          ))}
-        </ul>
-      ) : (
-        <p className="v8-rules-foldprev">{preview}</p>
-      )}
-      {hint && <small className="v8-rules-foldhint">{hint}</small>}
-    </div>
-  );
-}
-
-function RuleCheck() {
-  const [q, setQ] = useState('');
-  const [res, setRes] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const run = async () => {
-    if (!q.trim()) return;
-    setBusy(true);
-    try {
-      const r = await fetch(`${API_BASE}/api/rules/check?q=${encodeURIComponent(q)}`, { cache: 'no-store' });
-      setRes(await r.json());
-    } catch (e) {
-      setRes({ advice: `查询失败：${e.message || e}`, hits: [] });
-    } finally {
-      setBusy(false);
-    }
-  };
-  const blocked = res?.advice_kind === 'block';
-  return (
-    <div className="v8-rules-check">
-      <div className="v8-rules-checkrow">
-        <input
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') run(); }}
-          placeholder="我准备测：删掉某层 top-1% 单元看正确率是否下降……"
-        />
-        <button type="button" disabled={busy || !q.trim()} onClick={run}>{busy ? '查…' : '查重'}</button>
-      </div>
-      {res && (
-        <>
-          <p className={'v8-rules-advice' + (blocked ? ' bad' : res.advice_kind === 'new' ? ' new' : '')}>{res.advice}</p>
-          {(res.hits || []).map(h => {
-            const st = STATUS_STYLE[h.status] || STATUS_STYLE.open;
-            return (
-              <div key={h.id} className="v8-rules-hit">
-                <span className="v8-rules-id">{h.id}</span>
-                <span className="v8-rules-hit-claim">{h.claim}</span>
-                <Pill style={st}>{st.text}</Pill>
-                <span className="v8-rules-sim">相似 {Math.round((h.similarity || 0) * 100)}%</span>
-              </div>
-            );
-          })}
-        </>
-      )}
-    </div>
-  );
-}
-
-export default function RuleLedgerPage() {
-  const [data, setData] = useState(null);
-  const [err, setErr] = useState('');
-  const [domain, setDomain] = useState('');
-  const listRef = useRef(null);
+function RuleCheck({ rules, snapshot, disabled, onRule, prepared }) {
+  const [query, setQuery] = useState('');
+  const [scope, setScope] = useState({ model: snapshot, data: '', protocol: '' });
+  const [submitted, setSubmitted] = useState(null);
+  const criteria = useRef(null);
+  const queryInput = useRef(null);
 
   useEffect(() => {
-    let dead = false;
-    fetch(`${API_BASE}/api/rules/overview`, { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (!dead) setData(d); })
-      .catch(e => { if (!dead) setErr(e.message || String(e)); });
-    return () => { dead = true; };
-  }, []);
+    if (!prepared) return;
+    const known = ruleScope(prepared);
+    setQuery(prepared.id);
+    setScope({ model: known.modelId || snapshot, data: known.dataId, protocol: known.protocolId });
+    setSubmitted(null);
+    criteria.current.open = true;
+    queryInput.current.focus();
+  }, [prepared, snapshot]);
 
-  const rules = useMemo(() => {
-    const all = (data?.rules || []).slice();
-    const order = { refuted: 0, confirmed: 1, inconclusive: 2, open: 3, superseded: 4 };
-    all.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || String(a.id).localeCompare(String(b.id)));
-    return domain ? all.filter(r => r.domain === domain) : all;
-  }, [data, domain]);
+  const hits = submitted ? checkRules(rules, submitted.query, submitted.scope) : [];
+  return <section className="v8-rules-check" aria-label="实验查重">
+    <form onSubmit={event => {
+      event.preventDefault();
+      if (query.trim() && !disabled) setSubmitted({ query: query.trim(), scope });
+    }}>
+      <label htmlFor="rule-query">实验查重</label>
+      <div className="v8-rules-checkrow">
+        <input id="rule-query" ref={queryInput} value={query} maxLength={300}
+          placeholder="输入实验、关键词或规则编号"
+          onChange={event => { setQuery(event.target.value); setSubmitted(null); }} />
+        <button type="submit" disabled={disabled || !query.trim()}>查重</button>
+      </div>
+      <details ref={criteria} className="v8-rules-criteria">
+        <summary>核对模型、数据与实验口径</summary>
+        <div className="v8-rules-fields">
+          {SCOPE_FIELDS.map(({ key, label, placeholder }) => <label key={key}>{label}
+            <input value={scope[key]} placeholder={placeholder} maxLength={220} spellCheck={false}
+              onChange={event => { setScope({ ...scope, [key]: event.target.value }); setSubmitted(null); }} />
+          </label>)}
+        </div>
+        <p className="v8-note">只填关键词也可查找。完整身份可从有登记的规则详情带入。</p>
+      </details>
+    </form>
+    {submitted && <div className="v8-rules-results" aria-label="查重结果">
+      <p role="status">{hits.length ? `找到 ${hits.length} 条相关记录。展开核对项可查看差异。` : '没有找到相近记录。可换关键词或按规则编号查询。'}</p>
+      {hits.map(({ rule, decision, comparison }) => <article key={rule.id} className="v8-rules-hit">
+        <div className="v8-rules-hithead">
+          <button type="button" className="v6-linkbtn" onClick={() => onRule(rule)}>{rule.id} · {ruleTitle(rule)}</button>
+          <strong>{decision}</strong>
+        </div>
+        <details>
+          <summary>查看核对项</summary>
+          <dl className="v8-rules-compare">
+            {comparison.map(item => <div key={item.key}>
+              <dt>{item.label} · {item.outcome}</dt>
+              <dd>账本 {item.description || '未登记'}{item.registered && <code>{item.registered}</code>}</dd>
+              <dd>本次 {item.supplied || '未填写'}</dd>
+            </div>)}
+          </dl>
+          {rule.retest?.note && <p className="v8-note">复测条件 · {rule.retest.note}</p>}
+        </details>
+      </article>)}
+    </div>}
+  </section>;
+}
 
-  /* 类型概览：每类一条，带「证实 / 否证 / 待定」堆叠条。顶部先给这个，一屏看完全局。
-     类型从数据里聚合（不写死），名字优先用服务端标签，未知类型退回原 id。 */
-  const domainRows = useMemo(() => {
-    const all = data?.rules || [];
-    const labels = data?.labels?.domain || {};
-    const rank = id => {
-      const i = DOMAINS.findIndex(([k]) => k === id);
-      return i < 0 ? 99 : i;
-    };
-    const seen = new Map();
-    all.forEach(r => {
-      const id = r.domain || 'mlp';
-      if (!seen.has(id)) seen.set(id, { id, label: labels[id] || id, total: 0, confirmed: 0, refuted: 0 });
-      const row = seen.get(id);
-      row.total += 1;
-      if (r.status === 'confirmed') row.confirmed += 1;
-      else if (r.status === 'refuted') row.refuted += 1;
-    });
-    return [...seen.values()]
-      .map(row => ({ ...row, pending: row.total - row.confirmed - row.refuted }))
-      .sort((a, b) => rank(a.id) - rank(b.id) || b.total - a.total);
-  }, [data]);
+function RuleCard({ rule, labels, open, onToggle, onRule, byId, onPrepare }) {
+  const scope = ruleScope(rule);
+  const retest = rule.retest || {};
+  const source = rule.evidence || [];
+  const related = [...new Set([...(rule.related || []), ...(rule.supersedes || [])])].filter(id => byId.has(id));
+  const measure = Object.entries(rule.measure || {});
+  return <article className="v8-rules-card">
+    <button id={`rule-head-${rule.id}`} type="button" className="v8-rules-head" aria-expanded={open}
+      aria-controls={open ? `rule-detail-${rule.id}` : undefined} onClick={onToggle}>
+      <span className="v8-rules-id">{rule.id}</span>
+      <span className="v8-rules-claim">{rule.status === 'refuted' && !rule.title && <small>已否证 · </small>}{ruleTitle(rule)}</span>
+      <span className="v8-rules-cardmeta">{scope.model || '模型未登记'} · {labels[rule.domain] || DOMAINS[rule.domain] || rule.domain}</span>
+      <span className="v8-rules-caret">{open ? '收起' : '展开'}</span>
+    </button>
+    {open && <div id={`rule-detail-${rule.id}`} className="v8-rules-body">
+      {rule.title && <p className="v8-note">原命题 · {rule.claim}</p>}
+      <div>
+        <h4>适用范围</h4>
+        <dl className="v8-rules-scope">
+          {SCOPE_FIELDS.map(({ key, label }) => <div key={key}>
+            <dt>{label}</dt><dd>{scope[key] || '未登记'}</dd>
+          </div>)}
+        </dl>
+        <button type="button" className="fw-tbtn" onClick={() => onPrepare(rule)}>带入查重</button>
+      </div>
+      <div>
+        <h4>实测结果</h4>
+        {rule.criterion && <p className="v8-note">判据 · {rule.criterion}</p>}
+        {measure.length ? <dl className="v8-rules-chips">
+          {measure.map(([key, value]) => <div key={key}>
+            <dt>{key}</dt><dd>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</dd>
+          </div>)}
+        </dl> : <p className="v8-note">暂无独立数值摘要。</p>}
+      </div>
+      <div>
+        <h4>反例与判读</h4>
+        {rule.why && <p className="v8-note">{rule.why}</p>}
+        {rule.counterexamples?.length > 0 && <ul>{rule.counterexamples.map((item, index) => <li key={index}>{item}</li>)}</ul>}
+        {!rule.why && !rule.counterexamples?.length && <p className="v8-note">暂无单列记录，查看证据来源。</p>}
+      </div>
+      <div>
+        <h4>复测条件</h4>
+        <p className="v8-note">{[RETEST[retest.status], retest.note, retest.need_n ? `建议样本量 ${retest.need_n}` : ''].filter(Boolean).join(' · ') || '请结合适用范围和证据核对。'}</p>
+      </div>
+      {source.length > 0 && <ResearchDisclosure title="原始证据来源">
+        <ul className="v8-rules-sources">
+          {source.map((item, index) => <li key={index}>
+            <b>{item.phase}</b> {item.note}
+            {item.script && <code>{item.script}</code>}{item.data && <code>{item.data}</code>}
+            {item.run && <a href={workbenchHref(new URLSearchParams({ lens: 'process', station: 'execution', run: item.run, ...(scope.modelId ? { snapshot: scope.modelId } : {}) }).toString())}>打开研究报告</a>}
+            {item.artifact_sha256 && <code>SHA256 {item.artifact_sha256}</code>}
+          </li>)}
+        </ul>
+      </ResearchDisclosure>}
+      {related.length > 0 && <div className="v6-toolbar" aria-label="关联规则">
+        {related.map(id => <button className="fw-tbtn" type="button" key={id} onClick={() => onRule(byId.get(id))}>{id} · {byId.get(id).topic}</button>)}
+      </div>}
+    </div>}
+  </article>;
+}
 
-  const alive = useMemo(() => (data?.rules || []).filter(r => r.status === 'confirmed'), [data]);
-  const dead = useMemo(() => (data?.rules || []).filter(r => r.status === 'refuted'), [data]);
-  const cand = useMemo(() => (data?.rules || []).filter(r => r.status === 'inconclusive' || r.status === 'open'), [data]);
+export default function RuleLedgerPage({ children }) {
+  const ledger = useApi('/api/rules/overview');
+  const { snapshot } = useResearchContext();
+  const [group, setGroup] = useState('');
+  const [selected, setSelected] = useState('');
+  const [prepared, setPrepared] = useState(null);
+  const [pendingOpen, setPendingOpen] = useState(false);
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const [domain, setDomain] = useState('');
+  const focusRule = useRef('');
+  const rules = ledger.data?.rules || [];
+  const byId = new Map(rules.map(rule => [rule.id, rule]));
+  const labels = ledger.data?.labels?.domain || {};
+  const pending = rules.filter(rule => !GROUPS.some(item => item.id === rule.status));
+  const active = rules.filter(rule => rule.status === group && (!domain || rule.domain === domain));
+  const ordered = [...active].sort((a, b) => Number(Boolean(b.title)) - Number(Boolean(a.title)));
+  const visible = ordered.slice(0, limit);
+  const selectedRule = byId.get(selected);
+  if (selectedRule?.status === group && !visible.includes(selectedRule)) visible.unshift(selectedRule);
 
-  const pick = id => {
-    setDomain(id);
-    if (listRef.current) listRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  useEffect(() => {
+    if (!focusRule.current) return;
+    const target = document.getElementById(`rule-head-${focusRule.current}`);
+    if (target) {
+      focusRule.current = '';
+      target.focus();
+    }
+  });
 
-  if (err) return <Empty>规则账本读取失败：{err}</Empty>;
-  if (!data) return <Empty>读取规则账本…</Empty>;
-  if (!data.available) {
-    return <p className="v8-note">规则账本还是空的：在本机运行 <code>python tools/rules_ingest.py</code> 写入初始条目。</p>;
+  function choose(next, ruleId = '') {
+    setGroup(next);
+    setSelected(ruleId);
+    setDomain('');
+    setLimit(PAGE_SIZE);
   }
 
-  const c = data.counts || {};
-  const bs = c.by_status || {};
-  const scan = data.scan || {};
+  function openRule(rule) {
+    if (pending.includes(rule)) setPendingOpen(true);
+    focusRule.current = rule.id;
+    choose(GROUPS.some(item => item.id === rule.status) ? rule.status : '', rule.id);
+  }
 
-  return (
-    <div className="v8-rules">
-      <p className="v8-nprog-say">
-        已登记 <b>{c.total}</b> 条规则，其中 <b>{bs.refuted || 0}</b> 条已被实测否证。
-        否证最值钱——它直接告诉后来者这条路不通。
-      </p>
+  function renderRule(rule) {
+    return <RuleCard key={rule.id} rule={rule} labels={labels} open={selected === rule.id} byId={byId}
+      onToggle={() => setSelected(selected === rule.id ? '' : rule.id)} onRule={openRule}
+      onPrepare={item => setPrepared({ item: { ...item }, snapshot })} />;
+  }
 
-      <div className="v8-rules-ov">
-        <div className="v8-rules-ovlead">
-          <span>按类型</span>
-          <small>点一行筛选下面的清单</small>
-        </div>
-        {domainRows.map(row => (
-          <button
-            key={row.id}
-            type="button"
-            className={'v8-rules-ovrow' + (domain === row.id ? ' on' : '')}
-            onClick={() => pick(domain === row.id ? '' : row.id)}
-          >
-            <span className="v8-rules-ovname">{row.label}</span>
-            <span className="v8-rules-ovbar">
-              <i style={{ flexGrow: row.confirmed, background: '#1d9e75' }} />
-              <i style={{ flexGrow: row.refuted, background: '#d85a30' }} />
-              <i style={{ flexGrow: row.pending, background: '#d3d1c7' }} />
-            </span>
-            <span className="v8-rules-ovnum">{row.total}</span>
-            <span className="v8-rules-ovsub">
-              <b style={{ color: '#0f6e56' }}>{row.confirmed}</b>证实
-              <b style={{ color: '#993c1d' }}>{row.refuted}</b>否证
-              <b style={{ color: '#8a6d3b' }}>{row.pending}</b>待定
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <div className="v8-nprog-tiles">
-        <div><b>{c.total}</b><span>条规则已登记</span><small>每条 = 一条可判定命题 + 结论 + 证据链</small></div>
-        <div><b>{bs.refuted || 0}</b><span>条已被否证</span><small>最有价值的一类：直接告诉后来者这条路不通</small></div>
-        <div><b>{c.blocked || 0}</b><span>条不要重测</span><small>口径不变时再测不会得到新信息</small></div>
-        <div><b>{(bs.open || 0) + (c.need_n || 0)}</b><span>条仍待测</span><small>已预注册但还没跑，或需加样本才能定论</small></div>
-      </div>
-
-      <div>
-        <h4 className="v8-h4">编码破解现状 <small>按「机制假设是否还活着」分三堆：目标不是攒结论，是收缩候选空间</small></h4>
-        <div className="v8-rules-folds">
-          <Fold
-            tone="#1d9e75" title="仍然成立的机制事实" count={alive.length} items={alive}
-            preview={alive.slice(0, 3).map(r => r.topic || r.id).join(' · ') + (alive.length > 3 ? ` 等 ${alive.length} 条` : '')}
-          />
-          <Fold
-            tone="#d85a30" title="已被排除的机制" count={dead.length} items={dead}
-            preview={dead.slice(0, 3).map(r => r.topic || r.id).join(' · ') + (dead.length > 3 ? ` 等 ${dead.length} 条` : '')}
-            hint="这一堆越长，后面的弯路越短。口径不变时不要再测其中任何一条。"
-          />
-          <Fold
-            tone="#ba7517" title="仍在候选里的机制" count={cand.length} items={cand}
-            preview={cand.slice(0, 3).map(r => r.topic || r.id).join(' · ') + (cand.length > 3 ? ` 等 ${cand.length} 条` : '')}
-            hint="这几条是下一轮该做的实验；其余条目口径不变时不必再测。"
-          />
-        </div>
-      </div>
-
-      <div>
-        <h4 className="v8-h4">先查重：这件事是不是已经测过 <small>贴一句你准备做的测试，账本会给出最相近的已有结论</small></h4>
-        <RuleCheck />
-      </div>
-
-      {scan.memory_files ? (
-        <p className="v8-note">
-          日志扫描：{scan.memory_files} 篇工作日志（{scan.memory_lines} 行）与 {scan.design_files} 篇设计文档中，
-          共 <b>{data.scan_total_records || 0}</b> 条测试记录命中主题词（下面只列最集中的 5 类）。
-          重复最多的前几类：
-          {(data.scan_topics || []).slice(0, 5).map(t => ` ${t.name} ${t.n_records} 条`).join(' ·')}。
-          这些主题已收敛成上面的 {c.total} 条规则，不再重开。
-        </p>
-      ) : null}
-
-      <div ref={listRef} className="v8-rules-anchor">
-        <h4 className="v8-h4">
-          规则清单 <small>否证排在最前 · 点任意一条展开数字与证据</small>
-        </h4>
-        <p className="v8-rules-filter">
-          {domain
-            ? <>只看 <b>{(domainRows.find(r => r.id === domain) || {}).label || domain}</b> · {rules.length} 条</>
-            : <>全部 {rules.length} 条</>}
-          {domain ? <button type="button" onClick={() => setDomain('')}>显示全部</button> : null}
-        </p>
-        <div className="v8-rules-list">
-          {rules.map(r => <RuleCard key={r.id} rule={r} labels={data.labels} />)}
-        </div>
-      </div>
-
-      <p className="v8-note">{data.policy} 模型范围：{data.model_scope}。更新时间：{data.updated_at || '—'}。</p>
+  return <section className="v8-route v8-rule-ledger" aria-labelledby="rules-title">
+    <header className="v8-overview-heading"><h2 id="rules-title">成果与证据</h2></header>
+    <RuleCheck key={snapshot} rules={rules} snapshot={snapshot} disabled={!rules.length} onRule={openRule}
+      prepared={prepared?.snapshot === snapshot ? prepared.item : null} />
+    <div className="v8-rules-groups" role="group" aria-label="规则分类">
+      {GROUPS.map(item => <button key={item.id} type="button" className="v8-card v8-direction v8-rule-group"
+        aria-expanded={group === item.id} aria-controls={group === item.id ? 'rule-results' : undefined}
+        onClick={() => choose(group === item.id ? '' : item.id)}>
+        <strong>{item.label}</strong>
+        <span>{ledger.data ? rules.filter(rule => rule.status === item.id).length : '—'} 条</span>
+        <span className="v8-rule-group-caret" aria-hidden="true">{group === item.id ? '▴' : '▾'}</span>
+        <small>{item.note}</small>
+      </button>)}
     </div>
-  );
+    {ledger.error ? <Empty>规则账本读取失败 · {ledger.error} <button className="fw-tbtn" type="button" onClick={ledger.reload}>重试</button></Empty>
+      : !ledger.data ? <Empty>读取规则账本…</Empty> : null}
+    {group && <section id="rule-results" className="v8-rules-list" aria-label={GROUPS.find(item => item.id === group).label}>
+      <details className="v8-rules-criteria">
+        <summary>筛选规则</summary>
+        <label>研究领域 <select value={domain} onChange={event => { setDomain(event.target.value); setSelected(''); setLimit(PAGE_SIZE); }}>
+          <option value="">全部领域</option>
+          {[...new Set(rules.filter(rule => rule.status === group).map(rule => rule.domain))].map(key =>
+            <option key={key} value={key}>{labels[key] || DOMAINS[key] || key}</option>)}
+        </select></label>
+      </details>
+      {visible.length ? visible.map(renderRule) : <Empty>当前分类暂无规则。</Empty>}
+      {active.length > limit && <button type="button" className="fw-tbtn" onClick={() => setLimit(limit + PAGE_SIZE)}>
+        显示更多规则（剩 {active.length - limit} 条）
+      </button>}
+    </section>}
+    {pending.length > 0 && <details className="v8-card v8-overview-fold" open={pendingOpen}
+      onToggle={event => setPendingOpen(event.currentTarget.open)}>
+      <summary>未决与待验证 · {pending.length} 条</summary>
+      {pendingOpen && <div className="v8-rules-list">{pending.map(renderRule)}</div>}
+    </details>}
+    {children}
+  </section>;
 }

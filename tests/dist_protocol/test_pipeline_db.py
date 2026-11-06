@@ -13,6 +13,7 @@ import sys
 import tempfile
 import threading
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +24,7 @@ from shared.dist_protocol import grammar, pipeline  # noqa: E402
 
 SCHEMA = '''
 CREATE TABLE nodes(node_id TEXT PRIMARY KEY, token_hash TEXT, name TEXT, gpu TEXT, model TEXT, dtype TEXT,
-                   trust TEXT, created_at REAL, last_seen REAL);
+                   trust TEXT, created_at REAL, last_seen REAL, owner_user_id TEXT);
 CREATE TABLE templates(tm_id TEXT PRIMARY KEY, version INTEGER, name TEXT, dim TEXT, description TEXT,
                        metric_pin TEXT, model_pin TEXT, design_sha TEXT, status TEXT, bundle_dir TEXT,
                        created_at REAL, research_adapter_json TEXT DEFAULT '{}');
@@ -104,6 +105,77 @@ class PipelineDbTests(unittest.TestCase):
                 self.assertEqual(b['shards_present'], [])
         finally:
             self.db.execute("UPDATE templates SET design_sha='DESIGN' WHERE tm_id='TG-GR-ROLE'")
+            self.db.commit()
+
+    def test_cached_shard_missing_or_truncated_is_not_complete(self):
+        def bucket():
+            return pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', bucket='m-a|r1|bf16')['buckets'][0]
+
+        sha = self.shas[0]
+        path = self.tmp / 'objects' / sha[:2] / sha
+        data = path.read_bytes()
+        self.assertTrue(bucket()['complete'])
+        try:
+            path.unlink()
+            self.assertEqual(bucket()['shards_received'], ['0/2', '1/2'])
+            self.assertEqual(bucket()['shards_present'], ['1/2'])
+            self.assertFalse(bucket()['complete'])
+            path.write_bytes(data[:-100])
+            self.assertEqual(bucket()['primary_shas'], [self.shas[1]])
+            self.assertFalse(bucket()['complete'])
+        finally:
+            path.write_bytes(data)
+        self.assertTrue(bucket()['complete'])
+
+    def test_required_factors_and_layers_cannot_be_skipped(self):
+        layers = [{'tag': 'L1', 'replication': {'lockbox': {'a': {'mean_cos': .9}}}}]
+        agg = {'prereg': {'target_factors': ['a', 'b'], 'target_layers': ['L1', 'L2'], 'min_lockbox_cos': .8},
+               'buckets': [{'bucket': 'model|r|bf16', 'complete': True, 'behavior': {}, 'excluded': [],
+                            'replicates': [], 'agg': {'layers': layers}}]}
+        def status():
+            return {g['id']: g['status'] for g in pipeline.gate_chain(agg)}['lockbox']
+        self.assertEqual(status(), 'pending')
+        layers.append({'tag': 'L2', 'replication': {'lockbox': {'a': {'mean_cos': .9}}}})
+        self.assertEqual(status(), 'pending')
+        for layer in layers:
+            layer['replication']['lockbox']['b'] = {'mean_cos': .82}
+        self.assertEqual(status(), 'pass')
+        layers[0]['replication']['lockbox']['b']['mean_cos'] = float('nan')
+        self.assertEqual(status(), 'pending')
+
+    def test_identical_replicas_require_independent_node_and_lease(self):
+        with closing(sqlite3.connect(':memory:')) as db:
+            db.row_factory = sqlite3.Row
+            self.db.backup(db)
+            sha = self.shas[0]
+            def add(node, task='', owner=None):
+                db.execute('INSERT OR IGNORE INTO nodes(node_id,owner_user_id) VALUES(?,?)', (node, owner))
+                db.execute('INSERT INTO result_replicas VALUES(?,?,?,?,?,?,?,?)',
+                           (sha, node, task, 'm-a', 'r1', 'bf16', 5, 'byte_identical_replicate'))
+            def lease(task, node):
+                db.execute('INSERT INTO tasks(task_id,tm_id,node_id,status,result_sha,shard) VALUES(?,?,?,?,?,?)',
+                           (task, 'TG-GR-ROLE', node, 'done', sha, '0/2'))
+            def aggregate():
+                return pipeline.aggregate(db, self.tmp, 'TG-GR-ROLE', bucket='m-a|r1|bf16')
+            add('N0', 'same', 'owner-one')
+            lease('same', 'N0')
+            add('N4', 'same-owner', 'owner-one')
+            lease('same-owner', 'N4')
+            add('N5')
+            self.assertEqual(aggregate()['buckets'][0]['replicates'], [])
+            add('N6', 'independent', 'owner-two')
+            lease('independent', 'N6')
+            result = aggregate()
+            self.assertEqual([row['node_id'] for row in result['buckets'][0]['replicates']], ['N6'])
+            self.assertEqual({g['id']: g['status'] for g in pipeline.gate_chain(result)}['repeat'], 'pass')
+
+    def test_pending_results_are_preview_only(self):
+        preview = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE')
+        formal = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', audited_only=True)
+        self.assertEqual(preview['evidence_scope'], 'preview')
+        self.assertTrue(all(b['complete'] for b in preview['buckets']))
+        self.assertEqual(formal['evidence_scope'], 'audited')
+        self.assertTrue(all(not b['complete'] for b in formal['buckets']))
 
     def test_gate_chain_cross_model(self):
         agg = pipeline.aggregate(self.db, self.tmp, 'TG-GR-ROLE', gate=False)
@@ -133,7 +205,7 @@ class PipelineDbTests(unittest.TestCase):
         self.assertEqual(ov['stages'][0]['value'], 1)
         sb = pipeline.scoreboard(self.db, self.tmp)
         self.assertEqual(len(sb['templates']), 1)
-        self.assertTrue(sb['scores'])
+        self.assertFalse(sb['scores'])
 
     def test_catalog_export_and_atlas(self):
         import io
@@ -159,7 +231,15 @@ class PipelineDbTests(unittest.TestCase):
         self.assertTrue(name.startswith('respack_TG-GR-ROLE'))
         with self.assertRaises(LookupError):
             pipeline.export_pack(self.db, self.tmp, 'TG-GR-ROLE', bucket='nope')
-        at = pipeline.atlas_payload(self.db, self.tmp, gate=False)
+        with closing(sqlite3.connect(':memory:')) as reviewed:
+            reviewed.row_factory = sqlite3.Row
+            self.db.backup(reviewed)
+            reviewed.executemany("INSERT INTO audits VALUES(?,'passed','fixture','','[]',0)", [(sha,) for sha in self.shas])
+            at = pipeline.atlas_payload(reviewed, self.tmp, gate=False)
+            reviewed.execute("UPDATE templates SET status='closed' WHERE tm_id='TG-GR-ROLE'")
+            closed = pipeline.atlas_payload(reviewed, self.tmp, gate=False)
+            reviewed.execute("UPDATE templates SET status='open' WHERE tm_id='TG-GR-ROLE'")
+            reopened = pipeline.atlas_payload(reviewed, self.tmp, gate=False)
         self.assertEqual(sorted(at['models']), ['m-a|r1|bf16', 'm-b|r1|bf16'])
         for g in at['graphs']:
             self.assertEqual(g['families'], ['GR-ROLE'])
@@ -168,14 +248,11 @@ class PipelineDbTests(unittest.TestCase):
         pack, _ = pipeline.atlas_pack(at, 'm-a|r1|bf16')
         self.assertEqual(set(zipfile.ZipFile(io.BytesIO(pack)).namelist()), {'manifest.json', 'atlas.json', 'digest.md', 'prompt.md'})
         # 关闭的模板不进入谱图（结果保留），重开后恢复
-        self.db.execute("UPDATE templates SET status='closed' WHERE tm_id='TG-GR-ROLE'")
-        closed = pipeline.atlas_payload(self.db, self.tmp, gate=False)
         self.assertEqual(closed['graphs'], [])
         src = next(s for s in closed['sources'] if s['tm_id'] == 'TG-GR-ROLE')
         self.assertFalse(src['used'])
         self.assertIn('关闭', src['reason'])
-        self.db.execute("UPDATE templates SET status='open' WHERE tm_id='TG-GR-ROLE'")
-        self.assertEqual(sorted(pipeline.atlas_payload(self.db, self.tmp, gate=False)['models']), ['m-a|r1|bf16', 'm-b|r1|bf16'])
+        self.assertEqual(sorted(reopened['models']), ['m-a|r1|bf16', 'm-b|r1|bf16'])
 
 
 if __name__ == '__main__':

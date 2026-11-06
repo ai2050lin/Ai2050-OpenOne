@@ -17,7 +17,8 @@ const path = require('path');
 
 /* 界面可调用的接口（/shutdown 只由主进程在退出时调用） */
 const ROUTES = new Set([
-  'GET /status', 'GET /device', 'GET /config', 'GET /models', 'GET /logs', 'GET /history',
+  'GET /status', 'GET /participation', 'GET /device', 'GET /config', 'GET /models', 'GET /logs', 'GET /history',
+  'GET /parameters/models', 'GET /parameters/tensors', 'GET /parameters/slice', 'GET /parameters/identity',
   'PUT /config', 'POST /models/check', 'POST /models/download', 'POST /models/cancel',
   'GET /probe', 'GET /probes', 'POST /probe/start', 'POST /probe/cancel', 'POST /bind', 'POST /start', 'POST /pause', 'POST /resume', 'POST /stop',
 ]);
@@ -47,6 +48,7 @@ function pathPythons() {
 }
 
 function httpJson(port, token, method, route, body, timeoutMs = 15000) {
+  if (route.split('?')[0] === '/parameters/identity') timeoutMs = 120000;
   return new Promise(resolve => {
     const data = body === undefined ? null : Buffer.from(JSON.stringify(body));
     const req = http.request({

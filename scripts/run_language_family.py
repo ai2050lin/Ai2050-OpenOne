@@ -130,9 +130,16 @@ def write_report(args, family, tm, analysis, report, scoreboard, out_dir: Path):
             L.append(f'| {layer["tag"]} | {f} | {fmt(layer["trace_eta2"].get(f))} | {fmt((sp.get("confirm") or {}).get("probe_acc"))} | '
                      f'{fmt((sp.get("lockbox") or {}).get("probe_acc"))} | {fmt((sp.get("lockbox_frame") or {}).get("probe_acc"))} | '
                      f'{fmt((sp.get("lockbox") or {}).get("rep_cos_white"))} | {fmt(perm.get("sep_p"), 4)} / {fmt(perm.get("acc_p"), 4)} / {fmt(perm.get("rep_p"), 4)} |')
-    L += ['', '## 证据门链', '']
+    L += ['', '## 观测预览门链', '', '此处记录执行时的观测预览，可能包含待审分片。', '']
     for g in report.get('gates', []):
         L.append(f'- {g["label"]}：{g["status"]} — {g.get("note", "")}')
+    L += ['', '## 正式观测准入', '']
+    formal = report.get('formal_gates')
+    if formal is None:
+        L.append('当前中心未返回正式准入门链。')
+    else:
+        for g in formal:
+            L.append(f'- {g["label"]}：{g["status"]} — {g.get("note", "")}')
     L += ['', '## 行为门', '']
     for b in report.get('buckets', []):
         bad = [c for c, r in b['behavior'].items() if not r['pass']]

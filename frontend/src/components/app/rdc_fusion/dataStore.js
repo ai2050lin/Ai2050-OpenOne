@@ -5,6 +5,7 @@
    - 在线网页版的按需缓存：实验响应的合并统计与规律分析第一次在线读取后存进本地（od|<主包版本>|<路径>）。
    浏览器禁用 IndexedDB 时退化为只在内存里保存（关闭页面即失效）。 */
 
+import {consumeResearchStream} from './researchStream.js';
 const DB_NAME = 'ai2050-data';
 const STORE = 'kv';
 const ON_DEMAND = [/^\/api\/agg\/[^/]+\/v2$/, /^\/api\/analysis\/[^/]+$/];
@@ -46,6 +47,7 @@ export function canonical(path) {
 /* 一条请求应在哪个附加包里（与 deploy/datapack.py 的 pack_hint 相同）。 */
 export function packHint(path) {
   const [p, q = ''] = path.split('?');
+  if (p.startsWith('/api/research-library/artifacts') || ['/api/research-library/graph','/api/research-library/fragments','/api/research-library/workpackages','/api/research-library/catalog','/api/traces/research-space'].includes(p)) return 'research-library';
   const m = /^\/api\/(?:agg\/([^/]+)\/v2|analysis\/([^/]+))$/.exec(p);
   if (m) return `tm:${decodeURIComponent(m[1] || m[2])}`;
   if (p === '/api/neurons/unit' || p === '/api/neurons/layer') {
@@ -146,7 +148,7 @@ export function getLocal(path) {
 export async function getExtraEntry(path) {
   const id = packHint(path);
   if (!id || !state.extras[id]) return undefined;
-  return idb('get', `x|${canonical(path)}`);
+  return idb('get', `${state.extras[id].key_prefix||'x|'}${canonical(path)}`);
 }
 
 export function isOnDemand(path) {
@@ -204,6 +206,7 @@ export async function downloadDataPack(apiBase, onProgress) {
 
 /* 下载并保存一个附加包（替换同一个包的旧条目）。 */
 export async function downloadExtra(apiBase, id, onProgress) {
+  if(id==='research-library')return downloadResearchStream(apiBase,id,onProgress);
   const { doc, bytes } = await fetchPack(`${apiBase}/api/platform/datapack/extra/${encodeURIComponent(id)}`, onProgress);
   if (doc.schema !== 'datapack_extra.v1' || doc.id !== id) throw new Error('不是对应的附加包');
   const oldKeys = (await idb('get', `xkeys|${id}`)) || [];
@@ -214,6 +217,27 @@ export async function downloadExtra(apiBase, id, onProgress) {
   await idb('put', 'xmeta', state.extras);
   emit();
   return state.extras[id];
+}
+
+async function downloadResearchStream(apiBase,id,onProgress){
+  const db=await openDb();if(!db)throw Error('研究全版本附加包需要可用的浏览器本地数据库；当前仍可在线浏览。');
+  const response=await fetch(`${apiBase}/api/platform/datapack/extra/${encodeURIComponent(id)}?format=ndjson`,{cache:'no-store'});
+  if(!response.ok||!response.headers.get('Content-Type')?.startsWith('application/x-ndjson+gzip'))throw Error('中心暂不支持流式研究包，请更新中心服务后重试。');
+  let got=0;const total=Number(response.headers.get('Content-Length'))||0,keys=[],prefix=`xv|${id}|${crypto.randomUUID()}|`;
+  const progress=new TransformStream({transform(chunk,controller){got+=chunk.byteLength;onProgress?.(got,total);controller.enqueue(chunk)}});
+  const stream=response.body.pipeThrough(progress).pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
+  const transaction=(writes,deletes=[])=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);
+    for(const k of deletes)s.delete(k);for(const [k,v] of writes)s.put(v,k);
+    tx.oncomplete=resolve;tx.onerror=()=>reject(Error('本机存储写入失败，原版本保持可用'));tx.onabort=()=>reject(Error('本机存储提交中断，原版本保持可用'));
+  });
+  try{
+    const {header,count}=await consumeResearchStream(stream,{id,onEntry:async(path,data)=>{const key=prefix+canonical(path);if(keys.includes(key))throw Error('附加包含重复条目');keys.push(key);await transaction([[key,data]])}});
+    const oldKeys=(await idb('get',`xkeys|${id}`))||[];
+    const next={...state.extras,[id]:{version:header.version,created_at:header.created_at,bytes:got,n:count,key_prefix:prefix}};
+    await transaction([[`xkeys|${id}`,keys],['xmeta',next]],oldKeys);
+    state.extras=next;emit();return state.extras[id];
+  }catch(error){await transaction([],keys).catch(()=>{});throw error}
 }
 
 async function clearOldOnDemand(keepVersion) {

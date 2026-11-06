@@ -149,16 +149,165 @@ h1 {
   color: var(--blue);
 }
 
-/* ---------- 首页 Hero（融合 fw-hero 渐变） ---------- */
-.hero::before {
-  background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+/* ---------- 首页双方向主视区：以内容卡片呈现，不使用插画或模拟数据 ---------- */
+.home-scope {
+  display: grid;
+  align-content: center;
+  gap: 1.2rem;
+  min-height: min(500px, 46vw);
+  padding: clamp(1.25rem, 2.7vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
 }
 
-.visual-glow {
-  border-color: rgba(14, 165, 233, 0.25);
-  box-shadow:
-    inset 0 0 70px rgba(14, 165, 233, 0.1),
-    0 0 90px rgba(52, 211, 153, 0.12);
+.home-scope-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--line);
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.home-scope-index {
+  color: #94a3b8;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.home-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.home-scope-item {
+  display: flex;
+  min-height: 292px;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  padding: clamp(1rem, 1.8vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: inherit;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.home-scope-item:hover {
+  border-color: #7dd3fc;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.07);
+}
+
+.home-scope-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.home-scope-kicker {
+  color: var(--blue-deep);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.home-scope-hint {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #64748b;
+  background: #f8fafc;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.home-scope-item h3 {
+  margin: 0.55rem 0 0.2rem;
+  color: #0f172a;
+  font-size: clamp(1rem, 1.45vw, 1.25rem);
+  line-height: 1.45;
+}
+
+.home-scope-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+.home-scope-list {
+  display: grid;
+  margin: 0.3rem 0 0.2rem;
+  padding: 0;
+  border-top: 1px solid #edf2f7;
+  list-style: none;
+}
+
+.home-scope-list li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.45rem;
+  padding: 0.36rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.home-scope-list li span:first-child {
+  color: #94a3b8;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.home-scope-more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.25rem;
+  color: var(--blue-deep);
+  font-size: 0.77rem;
+  font-weight: 600;
+}
+
+.home-scope-more b {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.home-scope-foot {
+  margin: 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .home-scope {
+    min-height: 0;
+    padding: 1rem;
+  }
+
+  .home-scope-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-scope-item {
+    min-height: 0;
+  }
 }
 
 /* ---------- 栏目卡（融合 fw-entry：白面板 + 悬浮上移） ---------- */
@@ -199,6 +348,58 @@ h1 {
     linear-gradient(135deg, #f8fafc, #e0f2fe);
 }
 
+.home-shell .programs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.home-shell .program-card {
+  display: flex;
+  min-height: 0;
+  max-width: none;
+}
+
+.home-shell .program-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.35rem;
+}
+
+.home-shell .program-index {
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+}
+
+.home-shell .program-index::after {
+  width: 24px;
+}
+
+.home-shell .program-card h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.08rem;
+  line-height: 1.45;
+}
+
+.home-shell .program-copy p:last-child {
+  max-width: none;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .home-shell .programs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-shell .programs {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 变体背景必须在 base 之后重声明：否则本层 base 的 background 简写
    会覆盖 styles.css 中 .horizon/.brain/.forum 的 url() 栏目图 */
 /* 图在右、文在左：白遮罩只在贴文字的一侧浓，向右逐渐透明。
@@ -206,25 +407,25 @@ h1 {
 .horizon {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.34) 40%, rgba(255, 255, 255, 0) 100%),
-    url("assets/home_plan.png") center / cover no-repeat;
+    url("assets/home_overview.svg") center / cover no-repeat;
 }
 
 .brain {
   background:
     linear-gradient(90deg, rgba(15, 23, 42, 0.06), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.9)),
-    url("assets/home_agi.png") center / cover no-repeat;
+    url("assets/home_response.svg") center / cover no-repeat;
 }
 
 .forum {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.32) 40%, rgba(255, 255, 255, 0) 100%),
-    url("assets/home_forum.png") center / cover no-repeat;
+    url("assets/home_distributed.svg") center / cover no-repeat;
 }
 
 .lighthouse {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.96)),
-    url("assets/home_support.png") center / cover no-repeat;
+    url("assets/home_atlas.svg") center / cover no-repeat;
 }
 
 /* ---------- 页脚 ---------- */
@@ -1081,19 +1282,19 @@ h1 {
   .horizon {
     background-image:
       linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 100%),
-      url("assets/home_plan.png");
+      url("assets/home_overview.svg");
   }
 
   .forum {
     background-image:
       linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0) 100%),
-      url("assets/home_forum.png");
+      url("assets/home_distributed.svg");
   }
 
   .brain {
     background-image:
       linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0) 100%),
-      url("assets/home_agi.png");
+      url("assets/home_response.svg");
   }
 }
 

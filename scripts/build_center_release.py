@@ -24,12 +24,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'deploy'))
 
 INCLUDE = [
+    'deploy/research_library.py', 'deploy/node_control.py', 'deploy/parameter_service.py', 'deploy/parameter_reader.py',
+    'design/platform_spec_v1.md',
     'VERSION', 'LICENSE', 'NOTICE', 'README.md', '.github/CONTRIBUTING.md',
     'deploy/center_app.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/data_admin_service.py', 'deploy/platform_service.py',
     'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/reset_password.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
     'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
-    'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md',
-    'server/__init__.py', 'server/neuron_census_service.py',
+    'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md', 'deploy/README_RESEARCH_UPLOAD.md',
+    'deploy/research_pack_stream.py', 'deploy/research_ingest_bundle.py',
+    'server/__init__.py', 'server/neuron_census_service.py', 'server/rule_ledger_service.py', 'data/rules/ledger.json',
+    'server/research_space_service.py', 'server/trace_catalog.py',
     'data/lang_bench/meta.json', 'data/lang_bench/results.json',
     # 数据集清单靠这份摘要：题量、科目、三类分布、许可、源地址都在 by_dataset 里。
     # 题目正文不进包（见下面 QUESTIONS_ONLY 的说明）——中心没有正文也能回答「有哪些数据集、各多少题」。

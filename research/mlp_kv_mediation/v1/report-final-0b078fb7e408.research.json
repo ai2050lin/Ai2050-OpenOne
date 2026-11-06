@@ -1,0 +1,3501 @@
+{
+  "capability": {
+    "behavior_gate": true,
+    "estimand": "conditional on behavior gate for task claims; exact transport is a separate computational check",
+    "formal_sha256": "133db33ee1b271839332854a6b5f25078de26c48e909dba289d7455430771ace",
+    "input_sha256": "0aeac712fbba3b27df4983721b5b9fce1273f1a3c25ca37609c957d9597c02c5",
+    "kind": "real",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "offset": 42,
+    "part": "capability",
+    "prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "profile": "draft",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "reference_only_n": 140,
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_mediation_execution.v1",
+    "seconds": 133.87346601486206,
+    "source_sha256": "904946afdaf72239fad65a16f9631c389eaa9c20102d07699f8745a332637a2b",
+    "status": "complete",
+    "summary": {
+      "B33_MLP": {
+        "alpha": 0.025,
+        "base_accuracy": 0.6840909090909091,
+        "edited_accuracy": 0.6859090909090909,
+        "gains": 4,
+        "loss_interval": [
+          -0.005570802299994732,
+          0.001978154591434343
+        ],
+        "losses": 0,
+        "margin": 0.02,
+        "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+        "n": 2200,
+        "net_loss": -0.0018181818181818299,
+        "status": "noninferior"
+      },
+      "B34_H2": {
+        "alpha": 0.025,
+        "base_accuracy": 0.6840909090909091,
+        "edited_accuracy": 0.6836363636363636,
+        "gains": 0,
+        "loss_interval": [
+          -0.0023013885263382414,
+          0.0032574381662786077
+        ],
+        "losses": 1,
+        "margin": 0.02,
+        "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+        "n": 2200,
+        "net_loss": 0.00045454545454548523,
+        "status": "noninferior"
+      }
+    }
+  },
+  "cases": {
+    "capability": {
+      "chunk_size": 64,
+      "chunks": [
+        "f974eaad1a45e483de92e6ab5b25b2a45900642747a827d2675c8be8887803f9",
+        "0e1b39ae68163337fe9ee3323e17a9d2f5a0d0043b2db73955eec89753dd0252",
+        "d432760767228f54f2b9c6e883fc90f32dbb77f03d890e060a4b81078d95ba51",
+        "19584a12f2b21507c61892c063aa27469d50d6c62dddde50079159052a2572d8",
+        "e6e77cb38601d5b45301960511b1f99351e12e9b57ee2ee7948f85a345ffa332",
+        "605fac0b9538ab3f940ad5523187c5ba10fb9ac53b38a7be68619a0c9b2c8eaf",
+        "2a52d303d322aff5d90a3ea4a17055653fe6f484ce0cf2edfab2f611ed30c489",
+        "5d1b6f75fc11bfc6dacf43418dc19bf679573233bb867d439ee10da827cefbfd",
+        "e9a11077f688ed8a01609d697de8fd042c976c0ccf173784e3912ca8bc559cbe",
+        "4b532e4e3a7009b91f1e2484608878e4c43a72370649ea00ea51334d4a923551",
+        "96ca29b2c259e2b9b733559a42cf5bb86785b8cd18ff1c357ca2e18315b58ff6",
+        "06e675bf06c4fcbc475226d112d187cbb225fa44425ba567214421744c4f6544",
+        "6569322a795fc5b13225a179e19594ea89ff8ba481b16bf065f25e9ed4ce0999",
+        "b3397d3ebeab84085acdb9bf8290bdc31bff1e4b6e01da4aeed92c83e0dceff2",
+        "115018766209dc18d1478bd39f1efecbabf6af70c2dfd678c58a2269e783e465",
+        "dff17e0583d57dc497110d112ef68f3e714fbd4aae0e02fd7e010a5c9ec279ec",
+        "747c8fd4f77eb932944732472abb07f2cadfa3d4c01de36a291cba32277263a5",
+        "e92f84e4b617835b720a21819702002dd7b7da1c987c34590ee7a42896ae7ef1",
+        "df5c8962c80e5b9aa5bc1a86556172a11202cb53e63743d9ac0c0e7cc48f2740",
+        "7f83260ec2d0784d8772cac0c423946381eebdf456fd5bc44747e153d7019bbb",
+        "5068dfe780ab53726027bd35a0ec58ce6464bfdd9bc9b7b7600afcfef4f418d4",
+        "cbece5db313d3c777cae8c6e7ad58473077254c076913ad6bd5370381045b972",
+        "fa950d28b3e215c11c2d83eab2eeba71593b921308a85b9fcfe0013d199bc897",
+        "37f59f2729e5b195a40ec39fa3bb2f554f0682df2dc45a6e9adf91f566ea88e4",
+        "0e2eeef7e44dde0503bd224c690bd65857870ca635752a9e1614296066654008",
+        "d6ba52f52913b5f8d0a323a1940bba00dbf361e45b73661fa33765d49e7e4292",
+        "34883079f2c14f7b3152d5b88ca37e56c1492592d76e2e2c95baabd65196c82e",
+        "3fd389adcd006fef72e2457a418473404cb97d4893dc0f96a3e58d7c10877518",
+        "cd715d533ab4db8fc433d9d45c14d32dda5d9b4f9a6e156c4ef40c060fb5474b",
+        "f18c972aa9db11e4b39f4e402d46a59d65c092307b4bffbfed281ba8060eaecc",
+        "8f89add18e56c1a50d16e78943bf98d25714af6ad6d576378ad8931ae2dd8574",
+        "5908ff9c95e1b1933debfc1ce5c1eb66e4b6709b4b83134341f34ab5c98c24f6",
+        "c1d07332727ebd42a0583eb55b904cfd0a398006b5da4fc2ba286276d92b226e",
+        "26b423e86831141ed4b7f4e4e8104543026533fd269db09f4ab55a0502551eda",
+        "d37548e0a8260cb2415dffae7bc8ffc5a615e8d0c56fe25b893e8937333e5d6a",
+        "f63a0189d3065634838d8483c7c29cc0a66a73e06a33b0476cef0e7f04e16212",
+        "72f9841c0b1e7a48ea75d6b75d04b4623ae4508bb9da5996f112cc90fe62e842"
+      ],
+      "n": 2340
+    },
+    "earlier": {
+      "chunk_size": 64,
+      "chunks": [
+        "2e7ea401afe7309f235f3b3862a9d61839b1b7738f116b187c32e0896a1b554e"
+      ],
+      "n": 32
+    },
+    "formal": {
+      "chunk_size": 64,
+      "chunks": [
+        "56ddac64c4d09068345579a01338da100fb00cce651fc8a40a0397072d1a57f2",
+        "386ed12afd36ced1a42ddec162e903f650e346278ff72cc24a72286b5a8679ef",
+        "e0dcca385a00befcadd4fb35beeaebbb8a9070ba4c280805193739c2e83a869d",
+        "16ab3baa4c616a90b8cc2017d8ad09d6bba98dff1252ed1614a8416ef929a4bf",
+        "bd07545d0f9fafa6718d73f04e45f165eacaa0a9413116dcec217d0b10bf478c",
+        "8dd99048f9423655a64a27d2f4ba43d4eb38af9f0766b05c42722bc48955d006",
+        "c1f74d7c955b816e03b3334fb0f73f0f70ca52fd54a8eaebcc60dc8c4d08780d",
+        "f207e04b674ef28a52e16c88c11eb06b94f1f899b614d387527a17e0b5c6c855"
+      ],
+      "n": 512
+    },
+    "mediation": {
+      "chunk_size": 64,
+      "chunks": [
+        "a230f470b88b6b3aa2842fa71fbebfc72c9c475c1e0939f7a42137acf6c182b3",
+        "764f176d70f3028b799be2c6f9969a870809dddf97cfed0f6ce14901053f1c8b",
+        "a0f1bf633193e31dcbcfd9beaf004417f8d3b54c60e13516ea38c32a38ad1063",
+        "6e34532b4267eb05d3c4b394c1b29b8f2e2f3d1997d63db3033f0f77e225dab3"
+      ],
+      "n": 256
+    },
+    "pilot": {
+      "chunk_size": 64,
+      "chunks": [
+        "b34df5def8e0ee212722aea24250a8c57063f72422654e599179ae91e2dd1286",
+        "a8b3492e96a46f207568d94f021fe06949dd77b7de7f252f8e7bb6d37ecb15b8",
+        "a873fcf08369f1fa60ab51f78b1353401fa9ae8e632413b94332be2a4d878036",
+        "679f480b0ec7759aebc1280f5adde2bf52074c7582321c505b69e0727e69ee59"
+      ],
+      "n": 256
+    },
+    "screen": {
+      "chunk_size": 64,
+      "chunks": [
+        "891ddfbdc0c51607ae089b6a0200e32781beeeec7e519eb71c3506e0466501df",
+        "7b35fb03529c5fd4eec4fb07e47f00ed12fd9fbf17a3678f010599460139283b",
+        "440a2d08ee957a8271df3f5d8bca012d6bbb8a8b16419d06e34b4a2cff1f309e",
+        "6505e79e2cea8d7641ab577b6353bce965f242fdb0f6a4581c2cfee20fa72aed",
+        "f651504b3c4f4d0b632f8354153f8b9fb341dcd900e8f40e41a374c6d6b2f5ca",
+        "a86f84379b07c704953073752b46f11758d9d1d20c795ef106c3dc03bc39ba86",
+        "e591d2c2d64e5c7bb632697d87b52d41fe0ead06fbfeed542f3aad69c0d97a56",
+        "ba539d45ca64d3a002f08de78470480e55ab528afbfc37066b437ee40278f5fc",
+        "ce825f1275a74ee5db5657d1f2a83580281798969dff529ee7606edb1a828389",
+        "461c0c9258da1e1b82af40c1fb3d0c120c5a1713746a93fc78438ea7941d1e69",
+        "53cc18a3b172c4bf3aa80346de73724336c3ccc75c169f9b34a342144d9e73f9",
+        "a451c0f7c39f93dddccf1c6af6f0f78c2c0932d82e5f76992d215f3df968ca29",
+        "cfaaea2725f87a9ff732ef962f585a408f1206ee326f1f65de8cb00cd74b3043",
+        "030c3e8e57bd1cade8d704603d1d4253119c01428deb25676885c9fc84bfdf86"
+      ],
+      "n": 896
+    },
+    "targeted": {
+      "chunk_size": 64,
+      "chunks": [
+        "0fabb989c154f6d97c237f2c2842b2c90fa1ae8fe1c489733e1308a3cd6e7c1f",
+        "bea29e7ddca5db0596533005b5071a23ce735a39d4be7d4fad78f6f43c9b8a52"
+      ],
+      "n": 81
+    }
+  },
+  "earlier": {
+    "behavior_gate": true,
+    "checks": {
+      "only_B34_B35_and_source": true,
+      "replay_logits_bitwise_equal": 32,
+      "rescue_logits_bitwise_equal": 32
+    },
+    "estimand": "conditional on behavior gate for task claims; exact transport is a separate computational check",
+    "formal_sha256": "133db33ee1b271839332854a6b5f25078de26c48e909dba289d7455430771ace",
+    "kind": "real",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "negative_controls": [
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:0:draft:0",
+        "local_residual_delta_L2": 21.172386169433594,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:0:draft:1",
+        "local_residual_delta_L2": 23.69891929626465,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:1:draft:0",
+        "local_residual_delta_L2": 25.960193634033203,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:1:draft:1",
+        "local_residual_delta_L2": 27.110198974609375,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:2:draft:0",
+        "local_residual_delta_L2": 22.610910415649414,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:2:draft:1",
+        "local_residual_delta_L2": 23.179706573486328,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:3:draft:0",
+        "local_residual_delta_L2": 23.01885986328125,
+        "logits_bitwise_equal": true
+      },
+      {
+        "cache_bitwise_equal": true,
+        "generation_equal": true,
+        "id": "pilot:3:draft:1",
+        "local_residual_delta_L2": 25.956878662109375,
+        "logits_bitwise_equal": true
+      }
+    ],
+    "part": "earlier",
+    "prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "profile": "draft",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_mediation_execution.v1",
+    "scopes": [
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            34,
+            "K"
+          ],
+          [
+            34,
+            "V"
+          ],
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      }
+    ],
+    "seconds": 34.397427558898926,
+    "source_sha256": "904946afdaf72239fad65a16f9631c389eaa9c20102d07699f8745a332637a2b",
+    "status": "complete",
+    "summary": {
+      "evidence": "engineering and descriptive endpoint; n32",
+      "n": 32,
+      "operations": {
+        "B33_MLP": {
+          "accuracy": 0.78125,
+          "mean_KL": 1.4157269816388826e-05
+        },
+        "clean": {
+          "accuracy": 0.78125,
+          "mean_KL": 0.0
+        },
+        "only_B34": {
+          "accuracy": 0.78125,
+          "mean_KL": 2.0496174072219656e-05
+        },
+        "only_B35": {
+          "accuracy": 0.78125,
+          "mean_KL": 7.2773848651535735e-06
+        },
+        "replay_both": {
+          "accuracy": 0.78125,
+          "mean_KL": 1.4157269816388826e-05
+        },
+        "rescue_both": {
+          "accuracy": 0.78125,
+          "mean_KL": 0.0
+        }
+      }
+    }
+  },
+  "formal": {
+    "accuracy": 0.857421875,
+    "cells": [
+      {
+        "accuracy": 0.796875,
+        "correct": 51,
+        "expected": "fishing",
+        "frame": 0,
+        "n": 64,
+        "split": "confirm"
+      },
+      {
+        "accuracy": 0.828125,
+        "correct": 53,
+        "expected": "mining",
+        "frame": 0,
+        "n": 64,
+        "split": "confirm"
+      },
+      {
+        "accuracy": 0.9375,
+        "correct": 60,
+        "expected": "fishing",
+        "frame": 1,
+        "n": 64,
+        "split": "confirm"
+      },
+      {
+        "accuracy": 1.0,
+        "correct": 64,
+        "expected": "mining",
+        "frame": 1,
+        "n": 64,
+        "split": "confirm"
+      },
+      {
+        "accuracy": 0.765625,
+        "correct": 49,
+        "expected": "fishing",
+        "frame": 0,
+        "n": 64,
+        "split": "lockbox"
+      },
+      {
+        "accuracy": 0.765625,
+        "correct": 49,
+        "expected": "mining",
+        "frame": 0,
+        "n": 64,
+        "split": "lockbox"
+      },
+      {
+        "accuracy": 0.859375,
+        "correct": 55,
+        "expected": "fishing",
+        "frame": 1,
+        "n": 64,
+        "split": "lockbox"
+      },
+      {
+        "accuracy": 0.90625,
+        "correct": 58,
+        "expected": "mining",
+        "frame": 1,
+        "n": 64,
+        "split": "lockbox"
+      }
+    ],
+    "kind": "real",
+    "layout": "prefix+cached suffix for all cases",
+    "median_gap": 16.5,
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "n": 512,
+    "part": "formal",
+    "passed": true,
+    "prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "profile": "draft",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_behavior_execution.v1",
+    "source_sha256": "49849f19820b6100bb172eecd5a7a7ecb78324d0df3a9e838c966555f21fb58b",
+    "status": "complete"
+  },
+  "kind": "real",
+  "mediation": {
+    "behavior_gate": true,
+    "checks": {
+      "nonzero_KV_cases": 256,
+      "nonzero_future_distribution_cases": 256,
+      "only_B35_and_source": true,
+      "replay_generation_equal": 256,
+      "replay_logits_bitwise_equal": 256,
+      "rescue_generation_equal": 256,
+      "rescue_logits_bitwise_equal": 256
+    },
+    "estimand": "conditional on behavior gate for task claims; exact transport is a separate computational check",
+    "formal_sha256": "133db33ee1b271839332854a6b5f25078de26c48e909dba289d7455430771ace",
+    "kind": "real",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "native": {
+      "dtype": "BF16 stored as uint16",
+      "fields": {
+        "clean_K": [
+          256,
+          8,
+          128
+        ],
+        "clean_V": [
+          256,
+          8,
+          128
+        ],
+        "clean_head34_2": [
+          256,
+          128
+        ],
+        "clean_incoming_b35": [
+          256,
+          2560
+        ],
+        "edited_K": [
+          256,
+          8,
+          128
+        ],
+        "edited_V": [
+          256,
+          8,
+          128
+        ],
+        "edited_incoming_b35": [
+          256,
+          2560
+        ]
+      },
+      "path": "native-slots.npz",
+      "sha256": "8f1e56171944828f696d5f35d2c562e2160f41ceffb23c4d88ff6ca4e652e9b4"
+    },
+    "part": "mediation",
+    "prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "profile": "draft",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_mediation_execution.v1",
+    "scopes": [
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      }
+    ],
+    "seconds": 225.74780344963074,
+    "source_sha256": "904946afdaf72239fad65a16f9631c389eaa9c20102d07699f8745a332637a2b",
+    "status": "complete",
+    "summary": {
+      "all": {
+        "eligible": true,
+        "interaction_gap": {
+          "ci95": [
+            -0.010498046875,
+            0.00634765625
+          ],
+          "mean": -0.002197265625,
+          "n_clusters": 256
+        },
+        "loss_specificity": 0.0,
+        "n": 256,
+        "operations": {
+          "clean": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.25927734375,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0029296875,
+                0.009033203125
+              ],
+              "mean": 0.0029296875,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.8411986475443443e-05,
+            "mean_gap": 13.26220703125,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.001708984375,
+                0.012451171875
+              ],
+              "mean": 0.00537109375,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 7.149048679653467e-06,
+            "mean_gap": 13.2646484375,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.005126953125,
+                0.00732421875
+              ],
+              "mean": 0.0009765625,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.5473345876497953e-05,
+            "mean_gap": 13.26025390625,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0029296875,
+                0.009033203125
+              ],
+              "mean": 0.0029296875,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.8411986475443443e-05,
+            "mean_gap": 13.26220703125,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.25927734375,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.000244140625,
+                0.0146484375
+              ],
+              "mean": 0.00732421875,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.6989936537127346e-05,
+            "mean_gap": 13.2666015625,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 0.8515625,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.001708984375,
+                0.010260009765624911
+              ],
+              "mean": 0.004150390625,
+              "n_clusters": 256
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.63438624632197e-05,
+            "mean_gap": 13.263427734375,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      },
+      "confirm": {
+        "eligible": true,
+        "interaction_gap": {
+          "ci95": [
+            -0.0166015625,
+            0.0078125
+          ],
+          "mean": -0.0048828125,
+          "n_clusters": 128
+        },
+        "loss_specificity": 0.0,
+        "n": 128,
+        "operations": {
+          "clean": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.11083984375,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0078125,
+                0.005859375
+              ],
+              "mean": -0.0009765625,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.2281915516601369e-05,
+            "mean_gap": 13.10986328125,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.00537109375,
+                0.0146484375
+              ],
+              "mean": 0.00439453125,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 9.068467261944107e-06,
+            "mean_gap": 13.115234375,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.00537109375,
+                0.009765625
+              ],
+              "mean": 0.001953125,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 7.45558466620277e-06,
+            "mean_gap": 13.11279296875,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0078125,
+                0.005859375
+              ],
+              "mean": -0.0009765625,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.2281915516601369e-05,
+            "mean_gap": 13.10986328125,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.11083984375,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0166015625
+              ],
+              "mean": 0.0078125,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 9.148233737989461e-06,
+            "mean_gap": 13.11865234375,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 0.875,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0078125,
+                0.01171875
+              ],
+              "mean": 0.001953125,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 9.540627030649306e-06,
+            "mean_gap": 13.11279296875,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      },
+      "lockbox": {
+        "eligible": true,
+        "interaction_gap": {
+          "ci95": [
+            -0.0107421875,
+            0.01123046875
+          ],
+          "mean": 0.00048828125,
+          "n_clusters": 128
+        },
+        "loss_specificity": 0.0,
+        "n": 128,
+        "operations": {
+          "clean": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.40771484375,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.00244140625,
+                0.0166015625
+              ],
+              "mean": 0.0068359375,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.4542057434285514e-05,
+            "mean_gap": 13.41455078125,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.0029296875,
+                0.01611328125
+              ],
+              "mean": 0.00634765625,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 5.229630097362827e-06,
+            "mean_gap": 13.4140625,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.009765625,
+                0.00927734375
+              ],
+              "mean": 0.0,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.3491107086793134e-05,
+            "mean_gap": 13.40771484375,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.00244140625,
+                0.0166015625
+              ],
+              "mean": 0.0068359375,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.4542057434285514e-05,
+            "mean_gap": 13.41455078125,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 13.40771484375,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.003918457031249996,
+                0.0185546875
+              ],
+              "mean": 0.0068359375,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.483163933626523e-05,
+            "mean_gap": 13.41455078125,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 0.828125,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.00048828125,
+                0.0146484375
+              ],
+              "mean": 0.00634765625,
+              "n_clusters": 128
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.3147097895790097e-05,
+            "mean_gap": 13.4140625,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      },
+      "low_margin": {
+        "eligible": false,
+        "interaction_gap": {
+          "ci95": [
+            -0.051470588235294115,
+            0.0
+          ],
+          "mean": -0.022058823529411766,
+          "n_clusters": 34
+        },
+        "loss_specificity": 0.0,
+        "n": 34,
+        "operations": {
+          "clean": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.2536764705882355,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.022058823529411766,
+                0.022058823529411766
+              ],
+              "mean": 0.0,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 3.311606339548201e-05,
+            "mean_gap": 4.2536764705882355,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.022058823529411766,
+                0.022058823529411766
+              ],
+              "mean": 0.0,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.4477812928957037e-05,
+            "mean_gap": 4.2536764705882355,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.01838235294117647,
+                0.025735294117647058
+              ],
+              "mean": 0.003676470588235294,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 3.423077869429779e-05,
+            "mean_gap": 4.257352941176471,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.022058823529411766,
+                0.022058823529411766
+              ],
+              "mean": 0.0,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 3.311606339548201e-05,
+            "mean_gap": 4.2536764705882355,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.2536764705882355,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.022058823529411766,
+                0.011029411764705883
+              ],
+              "mean": -0.003676470588235294,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 1.4227669436366447e-05,
+            "mean_gap": 4.25,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.04044117647058824
+              ],
+              "mean": 0.01838235294117647,
+              "n_clusters": 34
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 2.9426540592825044e-05,
+            "mean_gap": 4.272058823529412,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      }
+    }
+  },
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "native": {
+    "mediation": {
+      "chunk_size": 8,
+      "chunks": [
+        "f13cf4dd97dca9dc69e942e62ee1860f82cf98e5c92fb2c2511a59de44659368",
+        "aa234ad4a17ddcc3b11d0fbb391e31e5d3ab3fb856918a246a16a2a7afb87282",
+        "f745a2617d9d4b47d142fd4b69c2319df88b3bab00c55fcd870defdbf6a71aba",
+        "b8e177ab867a92a1031be0784f0a46a72949358c9dfa565dc347447ff25e8510",
+        "a94f61a30022d00f6b30f2c01890acbc464763c78ed0100430b0c9a11c06fb82",
+        "a95507c56dd20945a97e2f16f0ff04c426e6fe89bb29177150610e43d1125c95",
+        "afe81bf24923febf735434a39ded674d6b151497bdb171a9fe91d3fadd0088c3",
+        "57ba1e8a652236021e9a3b09552160296e4729159eb4888da1dadfb654683a75",
+        "50ebfc07cc9f0adb67e8dd6dfca26fc1a3693784dc3fc635e536e988166ae615",
+        "e4b6173864b0d58f56acb4761710672c2bae3acb3afdd69bdacb1d29218cc1ab",
+        "ca3f8c78fd86c8a63ea7e73b60a19837d43839a09ccee7c2e5deb274756c2429",
+        "55bbc3bdb35e9c034ecc7d9adc318918218a2dc5f287cb66bc465750b72a2737",
+        "53ad405e4f6e3e04257397db4055451937b50c0de8b72e3ced4a6b7ff1d785b6",
+        "4cca15a18ce2d3a8953bd41ea2e36678eac4d0ecffdb2412dd6ff963a930cd27",
+        "9d3917486a53812739967ee94b13d33897e48992ada244a166b2f6bf90539f86",
+        "6211c10d18e2a833a36c51129aef2c3b32592d5eeedb2ac49700a456e8067f72",
+        "89e48cf369f14e18101d49eed3a40e0450e9cde642b0c7be59b6660ec5e88476",
+        "6b980fd70e713fc179461d0ed42361f80cd5fb074b5fdf140a210578d9737754",
+        "49897dfe01c3a6136148b1943287d9731bf5f01606a3e174785ffff5966fb659",
+        "8e93255d1b39e9671f65ce0bce65f89075def23734ee6075baf34c20de02b301",
+        "4d42e9ebd812a5d473e49c4e1ec9646d8a1f2f2970a873884e47c67852b58ab6",
+        "f846d0869f0feb4f063cf296df2f5d68fa5e3d07c36b91a74435cb71197a8c9a",
+        "0792883ca938992b636b6c224690772710d05f1569a0e27ca56a2221a554479b",
+        "98dab5a6c6ddfb5d721054b384a8d2e1af02c41dbac5fc9fa9377d3c9c9bb6a3",
+        "4238dc478297e39271d4a2ce764e9994a52a615fcac40cdcc0193608be485867",
+        "6a9b07fe338daf224c6317c88daed0b806c53bb9b6cfd7f8c868e054be4750c1",
+        "6c8458c0f3fdb2b175b2673e99a037262fa624946c823893a4e293a2fab556c4",
+        "0fa614f1847a79f2e2c3f9b38aecf35c1e355ceeae2793bbdba978504f75abcb",
+        "a15b6d48d4f2263f6cc920c2c044939f44abdb8dc6bbd842ab64eed4e73aa102",
+        "acea4429b11c70f4ea5d46e9c684702c2ac6e7dd071d26e5f48a99fc6e2be861",
+        "23d53480d12cbe2b5ae7b1d82831419a9db6b7cae099525141ab8c6df0a014e6",
+        "cd7ce006ed341a005afcbec461acabfcd928d711daba4dd79b72425626ba5400"
+      ],
+      "n": 256,
+      "provenance": {
+        "dtype": "BF16 stored as uint16",
+        "fields": {
+          "clean_K": [
+            256,
+            8,
+            128
+          ],
+          "clean_V": [
+            256,
+            8,
+            128
+          ],
+          "clean_head34_2": [
+            256,
+            128
+          ],
+          "clean_incoming_b35": [
+            256,
+            2560
+          ],
+          "edited_K": [
+            256,
+            8,
+            128
+          ],
+          "edited_V": [
+            256,
+            8,
+            128
+          ],
+          "edited_incoming_b35": [
+            256,
+            2560
+          ]
+        },
+        "path": "native-slots.npz",
+        "sha256": "8f1e56171944828f696d5f35d2c562e2160f41ceffb23c4d88ff6ca4e652e9b4"
+      }
+    },
+    "targeted": {
+      "chunk_size": 8,
+      "chunks": [
+        "3724e4605e4deacedd4064b545076b371990c0f643141a7cdc49f3517c166236",
+        "12098fdc66689659174bd9ecb79801872acc165da3e74e8d15498094bc65ef90",
+        "ae156faa01eea0dac8eb9f37c480a8871673dbd7d5083db4859c4b0512812411",
+        "1cadf564a48d3a244284cefd23c1df3ef6435121839215361a44f39936722e4e",
+        "f4ed46921bb9f03481cf787f8033e56f2aa746644f9a1b2689c0c23348cdfc13",
+        "27a12f5712e6e6c4e583695d54742d11439d093da20ff0033c48d38bd0eb6ce7",
+        "40f7c7e007693e42b97080bc3327004971d0397d5e7ba4bbc9839312869412e8",
+        "742b45605fc092ada1c1b9cb0379d8354299a5fd62ed69df0f16db806aacf0ac",
+        "42d1e477ba0a02d823b64adf1bcb6986be1e889614be1dcdfed7844cd88a40b7",
+        "2ec16fad92a98ca5c7def39556133cfa53a13ce37bc19ea82bbb6e0d0c6b3eba",
+        "b81a19917a466bd8d5254c682405b4efd25a391a185c35e00ad9e52712965d26"
+      ],
+      "n": 81,
+      "provenance": {
+        "dtype": "BF16 stored as uint16",
+        "fields": {
+          "clean_K": [
+            81,
+            8,
+            128
+          ],
+          "clean_V": [
+            81,
+            8,
+            128
+          ],
+          "clean_head34_2": [
+            81,
+            128
+          ],
+          "clean_incoming_b35": [
+            81,
+            2560
+          ],
+          "edited_K": [
+            81,
+            8,
+            128
+          ],
+          "edited_V": [
+            81,
+            8,
+            128
+          ],
+          "edited_incoming_b35": [
+            81,
+            2560
+          ]
+        },
+        "path": "native-slots-layout-v2.npz",
+        "sha256": "b3797d2be356c1382d8b76e5c57437f7e13ab09f3eac982fe9f1a291c391f0bc"
+      }
+    }
+  },
+  "pilot": {
+    "challenge_calibration_available": true,
+    "kind": "real",
+    "layout": "prefix+cached suffix for all cases",
+    "layout_parity": [
+      {
+        "KL_whole_to_segmented": [
+          1.467190304538235e-05,
+          0.00014680360618513077,
+          1.4364155504154041e-05,
+          3.4286000300198793e-05
+        ],
+        "argmax_equal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "bitwise_equal": false,
+        "case_ids": [
+          "pilot:0:direct:0",
+          "pilot:0:direct:1",
+          "pilot:0:stale:0",
+          "pilot:0:stale:1"
+        ],
+        "max_abs_logit_difference": 0.75
+      },
+      {
+        "KL_whole_to_segmented": [
+          2.0774445147253573e-05,
+          3.9677368476986885e-05,
+          1.5946963685564697e-05,
+          0.0003826418542303145
+        ],
+        "argmax_equal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "bitwise_equal": false,
+        "case_ids": [
+          "pilot:0:alias:0",
+          "pilot:0:alias:1",
+          "pilot:0:draft:0",
+          "pilot:0:draft:1"
+        ],
+        "max_abs_logit_difference": 0.5
+      },
+      {
+        "KL_whole_to_segmented": [
+          3.939311227441067e-06,
+          8.222676842706278e-05,
+          3.1870022212387994e-06,
+          6.260370355448686e-07
+        ],
+        "argmax_equal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "bitwise_equal": false,
+        "case_ids": [
+          "pilot:1:direct:0",
+          "pilot:1:direct:1",
+          "pilot:1:stale:0",
+          "pilot:1:stale:1"
+        ],
+        "max_abs_logit_difference": 0.5
+      },
+      {
+        "KL_whole_to_segmented": [
+          5.076257366454229e-06,
+          4.320612788433209e-06,
+          3.3196665754076093e-06,
+          3.139697582810186e-06
+        ],
+        "argmax_equal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "bitwise_equal": false,
+        "case_ids": [
+          "pilot:1:alias:0",
+          "pilot:1:alias:1",
+          "pilot:1:draft:0",
+          "pilot:1:draft:1"
+        ],
+        "max_abs_logit_difference": 0.5
+      }
+    ],
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "n": 256,
+    "part": "pilot",
+    "prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "profile": null,
+    "profiles": {
+      "alias": {
+        "accuracy": 0.390625,
+        "cells": [
+          {
+            "accuracy": 0.3125,
+            "correct": 5,
+            "expected": "fishing",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.625,
+            "correct": 10,
+            "expected": "mining",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.1875,
+            "correct": 3,
+            "expected": "fishing",
+            "frame": 1,
+            "n": 16
+          },
+          {
+            "accuracy": 0.4375,
+            "correct": 7,
+            "expected": "mining",
+            "frame": 1,
+            "n": 16
+          }
+        ],
+        "eligible": false,
+        "low_margin_correct": 4,
+        "median_gap": -7.125,
+        "n": 64
+      },
+      "direct": {
+        "accuracy": 0.96875,
+        "cells": [
+          {
+            "accuracy": 1.0,
+            "correct": 16,
+            "expected": "fishing",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.875,
+            "correct": 14,
+            "expected": "mining",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 1.0,
+            "correct": 16,
+            "expected": "fishing",
+            "frame": 1,
+            "n": 16
+          },
+          {
+            "accuracy": 1.0,
+            "correct": 16,
+            "expected": "mining",
+            "frame": 1,
+            "n": 16
+          }
+        ],
+        "eligible": true,
+        "low_margin_correct": 3,
+        "median_gap": 20.375,
+        "n": 64
+      },
+      "draft": {
+        "accuracy": 0.84375,
+        "cells": [
+          {
+            "accuracy": 0.6875,
+            "correct": 11,
+            "expected": "fishing",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.6875,
+            "correct": 11,
+            "expected": "mining",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 1.0,
+            "correct": 16,
+            "expected": "fishing",
+            "frame": 1,
+            "n": 16
+          },
+          {
+            "accuracy": 1.0,
+            "correct": 16,
+            "expected": "mining",
+            "frame": 1,
+            "n": 16
+          }
+        ],
+        "eligible": true,
+        "low_margin_correct": 9,
+        "median_gap": 16.1875,
+        "n": 64
+      },
+      "stale": {
+        "accuracy": 0.625,
+        "cells": [
+          {
+            "accuracy": 0.625,
+            "correct": 10,
+            "expected": "fishing",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.6875,
+            "correct": 11,
+            "expected": "mining",
+            "frame": 0,
+            "n": 16
+          },
+          {
+            "accuracy": 0.75,
+            "correct": 12,
+            "expected": "fishing",
+            "frame": 1,
+            "n": 16
+          },
+          {
+            "accuracy": 0.4375,
+            "correct": 7,
+            "expected": "mining",
+            "frame": 1,
+            "n": 16
+          }
+        ],
+        "eligible": false,
+        "low_margin_correct": 8,
+        "median_gap": 7.6875,
+        "n": 64
+      }
+    },
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_behavior_execution.v1",
+    "selected_profile": "draft",
+    "source_sha256": "49849f19820b6100bb172eecd5a7a7ecb78324d0df3a9e838c966555f21fb58b",
+    "status": "complete"
+  },
+  "prereg": {
+    "ability": "Two full-forward operations (B34/H2 and B33 MLP) at same prequestion offset on fixed 2200 formal MC items, 140 reference only; 2pp paired exact simultaneous bounds.",
+    "corpus_sha256": "c3d037d93644c6742a3e7d21417f2670063eb28625c97924529bc6a5a485af84",
+    "formal": "256 independent backgrounds, 128 per heldout, both T for behavior; hash-select one T per background before any edit. Require >=.80 overall and every split/frame/answer cell >=.65. Report selected one T plus full pairs. Gap uses complete model first-token logits and acceptable start-token variants; correctness uses actual generated first word.",
+    "kind": "real",
+    "margin_gate": "Report median gap compared to previous exposed revision and subset of correctly generated baseline with clean first-token gap in (0,8]. Subset needs n_required for 10pp to make a powered conditional claim. Predetermined, no dropping cases from primary n=256.",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "pilot": "32 new backgrounds x two T x four profiles, only this split is read for selection. Non-direct profile eligible if strict natural first-word accuracy >=.80 and minimum frame/answer accuracy >=.65. Maximize number with clean gap in (0,8] then lower median gap, then fixed profile order. If none eligible, use direct and report lack of calibrated challenge.",
+    "positions": {
+      "cut": 992,
+      "source": 991
+    },
+    "power_plan": {
+      "all_cases": {
+        "achieved_power": 0.999,
+        "expected_delta_pt": 10.0,
+        "n": 256,
+        "n_required": 79,
+        "p_d": 0.1,
+        "pass": true
+      },
+      "within_split": {
+        "achieved_power": 0.947,
+        "expected_delta_pt": 10.0,
+        "n": 128,
+        "n_required": 79,
+        "p_d": 0.1,
+        "pass": true
+      }
+    },
+    "primary": "At shared prequestion token B34/H2, true Head α=.5 and 1; replay only B35 K/V slot on clean cache, rescue same slot on edited cache, K-only, V-only, matched norm scrambled B35 K/V delta. Same segmented evaluation layout. Primary behavioral criterion >=10pp net loss with paired exact p<.05 and >=5pp more loss than matched control. Trace exact bitwise replay and rescue separately from generation effect.",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_mediation_prereg.v1",
+    "secondary": "B33 MLP whole-write removal, first 32 lockbox backgrounds fixed by order, trace B34 and B35 K/V individually and combined. B35/H25 local-only negative engineering check on first 8 pilot cases. Any continuous effects are descriptive at n32.",
+    "source_sha256": "837c1d890a71a7541062f05032412577cd5b23680d30e7976f4db153c46d33cb"
+  },
+  "previous_report_sha256": "1f070bfa5b08f63aa07c5bc89135c875296f0eb1c198bfdaa0a485d1ccdc7708",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052792
+  },
+  "refs": {
+    "capability": "8b96cddaa5fe1c5a1df6bc07e446cb6700c98a4d02f328af70287bfdb5a0fc4d",
+    "case_index": "65a3a23ff11fe275df4542b08fda84398c8d47af4725f163f7a0b3ade3a8dae2",
+    "earlier": "af1c931620e9db5f24926e48326acb38c4790704d7de0477d04159bc1d60adbb",
+    "formal": "3e708b773dc8fa3068a5450f661c96f25ce9ad709a82d09ddd28de4c13c9f92e",
+    "mediation": "2df6a4da6bcffcc711be9c0db55bc630af492691d2b54082c2cc8f441fb9d52d",
+    "pilot": "f090fd6824b7d2f4ebbfed4d9d7ed83dfdb27329132cb58c344280ec60b389c8",
+    "raw_slots": "60528573d2223f12412dc8543f8cb893241959000a584955daa113e63a76ccb0",
+    "screen": "88c1012344e9f075d765bfefbf96730ad7f97b609ec8bd3bbfc0f470437e5937",
+    "source_code": "9bb4a8311a0cba5e869d007097b6d82af300ef02be98f48fb412817bab5c8ecd",
+    "targeted": "91fbcaaf56047fd3c67f75b7768619153095b99ababaf7f4296039f1055913fc",
+    "targeted_initial_layout": "e72c9f4ab8df1a30bdf9d19a6ef1531b21bb762c1ab2c491d7ea0fdee391209d",
+    "targeted_raw_slots": "ac3e90ae93940fc437aa946a421436258c5d4081c2d7dc01d88b28e910965158"
+  },
+  "run_id": "MLP-KV-MEDIATION-20261105-v1",
+  "schema": "mlp_kv_mediation_report.v1",
+  "screen": {
+    "eligible": 81,
+    "enrolled": [
+      752,
+      64,
+      201,
+      553,
+      557,
+      424,
+      666,
+      822,
+      582,
+      885,
+      258,
+      741,
+      895,
+      817,
+      675,
+      319,
+      785,
+      324,
+      117,
+      264,
+      328,
+      383,
+      699,
+      351,
+      277,
+      739,
+      839,
+      454,
+      610,
+      471,
+      25,
+      529,
+      155,
+      767,
+      481,
+      511,
+      6,
+      835,
+      596,
+      808,
+      166,
+      535,
+      123,
+      195,
+      652,
+      705,
+      262,
+      278,
+      692,
+      855,
+      884,
+      321,
+      429,
+      392,
+      866,
+      35,
+      562,
+      31,
+      323,
+      593,
+      224,
+      163,
+      660,
+      501,
+      200,
+      456,
+      628,
+      854,
+      770,
+      829,
+      214,
+      615,
+      341,
+      653,
+      533,
+      834,
+      689,
+      360,
+      674,
+      703,
+      397
+    ],
+    "inputs_sha256": "dabca62f6a9d3efb17fc6929812622dd0320e36849ea353d7cd6ac4bb936a50a",
+    "kind": "real",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "n_screened": 896,
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_low_margin_enrollment.v1",
+    "source_sha256": "02422eb4d3c7eecb69a4b88bbf9e7f7e637a83fe4c6adc24f85c23bae9a505ab"
+  },
+  "state": "complete",
+  "targeted": {
+    "checks": {
+      "nonzero_KV_cases": 81,
+      "nonzero_future_distribution_cases": 81,
+      "only_B35_and_source": true,
+      "replay_generation_equal": 81,
+      "replay_logits_bitwise_equal": 81,
+      "rescue_generation_equal": 81,
+      "rescue_logits_bitwise_equal": 81
+    },
+    "core_sha256": "904946afdaf72239fad65a16f9631c389eaa9c20102d07699f8745a332637a2b",
+    "corrections": [
+      {
+        "after": {
+          "KL": 0.0,
+          "correct": true,
+          "gap": 7.5,
+          "text": "mining",
+          "tokens": [
+            1065,
+            287
+          ],
+          "word": "mining"
+        },
+        "batch_case_ids": [
+          "targeted:lockbox:796:draft:0",
+          "targeted:lockbox:797:draft:1",
+          "targeted:lockbox:798:draft:0",
+          "targeted:lockbox:799:draft:0"
+        ],
+        "before": {
+          "KL": 0.0,
+          "correct": true,
+          "gap": 7.25,
+          "text": "mining",
+          "tokens": [
+            1065,
+            287
+          ],
+          "word": "mining"
+        },
+        "enrolled_index": 80,
+        "retained_only": "targeted:lockbox:797:draft:1",
+        "screen": {
+          "correct": true,
+          "gap": 7.5,
+          "text": "mining",
+          "tokens": [
+            1065,
+            287
+          ],
+          "word": "mining"
+        },
+        "screen_index": 397
+      }
+    ],
+    "enrollment_sha256": "670d38e22445f99e81352946e37b29985a2a641bde20a13aa16efc626c7dfe53",
+    "kind": "real",
+    "layout_correction": {
+      "batches": {
+        "396": [
+          [
+            80,
+            397
+          ]
+        ]
+      },
+      "initial_result_sha256": "86db0276c67fa62dcdd95f595b1c421bad7358b9d656c540232897928bea466f",
+      "kind": "real",
+      "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "provenance": {
+        "git_dirty": true,
+        "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+        "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+        "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+        "seed": 511052792
+      },
+      "rule": "Use original screening order and shape to recompute all eight operations for every discrepant case. Other batch members are numerical padding only, excluded from enrolled statistics. Preserve all original results. Identical word and gap required for all enrolled cases.",
+      "run_id": "MLP-KV-MEDIATION-20261105-v1",
+      "schema": "mlp_kv_layout_correction_prereg.v2",
+      "screen_sha256": "670d38e22445f99e81352946e37b29985a2a641bde20a13aa16efc626c7dfe53",
+      "source_sha256": "519a25415cc7ceec495d62725e1e3367c5c90b8e3e312c23a416e1858d0c4464"
+    },
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "n_enrolled": 81,
+    "native": {
+      "dtype": "BF16 stored as uint16",
+      "fields": {
+        "clean_K": [
+          81,
+          8,
+          128
+        ],
+        "clean_V": [
+          81,
+          8,
+          128
+        ],
+        "clean_head34_2": [
+          81,
+          128
+        ],
+        "clean_incoming_b35": [
+          81,
+          2560
+        ],
+        "edited_K": [
+          81,
+          8,
+          128
+        ],
+        "edited_V": [
+          81,
+          8,
+          128
+        ],
+        "edited_incoming_b35": [
+          81,
+          2560
+        ]
+      },
+      "path": "native-slots-layout-v2.npz",
+      "sha256": "b3797d2be356c1382d8b76e5c57437f7e13ab09f3eac982fe9f1a291c391f0bc"
+    },
+    "power_plan": {
+      "achieved_power": 0.812,
+      "expected_delta_pt": 10.0,
+      "n": 81,
+      "n_required": 79,
+      "p_d": 0.1,
+      "pass": true
+    },
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_screened_execution.v1",
+    "scopes": [
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      },
+      {
+        "all_earlier_positions_bitwise_equal": true,
+        "only_allowed_layers": true,
+        "slots": [
+          [
+            35,
+            "K"
+          ],
+          [
+            35,
+            "V"
+          ]
+        ]
+      }
+    ],
+    "screen_to_replay_exact": 81,
+    "source_sha256": "02422eb4d3c7eecb69a4b88bbf9e7f7e637a83fe4c6adc24f85c23bae9a505ab",
+    "status": "complete",
+    "summary": {
+      "all": {
+        "eligible": true,
+        "interaction_gap": {
+          "ci95": [
+            -0.027777777777777776,
+            0.0030864197530864196
+          ],
+          "mean": -0.009259259259259259,
+          "n_clusters": 81
+        },
+        "loss_specificity": 0.0,
+        "n": 81,
+        "operations": {
+          "clean": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.012345679012345678,
+                0.012345679012345678
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00021210646368368898,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.018518518518518517
+              ],
+              "mean": 0.006172839506172839,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00020727412595846127,
+            "mean_gap": 4.506172839506172,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.012345679012345678
+              ],
+              "mean": 0.0030864197530864196,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00012623716705107834,
+            "mean_gap": 4.503086419753086,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.012345679012345678,
+                0.012345679012345678
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00021210646368368898,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.016975308641975308,
+                0.012345679012345678
+              ],
+              "mean": -0.0015432098765432098,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00022473072404683326,
+            "mean_gap": 4.4984567901234565,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.018518518518518517
+              ],
+              "mean": 0.006172839506172839,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00020726402494480398,
+            "mean_gap": 4.506172839506172,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      },
+      "confirm": {
+        "eligible": false,
+        "n": 0
+      },
+      "lockbox": {
+        "eligible": false,
+        "n": 0
+      },
+      "low_margin": {
+        "eligible": true,
+        "interaction_gap": {
+          "ci95": [
+            -0.027777777777777776,
+            0.0030864197530864196
+          ],
+          "mean": -0.009259259259259259,
+          "n_clusters": 81
+        },
+        "loss_specificity": 0.0,
+        "n": 81,
+        "operations": {
+          "clean": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "head_full": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.012345679012345678,
+                0.012345679012345678
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00021210646368368898,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "head_half": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.018518518518518517
+              ],
+              "mean": 0.006172839506172839,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00020727412595846127,
+            "mean_gap": 4.506172839506172,
+            "net_loss": 0.0
+          },
+          "k_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.012345679012345678
+              ],
+              "mean": 0.0030864197530864196,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00012623716705107834,
+            "mean_gap": 4.503086419753086,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.012345679012345678,
+                0.012345679012345678
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00021210646368368898,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.0,
+            "mean_gap": 4.5,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.016975308641975308,
+                0.012345679012345678
+              ],
+              "mean": -0.0015432098765432098,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00022473072404683326,
+            "mean_gap": 4.4984567901234565,
+            "net_loss": 0.0
+          },
+          "v_only": {
+            "accuracy": 1.0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.006172839506172839,
+                0.018518518518518517
+              ],
+              "mean": 0.006172839506172839,
+              "n_clusters": 81
+            },
+            "losses": 0,
+            "mcnemar_exact_p": 1.0,
+            "mean_KL": 0.00020726402494480398,
+            "mean_gap": 4.506172839506172,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false
+      }
+    }
+  },
+  "targeted_prereg": {
+    "baseline_pilot_sha256": "b0d1a6787197e691f95fdb5ce43325f08c2211fc42302ed67a62e816ded5afd3",
+    "criteria": "one new case per background, clean first word correct and 0<clean gap<=8; rank independent eligible cases by frozen hash then take first 128. Finish the entire screen before any edit.",
+    "earlier_prereg_sha256": "e5d348d631a51c1ab6dff8cc9168ec8a292b4086edd2b51b665a49eb58a55cc4",
+    "effect_test": "Same eight operations, same primary gate and offset as original phase. Qualified population is baseline-correct low-margin only, with baseline screening and all exclusions archived.",
+    "enroll_up_to": 128,
+    "kind": "real",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "no_retuning": "No treatment outcomes enter screening. If enrollment is smaller than n_required, mark efficacy exploratory.",
+    "power_plan": {
+      "achieved_power": 0.947,
+      "expected_delta_pt": 10.0,
+      "n": 128,
+      "n_required": 79,
+      "p_d": 0.1,
+      "pass": true
+    },
+    "profile": "draft",
+    "provenance": {
+      "git_dirty": true,
+      "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+      "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "seed": 511052792
+    },
+    "run_id": "MLP-KV-MEDIATION-20261105-v1",
+    "schema": "mlp_kv_targeted_prereg.v1",
+    "screening_n": 896,
+    "source_sha256": "02422eb4d3c7eecb69a4b88bbf9e7f7e637a83fe4c6adc24f85c23bae9a505ab"
+  }
+}

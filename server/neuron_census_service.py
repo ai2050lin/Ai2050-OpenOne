@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import glob
+import gzip
 import json
 import os
 import re
@@ -500,6 +501,35 @@ def unit_card(model_key: str = Query(...), block: int = Query(..., ge=0), unit: 
     card['explanations'] = expl_index().get((model_key, block, unit), [])
     card['evidence_axes'] = {'read': read, 'control': control, 'explain': explain_axis(card['explanations'])}
     return card
+
+
+@lru_cache(maxsize=2)
+def _archived_circuits(path: Path, stamp: int, size: int) -> dict:
+    with gzip.open(path, 'rt', encoding='utf-8') as source:
+        return json.load(source)
+
+
+@router.get('/circuit-archive')
+def archived_circuit(model_key: str, run: str, block: int = Query(..., ge=0), unit: int = Query(..., ge=0)):
+    """Read one precomputed candidate path without loading a model."""
+    from deploy.datapack import canonical, circuit_source
+    from deploy.research_library import services
+
+    path = circuit_source(services()._DATA_DIR, model_key)
+    try:
+        stat = path.stat()
+        doc = _archived_circuits(path, stat.st_mtime_ns, stat.st_size)
+    except FileNotFoundError:
+        return {'available': False, 'reason': '该普查尚无跨层权重候选包。'}
+    except (OSError, ValueError, EOFError):
+        raise HTTPException(503, '无法读取跨层权重候选包')
+    if not isinstance(doc, dict) or doc.get('schema') != 'neuron_circuit_pack.v1' or doc.get('model_key') != model_key or doc.get('run') != run:
+        return {'available': False, 'reason': '候选包的普查身份与当前选择不同。'}
+    key = canonical(f'/api/neurons/circuit?block={block}&unit={unit}&k={doc.get("k", 5)}&model_key={model_key}&run={run}')
+    entry = doc.get('entries', {}).get(key)
+    if not entry:
+        return {'available': False, 'reason': '该单元尚未纳入前后层候选的预计算范围。'}
+    return {**entry, 'model_key': model_key, 'run': run, 'model_snapshot': doc.get('model_snapshot')}
 
 
 @lru_cache(maxsize=4)

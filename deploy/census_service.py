@@ -345,6 +345,49 @@ def _owner(conn, node_id: str) -> Optional[str]:
     return r['owner_user_id'] if r else None
 
 
+def _claim_candidate(conn, b: ClaimIn, node_id: str, now: float):
+    if b.mode == 'synthetic' and not allow_synthetic():
+        return None
+    me_owner = _owner(conn, node_id)
+    sql = "SELECT job_id FROM census_jobs WHERE status='open'"
+    args: list = []
+    if b.job_id:
+        sql += ' AND job_id=?'; args.append(b.job_id)
+    if b.mode == 'real':
+        sql += ' AND snapshot_sha256=?'; args.append(b.model_snapshot)
+    for jr in conn.execute(sql + ' ORDER BY created_at', args).fetchall():
+        job = load_job(jr['job_id'])
+        res: Dict[str, list] = {}
+        for r in conn.execute("SELECT shard,node_id,status FROM census_results WHERE job_id=? AND status IN ('accepted','disputed')",
+                              (job['job_id'],)):
+            res.setdefault(r['shard'], []).append(r)
+        leases: Dict[str, List[str]] = {}
+        for r in conn.execute("SELECT shard,node_id FROM census_leases WHERE job_id=? AND status='claimed' AND lease_until>=?", (job['job_id'], now)):
+            leases.setdefault(r['shard'], []).append(r['node_id'])
+        first, second = [], []
+        for sh in job['shards']:
+            done_nodes = [r['node_id'] for r in res.get(sh['shard'], [])]
+            if any(r['status'] == 'disputed' for r in res.get(sh['shard'], [])):
+                continue
+            busy = leases.get(sh['shard'], [])
+            if node_id in done_nodes or node_id in busy:
+                continue
+            if len(done_nodes) + len(busy) >= sh['replicas']:
+                continue
+            if done_nodes:
+                owners = {_owner(conn, x) for x in done_nodes}
+                if me_owner and me_owner in owners:
+                    continue                      # 复算必须来自另一个账号
+                second.append(sh)
+            else:
+                first.append(sh)
+        pick = (first or second or [None])[0]
+        if pick is None:
+            continue
+        return job, pick
+    return None
+
+
 @router.post('/claim')
 def claim(b: ClaimIn, response: Response, x_node_token: str = Header(default='')):
     n = D._auth_node(x_node_token)
@@ -352,56 +395,22 @@ def claim(b: ClaimIn, response: Response, x_node_token: str = Header(default='')
         raise HTTPException(403, 'synthetic 只在沙盒中心（AI2050_DIST_ALLOW_SYNTHETIC=1）可用')
     conn = db()
     _expire(conn)
-    me_owner = _owner(conn, n['node_id'])
-    sql = "SELECT job_id FROM census_jobs WHERE status='open'"
-    args: list = []
-    if b.job_id:
-        sql += ' AND job_id=?'; args.append(b.job_id)
-    if b.mode == 'real':
-        sql += ' AND snapshot_sha256=?'; args.append(b.model_snapshot)
     now = time.time()
     with D._db_lock:
-        for jr in conn.execute(sql + ' ORDER BY created_at', args).fetchall():
-            job = load_job(jr['job_id'])
-            res: Dict[str, list] = {}
-            for r in conn.execute("SELECT shard,node_id,status FROM census_results WHERE job_id=? AND status IN ('accepted','disputed')",
-                                  (job['job_id'],)):
-                res.setdefault(r['shard'], []).append(r)
-            leases: Dict[str, List[str]] = {}
-            for r in conn.execute("SELECT shard,node_id FROM census_leases WHERE job_id=? AND status='claimed'", (job['job_id'],)):
-                leases.setdefault(r['shard'], []).append(r['node_id'])
-            first, second = [], []
-            for sh in job['shards']:
-                done_nodes = [r['node_id'] for r in res.get(sh['shard'], [])]
-                if any(r['status'] == 'disputed' for r in res.get(sh['shard'], [])):
-                    continue
-                busy = leases.get(sh['shard'], [])
-                if n['node_id'] in done_nodes or n['node_id'] in busy:
-                    continue
-                if len(done_nodes) + len(busy) >= sh['replicas']:
-                    continue
-                if done_nodes:
-                    owners = {_owner(conn, x) for x in done_nodes}
-                    if me_owner and me_owner in owners:
-                        continue                      # 复算必须来自另一个账号
-                    second.append(sh)
-                else:
-                    first.append(sh)
-            pick = (first or second or [None])[0]
-            if pick is None:
-                continue
-            lease_id = 'CL-' + uuid.uuid4().hex[:12]
-            conn.execute('INSERT INTO census_leases(lease_id,job_id,shard,node_id,status,claimed_at,lease_until) VALUES(?,?,?,?,?,?,?)',
-                         (lease_id, job['job_id'], pick['shard'], n['node_id'], 'claimed', now, now + LEASE_SECONDS))
-            conn.execute('UPDATE nodes SET last_seen=? WHERE node_id=?', (now, n['node_id']))
-            conn.commit()
-            return {'lease_id': lease_id, 'job_id': job['job_id'], 'shard': pick['shard'], 'spec': pick,
-                    'model': {k: job['model'].get(k) for k in ('model_key', 'name', 'hf_repo', 'hf_revision', 'snapshot_sha256')},
-                    'files': _bundle(job, pick), 'lease_until': now + LEASE_SECONDS, 'mode': b.mode,
-                    'chunk_bytes': MAX_CHUNK}
-    response.status_code = 204
-    return None
-
+        candidate = _claim_candidate(conn, b, n['node_id'], now)
+        if candidate is None:
+            response.status_code = 204
+            return None
+        job, pick = candidate
+        lease_id = 'CL-' + uuid.uuid4().hex[:12]
+        conn.execute('INSERT INTO census_leases(lease_id,job_id,shard,node_id,status,claimed_at,lease_until) VALUES(?,?,?,?,?,?,?)',
+                     (lease_id, job['job_id'], pick['shard'], n['node_id'], 'claimed', now, now + LEASE_SECONDS))
+        conn.execute('UPDATE nodes SET last_seen=? WHERE node_id=?', (now, n['node_id']))
+        conn.commit()
+        return {'lease_id': lease_id, 'job_id': job['job_id'], 'shard': pick['shard'], 'spec': pick,
+                'model': {k: job['model'].get(k) for k in ('model_key', 'name', 'hf_repo', 'hf_revision', 'snapshot_sha256')},
+                'files': _bundle(job, pick), 'lease_until': now + LEASE_SECONDS, 'mode': b.mode,
+                'chunk_bytes': MAX_CHUNK}
 
 def _lease(lease_id: str, node_id: str):
     r = db().execute('SELECT * FROM census_leases WHERE lease_id=?', (lease_id,)).fetchone()

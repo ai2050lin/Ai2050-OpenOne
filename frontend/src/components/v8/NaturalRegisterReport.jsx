@@ -1,0 +1,32 @@
+import {useState} from 'react';
+
+const p=x=>Number.isFinite(x)?`${(x*100).toFixed(1)}%`:'—';
+const pt=x=>Number.isFinite(x)?(x*100).toFixed(2):'—';
+const NI={noninferior:'通过非劣效门',inferior:'超过允许损失',inconclusive:'尚未证实',not_tested:'未测试'};
+
+export default function NaturalRegisterReport({doc}){
+  const [tab,setTab]=useState('result'),[page,setPage]=useState(0);
+  const r=doc.result,pilots=doc.pilots||[],errors=r?.counterexamples||[],formal=Boolean(r?.hypotheses);
+  return <section aria-label="自然生成语域研究报告" className="v8-intervention-report v8-natural-report">
+    <p className="v8-note">{doc.run_id} · 本地 Qwen3-4B / bf16 · 自由生成，不使用候选答案池</p>
+    <p><strong>{formal?(!r.baseline_gate?'留出行为门未通过，尚不能验收自然语域控制':Object.values(r.hypotheses).some(h=>h.supported)?'部分预注册假设在限定范围内获支持':'自然语域控制未通过预注册主判'):'发现集行为门尚未通过，正式机制结论未建立'}</strong></p>
+    <p className="v8-note">语域由完整输出的语言规则与未编辑原模型盲评共同判定；这不是独立人工评审。结论限于登记的语域条件、任务和模型快照。</p>
+    <div className="v6-toolbar" role="group" aria-label="自然生成报告内容">{[['result','自然生成结果'],['matching','长度与句式'],['examples','输出与反例'],['prereg','预注册与来源']].map(([k,t])=><button className="fw-tbtn" key={k} aria-pressed={tab===k} onClick={()=>setTab(k)}>{t}</button>)}</div>
+    {tab==='examples'&&doc.counterexample_breakdown&&<p className="v8-note">混合记录：生成或评分失败 {doc.counterexample_breakdown.natural_style_or_content} 条，正式能力题回退 {doc.counterexample_breakdown.formal_capability_regressions} 条，未独立验证的参考变化 {doc.counterexample_breakdown.reference_only_changes} 条。参考变化不计能力门，原始记录与更正版均保留。</p>}
+    {tab==='result'&&<>
+      {formal&&<><p className="v8-note">最终验证：行为门{r.baseline_gate?'通过':'未通过'}。分母保留全部书面条件输入，未按编辑后的成功样本筛选。</p>
+        {r.baseline_by_register&&<p className="v8-note">原模型在联合判据下：书面符合率{p(r.baseline_by_register.acad)}，口语符合率{p(r.baseline_by_register.colloq)}。{!r.baseline_gate&&'测量门失败时，零合格翻转不能说明模型没有语域门控。'}</p>}
+        <table className="v6-table"><thead><tr><th>预先固定的假设</th><th>合格自然翻转 / 区间</th><th>原有口语响应损失上界</th><th>内容损失上界</th><th>能力保持</th><th>结论</th></tr></thead><tbody>{Object.entries(r.hypotheses).map(([name,h])=><tr key={name}><td>{name.startsWith('legacy')?'旧方向':'等长度新方向'}</td><td>{p(h.qualified_flip.mean)}<small>[{h.qualified_flip.ci.map(p).join(', ')}]</small></td><td>{p(h.colloquial_loss?.ci?.[1])}<small>编辑后合格口语 {p(h.colloquial_source_preserved)}</small></td><td>{p(h.content_loss.ci[1])}</td><td>{NI[h.capability.status]}<small>{h.capability.n}题；净损失{pt(h.capability.net_loss)}个百分点</small></td><td>{h.supported?'范围内支持':'未支持'}</td></tr>)}</tbody></table>
+        <p className="v8-note">这是旧编辑的单向充分性检验。口语行为门未通过，未提取等长度新方向；口语保持仅比较原有响应的相对损失。零翻转时，退化的bootstrap区间不能说明真实效应恰为零。</p>
+        {doc.zero_event_bound&&<p className="v8-note">按当前合格事件定义，{doc.zero_event_bound.n_families}个家族未观察到事件；按家族独立假设，发生率单侧95%上界为{p(doc.zero_event_bound.upper95)}。这是补充描述；行为门失败时不能据此界定真实语域效应。</p>}
+        <details><summary>能力门与匹配对照</summary>{Object.entries(r.hypotheses).map(([name,h])=><div key={name}><p>{name}：能力损失区间 [{h.capability.loss_interval.map(pt).join(', ')}] 个百分点，允许2个百分点。</p>{Object.entries(h.comparisons).map(([k,v])=><p className="v8-note" key={k}>相对{k}的合格翻转差 {p(v.mean)}，区间 [{v.ci.map(p).join(', ')}]。</p>)}</div>)}</details></>}
+      <details><summary>发现集试跑与失败历史（{pilots.length}版）</summary><table className="v6-table"><thead><tr><th>条件 / 版本</th><th>书面可识别</th><th>口语可识别</th><th>内容保持</th><th>行为门</th></tr></thead><tbody>{pilots.map(x=><tr key={x.run_id}><td>{x.scope||x.run_id}</td><td>{p(x.style_accuracy?.acad)}</td><td>{p(x.style_accuracy?.colloq)}</td><td>{p(x.content_accuracy)}</td><td>{x.passed?'通过':'未通过'}</td></tr>)}</tbody></table></details>
+      {doc.secondary_diagnostics?.length>0&&<details><summary>全部条件的评分分歧与截断（描述性）</summary><p className="v8-note">unknown包括评估者分歧或输出不满足篇幅要求，不算翻转成功。以下诊断不改变预注册主判。</p><table className="v6-table"><thead><tr><th>条件 / 输入要求</th><th>输出书面 / 口语 / 未定</th><th>评估者分歧</th><th>内容通过</th><th>截断</th></tr></thead><tbody>{doc.secondary_diagnostics.map(x=><tr key={x.condition+x.input_register}><td>{x.condition} / {x.input_register}</td><td>{x.styles.acad||0} / {x.styles.colloq||0} / {x.styles.unknown||0}</td><td>{x.rater_disagreement} / {x.n}</td><td>{x.content_pass} / {x.n}</td><td>{x.truncated} / {x.n}</td></tr>)}</tbody></table></details>}
+      {doc.limitations?.length>0&&<details><summary>适用范围与未完成项（{doc.limitations.length}）</summary>{doc.limitations.map(t=><p className="v8-note" key={t}>{t}</p>)}</details>}
+    </>}
+    {tab==='matching'&&<><p className="v8-note">有效token长度必须按实际模型输入核验。masked padding、截断或补空格不计为排除长度混杂。</p>{doc.matching_audit?<><div className="v8-library-stats"><span><b>{doc.matching_audit.pairs}</b>实际核对的输入对</span><span><b>{doc.matching_audit.mismatched_pairs}</b>长度不相等对数</span><span><b>{doc.matching_audit.lengths?.join(' / ')}</b>有效token档</span></div><pre className="v8-sample-text">{JSON.stringify(doc.matching_audit,null,2)}</pre></>:<p className="v8-note">详见冻结输入及匹配清单。</p>}
+      {formal&&<details><summary>各句式、各长度的原模型行为门</summary><table className="v6-table"><thead><tr><th>条件格</th><th>原模型语域符合率</th></tr></thead><tbody>{Object.entries(r.baseline_cells).map(([k,v])=><tr key={k}><td>{k}</td><td>{p(v)}</td></tr>)}</tbody></table></details>}</>}
+    {tab==='examples'&&<><p className="v8-note">同时保留两位评估者的判断、内容检查、完整生成和失败；空结果不能替代失败样例。</p>{doc.qualitative_review?.map(x=><details key={x.sample_id+x.issue}><summary>事后审阅 · {x.issue}</summary><p className="v8-note">{x.description}</p><pre className="v8-sample-text">{x.text}</pre><p className="v8-note">AI逐例审阅，未纳入预注册主判，不是独立人工验收。</p></details>)}{(doc.examples||[]).map(e=><details key={e.id}><summary>{e.id} · {e.register} · {e.frame} / {e.length} tokens</summary><pre className="v8-sample-text">{e.prompt||e.text}</pre><pre className="v8-sample-text">{JSON.stringify(e.outputs,null,2)}</pre></details>)}<p>反例 {errors.length} 条</p>{errors.slice(page*20,(page+1)*20).map((e,i)=><details key={`${page}-${i}`}><summary>{e.sample_id} · {e.condition}</summary><pre className="v8-sample-text">{JSON.stringify(e,null,2)}</pre></details>)}{errors.length>20&&<div className="v6-toolbar"><button className="fw-tbtn" disabled={!page} onClick={()=>setPage(page-1)}>上一组</button><span>{page*20+1}–{Math.min((page+1)*20,errors.length)} / {errors.length}</span><button className="fw-tbtn" disabled={(page+1)*20>=errors.length} onClick={()=>setPage(page+1)}>下一组</button></div>}</>}
+    {tab==='prereg'&&<><details><summary>冻结预注册及完整报告</summary><pre className="v8-sample-text">{JSON.stringify(doc,null,2)}</pre></details><p className="v8-note">完整快照 {doc.model_snapshot}；同一schema的新产物继续归档，旧版失败不覆盖。</p></>}
+  </section>;
+}

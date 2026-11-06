@@ -1,0 +1,111 @@
+{
+  "schema": "w6_prereg.v3",
+  "run_id": "P2773-W6-REGISTER-v3",
+  "kind": "real",
+  "seed": 27732026,
+  "registered_at": 1793764445.8381646,
+  "prior_results_exposed": "Complete v2 and its failures; discovery/confirm directions reused with explicit provenance",
+  "hypothesis": "Editing a preselected sparse MLP writing direction attenuates paired-context register preference in NEW records",
+  "primary_candidate": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "candidate_source": "maximum mean margin shift among sparse k<9728 in v2 confirm; no selection on new families",
+  "paired_metric": "gap = [logP(colloq_completion)-logP(formal_completion)]_colloq_context - same_academic_context",
+  "effect": "attenuation = gap_base - gap_edited (nats), per entire record family",
+  "alternatives": {
+    "colloquial": "说白了，",
+    "formal": "综上所述，"
+  },
+  "baseline_measurement_gate": "On new records: paired gap mean CI lower>0 and fraction(gap>0)>=0.80. Otherwise no positive interpretation.",
+  "primary_criterion": {
+    "min_mean_attenuation_nats": 0.5,
+    "require_mean_ci95_lower_above": 0.5,
+    "min_fraction_attenuation_ge_half_nat": 0.7,
+    "require_vs_each_control_ci95_lower_above": 0
+  },
+  "controls": [
+    "three same-column norm-matched random directions",
+    "activation-energy-stratified random columns",
+    "wrong layers 0..9, intervention magnitude reported separately"
+  ],
+  "dose": {
+    "fixed_k": 512,
+    "alphas": [
+      -1.0,
+      0.5,
+      1.0,
+      2.0,
+      4.0,
+      6.0
+    ],
+    "secondary_only": "all doses published; no selection of a replacement primary after new results"
+  },
+  "power": {
+    "expected_delta_pt": 20.0,
+    "n": 160,
+    "p_d": 0.5,
+    "n_required": 99,
+    "achieved_power": 0.947,
+    "pass": true
+  },
+  "power_scope": "paired binary directional-win planning (0.70 vs 0.50); continuous-effect CI may be inconclusive",
+  "capability": {
+    "provided_key_n": 2200,
+    "m3exam_reference_n": 140,
+    "noninferiority_margin": 0.02,
+    "familywise_alpha": 0.05,
+    "method": "paired losses indicator and gains; simultaneous one-sided 97.5% Clopper-Pearson bounds; upper(loss)-lower(gain)",
+    "pass": "upper bound <= 0.02; inconclusive otherwise unless lower bound > 0.02",
+    "per_source": "paired point estimates and intervals; no claim of per-source 2pt preservation",
+    "m3exam": "reference only, excluded due to unverified mirror labels",
+    "prompt": "original benchmark question and all 4 or 5 choices, no artificial padding, chat no thinking; full one-token A..D/E likelihood; no multi-answer items"
+  },
+  "capability_reuse": "same frozen 2340-question monitor and unedited base scores from v2; no claim this is a newly untouched benchmark",
+  "natural_generation": {
+    "n_families": 16,
+    "registers": [
+      "acad",
+      "colloq"
+    ],
+    "max_new_tokens": 96,
+    "do_sample": false,
+    "selection": "first 16 new family IDs; paired base and selected edit; literal and lexical proxies descriptive"
+  },
+  "raw_fields": "all37 layers and all9728 MLP units in layers18..27 at last two positions, original BF16 bits, unedited new records",
+  "no_claims": [
+    "universal low-rank gates",
+    "capacity not locally editable",
+    "true minimum parameter count",
+    "general natural style control",
+    "cross-model replication"
+  ],
+  "time_budget_seconds": 1500,
+  "native_discovery_source_sha256": "8023fd70e493d8f68d1c859d25af6c6691163f8aedb0099ea548f672ed9e11d8",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "repair_note": "BatchEncoding container adapter from recorded v2 execution repair; token IDs identical",
+  "natural_markers": {
+    "colloquial": [
+      "说白了",
+      "咱们",
+      "嘛",
+      "啦",
+      "呀",
+      "呗",
+      "就剩",
+      "这么",
+      "反正"
+    ],
+    "academic": [
+      "综上",
+      "因此",
+      "据此",
+      "表明",
+      "可知",
+      "最终",
+      "数量为",
+      "剩余数量"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "natural_pilot.v1",
+  "run_id": "P2777-W6-NATURAL-v5",
+  "kind": "real",
+  "registered_at": 1793770078.4257789,
+  "rows": 32,
+  "families": 8,
+  "frames": [
+    0,
+    1
+  ],
+  "lengths": [
+    384,
+    512
+  ],
+  "generation": "greedy,160 new tokens,batch8,no thinking",
+  "no_future_holdout_access": true,
+  "calibration": "blind original Qwen (both letter orders) AND frozen whole-output linguistic rubric",
+  "pilot_gate": "per-register style agreement >=0.70, automatic content >=0.75 overall, reference both raters >=0.85; failed cells are not positive mechanism evidence",
+  "budget_seconds": 600,
+  "legacy_edit": {
+    "k": 512,
+    "alpha": 6.0,
+    "control": "target"
+  },
+  "material_sha256": "e78ef89cd6fea5df0a1fb723c27b8213ea47b95bc7d195334723d5b31d7994bb",
+  "engine_sha256": "0869729055e73f5d741dbaf8815b1a384b6480d5175529fddc53a9d33d5e3f60",
+  "prior_failed_pilot": "v1-v4 continuation/user/system-command pilots retained as failed calibration; v5 tests exemplar-conditioned transfer, a new scope",
+  "task": "equal-token semantically paired style examples from other topics, identical neutral source facts, supplied result; no forced output candidates",
+  "anti_copy": "max35% output character4grams from exemplar; reject style labels/meta commentary",
+  "script_sha256": "662392b2b0137d36d631662937299cbcb27bb2a94f375aafa757553128eae63a",
+  "scoring_limits": "authored reference, same-base-model judge; no human or external independent model claim"
+}

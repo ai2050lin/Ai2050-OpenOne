@@ -1,0 +1,228 @@
+{
+  "both_passed": false,
+  "comparison": "same per-token active budget k=256, ranked by abs(a_j)*norm(W_down[:,j]) for native neurons",
+  "fresh_documents_sha256": "4cb063c390c3ff61be0e94abecb0713dd4973da3efb5ec1be6c99da34c192287",
+  "gate": "On both heldouts, paired document CI for native256 minus functional SAE is >0 for KL and CE. Family alpha .05/4. All other contrasts and FVU descriptive.",
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "native_layout_logit_exact": true,
+  "operations": [
+    "clean",
+    "zero",
+    "archived_sae",
+    "mse_control",
+    "functional_sae",
+    "native256"
+  ],
+  "positions": [
+    511,
+    583,
+    655,
+    727,
+    799,
+    871,
+    943,
+    1022
+  ],
+  "power_plan": "256 paired documents per split, paired t planning d=0.25, family alpha .0125, power >.8 under iid document-level approximation.",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052026
+  },
+  "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+  "schema": "functional_dictionary_evaluation_prereg.v1",
+  "seconds": 111.66555333137512,
+  "source_sha256": "86336ffb3244631d3a4994f265324d660ac6dab21ea5a95001e2e601e6b9c3b7",
+  "status": "complete",
+  "summary": {
+    "confirm": {
+      "comparisons": {
+        "archived_sae": {
+          "CE": {
+            "adjusted_CI": [
+              0.054762421636861014,
+              0.09102310110271986
+            ],
+            "base_minus_functional": 0.07289276136979043
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              0.011297418887996166,
+              0.02217281651091601
+            ],
+            "base_minus_functional": 0.016735117699456088
+          }
+        },
+        "mse_control": {
+          "CE": {
+            "adjusted_CI": [
+              0.054121339666262216,
+              0.09053901223835982
+            ],
+            "base_minus_functional": 0.07233017595231102
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              0.00893476847181561,
+              0.019527873849551645
+            ],
+            "base_minus_functional": 0.014231321160683628
+          }
+        },
+        "native256": {
+          "CE": {
+            "adjusted_CI": [
+              -0.17169920073778727,
+              -0.10082400742684355
+            ],
+            "base_minus_functional": -0.1362616040823154
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              -0.05843501465388386,
+              -0.03364974571251135
+            ],
+            "base_minus_functional": -0.046042380183197604
+          }
+        }
+      },
+      "documents": 256,
+      "operations": {
+        "archived_sae": {
+          "CE": 2.8303351750886767,
+          "FVU": 0.1105391314256384,
+          "KL_clean": 0.10096464587549006,
+          "loss_recovered": 0.6115577006223702
+        },
+        "clean": {
+          "CE": 2.639841976201863,
+          "FVU": 0.0,
+          "KL_clean": 0.0,
+          "loss_recovered": 1.0
+        },
+        "functional_sae": {
+          "CE": 2.7574424137188864,
+          "FVU": 0.16566304032079268,
+          "KL_clean": 0.08422952817603398,
+          "loss_recovered": 0.7601962451999645
+        },
+        "mse_control": {
+          "CE": 2.8297725896711974,
+          "FVU": 0.10861698969189124,
+          "KL_clean": 0.0984608493367176,
+          "loss_recovered": 0.6127048910440704
+        },
+        "native256": {
+          "CE": 2.621180809636571,
+          "FVU": 0.13690731287940952,
+          "KL_clean": 0.03818714799283637,
+          "loss_recovered": 1.0380527309743905
+        },
+        "zero": {
+          "CE": 3.1302447958536512,
+          "FVU": 1.7379477625182125,
+          "KL_clean": 0.4645938771873265,
+          "loss_recovered": 0.0
+        }
+      },
+      "passed": false
+    },
+    "lockbox": {
+      "comparisons": {
+        "archived_sae": {
+          "CE": {
+            "adjusted_CI": [
+              0.06456791030042154,
+              0.10230684302523176
+            ],
+            "base_minus_functional": 0.08343737666282665
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              0.010086129059068916,
+              0.020322613012836787
+            ],
+            "base_minus_functional": 0.015204371035952851
+          }
+        },
+        "mse_control": {
+          "CE": {
+            "adjusted_CI": [
+              0.05610420419103856,
+              0.09547086559399007
+            ],
+            "base_minus_functional": 0.07578753489251432
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              0.00599679850435353,
+              0.01721411234181829
+            ],
+            "base_minus_functional": 0.011605455423085909
+          }
+        },
+        "native256": {
+          "CE": {
+            "adjusted_CI": [
+              -0.14333885423766876,
+              -0.07833115012996497
+            ],
+            "base_minus_functional": -0.11083500218381687
+          },
+          "KL_clean": {
+            "adjusted_CI": [
+              -0.06321772021531642,
+              -0.035515077427171006
+            ],
+            "base_minus_functional": -0.04936639882124372
+          }
+        }
+      },
+      "documents": 256,
+      "operations": {
+        "archived_sae": {
+          "CE": 2.871238918552687,
+          "FVU": 0.11184213784930855,
+          "KL_clean": 0.10263999453199565,
+          "loss_recovered": 0.5901182332188817
+        },
+        "clean": {
+          "CE": 2.7115625202715865,
+          "FVU": 0.0,
+          "KL_clean": 0.0,
+          "loss_recovered": 1.0
+        },
+        "functional_sae": {
+          "CE": 2.7878015418898605,
+          "FVU": 0.16479531793031404,
+          "KL_clean": 0.0874356234960428,
+          "loss_recovered": 0.8042980351826945
+        },
+        "mse_control": {
+          "CE": 2.863589076782375,
+          "FVU": 0.10962990529699856,
+          "KL_clean": 0.0990410789191287,
+          "loss_recovered": 0.609755015449476
+        },
+        "native256": {
+          "CE": 2.6769665397060436,
+          "FVU": 0.1358386253558049,
+          "KL_clean": 0.038069224674799076,
+          "loss_recovered": 1.0888062468240702
+        },
+        "zero": {
+          "CE": 3.101129491096053,
+          "FVU": 1.6883732284602515,
+          "KL_clean": 0.4810553214014305,
+          "loss_recovered": 0.0
+        }
+      },
+      "passed": false
+    }
+  },
+  "training_sha256": "3b5167b04b281148edbd090f558ce633b1df7865bf0a4fd4e3573e36113388f6",
+  "true_hook_logit_exact": true
+}

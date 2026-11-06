@@ -1,0 +1,267 @@
+{
+  "schema": "research_evidence.v1",
+  "kind": "real",
+  "run_id": "P2768-KN-FRUIT-TOOL-v1",
+  "revision": "discovery",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "model_name": "Qwen3-4B",
+  "title": "水果与工具 · 长文本类别响应",
+  "design": {
+    "run_id": "P2768-KN-FRUIT-TOOL-v1",
+    "version": 1,
+    "model": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "precision": "bf16",
+    "primary_block": 18,
+    "readout": "final",
+    "feature": "silu(G)*V",
+    "selection": "largest absolute pooled Cohen d over all 9728 units, discovery entities averaged across frames",
+    "permutations": 1000,
+    "seed": 2768,
+    "min_std": 0.0001,
+    "discovery_fwer_alpha": 0.05,
+    "heldout_min_auc": 0.8,
+    "heldout_min_abs_d": 0.8,
+    "min_behavior_acc": 0.8,
+    "min_tokens": 256,
+    "max_tokens": 768,
+    "splits": "entity-family deterministic SHA256; 50/25/25; third frame never used for selection",
+    "claim": "category-associated single-unit candidate, not a causal mechanism or independent graph predictor",
+    "not_measured": [
+      "necessity",
+      "sufficiency",
+      "natural free generation",
+      "graph-only next-token KL",
+      "other models",
+      "other languages"
+    ]
+  },
+  "result": {
+    "unit": 9031,
+    "block": 18,
+    "sign": 1,
+    "d": 3.2066858141536976,
+    "fwer_p": 0.000999000999000999,
+    "entities": [
+      "fruit-01",
+      "fruit-03",
+      "fruit-04",
+      "fruit-05",
+      "fruit-06",
+      "fruit-08",
+      "fruit-09",
+      "fruit-12",
+      "fruit-13",
+      "fruit-15",
+      "fruit-19",
+      "fruit-22",
+      "fruit-23",
+      "fruit-24",
+      "fruit-26",
+      "fruit-28",
+      "tool-03",
+      "tool-04",
+      "tool-05",
+      "tool-06",
+      "tool-07",
+      "tool-09",
+      "tool-11",
+      "tool-15",
+      "tool-17",
+      "tool-19",
+      "tool-21",
+      "tool-23",
+      "tool-26",
+      "tool-27",
+      "tool-29",
+      "tool-31"
+    ],
+    "threshold": -0.037680235470841025,
+    "all_units": 9728,
+    "selection_used_holdout": false,
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+  },
+  "raw_artifacts": {
+    "tests/glm5/result/phase2768_knowledge_loop/corpus.json": "d26bcd19541f3e784293c5d297e66d72872de0f9473309f9b00f1a5a4c504242",
+    "tests/glm5/result/phase2768_knowledge_loop/freeze.json": "8c60f190b15a249d36e499b37f23b0b5e511faad965da31fea079d585f80998d",
+    "tests/glm5/result/phase2768_knowledge_loop/discovery.json": "64fe1b8dfa79ad6f5bbba0a5581a3bc34e38f87a2b7b3cc6ee0d8ceef132c05a",
+    "tests/glm5/result/phase2768_knowledge_loop/collection/summary.json": "73f5d00e4fe664aaf34b4215746f41a8067dcf77669abe45075b7f82f04da6c9",
+    "tests/glm5/result/phase2768_knowledge_loop/collection/behavior.json": "8340f2a488c4ea605e57db68f0f2848548ebd8898ca9b847697da0a0be68cbbb"
+  },
+  "native_field": {
+    "dir": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\phase2768_knowledge_loop\\native\\KN-LOOP\\P2768-KN-FRUIT-TOOL-v1-v1\\14ee8bc6052551a5\\6be1034f0b55a6df-bf16\\shard-0of1",
+    "manifest": "manifest.json",
+    "manifest_sha256": "c06aa97dcee75132471ca81c9f961611433e14e66149fa68d33325e6ac3e8e6f",
+    "n_files": 37,
+    "bytes": 72754432,
+    "dtype": "float16",
+    "uploaded": false,
+    "nonfinite": 0,
+    "note": "原生全场只存于节点本地（不上传）；按 manifest 的 sha256 校验后可按需拉取或用同一语料与模型重算"
+  },
+  "mlp_units": {
+    "readouts": [
+      "target",
+      "final"
+    ],
+    "blocks": [
+      18
+    ],
+    "d_ff": 9728,
+    "act": "silu",
+    "n_items": 192,
+    "double_negative_share_strong": [
+      [
+        0.3087
+      ],
+      [
+        0.3517
+      ]
+    ],
+    "note": "double_negative_share_strong：|A| ≥ 该单元 99 分位的激活中 G<0 且 V<0（−×−）所占比例，按读出 × 块",
+    "check": {
+      "n": 64,
+      "rel_err_mean": 0.002429846670565894,
+      "rel_err_max": 0.0025991564616560936,
+      "note": "‖act(G)⊙V − down_proj 实际输入‖ / ‖down_proj 实际输入‖（bf16 前向，fp32 重算）"
+    },
+    "native": {
+      "dir": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\phase2768_knowledge_loop\\native\\KN-LOOP\\P2768-KN-FRUIT-TOOL-v1-v1\\14ee8bc6052551a5\\6be1034f0b55a6df-bf16\\shard-0of1\\mlp",
+      "manifest_sha256": "bb9d8a5027a128e38e65f936ecdbbfc20f04d8c12e17ef466b7ac8a8104b6b31",
+      "bytes": 14942698,
+      "n_files": 1,
+      "uploaded": false
+    }
+  },
+  "snapshot_manifest": {
+    "sha256": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "files": {
+      "model-00001-of-00003.safetensors": {
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+        "size": 3957900840
+      },
+      "model-00002-of-00003.safetensors": {
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+        "size": 3987450520
+      },
+      "model-00003-of-00003.safetensors": {
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+        "size": 99630640
+      },
+      "config.json": {
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+        "size": 726
+      },
+      "generation_config.json": {
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+        "size": 239
+      },
+      "tokenizer.json": {
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "size": 11422654
+      },
+      "tokenizer_config.json": {
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+        "size": 9732
+      },
+      "vocab.json": {
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "size": 2776833
+      },
+      "merges.txt": {
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "size": 1671853
+      }
+    },
+    "n_files": 9,
+    "note": "权重（*.safetensors 等）、config 与 tokenizer 文件逐个 sha256；sha256 为按文件名排序后的合成哈希"
+  },
+  "parameter_checks": {
+    "gate_proj": {
+      "name": "model.layers.18.mlp.gate_proj.weight",
+      "shape": [
+        9728,
+        2560
+      ],
+      "dtype": "BF16",
+      "start": [
+        9031,
+        0
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          -0.004241943359375
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    },
+    "up_proj": {
+      "name": "model.layers.18.mlp.up_proj.weight",
+      "shape": [
+        9728,
+        2560
+      ],
+      "dtype": "BF16",
+      "start": [
+        9031,
+        0
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          0.0074462890625
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    },
+    "down_proj": {
+      "name": "model.layers.18.mlp.down_proj.weight",
+      "shape": [
+        2560,
+        9728
+      ],
+      "dtype": "BF16",
+      "start": [
+        0,
+        9031
+      ],
+      "actual_shape": [
+        1,
+        1
+      ],
+      "values": [
+        [
+          -0.014404296875
+        ]
+      ],
+      "loaded_numel": 1,
+      "source": "safetensors_exact_slice",
+      "header_sha256": "55d8e8decb2976c9758e922be1274c003bf57dd8ac5f7c4a74dd91ee39fc0351",
+      "file": "model-00002-of-00003.safetensors"
+    }
+  },
+  "software_only": false,
+  "sample_count": 192,
+  "entity_count": 64,
+  "token_length_range": [
+    303,
+    307
+  ],
+  "model_binding": {
+    "local_model_id": "9a784350de7f8d690b04ffef",
+    "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+  },
+  "reproduction": "tests\\glm5\\phase2768_knowledge_loop.py"
+}

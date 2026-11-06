@@ -1,0 +1,104 @@
+{
+  "schema": "research_graph.v1",
+  "kind": "real",
+  "run_id": "P2768-KN-FRUIT-TOOL-v1",
+  "revision": "discovery",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "feature_cards": [
+    {
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:mlp:9031:final:P2768-KN-FRUIT-TOOL-v1",
+      "label": "类别响应候选 · B18 / U9031",
+      "layer": 18,
+      "boundary": "mlp.down_proj.input",
+      "index": {
+        "space": "mlp",
+        "unit": 9031
+      },
+      "method": "entity_grouped_maxT.v1",
+      "run_id": "P2768-KN-FRUIT-TOOL-v1",
+      "scope": {
+        "language": "en",
+        "categories": [
+          "fruit",
+          "tool"
+        ],
+        "readout": "final",
+        "context": "long catalogue/review prompts"
+      },
+      "evidence": {
+        "level": "observation",
+        "artifact_sha256": "6fba269c09c1d0ba8aa85593a2934344c2678c51beaa5006ca4c357de46577d3"
+      },
+      "counterexamples": [],
+      "summary": {
+        "unit": 9031,
+        "block": 18,
+        "sign": 1,
+        "d": 3.2066858141536976,
+        "fwer_p": 0.000999000999000999,
+        "entities": [
+          "fruit-01",
+          "fruit-03",
+          "fruit-04",
+          "fruit-05",
+          "fruit-06",
+          "fruit-08",
+          "fruit-09",
+          "fruit-12",
+          "fruit-13",
+          "fruit-15",
+          "fruit-19",
+          "fruit-22",
+          "fruit-23",
+          "fruit-24",
+          "fruit-26",
+          "fruit-28",
+          "tool-03",
+          "tool-04",
+          "tool-05",
+          "tool-06",
+          "tool-07",
+          "tool-09",
+          "tool-11",
+          "tool-15",
+          "tool-17",
+          "tool-19",
+          "tool-21",
+          "tool-23",
+          "tool-26",
+          "tool-27",
+          "tool-29",
+          "tool-31"
+        ],
+        "threshold": -0.037680235470841025,
+        "all_units": 9728,
+        "selection_used_holdout": false,
+        "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+      },
+      "causal_tests": "not_measured",
+      "natural_contexts": "Existing census available; this candidate was selected on controlled discovery, not a learned dictionary.",
+      "parameter_path": {
+        "gate_proj": "model.layers.18.mlp.gate_proj.weight",
+        "up_proj": "model.layers.18.mlp.up_proj.weight",
+        "down_proj": "model.layers.18.mlp.down_proj.weight"
+      },
+      "model_binding": {
+        "local_model_id": "9a784350de7f8d690b04ffef",
+        "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+      }
+    }
+  ],
+  "graph_edges": [
+    {
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:mlp:9031:final:P2768-KN-FRUIT-TOOL-v1:category",
+      "source": "language:knowledge:fruit-vs-tool",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:B18:mlp:9031:final:P2768-KN-FRUIT-TOOL-v1",
+      "relation": "candidate_response_association",
+      "run_id": "P2768-KN-FRUIT-TOOL-v1",
+      "evidence": {
+        "level": "observation",
+        "artifact_sha256": "6fba269c09c1d0ba8aa85593a2934344c2678c51beaa5006ca4c357de46577d3"
+      }
+    }
+  ]
+}

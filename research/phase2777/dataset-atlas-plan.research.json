@@ -1,0 +1,318 @@
+{
+  "schema": "research_dataset_atlas_plan.v1",
+  "kind": "proposal",
+  "run_id": "P2777-W6-NATURAL-CONFIRM-v1-DATA-ATLAS-PLAN",
+  "created_at": "2026-11-03 23:59",
+  "decision": "graph-centric navigation with dataset provenance and reverse dataset workflow",
+  "implementation_status": "proposal; real natural-register report/graph/client renderer already implemented; canonical registry and new distributed job are future work",
+  "principles": [
+    {
+      "title": "主入口围绕图谱，数据集作为证据维度",
+      "description": "研究对象是语言规律与内部计算关系；同一规律应承接多种材料。同一数据集又可服务知识、推理、语法多个问题，不能各建一棵互不相连的本体。保留按数据集管理材料、质量与执行进度的反向入口。"
+    },
+    {
+      "title": "三个图层，两个浏览方向",
+      "description": "外部层：词义、角色、关系、构式、任务、语境。内部层：模型特定的原生位置、字典特征、条件响应与计算路径。证据层：外部变量到内部对象、内部到输出的有类型主张。默认“规律→证据→数据”；研发支持“数据→任务→证据→图谱”。"
+    },
+    {
+      "title": "三种能力是主分类，语域等是交叉条件",
+      "description": "知识网络、分析推理（包括翻译、编程）、语法体系作为稳定导航。语言、语域、文体、领域、上下文长度和组合深度作为可重叠过滤项，不强制给每张卡唯一分类。"
+    },
+    {
+      "title": "对象身份与实验声明分离",
+      "description": "原生定位对象由完整模型快照、精度、层、边界、原生索引确定；提取特征还须绑定方法、方向或字典内容哈希。运行ID属于证据记录，不应不断生成“同一神经元的新本体”。同一单元可参与多个特征，不能因索引相同就合并语义。"
+    },
+    {
+      "title": "保留范围不同的正、负结果",
+      "description": "固定候选偏好与完整自然输出是不同观测目标。本次新主张不覆盖旧偏好结果；以同一候选写入操作关联两者，各自保存任务、指标、对照、反例与状态。联合10层的定位卡按1个独立干预计数。"
+    },
+    {
+      "title": "破解程度最终靠留出预测衡量",
+      "description": "执行率、特征数、数据集数、图谱覆盖都不是破解百分比。最终检验只用提取图谱预测未见前缀的激活及下一token分布，相比词汇身份、位置、n-gram等简单基线增加多少保真度。模型原始输出是核对目标，完整重跑模型不是图谱解释。"
+    }
+  ],
+  "contracts": {
+    "dataset_version": [
+      "dataset_id",
+      "upstream_revision",
+      "source_url",
+      "license",
+      "redistribution_scope",
+      "content_sha256",
+      "schema_version",
+      "label_status",
+      "task_facets",
+      "available_languages"
+    ],
+    "sample_lineage": [
+      "sample_id",
+      "origin_document_id",
+      "source_group_id",
+      "content_sha256",
+      "parent_sample_ids",
+      "transform_version",
+      "raw_split",
+      "research_split",
+      "actual_token_ids",
+      "model_tokenizer_hash",
+      "readout_spans",
+      "factor_labels",
+      "annotation_source"
+    ],
+    "feature_identity": [
+      "model_snapshot_sha256",
+      "precision",
+      "layer",
+      "boundary",
+      "native_index",
+      "method_version",
+      "direction_or_dictionary_sha256",
+      "canonical_feature_id",
+      "native_locator_id"
+    ],
+    "claim": [
+      "claim_id",
+      "subject_feature_ids",
+      "external_pattern_ids",
+      "operational_scope",
+      "outcome_metric",
+      "design_sha256",
+      "run_ids",
+      "dataset_versions",
+      "independent_source_groups",
+      "split_type",
+      "effect_and_interval",
+      "negative_controls",
+      "content_gate",
+      "capability_gate",
+      "dose_curve",
+      "counterexample_artifacts",
+      "evidence_type",
+      "claim_status",
+      "audit_status"
+    ],
+    "artifact": [
+      "sha256",
+      "schema",
+      "producer_version",
+      "model_snapshot",
+      "run_id",
+      "source_lineage",
+      "storage_uri",
+      "size",
+      "available_offline",
+      "recompute_recipe"
+    ],
+    "migration": "append canonical aliases and claim mappings to existing immutable CAS; never rewrite old CAS or merge different model buckets; original links remain resolvable",
+    "status_semantics": "supported_in_scope / not_supported / inconclusive / not_measured stay separate; execution/audit/evidence are separate dimensions; contradictory requires genuinely incompatible scoped propositions",
+    "dedup": "same document, translations, paraphrases and derivative datasets share source_group_id; splits and effective evidence counts use groups, not rows or dataset filenames"
+  },
+  "roles": [
+    {
+      "role": "自然发现库",
+      "materials": "经许可的真实长段落、对话、报告、代码及双语文本",
+      "purpose": "A引擎字典学习、激活普查、背景协方差",
+      "rule": "按原文档与来源组切分；512/1024/2048起步，保留上下文完整性。SAE训练量按激活token预算与复现质量逐步扩大，不能用少量模板替代自然语料。"
+    },
+    {
+      "role": "受控机制库",
+      "materials": "本项目生成式文法及经人审的语义等价重述",
+      "purpose": "B引擎变量映射、长度/句式/词汇混杂检验",
+      "rule": "记录族、词表、构式、领域分别留出；自然语域必须先通过输出行为门，长度在同一家族内交叉，不只跨不同记录比较。"
+    },
+    {
+      "role": "外部行为库",
+      "materials": "知识、推理、翻译、编程与语法公开基准",
+      "purpose": "能力保持与外部效度",
+      "rule": "按任务分别计分、域内配对NI、域间等权宏平均；正式验收题不参与方向或剂量选择。保留污染未知、答案来源和许可状态。"
+    },
+    {
+      "role": "反例与复算库",
+      "materials": "本轮全部失败、未知判定、原对改错、独立节点复算",
+      "purpose": "驱动新文法与C引擎因果检验",
+      "rule": "反例发现后只能形成新版本预注册；同一确认集不能反复改阈值。重复使用的能力监测池明确标注已暴露。"
+    }
+  ],
+  "dataset_candidates": [
+    {
+      "id": "CEVAL",
+      "name": "C-Eval",
+      "role": "综合知识与能力保持；按学科等权汇总，保留每域损伤，不作为内部特征本体。",
+      "primary_source": "https://github.com/hkust-nlp/ceval",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "MMLU",
+      "name": "MMLU",
+      "role": "与中文题池并列分层，不能把考试分数直接等同于语言机制。",
+      "primary_source": "https://github.com/hendrycks/test",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "GRAMMAR",
+      "name": "CLiMP / BLiMP",
+      "role": "中文、英文最小语法对照；原短句作为测量基线。扩成长文必须另建文法、核验含义和行为门，不能只补背景就称自然长文。",
+      "primary_source": "https://aclanthology.org/2021.eacl-main.242/",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "BLIMP",
+      "name": "BLiMP",
+      "role": "英语语法对照与构式覆盖，结合自主标点、角色、否定和长距离文法。",
+      "primary_source": "https://github.com/alexwarstadt/blimp",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "REASON",
+      "name": "GSM8K",
+      "role": "多步算术行为及内容保持；另建可控组合深度文法，不把现成解题标签当作内部电路。",
+      "primary_source": "https://github.com/openai/grade-school-math",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "CODE",
+      "name": "HumanEval",
+      "role": "执行单元测试的代码行为保持；固定执行环境与沙盒，题目、变体按题族一起切分。",
+      "primary_source": "https://github.com/openai/human-eval",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "TRANSLATION",
+      "name": "FLORES+",
+      "role": "句子对齐的跨语言行为与表征比较；锁定HF revision，不把短句自动当作长篇翻译。",
+      "primary_source": "https://huggingface.co/datasets/openlanguagedata/flores_plus",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "NLI",
+      "name": "XNLI",
+      "role": "多语言蕴含、矛盾和中立的受控语义视角；不是因果推理全集。",
+      "primary_source": "https://github.com/facebookresearch/XNLI",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "LONG",
+      "name": "LongBench v1",
+      "role": "自然较长上下文的外部效度补充；按原任务、文档来源、实际token长度和模型能力门筛选。v2很长且为选择题，不替代自然生成语域验收。",
+      "primary_source": "https://github.com/THUDM/LongBench",
+      "status": "recommended, not newly imported or run in this phase"
+    },
+    {
+      "id": "MEDICAL",
+      "name": "CMExam",
+      "role": "医学专业分层监测，限制在综合能力指标中的权重；不以大量医学题制造全域能力保持。",
+      "primary_source": "https://github.com/williamliujl/CMExam",
+      "status": "recommended, not newly imported or run in this phase"
+    }
+  ],
+  "stages": [
+    {
+      "stage": "A · 数据契约与身份整理",
+      "work": "先建立dataset_version / sample_lineage / claim索引，对既有CAS追加映射。为本轮偏好与自然生成两条主张建立共同候选操作引用。",
+      "acceptance": "旧报告与参数定位链接不失效；跨来源近重复不能重复算独立证据；未知许可、参考答案与真实金标准可区分。"
+    },
+    {
+      "stage": "B · 语域测量与自然长文行为",
+      "work": "在日常安排、解释说明、工作交流、叙事、知识介绍等领域建设真实连贯的双语体材料。先让独立双人盲评校准书面/口语/混合、保义与自然度，冻结分歧处理；不把关键词命中当主判。",
+      "acceptance": "未编辑模型各域、各句式、各长度行为门通过后才选内部正例。以同一内容家族交叉512/1024/2048有效token，多句式与领域留出；最终家族量按试跑方差和预定最小效应做功效规划，不能用增样掩盖无效测量。"
+    },
+    {
+      "stage": "C · 发现、映射与生成轨迹机制",
+      "work": "在同一冻结材料上并行比较字典特征、全坐标条件统计与候选参数路径。采提示与自回归生成步的全层原生场，检验旧编辑是只动初始读出、被后续恢复，还是评分器漏检。",
+      "acceptance": "A候选须经B留出复现，再按需C检验参数与计算边；保留hs[0]、位置/长度、随机标签、能量匹配对照。自然生成剂量曲线重新预注册；本轮只有0与6两个强度，不能继承旧候选分数曲线冒充自然生成曲线。"
+    },
+    {
+      "stage": "D · 分布式复算与图谱预测",
+      "work": "新增natural_register_intervention.v1任务适配器，以内容家族分片，独立节点复算；形成图谱独立的状态/输出预测器，并跨模型检验结构。",
+      "acceptance": "先Qwen3-4B，再GLM4、Qwen3-14B逐个执行。大模型按实测显存安排合适节点或另桶offload/量化；不将16GB卡视作可直接容纳14B bf16。原始张量进入大文件CAS，中心仅索引。图谱预测优于简单基线后，才能报告解释增量。"
+    }
+  ],
+  "client_pages": [
+    {
+      "page": "进展",
+      "secondary": "总览 → 三种能力卡 → 点击看冻结分母和研究矩阵",
+      "behavior": "第一屏最多三张能力卡，只突出计划执行率。展开后分开显示有效行为格、留出复现、因果主张、反例及预测保真度；无测试显示“未测”，无分母显示“—”。"
+    },
+    {
+      "page": "空间",
+      "secondary": "语言图谱 / 参数结构 / 样本响应",
+      "behavior": "默认围绕语言模式与候选机制浏览；顶部模型快照、证据范围、语言/长度、数据来源过滤。点击节点开右栏，默认一句主张、证据状态和一个实例，详情再展开。参数页保留所有head/MLP阵列，布局距离不能冒充真实计算关系。"
+    },
+    {
+      "page": "研发",
+      "secondary": "计划与执行 / 数据与模板 / 证据审核",
+      "behavior": "数据集列表负责来源、版本、质量、切分、任务队列；详情有“查看关联图谱”反向跳转。统一实时分析入口，通过样本与模型上下文打开空间响应，不再复制一套分析页面。"
+    },
+    {
+      "page": "配置",
+      "secondary": "模型与节点 / 算力贡献 / 账号",
+      "behavior": "资源与托管配置留在这里，研究材料和图谱不进入配置。贡献算力只执行注册任务类型、资源门与冻结任务包；本轮本机运行不标成多节点已复算。"
+    }
+  ],
+  "current_case": {
+    "report_sha256": "5d55b8e145b1becf15cfc5315e304e1158904f40234e8aa52d38f737dff9619b",
+    "graph_sha256": "ad84ec71e0e9cb0dd61d63596fa3b844e37c9a4322f8e8ef75deed0e5ad9223a",
+    "natural_flip": {
+      "n_families": 128,
+      "mean": 0.0,
+      "ci": [
+        0.0,
+        0.0
+      ]
+    },
+    "capability": {
+      "n": 2200,
+      "base_accuracy": 0.6854545454545454,
+      "edited_accuracy": 0.6840909090909091,
+      "losses": 23,
+      "gains": 20,
+      "net_loss": 0.0013636363636363447,
+      "loss_interval": [
+        -0.007366906303688739,
+        0.010084327622812904
+      ],
+      "margin": 0.02,
+      "status": "noninferior",
+      "method": "Bonferroni simultaneous Clopper-Pearson loss/gain bounds, confidence >=95%"
+    },
+    "prompts": 512,
+    "independent_families": 128,
+    "generated_outputs": 2048,
+    "joint_interventions": 1,
+    "parameter_locator_cards": 10,
+    "new_multi_node_replication": false
+  },
+  "job_contract_proposal": {
+    "job_kind": "natural_register_intervention.v1",
+    "unit": "whole source family across frames/styles/lengths",
+    "input": [
+      "pinned_model_snapshot",
+      "frozen_corpus",
+      "style_rater_version",
+      "direction_sha256",
+      "selected_columns",
+      "dose_grid",
+      "controls",
+      "capability_monitor",
+      "resource_limits"
+    ],
+    "output": [
+      "full_output_text_and_token_ids",
+      "rater_scores",
+      "content_and_capability_scores",
+      "native_manifest",
+      "canary",
+      "edit_manifest",
+      "restoration_verification",
+      "provenance"
+    ],
+    "merge": "same design,model,precision,method; dedup shard; repeat=replica check, not new sample; disagreement quarantined",
+    "evidence_boundary": "audit/transport success never promotes an intervention into a general language mechanism"
+  },
+  "fidelity_definition": {
+    "kl": "mean_t KL(p_model(.|prefix_t) || p_atlas(.|prefix_t)) on heldout source groups",
+    "loss_recovery": "(L_simple_baseline - L_atlas)/(L_simple_baseline - L_model), only defined if denominator>0; no clipping negative values",
+    "no_leakage": "predictor may access prefix and extracted graph only; cannot use target state, future answer tokens or a complete forward replay as explanation"
+  },
+  "sources_checked_date": "2026-11-03"
+}

@@ -256,7 +256,22 @@ async def lifespan(app: FastAPI):
     # Shutdown logic
     print("Shutting down...")
 
-app = FastAPI(title="AI2050 LLM Mechanism Atlas API", lifespan=lifespan)
+@asynccontextmanager
+async def workbench_lifespan(app: FastAPI):
+    """The full local server must maintain the same research packs as the standalone center."""
+    platform_runtime = None
+    if platform_router is not None:
+        import platform_service as platform_runtime
+        platform_runtime.start_refresher()
+    try:
+        async with lifespan(app):
+            yield
+    finally:
+        if platform_runtime is not None:
+            platform_runtime.stop_refresher()
+
+
+app = FastAPI(title="AI2050 LLM Mechanism Atlas API", lifespan=workbench_lifespan)
 run_service = RunService(
     agi_core_provider=lambda: agi_core,
     model_provider=lambda: model,
@@ -293,6 +308,14 @@ app.include_router(rdc_law_router)
 app.include_router(rdc_binding_router)
 app.include_router(rdc_update_router)
 app.include_router(research_workspace_router)
+from deploy.research_library import router as research_library_router
+from deploy.parameter_service import router as parameter_browser_router
+app.include_router(research_library_router)
+app.include_router(parameter_browser_router)
+from server.mechanism_trace_service import router as mechanism_trace_router
+app.include_router(mechanism_trace_router)
+from deploy.node_control import router as node_control_router
+app.include_router(node_control_router)
 
 
 def _resolve_workspace_relative_path(path_str: str) -> Path:

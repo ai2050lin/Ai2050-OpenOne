@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 router = APIRouter(prefix='/api/live', tags=['live'])
 
 DEFAULT_MODEL_DIR = 'D:/develop/model/Qwen/Qwen3-4B'
-MAX_TOKENS_CAP = 32
+MAX_TOKENS_CAP = 2048
 TOP_MLP = 16
 TOP_PAIRS = 3
 THUMB_HEAD = (8, 8)      # 每头 W_q / W_o 缩略图网格（head_dim 方向 × d_model 方向）
@@ -87,22 +87,29 @@ def _load_async() -> None:
     _set(status='loading', progress='正在加载模型权重（首次约 10–30 秒）…', error='', dir=str(d))
 
     def work():
+        lease = None
         try:
             import torch
             from transformers import AutoModelForCausalLM, AutoTokenizer
+            from shared.dist_protocol.mechanism_trace import GpuLease
+            lease=GpuLease().acquire()
+            if not torch.cuda.is_available():raise RuntimeError('真实长文本分析需要CUDA，未回退到CPU或合成数据。')
             meta = _read_meta(d)
             _set(progress='读取 tokenizer…')
             tok = AutoTokenizer.from_pretrained(str(d))
             _set(progress='读取权重到显存（bf16）…')
             try:
-                model = AutoModelForCausalLM.from_pretrained(str(d), dtype=torch.bfloat16, attn_implementation='eager')
+                model = AutoModelForCausalLM.from_pretrained(str(d), dtype=torch.bfloat16, attn_implementation='sdpa')
             except TypeError:                                   # 旧版 transformers 用 torch_dtype
-                model = AutoModelForCausalLM.from_pretrained(str(d), torch_dtype=torch.bfloat16, attn_implementation='eager')
+                model = AutoModelForCausalLM.from_pretrained(str(d), torch_dtype=torch.bfloat16, attn_implementation='sdpa')
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
             model.to(device).eval()
+            model.requires_grad_(False)
+            _state['gpu_lease']=lease
             _set(status='ready', model=model, tokenizer=tok, device=device, meta=meta,
                  progress='', error='')
         except Exception as exc:                                # 权重损坏 / 显存不足等：诚实报错
+            if lease:lease.release()
             _set(status='error', error=f'模型加载失败：{exc}')
 
     _THREAD = threading.Thread(target=work, daemon=True, name='live-analysis-load')
@@ -156,7 +163,6 @@ def live_load() -> dict:
     return {'ok': True, 'status': _state['status'], 'message': '开始后台加载模型。'}
 
 
-@router.post('/unload')
 def live_unload() -> dict:
     """手动卸载模型并释放 GPU 显存（前端会同步清掉旧 trace：卸载后参数缩略图无法继续取）。"""
     st = _state['status']
@@ -175,23 +181,34 @@ def live_unload() -> dict:
         if device == 'cuda' and torch.cuda.is_available():
             torch.cuda.empty_cache()
     except Exception as exc:
-        _set(model=None, tokenizer=None)
+        _set(model=None, tokenizer=None, status='idle', error=str(exc))
+        lease=_state.pop('gpu_lease',None)
+        if lease:lease.release()
         return {'ok': False, 'status': 'idle', 'message': f'卸载时出现问题（引用已清除）：{exc}'}
     _set(status='idle', progress='模型已卸载（GPU 显存已释放），需要时重新加载。', error='')
+    lease=_state.pop('gpu_lease',None)
+    if lease:lease.release()
     return {'ok': True, 'status': 'idle', 'message': '模型已卸载，GPU 显存已释放。'}
 
 
+@router.post('/unload')
+def safe_live_unload():
+    if not _RUN_LOCK.acquire(blocking=False):raise HTTPException(409,'正在采集真实轨迹，请等待当前任务结束再卸载。')
+    try:return live_unload()
+    finally:_RUN_LOCK.release()
+
+
 class LiveRun(BaseModel):
-    text: str = Field(..., min_length=1, max_length=4000)
-    max_tokens: int = Field(24, ge=1, le=MAX_TOKENS_CAP)
+    text: str = Field(..., min_length=1, max_length=40000)
+    max_tokens: int = Field(2048, ge=1, le=MAX_TOKENS_CAP)
+    readout_positions: list[int] | None = None
 
 
 def _r(x: float, nd: int = 4) -> float:
     return round(float(x), nd)
 
 
-@router.post('/run')
-def live_run(b: LiveRun) -> dict:
+def legacy_live_run(b: LiveRun) -> dict:
     _ensure_ready()
     import torch
     model = _state['model']
@@ -294,6 +311,46 @@ def live_run(b: LiveRun) -> dict:
             'elapsed_ms': int((time.perf_counter() - t0) * 1000),
             'layers': layer_docs,
             'output': {'final_norm': final_in[0], 'per_pos_top1': per_pos_top1, 'last_top': last_top}}
+
+
+@router.post('/run')
+def live_run(b:LiveRun)->dict:
+    """Same native recorder as research runs, SDPA, explicit limits, durable trace."""
+    _ensure_ready()
+    if not _RUN_LOCK.acquire(blocking=False):raise HTTPException(409,'已有真实采集在执行。')
+    try:
+        import shutil
+        from shared.dist_protocol.mechanism_trace import Recorder,TraceStore,digest
+        from deploy.parameter_reader import model_snapshot
+        import torch
+        tok=_state['tokenizer'];model=_state['model']
+        if model.config.model_type!='qwen3':raise HTTPException(422,'当前原生采集适配器仅核对过Qwen3。')
+        prompt=tok.apply_chat_template([{'role':'user','content':b.text}],tokenize=False,add_generation_prompt=True,enable_thinking=False)
+        ids=tok.encode(prompt,add_special_tokens=False)
+        if len(ids)>b.max_tokens:raise HTTPException(422,f'完整实际输入为{len(ids)} token，超过所选上限{b.max_tokens}；未截断、未执行。')
+        positions=b.readout_positions or sorted({0,len(ids)//2,len(ids)-1})
+        if len(positions)>32 or len(set(positions))!=len(positions) or any(type(p)is not int or p<0 or p>=len(ids) for p in positions):raise HTTPException(422,'需1–32个不重复且有效的模块读出位置。')
+        if not positions:raise HTTPException(422,'至少一个模块读出位置。')
+        positions=sorted(positions);snap=model_snapshot(_state['dir'])['sha256']
+        item={'id':'live-'+str(time.time_ns()),'text':b.text,'prompt':prompt,'token_ids':ids,'split':'unregistered_live','scope':'实时观察'}
+        folder=ROOT/'tests/glm5/result/live_traces'/digest(item)
+        folder.mkdir(parents=True,exist_ok=True)
+        if shutil.disk_usage(folder).free<8*2**30:raise HTTPException(409,'原生轨迹磁盘余量不足8GiB，未执行。')
+        import subprocess
+        def git(*args):
+            return subprocess.check_output(['git','-c',f'safe.directory={ROOT}',*args],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
+        try:revision=git('rev-parse','HEAD');dirty=bool(git('status','--porcelain'))
+        except (OSError,subprocess.SubprocessError):revision=None;dirty=None
+        provenance={'git_sha':revision,'git_dirty':dirty,'model_path':_state['dir'],'model_revision':snap,'seed':None,
+            'code_identity_status':'git revision plus working-tree changes' if revision else 'git identity unavailable; unregistered observation'}
+        t0=time.perf_counter()
+        with Recorder(model,positions,folder,deep=True) as rec:
+            with torch.inference_mode():out=model(input_ids=torch.tensor([ids],device=_state['device']),use_cache=False,output_hidden_states=True,logits_to_keep=1)
+        d,path=rec.finish(out,item,tok,snap,'LIVE-NATIVE-OBSERVATION',provenance)
+        if max(v['attention_relative_l2'] for v in d['reconstruction'].values())>=.05:raise HTTPException(409,'注意力重算与实际输出误差超出冻结容差，轨迹保留但不展示为通过。')
+        TraceStore().register(path)
+        return {**d,'elapsed_ms':int((time.perf_counter()-t0)*1000),'research_status':'unregistered observation, no mechanism claim','truncated':False}
+    finally:_RUN_LOCK.release()
 
 
 @router.get('/block')

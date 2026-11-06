@@ -171,6 +171,8 @@ class SnapshotWorkerTests(unittest.TestCase):
         self.assertEqual(doc['version'], meta['version'])
         for key in ('/api/catalog', '/api/templates', '/api/platform/overview', '/api/platform/snapshot/catalog'):
             self.assertIn(key, doc['entries'])
+        from server.rule_ledger_service import overview as rule_overview
+        self.assertEqual(doc['entries']['/api/rules/overview'], rule_overview())
         self.assertFalse(doc['entries']['/api/platform/snapshot/catalog']['pending'])
         again = self.W.run_once(log=lambda *_: None)                  # 指纹没变：数据包不重建
         self.assertEqual(again['datapack'], 'skipped')

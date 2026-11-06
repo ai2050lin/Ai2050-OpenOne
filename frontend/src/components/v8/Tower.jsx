@@ -22,6 +22,7 @@ import { fmtP, hsLabel, seq } from './v8Util.js';
 const DEG = Math.PI / 180;
 const MARK = '#1baf7a';
 const ZOOM_MAX = 4;
+const INITIAL_VIEW = { yaw: -30 * DEG, pitch: 22 * DEG, zoom: 1, dx: 0, dy: 0 };
 
 /* 层内两个模块：色与 v8 的分类色一致（蓝 = 注意力、橙 = MLP），与研究上「同一层是两条通路」对应。
    z 轴分前后两半：z<0 后半给注意力、z>0 前半给 MLP。36 层叠瓦时，两条带在透视下各自形成一列纵向色柱，
@@ -42,16 +43,29 @@ function inside(pt, pts) {
   return c;
 }
 
-export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption, edges, target, modules, selModule, onPickModule, arch, height = 600, focusKey = '' }) {
+function gridShape(kind, count) {
+  const cols = Math.min(count, kind === 'attn' ? 8 : 128);
+  const rows = Math.ceil(count / cols);
+  return { cols, rows, z: kind === 'attn' ? -.53 : .14, depth: .4 };
+}
+
+export function towerIndexPosition(kind, count, index) {
+  const { cols, rows, z, depth } = gridShape(kind, count);
+  return [-.94 + 1.88 * ((index % cols) + .5) / cols, z + depth * (Math.floor(index / cols) + .5) / rows];
+}
+
+export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption, edges, target, modules, selModule, onPickModule, arch, height = 600, focusKey = '', focusModules = false, cells, onPickIndex, panControls = false, fit = 1 }) {
   const cv = useRef(null), hits = useRef([]), drag = useRef(null);
-  const [view, setView] = useState({ yaw: -30 * DEG, pitch: 22 * DEG, zoom: 1 });
+  const cellGrid = useRef(null);
+  const [view, setView] = useState(INITIAL_VIEW);
+  const [pan, setPan] = useState(false);
   const [hover, setHover] = useState(null);
   const [w, setW] = useState(340);
   const H = height;
   useEffect(() => {
     const el = cv.current?.parentElement;
     if (!el || typeof ResizeObserver === 'undefined') return undefined;
-    const ro = new ResizeObserver(([e]) => setW(Math.max(260, e.contentRect.width)));
+    const ro = new ResizeObserver(([e]) => setW(Math.max(1, Math.floor(e.contentRect.width))));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -69,12 +83,12 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
     const ctx = c.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, H);
-    const n = nLayers + 2, span = 4.2, s = Math.min(w * 0.3, H * 0.22) * view.zoom;
+    const n = nLayers + 2, span = 4.2, s = Math.min(w * 0.3, H * 0.22) * fit * view.zoom;
     const yOf = i => -span / 2 + (span * i) / (n - 1);
     const P = (x, y, z) => {
       const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
-      return [w / 2 + x1 * s, H / 2 - (y * cp - z1 * sp) * s];
+      return [w / 2 + x1 * s + view.dx, H / 2 - (y * cp - z1 * sp) * s + view.dy];
     };
     const nums = (values || []).filter(v => v != null);
     const max = nums.length ? Math.max(1e-9, ...nums) : 1;
@@ -173,12 +187,12 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
           ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b2[0], b2[1]);
           ctx.lineWidth = 0.6; ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.stroke();
         }
-        out.push({ hs: null, pts: t, label: `词嵌入 ${am.embed.shape_text}`, v: null,
+        out.push({ hs: allowEmbedding ? 0 : null, pts: t, label: `词嵌入 ${am.embed.shape_text}`, v: null,
                    info: `${fmtP(am.embed.params)} 参数${am.embed.tied ? '（与输出头共享）' : ''}` });
       }
       /* 层内模块盒：Attn 后半面、MLP 前半面。后 push ⇒ 反转后优先命中，点盒不会误选整层。
          文字只在选中层画：多层同时画会在透视下撞字 */
-      if (modules && hs != null && hs > 0) {
+      if (modules && hs != null && hs > 0 && !focusModules) {
         for (const mb of MOD_BOXES) {
           const on = !!(selModule && selModule.hs === hs && selModule.mod === mb.mod);
           drawModule(mb, hs, y, on, { split: sel || on, label: sel || on });
@@ -189,6 +203,27 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
         ctx.font = `${sel || hs === peak ? 600 : 400} 10.5px ui-sans-serif, system-ui, sans-serif`;
         ctx.fillStyle = sel ? '#e34948' : hs === peak ? MARK : '#475569'; ctx.textAlign = 'right';
         ctx.fillText(isHead ? '输出头' : hs === 0 ? '嵌入' : `块 ${hs - 1}${hs === peak ? ' 峰' : ''}`, lc[0] - 6, lc[1] + 3);
+      }
+    }
+    if (focusModules && modules && selected > 0 && selected < n - 1) {
+      for (const mb of MOD_BOXES) drawModule(mb, selected, yOf(selected), selModule?.mod === mb.mod, { split: false, label: true });
+    }
+    cellGrid.current = null;
+    if (cells?.count > 0) {
+      const { cols, rows, z, depth } = gridShape(cells.kind, cells.count);
+      const y = yOf(cells.hs), origin = P(-.94, y, z), px = P(.94, y, z), pz = P(-.94, y, z + depth);
+      const a = [px[0] - origin[0], px[1] - origin[1]], b = [pz[0] - origin[0], pz[1] - origin[1]];
+      cellGrid.current = { origin, a, b, cols, rows, count: cells.count };
+      const corner = [px[0] + b[0], px[1] + b[1]];
+      quad([origin, px, corner, pz], cells.kind === 'attn' ? '#e6f0fc' : '#fff0e8', .96);
+      ctx.fillStyle = cells.kind === 'attn' ? '#2a78d6' : '#ac6446';
+      const size = cells.kind === 'attn' ? 4 : Math.max(.6, Math.min(1.9, view.zoom * .65));
+      const overlay = cells.values?.length===cells.count ? cells.values : null;
+      const scale = overlay ? Math.max(1e-12,...overlay.map(Math.abs)) : 1;
+      for (let index = 0; index < cells.count; index += 1) {
+        const x = ((index % cols) + .5) / cols, zPos = (Math.floor(index / cols) + .5) / rows;
+        if(overlay)ctx.fillStyle=`rgba(${overlay[index]<0?'235,104,52':'42,120,214'},${.1+.85*Math.abs(overlay[index])/scale})`;
+        ctx.fillRect(origin[0] + a[0] * x + b[0] * zPos - size / 2, origin[1] + a[1] * x + b[1] * zPos - size / 2, size, size);
       }
     }
     /* 跨层连线（上下游电路）：端点圆点 + 弧线 + 75% 处方向箭头，画在层板之上 */
@@ -213,7 +248,7 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
     }
     /* 选中的模块置顶重绘：36 层叠瓦时这一层盒子会被上面几层压住，只加粗描边根本看不见。
        在全部层画完之后补一遍，才真正「可见地选中」。 */
-    if (modules && selModule && selModule.hs > 0 && selModule.hs < n - 1) {
+    if (!focusModules && modules && selModule && selModule.hs > 0 && selModule.hs < n - 1) {
       const y = yOf(selModule.hs);
       for (const mb of MOD_BOXES) {
         if (mb.mod !== selModule.mod) continue;
@@ -227,12 +262,24 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       ctx.beginPath(); ctx.arc(p[0], p[1], 2, 0, Math.PI * 2); ctx.fillStyle = '#e34948'; ctx.fill();
     }
     hits.current = out.reverse();
-  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w, H, edges, target, modules, selModule, arch]);
+  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w, H, edges, target, modules, selModule, arch, focusModules, cells, fit]);
   const locate = e => {
     const r = cv.current.getBoundingClientRect();
     const pt = [e.clientX - r.left, e.clientY - r.top];
     return { pt, hit: hits.current.find(h => inside(pt, h.pts)) };
   };
+  function indexAt([x, y]) {
+    const grid = cellGrid.current;
+    if (!grid) return null;
+    const { origin, a, b, cols, rows, count } = grid;
+    const det = a[0] * b[1] - a[1] * b[0];
+    if (Math.abs(det) < 1) return null;
+    const dx = x - origin[0], dy = y - origin[1];
+    const u = (dx * b[1] - dy * b[0]) / det, v = (a[0] * dy - a[1] * dx) / det;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return null;
+    const index = Math.floor(v * rows) * cols + Math.floor(u * cols);
+    return index < count ? index : null;
+  }
   useEffect(() => {
     const c = cv.current;
     const wheel = e => { e.preventDefault(); setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(ZOOM_MAX, v.zoom * (e.deltaY < 0 ? 1.1 : 0.91))) })); };
@@ -242,28 +289,39 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
   const zoomBy = f => setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(ZOOM_MAX, v.zoom * f)) }));
   return (
     <div className="v8-tower-canvas">
-      <canvas ref={cv} style={{ width: w, height: H }} role="img" aria-label={caption || `${nLayers} 个块的层塔`}
-        onMouseDown={e => { drag.current = { x: e.clientX, y: e.clientY, view, moved: false }; }}
-        onMouseMove={e => {
+      <canvas ref={cv} style={{ width: w, height: H, touchAction: 'none' }} role="img" aria-label={caption || `${nLayers} 个块的层塔`}
+        onPointerDown={e => {
+          if (!e.isPrimary || ![0, 2].includes(e.button)) return;
+          drag.current = { x: e.clientX, y: e.clientY, view, moved: false, pan: panControls && (pan || e.shiftKey || e.button === 2) };
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={e => {
           if (drag.current) {
-            const dx = e.clientX - drag.current.x, dy = e.clientY - drag.current.y;
-            if (Math.abs(dx) + Math.abs(dy) > 3) drag.current.moved = true;
-            setView({ ...drag.current.view, yaw: drag.current.view.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, drag.current.view.pitch + dy * 0.008)) });
+            const d = drag.current, dx = e.clientX - d.x, dy = e.clientY - d.y;
+            if (Math.abs(dx) + Math.abs(dy) <= 3 && !d.moved) return;
+            d.moved = true;
+            setHover(null);
+            setView(d.pan ? { ...d.view, dx: d.view.dx + dx, dy: d.view.dy + dy }
+              : { ...d.view, yaw: d.view.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, d.view.pitch + dy * 0.008)) });
             return;
           }
           const { pt, hit } = locate(e);
           setHover(hit ? { ...hit, x: pt[0], y: pt[1] } : null);
         }}
-        onMouseUp={e => {
+        onPointerUp={e => {
           const d = drag.current; drag.current = null;
-          if (!d || d.moved) return;
-          const { hit } = locate(e);
-          if (hit?.mod && onPickModule) onPickModule(hit.hs, hit.mod);
+          if (!d || d.moved || e.button === 2) return;
+          const { pt, hit } = locate(e);
+          const cell = indexAt(pt);
+          if (cell != null && onPickIndex) onPickIndex(cell);
+          else if (hit?.mod && onPickModule) onPickModule(hit.hs, hit.mod);
           else if (hit?.hs != null) onPick?.(hit.hs);
         }}
-        onMouseLeave={() => { drag.current = null; setHover(null); }} />
+        onPointerCancel={() => { drag.current = null; setHover(null); }}
+        onPointerLeave={() => setHover(null)}
+        onContextMenu={panControls ? e => e.preventDefault() : undefined} />
       {hover && (
-        <div className="v8-tip" style={{ left: Math.min(hover.x + 12, w - 250), top: hover.y + 10 }}>
+        <div className="v8-tip" style={{ left: Math.max(0, Math.min(hover.x + 12, w - 250)), top: hover.y + 10 }}>
           {hover.label}
           {hover.info && <small>{hover.info}</small>}
           {hover.v != null && <small>{valueLabel} {Number(hover.v).toLocaleString()}</small>}
@@ -271,9 +329,10 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
         </div>
       )}
       <div className="v8-tower-btns">
+        {panControls && <button type="button" className="fw-tbtn ghost" aria-pressed={pan} onClick={() => setPan(value => !value)}>平移</button>}
         <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1.3)}>放大</button>
         <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1 / 1.3)}>缩小</button>
-        <button type="button" className="fw-tbtn ghost v8-reset" onClick={() => setView({ yaw: -30 * DEG, pitch: 22 * DEG, zoom: 1 })}>重置视角</button>
+        <button type="button" className="fw-tbtn ghost v8-reset" onClick={() => { setView(INITIAL_VIEW); setPan(false); }}>重置视角</button>
       </div>
     </div>
   );

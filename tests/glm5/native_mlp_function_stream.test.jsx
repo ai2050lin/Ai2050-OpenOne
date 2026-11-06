@@ -1,0 +1,10 @@
+import {it,expect} from 'vitest';
+import {ReadableStream} from 'node:stream/web';
+import {consumeResearchStream} from '../../frontend/src/components/app/rdc_fusion/researchStream.js';
+const header={schema:'datapack_extra_stream.v1',id:'research-library',version:'fixture'};
+function stream(rows,chunk=17){const text=rows.map(x=>JSON.stringify(x)).join('\n')+'\n';return new ReadableStream({start(c){for(let i=0;i<text.length;i+=chunk)c.enqueue(text.slice(i,i+chunk));c.close()}})}
+it('decodes arbitrarily split entries and Unicode without a whole-pack string',async()=>{const received=[];const r=await consumeResearchStream(stream([header,{path:'/api/x',data:{text:'中文🙂"\\',array:[1,.5]}},{complete:true,n_entries:1,version:'fixture'}]),{id:'research-library',onEntry:async(k,v)=>received.push([k,v])});expect(r.count).toBe(1);expect(received[0][1].text).toBe('中文🙂"\\')});
+it('rejects interrupted downloads before publication',async()=>{let published=false;try{await consumeResearchStream(stream([header,{path:'/api/x',data:1}]),{id:'research-library'});published=true}catch{}expect(published).toBe(false)});
+it('rejects wrong counts and versions',async()=>{await expect(consumeResearchStream(stream([header,{complete:true,n_entries:1,version:'fixture'}]),{id:'research-library'})).rejects.toThrow('计数');await expect(consumeResearchStream(stream([header,{complete:true,n_entries:0,version:'other'}]),{id:'research-library'})).rejects.toThrow('版本')});
+it('does not accept a different package or trailing entries',async()=>{await expect(consumeResearchStream(stream([header]),{id:'other'})).rejects.toThrow('对应');await expect(consumeResearchStream(stream([header,{complete:true,n_entries:0,version:'fixture'},{path:'/api/x',data:1}]),{id:'research-library'})).rejects.toThrow('完成标记')});
+it('propagates storage errors without completing the cache',async()=>{await expect(consumeResearchStream(stream([header,{path:'/api/x',data:1},{complete:true,n_entries:1,version:'fixture'}]),{id:'research-library',onEntry:async()=>{throw Error('quota')}})).rejects.toThrow('quota')});

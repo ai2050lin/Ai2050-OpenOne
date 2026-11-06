@@ -1,0 +1,60 @@
+{
+  "backgrounds": 512,
+  "behavior": "both confirm/lockbox allT/R/Q/frame cellsn96 require >=.90 correct generatedfirstsemanticword; score from8unrestrictedgreedytokens, firstalphabeticword lowercase. No fixedcandidatepreferencegate. Strictformatandfirsttokenmarginarediagnostics.",
+  "causal": {
+    "capability": "sameoperationatlastassistantquery,2200gateeligible +140reference,2ppNI; no weight edits",
+    "dose": [
+      0,
+      0.5,
+      1
+    ],
+    "generated_endpoint": "generatedfirstwordaccuracyvs clean, dose,matchedrandom; firsttokenCE/KL separate",
+    "layer": 35,
+    "n_lockbox_backgrounds": 192,
+    "samples": "oneT/Rcombination deterministicbybackgroundhash, bothQ:384inputcases; clusteredbybackground",
+    "selection": "all16discoveryfeature nominees, no selectionbyheldout causalorsemanticresults; random16 matchedwithin[.8,1.25] ondiscoveryactivationRMS anddecoder norm, otherwise specificitycomparisonnoteligible"
+  },
+  "corpus_sha256": "4040f47a9d00f68e35e1de75f775d79e1532866bf35315aa1a2c597503caa20c",
+  "factors": [
+    "selected_location T",
+    "industry pairing R, selectedindustry=T xorR",
+    "queried attribute Q"
+  ],
+  "feature_nomination": "atmost16/layer ondiscoveryonly:6locationT answeringlocationQ0,6industry(T xorR) answeringindustryQ1,4queryQ; fit sign atassistant andtestscope separately. Samefeatures atprequestionare independentreadoutdiagnostic. No unique/monosemanticlabelclaim.",
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "n_inputs": 4096,
+  "natural_fidelity": "fresh512documents8positions, fullSAEsplice/nativek/ablate atB35; true-next-tokenCE andclean-distributionKL,512docclusteredCIs; saveactualpreMLPresidual andfinalh. No surrogateinputpredictionclaim.",
+  "pilot": "first32discovery backgrounds×8=256; eachT/R/Q/frame celln16, >=15generatedfirstwordcorrect tocontinue; strictonewordformatseparatelyreported",
+  "prefix_controls": "Qquestionpadding onlyafter selected-recordreadout: stage0mustbitmatchacrossQ, hs[0] common readouttokens; Tpairedprefixhashbefore selector equal. Qhasno causalvisibility atstage0.",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 411062026
+  },
+  "revision": "v2/v3 codedtruth pilots failed8/32 and5/32cells; preservefailures andreplace task withnaturally generatedattributevalues. Newdesign, oldcodedhypotheses notconfirmed. No confirm/lockboxoutputs read.",
+  "run_id": "MLP-FIDELITY-20261104-v2",
+  "schema": "mlp_fidelity_controlled_prereg.v4",
+  "semantic_criteria": {
+    "alpha": 0.00017361111111111112,
+    "components": "TandindustryeachbothRorientations; QbothT/Rlevels; allrequired ineachheldout, samefittedsign",
+    "confirm_and_lockbox": true,
+    "labels": "operationalconditionalattributeanswerfeatures; answerwordconfoundremainsunlessprequestionandnaturalcontextpredictionsverify",
+    "layers": [
+      8,
+      24,
+      35
+    ],
+    "min_nonzero_fraction": 0.8,
+    "min_order_accuracy": 0.8
+  },
+  "source_sha256": "75638ea7a75091028358a33b151cfb7473387c3e93076b5c668607a55af374cc",
+  "splits": {
+    "confirm": 192,
+    "discovery": 128,
+    "lockbox": 192
+  },
+  "tail_path": "B35 lastMLP output writes directly before finalRMSNorm/unembedding. OriginalprefixKVindependentofB35MLPoutput: reuseprefillcache,croptoprefixbeforeeachgenerationbranch. Firsttoken tailrecompositionmustmatchnative finalh/logits; do notgeneralize thisshortcuttoearlierlayers."
+}

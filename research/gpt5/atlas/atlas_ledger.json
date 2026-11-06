@@ -843,7 +843,7 @@
    }
   }
  ],
- "ledger_sha256_8": "38b4bd0b",
+ "ledger_sha256_8": "29efe109",
  "linkage": [
   {
    "evidence": "G_mlp/G_attn=4.7 per word; e_ff=-0.23 (~30x OV static 0.0075); rotation layer word-specific",
@@ -10245,6 +10245,20 @@
    "res_sha8_glm": null,
    "prev_post": "7a2535aa",
    "note": "Cross-scale stability of the frequency subspace, pure static (no forward). Qwen3-14B (d=5120) newly downloaded (hf-mirror; shards validated - 3 shards needed a size-checked resume loop after two silent curl truncations). Same pool construction as Q8-B (n=24421, CHAR 8049 + WORD 16372). Runtime 114 s. E1 PRESENT: 14B full-space held-out R^2 0.7515 (verify 0.7493) vs 4B 0.8266. E2 LOG_SCALE: raw-frequency axis gives 0.023 (4B) / -0.106 (14B) => gap 0.804 / 0.858. The raw axis is a NOISE-FLOOR quantity: its point value depends on solver numerics (cv_fast -0.10 vs hand-written normal equations -0.97 on the same folds); reported as 3-seed mean with the verdict set by INEQUALITY (r2<0.10 and gap>=0.30), not point reproduction. New rule R-MTH-30. E3 LOW_DIM_DENSE: Krylov k*=2 both models (4B k1 0.529->k2 0.740; 14B k1 0.629->k2 0.736). With Q8-B this makes the shape family (log scale, 2-4 dim dense subspace, orthogonal to norm and semantics, no single-coordinate carrier: best coord -0.4414 4B / +0.4990 14B against R^2 0.83/0.75 full-space) a THREE-MODEL TWO-FAMILY reference-grade regularity spanning a 3.5x parameter gap. E4 SCALAR_WEAKLY_SHARED (the new cross-model instrument): coordinates do not align across models, so cos(w_freq) is meaningless; the only clean shared object is the per-token scalar t=(E-mu)@w on the shared 151936 rows. Raw Spearman 0.9141 is trivial (both predict zipf); after regressing zipf out of each t, the residual correlation is 0.4268 against a shuffle null p99 of 0.0175 (24x) - significantly non-zero but below the pre-registered 0.50 SHARED threshold. The two models put genuinely shared but minority structure on the same tokens. E5 SEM_ORTHOGONAL: COLOR/FRUIT within-set similarity retains 1.00 after removing the frequency component in 14B (0.1825->0.1823, 0.0973->0.0973; nulls 0.013/0.014). SYNTHESIS with Q8-D2: the frequency subspace is a universal by-product (attractor) of training, not a functional component - shape universal, usage null, token-level content majority-accidental with a real shared minority (0.43). VERIFY 18/0 after two verifier bugs were caught: (1) the verifier hanzi class missed CJK extension A (200 chars; pool 24221 vs 24421 - every number drifted), (2) it tried to point-reproduce the noise-floor raw-axis R^2 in float32 Gram. Cache-collision hazard empirically confirmed: the diagnostic hit a Gram cache poisoned across models (2560-dim G served to a 5120-dim solve) because the key lacks X identity - ns must carry the model name (extension of R-MTH-24)."
+  },
+  {
+   "phase": "Q9-B",
+   "name": "pat_q9b_qwen_patch_w6",
+   "line": "G",
+   "date": "2026-11-03",
+   "verdict": "register_direction_is_sufficient_not_necessary_and_component_agnostic_weight_space_gate_surgery_is_nonnull_but_negligible_glm_arms_pending",
+   "res_files": [
+    "tests/gpt5/result/pat_q9b_qwen_patch.json",
+    "tests/gpt5/result/pat_q9b_qwen_w6.json",
+    "tests/gpt5/result/pat_q9b_w6_precheck.json"
+   ],
+   "note": "Q9-B Qwen3-4B arms (bf16, frozen Q9-A material + frozen npz directions; GLM W4/W5 pending). Readout probe: 3-way register LR (C=1.0, max_iter=3000) fitted on discovery resid_in[35], applied to 180 confirm samples; intervention at last-token position, MLP/attn module outputs, mid band L18-27; alpha calibrated in units of median |mlp_out . v| per layer. PRE-CHECK (CPU, no forward): c_j = v . W_out[:,j] on real down_proj weights. Register direction energy in top-64 of 9728 columns S64=0.116+-0.016 vs random-direction null 0.063-0.066 (ratio 1.5-2.3x, z~22 but effect small); participation ratio 1050-2217 columns, k50~950, k80~2750. => DISTRIBUTED_WRITE_CANDIDATE, NOT a rank-1 gate. W1 sufficiency (MLP patch): dose response in d_margin +2.83/+5.69/+11.21/+20.11 for alpha=0.5/1/2/4; KL 0.024/0.095/0.373/1.124 vs random-direction null KL p95=0.003 (~30x above null at alpha=1); 3-way flip toward +s reaches 0.333 at alpha>=2 with acc dropping 1.000->0.667. SUFFICIENT. W2 necessity (ablate v-projection from mid-band MLP outputs): acc stays 1.000, d_margin -0.92, KL 0.072 (null KL 0.001) => direction is READ but NOT NECESSARY. W2b joint ablation (MLP+attention simultaneously): acc 0.989, d_margin -1.58, KL 0.114 - removing the direction from both components still barely changes the readout. W3 read/write separation: attention patch with the SAME direction and alpha=1 gives d_margin +6.20 (vs MLP +5.69) and KL 0.129 (vs 0.095): attention writes the register as effectively as MLP at the residual level => ATT_ALSO_WRITES, hypothesis H-RW REFUTED in its strong form. W3b attention ablation d_margin -0.61, KL 0.025. W6 weight-space gate surgery (WSP-inspired): W_out <- W_out - u u^T W_out on L18-27, dose by column count k=64/512/2048 vs random-column control. Edit is NON-NULL but tiny: KL 0.0251/0.0578/0.0792 vs random 0.0009/0.0015/0.0073 (11-39x); probe acc stays 1.000 and class flip 0.000 at every dose including full removal (KL 0.0908). Capability gate (440-item 4-set battery, forced-choice at prompt-final position): 0.693 base -> 0.698 edited (305->307/440), no damage (McNemar n.s.). Verdict: SUFFICIENT_NOT_NECESSARY + ATT_ALSO_WRITES + DISTRIBUTED_WRITE. Interpretation: register/style is an additive READABLE direction in the residual stream, not a closable rank-1 gate; the WSP single-direction surgery works for degenerate self-loop failures (their Qwen loop) but not for register style, exactly matching their own Gemma failure case. Consistent with Q2 (no necessary unit), Q5-A (weak-evidence accumulation) and Q9-A (hs[0] already carries 2/3 of the register discriminability).",
+   "prev_post": "38b4bd0b"
   }
  ],
  "migration_history": [
@@ -10741,6 +10755,30 @@
    "claim_refuted": "The frequency subspace is a shared functional structure: same family, larger scale, same tokens get the same frequency scalar.",
    "why_refuted": "After removing zipf from each model scalar t, the 4B-14B residual Spearman is 0.4268 - above the shuffle null (p99 0.0175) but below the pre-registered SHARED threshold 0.50; the majority of token-level variance is model-specific. Shape invariants (log scale, k*=2, semantic orthogonality) DO reproduce, so the claim is refuted only at the content level.",
    "what_stands": "A real shared minority component exists (24x null) - the attractor has structure worth dissecting (Q8-F); shape is reference-grade across three models and two families."
+  },
+  {
+   "name": "pat_q9b_neg_register_is_a_closable_gate",
+   "phase": "Q9-B",
+   "date": "2026-11-03",
+   "claim_refuted": "The register/style direction can be removed from the weights like the WSP loop direction (rank-1 surgery, 0.016%-style edit) so that behaviour switches off.",
+   "evidence": "Weight-space projection removal on Qwen3-4B L18-27 leaves the 3-way readout unchanged (acc 1.000, class flip 0.000) and only shifts next-token KL by 0.025-0.091 vs 0.001-0.007 for random-column edits; the 440-item capability battery is unchanged (0.693 -> 0.698). Pre-check shows the direction energy is spread over ~950-2750 of 9728 columns (S64=0.116 vs null 0.065), not a rank-1 structure.",
+   "what_stands": "The direction is measurable in the weights (edit above random control) and sufficient when ADDED at activation level (dose-dependent d_margin up to 20, KL 1.12). Readability and additivity stand; closability does not."
+  },
+  {
+   "name": "pat_q9b_neg_attention_reads_mlp_writes",
+   "phase": "Q9-B",
+   "date": "2026-11-03",
+   "claim_refuted": "Read/write separation: attention only reads contextual register cues while MLP writes the register increment (so patching MLP should move the readout much more than patching attention).",
+   "evidence": "Same direction, same calibrated alpha=1, same layers: attention patch d_margin +6.20 / KL 0.129 vs MLP patch +5.69 / KL 0.095 - attention is at least as effective. Ablations: MLP-only -0.92, attention-only -0.61, joint -1.58 (acc 0.989).",
+   "what_stands": "Q9-A share result stands (natural write increment in mid band is MLP-dominated, raw 0.11-0.39). What falls is the inference from share to component-specific controllability: the residual stream is additive, so any component injected with the same vector moves the readout similarly. Component attribution must be done by ablation, not by patch magnitude."
+  },
+  {
+   "name": "pat_q9b_neg_register_direction_is_necessary",
+   "phase": "Q9-B",
+   "date": "2026-11-03",
+   "claim_refuted": "The register direction is necessary for the model to represent/compute register: removing its projection from the mid-band writes should damage register classification (pre-registered W2 gate: acc drop >= 0.10).",
+   "evidence": "MLP ablation acc 1.000 (drop 0.000, gate FAIL); joint MLP+attention ablation acc 0.989 (drop 0.011); weight-space removal acc 1.000. Margin shifts are 10-100x above the random-direction null but far below the pre-registered gate.",
+   "what_stands": "The direction is causally READ (non-null ablation effect, KL 0.072-0.114 vs null 0.001) but redundant: other channels (hs[0] identity, remaining layers, positions) carry the same information. Record as NULL_BOUNDED for necessity, not as evidence of no effect."
   }
  ],
  "protocol_family": "LPF v5.3",

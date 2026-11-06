@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { probeContext, useAiContext } from './aiContext.js';
 import { fmtTime, nodeBridge, nodeCall } from './contributeUtil.js';
 import { Card, Empty } from './ui.jsx';
+import { authJson } from './api.js';
+import { useAuth } from './authContext.js';
 import './contribute.css';
 
 const DEFAULT_PROMPTS = ['我想聊聊关于', '这篇新闻报道的是', 'The article is about', 'Let me tell you about'];
@@ -127,6 +129,8 @@ function Report({ r }) {
 }
 
 export default function GoodfireProbePanel() {
+  const { user,guest }=useAuth();
+  const [publication,setPublication]=useState(''),[publishing,setPublishing]=useState(false);
   const bridge = nodeBridge();
   const [models, setModels] = useState(null);
   const [form, setForm] = useState({ snapshot: '', layer: 30, unit: 9517, k: 100, n_slices: 2, prompts: DEFAULT_PROMPTS.join('\n'), pairs: '' });
@@ -156,7 +160,7 @@ export default function GoodfireProbePanel() {
         const s = await nodeCall('GET', '/probe');
         const running = s.status === 'preparing' || s.status === 'running';
         if (wasBusy.current && !running) {                       // 刚结束：刷新记录，完成时打开报告
-          if (s.status === 'done') nodeCall('GET', `/probes/${s.id}`).then(setReport).catch(e => setErr(e.message));
+          if (s.status === 'done') nodeCall('GET', `/probes/${s.id}`).then(r=>{setReport(r);setPublication('')}).catch(e => setErr(e.message));
           nodeCall('GET', '/probes').then(r => setItems(r.items)).catch(() => {});
         }
         wasBusy.current = running;
@@ -177,7 +181,15 @@ export default function GoodfireProbePanel() {
       }));
     } catch (e) { setErr(e.message); }
   };
-  const open = id => nodeCall('GET', `/probes/${id}`).then(setReport).catch(e => setErr(e.message));
+  const open = id => nodeCall('GET', `/probes/${id}`).then(r=>{setReport(r);setPublication('')}).catch(e => setErr(e.message));
+  const publish=async()=>{
+    setPublishing(true);setPublication('');
+    try{
+      const identity=report.research_identity;
+      const result=await authJson('/api/research-library/submissions',{method:'POST',body:{schema:'research_submission.v1',kind:'real',model_snapshot:identity.model_snapshot,run_id:identity.run_id,precision:identity.precision,report}});
+      setPublication(`已归档 ${result.sha256.slice(0,16)} · 未审核贡献报告；未自动登记图谱或晋级证据`);
+    }catch(e){setPublication(e.message)}finally{setPublishing(false)}
+  };
   const [stTone, stIcon, stLabel] = STATUS[st?.status] || [];
   const prog = st?.progress;
   return (
@@ -207,7 +219,7 @@ export default function GoodfireProbePanel() {
         {err && <p className="v6-note warn">{err}</p>}
         <p className="v6-note">测试期间贡献算力不领取新任务；正在运行贡献任务时不能开始。参数与判据的出处见方法拆解文档；判据随结果一并保存。</p>
       </Card>
-      {report && <Card title="测试报告"><Report r={report} /></Card>}
+      {report && <Card title="测试报告" extra={<button className="fw-tbtn" disabled={publishing||!user||guest||!report.research_identity?.model_snapshot} onClick={publish}>登记到中心研究库（上传此报告）</button>}><p className="v6-note">包括提示文本、两极上下文及运行信息。默认保存在本机；主动登记后供团队回查，等待研究审核。</p>{publication&&<p className="v6-note">{publication}</p>}<Report r={report} /></Card>}
       <Card title="本机测试记录" sub="结果只存在本机（节点服务目录 probes/），不上传">
         {!items.length ? <Empty>还没有测试记录。</Empty> : (
           <table className="v6-mini-table">

@@ -1,0 +1,389 @@
+{
+  "checks": {
+    "browser-acceptance.json": {
+      "actual_browser": "local Playwright Chromium",
+      "cases": [
+        {
+          "milliseconds": 1820,
+          "name": "navigation",
+          "passed": true
+        },
+        {
+          "milliseconds": 6451,
+          "name": "legacy-links",
+          "passed": true
+        },
+        {
+          "milliseconds": 8308,
+          "name": "graph-runtime-parameters",
+          "passed": true
+        },
+        {
+          "milliseconds": 820,
+          "name": "contribution-web",
+          "passed": true
+        },
+        {
+          "milliseconds": 1990,
+          "name": "data-sync",
+          "passed": true
+        },
+        {
+          "milliseconds": 1348,
+          "name": "narrow-layout",
+          "passed": true
+        }
+      ],
+      "kind": "engineering",
+      "mocked_research_data": false,
+      "page_errors": [],
+      "passed": true,
+      "schema": "browser_visual_acceptance.v1",
+      "screenshots": [
+        {
+          "name": "01-overview-ready",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\01-overview-ready.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=route"
+        },
+        {
+          "name": "02-config",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\02-config.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=config&csec=model&ds=C-Eval+val&mdl=qwen3-4b%7Ccfg-8ba006f74fec%7Cbf16"
+        },
+        {
+          "name": "03-legacy-compatibility",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\03-legacy-compatibility.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=config&csec=legacy"
+        },
+        {
+          "name": "04-research-graph",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\04-research-graph.png",
+          "url": "http://127.0.0.1:5173/workbench?run=P2794-ATOMIC-ARBITRATION-v4&snapshot=6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad&lens=spatial&view=graph&gview=internal"
+        },
+        {
+          "name": "05-real-mlp-array",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\05-real-mlp-array.png",
+          "url": "http://127.0.0.1:5173/workbench?trace=4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd&tblock=34&thead=10&tunit=1995&lens=spatial&view=live&run=P2794-ATOMIC-ARBITRATION-v4&snapshot=6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad&ttab=mlp&tpos=1023"
+        },
+        {
+          "name": "06-real-parameter-contributions",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\06-real-parameter-contributions.png",
+          "url": "http://127.0.0.1:5173/workbench?trace=4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd&tblock=34&thead=10&tunit=1995&lens=spatial&view=live&run=P2794-ATOMIC-ARBITRATION-v4&snapshot=6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad&ttab=connections&tpos=1023"
+        },
+        {
+          "name": "07-actual-weight-slices",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\07-actual-weight-slices.png",
+          "url": "http://127.0.0.1:5173/workbench?pmodel=9a784350de7f8d690b04ffef&pblock=34&pkind=mlp&punit=1995&trace=4897d1d8fcc5dd2da58fe22a08651a66d38608133b4b972c060ca693faf5a2bd&run=P2794-ATOMIC-ARBITRATION-v4&snapshot=6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad&lens=spatial&view=parameters&phead=0&prow=0"
+        },
+        {
+          "name": "08-contribution-browser",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\08-contribution-browser.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=config&csec=node"
+        },
+        {
+          "name": "09-data-sync-success",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\09-data-sync-success.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=route&data=import"
+        },
+        {
+          "name": "10-data-sync-failure",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\10-data-sync-failure.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=route&data=import"
+        },
+        {
+          "name": "11-mobile-overview",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\11-mobile-overview.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=route"
+        },
+        {
+          "name": "12-mobile-contribution",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\12-mobile-contribution.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=config&csec=node"
+        },
+        {
+          "name": "13-mobile-sync",
+          "path": "tests\\glm5\\result\\workbench_playwright_20261104\\13-mobile-sync.png",
+          "url": "http://127.0.0.1:5173/workbench?lens=config&csec=node&data=import"
+        }
+      ]
+    },
+    "electron-acceptance.json": {
+      "actual_main_and_preload": true,
+      "actual_node_service": true,
+      "checks": [
+        {
+          "guard": "unbound start disabled",
+          "name": "actual_electron_preload_and_idle_node",
+          "passed": true,
+          "synthetic": false
+        },
+        {
+          "name": "resource_budget_saved_via_real_ipc",
+          "passed": true,
+          "remote_authority_granted": false
+        },
+        {
+          "name": "packaged_ui_primary_pack_real_download",
+          "passed": true
+        },
+        {
+          "name": "complete_research_library_stream_real_download",
+          "passed": true
+        },
+        {
+          "name": "research_graph_reads_actual_downloaded_extra",
+          "passed": true
+        }
+      ],
+      "isolated_profile": true,
+      "kind": "engineering",
+      "model_inference_executed": false,
+      "page_errors": [],
+      "passed": true,
+      "schema": "electron_visual_acceptance.v1"
+    },
+    "electron-reload-acceptance.json": {
+      "actual_main_and_preload": true,
+      "actual_node_service": true,
+      "checks": [
+        {
+          "guard": "unbound start disabled",
+          "name": "actual_electron_preload_and_idle_node",
+          "passed": true,
+          "synthetic": false
+        },
+        {
+          "name": "resource_budget_saved_via_real_ipc",
+          "passed": true,
+          "remote_authority_granted": false
+        },
+        {
+          "name": "packaged_ui_primary_pack_real_download",
+          "passed": true
+        },
+        {
+          "name": "research_graph_reads_actual_downloaded_extra",
+          "passed": true
+        },
+        {
+          "name": "downloaded_extra_and_graph_selection_survive_reload",
+          "passed": true
+        }
+      ],
+      "isolated_profile": true,
+      "kind": "engineering",
+      "model_inference_executed": false,
+      "page_errors": [],
+      "passed": true,
+      "schema": "electron_visual_acceptance.v1"
+    },
+    "package-verification.json": {
+      "bytes": 112172088,
+      "created_at": "2026-11-05T04:42:43.566Z",
+      "files": [
+        {
+          "path": "electron/main.js",
+          "sha256": "950dd06c8aed0d995cd8afda4ec5c5a8c4d94b2cac1f741259e3452c9814b73b"
+        },
+        {
+          "path": "electron/preload.js",
+          "sha256": "b7296283f5382fc2aa6e9d9c3b8ca54efe2eef4fa7a23c061183b5157d12801f"
+        },
+        {
+          "path": "electron/nodeSupervisor.js",
+          "sha256": "f422a41d3c7469a5d92432e43a5bc78b4d91f2887259e5b289b8e867d646043a"
+        },
+        {
+          "path": "electron/runtimeInstaller.js",
+          "sha256": "a6dc51b2b098a7ed469386ba4c04e1fbde93b6e765018902e00a1ff39fa2e40f"
+        },
+        {
+          "path": "electron/aiAssistant.js",
+          "sha256": "f7819a05d270aa87231ec244015b51ad7742744eada01d8c689b67bf2c05cf39"
+        },
+        {
+          "path": "resources/node/parameter_reader.py",
+          "sha256": "73422f0593bb4354c0e2502211954ad8b6490773d38fa0b557ff1063dde5822f"
+        },
+        {
+          "path": "resources/node/node_agent.py",
+          "sha256": "177d0d8f7dab76d85052d73f5083746c1600afb14423ddf607c8a5ed7a71f9c2"
+        },
+        {
+          "path": "resources/node/node_service.py",
+          "sha256": "5b69d0332101409b8db4cac6c9d2b17332915c17ad4bc56f552c9af71a4e444d"
+        },
+        {
+          "path": "resources/node/goodfire_runner.py",
+          "sha256": "3b8556af4b1c9004f9e23fed37d28609329234f8c0da400fe37712271c57bf37"
+        },
+        {
+          "path": "resources/node/goodfire_probe.py",
+          "sha256": "a6379712682d4a99a7a224ab074a5d14b93e2e20eb4011a263fbb1ff35c78495"
+        },
+        {
+          "path": "resources/node/runtime/requirements-win-cu130.lock",
+          "sha256": "fe7ba4ae4c37113414a80429c6e947a7e28b4d98efe1a16bfa93d2a7b5a0e624"
+        }
+      ],
+      "frontend_files_verified": 41,
+      "installer": "D:\\AI2050\\Ai2050-OpenOne\\frontend\\dist-installer\\1.0.5\\AI2050-Setup-1.0.5-x64.exe",
+      "installer_executed": false,
+      "kind": "engineering",
+      "passed": true,
+      "schema": "package_integrity.v1",
+      "sha256": "c50d849fc8b4d5376e8d0b72d25c8ce7dafffbb9010fb534b0990cc3980bbb2e",
+      "signed": false,
+      "target": "win-x64",
+      "version": "1.0.5"
+    },
+    "packaged-smoke.json": {
+      "identity": {
+        "asar": true,
+        "isolated_profile": true,
+        "packaged": true,
+        "version": "1.0.5"
+      },
+      "installer_executed": false,
+      "kind": "engineering",
+      "node": {
+        "bound": false,
+        "http": 200,
+        "state": "stopped"
+      },
+      "page_errors": [],
+      "passed": true,
+      "schema": "packaged_smoke.v1"
+    }
+  },
+  "created_at": "2026-11-04 22:45",
+  "electron_regressions": 11,
+  "evidence": [
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/browser-acceptance.json",
+      "sha256": "6d0f8ec1a44143da0ff189ab00bf2fb7f2bb48a24377d80bf492190107406b11"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/electron-acceptance.json",
+      "sha256": "23203eb2797f2c36d84f10c725d937f3cbc22e45c28d99ae65daa3e8c2936f1b"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/electron-reload-acceptance.json",
+      "sha256": "7e721326150c9d2413698e23282c95f5695e24b06a3b2be73b7e9eeda815afd5"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/packaged-smoke.json",
+      "sha256": "363f3d8fdb4f49c517c24b6be6d6f1cebefc902c080ba125b0d747bdcc7720f2"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/package-verification.json",
+      "sha256": "ee0b811309e0f530778a519838a18af76879fe7187b02e9d47a29746928ec620"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/release-source-manifest.json",
+      "sha256": "a35942bc03c9687cdd2c706d13f9a6b252ded3b6a0c0959a17946f9791be1115"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/01-overview-ready.png",
+      "sha256": "929ba053c1e435fd9c02da2c0784e778a6ed7aed40cef9dfc4d3f682da412fec"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/01-overview.png",
+      "sha256": "9f844086528dc36c7d3693c8b28f3b6c831c0cec157630e6b3b339b2f8dacd35"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/02-config.png",
+      "sha256": "f8f632a9f11c6be8430bc679b61d01038dffd487de3b1e09db324e7ead572c27"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/03-legacy-compatibility.png",
+      "sha256": "2a3ee5ba96e829808ee1598abab43d4194544b44e2b930307e4c27d6eba31c2f"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/04-research-graph.png",
+      "sha256": "28b16f973376a4a0b248ccbc66061d089447ce22f795fc0cbd845d2957eb7f0f"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/05-real-mlp-array.png",
+      "sha256": "23e9bfc419e6004aa3ded251cd0c2331578f9488171d93e6b5c19c75a07b1f08"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/06-real-parameter-contributions.png",
+      "sha256": "517308634e476d93e27da5cfcf1de240181baba9725dcbd0d2bad61827002d7a"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/07-actual-weight-slices.png",
+      "sha256": "35f21442709b5f8974c4304dd9715327a4d4395af7f59a707734923911387a1a"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/08-contribution-browser.png",
+      "sha256": "e6827c7d62f908b28805e8f7044fcec784dd3155a7d8e4f7b356dc09361f1862"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/09-data-sync-success.png",
+      "sha256": "1bcf012e64b6179d23d4513800d681e687e1164230f5c6f9ad7a2bbbe50bdd8c"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/10-data-sync-failure.png",
+      "sha256": "ff234298bd856d841abefbdd67854ecb4f68a3712d7396f009d822b158710e19"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/11-mobile-overview.png",
+      "sha256": "ee10d8f82cd0e240a999f4ffd236ebcda52a0df621a0f1b122c71d8b835c8202"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/12-mobile-contribution.png",
+      "sha256": "caeb67aed3a5c66c6b228340d18761951e91ad22cde554b3c42d32909857a696"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/13-mobile-sync.png",
+      "sha256": "db11af29a2d5af026888ac1ad1aee1e0f8b260721a051d037d0105464162ec6f"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/14-desktop-real-node.png",
+      "sha256": "21dd115b1aa77bb75c552a2cf848fc7e64002f3a5af6bf91bf09d69538757bb5"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/15-desktop-data-sync.png",
+      "sha256": "11cf58f6ea3d56e2a728cee2a12ebf0725e378de203abc75f924214fd38c7e60"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/16-desktop-offline-graph.png",
+      "sha256": "d98e629f4fb8e1d644ae7c534ef780692aea67bf9365242b74ed954a8680358e"
+    },
+    {
+      "path": "tests/glm5/result/workbench_playwright_20261104/17-packaged-client.png",
+      "sha256": "221f6a3dfa7f3526942d20c93736554706f612196640dd10c5b01069fe43ca0e"
+    }
+  ],
+  "fixes": [
+    "数据与同步弹窗居中、限制高度并允许长版本号换行",
+    "390px顶栏品牌保持单行，隐藏重复副标题",
+    "网页贡献指引改为配置→本机算力"
+  ],
+  "frontend_regressions": 61,
+  "kind": "engineering",
+  "limits": [
+    "未执行新GPU模型任务，未验证新远端节点绑定后领题上传或真实托管授权",
+    "安装包未安装、未发布，Authenticode状态NotSigned",
+    "仅当前Windows机器与1440/1584宽及390px视口，不代表全部系统/显卡/设备",
+    "保留既有大bundle警告；3D索引布局不是语义几何或唯一因果机制"
+  ],
+  "model_runs": 0,
+  "previous_implementation_sha256": "3423ac5f95d415710679111f0fa558b0a8127fc2935463f626ab2afebed2b3f8",
+  "production_build": "passed",
+  "run_id": "WB-VISUAL-RELEASE-20261104-v1",
+  "schema": "research_client_acceptance.v1",
+  "scientific_evidence_upgraded": false,
+  "status": "visual_acceptance_passed_and_packaged",
+  "test_method": [
+    "本地Playwright Chromium真实渲染与点击，四一级/十四二级及旧链接",
+    "真实P2794归档→样本→B34/H10/U1995→权重切片，核验完整快照并检查后退/刷新",
+    "全部32Head索引和9728单元阵列、真实query位置、计算来源显示",
+    "真实Electron main/preload与独立本机节点，未绑定启动保护与资源预算实际保存",
+    "真实主包和研究库流下载、IndexedDB提交、重启/刷新后离线图谱与工作包选择保留",
+    "打包后exe实际启动、app.asar身份和真实节点IPC；逐字节校验打包内容"
+  ],
+  "timezone": "America/Chicago",
+  "version": "1.0.5"
+}

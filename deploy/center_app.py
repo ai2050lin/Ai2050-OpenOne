@@ -24,7 +24,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 # 只适合在研究者自己机器上用的端点：读取本机模型权重、下载模型
-LOCAL_TOOL_PREFIXES = ('/api/live/', '/api/models/')
+LOCAL_TOOL_PREFIXES = ('/api/live/', '/api/models/', '/api/parameters/', '/api/traces/')
 # 会真的在本机启动进程、加载权重、占显存的端点。中心（公开部署）一律不执行：
 # 自动测试要在有 GPU 的机器上跑，中心只负责保存任务记录、分发命令与回收结果。
 # 这些路径不给「管理员令牌」这个后门——给管理员留后门，等于给「中心偷偷跑 GPU」留了路。
@@ -67,7 +67,8 @@ def create_app():
         if request.method != 'OPTIONS':
             if not local_tools and path.startswith(GPU_ONLY_PREFIXES):
                 return JSONResponse({'detail': GPU_ONLY_REASON, 'local_only': True}, status_code=403)
-            if not local_tools and path.startswith(LOCAL_TOOL_PREFIXES):
+            archived_index = request.method in ('GET', 'HEAD') and path == '/api/traces/research-space'
+            if not local_tools and path.startswith(LOCAL_TOOL_PREFIXES) and not archived_index:
                 try:
                     distributed_service._auth_admin(request.headers.get('x-admin-token', ''))
                 except Exception:
@@ -81,6 +82,21 @@ def create_app():
     app.include_router(platform_service.auth_router)
     app.include_router(platform_service.lang_router)
     app.include_router(neuron_census_service.router)
+    from deploy.research_library import router as library_router
+    from deploy.parameter_service import router as parameter_router
+    from server.rule_ledger_service import overview as rule_overview
+    if local_tools and (REPO / 'server' / 'mechanism_trace_service.py').is_file():
+        from server.mechanism_trace_service import router as mechanism_trace_router
+        app.include_router(mechanism_trace_router)
+    else:
+        # The public index depends on the archive only. Native file and model tools stay local.
+        from server.research_space_service import router as research_space_router
+        app.include_router(research_space_router, prefix='/api/traces')
+    app.include_router(library_router)
+    app.include_router(parameter_router)
+    app.add_api_route('/api/rules/overview', rule_overview, methods=['GET'])
+    from deploy.node_control import router as node_control_router
+    app.include_router(node_control_router)
 
     data_dir = Path(distributed_service._DATA_DIR).resolve()
     in_release = REPO.resolve() in data_dir.parents          # 数据目录在带版本号的程序目录里：换新版本目录时会「丢」数据

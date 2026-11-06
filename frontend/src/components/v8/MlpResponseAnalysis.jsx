@@ -1,0 +1,15 @@
+import {useState} from 'react';
+import {useApi} from '../app/rdc_fusion/api.js';
+import {Empty} from '../app/rdc_fusion/ui.jsx';
+import MechanismScene,{NativeArray} from './MechanismScene.jsx';
+const num=x=>Number.isFinite(x)?x.toPrecision(5):'—';
+export default function MlpResponseAnalysis({run,analysis}){
+  const [block,setBlock]=useState(24),[unit,setUnit]=useState(8443),[stage,setStage]=useState(0),[metric,setMetric]=useState('response_replicated');
+  const base=`/api/traces/mlp-bank/${encodeURIComponent(run)}/analysis`,layer=useApi(`${base}/layers/${block}`),detail=useApi(`${base}/units/${block}/${unit}`),d=layer.data,u=detail.data;
+  const values=d?.[metric]?.[stage]?.map(Number),clamp=(v,max)=>Math.max(0,Math.min(max,Number(v)||0));
+  return <section aria-label="全MLP留出检验"><p><strong>全部350,208单元均检验，失败不隐藏</strong></p><p className="v8-note">范围内响应复现与功能解释资格分开显示。全局行为门{analysis.behavior_gate?'通过':'未通过'}；未通过时，响应统计不得晋级功能解释。符号只在发现集A/B拟合，留出同时检查3种代码×2映射。</p>
+    <div className="v6-toolbar"><label>块 <input aria-label="响应检验块" type="number" min="0" max="35" value={block} onChange={e=>setBlock(clamp(e.target.value,35))}/></label><label>单元 <input aria-label="响应检验单元" type="number" min="0" max="9727" value={unit} onChange={e=>setUnit(clamp(e.target.value,9727))}/></label><select aria-label="响应检验读出" value={stage} onChange={e=>setStage(Number(e.target.value))}><option value="0">完整问题后</option><option value="1">assistant边界</option></select><select aria-label="响应检验指标" value={metric} onChange={e=>setMetric(e.target.value)}><option value="response_replicated">范围内响应复现</option><option value="eligible_supported">行为过门且响应复现</option><option value="shuffled_replicated">打乱标签负对照</option><option value="confirm_fvu">confirm预测FVU</option><option value="lockbox_fvu">lockbox预测FVU</option></select></div>
+    {layer.error?<Empty>{layer.error}；完整报告中的汇总和CAS来源仍保留。</Empty>:<><MechanismScene manifest={{n_layers:36,d_ff:9728,d_model:2560,n_heads:32,n_kv_heads:8,head_dim:128}} block={block} head={0} unit={unit} activation={values} caption={`留出检验 · ${metric} · 结构位置不是因果连接`} onBlock={setBlock} onHead={()=>{}} onUnit={setUnit}/><NativeArray values={values} selected={unit} onPick={setUnit} label="全9728单元留出结果"/></>}
+    {u&&<><p>B{block}/U{unit} · 符号{u.sign[stage]} · 响应复现{u.response_replicated[stage]?'是':'否'} · 功能解释资格{u.eligible_supported[stage]?'是':'否'} · lockbox FVU={num(u.lockbox_fvu[stage])}</p><p className="v8-note">FVU预测器使用输入因子标签和发现集条件均值；它不是图谱独立预测，也不是下一token机制模型。Embedding/Head只示结构定位。</p><table className="v6-table"><thead><tr><th>代码/映射</th><th>confirm正序/192</th><th>lockbox正序/192</th><th>lockbox p</th></tr></thead><tbody>{['A/B','C/D','甲/乙'].flatMap((code,c)=>[0,1].map(m=><tr key={`${c}:${m}`}><td>{code} / {m}</td><td>{u.confirm_successes[c][m][stage]}</td><td>{u.lockbox_successes[c][m][stage]}</td><td>{num(u.lockbox_p[c][m][stage])}</td></tr>))}</tbody></table><details><summary>全部八项因子系数、误差和零方差标记</summary><pre className="v8-artifact-json">{JSON.stringify(u,null,2)}</pre></details></>}
+  </section>;
+}

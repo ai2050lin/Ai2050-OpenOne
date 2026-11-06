@@ -277,10 +277,15 @@ class SandboxCenterE2ETests(unittest.TestCase):
         b = start_service(self.tmp / 'svc', synthetic=True, server_override=self.center)
         p, tok = b['port'], b['token']
         try:
+            self.assertEqual(call(p, '/participation', token=tok)[1]['step'], 'account')
             st, r = call(p, '/bind', 'POST', {'bind_code': code}, token=tok)
             self.assertEqual(st, 200, r)
             self.assertTrue(r['owner_bound'])
             self.assertTrue(call(p, '/status', token=tok)[1]['bound'])
+            preview = call(p, '/participation', token=tok)[1]
+            self.assertTrue(preview['center_current'], preview)
+            self.assertEqual(preview['available']['job'], 'CJ-svc')
+            self.assertEqual(self.http('/api/census/jobs/CJ-svc')['counts'], {'queued': 2})
             self.assertEqual(call(p, '/start', 'POST', {}, token=tok)[0], 200)
             deadline = time.time() + 120
             while time.time() < deadline:
@@ -292,6 +297,12 @@ class SandboxCenterE2ETests(unittest.TestCase):
             hist = call(p, '/history', token=tok)[1]['items']
             self.assertEqual(sorted(h['status'] for h in hist), ['accepted', 'accepted'])
             self.assertEqual({h['job'] for h in hist}, {'CJ-svc'})
+            preview = call(p, '/participation', token=tok)[1]
+            self.assertIsNone(preview['available'])
+            self.assertEqual([r['status'] for r in preview['receipts']], ['accepted', 'accepted'])
+            other = self.http('/api/nodes/register', 'POST', {'name': 'other'})
+            result = self.http('/api/nodes/participation', 'POST', {}, {'X-Node-Token': other['node_token']})
+            self.assertEqual(result['receipts'], [])
             prog = self.http('/api/census/jobs/CJ-svc')
             self.assertEqual(prog['counts'], {'done': 2}, prog['counts'])
             logs = call(p, '/logs?after=0', token=tok)[1]['items']

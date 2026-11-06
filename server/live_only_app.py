@@ -27,6 +27,8 @@ app.add_middleware(
     allow_headers=['*'],
 )
 app.include_router(router)
+from server.mechanism_trace_service import router as trace_router
+app.include_router(trace_router)
 
 
 @app.get('/api/v1/health')

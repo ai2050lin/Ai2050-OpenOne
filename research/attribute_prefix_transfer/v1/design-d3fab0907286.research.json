@@ -1,0 +1,42 @@
+{
+  "directions_sha256": "466a79b1ab0890fb1ecc81e88e69cf0f4800cf629e172255930cbab183292470",
+  "gates": {
+    "alpha_per_split": 0.025,
+    "alternate_gain": 0.1,
+    "clean_accuracy": 0.8,
+    "matched_pre_rounding_tolerance": 1e-05,
+    "over_equal_norm": 0.05,
+    "replay_rescue": "all rows, exact first logits and four generated tokens"
+  },
+  "inputs_sha256": "2500fd2a6973429b39dbf5c6d2b06787d62b848392f772d8f8108fd9a3b7af30",
+  "intervention": "Unchanged pre-question writer from Phase 2801, alpha=4, mapped to expected/alternative role by fixed answer order. Actual four-token greedy, equal-norm signed permutation, exact KV replay and rescue, all rows. Lockbox role orientation transferred without using new label activations to refit.",
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "power": {
+    "achieved_power": 0.909,
+    "expected_delta_pt": 10.0,
+    "n": 128,
+    "n_required": 96,
+    "p_d": 0.1,
+    "pass": true
+  },
+  "prediction": "Fixed B35 last pre-question V at common tail. Ridge lambda=10 fit on discovery centered label-oriented vectors and gap residual over OLS label, competing record match, order and display baseline. Gap uses maximum first-token logits across surface forms. Confirmation and new-label lockbox evaluated once, pass if per split RMSE improves >=5% and paired mean binary KL improves.",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052801
+  },
+  "recipe_sha256": "7708c2a2f84de329664d4a8593b3e430aaa80f70bb8d1addaacda5bd22acc264",
+  "run_id": "ATTRIBUTE-PREFIX-TRANSFER-20261106-v1",
+  "runner_sha256": "f740d8d8fd4165c5c9b13e3bea161b02273618ac62d5b62af0556d440c53f647",
+  "schema": "attribute_prefix_prereg.v1",
+  "scope": "Controlled generated backgrounds, fixed-length instructions, one sample per document. The new words test transfer of the old writer without assuming the new words share its native direction.",
+  "seed": 611062805,
+  "splits": {
+    "confirm": 128,
+    "discovery": 96,
+    "lockbox": 128
+  }
+}

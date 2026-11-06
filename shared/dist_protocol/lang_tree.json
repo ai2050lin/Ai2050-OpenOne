@@ -1,6 +1,6 @@
 {
   "schema": "lang_tree.v1",
-  "version": 1,
+  "version": 2,
   "note": "语言树是展示层的组织方式，不是模型内部结构的事实；交叉项只存一次（主类型 + also_in）。planned=true 的语言项还没有模式族，图谱显示为「未研究」。",
   "types": [
     {"id": "KN", "name": "知识网络", "desc": "实体、类别、属性与关系的表征和读出"},
@@ -18,7 +18,8 @@
     {"id": "GR.clause", "type": "GR", "name": "句类"},
     {"id": "GR.argument", "type": "GR", "name": "论元角色"},
     {"id": "GR.construction", "type": "GR", "name": "句式"},
-    {"id": "EXT.language", "type": "EXT", "name": "语种"}
+    {"id": "EXT.language", "type": "EXT", "name": "语种"},
+    {"id": "EXT.surface", "type": "EXT", "name": "表述控制"}
   ],
   "items": [
     {"id": "KN.ISA", "category": "KN.taxonomy", "name": "上下位（是一种）", "desc": "实体属于哪个上位类别，如「苹果是一种水果」", "languages": ["zh"]},
@@ -34,7 +35,8 @@
     {"id": "GR.Q", "category": "GR.clause", "name": "疑问 / 陈述", "desc": "句子是疑问还是陈述（含嵌入式疑问，句末标点一致）", "languages": ["zh"]},
     {"id": "GR.ROLE", "category": "GR.argument", "name": "施事 / 受事", "desc": "名词在事件中是施事还是受事", "languages": ["zh"]},
     {"id": "GR.CONSTR", "category": "GR.construction", "name": "主动 / 把字 / 被字", "desc": "同一事件的不同句式", "languages": ["zh"]},
-    {"id": "EXT.LANG", "category": "EXT.language", "name": "语种识别", "desc": "输入是中文还是英文", "languages": ["zh", "en"]}
+    {"id": "EXT.LANG", "category": "EXT.language", "name": "语种识别", "desc": "输入是中文还是英文", "languages": ["zh", "en"]},
+    {"id": "EXT.FRAME", "category": "EXT.surface", "name": "提问表述变体", "desc": "同一分类任务的不同提示框架；材料控制标签，不代表疑问/陈述或模型内部独立模块", "languages": ["en"]}
   ],
   "family_map": {
     "GR-Q": {"mood": "GR.Q"},
@@ -42,9 +44,10 @@
     "GR-ROLE": {"role": "GR.ROLE", "construction": "GR.CONSTR"},
     "KN-ATTR": {"attr": "KN.ATTR", "frame": "GR.Q"},
     "KN-ISA": {"category": "KN.ISA", "frame": "GR.Q"},
+    "KN-LOOP": {"category": "KN.CAT", "frame": "EXT.FRAME"},
     "ENT-XF": {"cat": "KN.CAT", "lang": "EXT.LANG", "polarity": "RS.NEG", "task": "RS.TASK"}
   },
   "family_languages": {
-    "GR-Q": ["zh"], "GR-NEG": ["zh"], "GR-ROLE": ["zh"], "KN-ATTR": ["zh"], "KN-ISA": ["zh"], "ENT-XF": ["zh", "en"]
+    "GR-Q": ["zh"], "GR-NEG": ["zh"], "GR-ROLE": ["zh"], "KN-ATTR": ["zh"], "KN-ISA": ["zh"], "KN-LOOP": ["en"], "ENT-XF": ["zh", "en"]
   }
 }

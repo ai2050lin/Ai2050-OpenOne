@@ -171,7 +171,16 @@ def pack_blob(files: dict) -> bytes:
 
 def execute_task(args, task: dict, work_root: Path) -> Path:
     """落盘模板包 → 跑 runner → 返回 outputs 目录。"""
-    tdir = work_root / task['task_id']
+    work_root=Path(work_root).resolve();tdir=(work_root/task['task_id']).resolve()
+    if Path(task['task_id']).name!=task['task_id']:raise ValueError('invalid task id')
+    if not tdir.is_relative_to(work_root) or tdir==work_root:raise ValueError('task directory outside workspace')
+    if any(Path(n).name!=n or n in ('.','..') for n in task['files']):raise ValueError('unsafe bundle path')
+    if task.get('job_kind')=='natural_register':
+        files=task['files'];contract=json.loads(files['contract.json']);corpus=json.loads(files['corpus.json'])
+        design={'tm_id':task['tm_id'],'version':task['version'],'corpus':corpus,
+            'runner_sha256':hashlib.sha256(files['runner.py'].encode('utf-8')).hexdigest()}
+        actual=hashlib.sha256(json.dumps(design,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        if actual!=task['design_sha'] or actual!=contract['design_sha']:raise ValueError('frozen natural bundle fingerprint differs')
     if tdir.exists():
         import shutil
         shutil.rmtree(tdir)
@@ -257,11 +266,15 @@ def run_one(args, creds: dict, work_root: Path) -> bool:
                          {'model_id': args.model_id, 'model_rev': args.model_rev,
                           'tokenizer_sha256': args.tokenizer_sha256,
                           'gpu': args.gpu, 'dtype': args.dtype, 'seed': args.seed,
-                          'tm_id': getattr(args, 'tm_id', '') or ''},
+                          'tm_id': getattr(args, 'tm_id', '') or '',
+                          'job_kind':getattr(args,'job_kind','family_test')},
                          token=creds['node_token'], ok_204=True)
     if st == 204 or not task:
         return False
     ABORT.clear()
+    kind = task.get('job_kind') or getattr(args, 'job_kind', 'family_test')
+    _emit(PROGRESS_HOOKS, {'stage': 'claimed', 'task': task['task_id'], 'tm_id': task['tm_id'],
+                           'name': task.get('name'), 'shard': task.get('shard')})
     log(f"claimed {task['task_id']} {task['tm_id']} v{task['version']} "
         f"design_sha={task['design_sha'][:12]}" + (f" shard={task['shard']}" if task.get('shard') else ''))
     stop_hb = threading.Event()
@@ -276,16 +289,17 @@ def run_one(args, creds: dict, work_root: Path) -> bool:
     threading.Thread(target=hb, daemon=True).start()
     try:
         out_dir = execute_task(args, task, work_root)
+        _emit(PROGRESS_HOOKS, {'stage': 'uploading'})
         sha = upload_outputs(args, creds, task, out_dir)
         log(f"result sha={sha[:16]} uploaded")
         with_retry(lambda: http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
                                      {'status': 'done', 'result_sha': sha}, token=creds['node_token']), '任务完成登记')
-        _emit(RESULT_HOOKS, {'kind': 'family_test', 'task': task['task_id'], 'tm_id': task['tm_id'],
-                             'shard': task.get('shard'), 'status': 'done', 'sha': sha})
+        _emit(RESULT_HOOKS, {'kind': kind, 'task': task['task_id'], 'tm_id': task['tm_id'],
+                             'name': task.get('name'), 'shard': task.get('shard'), 'status': 'done', 'sha': sha})
     except Exception as e:
         log(f"task failed: {e}")
-        _emit(RESULT_HOOKS, {'kind': 'family_test', 'task': task['task_id'], 'tm_id': task['tm_id'],
-                             'shard': task.get('shard'), 'status': 'failed', 'note': str(e)[:300]})
+        _emit(RESULT_HOOKS, {'kind': kind, 'task': task['task_id'], 'tm_id': task['tm_id'],
+                             'name': task.get('name'), 'shard': task.get('shard'), 'status': 'failed', 'note': str(e)[:300]})
         try:
             http_json(base + f"/api/tasks/{task['task_id']}/complete", 'POST',
                       {'status': 'failed', 'note': str(e)[:300]}, token=creds['node_token'])
@@ -525,6 +539,7 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
         return False
     ABORT.clear()
     lid = lease['lease_id']
+    _emit(PROGRESS_HOOKS, {'stage': 'claimed', 'task': lid, 'job': lease['job_id'], 'shard': lease['shard']})
     layers = lease['spec']['layers']
     log(f"领取普查分片 {lease['job_id']} / {lease['shard']}（层 {layers[0]}–{layers[-1]}，"
         f"应计入 {lease['spec']['expected_n']:,} token）")
@@ -558,7 +573,7 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
                '--tokens', str(tdir / tokens), '--out', str(tdir / 'outputs'), '--device', device, '--mode', mode]
         if mode == 'real':
             cmd += ['--model', model_dir]
-        proc = _spawn(cmd, cwd=str(tdir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+        proc = _spawn(cmd, cwd=str(tdir), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                       encoding='utf-8', errors='replace')
         tail = []
         for line in proc.stdout:
@@ -573,8 +588,9 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
         proc.stdout.close()
         RUNNING.discard(proc)
         if rc != 0:
-            raise RuntimeError('runner 失败：' + ' | '.join(tail[-5:]))
+            raise RuntimeError(f'runner 失败（退出码 {rc}）：' + ' | '.join(tail[-5:]))
         _console('')
+        _emit(PROGRESS_HOOKS, {'stage': 'uploading'})
         data = (tdir / 'outputs' / 'shard.npz').read_bytes()
         summary = json.loads((tdir / 'outputs' / 'summary.json').read_text(encoding='utf-8'))
         size = int(lease.get('chunk_bytes') or 4_000_000)
@@ -673,6 +689,11 @@ def cmd_participate(args) -> None:
                         if run_census_shard(server, token, work, d, device, mode, py, snapshot=snap):
                             did = True
                             break
+            if not did and 'natural_register' in kinds and mode=='real':
+                for snap,d in ready.items():
+                    ns=argparse.Namespace(python=py,run_timeout=6*3600.,model_path=d,model_id=(models[snap].get('name') or '').lower(),
+                        model_rev=snap,tokenizer_sha256='',gpu=gpu.get('name',''),dtype='bf16',seed=27732026,tm_id='',server=server,job_kind='natural_register')
+                    if run_one(ns,creds,data_dir/'natural_tasks'):did=True;break
             if not did and 'family_test' in kinds and mode == 'real':
                 for snap, d in ready.items():
                     ns = argparse.Namespace(python=py, run_timeout=6 * 3600.0, model_path=d,

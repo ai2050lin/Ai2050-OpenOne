@@ -1,0 +1,398 @@
+{
+  "behavior_gate": true,
+  "canaries": [
+    {
+      "zero_dose_logit_bitwise_equal": true
+    }
+  ],
+  "capability_input_sha256": "0aeac712fbba3b27df4983721b5b9fce1273f1a3c25ca37609c957d9597c02c5",
+  "capability_offset_from_assistant": 32,
+  "dictionary_sha256": "b1801916dbbd65902a2f2df702e029304c4bfc89771b0511cab35b310b3d1733",
+  "kind": "real",
+  "matched_control": "same-layer writer signed permutation, equal source-vector Euclidean norm before BF16 add",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "n": 320,
+  "observation_sha256": "373b26f251f54f32f4f312ed10042c05f382b4dcbe106cfb184af79eb07f80a3",
+  "operations": [
+    [
+      "clean",
+      [],
+      [],
+      0.0
+    ],
+    [
+      "joint_0.5",
+      [
+        [
+          34,
+          2
+        ],
+        [
+          35,
+          25
+        ]
+      ],
+      [
+        34,
+        33
+      ],
+      0.5
+    ],
+    [
+      "joint_1",
+      [
+        [
+          34,
+          2
+        ],
+        [
+          35,
+          25
+        ]
+      ],
+      [
+        34,
+        33
+      ],
+      1.0
+    ],
+    [
+      "attention_1",
+      [
+        [
+          34,
+          2
+        ],
+        [
+          35,
+          25
+        ]
+      ],
+      [],
+      1.0
+    ],
+    [
+      "mlp_1",
+      [],
+      [
+        34,
+        33
+      ],
+      1.0
+    ],
+    [
+      "head34_2",
+      [
+        [
+          34,
+          2
+        ]
+      ],
+      [],
+      1.0
+    ],
+    [
+      "random_1",
+      [],
+      [],
+      0.0
+    ]
+  ],
+  "part": "generated",
+  "prereg_sha256": "12c9d765215e1be050ddb24433264fee0416b75d1758fffe93b1b64f8a16cdd3",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052026
+  },
+  "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+  "schema": "functional_revision_intervention.v2",
+  "seconds": 533.0766124725342,
+  "source_sha256": "ea13620a99a3c8d23aadba5cc2dd6f71c6e02a45268f5737e27d3baaf373d72a",
+  "status": "complete",
+  "summary": {
+    "industry": {
+      "n": 160,
+      "operations": {
+        "attention_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 1.373050255200499e-05,
+          "mean_answer_gap": 22.399609375,
+          "mean_signed_industry_residual": -0.02414398193359375,
+          "mean_signed_location_residual": 1.2370970726013184
+        },
+        "clean": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 0.0,
+          "mean_answer_gap": 22.40078125,
+          "mean_signed_industry_residual": -0.013230514526367188,
+          "mean_signed_location_residual": 1.246741032600403
+        },
+        "head34_2": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 1.373050255200499e-05,
+          "mean_answer_gap": 22.399609375,
+          "mean_signed_industry_residual": -0.018006277084350587,
+          "mean_signed_location_residual": 1.251669454574585
+        },
+        "joint_0.5": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 2.2081307001652684e-05,
+          "mean_answer_gap": 22.403125,
+          "mean_signed_industry_residual": 0.1327150583267212,
+          "mean_signed_location_residual": 1.2446085453033446
+        },
+        "joint_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 3.0307796278712265e-05,
+          "mean_answer_gap": 22.40625,
+          "mean_signed_industry_residual": 0.24960792064666748,
+          "mean_signed_location_residual": 1.2766638040542602
+        },
+        "mlp_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 2.937276290721168e-05,
+          "mean_answer_gap": 22.408203125,
+          "mean_signed_industry_residual": 0.24651165008544923,
+          "mean_signed_location_residual": 1.2819300413131713
+        },
+        "random_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 2.437918103445507e-05,
+          "mean_answer_gap": 22.403515625,
+          "mean_signed_industry_residual": -0.03440747261047363,
+          "mean_signed_location_residual": 1.081246542930603
+        }
+      },
+      "passed": false,
+      "target_minus_random": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_clusters": 160
+      }
+    },
+    "location": {
+      "n": 160,
+      "operations": {
+        "attention_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 6.494103170376331e-08,
+          "mean_answer_gap": 24.765625,
+          "mean_signed_industry_residual": -0.02414398193359375,
+          "mean_signed_location_residual": 1.2370970726013184
+        },
+        "clean": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 0.0,
+          "mean_answer_gap": 24.76640625,
+          "mean_signed_industry_residual": -0.013230514526367188,
+          "mean_signed_location_residual": 1.246741032600403
+        },
+        "head34_2": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 6.494103170376331e-08,
+          "mean_answer_gap": 24.765625,
+          "mean_signed_industry_residual": -0.018006277084350587,
+          "mean_signed_location_residual": 1.251669454574585
+        },
+        "joint_0.5": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 3.71669516338876e-07,
+          "mean_answer_gap": 24.767578119039534,
+          "mean_signed_industry_residual": 0.1327150583267212,
+          "mean_signed_location_residual": 1.2446085453033446
+        },
+        "joint_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 8.131397366976244e-08,
+          "mean_answer_gap": 24.768749994039535,
+          "mean_signed_industry_residual": 0.24960792064666748,
+          "mean_signed_location_residual": 1.2766638040542602
+        },
+        "mlp_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 1.1503918083505928e-07,
+          "mean_answer_gap": 24.771093744039536,
+          "mean_signed_industry_residual": 0.24651165008544923,
+          "mean_signed_location_residual": 1.2819300413131713
+        },
+        "random_1": {
+          "accuracy": 1.0,
+          "gains": 0,
+          "loses": 0,
+          "loss": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n_clusters": 160
+          },
+          "mcnemar_exact_p": 1.0,
+          "mean_KL": 3.323992834651143e-07,
+          "mean_answer_gap": 24.769921869039536,
+          "mean_signed_industry_residual": -0.03440747261047363,
+          "mean_signed_location_residual": 1.081246542930603
+        }
+      },
+      "passed": false,
+      "target_minus_random": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_clusters": 160
+      }
+    },
+    "primary_attribute": "industry"
+  }
+}

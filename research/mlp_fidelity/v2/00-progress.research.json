@@ -1,0 +1,331 @@
+{
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "run_id": "MLP-FIDELITY-20261104-v2",
+  "schema": "research_workpackage.v1",
+  "stages": {
+    "all_layer_training": {
+      "layers": 36,
+      "seconds": 513.3941202163696,
+      "status": "done",
+      "time": 1793851284.9272246
+    },
+    "controlled": {
+      "inputs": 4096,
+      "native_bytes": 3565161216,
+      "status": "done",
+      "time": 1793853130.6142972
+    },
+    "development": {
+      "seconds": 211.8201928138733,
+      "status": "done",
+      "time": 1793849808.0673423,
+      "trained": 15
+    },
+    "development_expansion": {
+      "selection": {
+        "candidate": {
+          "id": "sae4096k256",
+          "k": 256,
+          "kind": "sae_output",
+          "m": 4096
+        },
+        "mean_validation_FVU": 0.2941349995047676,
+        "selection_score": 0.3441349995047676,
+        "step": 5000
+      },
+      "status": "done",
+      "time": 1793850768.9332614
+    },
+    "fresh_evaluation": {
+      "passed_layers": [
+        35
+      ],
+      "seconds": 48.89639139175415,
+      "status": "done",
+      "time": 1793851445.1165016
+    },
+    "natural": {
+      "inputs": 512,
+      "native_bytes": 1509958656,
+      "status": "done",
+      "time": 1793850241.8833475
+    },
+    "pilot": {
+      "failed_cells": 8,
+      "status": "behavior_failed",
+      "time": 1793850117.118586,
+      "total_cells": 32
+    },
+    "pilot_v3": {
+      "failed_cells": 5,
+      "status": "behavior_failed",
+      "time": 1793850620.727947,
+      "total_cells": 32
+    },
+    "pilot_v4": {
+      "cells": 16,
+      "failed_cells": 0,
+      "status": "done",
+      "time": 1793851392.7895923
+    },
+    "preregistration": {
+      "fresh_documents": 512,
+      "prototype_layers": [
+        0,
+        8,
+        16,
+        24,
+        35
+      ],
+      "status": "done",
+      "time": 1793849483.8730328
+    },
+    "semantics": {
+      "behavior_gate": true,
+      "layers": 3,
+      "status": "done",
+      "time": 1793853274.4927685
+    },
+    "tail_capability": {
+      "seconds": 151.4142518043518,
+      "status": "done",
+      "summary": {
+        "NI": {
+          "sae_full": {
+            "alpha": 0.025,
+            "base_accuracy": 0.6854545454545454,
+            "edited_accuracy": 0.6813636363636364,
+            "gains": 9,
+            "loss_interval": [
+              -0.004726646196388966,
+              0.012847769357676286
+            ],
+            "losses": 18,
+            "margin": 0.02,
+            "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+            "n": 2200,
+            "net_loss": 0.004090909090909034,
+            "status": "noninferior"
+          },
+          "selected_1": {
+            "alpha": 0.025,
+            "base_accuracy": 0.6854545454545454,
+            "edited_accuracy": 0.6845454545454546,
+            "gains": 3,
+            "loss_interval": [
+              -0.004328410886807959,
+              0.006101830677394748
+            ],
+            "losses": 5,
+            "margin": 0.02,
+            "method": "simultaneous exact Clopper-Pearson loss/gain bounds; two operation family correction",
+            "n": 2200,
+            "net_loss": 0.0009090909090908594,
+            "status": "noninferior"
+          }
+        },
+        "reference_only_n": 140
+      },
+      "time": 1793854457.7838893
+    },
+    "tail_generated": {
+      "seconds": 209.6840238571167,
+      "status": "done",
+      "summary": {
+        "dose_curve": [
+          {
+            "CE": 0.004702906294034563,
+            "KL_clean": 0.0,
+            "accuracy": 1.0,
+            "alpha": 0.0,
+            "condition": "clean"
+          },
+          {
+            "CE": 0.09333950885078884,
+            "KL_clean": 0.08063736045338142,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "sae_full"
+          },
+          {
+            "CE": 0.37491597071834804,
+            "KL_clean": 0.3618124872706782,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "zero"
+          },
+          {
+            "CE": 0.1496198065504719,
+            "KL_clean": 0.13828435098650166,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "native32"
+          },
+          {
+            "CE": 0.003579265776708973,
+            "KL_clean": 0.0010588911147194808,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "native_matched_k"
+          },
+          {
+            "CE": 0.012829183383982626,
+            "KL_clean": 0.01277022291420043,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "tc4096_diagnostic"
+          },
+          {
+            "CE": 0.004749930403939044,
+            "KL_clean": 0.0001252577871543566,
+            "accuracy": 1.0,
+            "alpha": 0.5,
+            "condition": "selected_0.5"
+          },
+          {
+            "CE": 0.005099123965614553,
+            "KL_clean": 0.0003226071632613838,
+            "accuracy": 1.0,
+            "alpha": 1.0,
+            "condition": "selected_1"
+          },
+          {
+            "CE": 0.004630517847908411,
+            "KL_clean": 4.873980809557097e-05,
+            "accuracy": 1.0,
+            "alpha": null,
+            "condition": "random_1"
+          }
+        ],
+        "effect_supported": false,
+        "selected_loss": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n_clusters": 192
+        },
+        "target_minus_random_loss": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n_clusters": 192
+        }
+      },
+      "time": 1793854122.0543725
+    },
+    "tail_natural": {
+      "seconds": 152.56786942481995,
+      "status": "done",
+      "summary": {
+        "operations": {
+          "clean": {
+            "CE": 2.6848435814026743,
+            "CE_difference": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.0,
+            "loss_recovered": 1.0
+          },
+          "native32": {
+            "CE": 2.820334689109586,
+            "CE_difference": {
+              "ci95": [
+                0.11612045844740351,
+                0.15538740034608053
+              ],
+              "mean": 0.13549110770691186,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.11907431809231639,
+            "loss_recovered": 0.705722656884651
+          },
+          "native_matched_k": {
+            "CE": 2.659738380505587,
+            "CE_difference": {
+              "ci95": [
+                -0.037187605776125565,
+                -0.013170693617939834
+              ],
+              "mean": -0.025105200897087343,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.04118352009982118,
+            "loss_recovered": 1.0545267652129104
+          },
+          "sae_full": {
+            "CE": 2.873987932478485,
+            "CE_difference": {
+              "ci95": [
+                0.16842233370643953,
+                0.2103277680649626
+              ],
+              "mean": 0.18914435107581085,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.10521852633041817,
+            "loss_recovered": 0.5891915119605523
+          },
+          "tc4096_diagnostic": {
+            "CE": 2.9726603344315663,
+            "CE_difference": {
+              "ci95": [
+                0.2603537507755391,
+                0.31499230608096696
+              ],
+              "mean": 0.287816753028892,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.172175986586808,
+            "loss_recovered": 0.3748818588992303
+          },
+          "zero": {
+            "CE": 3.1452633550507016,
+            "CE_difference": {
+              "ci95": [
+                0.4006891386328789,
+                0.5212547274510143
+              ],
+              "mean": 0.46041977364802733,
+              "n_clusters": 512
+            },
+            "KL_clean": 0.4956857758916158,
+            "loss_recovered": 0.0
+          }
+        }
+      },
+      "time": 1793853433.1770911
+    },
+    "v3_pilot": {
+      "done": 512,
+      "seconds": 111.0,
+      "status": "running",
+      "time": 1793850615.0278974,
+      "total": 512
+    },
+    "v4_controlled": {
+      "done": 4096,
+      "seconds": 995.5,
+      "status": "running",
+      "time": 1793853122.9016867,
+      "total": 4096
+    },
+    "v4_pilot": {
+      "done": 256,
+      "seconds": 69.3,
+      "status": "running",
+      "time": 1793851387.5722811,
+      "total": 256
+    }
+  },
+  "title": "提高MLP字典保真度：新材料、语义和因果闭环"
+}

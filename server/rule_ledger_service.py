@@ -144,6 +144,16 @@ def _score(qt: set[str], rule: dict[str, Any]) -> float:
 
 # ---------- API ----------
 
+class RuleScope(BaseModel):
+    model: str = ''
+    data: str = ''
+    protocol: str = ''
+    model_snapshot: str | None = Field(default=None, pattern=r'^[0-9a-fA-F]{64}$')
+    data_sha256: str | None = Field(default=None, pattern=r'^[0-9a-fA-F]{64}$')
+    design_sha256: str | None = Field(default=None, pattern=r'^[0-9a-fA-F]{64}$')
+    protocol_id: str | None = Field(default=None, pattern=r'^[^@\s]+$')
+
+
 class RuleIn(BaseModel):
     id: str = Field(..., min_length=3)
     claim: str = Field(..., min_length=4)
@@ -159,6 +169,10 @@ class RuleIn(BaseModel):
     tags: list[str] = Field(default_factory=list)
     keywords: list[str] = Field(default_factory=list)
     supersedes: list[str] = Field(default_factory=list)
+    title: str | None = None
+    scope: RuleScope | None = None
+    counterexamples: list[str] | None = None
+    related: list[str] | None = None
 
 
 @router.get('/overview')
@@ -270,7 +284,7 @@ def upsert(item: RuleIn) -> dict:
         return {'ok': False, 'error': 'status 必须是 %s' % (STATUS,)}
     d = _load()
     rules = d.setdefault('rules', [])
-    body = item.model_dump()
+    body = item.model_dump(exclude_none=True)
     body.setdefault('retest', {})
     body['updated_at'] = time.strftime('%Y-%m-%dT%H:%M:%S')
     for i, r in enumerate(rules):

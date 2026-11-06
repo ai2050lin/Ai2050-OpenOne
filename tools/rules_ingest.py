@@ -1593,12 +1593,14 @@ def main():
 
     rules = []
     for r in R:
-        r = dict(r)
-        r['created_at'] = (prev.get(r['id']) or {}).get('created_at', now)
+        r = {**prev.pop(r['id'], {}), **r}
+        r.setdefault('created_at', now)
         r['updated_at'] = now
         rules.append(r)
+    rules.extend(prev.values())
 
     out = {
+        **old,
         'schema': 'rule_ledger.v1',
         'version': int(old.get('version') or 1),
         'updated_at': now,

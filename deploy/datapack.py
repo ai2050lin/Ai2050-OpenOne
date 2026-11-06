@@ -59,14 +59,25 @@ def research_stamp(research_root: Path) -> str:
 
 def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     """主数据包的 (请求路径, 取值函数) 列表。函数直接调用各路由的实现，与在线接口返回完全一致。"""
+    from deploy.research_library import overview as library_overview, graph as library_graph, progress as library_progress, artifacts as library_artifacts, workpackages as library_workpackages
     import census_service as CS
     import distributed_service as D
     import platform_service as PS
     from server import neuron_census_service as NS
+    from server.rule_ledger_service import overview as rule_overview
     from shared.dist_protocol import pipeline as P
 
     plan: List[Tuple[str, Callable[[], Any]]] = [
         ('/api/platform/overview', lambda: {**PS.build_overview(), 'computed_at': time.time()}),
+        ('/api/research-library/overview', lambda: library_overview()),
+        ('/api/rules/overview', rule_overview),
+        ('/api/research-library/progress', lambda: library_progress()),
+        ('/api/research-library/workpackages', lambda: library_workpackages()),
+        ('/api/research-library/graph', lambda: library_graph(offset=0,limit=100)),
+        ('/api/research-library/graph?offset=0&limit=100', lambda: library_graph(offset=0,limit=100)),
+        ('/api/research-library/artifacts?offset=0&limit=50', lambda: library_artifacts(offset=0,limit=50)),
+        ('/api/research/work-units', lambda: D.research_work_units(language_graph_target_id='',offset=0,limit=200)),
+        ('/api/tasks', D.tasks_public),
         ('/api/catalog', D.api_catalog),
         ('/api/templates', D.templates_list),
         ('/api/grammar/library', D.grammar_library),
@@ -88,6 +99,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
             plan.append((f'/api/lang/item/{item_id}', (lambda i=item_id: PS.lang_item_ep(i))))
         for mk in sorted(data['skeletons']):
             plan.append((f'/api/model/skeleton?model_key={mk}', (lambda m=mk: PS.model_skeleton_ep(m))))
+            plan.append((f'/api/model/arch?model_key={mk}', (lambda m=mk: PS.model_arch_ep(m))))
         for mk in sorted(data['overlays']):
             plan.append((f'/api/space/overlay?model_key={mk}', (lambda m=mk: PS.space_overlay_ep(m))))
     if (Path(__file__).resolve().parents[1] / 'data' / 'lang_bench' / 'meta.v3.json').is_file():
@@ -311,12 +323,35 @@ def circuit_source(data_dir: Path, model_key: str) -> Path:
     return Path(data_dir) / 'circuit_sources' / (re.sub(r'[^A-Za-z0-9._-]', '_', model_key) + '.circuit.v1.json.gz')
 
 
+def research_entries():
+    """All immutable research versions; stream raw objects without loading the entire archive."""
+    from deploy.research_library import library
+    lib=library();entries={}
+    with lib.db() as db:
+        shas=[r[0] for r in db.execute('SELECT sha FROM artifacts ORDER BY sha')]
+        count=db.execute('SELECT COUNT(*) FROM graph_objects').fetchone()[0]
+    for sha in shas:
+        entries[f'/api/research-library/artifacts/{sha}']=RawFile(lib.root/'objects'/sha[:2]/(sha+'.json'))
+    for offset in range(0,len(shas)+50,50):
+        entries[canonical(f'/api/research-library/artifacts?offset={offset}&limit=50')]=lib.artifacts(offset=offset,limit=50)
+    for offset in range(0,count+100,100):
+        entries[canonical(f'/api/research-library/graph?offset={offset}&limit=100')]=lib.graph(offset=offset,limit=100)
+    for offset in range(0,lib.fragments(limit=1)['total']+50,50):
+        entries[canonical(f'/api/research-library/fragments?offset={offset}&limit=50')]=lib.fragments(offset=offset,limit=50)
+    entries['/api/research-library/workpackages']=lib.workpackages()
+    from shared.dist_protocol.research_registry import Registry
+    entries['/api/research-library/catalog']=Registry(lib).catalog()
+    from server.research_space_service import research_space
+    entries['/api/traces/research-space']=research_space()
+    return entries,['完整产物历史与显式图谱；归档和证据声明不代表自动验证。']
+
+
 def extras_plan() -> List[Dict[str, Any]]:
     """附加包清单：每个 v3 模式族一个，每个有普查结果的模型一个单元卡包与一个跨层电路包。"""
     import distributed_service as D
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
-    out = []
+    out = [{'id':'research-library','kind':'research-library','label':'持续研究库 · 产物与图谱全版本'}]
     for t, corpus in P.templates_v3(D._db()):
         if P.is_v3(corpus):
             out.append({'id': f"tm:{t['tm_id']}", 'kind': 'template', 'tm_id': t['tm_id'],
@@ -343,7 +378,10 @@ def build_extras(data_dir: Path, cards_version: str, force: bool = False, log=pr
     for e in plan:
         src_circuit = None
         try:
-            if e['kind'] == 'cards':
+            if e['kind'] == 'research-library':
+                from deploy.research_library import library
+                version=library().fingerprint()
+            elif e['kind'] == 'cards':
                 version = cards_version
             elif e['kind'] == 'circuit':
                 # 电路在研发机预计算（服务器没有权重）：源文件存在才打包，版本 = 源哈希 + 研究版本
@@ -366,7 +404,9 @@ def build_extras(data_dir: Path, cards_version: str, force: bool = False, log=pr
         if guard:
             guard.start(name)
         try:
-            if e['kind'] == 'template':
+            if e['kind'] == 'research-library':
+                entries,notes=research_entries()
+            elif e['kind'] == 'template':
                 entries, notes = template_entries(e['tm_id'])
             elif e['kind'] == 'circuit':
                 with gzip.open(src_circuit, 'rt', encoding='utf-8') as fh:
@@ -400,6 +440,8 @@ def extras_meta(data_dir: Path) -> List[Dict[str, Any]]:
 def pack_hint(path: str) -> Optional[str]:
     """一条请求应在哪个附加包里（客户端有同样的规则，用于「下载该包」提示）。"""
     p = urlsplit(path)
+    if p.path.startswith('/api/research-library/artifacts') or p.path in ('/api/research-library/graph','/api/research-library/fragments','/api/research-library/workpackages','/api/research-library/catalog','/api/traces/research-space'):
+        return 'research-library'
     m = re.match(r'^/api/(?:agg/([^/]+)/v2|analysis/([^/]+))$', p.path)
     if m:
         return f'tm:{m.group(1) or m.group(2)}'

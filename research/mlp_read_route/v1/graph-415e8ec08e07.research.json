@@ -1,0 +1,732 @@
+{
+  "feature_cards": [
+    {
+      "boundary": "source_token_joint_write",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:writer-group",
+      "index": {
+        "field": "source_writer_group",
+        "space": "residual"
+      },
+      "label": "属性词与选择键的联合写入",
+      "layer": 34,
+      "method": "rank on discovery derivatives; intervene on native Head and MLP output at frozen token roles",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "heads": [
+          [
+            34,
+            13
+          ],
+          [
+            33,
+            29
+          ]
+        ],
+        "mlps": [
+          34
+        ],
+        "roles": [
+          "approved",
+          "selector"
+        ]
+      }
+    },
+    {
+      "boundary": "attention_o_proj_input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:head-34-13",
+      "index": {
+        "head": 13,
+        "space": "attention"
+      },
+      "label": "B34/H13 原生写入",
+      "layer": 34,
+      "method": "selected on discovery; actual pre-o_proj edit as member of joint group",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "roles": [
+          "approved",
+          "selector"
+        ]
+      }
+    },
+    {
+      "boundary": "attention_o_proj_input",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:head-33-29",
+      "index": {
+        "head": 29,
+        "space": "attention"
+      },
+      "label": "B33/H29 原生写入",
+      "layer": 33,
+      "method": "selected on discovery; actual pre-o_proj edit as member of joint group",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "roles": [
+          "approved",
+          "selector"
+        ]
+      }
+    },
+    {
+      "boundary": "mlp_output",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:mlp-34",
+      "index": {
+        "field": "residual_write",
+        "space": "mlp"
+      },
+      "label": "B34 MLP 原生写入",
+      "layer": 34,
+      "method": "selected on discovery; actual MLP output edit as member of joint group",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "roles": [
+          "approved",
+          "selector"
+        ]
+      }
+    },
+    {
+      "boundary": "answer_query_attention_output",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:reader-34",
+      "index": {
+        "field": "source_values",
+        "space": "attention"
+      },
+      "label": "B34 回答查询的源槽读取",
+      "layer": 34,
+      "method": "post-RoPE Q/K and native V reconstruction; actual V zero with unchanged query and K",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "Q_unchanged": 82,
+        "median_cosine": 0.9997648596763611,
+        "median_relative_error": 0.021702843718230724,
+        "nonzero_read": 82
+      }
+    },
+    {
+      "boundary": "answer_query_attention_output",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:reader-35",
+      "index": {
+        "field": "source_values",
+        "space": "attention"
+      },
+      "label": "B35 回答查询的源槽读取",
+      "layer": 35,
+      "method": "post-RoPE Q/K and native V reconstruction; actual V zero with unchanged query and K",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "Q_unchanged": 82,
+        "median_cosine": 0.9681258201599121,
+        "median_relative_error": 0.25910989940166473,
+        "nonzero_read": 82
+      }
+    },
+    {
+      "boundary": "prefill_cache_changed_ranges",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:changed-cache",
+      "index": {
+        "field": "kv_changed_ranges",
+        "space": "attention"
+      },
+      "label": "原生 B34/B35 缓存改动范围",
+      "layer": 35,
+      "method": "compare every native cache slot and replay all changed slices, source-only and propagated-slot-only",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "layout_corrections": 0,
+        "no_changes_before_earliest_origin": true,
+        "nonzero_future_distribution_cases": 82,
+        "only_B34_B35": true,
+        "replay_generation_equal": 82,
+        "replay_logits_bitwise_equal": 82,
+        "rescue_generation_equal": 82,
+        "rescue_logits_bitwise_equal": 82,
+        "screen_exact": 82,
+        "strict_matched_control": {
+          "clean_recheck_exact": 82,
+          "max_post_rounding_relative_error": 0.001610535067664707,
+          "max_pre_rounding_relative_error": 1.177041384068839e-07,
+          "median_post_rounding_relative_error": 0.0003584635119071813,
+          "vectors": 492
+        }
+      }
+    },
+    {
+      "boundary": "assistant_logits",
+      "counterexamples": [],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:readout",
+      "index": {
+        "field": "assistant_distribution",
+        "space": "residual"
+      },
+      "label": "后续词表分布的逐位回放与恢复",
+      "layer": 35,
+      "method": "counterfactual replay on clean prefix; restoration on edited prefix",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "layout_corrections": 0,
+        "no_changes_before_earliest_origin": true,
+        "nonzero_future_distribution_cases": 82,
+        "only_B34_B35": true,
+        "replay_generation_equal": 82,
+        "replay_logits_bitwise_equal": 82,
+        "rescue_generation_equal": 82,
+        "rescue_logits_bitwise_equal": 82,
+        "screen_exact": 82,
+        "strict_matched_control": {
+          "clean_recheck_exact": 82,
+          "max_post_rounding_relative_error": 0.001610535067664707,
+          "max_pre_rounding_relative_error": 1.177041384068839e-07,
+          "median_post_rounding_relative_error": 0.0003584635119071813,
+          "vectors": 492
+        }
+      }
+    },
+    {
+      "boundary": "generated_first_word",
+      "counterexamples": [
+        {
+          "KL": 0.007750089806913026,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:392:T:0",
+          "index": 3
+        },
+        {
+          "KL": 0.007631569088374363,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:1520:H:0",
+          "index": 32
+        },
+        {
+          "KL": 0.007609221641838485,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:1502:M:1",
+          "index": 74
+        },
+        {
+          "KL": 0.005402682163884297,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:1104:H:0",
+          "index": 14
+        },
+        {
+          "KL": 0.0036695275924513923,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:642:G:0",
+          "index": 55
+        },
+        {
+          "KL": 0.0030797060826840794,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:959:M:1",
+          "index": 75
+        },
+        {
+          "KL": 0.002598266538730231,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "confirm:1184:T:0",
+          "index": 0
+        },
+        {
+          "KL": 0.0019073370007863814,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:1063:G:1",
+          "index": 52
+        },
+        {
+          "KL": 0.001232071140876485,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:1282:G:0",
+          "index": 50
+        },
+        {
+          "KL": 0.0009700775689367166,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "confirm:641:T:0",
+          "index": 38
+        },
+        {
+          "KL": 0.0007521946389928253,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:64:H:0",
+          "index": 17
+        },
+        {
+          "KL": 0.0006160600550152691,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:692:H:1",
+          "index": 35
+        },
+        {
+          "KL": 0.0004001347447784935,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:671:M:1",
+          "index": 81
+        },
+        {
+          "KL": 0.00034107556751451296,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:656:H:0",
+          "index": 9
+        },
+        {
+          "KL": 0.0002534390553373093,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:166:G:1",
+          "index": 80
+        },
+        {
+          "KL": 0.0002451576205638237,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:1374:M:1",
+          "index": 68
+        },
+        {
+          "KL": 0.0002035584515666035,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:514:G:0",
+          "index": 78
+        },
+        {
+          "KL": 0.00017640736740584181,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:318:M:1",
+          "index": 53
+        },
+        {
+          "KL": 0.0001378152542078,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:1363:G:0",
+          "index": 46
+        },
+        {
+          "KL": 9.469309758434346e-05,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:353:H:0",
+          "index": 20
+        },
+        {
+          "KL": 5.662798779191257e-05,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:1516:T:1",
+          "index": 10
+        },
+        {
+          "KL": 5.4098168356521306e-05,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:761:T:0",
+          "index": 29
+        },
+        {
+          "KL": 5.319523581623028e-05,
+          "after": "mining",
+          "changed": false,
+          "expected": "mining",
+          "id": "confirm:473:T:0",
+          "index": 6
+        },
+        {
+          "KL": 5.0025860684178844e-05,
+          "after": "fishing",
+          "changed": false,
+          "expected": "fishing",
+          "id": "lockbox:939:M:0",
+          "index": 71
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "negative"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:word-outcome",
+      "index": {
+        "field": "greedy_first_word",
+        "space": "residual"
+      },
+      "label": "未见低余量组合的生成首词效应",
+      "layer": 35,
+      "method": "paired natural first word, fixed norm-matched writer control, preregistered effect gate",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "scope": {
+        "eligible": true,
+        "median_clean_gap": 4.75,
+        "n": 82,
+        "operations": {
+          "clean": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0,
+            "net_loss": 0.0
+          },
+          "head_only": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.018292682926829267,
+                0.039634146341463415
+              ],
+              "mean": 0.010670731707317074,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0004965971250884354,
+            "net_loss": 0.0
+          },
+          "joint_0.5": {
+            "accuracy": 0.9878048780487805,
+            "first_word_changes": 1,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.027439024390243903,
+                0.027439024390243903
+              ],
+              "mean": 0.0,
+              "n_clusters": 82
+            },
+            "losses": 1,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0005144932985356741,
+            "net_loss": 0.012195121951219523
+          },
+          "joint_1": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.025914634146341462,
+                0.028963414634146343
+              ],
+              "mean": 0.001524390243902439,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0005554494256779726,
+            "net_loss": 0.0
+          },
+          "kv_replay": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.025914634146341462,
+                0.028963414634146343
+              ],
+              "mean": 0.001524390243902439,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0005554494256779726,
+            "net_loss": 0.0
+          },
+          "kv_rescue": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0,
+            "net_loss": 0.0
+          },
+          "matched": {
+            "accuracy": 0.9878048780487805,
+            "first_word_changes": 1,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.009146341463414634,
+                0.04725609756097561
+              ],
+              "mean": 0.019817073170731708,
+              "n_clusters": 82
+            },
+            "losses": 1,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0007049045772418576,
+            "net_loss": 0.012195121951219523
+          },
+          "matched_contextual_v1": {
+            "accuracy": 0.9878048780487805,
+            "first_word_changes": 1,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.024390243902439025,
+                0.03048780487804878
+              ],
+              "mean": 0.003048780487804878,
+              "n_clusters": 82
+            },
+            "losses": 1,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0005753408084176799,
+            "net_loss": 0.012195121951219523
+          },
+          "mlp_only": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.021341463414634148,
+                0.024390243902439025
+              ],
+              "mean": 0.001524390243902439,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.00022940280833870418,
+            "net_loss": 0.0
+          },
+          "other_slots_only": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.009146341463414634,
+                0.018292682926829267
+              ],
+              "mean": 0.003048780487804878,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 5.079071800875604e-05,
+            "net_loss": 0.0
+          },
+          "source_only": {
+            "accuracy": 1.0,
+            "first_word_changes": 0,
+            "gains": 0,
+            "gap_delta": {
+              "ci95": [
+                -0.024390243902439025,
+                0.03048780487804878
+              ],
+              "mean": 0.003048780487804878,
+              "n_clusters": 82
+            },
+            "losses": 0,
+            "mcnemar_p": 1.0,
+            "mean_KL": 0.0005690582817537139,
+            "net_loss": 0.0
+          }
+        },
+        "passed": false,
+        "specificity": -0.012195121951219523
+      }
+    }
+  ],
+  "graph_edges": [
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "850689746ea33f32f527ab0c43bc5fdf6e8246928db042d580f46eedfc85577e",
+      "relation": "joint_writer_member",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:head-34-13",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:writer-group"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "eedc0392ace70e62fb849dd2bd71b37fe31e423ad66fbdc125b83b0c66128e48",
+      "relation": "joint_writer_member",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:head-33-29",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:writer-group"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "eb571ee1a1f9df1487cc06a20db951d7feacf8b44d7a6650d4f1aaafa68dbe86",
+      "relation": "joint_writer_member",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:mlp-34",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:writer-group"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "parameter_source"
+      },
+      "id": "c09b6a969ae35bd24d9d958da84fc37c306519cdc0b60a4248df0fdb582f56ac",
+      "relation": "native_writer_to_changed_cache",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:writer-group",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:changed-cache"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "1b00be8d2924c8897d14a36f2fa8e69c0d728334ca48269f67dc5b7f551928a1",
+      "relation": "source_value_read_validation",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:changed-cache",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:reader-34"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "724b0f2ba24a95acbf331066fd1d097e1eda7d31c0845d4e8a6ccb4407aaff21",
+      "relation": "source_value_read_validation",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:changed-cache",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:reader-35"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "intervention"
+      },
+      "id": "35cf7c515bd9c237aa5fd43ec3e2d3a63b3174ea0e2ae43bcb934114d69e06fa",
+      "relation": "full_cache_replay_and_rescue",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:changed-cache",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:readout"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "1c5c8939aa6843fa938a57d36b752fedba911e24bd0a7970909173b8e2749634",
+        "level": "negative"
+      },
+      "id": "1e6abddd37d96998053e47ea3269637fd8d35746a1d1adcedecf59a02c91d979",
+      "relation": "generated_word_effect",
+      "run_id": "MLP-READ-ROUTE-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:readout",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-READ-ROUTE-20261105-v1:word-outcome"
+    }
+  ],
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052800
+  },
+  "run_id": "MLP-READ-ROUTE-20261105-v1",
+  "schema": "research_graph.v1"
+}

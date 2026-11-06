@@ -1,0 +1,1297 @@
+{
+  "feature_cards": [
+    {
+      "boundary": "mlp.output_sae",
+      "counterexamples": [
+        {
+          "comparison_passed": false,
+          "functional_sae": {
+            "CE": 2.7878015418898605,
+            "FVU": 0.16479531793031404,
+            "KL_clean": 0.0874356234960428,
+            "loss_recovered": 0.8042980351826945
+          },
+          "native256": {
+            "CE": 2.6769665397060436,
+            "FVU": 0.1358386253558049,
+            "KL_clean": 0.038069224674799076,
+            "loss_recovered": 1.0888062468240702
+          }
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "cff604d2e0d91c1d32353661dcc2b69afd4e145144d3a56d02efb1f6a1f1ab80",
+        "level": "heldout"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:behavior-sae",
+      "index": {
+        "active_budget": 256,
+        "dictionary_size": 4096,
+        "space": "dictionary"
+      },
+      "label": "B35 字典行为校准与同预算对照",
+      "layer": 35,
+      "method": "完整词表 KL、真实 next-token CE 及输出重建联合训练，两个新留出比较",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "kind": "representation",
+        "native_units_not_equated": true,
+        "observe": "native MLP output"
+      }
+    },
+    {
+      "boundary": "pre_mlp_residual",
+      "counterexamples": [
+        {
+          "lockbox": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.521875,
+            "paired_accuracy_by_assignment": [
+              0.5375,
+              0.5125
+            ]
+          },
+          "scope": "document-defined attributes"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-industry",
+      "index": {
+        "dimensions": 2560,
+        "space": "residual"
+      },
+      "label": "问题前 B35 输入 · 生计属性",
+      "layer": 35,
+      "method": "发现集固定方向与阈值，两个留出预测；Q 后缀不可见",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "embedding_pair_effect_max_abs": 0.0,
+        "incoming": {
+          "confirm": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.525,
+            "paired_accuracy_by_assignment": [
+              0.7375,
+              0.5875
+            ]
+          },
+          "discovery": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.58203125,
+            "paired_accuracy_by_assignment": [
+              0.7578125,
+              0.59375
+            ]
+          },
+          "lockbox": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.521875,
+            "paired_accuracy_by_assignment": [
+              0.5375,
+              0.5125
+            ]
+          }
+        },
+        "incoming_projection_rms": 87.27083587646484,
+        "projection_residual_rmse": 0.171950563788414
+      }
+    },
+    {
+      "boundary": "attention_o_proj_head",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.09042321996544489,
+                  0.19990203423644415
+                ],
+                [
+                  0.08323826146329123,
+                  0.19718549895083232
+                ]
+              ],
+              "mean_by_R": [
+                0.14516262710094452,
+                0.14021188020706177
+              ],
+              "passed": true,
+              "positive_fraction_by_R": [
+                0.7375,
+                0.725
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  0.048401041164740324,
+                  0.10402621494259
+                ],
+                [
+                  0.04702018247991273,
+                  0.10037429584116271
+                ]
+              ],
+              "mean_by_R": [
+                0.07621362805366516,
+                0.07369723916053772
+              ],
+              "passed": true,
+              "positive_fraction_by_R": [
+                0.7375,
+                0.74375
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-2",
+      "index": {
+        "head": 2,
+        "space": "attention"
+      },
+      "label": "B34/H2 · 问题前生计属性写入",
+      "layer": 34,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 34,
+        "discovery_mean": 0.16611386835575104,
+        "discovery_output_rms": 11.276140149444839,
+        "head": 2,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.09042321996544489,
+                0.19990203423644415
+              ],
+              [
+                0.08323826146329123,
+                0.19718549895083232
+              ]
+            ],
+            "mean_by_R": [
+              0.14516262710094452,
+              0.14021188020706177
+            ],
+            "passed": true,
+            "positive_fraction_by_R": [
+              0.7375,
+              0.725
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                0.048401041164740324,
+                0.10402621494259
+              ],
+              [
+                0.04702018247991273,
+                0.10037429584116271
+              ]
+            ],
+            "mean_by_R": [
+              0.07621362805366516,
+              0.07369723916053772
+            ],
+            "passed": true,
+            "positive_fraction_by_R": [
+              0.7375,
+              0.74375
+            ]
+          }
+        },
+        "kind": "attention",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "attention_o_proj_head",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.06574801456292961,
+                  0.37784515965620186
+                ],
+                [
+                  -0.08445595404600678,
+                  0.23102298578714905
+                ]
+              ],
+              "mean_by_R": [
+                0.22179658710956573,
+                0.07328351587057114
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.64375,
+                0.51875
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  0.04498582804161437,
+                  0.18166917836707702
+                ],
+                [
+                  -0.01671244766121567,
+                  0.11541721041804016
+                ]
+              ],
+              "mean_by_R": [
+                0.1133275032043457,
+                0.04935238137841225
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.69375,
+                0.525
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-35-25",
+      "index": {
+        "head": 25,
+        "space": "attention"
+      },
+      "label": "B35/H25 · 问题前生计属性写入",
+      "layer": 35,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 35,
+        "discovery_mean": 0.16264888644218445,
+        "discovery_output_rms": 24.602355149583747,
+        "head": 25,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.06574801456292961,
+                0.37784515965620186
+              ],
+              [
+                -0.08445595404600678,
+                0.23102298578714905
+              ]
+            ],
+            "mean_by_R": [
+              0.22179658710956573,
+              0.07328351587057114
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.64375,
+              0.51875
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                0.04498582804161437,
+                0.18166917836707702
+              ],
+              [
+                -0.01671244766121567,
+                0.11541721041804016
+              ]
+            ],
+            "mean_by_R": [
+              0.1133275032043457,
+              0.04935238137841225
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.69375,
+              0.525
+            ]
+          }
+        },
+        "kind": "attention",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "mlp_output",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.2761071190832881,
+                  0.6034241452218266
+                ],
+                [
+                  0.15483474490945684,
+                  0.4755704426973547
+                ]
+              ],
+              "mean_by_R": [
+                0.4397656321525574,
+                0.31520259380340576
+              ],
+              "passed": true,
+              "positive_fraction_by_R": [
+                0.7125,
+                0.6625
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.09974287010102872,
+                  0.2561666474428714
+                ],
+                [
+                  0.020679543111769033,
+                  0.36364873280719157
+                ]
+              ],
+              "mean_by_R": [
+                0.07821188867092133,
+                0.19216413795948029
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.50625,
+                0.6
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-None",
+      "index": {
+        "field": "residual_write",
+        "space": "mlp"
+      },
+      "label": "B34 MLP · 问题前生计属性写入",
+      "layer": 34,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 34,
+        "discovery_mean": 0.5012209415435791,
+        "discovery_output_rms": 146.53004038208343,
+        "head": null,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.2761071190832881,
+                0.6034241452218266
+              ],
+              [
+                0.15483474490945684,
+                0.4755704426973547
+              ]
+            ],
+            "mean_by_R": [
+              0.4397656321525574,
+              0.31520259380340576
+            ],
+            "passed": true,
+            "positive_fraction_by_R": [
+              0.7125,
+              0.6625
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.09974287010102872,
+                0.2561666474428714
+              ],
+              [
+                0.020679543111769033,
+                0.36364873280719157
+              ]
+            ],
+            "mean_by_R": [
+              0.07821188867092133,
+              0.19216413795948029
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.50625,
+              0.6
+            ]
+          }
+        },
+        "kind": "mlp",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "mlp_output",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.2986588876186751,
+                  0.5852215488017656
+                ],
+                [
+                  -0.0053911313500068225,
+                  0.27659464926382515
+                ]
+              ],
+              "mean_by_R": [
+                0.44194021821022034,
+                0.13560175895690918
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.775,
+                0.58125
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.1552590943988895,
+                  0.24947341458168978
+                ],
+                [
+                  -0.089206116631344,
+                  0.3153618447330744
+                ]
+              ],
+              "mean_by_R": [
+                0.047107160091400146,
+                0.11307786405086517
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.4875,
+                0.60625
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-33-None",
+      "index": {
+        "field": "residual_write",
+        "space": "mlp"
+      },
+      "label": "B33 MLP · 问题前生计属性写入",
+      "layer": 33,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 33,
+        "discovery_mean": 0.4473952054977417,
+        "discovery_output_rms": 80.91050466796632,
+        "head": null,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.2986588876186751,
+                0.5852215488017656
+              ],
+              [
+                -0.0053911313500068225,
+                0.27659464926382515
+              ]
+            ],
+            "mean_by_R": [
+              0.44194021821022034,
+              0.13560175895690918
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.775,
+              0.58125
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.1552590943988895,
+                0.24947341458168978
+              ],
+              [
+                -0.089206116631344,
+                0.3153618447330744
+              ]
+            ],
+            "mean_by_R": [
+              0.047107160091400146,
+              0.11307786405086517
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.4875,
+              0.60625
+            ]
+          }
+        },
+        "kind": "mlp",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "pre_mlp_residual",
+      "counterexamples": [
+        {
+          "lockbox": {
+            "block_sign_permutation_p": 0.008747813046738315,
+            "classification_accuracy": 0.540625,
+            "paired_accuracy_by_assignment": [
+              0.525,
+              0.51875
+            ]
+          },
+          "scope": "document-defined attributes"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-location",
+      "index": {
+        "dimensions": 2560,
+        "space": "residual"
+      },
+      "label": "问题前 B35 输入 · 地理属性",
+      "layer": 35,
+      "method": "发现集固定方向与阈值，两个留出预测；Q 后缀不可见",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "embedding_pair_effect_max_abs": 0.0,
+        "incoming": {
+          "confirm": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.6140625,
+            "paired_accuracy_by_assignment": [
+              0.525,
+              0.5
+            ]
+          },
+          "discovery": {
+            "block_sign_permutation_p": 0.00024993751562109475,
+            "classification_accuracy": 0.6015625,
+            "paired_accuracy_by_assignment": [
+              0.5859375,
+              0.5078125
+            ]
+          },
+          "lockbox": {
+            "block_sign_permutation_p": 0.008747813046738315,
+            "classification_accuracy": 0.540625,
+            "paired_accuracy_by_assignment": [
+              0.525,
+              0.51875
+            ]
+          }
+        },
+        "incoming_projection_rms": 72.45225524902344,
+        "projection_residual_rmse": 0.12215542048215866
+      }
+    },
+    {
+      "boundary": "attention_o_proj_head",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  -0.486395557892082,
+                  1.0682810149309614
+                ],
+                [
+                  -0.7004443140097705,
+                  0.8524874777861682
+                ]
+              ],
+              "mean_by_R": [
+                0.2909427285194397,
+                0.07602158188819885
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.5,
+                0.5
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.35720663436712985,
+                  0.31782659062208896
+                ],
+                [
+                  -0.32396132647065984,
+                  0.34750863126485215
+                ]
+              ],
+              "mean_by_R": [
+                -0.019690021872520447,
+                0.011773652397096157
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.49375,
+                0.49375
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-29",
+      "index": {
+        "head": 29,
+        "space": "attention"
+      },
+      "label": "B33/H29 · 问题前地理属性写入",
+      "layer": 33,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 33,
+        "discovery_mean": 0.24706904590129852,
+        "discovery_output_rms": 28.313645767034203,
+        "head": 29,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                -0.486395557892082,
+                1.0682810149309614
+              ],
+              [
+                -0.7004443140097705,
+                0.8524874777861682
+              ]
+            ],
+            "mean_by_R": [
+              0.2909427285194397,
+              0.07602158188819885
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.5,
+              0.5
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.35720663436712985,
+                0.31782659062208896
+              ],
+              [
+                -0.32396132647065984,
+                0.34750863126485215
+              ]
+            ],
+            "mean_by_R": [
+              -0.019690021872520447,
+              0.011773652397096157
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.49375,
+              0.49375
+            ]
+          }
+        },
+        "kind": "attention",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "attention_o_proj_head",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  -0.21446791696701767,
+                  0.5342683236614298
+                ],
+                [
+                  -0.3384541731404458,
+                  0.3894133653568421
+                ]
+              ],
+              "mean_by_R": [
+                0.15990020334720612,
+                0.025479596108198166
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.5,
+                0.5
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.09574474148395301,
+                  0.13495586939099075
+                ],
+                [
+                  -0.10973233618608269,
+                  0.11229951196184906
+                ]
+              ],
+              "mean_by_R": [
+                0.019605563953518867,
+                0.0012835878878831863
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.55,
+                0.50625
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-1",
+      "index": {
+        "head": 1,
+        "space": "attention"
+      },
+      "label": "B34/H1 · 问题前地理属性写入",
+      "layer": 34,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 34,
+        "discovery_mean": 0.19034937024116516,
+        "discovery_output_rms": 26.605141554385803,
+        "head": 1,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                -0.21446791696701767,
+                0.5342683236614298
+              ],
+              [
+                -0.3384541731404458,
+                0.3894133653568421
+              ]
+            ],
+            "mean_by_R": [
+              0.15990020334720612,
+              0.025479596108198166
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.5,
+              0.5
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.09574474148395301,
+                0.13495586939099075
+              ],
+              [
+                -0.10973233618608269,
+                0.11229951196184906
+              ]
+            ],
+            "mean_by_R": [
+              0.019605563953518867,
+              0.0012835878878831863
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.55,
+              0.50625
+            ]
+          }
+        },
+        "kind": "attention",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "mlp_output",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.07118388836740924,
+                  0.5868766027176433
+                ],
+                [
+                  -0.06934243268237,
+                  0.4353187364982117
+                ]
+              ],
+              "mean_by_R": [
+                0.32903024554252625,
+                0.18298815190792084
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.59375,
+                0.54375
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.09647313603995475,
+                  0.2861887300932232
+                ],
+                [
+                  -0.14038669039484333,
+                  0.2306395815777428
+                ]
+              ],
+              "mean_by_R": [
+                0.09485779702663422,
+                0.04512644559144974
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.56875,
+                0.5375
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-None",
+      "index": {
+        "field": "residual_write",
+        "space": "mlp"
+      },
+      "label": "B34 MLP · 问题前地理属性写入",
+      "layer": 34,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 34,
+        "discovery_mean": 0.5558287501335144,
+        "discovery_output_rms": 146.53004038208343,
+        "head": null,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.07118388836740924,
+                0.5868766027176433
+              ],
+              [
+                -0.06934243268237,
+                0.4353187364982117
+              ]
+            ],
+            "mean_by_R": [
+              0.32903024554252625,
+              0.18298815190792084
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.59375,
+              0.54375
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.09647313603995475,
+                0.2861887300932232
+              ],
+              [
+                -0.14038669039484333,
+                0.2306395815777428
+              ]
+            ],
+            "mean_by_R": [
+              0.09485779702663422,
+              0.04512644559144974
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.56875,
+              0.5375
+            ]
+          }
+        },
+        "kind": "mlp",
+        "replicated": false
+      }
+    },
+    {
+      "boundary": "mlp_output",
+      "counterexamples": [
+        {
+          "heldouts": {
+            "confirm": {
+              "CI_by_R": [
+                [
+                  0.24977200097236407,
+                  0.5019023531040214
+                ],
+                [
+                  0.02446724138555978,
+                  0.29304601587953116
+                ]
+              ],
+              "mean_by_R": [
+                0.37583717703819275,
+                0.15875662863254547
+              ],
+              "passed": true,
+              "positive_fraction_by_R": [
+                0.83125,
+                0.6375
+              ]
+            },
+            "lockbox": {
+              "CI_by_R": [
+                [
+                  -0.03450211396514177,
+                  0.26842674126921895
+                ],
+                [
+                  -0.08667672702061799,
+                  0.2159411711333957
+                ]
+              ],
+              "mean_by_R": [
+                0.11696231365203857,
+                0.06463222205638885
+              ],
+              "passed": false,
+              "positive_fraction_by_R": [
+                0.575,
+                0.60625
+              ]
+            }
+          },
+          "revision": null,
+          "scope": "writer correspondence and individual necessity are distinct"
+        }
+      ],
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-None",
+      "index": {
+        "field": "residual_write",
+        "space": "mlp"
+      },
+      "label": "B33 MLP · 问题前地理属性写入",
+      "layer": 33,
+      "method": "真实输出投影，两个 R 方向、两个留出独立检验",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "scope": {
+        "block": 33,
+        "discovery_mean": 0.504274308681488,
+        "discovery_output_rms": 80.91050466796632,
+        "head": null,
+        "heldouts": {
+          "confirm": {
+            "CI_by_R": [
+              [
+                0.24977200097236407,
+                0.5019023531040214
+              ],
+              [
+                0.02446724138555978,
+                0.29304601587953116
+              ]
+            ],
+            "mean_by_R": [
+              0.37583717703819275,
+              0.15875662863254547
+            ],
+            "passed": true,
+            "positive_fraction_by_R": [
+              0.83125,
+              0.6375
+            ]
+          },
+          "lockbox": {
+            "CI_by_R": [
+              [
+                -0.03450211396514177,
+                0.26842674126921895
+              ],
+              [
+                -0.08667672702061799,
+                0.2159411711333957
+              ]
+            ],
+            "mean_by_R": [
+              0.11696231365203857,
+              0.06463222205638885
+            ],
+            "passed": false,
+            "positive_fraction_by_R": [
+              0.575,
+              0.60625
+            ]
+          }
+        },
+        "kind": "mlp",
+        "replicated": false
+      }
+    }
+  ],
+  "graph_edges": [
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "f44efe678aff3866c8f90d15459e0f8e66c01ae4bedf58c4b77190e8ade54285",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_industry_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-2"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "10cbf410c03db4158f1001919d24ef8fd75a8a8f003c5113b24dfde2331c53eb",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-2",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-industry"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "fb053bb1937a1ba887a27250ed00a7da68bb9a00db29b777e7f6a8ea9f6cacd2",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_industry_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-35-25"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "92ea0b8f04544d6fc97612c014a5b3d1785e865fcc8dabdb9dd6a583867ac0f0",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-35-25",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-industry"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "5fb1612472fb88fdc7122bbbb5c4be2640e932e3e3928c3583278b59f69afa04",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_industry_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-None"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "3a537ea71846ebfcf051f2748b209b428648a3555a82558f723132d4fa493ca0",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-34-None",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-industry"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "811747b5140cf771035a810aa597d4c5aa9ec366834ad5f3d1d1c43ce9dec856",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_industry_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-33-None"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "ab4c501d7f4058370fc1973fed7ab0efc03c160ec06240f30b8750a0098b30ba",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:industry-33-None",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-industry"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "7bffa00cc80c4dea578c17f88a694407694d66d9f43fc391aa3802a6126aee9a",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_location_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-29"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "6c188f10aa9bc59c3ccdf8a92bf840fa670a82d3b18892f5a87947ee175e2f26",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-29",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-location"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "90d2353d108d2b0e485a9e93d6d1c60bfded5d2331c822e4b0021cb68de6c35d",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_location_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-1"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "b62e1a615be56759d22214451795fc4c403fb0943887dc04b07a965e60b8c9b8",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-1",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-location"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "88c5159102daf5d4ac49294514ae29e239b9531a98791ab03233c970e535b829",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_location_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-None"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "a80eb92dfd77159a65e46edf3064fcab0e641643de2831610f1913a12c208c9d",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-34-None",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-location"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "3f16c4e754b365b4b1db2b8bf9a78d7b16d2f2edf3ec32b67eba34fe3ff5f6f3",
+        "level": "observation"
+      },
+      "id": "fafef1e55bb1fb4a6a671a89ac785b36ce4eca8de23322eb6f05da12479b913f",
+      "relation": "prequestion_attribute_response",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "language:document_location_selection",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-None"
+    },
+    {
+      "evidence": {
+        "artifact_sha256": "a2fab823cfebd2c2ace55f5a182bc09509f1bc60a8a2ea04fedd12cb528d0411",
+        "level": "parameter_source"
+      },
+      "id": "3539e94bc45a318dc051d6359c1c8100dee96dd2ee8a5c497e4c4f55bc644fe9",
+      "relation": "native_residual_write_projection",
+      "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+      "source": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:location-33-None",
+      "target": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad:MLP-FUNCTIONAL-UPSTREAM-20261105-v1:incoming-location"
+    }
+  ],
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 511052026
+  },
+  "run_id": "MLP-FUNCTIONAL-UPSTREAM-20261105-v1",
+  "schema": "research_graph.v1",
+  "semantic_mechanisms_closed": 0
+}

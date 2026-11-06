@@ -1,0 +1,167 @@
+{
+  "kind": "real",
+  "migration_status": "original artifact preserved; not recomputed or automatically promoted",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "original_report": {
+    "atom_compare": {
+      "tc-m16384-k64-s0": {
+        "feature_wins": false,
+        "fvu": [
+          0.40502654839114527,
+          0.5225129350802575
+        ],
+        "k": 64,
+        "loss_recovered_vs_zero": [
+          0.6081716112140527,
+          0.7580910833764041
+        ],
+        "neurons_needed_for_same_fvu": 256
+      }
+    },
+    "ce_clean": 2.7274700684980915,
+    "ce_mean": 2.8036022456005365,
+    "ce_zero": 2.8099808240177655,
+    "collect": "D:\\ai2050_native\\_transcoder\\6be1034f0b55a6df-bf16\\2ca5f0a756d36c8a-L30",
+    "conditions": {
+      "neuron_k1024": {
+        "ce": 2.732767850702459,
+        "fvu": 0.13117588261219862,
+        "kl": 0.009014727901479211,
+        "loss_recovered_vs_mean": 0.9304133625754745,
+        "loss_recovered_vs_zero": 0.93579282881364
+      },
+      "neuron_k128": {
+        "ce": 2.740875409829496,
+        "fvu": 0.41037275061110523,
+        "kl": 0.028592483187564695,
+        "loss_recovered_vs_mean": 0.8239201630426767,
+        "loss_recovered_vs_zero": 0.8375321950820316
+      },
+      "neuron_k16": {
+        "ce": 2.7637889264809963,
+        "fvu": 0.7626734763083503,
+        "kl": 0.059305580878498576,
+        "loss_recovered_vs_mean": 0.5229499619584844,
+        "loss_recovered_vs_zero": 0.5598288034795069
+      },
+      "neuron_k2048": {
+        "ce": 2.7286006330239654,
+        "fvu": 0.062317543071588766,
+        "kl": 0.004591072898245219,
+        "loss_recovered_vs_mean": 0.9851499777242336,
+        "loss_recovered_vs_zero": 0.9862979738974232
+      },
+      "neuron_k256": {
+        "ce": 2.7362982875168926,
+        "fvu": 0.30869204598818656,
+        "kl": 0.02036571909833436,
+        "loss_recovered_vs_mean": 0.8840408963095627,
+        "loss_recovered_vs_zero": 0.8930052335213906
+      },
+      "neuron_k32": {
+        "ce": 2.7551956234556254,
+        "fvu": 0.6426313793455475,
+        "kl": 0.04844754874104201,
+        "loss_recovered_vs_mean": 0.635823432183926,
+        "loss_recovered_vs_zero": 0.6639764745467275
+      },
+      "neuron_k512": {
+        "ce": 2.734836628461125,
+        "fvu": 0.2143663826644879,
+        "kl": 0.014192210860324628,
+        "loss_recovered_vs_mean": 0.9032398619952653,
+        "loss_recovered_vs_zero": 0.9107200035118211
+      },
+      "neuron_k64": {
+        "ce": 2.74743015597565,
+        "fvu": 0.5225129350802575,
+        "kl": 0.03844023286694228,
+        "loss_recovered_vs_mean": 0.7378232406161191,
+        "loss_recovered_vs_zero": 0.7580910833764041
+      },
+      "tc-m16384-k64-s0": {
+        "ce": 2.7598001248908766,
+        "fvu": 0.40502654839114527,
+        "kl": 0.054551914123573686,
+        "loss_recovered_vs_mean": 0.5753430727551494,
+        "loss_recovered_vs_zero": 0.6081716112140527
+      }
+    },
+    "criteria": {
+      "atom_compare": "feature wins iff fvu_feature < fvu_neuron and loss_recovered_feature > loss_recovered_neuron at the same k",
+      "concentration_top": 100,
+      "dead_after_tokens": 1000000,
+      "schema": "transcoder.v1"
+    },
+    "eval_windows": 128,
+    "layer": 30,
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "monosemanticity_proxy": {
+      "neurons": {
+        "concentration_ge_0.5": 0.009251644736842105,
+        "concentration_ge_0.9": 0.0005139802631578947,
+        "concentration_median": 0.07999999821186066,
+        "positive_freq_median": 0.5010156035423279,
+        "units_with_100_acts": 9728
+      },
+      "tc-m16384-k64-s0": {
+        "concentration_ge_0.5": 0.04020585397233837,
+        "concentration_ge_0.9": 0.008577248847432186,
+        "concentration_median": 0.09999999403953552,
+        "dead_in_eval": 0.01910400390625,
+        "freq_median": 0.001060724607668817,
+        "units_with_100_acts": 9327
+      }
+    },
+    "n_eval_tokens_ce": 63360,
+    "n_eval_tokens_recon": 132928,
+    "schema": "transcoder.v1",
+    "seconds": 154.9,
+    "torch": "2.13.0+cu130",
+    "transcoders": {
+      "tc-m16384-k64-s0": {
+        "batch": 4096,
+        "collect": {
+          "eval_windows.npy": "6dc7a7f288a6060508091262c8b58bfbdf9759d8fe5f56730767aeeb9b9b6690",
+          "tok_eval.npy": "565d9827a311cc34b7c28b0da95dc9cb6d4de5882e084d992594e4a00fcffd53",
+          "tok_train.npy": "85a8c82d4d87343aeadeadd15df6b429594363fd2ecf5802ac0a8be255f0e2b9",
+          "x_eval.npy": "91d3a77f063d12b01ea0395ea68adfa235a619f340d2baf9fc3194a295fe0acd",
+          "x_train.npy": "62d2b9831c386673e2dd970b3889ff5c41d89d964b60676a18ea24ac12f859ad"
+        },
+        "criteria": {
+          "atom_compare": "feature wins iff fvu_feature < fvu_neuron and loss_recovered_feature > loss_recovered_neuron at the same k",
+          "concentration_top": 100,
+          "dead_after_tokens": 1000000,
+          "schema": "transcoder.v1"
+        },
+        "curve": null,
+        "epochs": 12.28,
+        "k": 64,
+        "layer": 30,
+        "lr": 0.0004,
+        "m": 16384,
+        "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+        "schema": "transcoder.v1",
+        "seconds": 1612.4,
+        "seed": 0,
+        "steps": 6000,
+        "tokens_seen": 24576000,
+        "torch": "2.13.0+cu130",
+        "train_tokens": 2001856
+      }
+    }
+  },
+  "precision": "not_declared_in_original_report",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 27932026
+  },
+  "provenance_scope": "import operation only, not retroactive execution provenance",
+  "schema": "research_historical_evidence.v1",
+  "source_file_sha256": "59b729689c8e2f689aad455c90ffa5cafcee739e613fde5cc9875d316b89b5fb",
+  "source_path": "research/transcoder/TC-v1-qwen3-4b-L30/report.json",
+  "title": "第30层字典"
+}

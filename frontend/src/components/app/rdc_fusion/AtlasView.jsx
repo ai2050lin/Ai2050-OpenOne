@@ -150,7 +150,7 @@ function AiPanel({ model, local }) {
   );
 }
 
-export default function AtlasView({ localAtlas, localName, onOpenFamily, snapshot = false }) {
+export default function AtlasView({ localAtlas, localName, onOpenFamily, snapshot = false, modelKey='', onModelChange }) {
   // snapshot：读中心后台定时计算的快照（开放平台公开页；谱图全量计算要十几秒）
   const remote = useApi(localAtlas ? null : (snapshot ? '/api/platform/snapshot/atlas' : '/api/atlas'));
   const atlas = localAtlas || (snapshot ? remote.data?.data : remote.data);
@@ -164,7 +164,7 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
   // 默认看关系矩阵：账本判据直接可读，不做降维。3D 点云保留为可切换的「空间」子视图。
   const [view, setView] = useState('matrix');
   const graphs = useMemo(() => atlas?.graphs || [], [atlas]);
-  const g = graphs.find(x => x.model === modelPick) || graphs[0];
+  const g = graphs.find(x => x.model === (modelKey||modelPick)) || (modelKey?null:graphs[0]);
   const layer = g?.layers.includes(layerPick) ? layerPick : (g ? richestLayer(g) : '');
   const node = g?.nodes.find(n => n.id === nodeId && n.layer === layer);
   const axesShown = (g?.axes || []).filter(a => allLayers || a.layer === layer);
@@ -174,6 +174,7 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
     return <Empty>{remote.error ? `中心服务未接入（${remote.error}）。可以打开本地谱图包。` : '读取语言谱图…'}</Empty>;
   }
   if (!g) {
+    if(modelKey)return <Empty>当前被测模型尚无同口径的跨族图谱，未替换成其他模型。</Empty>;
     const unused = (atlas.sources || []).filter(s => !s.used);
     return (
       <Empty>
@@ -195,7 +196,7 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
     <div className="v6-atlas">
       <div className="v6-toolbar">
         <label>模型
-          <select value={g.model} onChange={e => { setModel(e.target.value); setAxisId(''); setNodeId(''); }}>
+          <select value={g.model} onChange={e => { if(onModelChange)onModelChange(e.target.value);else setModel(e.target.value); setAxisId(''); setNodeId(''); }}>
             {graphs.map(x => <option key={x.model} value={x.model}>{x.model}</option>)}
           </select>
         </label>

@@ -38,11 +38,13 @@ import node_agent as A  # noqa: E402
 SCHEMA = 'node_service.v1'
 VERSION = '1'
 DEFAULT_PORT = 5030
-TASK_KINDS = ('census_shard', 'family_test')
-DEFAULT_LIMITS = {'hours': '', 'pause_on_battery': True, 'yield_gpu_util': 30, 'max_vram_gib': 0, 'min_free_disk_gib': 5}
+TASK_KINDS = ('census_shard', 'family_test', 'natural_register')
+DEFAULT_LIMITS = {'hours': '', 'pause_on_battery': True, 'yield_gpu_util': 30, 'max_vram_gib': 0, 'min_free_disk_gib': 5,
+                  'max_session_minutes': 0, 'max_work_gib': 0}
 HF_ENDPOINTS = ('https://huggingface.co', 'https://hf-mirror.com')   # 模型下载来源只能二选一；文件最终按模型快照核对
 DEFAULT_CONFIG = {'server': '', 'task_kinds': list(TASK_KINDS), 'device': 'cuda:0', 'node_name': '',
-                  'models_root': '', 'model_dirs': {}, 'hf_endpoint': HF_ENDPOINTS[0], 'limits': dict(DEFAULT_LIMITS)}
+                  'models_root': '', 'model_dirs': {}, 'hf_endpoint': HF_ENDPOINTS[0], 'limits': dict(DEFAULT_LIMITS),
+                  'participation_mode': 'self'}
 CONFIG_TTL = 1800.0          # 站点配置最多每 30 分钟读一次
 GATE_RECHECK = 60.0          # 资源门不满足时每分钟复查一次
 VRAM_FACTOR = 1.2            # 显存需求 ≈ 权重文件总大小 × 1.2（近似）
@@ -120,11 +122,16 @@ def validate_config(cur: dict, patch: dict) -> dict:
             parse_window(lim['hours'])
             if not isinstance(lim['pause_on_battery'], bool):
                 raise ValueError('pause_on_battery 必须是 true / false')
-            for key, hi in (('yield_gpu_util', 100), ('max_vram_gib', 1024), ('min_free_disk_gib', 100000)):
+            for key, hi in (('yield_gpu_util', 100), ('max_vram_gib', 1024), ('min_free_disk_gib', 100000),
+                            ('max_session_minutes', 10080), ('max_work_gib', 100000)):
                 x = lim[key]
                 if isinstance(x, bool) or not isinstance(x, (int, float)) or not (0 <= x <= hi):
                     raise ValueError(f'{key} 应为 0–{hi} 的数')
             new['limits'] = lim
+        elif k == 'participation_mode':
+            if v not in ('self','managed'):
+                raise ValueError('participation_mode 只能取 self / managed')
+            new[k] = v
         elif k == 'task_kinds':
             if not isinstance(v, list) or not set(v) <= set(TASK_KINDS):
                 raise ValueError(f'task_kinds 只能取 {", ".join(TASK_KINDS)}')
@@ -427,6 +434,11 @@ class NodeService:
         self.runtime, self.runtime_at = None, 0.0
         self.cfg = self._load_config()
         self.thread = None
+        self.control_thread = None
+        self.grant_id = ''
+        self.session_started = None
+        self.command_ack = []
+        self.command_seen = set()
         A.LOG_HOOKS.append(self._on_log)
         A.PROGRESS_HOOKS.append(self._on_progress)
         A.RESULT_HOOKS.append(self._on_result)
@@ -471,7 +483,10 @@ class NodeService:
     def _on_progress(self, p: dict) -> None:
         with self.lock:
             if self.current is not None:
-                self.current['progress'] = p
+                if p.get('stage') == 'claimed':
+                    self.current.update({k: p[k] for k in ('task', 'name', 'job', 'tm_id', 'shard') if k in p})
+                else:
+                    self.current['progress'] = p
 
     def _on_result(self, r: dict) -> None:
         r = {'t': time.time(), **r}
@@ -664,9 +679,64 @@ class NodeService:
         c = self.creds()
         with self.lock:
             return {'schema': SCHEMA, 'state': self.state, 'reasons': list(self.reasons), 'current': self.current,
+                    'participation_mode': self.cfg.get('participation_mode','self'),
+                    'remote_granted': bool(self.grant_id), 'session_started': self.session_started,
                     'next_at': self.next_at, 'last_error': self.last_error, 'counts': dict(self.counts),
                     'server': self.cfg.get('server'), 'bound': bool(c), 'node_id': c.get('node_id'),
                     'owner_bound': bool(c.get('owner_bound')), 'synthetic': self.synthetic, 'log_seq': self.seq}
+
+    def participation(self) -> dict:
+        """Report preparation and availability without starting a runner or claiming work."""
+        creds = self.creds()
+        out = {'step': '', 'reason': '', 'available': None, 'receipts': self.history(5), 'center_current': False}
+        if not creds:
+            return {**out, 'step': 'account', 'reason': '请先注册本机节点，可绑定账号署名。'}
+        models, census_snapshots = [], []
+        try:
+            pc = self.platform_config()
+            kinds = set(self.cfg['task_kinds']) & set(pc.get('task_kinds') or [])
+            if not self.cfg['task_kinds']:
+                out.update(step='resources', reason='请至少选择一种允许执行的任务。')
+            elif not kinds:
+                out['reason'] = '中心暂未开放本机选择的任务类型。'
+            elif self.synthetic:
+                if 'census_shard' in kinds:
+                    census_snapshots = ['']
+            else:
+                device = self.device()
+                gpu = next((g for g in device['gpus'] if g['index'] == gpu_index(self.cfg['device'])), None)
+                ready = self.ready_models(device['gpus'])
+                reasons = self.gates()
+                if self.cfg['device'].startswith('cuda') and gpu is None:
+                    out.update(step='device', reason='未检测到所选 NVIDIA 显卡，请检查驱动和设备。')
+                elif not device['runtime'].get('ok'):
+                    out.update(step='runtime', reason='请先安装或核对 CUDA 计算组件。')
+                elif reasons:
+                    out.update(step='resources', reason=reasons[0])
+                elif not ready:
+                    out.update(step='models', reason='请核对中心所需模型，或检查该模型是否超过本机显存预算。')
+                else:
+                    census_snapshots = list(ready)[:12] if 'census_shard' in kinds else []
+                    for kind in ('natural_register', 'family_test'):
+                        if kind not in kinds:
+                            continue
+                        for snapshot, (directory, model) in list(ready.items())[:12]:
+                            natural = kind == 'natural_register'
+                            models.append({'job_kind': kind, 'model_id': (model.get('name') or '').lower(),
+                                           'model_rev': snapshot if natural else A._model_rev(directory),
+                                           'dtype': 'bf16', 'seed': 27732026 if natural else 0})
+            _, center = A.http_json(creds['server'] + '/api/nodes/participation', 'POST',
+                                    {'models': models, 'census_snapshots': census_snapshots, 'synthetic': self.synthetic},
+                                    token=creds['node_token'], timeout=6)
+        except (RuntimeError, OSError, ValueError) as exc:
+            return {**out, 'center_error': str(exc)[:300]}
+        if not isinstance(center, dict):
+            return {**out, 'center_error': '中心未返回可用的参与状态。'}
+        # Keep a local failure if it happened before the center recorded completion.
+        receipts = {item['task']: item for item in out['receipts'] if item.get('task') and item.get('status') == 'failed'}
+        receipts.update((item['task'], item) for item in center['receipts'])
+        return {**out, 'available': center['available'], 'center_current': True,
+                'receipts': sorted(receipts.values(), key=lambda item: item['t'], reverse=True)[:5]}
 
     def start(self) -> dict:
         if not self.creds():
@@ -674,27 +744,37 @@ class NodeService:
         with self.lock:
             if self.state in ('stopped', 'error'):
                 self.state = 'running'
+                self.session_started = time.time()
+                self.grant_id = secrets.token_hex(24) if self.cfg.get('participation_mode') == 'managed' and self.creds().get('owner_bound') else ''
+                self.command_seen.clear()
                 self.backoff.reset()
                 self.last_error = ''
                 A.log('开始贡献：' + ('沙盒联调（synthetic）' if self.synthetic else '按资源限制领取任务'))
             if self.thread is None or not self.thread.is_alive():
                 self.thread = threading.Thread(target=self._loop, daemon=True, name='node-loop')
                 self.thread.start()
+            if self.control_thread is None or not self.control_thread.is_alive():
+                self.control_thread=threading.Thread(target=self._control_loop,daemon=True,name='node-control')
+                self.control_thread.start()
         self.wake.set()
         return self.status()
 
-    def pause(self) -> dict:
+    def pause(self, *, remote=False) -> dict:
         with self.lock:
+            if not remote:
+                self.grant_id = ''
             if self.state != 'stopped':
                 self.state = 'paused'
                 A.log('已暂停：当前任务做完后不再领取' if self.current else '已暂停')
         self.wake.set()
         return self.status()
 
-    def resume(self) -> dict:
+    def resume(self, *, remote=False) -> dict:
         with self.lock:
             if self.state == 'paused':
                 self.state = 'running'
+                if not remote:
+                    self.grant_id = secrets.token_hex(24) if self.cfg.get('participation_mode') == 'managed' and self.creds().get('owner_bound') else ''
                 self.backoff.reset()
                 A.log('继续领取任务')
         self.wake.set()
@@ -703,6 +783,7 @@ class NodeService:
     def stop(self) -> dict:
         with self.lock:
             self.state = 'stopped'
+            self.grant_id = ''
             self.next_at = None
         n = A.abort_running()
         A.log('已停止' + (f'（结束了 {n} 个运行中的任务，中心会重新派发）' if n else ''))
@@ -725,9 +806,60 @@ class NodeService:
             if new.get('server') != self.cfg.get('server'):
                 self.pcfg, self.pcfg_at = None, 0.0
             self.cfg = new
+            if new.get('participation_mode') != 'managed':
+                self.grant_id = ''
             self._save_config()
         self.wake.set()
         return self.cfg
+
+    def budget_reason(self):
+        lim=self.cfg['limits']
+        if self.session_started and lim.get('max_session_minutes') and time.time()-self.session_started>=lim['max_session_minutes']*60:
+            return '本次运行时长预算已耗尽'
+        if lim.get('max_work_gib'):
+            used=sum(p.stat().st_size for p in (self.home/'work').rglob('*') if p.is_file())
+            if used>=lim['max_work_gib']*2**30:
+                return '本机任务目录存储预算已耗尽'
+        return ''
+
+    def _control_loop(self):
+        while not self.quit.wait(5):
+            try:
+                if self.state not in ('stopped','error'):
+                    reason=self.budget_reason()
+                    if reason:
+                        self.stop()
+                        with self.lock:self.last_error=reason
+                        A.log(reason)
+                creds=self.creds()
+                if not creds or self.cfg.get('participation_mode')!='managed':continue
+                ack=list(self.command_ack)
+                _,response=A.http_json(creds['server']+'/api/research-nodes/poll','POST',
+                    {'grant_id':self.grant_id,'state':self.state,'ack':ack,'limits':self.cfg['limits']},
+                    token=creds['node_token'],timeout=10)
+                self.command_ack=[x for x in self.command_ack if x not in ack]
+                self._apply_remote_commands(response.get('commands',[]))
+            except Exception as exc:
+                # Remote unavailability cannot bypass local resource budgets or restart a node.
+                with self.lock:self.last_error='托管通道：'+str(exc)[:180]
+
+    def _apply_remote_commands(self, commands):
+        for cmd in commands:
+            with self.lock:
+                if not self.grant_id or cmd.get('grant_id')!=self.grant_id:continue
+                cid=cmd.get('id')
+                if not isinstance(cid,str) or not cid or len(cid)>80:continue
+                if cid in self.command_seen:
+                    if cid not in self.command_ack:self.command_ack.append(cid)
+                    continue
+                action=cmd.get('action')
+                if action=='pause':self.pause(remote=True)
+                elif action=='resume':self.resume(remote=True)
+                elif action=='stop':self.stop()
+                else:continue
+                self.command_seen.add(cid)
+                self.command_ack.append(cid)
+                A.log('已执行本人账号远程控制：'+action)
 
     # --- Goodfire 式神经元逆向分析（goodfire_probe.v1，只在本机：结果不上传） ---
     @property
@@ -917,7 +1049,13 @@ class NodeService:
         p = self.probes_dir / pid / 'result.json'
         if not p.is_file():
             raise ValueError('没有这个测试的结果')
-        return json.loads(p.read_text(encoding='utf-8'))
+        result=json.loads(p.read_text(encoding='utf-8'))
+        status_path=p.with_name('status.json')
+        if status_path.is_file():
+            status=json.loads(status_path.read_text(encoding='utf-8'))
+            result['research_identity']={'run_id':pid,'model_snapshot':(status.get('params') or {}).get('snapshot'),
+                                         'precision':(result.get('env') or {}).get('dtype'), 'verification':'local_run_record_not_center_reviewed'}
+        return result
 
     # --- 任务循环 ---
     def _sleep(self, seconds: float) -> None:
@@ -979,9 +1117,13 @@ class NodeService:
         creds = self.creds()
         if not creds:
             raise RuntimeError('节点凭据与当前中心地址不符，请重新绑定')
+        if not self.cfg['task_kinds']:
+            raise Waiting('尚未选择任务类型：请在参与方式与资源预算中勾选允许的任务')
         pc = self.platform_config()
         offered = pc.get('task_kinds') or []
         kinds = [k for k in self.cfg['task_kinds'] if k in offered]
+        if not kinds:
+            raise Waiting('中心暂未开放所选任务类型，请查看任务与数据或调整允许的任务')
         server, token = creds['server'], creds['node_token']
         work = self.home / 'work'
         if self.synthetic:
@@ -999,6 +1141,12 @@ class NodeService:
                 if self._run('census_shard', m, lambda: A.run_census_shard(server, token, work / 'census', d, device, 'real',
                                                                          self.python, snapshot=snap)):
                     return True
+        if 'natural_register' in kinds:
+            g=next((x for x in gpus if x['index']==gpu_index(device)),{})
+            for snap,(d,m) in ready.items():
+                ns=argparse.Namespace(python=self.python,run_timeout=6*3600.,model_path=d,model_id=(m.get('name') or '').lower(),
+                    model_rev=snap,tokenizer_sha256='',gpu=g.get('name',''),dtype='bf16',seed=27732026,tm_id='',server=server,job_kind='natural_register')
+                if self._run('natural_register',m,lambda:A.run_one(ns,creds,work/'natural_tasks')):return True
         if 'family_test' in kinds:
             g = next((x for x in gpus if x['index'] == gpu_index(device)), {})
             for snap, (d, m) in ready.items():
@@ -1106,10 +1254,37 @@ def make_handler(svc: NodeService, token: str, port_ref: dict, allow_origins=())
             try:
                 if route == ('GET', '/status'):
                     return self._send(200, svc.status())
+                if route == ('GET', '/participation'):
+                    return self._send(200, svc.participation())
                 if route == ('GET', '/device'):
                     return self._send(200, svc.device(refresh=q.get('refresh') == '1'))
                 if route == ('GET', '/config'):
                     return self._send(200, svc.cfg)
+                if method == 'GET' and route[1] in ('/parameters/models', '/parameters/tensors', '/parameters/slice', '/parameters/identity'):
+                    # Local-token guard above also protects all weight reads. No server paths are accepted.
+                    import parameter_reader as PR
+                    roots = [svc.models_root(), *[Path(v) for v in svc.cfg.get('model_dirs', {}).values()]]
+                    models = PR.catalog(roots)
+                    if route[1] == '/parameters/models':
+                        return self._send(200, {'models': [{k:v for k,v in m.items() if k!='_path'} for m in models], 'source':'local_node_safetensors', 'inference':False})
+                    model = next((m for m in models if m['id']==q.get('model')), None)
+                    if not model:
+                        return self._send(404, {'detail':'模型不在本机节点配置的模型目录中'})
+                    if route[1] == '/parameters/identity':
+                        return self._send(200, {'model':model['id'],**PR.model_snapshot(model['_path'])})
+                    if route[1] == '/parameters/tensors':
+                        block=int(q.get('block',0)); embedding=q.get('embedding')=='true'
+                        if block<0 or block>=model['config']['num_hidden_layers']:raise ValueError('块索引越界')
+                        tensors=[]
+                        for file in sorted(model['_path'].glob('*.safetensors')):
+                            head,_,sha=PR.header(file)
+                            tensors.extend({'name':name,'shape':meta['shape'],'dtype':meta['dtype'],'header_sha256':sha} for name,meta in head.items() if (embedding and 'embed_tokens' in name) or (not embedding and f'layers.{block}.' in name))
+                        return self._send(200, {'model':model['id'],'tensors':tensors,'model_snapshot':None,'source':'local_node_safetensors'})
+                    try:
+                        values=PR.read_slice(model['_path'],q.get('name',''),*[int(q.get(k,d)) for k,d in [('row',0),('col',0),('rows',8),('cols',8)]])
+                    except FileNotFoundError:
+                        return self._send(404, {'detail':'参数不存在'})
+                    return self._send(200, {'model':model['id'],**values})
                 if route == ('PUT', '/config'):
                     return self._send(200, svc.update_config(self._body()))
                 if route == ('GET', '/models'):
@@ -1142,6 +1317,7 @@ def make_handler(svc: NodeService, token: str, port_ref: dict, allow_origins=())
                     return self._send(200, {'items': svc.history(int(q.get('limit') or 200))})
                 actions = {'/start': svc.start, '/pause': svc.pause, '/resume': svc.resume, '/stop': svc.stop}
                 if method == 'POST' and route[1] in actions:
+                    self._body()
                     return self._send(200, actions[route[1]]())
                 if route == ('POST', '/shutdown'):
                     self._send(200, {'ok': True})

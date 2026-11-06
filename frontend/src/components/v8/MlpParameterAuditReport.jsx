@@ -1,0 +1,15 @@
+import {useState} from 'react';
+import {useApi} from '../app/rdc_fusion/api.js';
+import {Empty} from '../app/rdc_fusion/ui.jsx';
+import MechanismScene,{NativeArray} from './MechanismScene.jsx';
+const num=x=>Number.isFinite(x)?x.toPrecision(6):'—';
+export default function MlpParameterAuditReport({doc:d}){
+  const [block,setBlock]=useState(24),[unit,setUnit]=useState(8443),[stage,setStage]=useState(0),[metric,setMetric]=useState('Gate_term_RMS');
+  const base='/api/traces/mlp-parameter-audit',layer=useApi(`${base}/layers/${block}`),detail=useApi(`${base}/units/${block}/${unit}`),l=layer.data,u=detail.data;
+  const values=l?(metric.endsWith('term_RMS')||metric==='rounding_residual_RMS'?l[metric][stage]:l[metric]):undefined,clamp=(v,max)=>Math.max(0,Math.min(max,Number(v)||0));
+  return <section aria-label="全MLP真实参数计算审计"><p><strong>350,208个原生单元 · 参数投影与乘积响应来源</strong></p><p className="v8-note">9,984输入×2位置×36块逐坐标核验真实权重计算。算术可重算与语义已解释分别记账；这里没有认定某个单元专门表示某种概念。</p><details><summary>原理与全层误差</summary><p>G=xWgᵀ，V=xWvᵀ，A=SiLU(G)⊙V，y=AWdownᵀ。对两个观测语境，Δ(SV)=½ΔS(V₁+V₀)+½ΔV(S₁+S₀)。这是对称代数分摊，不能当作唯一因果分解，也不能把Gate直接解释成语义开关。</p><pre className="v8-artifact-json">{JSON.stringify({plan:d.plan,layers:d.layers,refs:d.artifact_refs},null,2)}</pre></details>
+    <div className="v6-toolbar"><label>块 <input aria-label="参数审计块" type="number" min="0" max="35" value={block} onChange={e=>setBlock(clamp(e.target.value,35))}/></label><label>单元 <input aria-label="参数审计单元" type="number" min="0" max="9727" value={unit} onChange={e=>setUnit(clamp(e.target.value,9727))}/></label><select aria-label="参数审计读出" value={stage} onChange={e=>setStage(Number(e.target.value))}><option value="0">完整问题后</option><option value="1">assistant边界</option></select><select aria-label="参数审计指标" value={metric} onChange={e=>setMetric(e.target.value)}>{[['Gate_term_RMS','Gate分摊项RMS'],['Value_term_RMS','Value分摊项RMS'],['rounding_residual_RMS','数值残差RMS'],['G_relative_RMS','Gate投影相对RMS误差'],['V_relative_RMS','Value投影相对RMS误差'],['A_relative_RMS','激活重算相对RMS误差']].map(([k,t])=><option key={k} value={k}>{t}</option>)}</select></div>
+    {layer.error?<Empty>{layer.error}；归档报告保留完整核验汇总。</Empty>:!l?<p>读取当前层全部9728单元的参数审计…</p>:<><MechanismScene manifest={{n_layers:36,d_ff:9728,d_model:2560,n_heads:32,n_kv_heads:8,head_dim:128}} block={block} head={0} unit={unit} activation={values} onBlock={setBlock} onHead={()=>{}} onUnit={setUnit} caption="真实原生索引 · 算术项着色，未采集的模块不生成激活"/><NativeArray values={values} selected={unit} onPick={setUnit} label="全部9728单元参数来源审计"/></>}
+    {u&&<><p>B{block}/U{unit} · Gate项{num(u.Gate_term_RMS[stage])} · Value项{num(u.Value_term_RMS[stage])} · 数值残差{num(u.rounding_residual_RMS[stage])}</p><p className="v8-note">分摊用已记录G/V，在CPU执行BF16 SiLU并转FP32计算；残差包括数值舍入差。两个分摊项可以抵消，较大不代表必要性。</p><a href={`?lens=spatial&view=parameters&pmodel=9a784350de7f8d690b04ffef&pblock=${block}&pkind=mlp&punit=${unit}`}>检查该单元的全部真实参数</a><details><summary>当前单元全部分组分摊、误差、精确比例及权重范数</summary><pre className="v8-artifact-json">{JSON.stringify(u,null,2)}</pre></details></>}
+  </section>;
+}

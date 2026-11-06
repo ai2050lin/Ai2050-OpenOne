@@ -300,47 +300,6 @@ h1 {
   gap: 0.9rem;
 }
 
-.hero-visual {
-  position: relative;
-  min-height: min(540px, 48vw);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.hero-visual img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: right center;
-  filter: saturate(1.04) contrast(1.02);
-}
-
-.hero-visual::before {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  content: "";
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0%, transparent 30%);
-  pointer-events: none;
-}
-
-.visual-glow {
-  position: absolute;
-  right: 4%;
-  bottom: 16%;
-  z-index: 2;
-  width: 40%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(18, 101, 255, 0.22);
-  border-radius: 50%;
-  box-shadow:
-    inset 0 0 70px rgba(18, 101, 255, 0.16),
-    0 0 90px rgba(18, 101, 255, 0.18);
-}
-
 .programs {
   display: grid;
   gap: 1rem;
@@ -435,7 +394,7 @@ h1 {
 .horizon {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.84)),
-    url("assets/home_plan.png") center / cover no-repeat;
+    url("assets/home_overview.svg") center / cover no-repeat;
 }
 
 .horizon::before {
@@ -464,7 +423,7 @@ h1 {
 .brain {
   background:
     linear-gradient(90deg, rgba(4, 19, 49, 0.08), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.92)),
-    url("assets/home_agi.png") center / cover no-repeat;
+    url("assets/home_response.svg") center / cover no-repeat;
 }
 
 .brain::before {
@@ -492,7 +451,7 @@ h1 {
 .forum {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.86)),
-    url("assets/home_forum.png") center / cover no-repeat;
+    url("assets/home_distributed.svg") center / cover no-repeat;
 }
 
 .forum::before {
@@ -525,7 +484,7 @@ h1 {
 .lighthouse {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.96)),
-    url("assets/home_support.png") center / cover no-repeat;
+    url("assets/home_atlas.svg") center / cover no-repeat;
 }
 
 .lighthouse::before {
@@ -1478,10 +1437,6 @@ h1 {
     min-height: auto;
   }
 
-  .hero-visual {
-    min-height: 460px;
-  }
-
   .program-card,
   .program-card.split,
   .program-card.reverse {
@@ -1547,18 +1502,6 @@ h1 {
 
   h1 {
     font-size: clamp(4rem, 20vw, 5.7rem);
-  }
-
-  .hero-visual {
-    min-height: 340px;
-  }
-
-  .hero-visual img {
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: right center;
   }
 
   .program-image {

@@ -1,0 +1,212 @@
+{
+  "schema": "research_dataset_atlas_plan.v1",
+  "kind": "proposal",
+  "run_id": "P2792-CONDITIONAL-COMPUTE-ATLAS-PLAN-v1",
+  "title": "条件化计算通道图谱：研究与3D联动执行方案",
+  "created_at": "2026-11-04 02:34",
+  "implementation_status": "proposal_only",
+  "no_new_model_tests": true,
+  "principles": [
+    {
+      "title": "统一问题",
+      "description": "同一实体属性在不同提问范围、构式和语境中，哪些内部响应与真实计算路径复用，哪些条件改变信息的使用？能否预测未见组合，而不只解释已见输出？"
+    },
+    {
+      "title": "以条件化计算通道组织图谱",
+      "description": "外部模式与变量→模型特定特征/位置→真实模块路径→输出，记录条件、位置、层、生成步和失效范围。节点布局不是模型几何，物理参数连接不是已验证的语言功能。"
+    },
+    {
+      "title": "先复用现有结果再新增采集",
+      "description": "先回填实体属性、代码QK和后段冲突单元、L30字典、AM局部预测及W6负结果；新候选只从发现集选择。历史原生场缺什么就标什么，不把未保存的注意力编出来。"
+    },
+    {
+      "title": "三维定位，二维核验",
+      "description": "3D负责层、模块、索引与局部通道导航；完整坐标热力图、注意力矩阵、逐项乘积、剂量与反例用2D/表格联动，点击任何高亮均可回查实数和哈希。"
+    },
+    {
+      "title": "三引擎共同检验",
+      "description": "A自然字典或原生全坐标发现；B受控变量与未见实体/句式映射；C来源分解和预注册因果检验。不把均值差、单元标签或删除成功各自当完整机制。"
+    },
+    {
+      "title": "完成度以预测界定",
+      "description": "执行率、可读出覆盖、范围内干预、留出预测保真度分别展示。已有受控AM预测保留；自然全词表/连续生成是更强目标，不以重跑原模型或注入真实目标残差替代。"
+    }
+  ],
+  "stages": [
+    {
+      "stage": "A · 统一证据与可视化数据契约",
+      "status": "方案，未执行",
+      "work": "回填3条既有强证据线（属性读写、同模式QK、后段MLP冲突门控）及反例；沿模型完整快照、run、sample、token/span、generation_step、block、boundary统一参数、场、特征和证据身份。先修正实时分析32-token/Top16/attn_last限制与选中位置绑定。",
+      "acceptance": "没有缺失值伪装0、没有把末位注意力标成任意token、没有把权重缩略图当原始参数。旧链接可用；原生单元、残差坐标、字典特征和标量参数分别寻址。无需GPU即可完成历史迁移与接口合同测试。"
+    },
+    {
+      "stage": "B · 统一长材料与自然前向观察",
+      "status": "方案，未执行",
+      "work": "主线选择实体属性→文档/现实范围仲裁，配套否定/肯定、语域和代码冲突验证。先16内容家族方法试跑；有效token为512/1024/2048，多句式，按家族留出。先复现原有代码冲突正控制，再在新自然材料观察。",
+      "acceptance": "同因子配对的核心事实与其他条件匹配，读出在全部区分信息之后，使用共用token并报告hs[0]、词频/长度/位置与n-gram基线。两AI盲评各语域保义与自然性，建议新版本保义点估计≥.90作为试跑门，正式推广需独立样本与区间；失败格全部记录，修改后升版本。"
+    },
+    {
+      "stage": "C · 特征、真实连接与范围内因果验证",
+      "status": "方案，未执行",
+      "work": "在同一快照冻结材料比较A字典/原生坐标、B条件选择性、C来源分解与干预。完整报告G、V、A、W_down贡献；Q/K含归一化与RoPE、V及W_O；随机方向、同层/同能量单元与读写分离负对照。",
+      "acceptance": "所有局部分解对真实前向核对，FP32软件对照与BF16误差分别校准；路径来源、直接logit归因、下游总效应分开。新候选的剂量和阈值在确认前冻结，保义与开放任务能力保持并测。只有范围内干预边可被标为干预，参数连接不自动晋级。"
+    },
+    {
+      "stage": "D · 锁箱拼装预测、自然生成与跨节点/模型",
+      "status": "方案，未执行",
+      "work": "先预测未见实体/构式的属性与仲裁答案，再扩展全词表和连续生成。记录预测可用输入，图谱不能读取目标隐态、logits、未来token或真实重建残差。至少第二物理节点复算，再顺序扩展GLM4-9B、Qwen3-14B。",
+      "acceptance": "模型×精度×设计分桶；家族级切分、CI与置换，不把token当独立n。两项二值配对主假设可参考delta=.20,p_d=.5,alpha=.025需119家族、取128；更多主判或连续KL指标须重算/模拟功效。完整KL、相对基线损失恢复及反例保存；不承诺总体已破解百分比。"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "structure",
+      "title": "结构与参数",
+      "coordinates": "Y=真实块/hs层索引；层板X/Z=Head或MLP索引布局，非语义距离；token与生成步为独立选择器。",
+      "content": "保留全部层、全部Q头与GQA共享KV关系；所选层完整MLP阵列、完整向量与权重矩阵分页读取。Embedding灰、Attention蓝、MLP橙。选中对象才展开统计、原文、参数与上下游。"
+    },
+    {
+      "id": "trace",
+      "title": "运行与路径（现有实时分析升级）",
+      "coordinates": "同一层塔同步选中样本、query token、生成步；实际采集与重算结果有显式来源标记。",
+      "content": "点击词/跨度→定位embedding行→查看各层query/key匹配与完整注意力行→各Head输出→MLP gate/value/activation与输出贡献→下一token分布。支持原生/编辑、两句式或两因子的并排对照。缺采集的层/步标未采集。"
+    },
+    {
+      "id": "atlas",
+      "title": "语言图谱",
+      "coordinates": "外部模式/内部特征/实验主张分区，层高度可有意义；布局距离本身无物理含义。",
+      "content": "知识、推理/翻译/编程、语法是导航分类，语域/语言/领域/长度是过滤条件。选择苹果/颜色等外部节点，查看多个内部条件化特征与全部有范围主张，点击跳回真实样本路径和参数。"
+    },
+    {
+      "id": "comparison",
+      "title": "响应对照",
+      "coordinates": "完整原生坐标与固定顺序热力图；相关矩阵、跨层/时间曲线、剂量和置信区间。",
+      "content": "作为3D的定量核验面板，保留原始值与标准化视图、固定共享色标和弱背景。投影3D点云为可选，必须记录冻结投影与解释方差，不用点云距离证明机制。"
+    }
+  ],
+  "contracts": {
+    "identity": [
+      "model_snapshot",
+      "precision",
+      "tokenizer_sha256",
+      "run_id",
+      "design_sha",
+      "sample_id",
+      "source_group_id",
+      "split",
+      "input_ids_sha256",
+      "generation_step",
+      "token_position",
+      "text_span",
+      "block",
+      "boundary",
+      "method_version"
+    ],
+    "parameters": "embedding row; attention Q/K/V/O head slices, GQA group, bias, QK norm; MLP gate/up rows and down column; scalar index. CPU exact slices, original weights independent of saved edited responses.",
+    "native_fields": "manifest-sha addressed; h0..hL, module norm boundaries, actual MLP G/V/A and output where captured, post-norm/post-RoPE Q/K plus grouped V and actual o_proj input, valid positions and EOS mask. Never infer unrecorded fields.",
+    "feature_card": [
+      "canonical_feature_id",
+      "native_locator_ids",
+      "feature_source",
+      "dictionary_or_direction_sha",
+      "typical_contexts",
+      "activation_stats",
+      "selectivity_and_baselines",
+      "holdout_generalization",
+      "readout",
+      "upstream_downstream",
+      "intervention_effect_CI",
+      "dose_curve",
+      "min_edit_params_or_null",
+      "counterexamples",
+      "scope",
+      "status",
+      "evidence_artifact_sha256"
+    ],
+    "edge": [
+      "source",
+      "target",
+      "connection_kind",
+      "condition",
+      "sample_or_scope",
+      "metric_name",
+      "value",
+      "CI",
+      "negative_control",
+      "reconstruction_error",
+      "evidence_level",
+      "run_id",
+      "artifact_sha256"
+    ],
+    "connection_kind": [
+      "known_parameter_connection",
+      "sample_computation_contribution",
+      "observed_association",
+      "heldout_prediction",
+      "scoped_intervention"
+    ],
+    "rendering": "module hue and activation/effect legends distinct; uncollected=null, observed0=0; default local selected path, full contributor ranges accessible, filtering never changes research statistics; no inferred causal edges from weight similarity alone",
+    "query_proposals": [
+      "GET /traces/{sha}/manifest",
+      "GET /traces/{sha}/field?block&token&step&boundary&range",
+      "GET /traces/{sha}/attention-row?block&head&query&step",
+      "GET /features/{id}/claims",
+      "GET /atlas/subgraph?model&condition&source"
+    ],
+    "status": "New trace contracts and endpoints above are proposed, not implemented in this planning task."
+  },
+  "resource_plan": {
+    "model": "Qwen3-4B, BF16, 36 blocks, hidden2560, MLP9728,32Q/8KV,head_dim128",
+    "analytic_not_measurement": true,
+    "T": 2048,
+    "hidden_all37_bf16_GiB": 0.361328125,
+    "mlp_A_all36_bf16_GiB": 1.3359375,
+    "dense_attention_all36_bf16_GiB": 9.0,
+    "dense_attention_all36_float32_GiB": 18.0,
+    "qkv_grouped_all36_bf16_GiB": 0.84375,
+    "capture_tiers": [
+      "discovery panel: all native hidden coordinates at registered readouts across all layers; all units/heads at selected boundaries; every actual generation step where contracted",
+      "small deep panel: full-token hidden fields, selected layer-group Q/K/V/O and full MLP G/V/A; exact original order, noTopK truncation",
+      "attention row reconstruction from captured Q/K and actual mask/position state, validated against actual saved attention output; label reconstructed and native separately",
+      "native fields stay node-local, center stores hashes and metadata; publish needed full arrays by range; budget/checkpoint before expansion"
+    ],
+    "execution": "One shared GPU lease across live observation and distributed work; no three models loaded concurrently; 9B/14B BF16 need suitable node or explicitly recorded CPU offload; no new quantized experiment."
+  },
+  "client_pages": [
+    {
+      "page": "空间",
+      "secondary": "结构与参数",
+      "behavior": "保留全部层、全部Q头与GQA共享KV关系；所选层完整MLP阵列、完整向量与权重矩阵分页读取。Embedding灰、Attention蓝、MLP橙。选中对象才展开统计、原文、参数与上下游。"
+    },
+    {
+      "page": "空间",
+      "secondary": "运行与路径（现有实时分析升级）",
+      "behavior": "点击词/跨度→定位embedding行→查看各层query/key匹配与完整注意力行→各Head输出→MLP gate/value/activation与输出贡献→下一token分布。支持原生/编辑、两句式或两因子的并排对照。缺采集的层/步标未采集。"
+    },
+    {
+      "page": "空间",
+      "secondary": "语言图谱",
+      "behavior": "知识、推理/翻译/编程、语法是导航分类，语域/语言/领域/长度是过滤条件。选择苹果/颜色等外部节点，查看多个内部条件化特征与全部有范围主张，点击跳回真实样本路径和参数。"
+    },
+    {
+      "page": "空间",
+      "secondary": "响应对照",
+      "behavior": "作为3D的定量核验面板，保留原始值与标准化视图、固定共享色标和弱背景。投影3D点云为可选，必须记录冻结投影与解释方差，不用点云距离证明机制。"
+    }
+  ],
+  "dataset_candidates": [],
+  "source_files": {
+    "frontend/src/components/v8/SpaceLens.jsx": "a38072a239a4f90d8098d32d6375b3e4554e61192c9cad5bc8a75b2273bc969d",
+    "frontend/src/components/v8/LivePane.jsx": "10fe1f35acf826a1619df2e2923507b512c5c5384a72c2522ec1dbe7841c0f0b",
+    "server/live_analysis_service.py": "da39809d28431781993a3257e6dc5d8669d3a01665d48d5dc1d8cb18b769c958",
+    "shared/dist_protocol/natural_register_runner.py": "0429d6eb77ddf69b7d6e329b171dddd59dbe0d4f382dd1450ff4c45f0cf19668",
+    "frontend/src/components/v8/ResearchFocus.jsx": "54905c7d37c7cfdb5c5f98714f8f345d2284b5cdf113b4da5e78c0b6358fba38"
+  },
+  "provenance": {
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "git_dirty": true,
+    "model_path": "D:/develop/model/Qwen/Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": null
+  }
+}

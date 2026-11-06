@@ -1,0 +1,128 @@
+{
+  "candidates": [
+    {
+      "id": "tc1024",
+      "k": 32,
+      "kind": "transcoder",
+      "m": 1024
+    },
+    {
+      "id": "tc4096",
+      "k": 32,
+      "kind": "transcoder",
+      "m": 4096
+    },
+    {
+      "id": "sae4096",
+      "k": 32,
+      "kind": "sae_output",
+      "m": 4096
+    }
+  ],
+  "causal_prereg": {
+    "NI_margin": 0.02,
+    "NI_method": "simultaneouspairedClopperPearsonloss/gainbound; cannot infer preservation fromp>.05",
+    "capability_n": 2200,
+    "capability_pool": "previously exposed keyed monitor, samefrozeninputhash; reference140 excluded",
+    "dose": [
+      0,
+      0.5,
+      1
+    ],
+    "eligible": "only study layer satisfying fresh-fidelity gate andallheldoutbehaviorcells; then frozen discoveryfeaturegroup, not selected byheldouteffects",
+    "primary": "192lockbox backgrounds, selectedcode/mappingbalanced fixedsubset; targetvsrandom matchedfeaturegroup; effect20%loss ofpairedanswer discriminability ormonotone logitgapshift with pairedCI; scoped sufficient/necessary claims only. Fullreplacementloss/KL plusnative32 controls reported separately."
+  },
+  "controlled_materials": {
+    "backgrounds": 512,
+    "capture": "all37 hidden atbothreadouts; all9728GVA andMLPinput/output/headZ inselectedthreeblocks; uncaptured layers/modules explicit; noattentionrows",
+    "code_pairs": [
+      [
+        "A",
+        "B"
+      ],
+      [
+        "C",
+        "D"
+      ]
+    ],
+    "confirm": 192,
+    "discovery": 128,
+    "factors": [
+      "mapping",
+      "selected_coastal_or_inland_record",
+      "asked_coastal_or_inland"
+    ],
+    "frames": 2,
+    "heldout_behavior": "eachsplit/code/mapping/truth/question/frame celln96, accuracy>=.90; codechoice andunrestrictedtop1 reported separately",
+    "lockbox": 192,
+    "native_capture_layers": [
+      8,
+      24,
+      35
+    ],
+    "pilot": "first32discoverybackgrounds×16; eachframe/code/mapping/truth/question cell16, >=15correct; no heldout scoring before pilotpasses",
+    "readouts": [
+      "question_end",
+      "assistant_boundary"
+    ],
+    "scope": "invented settlement referent definitions; no item/object wording; statement coasts vs inland opposite predicates within same entity category",
+    "tokens": 1034,
+    "variants_per_background": 16
+  },
+  "development": "All old2048 documents are exposed development. Within each of4 sources, hash-split384 train/128 validation; no use of fresh evaluation or new controlled outputs in model selection.",
+  "fresh_evaluation": {
+    "documents": 512,
+    "fidelity_gate": "both new splits perselected causalstudy layer FVU<=.2; meanimprovement vsarchiveddictionary positive paired-document95%CI, familyalpha .05/(36*2). Alllayerfailures retained. No feature-win claim without actual lossrecovery.",
+    "materials": "new Wikipedia rowgroups>=7, source IDs and1024-tokenprefixes excluded from all old consumed docs; unknown pretraining exposure",
+    "positions_per_doc": 8,
+    "splits": {
+      "confirm": {
+        "en": 128,
+        "zh": 128
+      },
+      "lockbox": {
+        "en": 128,
+        "zh": 128
+      }
+    },
+    "tokens_per_doc": 1024
+  },
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "old_split_correction": "v1 dictionary uses slices0:1024 FineWeb en/zh train,1024:1536 Wikipedia-en confirm,1536:2048 Wikipedia-zh lockbox. Those labels are not language-balanced independent repeats. Old result numbers unchanged; v2 development may use all exposed old documents.",
+  "prototype_layers": [
+    0,
+    8,
+    16,
+    24,
+    35
+  ],
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 411062026
+  },
+  "resource": "oneCUDAjob atatime; originalQwen3-4B BF16; allnewdisk<=14GiB andfree>=4GiB; captureonce/manyanalyses; no deletion of old evidence",
+  "run_id": "MLP-FIDELITY-20261104-v2",
+  "schema": "mlp_fidelity_plan.v2",
+  "selection": "Choose global candidate and checkpoint minimizing mean validation FVU across five prototype layers. Compare against tc1024 at1000steps undernewtraining, plus archivedv1model. No fresh-evaluation based checkpointselection. Train same chosen recipe onall36 layers. SAE sees observed MLP output: a representation/compression model, not an input-to-output predictor.",
+  "semantic_prereg": "After behavior pilot anddevelopmentdictionaryselection, nominate atmost16 dictionaryfeatures perstudy layer using only controlleddiscovery. Identify operationalcoast/inland orabstractmatch/outputcode/format effect; fit sign only discovery. Require confirm+lockbox response, shuffled-label andembedding baselines; code-specificfeatures not semantic-invariant bydefault. AI labels remain untested.",
+  "source_sha256": "18eedb0c640bfff3ccd8d62528400e0a0c5568bf0d6cbbc21da8ec3de4a681bb",
+  "training": {
+    "batch": 256,
+    "checkpoints": [
+      1000,
+      2500,
+      5000
+    ],
+    "lr": 0.001,
+    "lr_end": 0.0001,
+    "max_total_dictionary_GiB": 5,
+    "normalization": "fixed discovery variance in physical output units; sampleuniform acrossdevelopment trainingpositions",
+    "precision": "FP32parameters/optimizer; BF16autocastforward onCUDA; no original model quantization",
+    "seed": 411062026,
+    "steps": 5000
+  }
+}

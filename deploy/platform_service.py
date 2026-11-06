@@ -184,7 +184,7 @@ def config(request: Request) -> dict:
         'tagline': cfg.get('tagline', '一起绘制大语言模型的语言编码图谱：看进展、学方法、用自己的 GPU 跑一个分片。'),
         'public_url': public_url(request),
         'registration': A.registration_policy(D._db()),
-        'task_kinds': cfg.get('task_kinds', ['family_test', 'census_shard']),
+        'task_kinds': cfg.get('task_kinds', ['family_test', 'census_shard','natural_register']),
         'contact': cfg.get('contact', ''),
         'repo_url': cfg.get('repo_url', 'https://github.com/ai2050lin/Ai2050-OpenOne'),
         'license': {'code': 'Apache-2.0', 'data': 'CC BY 4.0'},
@@ -307,7 +307,7 @@ def datapack_download():
 
 
 @router.get('/datapack/extra/{extra_id}')
-def datapack_extra_download(extra_id: str):
+def datapack_extra_download(extra_id: str, format: str = ''):
     """附加包（gzip JSON，datapack_extra.v1）：tm:<模式族> 或 cards:<模型>。清单见站点配置 datapack.extras。"""
     from fastapi.responses import FileResponse
     import datapack as DP
@@ -315,6 +315,11 @@ def datapack_extra_download(extra_id: str):
     p = DP.extra_file(D._DATA_DIR, extra_id)
     if not info or not p.is_file():
         raise HTTPException(404, '没有这个附加包，或还在后台生成')
+    if format=='ndjson':
+        from fastapi.responses import StreamingResponse
+        from deploy.research_pack_stream import gzip_records
+        return StreamingResponse(gzip_records(p),media_type='application/x-ndjson+gzip',headers={
+            'Content-Encoding':'identity','Cache-Control':'no-cache','X-Datapack-Stream':'ndjson.v1'})
     return FileResponse(p, media_type='application/octet-stream', filename=p.name,
                         headers={'Content-Encoding': 'identity', 'X-Datapack-Version': str(info.get('version') or ''),
                                  'Cache-Control': 'no-cache'})
@@ -410,7 +415,7 @@ huggingface_hub>=0.34
 
 def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
     cfg = {'schema': 'participant_config.v1', 'server': server, 'bind_code': bind_code, 'account': user,
-           'task_kinds': _config_file().get('task_kinds', ['family_test', 'census_shard']),
+           'task_kinds': _config_file().get('task_kinds', ['family_test', 'census_shard','natural_register']),
            'device': 'cuda', 'model_dirs': {}, 'models_root': '', 'node_name': '',
            'created_at': time.strftime('%Y-%m-%d %H:%M:%S'),
            'note': 'bind_code 一次性有效（7 天内）；model_dirs 按作业的模型快照填写本机目录，留空时程序会询问。'}
@@ -428,6 +433,7 @@ def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
             z.writestr(info, data if isinstance(data, bytes) else data.encode('utf-8'))
         add('node_agent.py', agent)
         add('node_service.py', service)
+        add('parameter_reader.py', (here / 'parameter_reader.py').read_bytes())
         for n, data in probe_files.items():
             add(n, data)
         add('config.json', json.dumps(cfg, ensure_ascii=False, indent=1))

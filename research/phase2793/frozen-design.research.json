@@ -1,0 +1,99 @@
+{
+  "execution_freeze": {
+    "corpus_sha256": "317c398af7e1e16cb2efaf91290f763af4beb19055778af46ff19fe5ddaa57d3",
+    "dependencies": {
+      "shared\\dist_protocol\\mechanism_trace.py": "c5f6c2e7d7572ca4107d6a41bfdd3f13f0f7e068224bb23dc5952a783a9d8f39",
+      "tests\\glm5\\phase2793_materials.py": "767aab2fa6f23eb26eb9d20273cafa758da03991be93e7e54630fede2055ba7c",
+      "tests\\glm5\\phase2793_run.py": "f6a1003fb83583edb49d4f6341473efc4d95d8fe885b6ba50183d4cf0849f67a"
+    },
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "prereg_file_sha256": "68c00986207adaca3e0a2ad0491b877a3f6b062d979cee5c069afc2d04a488dc",
+    "run_id": "P2793-ENTITY-ARBITRATION-v1",
+    "seed": 27932026
+  },
+  "input_chunk_sha256": [
+    "7e53b10b8df90cbdc3a8a294c09d9832a96bcc875fc92a92c5a02600fd56fda0",
+    "5e25822133208b2c661602271a69212cdf716cd2778395fe404cadd1723cb15e",
+    "017201251c0a4eeca9e86c59e1d97eb0f5cd8870ed00c6126bf42af2761aca5e",
+    "6b6a80adcaf00052555c47c97a0f9dd296e6f822cdd0baa6198411b5ac47ba75",
+    "bb8972358bcd6269b1114692ceaaf6f4668bb4e5b5485e09b4fcb4d4bdc34201",
+    "37ba16a0dfa2233dc3d15af96a3ee37355c11c490f6c88f910513ae4bbfeb948",
+    "85e3252ff76a2cff49eedce5dcd24b60500dac6a5d9cd96a99652d2826765356",
+    "8e9a34ffdb4a4f52ebe058e1988b28bdc6b0bedc2cd2a52d584e0549470b7743",
+    "d93aeae71f04d5bd0eddfbc548b35bb922e007c4231f7a7dde2b8ea6e48e9b0b",
+    "a795e795f09509c2670e268a4f541cf2e85dae5f3046aa7e342fcea73ab40254",
+    "4db791a805c2ba407824a122582e325c7c2e88a47fa8738f1e73e49604799156",
+    "67c194add0653335d1aadfab43ee75360c49ec787af5128fe146b8501bb4daa0"
+  ],
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "original_corpus_file_sha256": "5b8140c378b0e54ee80a5dff55d1b902c4d49facf0262db4018e369b7a724b72",
+  "preregistration": {
+    "H1": {
+      "criterion": "mean paired document-choice difference>=.50 and entity-bootstrap95% lower>.20; majority binary outcome additionally reported; model-specific controlled question-answering, not general language theory",
+      "expected_delta": 0.5,
+      "power_binary_entity_majority": {
+        "achieved_power": 0.873,
+        "expected_delta_pt": 50.0,
+        "n": 32,
+        "n_required": 27,
+        "p_d": 0.7,
+        "pass": true
+      }
+    },
+    "H2": {
+      "criterion": "on32 heldout entities at F2/L1024/doc, ablating8 discovery-selected late heads lowers correct forced-choice by>=.20 and paired entity lowerCI>0; matched-block8 random heads smaller. Failures retained.",
+      "expected_delta": 0.35,
+      "power_binary_entity_vote": {
+        "achieved_power": 0.813,
+        "expected_delta_pt": 35.0,
+        "n": 32,
+        "n_required": 32,
+        "p_d": 0.4,
+        "pass": true
+      }
+    },
+    "behavior_gate": "each scope heldout forced choice>=.80; report all cells and all inputs; prior probes and dataset keys separate; no posthoc row exclusion",
+    "capability": "new head interventions additionally evaluated on frozen previous2200-keyed monitor if an effect is supported; otherwise no capability-preservation claim. Reference-only questions excluded.",
+    "controls": "same-block matched random heads; source-free prior probe for every entity; identity/length controls and hs[0] saved; no reselect on holdout",
+    "corpus_sha256": "317c398af7e1e16cb2efaf91290f763af4beb19055778af46ff19fe5ddaa57d3",
+    "created_at": 1793782128.286762,
+    "deep_ids": [
+      "vegetable.zucchini:F0:L512:doc",
+      "vegetable.zucchini:F0:L512:world",
+      "vegetable.zucchini:F0:L2048:doc",
+      "vegetable.zucchini:F0:L2048:world",
+      "food.sugar:F2:L512:doc",
+      "food.sugar:F2:L512:world",
+      "food.sugar:F2:L2048:doc",
+      "food.sugar:F2:L2048:world"
+    ],
+    "generation": "fixed deep8 actual greedy max24 new tokens, cache continued without teacher forcing; generation fields at every actual step",
+    "kind": "real",
+    "limits": [
+      "authored repeated document background, not natural corpus",
+      "length adds background content",
+      "lexicon colour labels may fail; prior probes distinguish model knowledge errors",
+      "primary restricted forced-choice distribution; free generations descriptive",
+      "one local physical node",
+      "no cross-model generalization"
+    ],
+    "materials_sha256": "767aab2fa6f23eb26eb9d20273cafa758da03991be93e7e54630fede2055ba7c",
+    "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "native": "all37 hidden layers at registered readouts, all36 blocks fullMLP G/V/A and head output vectors; fixed deep8 examples also full-token hidden and postRoPE normalized Q/K plus groupedV; noTopK coordinate truncation",
+    "primary": "heldout32 entities: difference of document preference under document versus reality scope, entity means over2 new frames x3 lengths",
+    "readout": "entire scope cue and conflicting fact visible before final readout; same assistant suffix across pairs. Entity/cue earlier positions have causal visibility flags, not tested for future scope encoding.",
+    "run_id": "P2793-ENTITY-ARBITRATION-v1",
+    "schema": "entity_arbitration_prereg.v1",
+    "selection": "only discovery16; choose8 heads in blocks18..35 by mean document-minus-reality direct logit contribution. DLA freezes actual final RMS; it is direct attribution, not total causality."
+  },
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 27932026
+  },
+  "run_id": "P2793-ENTITY-ARBITRATION-v1",
+  "schema": "research_frozen_design.v1"
+}

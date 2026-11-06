@@ -1,0 +1,72 @@
+{
+  "H2": {
+    "criterion": "on64 familiar entities,F2,1024,bothscopes; joint32 MLP activation removal reduces full-integer accuracy>=.20; loss versus same-block/RMS-matched random32>=.10 and entity bootstrap95% lower>0; behavior gate required",
+    "power": {
+      "achieved_power": 0.832,
+      "expected_delta_pt": 20.0,
+      "n": 64,
+      "n_required": 59,
+      "p_d": 0.3,
+      "pass": true
+    }
+  },
+  "behavior_gate": "full greedy generated integer equals the complete number, max4 new tokens; each unseen-combination and unseen-entity scope accuracy>=.80; do not discard individual errors",
+  "calibration": {
+    "passed": true,
+    "pilot_sha256": "d0746265c211093dd4724d3a3bd1d875133f18b07b29acf1d52e64d295809700",
+    "scope": "only16 discovery entities,F0/F1; previous v1/v2/v3 failures retained"
+  },
+  "capability": "unconditionally run new32-MLP alpha1 onthe repeated frozen2200 keyed pool,2pp NI andpaired simultaneousCP95%;140reference-only excluded",
+  "capability_pool_sha256": "0aeac712fbba3b27df4983721b5b9fce1273f1a3c25ca37609c957d9597c02c5",
+  "corpus_sha256": "0677b466e01923dde64b4ab53d26b942a7c7649695a4f39bd6cad6528dec59b3",
+  "created_at": 1793793807.3929439,
+  "deep_ids": [
+    "Sc:F2:L1024:doc",
+    "Sc:F2:L1024:world",
+    "Cs:F2:L1024:doc",
+    "Cs:F2:L1024:world",
+    "Sc:F0:L512:doc",
+    "Sc:F0:L512:world",
+    "Sc:F0:L2048:doc",
+    "Sc:F0:L2048:world"
+  ],
+  "doses": [
+    0,
+    0.25,
+    0.5,
+    1
+  ],
+  "interventions": "multiply selected final-query activations by1-alpha at every actual generated step; head8 andsame-blockrandom8 secondary; originalweights unchanged",
+  "kind": "real",
+  "limits": [
+    "only one attribute andone localphysical node",
+    "author-written repeated long background",
+    "scope is system-level; changes early states too",
+    "world reference is supplied, not memory-only arbitration",
+    "discovery16 entities used forcalibration",
+    "single final query pathway andfirstdigit DLA selection",
+    "no Goodfire native-neuron completeness claim"
+  ],
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "native": "all37 hidden layers and36 blocks complete G/V/A,HeadZ at entity/final; deep8 fulltoken HiddenState/QKV, actual cached generation steps; raw values notTopK",
+  "prediction": {
+    "criterion": ">=10% KL reduction versus scope-blind mixture, entity cluster bootstrap lower of KL gain>0, behavior gate required",
+    "internal": "discovery-selected block; Ridge lambda1, entity-by-scope and each explicitly provided source-first-digit-by-scope one-hots; predict all9728 MLP units and2560 next hidden coordinates; compare entity/scope empiricalmean, report raw/standardizedMSE",
+    "internal_criterion": ">=5% standardizedMSE reduction and paired entity bootstrap lower>0; no test-state/logit or expected answer label as input; source values are explicitly present in user text",
+    "limit": "familiar-entity new combinations; no graph-only new-entity prediction claim, no complete-integer generation prediction claim",
+    "output": "full-vocabulary NEXT token KL on256 unseen-combination inputs; mixture of discovery reality-memory nodes and document-first-digit prototypes, scope weights fit ondiscovery only; cached model not called at prediction time",
+    "status": "predeclared heldout predictive assessment, no assumed power for continuous KL/MSE"
+  },
+  "reference_sha256": "ff0f75976583b8a6493b18d0b42e83e1b68bd6e112b45d33578d98494ed5d321",
+  "reference_source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON",
+  "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+  "schema": "atomic_arbitration_prereg.v1",
+  "scope": "single-entity atomic-number arbitration with an explicit verified reference card AND a contradictory fictitious record in both scopes; NOT closed-book factual recall",
+  "selection": "discovery only; select32 native MLP units and8heads in blocks18..35 by mean direct expected-first-digit minus opposing-first-digit contribution; actual final RMS fixed. This selects answer-support candidates, NOT scope-specific semantic units.",
+  "splits": {
+    "discovery": "64 familiar entities x2 frames x2 scopes,1024tokens,256inputs",
+    "length_panel": "first16 discovery entities,F0,512/2048tokens,64inputs",
+    "unseen_combination": "same64 entities,new number assignments andnew source frames2/3,256inputs",
+    "unseen_entity": "32 disjoint entities,frames2/3,128inputs"
+  }
+}

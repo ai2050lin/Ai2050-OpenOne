@@ -3087,3 +3087,28 @@ Q8-D 干预（唯一能升 E2）：冻住 token 嵌入沿 w_freq 平移，看前
 ## 预注册修订记录: Q9-B WSP 增补 A1——W6-a 能力保持门数据集更换 [2026-11-02 22:10]
 
 **owner 指令**（22:01）：能力保持基准由 MATH-500/GSM8K 改为 C-Eval / MMLU / M3Exam / 本地测试数据集四个。修订已落 `PAT_Q9B_WSP_ADDENDUM_v1.md` 修订 A1（v1.1，v1 各门不变）。四数据集电池 `data/lang_bench/q9b_capgate.v1.jsonl` 构建完成：**440 题** = C-Eval val 100（本地已有）+ MMLU test 100（cais/mmlu）+ M3Exam 140（chiayewken/m3exam zh+en，dev 全量文本题 40 + test 子样 100）+ 项目池 questions.v2 剔 C-Eval 重叠 100；统一 lang_bench schema、四集互斥、rng=default_rng(20261102) 消费序固定、manifest 在 `q9b_capgate_manifest.v1.json`。判据按 D23 重写：base vs edited 同题配对 McNemar p<0.05 主判（n=100 单集独立口径 95%CI 半宽约 ±10pt，不设单集否决阈，>8pt 记 FLAG）；M3Exam 镜像答案未经验证、只用于配对比较并已声明。构建脚本 `tests/gpt5/q9b_capgate_data.py`。坑：M3Exam test 含 1–4 数字答案的非选择题与 CMExam 5 选项题（均已滤）、子样循环变量泄漏 bug（修后重建）。Q9-B（v1 五门 + W6/W7 增补 + A1 电池）现已具备正式运行条件。
+
+
+## Phase Q9-B: 语域方向充分但非必需、组件无关、权重手术无效——WSP 单方向闸门的边界 [2026-11-03 11:20]
+
+**预注册**：PAT_Q9B_PREREG_v1.md（W1–W5）+ PAT_Q9B_WSP_ADDENDUM_v1.md（W6/W7 + 修订 A1 四数据集电池）。主脚本 tests/gpt5/pat_q9b.py（STAGE=patch|w6），预检 tests/gpt5/pat_q9b_w6_precheck.py，材料复用 Q9-A 冻结 npz。结果：`tests/gpt5/result/pat_q9b_qwen_patch.json` / `pat_q9b_qwen_w6.json` / `pat_q9b_w6_precheck.json`。账本追加 1 测量 + 3 negative（n=**471**, neg=**47**, head **29efe109** 复算 match=True）；规则 120→**127**（confirmed 28→**31**：+R-MET-41 顶格禁用翻转率、+R-MET-42 patch/ablation 双口径、+R-MTH-33 多选评分位置）。文档 `PAT_Q9B_FINDINGS_20261103.md`。证据等级 **E2 线索**（Qwen 侧）。
+
+**背景**：Q9-A 得"中段 MLP 主写语域"（E1 份额），WSP 博客展示秩一权重大手术可修 Qwen 循环故障。Q9-B 检验两件事：读写分离假设是否成立；语域方向是否属于"可关闭闸门"这一类结构。
+
+**预检（零成本，CPU）**：`c_j = v·W_out[:,j]` 在真实 down_proj 上，中段 top-64 列只占方向能量 **S64=0.116±0.016**（随机零分布 0.063–0.066，比值 1.5–2.3×），参与比 1050–2217 列，**k50≈950 / k80≈2750** ⇒ **DISTRIBUTED_WRITE**。WSP 的循环方向 64 列即可关闭，两者不同类。
+
+**四条主结果（Qwen3-4B bf16，conf n=180）**：
+1. **充分性成立**：MLP patch 剂量-响应单调（α=0.5/1/2/4 的 Δmargin +2.83/+5.69/+11.21/+20.11，KL 0.024/0.095/0.373/1.124），随机方向零分布 KL p95=0.003 ⇒ α=1 约 30 倍于零分布；α≥2 时 1/3 样本翻类（acc 1.000→0.667）。
+2. **必要性不成立**：消融 MLP 投影 acc 1.000（预注册门要求降 ≥0.10，FAIL）；联合消融 mlp+attn 后 acc 仍 **0.989**；效应量虽为随机零分布 10–100 倍，但记 NULL_BOUNDED。
+3. **读写分离被否证**：同方向同 α 的注意力 patch Δmargin **+6.20**（MLP +5.69）、KL 0.129（MLP 0.095）⇒ **ATT_ALSO_WRITES**。根因是残差流加性：patch 效应反映注入点到读出的可及性，不反映组件在日常前向中的分担份额（Q9-A 的 raw 0.11–0.39 是份额，不可外推为"只有 MLP 能写"）。
+4. **权重手术非空但可忽略**：`W_out ← W_out − u uᵀ W_out`（L18–27，k=64/512/2048 列 vs 随机列对照）KL 0.0251/0.0578/0.0792 vs 随机 0.0009/0.0015/0.0073（11–39×，证明编辑生效）；但探针 acc 恒 1.000、翻类率恒 0，全移除 KL 仅 **0.0908**；能力保持门（440 题四集：C-Eval/MMLU/M3Exam/本地池）**0.693→0.698**（305→307/440），McNemar 不显著 ⇒ 无损伤也无改变。
+
+**判决**：`SUFFICIENT_NOT_NECESSARY + ATT_ALSO_WRITES + DISTRIBUTED_WRITE`。三条否证：`register_is_a_closable_gate`、`attention_reads_mlp_writes`、`register_direction_is_necessary`。
+
+**对 WSP 的对质**：WSP 单方向手术成立的前提是**故障为退化自激**（状态被一个方向锁死在固定点）。语域风格不满足：信息在 hs[0] 已有 2/3（Q9-A）、写入摊在 ~1000 列（本 Phase）、下游对方向而非来源响应（W3）⇒ 删副本不改变读出。这把"容量（分布式加性、不可局部编辑）× 门控（低秩、秩一可关）"的两分法落成项目内第一个判据：**语域风格属容量侧**，与 WSP 自己的 Gemma 数学失败同类。
+
+**方法三坑（全部入规则）**：①顶格探针（base acc 1.000）下翻转率按构造恒 0，首版 8 个条件全报零效应——必须改用 Δmargin/KL/top-1 变化率（**R-MET-41**）。②把字母追加到 prompt 后再读末位 logit，读的是"字母之后"⇒ 440 题能力门塌到 0.327 近似随机；改在 prompt 末位读字母后 0.693（**R-MTH-33**，绝对差 +0.366）。③用 patch 大小判读写分离必然误判（**R-MET-42**）。
+
+**不能声称**：E2 线索非机制；"MLP 非必需"≠"MLP 无关"（效应 10–100× 零分布）；单模型单材料族；α 用中位数标定未扫分位数；无 ΔW 落盘（脚本内回滚）。
+
+**下一步**：①GLM 侧 W4/W5 串行补跑（末段注意力语言回写 + bf16 精度桥清 8-bit 挂账）；②Q9-C：把"容量 vs 门控"做成可测分类器——对 N 个语言变量各算 S64/k50/消融可伤性，检验二分是否稳定；③容量侧的研究纲领换轨：不再找必需单元，改找"可达集边界"（覆盖率×集中度的强化学习式刻画）。

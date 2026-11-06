@@ -1,0 +1,113 @@
+{
+  "application_changed": true,
+  "changes": [
+    "统一图谱浏览及三个图层、四个空间页面",
+    "账号与节点拆分，贡献算力常驻顶栏",
+    "研究计划不重复加载报告，实验队列内选择专业工位",
+    "旧入口迁移，主要页面历史和popstate恢复，源实验/快照/样本持续回查",
+    "参数快照核验、缺失模型和图谱桶不自动替换、索引越界约束",
+    "主包/附加包同步和本地导入、历史实测能力下钻、教学工具限于高级兼容"
+  ],
+  "checks": {
+    "build_warning": "existing large bundle warning remains",
+    "frontend_tests": 61,
+    "installer_packaged": false,
+    "production_build": "passed",
+    "security_bypass_attempted": false,
+    "test_files": 10,
+    "visual_acceptance": "not_completed",
+    "visual_reason": "Computer Use could not determine current browser URL confidently enough to enforce policy and stopped for the turn"
+  },
+  "created_at": "2026-11-04 22:02",
+  "kind": "engineering",
+  "limits": [
+    "DOM回归和编译不能替代浏览器视觉验收；未声称检查全部屏幕尺寸和真实设备交互。",
+    "旧数据集实测仍使用本机服务已加载模型；界面提供模型不匹配隔离，不自动更换GPU权重。",
+    "本机独立Goodfire测试的科学结果仍需现有登记/审计，不因菜单迁移自动写为机制结论。"
+  ],
+  "logs": [
+    {
+      "path": "tests\\glm5\\result\\workbench_navigation_20261104\\frontend-tests.log",
+      "sha256": "b613e86188ec7953e1720b9c1c25fc1c5d6869593c90c283a118d329eeb80738"
+    },
+    {
+      "path": "tests\\glm5\\result\\workbench_navigation_20261104\\build.log",
+      "sha256": "57f522f93bfbbb0c005322d450f2556587940d3ff38d37164836c25e23873046"
+    }
+  ],
+  "model_runs": 0,
+  "primary_count": 4,
+  "proposal_sha256": "485e4f211196e0152c40f46f6f0c6a6e8ba1ac4330deb151d1d1dc9c23093f26",
+  "run_id": "WB-NAV-IMPLEMENTATION-20261104-v1",
+  "schema": "research_navigation_implementation.v1",
+  "scientific_evidence_upgraded": false,
+  "secondary_count": 14,
+  "source_files": [
+    {
+      "path": "frontend/src/components/app/Workbench.jsx",
+      "sha256": "25b19af94b492fccd90d1b700c37d96c042aaba617a07e1a1adb45778693f661"
+    },
+    {
+      "path": "frontend/src/components/app/workbenchUtil.js",
+      "sha256": "3c7d178868c4e5bbec85ede0344c36210240d731a2afc913539217e85c6a69e2"
+    },
+    {
+      "path": "frontend/src/components/app/ConfigView.jsx",
+      "sha256": "6210dd3917fb31b53743683190d154d4f4d785e78c1b82317a0c2395aee2e94f"
+    },
+    {
+      "path": "frontend/src/components/app/WorkbenchHelp.jsx",
+      "sha256": "4ccfb1d6be483592653e92549e67ce4f4c7e6239aceac754fd95a48fadafecb0"
+    },
+    {
+      "path": "frontend/src/components/app/researchContext.js",
+      "sha256": "bdc800ad0e9848662b108f9455374c293a7875a60c890390356541fc4efcfe63"
+    },
+    {
+      "path": "frontend/src/components/app/workbench.css",
+      "sha256": "5479c0c211c9bca7113139ddd86167e45d03d613570f7df448d9c68deb776035"
+    },
+    {
+      "path": "frontend/src/components/v8/SpaceLens.jsx",
+      "sha256": "01711f1bd84821ec3744243eacbae21f2e3726f0754cc27e502178e1c1066311"
+    },
+    {
+      "path": "frontend/src/components/v8/ResearchSpace.jsx",
+      "sha256": "5c3630cb87bc097c9ed913dea92a45083ce11fce52ffe1da9ae2ba70d295a1ca"
+    },
+    {
+      "path": "frontend/src/components/v8/ResearchExecution.jsx",
+      "sha256": "ba1f7660c2189509cd3ab18d35649f085219cd37e51b846eb55acd294dc6fe7a"
+    },
+    {
+      "path": "frontend/src/components/v8/ParameterExplorer.jsx",
+      "sha256": "93ffce6943f8761911264c46cd7ec53cd384f22af55db19b5b7c07c20b0a53ee"
+    },
+    {
+      "path": "frontend/src/components/v8/MechanismTraceExplorer.jsx",
+      "sha256": "74cefa752986ae5fc4aca7c129896db203cd38f85b587035f5998324fc5aeaaa"
+    },
+    {
+      "path": "frontend/src/components/v8/LangAtlas.jsx",
+      "sha256": "b4847dc25fac2a197dcd99b6e9ce593133f03e3f3b57a81d1907a1336c70ea6e"
+    },
+    {
+      "path": "frontend/src/components/app/rdc_fusion/AtlasView.jsx",
+      "sha256": "5160556a6aa42e695356703853ca4968bda9873ddec5fd2c165e84f591c3e5dd"
+    },
+    {
+      "path": "tests/glm5/workbench_navigation_20261104.test.jsx",
+      "sha256": "5782d7516e94990460ed16b3587da618ba32b126fda4bdb269a0dc337a8d94d2"
+    },
+    {
+      "path": "tests/glm5/workbench_node_settings_20261104.test.jsx",
+      "sha256": "2283b0814a3678c9a7db4ff6794d8a9e9e4afa6fe52616246b97558e51cdb905"
+    },
+    {
+      "path": "tests/glm5/workbench_graph_identity_20261104.test.jsx",
+      "sha256": "1434296e8c528fb6f54e3d47cf4be6d3379329a510cac2ca9cdb9df77278fdf8"
+    }
+  ],
+  "status": "implemented_and_regression_checked_visual_acceptance_incomplete",
+  "timezone": "America/Chicago"
+}

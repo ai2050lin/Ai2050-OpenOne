@@ -16,6 +16,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23184f95'/%3E%3Ctext x='16' y='22' font-family='Segoe UI,Arial,sans-serif' font-size='14' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EA2%3C/text%3E%3C/svg%3E" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="fusion-theme.css" />
+    <link rel="stylesheet" href="home-visual.css?v=1" />
   </head>
   <body>
     <header class="site-header" aria-label="主导航">
@@ -40,7 +41,7 @@
     </header>
 
     <main class="page-shell home-shell">
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero home-front" aria-labelledby="hero-title">
         <div class="hero-copy">
           <!-- <div class="hero-logo" aria-hidden="true">
             <span class="orbital-mark"><span></span></span>
@@ -54,28 +55,49 @@
           </p> -->
           <div class="hero-actions">
             <a class="ghost-button" href="ai2050.html">查看计划</a>
-            <a class="primary-button" href="https://server.ai2050.com/">进入研究中心</a>            
+            <a class="primary-button" href="https://server.ai2050.com/">进入研究中心</a>
+            <a id="desktop-client-download" class="ghost-button" href="https://github.com/ai2050lin/Ai2050-OpenOne/releases/download/desktop-v1.0.7/AI2050-Setup-1.0.7-x64.exe" aria-label="下载 Windows x64 客户端 1.0.7">下载客户端 1.0.7</a>            
           </div>
         </div>
 
-        <div class="hero-visual" aria-label="AI2050 概念视觉">
-          <img src="index.png" alt="AI2050 人类协作与智能网络概念图" />
-          <div class="visual-glow"></div>
-        </div>
+        <figure class="home-map">
+          <figcaption>
+            <span class="home-map-kicker">AI2050 研究路线示意</span>
+            从语言现象到模型机制
+          </figcaption>
+          <div class="home-map-flow">
+            <div class="home-map-group">
+              <h3>外部语言图谱</h3>
+              <ul>
+                <li>知识网络</li>
+                <li>推理与功能</li>
+                <li>语法体系</li>
+              </ul>
+            </div>
+            <div class="home-map-linkline" aria-hidden="true"></div>
+            <div class="home-map-group">
+              <h3>内部模型图谱</h3>
+              <ul>
+                <li>词嵌入</li>
+                <li>注意力 Head</li>
+                <li>MLP 神经元</li>
+              </ul>
+            </div>
+          </div>
+          <p class="home-map-note">用对照实验检验语言现象与模型内部响应的关联。</p>
+        </figure>
       </section>
 
-      <section class="programs" aria-label="AI2050 栏目">
-        <a class="program-card wide" id="plan" href="ai2050.html">
+      <section class="programs home-entry-grid" aria-label="AI2050 栏目">
+        <a class="program-card" id="plan" href="ai2050.html">
           <div class="program-copy">
             <p class="program-index">01</p>
             <h3>AI2050计划</h3>
             <p>讨论 AGI 实现后的使用、管理与治理，形成长期公共路线。</p>
           </div>
-          <div class="program-image horizon"></div>
         </a>
 
-        <a class="program-card split" id="agi" href="agi_project.html">
-          <div class="program-image brain"></div>
+        <a class="program-card" id="agi" href="agi_project.html">
           <div class="program-copy">
             <p class="program-index">02</p>
             <h3>AGI项目</h3>
@@ -83,23 +105,13 @@
           </div>
         </a>
 
-        <article class="program-card wide reverse" id="forum">
+        <article class="program-card" id="forum">
           <div class="program-copy">
             <p class="program-index">03</p>
             <h3>社区</h3>
             <p>汇集研究者与公众观点，形成开放协作社区。</p>
           </div>
-          <div class="program-image forum"></div>
         </article>
-
-        <!-- <article class="program-card split" id="support">
-          <div class="program-image lighthouse"></div>
-          <div class="program-copy">
-            <p class="program-index">04</p>
-            <h3>捐赠与开支</h3>
-            <p>公开展示捐赠记录与开支流水，保持透明监督。</p>
-          </div>
-        </article> -->
       </section>
     </main>
 

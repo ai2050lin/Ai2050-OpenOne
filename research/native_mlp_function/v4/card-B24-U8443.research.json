@@ -1,0 +1,264 @@
+{
+  "card": {
+    "boundary": "question_end / assistant_boundary separately",
+    "coordinate_results": [],
+    "counterexamples": [
+      {
+        "dose_sha256": "c83c2cbb29fdd1ba4efd71513544c1325a895f648a3e2532c1bee180d61777c9",
+        "reason": "current-query joint ablation below registered effect threshold; not individual necessity test"
+      },
+      {
+        "polarity_refs": [
+          "7efd23c88925dd0baf3cc9d9688732f42ff3082614b67ab036306e2bab2b3dc0",
+          "001dc9b4de1d5d8ae734f8a83fd8248ecd5c14ab57cd9db89c90facf3c26a1bb"
+        ],
+        "reason": "six coordinates track answer after question inversion; B24/U8443 only question-end answer-aligned, assistant boundary not disambiguated"
+      }
+    ],
+    "examples": [
+      {
+        "deep": true,
+        "label": "限定任务中的答案方向响应",
+        "layer": 24,
+        "n_tokens": 1034,
+        "readout_annotations": [
+          {
+            "position": 1000,
+            "role": "before_selector",
+            "visible_prefix_tokens": 1001
+          },
+          {
+            "position": 1005,
+            "role": "selector_partial_question",
+            "visible_prefix_tokens": 1006
+          },
+          {
+            "position": 1023,
+            "role": "question_end",
+            "visible_prefix_tokens": 1024
+          },
+          {
+            "position": 1033,
+            "role": "assistant_boundary",
+            "visible_prefix_tokens": 1034
+          }
+        ],
+        "run_id": "NMLP-FUNCTION-20261104-v4",
+        "sample_id": "location:288:0",
+        "trace_id": "bc6bf1630df82abe5dcc21953a6883a48f8bf8c62aba6ca463399d12f271cf87",
+        "unit": 8443,
+        "url": "?lens=spatial&view=live&trace=bc6bf1630df82abe5dcc21953a6883a48f8bf8c62aba6ca463399d12f271cf87&tblock=24&tunit=8443&ttab=evidence"
+      },
+      {
+        "deep": true,
+        "label": "限定任务中的答案方向响应",
+        "layer": 24,
+        "n_tokens": 1034,
+        "readout_annotations": [
+          {
+            "position": 1000,
+            "role": "before_selector",
+            "visible_prefix_tokens": 1001
+          },
+          {
+            "position": 1005,
+            "role": "selector_partial_question",
+            "visible_prefix_tokens": 1006
+          },
+          {
+            "position": 1023,
+            "role": "question_end",
+            "visible_prefix_tokens": 1024
+          },
+          {
+            "position": 1033,
+            "role": "assistant_boundary",
+            "visible_prefix_tokens": 1034
+          }
+        ],
+        "run_id": "NMLP-FUNCTION-20261104-v4",
+        "sample_id": "location:288:1",
+        "trace_id": "a0b1b9bf5db518b012c6112c2e1472a851f8ec316deb2b91414a8c6385ab0140",
+        "unit": 8443,
+        "url": "?lens=spatial&view=live&trace=a0b1b9bf5db518b012c6112c2e1472a851f8ec316deb2b91414a8c6385ab0140&tblock=24&tunit=8443&ttab=evidence"
+      }
+    ],
+    "findings": [
+      {
+        "answer_supported": true,
+        "fact_supported": false,
+        "family": "location",
+        "interpretation": "answer-aligned_in_this_scope",
+        "layer": 24,
+        "results": {
+          "0": {
+            "answer_order": {
+              "accuracy": 0.9296875,
+              "p": 1.5816581633095562e-26,
+              "passed": true,
+              "unequal_fraction": 0.984375
+            },
+            "fact_order": {
+              "accuracy": 0.0703125,
+              "p": 1.0,
+              "passed": false,
+              "unequal_fraction": 0.984375
+            }
+          },
+          "1": {
+            "answer_order": {
+              "accuracy": 0.98828125,
+              "p": 7.52316384526264e-37,
+              "passed": true,
+              "unequal_fraction": 0.9921875
+            },
+            "fact_order": {
+              "accuracy": 0.98828125,
+              "p": 7.52316384526264e-37,
+              "passed": true,
+              "unequal_fraction": 0.9921875
+            }
+          }
+        },
+        "scope": "name_balanced_place",
+        "stage": 0,
+        "unit": 8443
+      },
+      {
+        "answer_supported": false,
+        "fact_supported": false,
+        "family": "location",
+        "interpretation": "not_disambiguated",
+        "layer": 24,
+        "results": {
+          "0": {
+            "answer_order": {
+              "accuracy": 0.390625,
+              "p": 0.9952484174835489,
+              "passed": false,
+              "unequal_fraction": 0.984375
+            },
+            "fact_order": {
+              "accuracy": 0.609375,
+              "p": 0.00790910200402604,
+              "passed": false,
+              "unequal_fraction": 0.984375
+            }
+          },
+          "1": {
+            "answer_order": {
+              "accuracy": 0.63671875,
+              "p": 0.0012087759625490496,
+              "passed": false,
+              "unequal_fraction": 0.9921875
+            },
+            "fact_order": {
+              "accuracy": 0.63671875,
+              "p": 0.0012087759625490496,
+              "passed": false,
+              "unequal_fraction": 0.9921875
+            }
+          }
+        },
+        "scope": "name_balanced_place",
+        "stage": 1,
+        "unit": 8443
+      }
+    ],
+    "individual_necessity": "not_tested",
+    "label": "限定任务中的答案方向响应",
+    "layer": 24,
+    "natural_discovery": "2e9f23a3af64d4b5a58d30a5f5cd39f01a5a90b90b014172153ec562d32e8d76",
+    "original_hypotheses": [
+      {
+        "behavior_gate": true,
+        "family": "location",
+        "results": {
+          "confirm": {
+            "A": {
+              "accuracy": 0.982421875,
+              "mean_oriented_delta": 0.06832504272460938,
+              "n": 256,
+              "nonzero_fraction": 0.98828125,
+              "p": 1.8648997649349696e-70,
+              "passed": true
+            },
+            "G": {
+              "accuracy": 0.99609375,
+              "mean_oriented_delta": 0.329681396484375,
+              "n": 256,
+              "nonzero_fraction": 1.0,
+              "p": 2.2194953186592723e-75,
+              "passed": true
+            },
+            "V": {
+              "accuracy": 1.0,
+              "mean_oriented_delta": 0.29227447509765625,
+              "n": 256,
+              "nonzero_fraction": 1.0,
+              "p": 8.636168555094445e-78,
+              "passed": true
+            },
+            "early_prefix_max_abs": 0.0,
+            "final_embedding_max_abs": 0.0,
+            "hidden_pair_direction": {
+              "accuracy": 1.0,
+              "scope": "exploratory supervised response-direction comparator, not SAE or autonomous output prediction"
+            }
+          },
+          "lockbox": {
+            "A": {
+              "accuracy": 0.986328125,
+              "mean_oriented_delta": 0.08330154418945312,
+              "n": 256,
+              "nonzero_fraction": 0.99609375,
+              "p": 4.773687076904941e-71,
+              "passed": true
+            },
+            "G": {
+              "accuracy": 0.9921875,
+              "mean_oriented_delta": 0.34564208984375,
+              "n": 256,
+              "nonzero_fraction": 1.0,
+              "p": 2.8410403695694194e-73,
+              "passed": true
+            },
+            "V": {
+              "accuracy": 0.99609375,
+              "mean_oriented_delta": 0.3442230224609375,
+              "n": 256,
+              "nonzero_fraction": 1.0,
+              "p": 2.2194953186592723e-75,
+              "passed": true
+            },
+            "early_prefix_max_abs": 0.0,
+            "final_embedding_max_abs": 0.0,
+            "hidden_pair_direction": {
+              "accuracy": 1.0,
+              "scope": "exploratory supervised response-direction comparator, not SAE or autonomous output prediction"
+            }
+          }
+        },
+        "supported": true,
+        "title": "被选中名称指代地点",
+        "unit": [
+          24,
+          8443
+        ]
+      }
+    ],
+    "semantic_monosemanticity": "not_established",
+    "unit": 8443
+  },
+  "kind": "real",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "provenance": {
+    "git_dirty": true,
+    "git_sha": "163a3214ce0ad450b7c03cb761c6dc29638d0a54",
+    "model_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+    "model_revision": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+    "seed": 4112026
+  },
+  "run_id": "NMLP-FUNCTION-20261104-v4",
+  "schema": "research_native_function_card.v1"
+}

@@ -1,0 +1,12 @@
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';
+import React,{act} from '../../frontend/node_modules/react/index.js';
+import {createRoot} from '../../frontend/node_modules/react-dom/client.js';
+import ConfigView,{CFG_SECTIONS} from '../../frontend/src/components/app/ConfigView.jsx';
+vi.mock('../../frontend/src/components/app/rdc_fusion/authContext.js',()=>({useAuth:()=>({user:{username:'fixture',role:'member'},logout:vi.fn(),enterAuth:vi.fn()})}));
+vi.mock('../../frontend/src/components/app/rdc_fusion/ContributePanel.jsx',()=>({default:()=> <div data-testid="actual-contribution-panel">节点预算、托管和运行</div>}));
+vi.mock('../../frontend/src/components/app/rdc_fusion/api.js',()=>({ADMIN_LIVE:true,API_BASE:'http://localhost',DESKTOP:false,OFFLINE_CLIENT:false,REMOTE_CENTER:false,WEB_URL:''}));
+let host,root;
+beforeEach(()=>{globalThis.IS_REACT_ACT_ENVIRONMENT=true;host=document.createElement('div');document.body.append(host);root=createRoot(host)});
+afterEach(async()=>{await act(async()=>root.unmount());host.remove()});
+it('account settings keep identity and permissions without eagerly running node controls',async()=>{await act(async()=>root.render(<ConfigView section="account"/>));expect(host.textContent).toContain('fixture');expect(host.querySelector('[data-testid="actual-contribution-panel"]')).toBe(null)});
+it('node settings mount the existing contribution implementation in its own page',async()=>{await act(async()=>root.render(<ConfigView section="node"/>));expect(host.querySelector('[data-testid="actual-contribution-panel"]')).not.toBe(null);expect(CFG_SECTIONS.map(s=>s.id)).toEqual(['conn','account','node','model'])});

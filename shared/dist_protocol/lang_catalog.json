@@ -1,0 +1,161 @@
+{
+  "schema": "lang_catalog.v1",
+  "version": 3,
+  "sections": [
+    {"id": "knowledge", "name": "知识网络", "summary": "词义、概念、实体属性与知识关系", "domains": ["meaning"]},
+    {"id": "reasoning-functions", "name": "推理与功能", "summary": "逻辑推断、语境理解、多语表达与应用任务", "domains": ["reasoning", "discourse", "variation", "tasks"]},
+    {"id": "grammar-system", "name": "语法体系", "summary": "字词构成、书写规则、句法与形态", "domains": ["grammar", "form"]}
+  ],
+  "domains": [
+    {
+      "id": "form", "name": "字词与书写", "summary": "字符、词界、拼写和构词",
+      "groups": [
+        {"name": "书写与分界", "items": [
+          {"id": "FORM.BOUNDARY", "name": "词界与分词", "example": "「研究生命起源」切成「研究 / 生命 / 起源」，语言词界可与模型 token 边界分别记录。"},
+          {"id": "FORM.PUNCT", "name": "标点与段落边界", "example": "「他说：『走吧。』」的冒号和引号标出说话内容。"},
+          {"id": "FORM.NOTATION", "name": "数字、日期与符号写法", "example": "「三点五」与「3.5」可以表示同一数值。"}
+        ]},
+        {"name": "构词", "items": [
+          {"id": "FORM.AFFIX", "name": "词缀与派生", "example": "英文 kind 加前缀 un- 形成 unkind。"},
+          {"id": "FORM.COMPOUND", "name": "复合词", "example": "「火车站」由「火车」和「站」组合，整体指一种设施。"},
+          {"id": "FORM.REDUP", "name": "重叠", "example": "「看看」与「看」词形相关，在请求中的语气可能不同。"}
+        ]},
+        {"name": "形式变体", "items": [
+          {"id": "FORM.SPELL", "name": "拼写和字形变体", "example": "英文 colour 与 color 的拼写不同。"},
+          {"id": "FORM.ABBR", "name": "缩写与简称", "example": "「北京大学」可在适当语境中简称「北大」。"},
+          {"id": "FORM.TYPO", "name": "错字与变体恢复", "example": "在「我收道了邮件」中结合上下文恢复「收到」。"}
+        ]}
+      ]
+    },
+    {
+      "id": "meaning", "name": "词义与知识", "summary": "词义、概念关系、实体和事件",
+      "groups": [
+        {"name": "词义与类别", "items": [
+          {"id": "SEM.SENSE", "name": "多义与词义消歧", "example": "「花钱」中的「花」与「一朵花」中的「花」含义不同。"},
+          {"id": "SEM.LEXREL", "name": "近义与反义", "example": "「高兴」与「愉快」意思相近，「开」与「关」在某些语境中相反。"},
+          {"id": "SEM.CATEGORY", "name": "名词语义类别", "example": "「扳手」属于工具类，「鲤鱼」属于动物类。", "measurement": "KN.CAT"}
+        ]},
+        {"name": "概念与实体关系", "items": [
+          {"id": "SEM.ISA", "name": "上下位关系", "example": "「苹果是一种水果」表达类别归属。", "measurement": "KN.ISA"},
+          {"id": "SEM.PART", "name": "部分与整体", "example": "「轮子是汽车的一部分」表达组成关系。", "measurement": "KN.PART"},
+          {"id": "SEM.ORIGIN", "name": "来源与产地", "example": "「葡萄酒由葡萄酿成」表达原料来源。", "measurement": "KN.ORIGIN"}
+        ]},
+        {"name": "属性与时空", "items": [
+          {"id": "SEM.ATTRIBUTE", "name": "属性绑定", "example": "「红杯子旁有个蓝碗」要求把颜色分别绑定给两个实体。", "measurement": "KN.ATTR"},
+          {"id": "SEM.QUANTITY", "name": "数值、计量与单位", "example": "「两升水」结合数量、单位和所计量的对象。"},
+          {"id": "SEM.SPACETIME", "name": "空间与时间关系", "example": "「杯子在书的左侧」「会议在午饭后」分别描述相对位置和顺序。"}
+        ]},
+        {"name": "实体与事件知识", "items": [
+          {"id": "SEM.IDENTITY", "name": "实体身份与别名", "example": "在相关语境中辨别「鲁迅」和「周树人」指的是同一人。"},
+          {"id": "SEM.EVENT", "name": "事件与常识脚本", "example": "餐厅语境中「点菜」和「结账」通常处在不同阶段。"},
+          {"id": "SEM.SOURCE", "name": "知识来源与冲突", "example": "设定资料和现实知识不一致时，按问题指定的来源作答。"}
+        ]}
+      ]
+    },
+    {
+      "id": "grammar", "name": "句法与形态", "summary": "句类、论元、句式和形态标记",
+      "groups": [
+        {"name": "句类与短语", "items": [
+          {"id": "SYN.MOOD", "name": "疑问与陈述", "example": "「我想知道他来不来。」有嵌入式疑问，句末仍可用句号。", "measurement": "GR.Q"},
+          {"id": "SYN.COMMAND", "name": "祈使与感叹", "example": "「请关门」用于请求；「多美的景色啊」表达感叹。"},
+          {"id": "SYN.PHRASE", "name": "短语结构与修饰归属", "example": "「新买的木桌」中「新买的」修饰「木桌」。"}
+        ]},
+        {"name": "论元与句式", "items": [
+          {"id": "SYN.ROLE", "name": "施事与受事", "example": "「小王推开了门」中小王是施事，门是受事。", "measurement": "GR.ROLE"},
+          {"id": "SYN.VALENCY", "name": "配价与论元省略", "example": "「她送了我一本书」涉及赠送者、接收者和物品。"},
+          {"id": "SYN.CONSTRUCTION", "name": "主动、把字与被字句", "example": "「他打破了杯子」与「杯子被他打破了」可描述同一事件。", "measurement": "GR.CONSTR"}
+        ]},
+        {"name": "组合结构", "items": [
+          {"id": "SYN.ORDER", "name": "语序与成分移动", "example": "「这本书我已经看了」把讨论对象置于句首。"},
+          {"id": "SYN.EMBED", "name": "并列、从句与嵌套", "example": "「我知道他认为这很重要」包含多层从句。"},
+          {"id": "SYN.DISTANCE", "name": "长距离句法依存", "example": "「我昨天遇到的那位老师来了」中，主语与主要谓语之间可插入较长修饰。"}
+        ]},
+        {"name": "形态与语法标记", "items": [
+          {"id": "SYN.AGREEMENT", "name": "一致关系", "example": "英文 The book is here 与 The books are here 的主谓数一致。"},
+          {"id": "SYN.TAM", "name": "时、体与情态", "example": "「已经完成」「正在完成」「可能完成」表达不同的时间结构或可能性。"},
+          {"id": "SYN.CASE", "name": "格、助词与结构标记", "example": "「我的书」中「的」标记领属修饰关系。"}
+        ]}
+      ]
+    },
+    {
+      "id": "reasoning", "name": "命题与推理", "summary": "真值、作用域和多步关系组合",
+      "groups": [
+        {"name": "真值与作用域", "items": [
+          {"id": "LOG.NEG", "name": "否定与真值", "example": "「灯亮着」和「灯没有亮」给出相反的状态描述。", "measurement": "RS.NEG"},
+          {"id": "LOG.QUANT", "name": "量词与作用域", "example": "「不是所有人都到了」允许部分人已经到达。"},
+          {"id": "LOG.CONNECTIVE", "name": "命题连接与蕴含", "example": "在通常的合取读法下，「下雨且刮风」蕴含「下雨」。"}
+        ]},
+        {"name": "局部推断", "items": [
+          {"id": "LOG.COND", "name": "条件推理", "example": "给出「若缺电则停机」与「缺电」，推得「停机」。", "measurement": "RS.COND"},
+          {"id": "LOG.CAUSE", "name": "因果关系", "example": "「水管冻裂导致漏水」给出一个有方向的因果关系。", "measurement": "RS.CAUSE"},
+          {"id": "LOG.COMPARE", "name": "比较判断", "example": "「甲比乙高」要求正确处理被比较对象和比较方向。", "measurement": "RS.COMPARE"}
+        ]},
+        {"name": "组合推理", "items": [
+          {"id": "LOG.CHAIN", "name": "传递与多步推断", "example": "若甲早于乙、乙早于丙，可推得甲早于丙。"},
+          {"id": "LOG.QUANTITATIVE", "name": "数量与时间计算", "example": "「下午三点出发，两小时后到达」要求推算到达时间。"},
+          {"id": "LOG.CONSTRAINT", "name": "约束一致性与反例", "example": "在同一时刻、同一意义下，「门开着」和「门关着」互相冲突。"}
+        ]}
+      ]
+    },
+    {
+      "id": "discourse", "name": "篇章与交际", "summary": "上下文、言外之意和多轮交流",
+      "groups": [
+        {"name": "篇章衔接", "items": [
+          {"id": "DIS.COREF", "name": "指代、照应与省略恢复", "example": "从「李明借了本书。他读完了」恢复「他」与省略的宾语。"},
+          {"id": "DIS.TOPIC", "name": "主题延续与信息焦点", "example": "连续几句谈天气后，「至于交通」切换讨论主题。"},
+          {"id": "DIS.RELATION", "name": "转折、解释与篇章关系", "example": "「路很远，不过交通方便」用转折衔接两句。"}
+        ]},
+        {"name": "交际意图", "items": [
+          {"id": "DIS.ACT", "name": "言语行为与间接请求", "example": "在合适语境中，「你能关窗吗？」可以是在请求关窗。"},
+          {"id": "DIS.PRESUP", "name": "预设", "example": "「她又迟到了」通常预设此前有过迟到。"},
+          {"id": "DIS.IMPLICATURE", "name": "会话含义", "example": "「我读了一部分」在一些场合暗示没有读完，含义依赖语境。"}
+        ]},
+        {"name": "对话与长文本", "items": [
+          {"id": "DIS.TURN", "name": "说话人、轮次与引语", "example": "区分「他说我明天去」中转述者与被转述者。"},
+          {"id": "DIS.COMMONGROUND", "name": "共同知识与视角", "example": "角色甲看见了信息，角色乙没看见，后续对话需分开两人的已知信息。"},
+          {"id": "DIS.CONSISTENCY", "name": "跨段一致与信息更新", "example": "后文应使用人物新公布的地址，并能区分旧址和新址。"}
+        ]}
+      ]
+    },
+    {
+      "id": "variation", "name": "多语与表达变体", "summary": "语言对齐、语域和意义相近的表达",
+      "groups": [
+        {"name": "语言与跨语对应", "items": [
+          {"id": "VAR.LANGUAGE", "name": "语种识别", "example": "区分中文「早上好」与英文 Good morning。", "measurement": "EXT.LANG"},
+          {"id": "VAR.SWITCH", "name": "语码混用", "example": "「这个 meeting 改到明天了」在一句话中混用两种语言。"},
+          {"id": "VAR.ALIGNMENT", "name": "跨语言语义对齐", "example": "在具体语境中对齐中文「明天」与英文 tomorrow 的时间指向。"}
+        ]},
+        {"name": "社群与风格", "items": [
+          {"id": "VAR.DIALECT", "name": "地域变体与方言词汇", "example": "比较不同地区如何称呼同一种事物，并保留说话地区。"},
+          {"id": "VAR.REGISTER", "name": "正式、口语与专业语域", "example": "「请尽快回复」和「有空赶紧回我」在语气和场合上有所差异。"},
+          {"id": "VAR.FIGURATIVE", "name": "隐喻、习语与反讽", "example": "「给项目踩刹车」可指降低进度，具体含义取决于上下文。"}
+        ]},
+        {"name": "表述变换", "items": [
+          {"id": "VAR.FRAME", "name": "提问表述变体", "example": "用不同提示框架询问同一分类问题，保持预期任务一致。", "measurement": "EXT.FRAME"},
+          {"id": "VAR.PARAPHRASE", "name": "同义改写与意义保持", "example": "「会议推迟到周五」可改写为「会议改在周五举行」。"},
+          {"id": "VAR.POLITENESS", "name": "礼貌与表达强度", "example": "「关窗」「请关窗」和「方便关一下窗吗」可请求同一行动。"}
+        ]}
+      ]
+    },
+    {
+      "id": "tasks", "name": "语言应用任务", "summary": "指令、内容转换和受约束生成",
+      "groups": [
+        {"name": "指令与任务约束", "items": [
+          {"id": "TASK.CUE", "name": "任务线索识别", "example": "同一文本前的「翻译」「判断」「续写」指向不同任务。", "measurement": "RS.TASK"},
+          {"id": "TASK.PRIORITY", "name": "多条指令与约束冲突", "example": "「保留所有数字」与「省略统计细节」并存时，需要确定适用范围。"},
+          {"id": "TASK.FORMAT", "name": "格式与长度约束", "example": "「用两句中文回答，并给出日期」同时规定语言、长度和内容。"}
+        ]},
+        {"name": "理解与转换", "items": [
+          {"id": "TASK.TRANSLATION", "name": "翻译", "example": "在目标语言中表达原句事件、角色和语气。"},
+          {"id": "TASK.SUMMARY", "name": "摘要与信息取舍", "example": "将一篇报道缩写成一段，保留关键事实和限制条件。"},
+          {"id": "TASK.EXTRACTION", "name": "问答与信息抽取", "example": "从通知中抽取活动时间、地点和报名截止日。"}
+        ]},
+        {"name": "生成与形式化", "items": [
+          {"id": "TASK.COMPLETION", "name": "补全、续写与润色", "example": "续写故事时保持角色和已建立情节一致。"},
+          {"id": "TASK.FORMAL", "name": "程序与数学表达", "example": "把「选出所有大于 10 的数」转换成筛选条件或代码。"},
+          {"id": "TASK.TOOL", "name": "工具调用与结构化输出", "example": "将「查周五上海的天气」转换为含地点与日期的查询参数。"}
+        ]}
+      ]
+    }
+  ]
+}

@@ -211,6 +211,13 @@ def _register_template(cur_row: dict) -> str:
     design_sha = _canonical_design_sha(
         cur_row['tm_id'], cur_row['version'], cur_row['corpus'], cur_row['runner'],
         cur_row.get('research_adapter'))
+    if cur_row['corpus'].get('job_kind')=='natural_register':
+        from shared.dist_protocol import natural_register_runner as NR
+        NR.validate_corpus(cur_row['corpus'])
+        if cur_row['runner']!=Path(NR.__file__).read_bytes().decode('utf-8'):
+            raise ValueError('natural register tasks require the installed audited runner')
+        previous=db.execute('SELECT design_sha FROM templates WHERE tm_id=?',(cur_row['tm_id'],)).fetchone()
+        if previous and previous['design_sha']!=design_sha:raise ValueError('natural task IDs are immutable; use a new versioned ID')
     bundle_dir = _DATA_DIR / 'bundles' / cur_row['tm_id'] / f"v{cur_row['version']}"
     bundle_dir.mkdir(parents=True, exist_ok=True)
     (bundle_dir / 'corpus.json').write_text(
@@ -441,6 +448,7 @@ class ClaimReq(BaseModel):
     dtype: str = ''
     seed: int = 0
     tm_id: str = ''  # 定向领取（可缺省=负载均衡轮询）
+    job_kind: str = 'family_test'
 
 
 @router.post('/nodes/register')
@@ -685,29 +693,32 @@ def tasks_public() -> dict:
         db.execute("UPDATE tasks SET status='expired' WHERE status='claimed' AND lease_until<?", (now,))
         db.commit()
     queued = db.execute(
-        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,
+        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,k.shard,
                   t.name AS template_name,t.version AS template_version
            FROM tasks k LEFT JOIN templates t ON t.tm_id=k.tm_id
            WHERE k.status='queued' ORDER BY k.rowid LIMIT 50''').fetchall()
     active = db.execute(
-        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,k.claimed_at,k.lease_until,
+        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,k.shard,k.claimed_at,k.lease_until,
                   n.name AS node_name,n.gpu,n.model,n.dtype
            FROM tasks k LEFT JOIN nodes n ON n.node_id=k.node_id
            WHERE k.status='claimed' ORDER BY k.claimed_at DESC LIMIT 50''').fetchall()
-    recent = db.execute(
-        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,k.status,k.claimed_at,k.done_at,k.note,k.result_sha,
+    recent_query = (
+        '''SELECT k.task_id,k.tm_id,k.work_unit_id,k.research_ref_json,k.shard,k.status,k.claimed_at,k.done_at,k.note,k.result_sha,
                   n.name AS node_name,n.model
            FROM tasks k LEFT JOIN nodes n ON n.node_id=k.node_id
-           WHERE k.status IN ('done','failed') ORDER BY COALESCE(k.done_at,k.claimed_at) DESC LIMIT 30''').fetchall()
+           WHERE k.status IN (?, ?) ORDER BY COALESCE(k.done_at,k.claimed_at) DESC LIMIT 30''')
+    recent = db.execute(recent_query, ('done', 'failed')).fetchall()
+    attention = db.execute(recent_query, ('failed', 'expired')).fetchall()
     stats = {r['status']: r['n'] for r in db.execute(
         'SELECT status,COUNT(*) AS n FROM tasks GROUP BY status').fetchall()}
     by_tm = [dict(r) for r in db.execute(
-        '''SELECT tm_id,
-                  SUM(CASE WHEN status='claimed' THEN 1 ELSE 0 END) AS active,
-                  SUM(CASE WHEN status='done' THEN 1 ELSE 0 END) AS done,
-                  SUM(CASE WHEN status='failed' THEN 1 ELSE 0 END) AS failed,
-                  SUM(CASE WHEN status='expired' THEN 1 ELSE 0 END) AS expired
-           FROM tasks GROUP BY tm_id ORDER BY tm_id''').fetchall()]
+        '''SELECT k.tm_id, t.name AS template_name, COUNT(*) AS total,
+                  SUM(CASE WHEN k.status='queued' THEN 1 ELSE 0 END) AS queued,
+                  SUM(CASE WHEN k.status='claimed' THEN 1 ELSE 0 END) AS active,
+                  SUM(CASE WHEN k.status='done' THEN 1 ELSE 0 END) AS done,
+                  SUM(CASE WHEN k.status='failed' THEN 1 ELSE 0 END) AS failed,
+                  SUM(CASE WHEN k.status='expired' THEN 1 ELSE 0 END) AS expired
+           FROM tasks k LEFT JOIN templates t ON t.tm_id=k.tm_id GROUP BY k.tm_id ORDER BY k.tm_id''').fetchall()]
     def expose(row):
         value = dict(row)
         raw_ref = value.pop('research_ref_json', '{}')
@@ -720,7 +731,107 @@ def tasks_public() -> dict:
             'stats': stats, 'by_template': by_tm,
             'queued': [expose(r) for r in queued],
             'active': [expose(r) for r in active],
-            'recent': [expose(r) for r in recent]}
+            'recent': [expose(r) for r in recent],
+            'attention': [expose(r) for r in attention]}
+
+
+def _claim_candidate(db, b: ClaimReq, now: float):
+    if b.job_kind not in ('family_test','natural_register'):raise HTTPException(422,'unsupported task kind')
+
+    def compatible(tpl):
+        try:c=json.loads((Path(tpl['bundle_dir'])/'corpus.json').read_text(encoding='utf-8'))
+        except (OSError,ValueError):return b.job_kind=='family_test'
+        kind=c.get('job_kind','family_test')
+        return kind==b.job_kind and (kind!='natural_register' or (c['model_snapshot']==b.model_rev and b.dtype=='bf16'))
+
+    queued_sql = "SELECT * FROM tasks WHERE status='queued'"
+    queued_args = []
+    if b.tm_id:
+        queued_sql += ' AND tm_id=?'; queued_args.append(b.tm_id)
+    for pending in db.execute(queued_sql + ' ORDER BY rowid LIMIT 100', queued_args).fetchall():
+        ref = json.loads(pending['research_ref_json'] or '{}')
+        if (b.model_id, b.dtype, b.model_rev, b.tokenizer_sha256, b.seed) != tuple(
+            ref.get(key) for key in ('model_id', 'precision', 'model_snapshot_id', 'tokenizer_sha256', 'seed')
+        ):
+            continue
+        tpl = db.execute("SELECT * FROM templates WHERE tm_id=? AND status='open'", (pending['tm_id'],)).fetchone()
+        if (tpl and compatible(tpl) and tpl['design_sha'] == ref.get('template_design_sha')
+                and int(tpl['version']) == int(ref.get('template_version', -1))):
+            shard = pending['shard'] or str((ref.get('resource_request') or {}).get('shard') or '') or _next_shard(db, tpl)
+            return tpl, pending['task_id'], ref, shard
+
+    if b.tm_id:
+        tpl = db.execute("SELECT * FROM templates WHERE status='open' AND tm_id=?", (b.tm_id,)).fetchone()
+        if not tpl:
+            raise HTTPException(404, f'template {b.tm_id} not found or not open')
+        if json.loads(tpl['research_adapter_json'] or '{}'):
+            raise HTTPException(409, 'template is bound to Research Work Units and cannot issue an unlinked legacy task')
+        if not compatible(tpl):
+            return None
+    else:
+        candidates = db.execute("SELECT * FROM templates WHERE status='open' AND COALESCE(research_adapter_json,'{}')='{}'")
+        candidates = [row for row in candidates if compatible(row)]
+        if not candidates:
+            return None
+        active = {r['tm_id']: r['n'] for r in db.execute(
+            "SELECT tm_id,COUNT(*) AS n FROM tasks WHERE status='claimed' AND lease_until>=? GROUP BY tm_id", (now,))}
+        tpl = min(candidates, key=lambda r: (active.get(r['tm_id'], 0), r['tm_id']))
+    if b.job_kind == 'natural_register':
+        occupied = _shards_done_for_model(db, tpl, b.model_id, b.model_rev)
+        occupied.update(r['shard'] for r in db.execute(
+            "SELECT shard FROM tasks WHERE tm_id=? AND status='claimed' AND lease_until>=?", (tpl['tm_id'], now)))
+        count = _template_shards(tpl)
+        shard = next((f'{i}/{count}' for i in range(count) if f'{i}/{count}' not in occupied), None)
+        if shard is None:
+            return None
+    else:
+        shard = _next_shard(db, tpl, b.model_id, b.model_rev)
+    return tpl, None, {}, shard
+
+
+class ParticipationIn(BaseModel):
+    models: List[ClaimReq] = Field(default_factory=list, max_length=24)
+    census_snapshots: List[str] = Field(default_factory=list, max_length=12)
+    synthetic: bool = False
+
+
+@router.post('/nodes/participation')
+def node_participation(b: ParticipationIn, x_node_token: str = Header(default='')) -> dict:
+    """Inspect work the node can claim and its own receipts, without taking a lease."""
+    import census_service as census
+
+    node = _auth_node(x_node_token)
+    node_id = node['node_id']
+    db = _db()
+    census_db = census.db()
+    now = time.time()
+    available = None
+    for snapshot in b.census_snapshots:
+        pick = census._claim_candidate(census_db, census.ClaimIn(model_snapshot=snapshot,
+                                       mode='synthetic' if b.synthetic else 'real'), node_id, now)
+        if pick:
+            job, shard = pick
+            available = {'kind': 'census_shard', 'name': '神经元普查', 'job': job['job_id'], 'shard': shard['shard']}
+            break
+    if available is None and not b.synthetic:
+        for model in b.models:
+            candidate = _claim_candidate(db, model, now)
+            if candidate:
+                template, _, _, shard = candidate
+                available = {'kind': model.job_kind, 'name': template['name'], 'tm_id': template['tm_id'], 'shard': shard}
+                break
+    receipts = [dict(row) for row in db.execute('''
+        SELECT k.task_id AS task,k.tm_id,t.name,k.shard,k.status,k.result_sha AS sha,k.done_at AS t,
+               k.note,a.status AS audit_status,a.note AS audit_note,a.created_at AS audited_at
+        FROM tasks k LEFT JOIN templates t ON t.tm_id=k.tm_id LEFT JOIN audits a ON a.result_sha=k.result_sha
+        WHERE k.node_id=? AND k.status IN ('done','failed','expired') AND k.done_at IS NOT NULL
+        ORDER BY k.done_at DESC LIMIT 5''', (node_id,))]
+    receipts.extend(dict(row) for row in census_db.execute('''
+        SELECT l.lease_id AS task,l.job_id AS job,l.shard,COALESCE(r.status,l.status) AS status,
+               l.result_sha AS sha,l.done_at AS t,l.note,r.review_note AS audit_note,'census_shard' AS kind
+        FROM census_leases l LEFT JOIN census_results r ON r.lease_id=l.lease_id
+        WHERE l.node_id=? AND l.done_at IS NOT NULL ORDER BY l.done_at DESC LIMIT 5''', (node_id,)))
+    return {'available': available, 'receipts': sorted(receipts, key=lambda row: row['t'], reverse=True)[:5]}
 
 
 @router.post('/tasks/claim')
@@ -728,77 +839,28 @@ def task_claim(b: ClaimReq, x_node_token: str = Header(default='')) -> dict:
     n = _auth_node(x_node_token)
     db = _db()
     now = time.time()
-    claimed = None
     with _db_lock:
         db.execute("UPDATE tasks SET status='expired' WHERE status='claimed' AND lease_until<?", (now,))
-        active = {r['tm_id']: r['n'] for r in db.execute(
-            "SELECT tm_id,COUNT(*) AS n FROM tasks WHERE status='claimed' GROUP BY tm_id").fetchall()}
-        queued_sql = "SELECT * FROM tasks WHERE status='queued'"
-        queued_args: list = []
-        if b.tm_id:
-            queued_sql += ' AND tm_id=?'; queued_args.append(b.tm_id)
-        queued_sql += ' ORDER BY rowid LIMIT 100'
-        for pending in db.execute(queued_sql, queued_args).fetchall():
-            ref = json.loads(pending['research_ref_json'] or '{}')
-            if (b.model_id != ref.get('model_id') or b.dtype != ref.get('precision')
-                    or b.model_rev != ref.get('model_snapshot_id')
-                    or b.tokenizer_sha256 != ref.get('tokenizer_sha256')
-                    or b.seed != ref.get('seed')):
-                continue
-            tpl_candidate = db.execute('SELECT * FROM templates WHERE tm_id=? AND status=?',
-                                       (pending['tm_id'], 'open')).fetchone()
-            if not tpl_candidate:
-                continue
-            if (tpl_candidate['design_sha'] != ref.get('template_design_sha')
-                    or int(tpl_candidate['version']) != int(ref.get('template_version', -1))):
-                continue
-            db.execute('UPDATE tasks SET status=?,node_id=?,claimed_at=?,lease_until=? WHERE task_id=? AND status=?',
-                       ('claimed', n['node_id'], now, now + LEASE_SECONDS, pending['task_id'], 'queued'))
-            if not pending['shard']:
-                shard_ref = str((ref.get('resource_request') or {}).get('shard') or '') or _next_shard(db, tpl_candidate)
-                db.execute('UPDATE tasks SET shard=? WHERE task_id=?', (shard_ref, pending['task_id']))
-            claimed = (pending['task_id'], tpl_candidate, ref)
-            break
-        if claimed:
-            db.execute('UPDATE nodes SET last_seen=?, model=? WHERE node_id=?',
-                       (now, b.model_id or n['model'], n['node_id']))
-            db.commit()
+        db.commit()  # Early 204/404 paths must not leave a write transaction open.
+        candidate = _claim_candidate(db, b, now)
+        if candidate is None:
+            raise HTTPException(204, 'no compatible task')
+        tpl, task_id, research_ref, shard = candidate
+        if task_id:
+            db.execute("UPDATE tasks SET status='claimed',node_id=?,claimed_at=?,lease_until=?,shard=? WHERE task_id=?",
+                       (n['node_id'], now, now + LEASE_SECONDS, shard, task_id))
         else:
-            claimed = None
-        if claimed:
-            task_id, tpl, research_ref = claimed
-        else:
-            if b.tm_id:
-                tpl = db.execute(
-                    "SELECT * FROM templates WHERE status='open' AND tm_id=? "
-                    "AND COALESCE(research_adapter_json,'{}')='{}'", (b.tm_id,)).fetchone()
-                if not tpl:
-                    adapter_tpl = db.execute(
-                        "SELECT research_adapter_json FROM templates WHERE status='open' AND tm_id=?",
-                        (b.tm_id,)).fetchone()
-                    if adapter_tpl and json.loads(adapter_tpl['research_adapter_json'] or '{}'):
-                        raise HTTPException(409, 'template is bound to Research Work Units and cannot issue an unlinked legacy task')
-                    raise HTTPException(404, f'template {b.tm_id} not found or not open')
-            else:
-                cand = db.execute(
-                    "SELECT * FROM templates WHERE status='open' "
-                    "AND COALESCE(research_adapter_json,'{}')='{}' ORDER BY tm_id").fetchall()
-                if not cand:
-                    raise HTTPException(204, 'no open template')
-                cand = sorted(cand, key=lambda r: (active.get(r['tm_id'], 0), r['tm_id']))
-                tpl = cand[0]
             task_id = 'T-' + uuid.uuid4().hex[:10]
-            research_ref = {}
-            shard = _next_shard(db, tpl, b.model_id, b.model_rev)
             db.execute(
                 'INSERT INTO tasks(task_id,tm_id,node_id,status,claimed_at,lease_until,research_ref_json,shard) '
                 'VALUES(?,?,?,?,?,?,?,?)',
                 (task_id, tpl['tm_id'], n['node_id'], 'claimed', now, now + LEASE_SECONDS, '{}', shard))
-            db.execute('UPDATE nodes SET last_seen=?, model=? WHERE node_id=?',
-                       (now, b.model_id or n['model'], n['node_id']))
-            db.commit()
+        db.execute('UPDATE nodes SET last_seen=?, model=? WHERE node_id=?',
+                   (now, b.model_id or n['model'], n['node_id']))
+        db.commit()
     shard_row = db.execute('SELECT shard FROM tasks WHERE task_id=?', (task_id,)).fetchone()
     return {'task_id': task_id, 'tm_id': tpl['tm_id'], 'version': tpl['version'],
+            'job_kind':b.job_kind,
             'design_sha': tpl['design_sha'], 'name': tpl['name'], 'dim': tpl['dim'],
             'shard': (shard_row['shard'] if shard_row else None) or '',
             'lease_until': now + LEASE_SECONDS, 'work_unit_id': research_ref.get('work_unit_id', ''),
@@ -978,7 +1040,8 @@ def re_full_sha256(value: Any) -> bool:
 def template_register(b: TemplateReg, x_admin_token: str = Header(default='')) -> dict:
     _auth_admin(x_admin_token)
     _validate_research_adapter_for_registration(b.research_adapter)
-    design_sha = _register_template(b.model_dump())
+    try:design_sha = _register_template(b.model_dump())
+    except (ValueError,KeyError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
     return {'tm_id': b.tm_id, 'version': b.version, 'design_sha': design_sha,
             'research_adapter': bool(b.research_adapter),
             'note': '预注册冻结：corpus/runner/research_adapter 变更必须升 version'}
@@ -1269,11 +1332,26 @@ def _upload_register(n, up: dict, parts: List[Path]) -> dict:
         raw_files[f['path']] = content
     if offset != len(rest):
         raise HTTPException(422, 'blob payload length does not match manifest sizes')
+    natural_validation=None
+    tpl=_db().execute('SELECT * FROM templates WHERE tm_id=?',(meta['tm_id'],)).fetchone()
+    corpus=json.loads((Path(tpl['bundle_dir'])/'corpus.json').read_text(encoding='utf-8')) if tpl else {}
+    if corpus.get('job_kind')=='natural_register':
+        from shared.dist_protocol import natural_register_runner as NR
+        try:
+            if not task or meta['kind']!='real' or meta['model_rev']!=corpus['model_snapshot'] or meta.get('precision')!='bf16':raise ValueError('natural upload requires active real pinned-model task')
+            summary=json.loads(raw_files['summary.json']);samples=json.loads(raw_files['samples.json'])
+            canary=json.loads(raw_files['canary.json']);native=json.loads(raw_files['native-manifest.json'])
+            if NR.digest(meta['summary'])!=NR.digest(summary):raise ValueError('summary metadata differs from uploaded file')
+            if summary.get('native_manifest_sha256')!=NR.digest(native):raise ValueError('native manifest fingerprint differs')
+            if summary.get('provenance',{}).get('runner_sha256')!=hashlib.sha256(_bundle_files(tpl['bundle_dir'])['runner.py'].encode('utf-8')).hexdigest():raise ValueError('runner version differs')
+            natural_validation=NR.validate_result(corpus,task['shard'],summary,samples,canary)
+        except (KeyError,ValueError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
     whole = hashlib.sha256(blob).hexdigest()
     obj_dir = _DATA_DIR / 'objects' / whole[:2]
     obj_dir.mkdir(parents=True, exist_ok=True)
     (obj_dir / whole).write_bytes(blob)
     summary_stored = dict(meta['summary'] or {})
+    if natural_validation:summary_stored['_natural_execution']=natural_validation
     summary_stored['_manifest'] = meta['manifest']
     summary_stored['_upload_meta'] = {'precision': meta.get('precision', ''),
                                       'tokenizer_sha256': meta.get('tokenizer_sha256', '')}
@@ -1299,7 +1377,7 @@ def _upload_register(n, up: dict, parts: List[Path]) -> dict:
                               (whole,)).fetchone()
         if existing:
             # 内容寻址：字节完全相同的重复上传不覆盖原记录（保留首个上传者与金丝雀判定），
-            # 另记一条副本——同快照下即「逐字节一致的独立重跑」；模型标识不同则标记可疑。
+            # 另记一次上传。同快照只说明字节一致，独立性由合并时的节点和租约检查确认。
             prev_meta = (json.loads(existing['summary_json'] or '{}').get('_upload_meta') or {})
             same_model = (existing['model_id'] == meta['model_id'] and existing['model_rev'] == meta['model_rev']
                           and prev_meta.get('precision', '') == meta.get('precision', ''))
@@ -1333,6 +1411,8 @@ def _evaluate_canary(meta: dict, content: bytes, sha: str) -> dict:
     except (UnicodeDecodeError, json.JSONDecodeError):
         return {'status': 'missing', 'detail': 'canary.json 无法解析'}
     key = _canary.model_key(meta.get('model_id', ''), meta.get('model_rev', ''), meta.get('precision', ''))
+    if meta.get('summary',{}).get('job_kind')=='natural_register':
+        key+='|natural-recipe:'+meta['summary']['canary_recipe_sha256']
     db = _db()
     row = db.execute('SELECT reference_json,source_sha FROM canary_refs WHERE model_key=?', (key,)).fetchone()
     ref = json.loads(row['reference_json']) if row else None
@@ -1828,6 +1908,7 @@ def grammar_report(tm_id: str) -> dict:
     if not corpus:
         raise HTTPException(404, f'template {tm_id} not found')
     agg = _pipeline.aggregate(db, _DATA_DIR, tm_id, gate=False)
+    formal = _pipeline.aggregate(db, _DATA_DIR, tm_id, gate=False, audited_only=True)
     buckets = []
     for bk in agg['buckets']:
         light = {k: v for k, v in bk.items() if k != 'agg'}
@@ -1838,7 +1919,8 @@ def grammar_report(tm_id: str) -> dict:
     return {'tm_id': tm_id, 'family_id': corpus.get('family_id'), 'mode': corpus.get('mode'),
             'prereg': corpus.get('prereg', {}), 'shards': corpus.get('shards', 1),
             'n_items': sum(1 for it in corpus.get('items', []) if not it.get('canary')),
-            'tasks': tasks, 'non_real_results': smoke, 'buckets': buckets, 'gates': _pipeline.gate_chain(agg)}
+            'tasks': tasks, 'non_real_results': smoke, 'buckets': buckets, 'gates': _pipeline.gate_chain(agg),
+            'gate_scope': 'preview', 'formal_gates': _pipeline.gate_chain(formal)}
 
 
 @router.get('/agg/{tm_id}/v2')

@@ -1,0 +1,54 @@
+{
+  "decision": "Native MLP first, small verified circuits before any completeness claim; do not require solving all MLP before attention.",
+  "kind": "proposal",
+  "literature": [
+    {
+      "status": "working hypothesis and model-specific preliminary audits, not established Qwen3-4B completeness",
+      "url": "https://already-clean.goodfire.com/"
+    },
+    {
+      "path": "research/neurons/goodfire/GF-L30-U9517-local.json",
+      "scope": "historical256token two-unit studies; not new long-text confirmation"
+    }
+  ],
+  "long_corpus": "512/1024/2048 document contexts, multiple languages/domains; preserve document families and rare strong events. Start with resource-calibrated corpus; grow based on empirical event frequency and independent-document counts, not a universal token quota.",
+  "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "population": {
+    "layers": 36,
+    "pole_count": 700416,
+    "units": 350208,
+    "units_per_layer": 9728
+  },
+  "remaining_closed_book_task": "Factorially compare known-source-free facts with/without conflicting documents andwith/without reference, matched instruction paraphrases/positions; preregistered eligible facts andnew lockbox before long-context mechanism claims.",
+  "run_id": "P2794-ATOMIC-ARBITRATION-v4",
+  "sampling": "Stratified432 random units (12/layer), plus current32 candidates andhistorical2; selection and doc splits frozen before explanations or evaluations; counts are planned, not executed.",
+  "schema": "research_native_mlp_plan.v1",
+  "stages": [
+    {
+      "detail": "Qwen3-4B共36×9728=350,208个原生MLP单元。先分层普查和分组解释，保留SAE/transcoder作同预算对照；不把“原生一定干净”或“一单元一概念”作为结论。已有GF-L30-U9517/U80使用256token窗口且未通过项目全部判据，不能算本轮长文本复现。",
+      "title": "原生单元优先，作为研究主线"
+    },
+    {
+      "detail": "按独立文档划分发现/确认/锁箱；512–2048token多领域长文采集G、V、A=SiLU(G)×V及写出。记录正负两极、G/V四象限、范数/RMS、弱响应、频率、近零与背景。原生全阵列不截断；Top例子仅作检索。先估计稀有强响应率，再按每极有效事件和独立文档数分配语料预算，不假定2Mtoken足够。",
+      "title": "自然长语料两极、弱响应与门控分解"
+    },
+    {
+      "detail": "从自然上下文提出单元功能假设；AI可写标签但不能自动升级证据。冻结新句式、新实体、包含关键词但不满足功能的近似反例，以及不含关键词的语义正例；独立划分检验两极和读入/写出。未知、粗粒度、多用途和无法复现都合法保留。",
+      "title": "解释必须能预测新例与近似反例"
+    },
+    {
+      "detail": "区分gate/up读取、down写出、残差/RMS、Attention提供的信息和后续神经元的读入。读写方向不必相同，不把它们不平行单独当作失败。沿参数乘积和实际响应构建类型化边，再用剂量、同层/同能量随机对照与交互消融检验作用。",
+      "title": "从读入走到真实写出和上下游"
+    },
+    {
+      "detail": "先以可解释且可重复的小型MLP子图为交付，不承诺先破解全部MLP。比较native与同k字典的激活预测、完整词表KL/损失恢复和未解释残差；预测时不能读取目标真值状态。持续做能力保持和生成保义检查，向Attention/残差追踪缺失来源，最后顺序跨模型与独立节点复算。",
+      "title": "用预测保真度和能力保持验收"
+    }
+  ],
+  "storage_estimates": {
+    "candidate432_GVA_2M_tokens_BF16_bytes": 5184000000,
+    "full_GVA_2M_tokens_BF16_bytes": 4202496000000,
+    "rule": "stream population statistics and pole/context IDs; preserve detailed original vectors for pilot units and controlled templates; do not claim all natural-token arrays saved"
+  },
+  "success": "Heldout activation/pole prediction, near misses, real reader/writer paths, scoped interventions andgraph-only prediction beyond strong baselines; unknown andnegative cards retained."
+}
