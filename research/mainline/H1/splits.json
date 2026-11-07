@@ -1,0 +1,71 @@
+{
+ "id": "MA-H1",
+ "created": "2026-11-07T05:51:32",
+ "pool_sha256": "85e81ea5ed01fc2b2993c07bfa83d13f122bc49eaa4e11d155865ba85242648b",
+ "pool_size": 252,
+ "rule": "每类内按 sha256(MA-H1|id) 排序，依次轮流分到 discovery / confirm / lockbox",
+ "splits": {
+  "discovery": {
+   "n": 84,
+   "sha256": "473a85265240b4f5c6f0fb630c24fb32689c6540e44a89148ae72f635d77164a",
+   "per_category": {
+    "clothing": 7,
+    "furniture": 7,
+    "household": 7,
+    "insect": 7,
+    "instrument": 7,
+    "kitchen": 7,
+    "mineral": 7,
+    "reptile": 7,
+    "sports": 7,
+    "stationery": 7,
+    "tool": 7,
+    "vehicle": 7
+   },
+   "location": "research/mainline/H1/discovery.tsv"
+  },
+  "confirm": {
+   "n": 84,
+   "sha256": "206f651463148e5a4a5f80b469ad60cc0a00a0cb8bb1fd3a76674900002d2d11",
+   "per_category": {
+    "clothing": 7,
+    "furniture": 7,
+    "household": 7,
+    "insect": 7,
+    "instrument": 7,
+    "kitchen": 7,
+    "mineral": 7,
+    "reptile": 7,
+    "sports": 7,
+    "stationery": 7,
+    "tool": 7,
+    "vehicle": 7
+   },
+   "location": "sealed/confirm.tsv（节点本地）"
+  },
+  "lockbox": {
+   "n": 84,
+   "sha256": "03b78997401b193e60b22c8635cf53ca20209ae2379acae932904de75d6bb17d",
+   "per_category": {
+    "clothing": 7,
+    "furniture": 7,
+    "household": 7,
+    "insect": 7,
+    "instrument": 7,
+    "kitchen": 7,
+    "mineral": 7,
+    "reptile": 7,
+    "sports": 7,
+    "stationery": 7,
+    "tool": 7,
+    "vehicle": 7
+   },
+   "location": "sealed/lockbox.tsv（节点本地）"
+  }
+ },
+ "custody": {
+  "sealed_dir": "节点本地 <AI2050_NATIVE_DIR>/_mainline/MA-H1/sealed/",
+  "rule": "confirm、lockbox 词表与留出句式结果在相应阶段前不读取；开封要在研究记录里写明开封人、时间、用途与开封前已冻结的结论，并更新本文件",
+  "opened": []
+ }
+}

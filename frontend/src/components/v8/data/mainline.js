@@ -4,9 +4,10 @@
 
 /* H0–H7：v6 第 8 节的阶段、完成定义与过门清单。done 为已满足的过门项序号。 */
 export const STAGES = [
-  { id: 'H0', name: '明确操作与备择机制', def: '每种结果会改变哪项判断写入主张卡，完成行为门和简单基线', gates: ['主张卡写好至少两个可区分的假设', '行为门通过', '简单基线已跑'], done: [0, 2],
-    note: 'MA-H0-v5（Phase 322）：中文 32 / 32 格通过；英文 31 / 32，“现实范围 · 双实体 · 末条 · k=3 · 有草稿”一格 0.796，按冻结规则行为门未全过。基线通过：资料范围 0.99 对最好启发式 0.38，范围切换 0.95–0.98 对不看范围的 0.50。v3、v4 的两处设计缺陷已在 v5 修正。' },
-  { id: 'H1', name: '冻结材料与统计', def: '主效应、交互、保护、排除及多重比较口径完整，确认材料保持独立', gates: ['discovery、confirm、lockbox 已建', '功效三栏通过（检验力 ≥ 0.8）', '确认与锁箱已封存'], done: [] },
+  { id: 'H0', name: '明确操作与备择机制', def: '每种结果会改变哪项判断写入主张卡，完成行为门和简单基线', gates: ['主张卡写好至少两个可区分的假设', '行为门通过', '简单基线已跑'], done: [0, 1, 2],
+    note: 'MA-H0-v5（Phase 322）：中文 32 / 32 格通过，基线通过。用户 2026-11-07 决定以中文为主线（Phase 323），行为门按中文主线记为通过；英文 31 / 32，未过的一格排除在内部分析之外。' },
+  { id: 'H1', name: '冻结材料与统计', def: '主效应、交互、保护、排除及多重比较口径完整，确认材料保持独立', gates: ['discovery、confirm、lockbox 已建', '功效三栏通过（检验力 ≥ 0.8）', '确认与锁箱已封存'], done: [0, 1, 2],
+    note: 'MA-H1（Phase 323）：252 个新实体按家族分为 84 / 84 / 84，confirm 与 lockbox 封存在节点本地；功效三栏检验力 0.83–0.87。discovery 材料检查 30 / 32 格通过，“现实范围 · 双实体 · 末条 · k=3”两格未过，按预注册排除在内部分析之外。' },
   { id: 'H2', name: '全场采集与响应发现', def: '原始与标准化视图可重算，先给出单因素及组合的响应脉络', gates: ['采集清单与 manifest 哈希', '原始和标准化视图可重算', '单因素与组合响应脉络'], done: [] },
   { id: 'H3', name: '冻结载体与预测规则', def: '在新材料上预测因素响应和角色绑定，并保留未解释部分', gates: ['方法同题比较', '载体与规则已冻结', '新材料预测与残差'], done: [] },
   { id: 'H4', name: '原生使用与交互验证', def: '明确哪条条件规则受支持，哪些仍是观察或注入效应', gates: ['QK、V/O、MLP 分项干预', '剂量与匹配负对照', '能力保持'], done: [] },
@@ -33,9 +34,9 @@ export const PAIRS = [
 ].map(([pair, design, base]) => ({ pair, design, base, built: false }));
 
 export const SPLITS = [
-  { id: 'discovery', use: '候选筛选、曲线拟合和定位', built: false },
-  { id: 'confirm', use: '确认', built: false },
-  { id: 'lockbox', use: '一次性留出', built: false },
+  { id: 'discovery', use: '候选筛选、曲线拟合和定位', built: true },
+  { id: 'confirm', use: '确认', built: true },
+  { id: 'lockbox', use: '一次性留出', built: true },
 ];
 
 /* 四组成绩：v6 第 11 节。全部未测。 */
@@ -56,7 +57,9 @@ export const RUNS = [
 export const LOCKBOXES = [
   { id: 'MB-v1 lockbox', phase: 315, state: 'opened', note: 'Phase 315 评估时一次性开封' },
   { id: 'SP-v1 封存划分', phase: 316, state: 'opened', note: 'Phase 316 评估时一次性开封；材料不与 MB-v1 重叠' },
-  { id: '主线 lockbox', phase: null, state: 'not_built', note: 'H1 冻结时建立' },
+  { id: '主线 confirm（MA-H1）', phase: 323, state: 'sealed', note: '84 个实体，封存在节点本地，H3 冻结后评估一次' },
+  { id: '主线 lockbox（MA-H1）', phase: 323, state: 'sealed', note: '84 个实体，全部确认结论冻结后一次性开封' },
+  { id: '留出句式 lockbox_frame（MA-H1）', phase: 323, state: 'sealed', note: '只与 lockbox 实体一起评估一次' },
 ];
 
 /* 方法基准：lockbox 的 cf 节点 auc_f（Phase 315），1% 预算特异性判定（Phase 316）。 */
