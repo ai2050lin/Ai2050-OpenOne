@@ -44,9 +44,9 @@ export function AssocIntro() {
 }
 
 /* 四组成绩：v6 第 11 节的主指标。 */
-export function ScoreBoard() {
-  return <section className="v8-card cg-section" aria-label="关联机制的四组成绩">
-    <h3>关联机制的四组成绩</h3>
+export function ScoreBoard({ bare = false }) {
+  return <section className={bare ? "cg-section" : "v8-card cg-section"} aria-label="关联机制的四组成绩">
+    {!bare && <h3>关联机制的四组成绩</h3>}
     <p className="v8-note">这是衡量破解程度的主指标。覆盖数和连接数只表示执行量，不计入这里。</p>
     <div className="mp-scores">{SCORES.map(score => <div key={score.name}><b>{score.name}</b><span className="v8-note">{score.desc}</span>
       <div className="mp-v muted">{score.value ?? '未测'}</div></div>)}</div>

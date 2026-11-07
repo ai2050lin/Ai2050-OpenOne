@@ -60,10 +60,10 @@ export function relationCounts(objects, snapshot) {
 }
 
 /* 最近的发现读研究登记表（data/mainline.js 的 FINDINGS，每个 Phase 追加），按 Phase 倒序，首屏 4 条，其余折叠。 */
-export function LatestFindings({ onGo }) {
+export function LatestFindings({ onGo, bare = false }) {
   const list = [...FINDINGS].sort((a, b) => b.phase - a.phase);
   const card = f => <div key={f.title}><Ev kind={f.kind}/> <small className="v8-note">Phase {f.phase}</small><h4>{f.title}</h4><p className="v8-note">{f.text}</p></div>;
-  return <section className="v8-card cg-section" aria-label="最近的发现"><h3>最近的发现</h3>
+  return <section className={bare ? "cg-section" : "v8-card cg-section"} aria-label="最近的发现">{!bare && <h3>最近的发现</h3>}
     <div className="cg-grid2">{list.slice(0, 4).map(card)}</div>
     {list.length > 4 && <details className="mp-fold"><summary>更早的发现（{list.length - 4}）</summary><div className="mp-fold-body cg-grid2">{list.slice(4).map(card)}</div></details>}
     <div className="v6-toolbar"><button type="button" className="fw-tbtn" onClick={() => onGo('route', null, null, { rtab: 'rules' })}>查看全部成果与证据</button></div>

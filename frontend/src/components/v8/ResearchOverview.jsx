@@ -10,7 +10,14 @@ import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
-import { SCORES } from './data/mainline.js';
+import { FINDINGS, SCORES } from './data/mainline.js';
+
+function OverviewFold({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return <details className="v8-card v8-overview-fold" open={open} onToggle={event => setOpen(event.currentTarget.open)}>
+    <summary>{title}</summary>{open && children}
+  </details>;
+}
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
@@ -283,12 +290,12 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
         </section>}
       </Fragment>)}
     </div>
-    <section className="v8-card cg-next"><div><h3>看一个决策点案例</h3>
-      <p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p></div>
-      <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></section>
-    <ScoreBoard/>
-    <LatestFindings onGo={onGo}/>
-    <NextStep onGo={onGo}/>
+    {/* 三张卡片以下的模块默认折叠，点开才渲染 */}
+    <OverviewFold title="看一个决策点案例"><div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
+      <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></div></OverviewFold>
+    <OverviewFold title={`关联机制的四组成绩 · ${SCORES.filter(score => score.value != null).length} / ${SCORES.length} 已测`}><ScoreBoard bare/></OverviewFold>
+    <OverviewFold title={`最近的发现 · ${FINDINGS.length} 条`}><LatestFindings onGo={onGo} bare/></OverviewFold>
+    <OverviewFold title="下一步可以做什么"><NextStep onGo={onGo}/></OverviewFold>
     <details className="v8-card v8-overview-fold wb-pro" open={plan} onToggle={event => setPlan(event.currentTarget.open)}>
       <summary>阶段任务与历史分片</summary>
       {plan && <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} />}
