@@ -1,6 +1,6 @@
 /* 语言图谱 · 关系图（种子，2026-11-07 审定）。可拖动或用方向键旋转的 3D 视图，右侧是同一节点的二维详情和键盘查询。
    布局是人工展示：区域 = 语言目录三大类，纵向 = 抽象程度；距离不代表模型几何。
-   边按依据区分浓淡：有材料 / 只有标签或目录 / 人工定义无材料。“模型里是否这样组织”尚未测量，界面写“未测”。 */
+   边按依据区分浓淡：有材料 / 只有标签或目录 / 人工定义无材料。本图只描述语言本身，不含模型信息。 */
 import { useMemo, useRef, useState } from 'react';
 
 import { BASIS, EDGES, EDGE_TYPES, NODES, STATE_LABEL, ZONES, neighbors } from './data/lang_graph_seed.js';
@@ -29,7 +29,7 @@ export default function LangGraph3D() {
 
   return <section className="v8-card cg-section lg3-card" aria-label="语言关系图">
     <h3>语言关系图 <span className="mp-tag ok">种子 · 2026-11-07 审定</span></h3>
-    <p className="v8-note">词形、词义、操作和规则分开成节点。先看人定义的关系；模型内部是否同样组织，要等实测。</p>
+    <p className="v8-note">词形、词义、操作和规则分开成节点，边是人定义的语言关系，按有无测试材料区分浓淡。</p>
     <div className="lg3-grid">
       <div>
         <div className="v6-toolbar" role="group" aria-label="类别筛选">
@@ -63,7 +63,7 @@ export default function LangGraph3D() {
             </g>;
           })}
         </svg>
-        <p className="v8-note">拖动或用方向键旋转。纵向是抽象程度，三个区域是展示分类，距离不代表模型几何。</p>
+        <p className="v8-note">拖动或用方向键旋转。纵向是抽象程度，三个区域是展示分类，节点间的距离只为排版，没有含义。</p>
         <div className="lg3-legend">
           <span><i className="lg3-dot full"/>已有项目材料 {counts.real}</span><span><i className="lg3-dot"/>目录已有，未测 {counts.cat}</span><span><i className="lg3-dot dash"/>需新增 {counts.new}</span>
         </div>
@@ -78,8 +78,6 @@ export default function LangGraph3D() {
         <p className="v8-note">{node.note}</p>
         <h4>关系</h4>
         <ul className="lg3-rel">{rel.map(([m, t, basis]) => <li key={m.id}><button type="button" className="v6-linkbtn" onClick={() => setSel(m.id)}>{m.name}</button><small>{EDGE_TYPES[t][0]} · {BASIS[basis][0]}</small></li>)}</ul>
-        <h4>模型里是否这样组织</h4>
-        <p className="v8-note"><span className="mp-tag">未测</span> 以后显示：关系是否读得出、未见词能否复现、干预后回答是否改变。</p>
         <label className="v8-note">键盘查询 <select value={sel} onChange={e => setSel(e.target.value)} aria-label="选择语言节点">
           {NODES.map(item => <option key={item.id} value={item.id}>{ZONES[item.zone].name} · {item.name}</option>)}</select></label>
       </aside>

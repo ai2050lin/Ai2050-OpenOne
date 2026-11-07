@@ -29,7 +29,7 @@ export const SPATIAL_VIEWS = [
 /* 空间三张图（2026-11-07 第一批）：语言图谱 / LLM 编码图谱 / 关联机制。
    路由仍用原来的 view + gview，三张图只是它们的分组，旧链接（?view=live、?gview=language 等）照常打开。 */
 export const SPATIAL_MODES = [
-  { id: 'lang', label: '语言图谱', desc: '知识网络、推理功能、语法规则三类关系，以及数据集实测与模式目录' },
+  { id: 'lang', label: '语言图谱', desc: '外部能力框架：知识网络、推理功能、语法规则的语言项与关系，不含模型信息' },
   { id: 'enc', label: 'LLM 编码图谱', desc: '词嵌入、注意力头、MLP 的结构、参数与证据阶梯' },
   { id: 'assoc', label: '关联机制', desc: '一段文字在各层怎样被读取、改写并决定下一个词；运行、对照与共享关系' },
 ];
@@ -37,6 +37,7 @@ export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: {
 export const ASSOC_TABS = [
   { id: 'live', label: '运行与路径', patch: { view: 'live' } },
   { id: 'response', label: '响应对照', patch: { view: 'response' } },
+  { id: 'langmeasure', label: '语言项实测', patch: { view: 'graph', gview: 'langmeasure' } },
   { id: 'relations', label: '共享关系', patch: { view: 'graph', gview: 'relations' } },
 ];
 export const ENC_TABS = [
@@ -45,7 +46,7 @@ export const ENC_TABS = [
 ];
 export function spaceMode(view, gview) {
   if (view === 'graph' && gview === 'language') return 'lang';
-  if (view === 'live' || view === 'response' || (view === 'graph' && gview === 'relations')) return 'assoc';
+  if (view === 'live' || view === 'response' || (view === 'graph' && ['relations', 'langmeasure'].includes(gview))) return 'assoc';
   return 'enc';
 }
 export function spaceTab(view, gview) {
@@ -53,8 +54,10 @@ export function spaceTab(view, gview) {
   return view === 'parameters' ? 'structure' : view;
 }
 export const GRAPH_LAYERS = [
-  {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
+  {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'langmeasure',label:'语言项实测'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
 ];
+/* 语言图谱只放外部能力框架（gview=language）；语言项在模型上的读出、层塔、数据集实测属于关联机制（gview=langmeasure）。
+   旧别名 ?view=lang 原本指语言项实测页，归到 langmeasure。 */
 
 /* 研发工位：网页只能浏览；执行测试（神经元测试）与管理都在桌面客户端。
    admin：只给管理员账号（连接本机后端的开发不限）；autotest 另外只在本机中心（local_tools）出现——公开中心没有被测模型。
@@ -100,7 +103,7 @@ export function visibleStations({ live, admin, localTools }) {
    这条口径写在一处，页顶的数据集方块就按它决定显不显示：留着不工作的方块比不显示更糟，
    因为换一项数字不动，会被读成「做了实验但没差别」。 */
 export function dsBound(lens, { view, gview } = {}) {
-  return lens === 'spatial' && (view === 'lang' || (view === 'graph'&&gview==='language'));
+  return lens === 'spatial' && (view === 'lang' || (view === 'graph'&&gview==='langmeasure'));
 }
 
 // Canonical routes retain aliases for all previously published research links.
@@ -111,7 +114,7 @@ export function normalizeState(input) {
   const old=OLD_STATIONS[st.station];
   if(old){st.lens=old[0];st.pstep=old[2]||'design';st.station=old[1]||'plan';if(input.station==='contribute')st.csec='node';if(input.station==='ai')st.csec='model';}
   if(st.view==='research'){st.view='graph';st.gview='internal';}
-  if(st.view==='lang'){st.view='graph';st.gview='language';}
+  if(st.view==='lang'){st.view='graph';st.gview='langmeasure';}
   if(['relations','atlas'].includes(st.view)){st.view='graph';st.gview='relations';}
   if(['neuron','units'].includes(st.view)){st.view='parameters';st.ptab='neurons';}
   if(st.view==='local'){st.view='graph';st.importing=true;}

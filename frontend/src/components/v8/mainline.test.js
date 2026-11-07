@@ -14,7 +14,9 @@ describe('空间三张图的路由', () => {
     expect(mode({ lens: 'spatial', view: 'response' })).toEqual(['assoc', 'response']);
   });
   it('旧链接仍能归到三张图之一', () => {
-    expect(mode({ lens: 'spatial', view: 'lang' })[0]).toBe('lang');
+    // 旧别名 view=lang 原本是语言项实测页，现归关联机制；语言图谱只剩外部框架
+    expect(mode({ lens: 'spatial', view: 'lang' })).toEqual(['assoc', 'langmeasure']);
+    expect(mode({ lens: 'spatial', view: 'graph', gview: 'langmeasure' })).toEqual(['assoc', 'langmeasure']);
     expect(mode({ lens: 'spatial', view: 'atlas' })).toEqual(['assoc', 'relations']);
     expect(mode({ lens: 'spatial', view: 'neuron' })).toEqual(['enc', 'structure']);
     expect(mode({ lens: 'spatial', view: 'research' })).toEqual(['enc', 'internal']);

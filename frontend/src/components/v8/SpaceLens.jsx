@@ -24,7 +24,7 @@ import ModelStructure from './ModelStructure.jsx';
 import Tower from './Tower.jsx';
 import { OVERLAYS, READOUT_LABEL, defaultModel, fmtP, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
-import LangGraph3D from './LangGraph3D.jsx';
+import LanguageFrame from './LanguageFrame.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import H2Results from './H2Results.jsx';
 import { AlgorithmPanel, AnomalyDraft, FlowRibbons } from './AssocDeep.jsx';
@@ -81,7 +81,8 @@ export default function SpaceLens(props) {
 }
 
 function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
-  const view=routeView==='graph'?({language:'lang',internal:'research',relations:'relations'}[graphMode]||'lang'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
+  /* language = 语言图谱（只有外部能力框架）；langmeasure = 关联机制里的语言项实测（原语言图谱页：层塔、读出、神经元、数据集实测） */
+  const view=routeView==='graph'?({language:'langframe',langmeasure:'lang',internal:'research',relations:'relations'}[graphMode]||'langframe'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
   /* 图层切换已由工作台的三张图和视图条承担，这里不再重复一排图层按钮 */
   const modeBar=routeView==='graph'?null:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;
   const treeApi = useApi('/api/lang/tree');
@@ -239,8 +240,9 @@ function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weig
   if (view === 'parameters') return <>{modeBar}<ParameterExplorer researchModel={gModel || model} /><HistoricalPanel kind="activation"/></>;
   if (view === 'live') return <LivePane/>;
   if (view === 'research') return <>{modeBar}<ResearchSpace/></>;
+  if (view === 'langframe') return <LanguageFrame/>;
   return (
-    <>{modeBar}{view === 'lang' && <LangGraph3D/>}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
+    <>{modeBar}{view === 'lang' && <p className="v8-note">语言项实测：语言图谱里的每一项能力，在模型上能不能读出、在哪一层、由哪些单元承载。外部框架本身在“空间 · 语言图谱”。</p>}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
       {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">
@@ -356,7 +358,7 @@ function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weig
           {view === 'relations' && (
             <div className="v8-atlaswrap">
               <div className="v8-atlas-back">
-                <button type="button" onClick={() => setView('lang')}>← 返回语言图谱</button>
+                <button type="button" onClick={() => setView('lang')}>← 返回语言项实测</button>
                 <b>谱图关系</b>
                 <span>跨模式族的共享编码轴、概念假设与跨模型一致性；点击一个族回到响应点云看证据</span>
               </div>

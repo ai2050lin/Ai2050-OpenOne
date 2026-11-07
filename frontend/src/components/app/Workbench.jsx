@@ -195,7 +195,7 @@ export default function Workbench() {
           {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
           {/* 图谱覆盖在摘要旁选模型，在数据集实测里选题库；空间继续使用全局维度条。 */}
           {!(lens==='process'&&station==='plan') && (context.run || context.trace || context.context_trace || (context.snapshot && (lens !== 'route' || !['overview','lang'].includes(rtab)))) && <div className="wb-research-context wb-pro" aria-label="当前研究上下文"><span>研究：{context.run||'未绑定实验'}</span>{context.snapshot&&<span title={context.snapshot}>来源快照 {context.snapshot.slice(0,16)} · 页面内核验</span>}{(context.trace||context.context_trace)&&view!=='live'&&<button type="button" className="v6-linkbtn" onClick={()=>set({lens:'spatial',view:'live'})}>回到来源样本</button>}</div>}
-          {lens === 'spatial' && view==='graph'&&['language','relations'].includes(st.gview) && (
+          {lens === 'spatial' && view==='graph'&&['langmeasure','relations'].includes(st.gview) && (
             <Gctx ds={st.ds || ''} mdl={st.mdl || ''} dsBound={dsOn} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
                   scope={view === 'graph' ? '当前图层的数据来源与被测模型；不同快照分别查看'
                     : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）'} />

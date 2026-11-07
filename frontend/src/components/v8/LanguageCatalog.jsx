@@ -14,7 +14,7 @@ function CatalogItems({ domain, onOpenMeasurement }) {
       {group.items.map(item => <details className="v8-catalog-item" key={item.id}>
         <summary>{item.name}</summary>
         <p className="v8-note">{item.example}</p>
-        {item.measurement && <button type="button" className="v6-linkbtn" onClick={() => onOpenMeasurement(item.measurement)}>
+        {item.measurement && onOpenMeasurement && <button type="button" className="v6-linkbtn" onClick={() => onOpenMeasurement(item.measurement)}>
           查看对应实验条目
         </button>}
       </details>)}
