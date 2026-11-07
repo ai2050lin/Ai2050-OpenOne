@@ -45,3 +45,28 @@
   .af-overlay b { font-size: 20px; }
   .as-frow { grid-template-columns: 1fr; }
 }
+/* 控制台（Phase 335） */
+.ac { display: flex; flex-direction: column; gap: 12px; }
+.ac-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ac-head h3 { margin: 0; font-size: 15px; }
+.ac-modes { display: flex; border: 1px solid #cbd5e2; border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+.ac-modes button { border: 0; border-left: 1px solid #e2e7ef; background: #fff; padding: 5px 12px; font-size: 13px; cursor: pointer; color: #3e4b60; }
+.ac-modes button:first-child { border-left: 0; }
+.ac-modes button[aria-pressed='true'] { background: #183f77; color: #fff; }
+.ac-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 16px; align-items: start; }
+.ac-input { display: flex; flex-direction: column; gap: 8px; }
+.ac-input textarea { width: 100%; border: 1px solid #cbd5e2; border-radius: 8px; padding: 8px 10px; font: inherit; resize: vertical; background: #fff; }
+.ac-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ac-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.ac-dot.ok { background: #2f8f5b; } .ac-dot.off { background: #c3cbd8; }
+.ac-err { margin: 0; color: #a33e43; font-size: 12px; }
+.ac-result { border: 1px solid #e2e7ef; border-radius: 10px; padding: 12px 14px; background: #f8fafc; min-height: 160px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ac-k { margin: 0; font-weight: 600; font-size: 13px; }
+.ac-empty { display: flex; flex-direction: column; gap: 6px; }
+.ac-top { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ac-top li { display: grid; grid-template-columns: 90px 1fr 48px; gap: 8px; align-items: center; font-size: 12px; }
+.ac-top code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-top i { display: block; height: 8px; border-radius: 4px; background: #e9edf3; overflow: hidden; }
+.ac-top i b { display: block; height: 100%; background: #d29a00; }
+.ac-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 860px) { .ac-body, .ac-two { grid-template-columns: 1fr; } }

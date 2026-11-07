@@ -23,7 +23,7 @@ function inPoly(x, y, poly) {
 }
 
 /* data: { lensDoc[37], lensReal[37], heads: { doc[36][32], real[36][32] }, factors: [[key, label, color, values[37]]] } */
-export default function AssocFlow3D({ data, cur, onCur, facOn, selHead }) {
+export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) {
   const canvasRef = useRef(null);
   const viewRef = useRef({ yaw: -0.65, pitch: 0.42 });
   const platesRef = useRef([]);
@@ -120,6 +120,15 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead }) {
       path(l => proj(Math.cos(th) * rad(l), yAt(l) + 0.004, Math.sin(th) * rad(l) * 0.6));
     });
     ctx.globalAlpha = 1; ctx.strokeStyle = '#172033'; ctx.lineWidth = 3; path(l => proj(0, yAt(l), 0));
+    /* 本次输入：每层改写幅度画成主干上的金色圆点（只画到当前层） */
+    if (live?.curve) {
+      const mx = Math.max(...live.curve.slice(1)) || 1;
+      for (let l = 1; l <= Math.min(upto, live.curve.length - 1); l++) {
+        const [x, y] = proj(0, LY(l), 0), r = 2 + 10 * (live.curve[l] / mx);
+        ctx.fillStyle = 'rgba(210,154,0,.55)'; ctx.strokeStyle = '#b07d00'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
+    }
     const [px, py] = proj(0, yAt(cur), 0);
     const g = ctx.createRadialGradient(px, py, 0, px, py, 18); g.addColorStop(0, 'rgba(210,154,0,.9)'); g.addColorStop(1, 'rgba(210,154,0,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI * 2); ctx.fill();
@@ -132,7 +141,7 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead }) {
         ctx.fillStyle = '#8a5010'; ctx.font = '11px sans-serif'; ctx.fillText(`L${ci - 1}H${h}`, hx - 18, hy - 6);
       });
     }
-  }, [cur, ci, scope, view, facOn, selHead, tick, data, hmax]);
+  }, [cur, ci, scope, view, facOn, selHead, tick, data, hmax, live]);
 
   /* 拖动旋转、点层板选层 */
   const drag = useRef(null);
@@ -155,7 +164,7 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead }) {
 
   return <section className="af-stage" aria-label="全部层的 3D 空间">
     <div className="af-head">
-      <div><h3>一段文字怎样决定下一个词</h3><span className="v8-note">看 HiddenState 从词嵌入往上流过 36 层 · MA-H2 真实汇总（Qwen3-4B bf16，{data.n.toLocaleString()} 条）</span></div>
+      <div><h3>一段文字怎样决定下一个词</h3><span className="v8-note">看 HiddenState 从词嵌入往上流过 36 层 · MA-H2 真实汇总（Qwen3-4B bf16，{data.n.toLocaleString()} 条）{live ? ' · 金色圆点为本次输入' : ''}</span></div>
       <div className="af-seg" role="group" aria-label="问法范围">{SCOPES.map(([id, label]) =>
         <button type="button" key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
       <button type="button" className="fw-tbtn" onClick={() => { const next = VORDER[(VORDER.indexOf(view) + 1) % 3]; viewRef.current = { yaw: VIEWS[next][0], pitch: VIEWS[next][1] }; setView(next); }}>视角：{VIEWS[view][2]}</button>
@@ -185,6 +194,7 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead }) {
       <span><i style={{ background: 'linear-gradient(90deg,#eef3fa,#7aa6e0,#1f5fbf)' }} />头越蓝，越看资料里的颜色</span>
       <span><i style={{ background: '#e4e7ec' }} />MLP（本案例未分析）</span>
       <span><i style={{ background: '#172033', height: 3 }} />HiddenState</span>
+      {live?.curve && <span><i style={{ background: '#d29a00', borderRadius: '50%', width: 10, height: 10 }} />本次输入每层改写幅度</span>}
       <span><i style={{ background: 'linear-gradient(90deg,#7050a0,#087b70,#b07d00,#c0392b,#4a7fd0)', height: 3 }} />各因素（离中线越远差异越大）</span>
     </div>
   </section>;

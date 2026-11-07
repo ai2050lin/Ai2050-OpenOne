@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { FLOW_DATA, rankHeads } from './data/assocFlow.js';
+import { FLOW_DATA, rankHeads, rewriteCurve } from './data/assocFlow.js';
 
 describe('关联机制 3D 流数据（MA-H2）', () => {
   it('词嵌入 + 36 层，36 块 × 32 头', () => {
@@ -19,4 +19,15 @@ describe('关联机制 3D 流数据（MA-H2）', () => {
     const d = rankHeads().map(x => x.d - x.r);
     expect([...d].sort((a, b) => b - a)).toEqual(d);
   });
+});
+
+describe('控制台：每层改写幅度', () => {
+  it('同向为 0、正交为 1、反向为 2，第 0 层记 0', () => {
+    const c = rewriteCurve([[1, 0], [2, 0], [0, 3], [0, -1]]);
+    expect(c[0]).toBe(0);
+    expect(c[1]).toBeCloseTo(0);
+    expect(c[2]).toBeCloseTo(1);
+    expect(c[3]).toBeCloseTo(2);
+  });
+  it('零向量不报错', () => { expect(rewriteCurve([[0, 0], [1, 1]])).toEqual([0, 0]); });
 });

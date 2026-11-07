@@ -20,3 +20,14 @@ export function rankHeads(data = FLOW_DATA, n = 12) {
   return rows.sort((a, b) => (b.d - b.r) - (a.d - a.r)).slice(0, n);
 }
 
+/* 每层改写幅度：1 − cos(h_l, h_{l−1})，第 0 层（词嵌入）记 0 */
+export function rewriteCurve(hidden) {
+  const out = [0];
+  for (let l = 1; l < hidden.length; l++) {
+    const a = hidden[l - 1], b = hidden[l];
+    let dot = 0, na = 0, nb = 0;
+    for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+    out.push(na && nb ? Math.max(0, 1 - dot / Math.sqrt(na * nb)) : 0);
+  }
+  return out;
+}
