@@ -1,0 +1,85 @@
+{
+ "id": "MA-H2",
+ "schema": "mainline_prereg.v1",
+ "created": "2026-11-07",
+ "stage": "H2",
+ "basis": "MA-H1（Phase 323）discovery 划分与材料",
+ "split": "discovery（84 个实体），不读 confirm / lockbox",
+ "positions": [
+  "ans",
+  "qname",
+  "scope",
+  "tname",
+  "tcol",
+  "lastcol"
+ ],
+ "kv_positions": [
+  "tname",
+  "tcol",
+  "lastcol"
+ ],
+ "layers": "hs[0]–hs[36] 全部",
+ "factors": [
+  "scope",
+  "pos",
+  "k",
+  "draft",
+  "form"
+ ],
+ "pairs": [
+  [
+   "scope",
+   "draft"
+  ],
+  [
+   "scope",
+   "form"
+  ],
+  [
+   "scope",
+   "pos"
+  ],
+  [
+   "form",
+   "pos"
+  ]
+ ],
+ "excluded_cells": [
+  [
+   "real",
+   "last",
+   3,
+   0,
+   "pair"
+  ],
+  [
+   "real",
+   "last",
+   3,
+   1,
+   "pair"
+  ]
+ ],
+ "boundaries": "与响应发现（ResearchPlan v6 第 3、8 节，切片 A，中文主线）。\n\n材料  MA-H1 的 discovery 划分（84 个实体）× MA-H0-v5 的 32 格 = 2,688 条，构造与 MA-H1 材料检查完全相同（种子 MA-H1）。\n      不读取 confirm / lockbox。MA-H1 排除的两格照常",
+ "outputs": [
+  "逐层读出曲线与 R1 / R2 判定",
+  "单因素效应（原始 L2 与标准化 RMS）与可读出性（实体留出 AUC，含 hs[0] 基线）",
+  "两因素交互范数比",
+  "答案位置的注意力去向（按头）",
+  "答案位置 MLP 单元的范围效应排序"
+ ],
+ "criteria": {
+  "readable": "AUC ≥ 0.75，且比同一位置 hs[0] 的 AUC 高至少 0.10（按实体二分、5 次随机切分取平均；方向只在训练半拟合）",
+  "readable_auc": 0.75,
+  "readable_margin": 0.1,
+  "splits": 5,
+  "r1_r2": "现实范围中最终读出正确（第 36 层 K−P < 0）的条目里，第 8–32 层任一层 K−P > 0 的比例：≥ 0.5 记为支持 R2（晚仲裁），≤ 0.2 记为支持 R1（早门控），之间记为混合",
+  "r2_share": 0.5,
+  "r1_share": 0.2,
+  "lens_layers": [
+   8,
+   32
+  ],
+  "caveat": "逐层读出是读出近似，早层不可靠；这里只作候选观察，R1 / R2 的确认要到 H4 的路径干预"
+ }
+}
