@@ -29,9 +29,9 @@ export const SPATIAL_VIEWS = [
 /* 空间三张图（2026-11-07 第一批）：语言图谱 / LLM 编码图谱 / 关联机制。
    路由仍用原来的 view + gview，三张图只是它们的分组，旧链接（?view=live、?gview=language 等）照常打开。 */
 export const SPATIAL_MODES = [
-  { id: 'lang', label: '语言图谱', desc: '外部能力框架：知识网络、推理功能、语法规则的语言项与关系，不含模型信息' },
   { id: 'enc', label: 'LLM 编码图谱', desc: '词嵌入、注意力头、MLP 的结构、参数与证据阶梯' },
   { id: 'assoc', label: '关联机制', desc: '一段文字在各层怎样被读取、改写并决定下一个词；运行、对照与共享关系' },
+  { id: 'lang', label: '语言图谱', desc: '外部能力框架：知识网络、推理功能、语法规则的语言项与关系，不含模型信息' },
 ];
 export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: { view: 'graph', gview: 'structure' }, assoc: { view: 'live' } };
 export const ASSOC_TABS = [

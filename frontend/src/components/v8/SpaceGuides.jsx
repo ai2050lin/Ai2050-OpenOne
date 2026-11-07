@@ -14,8 +14,10 @@ export function EncodingLadder() {
   const arch = useApi(coverage.model ? `/api/model/arch?model_key=${encodeURIComponent(coverage.model)}` : null).data;
   const a = arch?.available ? arch : null;
   const heads = a ? a.n_layers * a.n_heads : null, kv = a ? a.n_layers * a.n_kv_heads : null;
-  return <section className="v8-card cg-section" aria-label="证据阶梯">
-    <h3>三类对象的证据阶梯</h3>
+  /* 默认只显示一行摘要，点开再看逐项表格 */
+  return <details className="v8-card v8-overview-fold ladder-fold" aria-label="证据阶梯">
+    <summary><b>三类对象的证据阶梯</b>
+      <span className="v8-note"> 词嵌入 {a ? n(a.vocab_size) : '—'} 行 · 注意力头 {heads ? n(heads) : '—'} 个 · MLP 单元 {n(coverage.neuronTotal)} 个，已检查 {coverage.checked == null ? '—' : n(coverage.checked)} · 能预测：未测</span></summary>
     <p className="v8-note">每个对象按“已检查 → 读得出 → 改得动 → 能预测”记录，不用一个破解百分比。总量来自模型结构，没有按对象汇总的写“未统计”。</p>
     <div className="v8-weight-scroll"><table className="v6-table">
       <thead><tr><th>对象</th><th>总量</th><th>已检查</th><th>读得出</th><th>改得动</th><th>能预测</th></tr></thead>
@@ -26,7 +28,7 @@ export function EncodingLadder() {
         <tr><td>字典特征（并列）</td><td>第 30 块 16,384 个 transcoder 特征</td><td>1 层（Phase 262）</td><td><Unset/></td><td><Unset>未测</Unset></td><td><Unset>未测</Unset></td></tr>
       </tbody></table></div>
     <p className="v8-note">更接近“破解”的指标是：只保留已解释的对象，留出句子的下一词分布还能恢复多少，并与词身份、位置、n-gram 基线比较。这一项<b>未测</b>。</p>
-  </section>;
+  </details>;
 }
 
 /* 关联机制：三种运行方式的边界。 */
