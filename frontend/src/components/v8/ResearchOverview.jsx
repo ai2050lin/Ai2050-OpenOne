@@ -11,7 +11,7 @@ import { LatestFindings, NextStep, languageSections, relationCounts } from './Cl
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
 import { FINDINGS, SCORES } from './data/mainline.js';
-import { CoreCard, PillTools, Ring } from './CoreKit.jsx';
+import { Bar, PageHead, PillTools } from './CoreKit.jsx';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
@@ -265,15 +265,27 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
       <WorkList key={snapshot + topic} works={related} pane={open} scope={scope} run={run} />
     </details>
   </section> : null;
-  const node = id => <button type="button" className="ck-node" aria-expanded={open === id} aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => toggle(id)}>
-    <Ring value={rings[id].value} label={rings[id].label} color={rings[id].color} ariaLabel={`${cardOf(id)[1]} ${rings[id].label}`} />
-    <b>{cardOf(id)[1]}</b><span className="v8-note">{rings[id].sub}</span></button>;
-  /* 首屏只有一个核心模块：三个进度环。其余内容收进按钮（Phase 333） */
+  const card = id => {
+    const [, title, description, part] = cardOf(id);
+    return <button type="button" key={id} className={`v8-card v8-direction v8-overview-card${id === 'relations' ? ' v8-overview-core' : ''}`} aria-label={title}
+      aria-expanded={open === id} aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => toggle(id)}>
+      <small>{part}</small>
+      <strong>{title}</strong>
+      <span className="v8-overview-metric v8-overview-ratio">{id === 'relations' ? `四组成绩 ${rings.relations.label} 已测` : summaries[id]}</span>
+      <Bar value={rings[id].value} color={rings[id].color} label={`${title}进度`} />
+      <span className="v8-note">{description}</span>
+      {id === 'language' && <span className="v8-note">{sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}</span>}
+      {id === 'internal' && <span className="v8-note">已检查的 MLP 单元 / 全部单元；注意力头和词嵌入未按对象统计</span>}
+      {id === 'relations' && <span className="v8-note">{space.data ? `已登记连接 ${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条，只表示登记量` : '读取连接…'}</span>}
+      <span className="v8-overview-action">{open === id ? '收起 ↑' : '查看详情 →'}</span>
+    </button>;
+  };
+  /* 线上版的结构（Phase 334）：页面标题 → 三张卡片 → 点开的详情 → 左对齐折叠行 */
   return <div className="v8-route v8-overview">
-    {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
-    <CoreCard question="我们在破解什么：语言能力在模型里怎样编码" hint="点一个圆看详情 · 语言图谱是外部能力框架，LLM 编码图谱是模型内部，关联机制把两边对上">
+    <PageHead title="语言机制研究总览" sub="我们在破解什么：语言里的知识、推理和语法，在模型里怎样编码。分三部分：语言图谱、LLM 编码图谱，以及把两边对上的关联机制。"
+      note={analysisModel ? `覆盖统计 · ${[shortModel(analysisModel), analysisModel.split('|')[2]].filter(Boolean).join(' · ')}` : '当前范围暂无可核对的统计模型。'}>
       <details className="v8-overview-scope wb-pro">
-        <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}{analysisModel ? ` · 统计模型 ${shortModel(analysisModel)}` : ''}</summary>
+        <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}</summary>
         <label>模型快照 <select aria-label="总览模型快照" value={snapshot} onChange={event => {
           const next = event.target.value;
           publishResearchContext({ snapshot: next, run: '', trace: '', context_trace: '', pmodel: '' });
@@ -282,8 +294,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
           {snapshots.map(value => <option key={value} value={value}>{modelList.find(entry => entry.model_snapshot === value)?.model.split('|')[0] || '快照'} · {value.slice(0, 12)}</option>)}
         </select></label>
       </details>
-      <div className="ck-trio">{node('language')}<span className="ck-arrow" aria-hidden="true">→</span>{node('relations')}<span className="ck-arrow" aria-hidden="true">←</span>{node('internal')}</div>
-    </CoreCard>
+    </PageHead>
+    {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
+    <div className="ck-cards">{['language', 'relations', 'internal'].map(card)}</div>
     {detail}
     <PillTools label="总览的更多内容" items={[
       { id: 'case', label: '一个决策点案例', render: () => <div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>

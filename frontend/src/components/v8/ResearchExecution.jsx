@@ -11,9 +11,8 @@ import ResearchBundleUpload from './ResearchBundleUpload.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
 import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
 import ClaimDraft from './ClaimDraft.jsx';
-import { MainlineCard, PBar } from './MainlineProgress.jsx';
-import { CoreCard, GateBar, PillTools } from './CoreKit.jsx';
-import { pct } from './data/mainline.js';
+import { MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
+import { PageHead, PillTools } from './CoreKit.jsx';
 import { useCoverage } from './coverage.js';
 import { RUNS, SCORES, SLICES, STAGES } from './data/mainline.js';
 
@@ -185,27 +184,22 @@ function ResearchPlans({ onGo }) {
     census: ['当前作业', census0 ? `${census0.name}：${census0.done} / ${census0.total} 分片完成，${census0.active} 个运行中。` : '没有开放的普查作业。', () => onGo('execution')],
   }[tile];
 
-  const mini = (id, title, done, total, unit, empty) => <button type="button" key={id} className="ck-mini-btn" aria-expanded={tile === id} onClick={() => setTile(tile === id ? '' : id)}>
-    <span className="v8-note">{title}</span><b>{done == null || !total ? (empty || '未统计') : `${pct(done, total)}%`}</b>
-    <span className="v8-note">{done == null || !total ? ' ' : `${done.toLocaleString()} / ${total.toLocaleString()} ${unit}`}</span></button>;
-
   /* 首屏只有一个核心模块：主线进度环 + 阶段 + 一键参与；其余收进按钮（Phase 333） */
   return <section className="v8-rnd v8-rnd-current" aria-label="当前研发">
-    <CoreCard question="主线走到哪里" hint="点一个阶段看完成定义 · 点下面的数字看来源">
-      <div className="ck-plan">
-        <MainlineCard ring/>
-        <div className="ck-join"><ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
-          publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
-          onTaskChanged={refreshJobs}/></div>
-      </div>
-      <div className="ck-mini">
-        {mini('language', '语言图谱', coverage.language, coverage.languageTotal, '项')}
-        {mini('internal', 'LLM 编码图谱', coverage.checked, coverage.neuronTotal, '单元')}
-        {mini('relations', '关联机制', SCORES.filter(score => score.value != null).length, SCORES.length, '组成绩')}
-        {mini('census', census0 ? census0.name : '当前作业', census0?.done, census0?.total, '分片', census.loading ? '读取中' : '无开放作业')}
-      </div>
-      {tileDetail && <div className="mp-detail"><b>{tileDetail[0]}</b>：{tileDetail[1]} <button type="button" className="v6-linkbtn" onClick={tileDetail[2]}>打开</button></div>}
-    </CoreCard>
+    <PageHead title="当前研发" sub="主线走到哪里，现在能怎样参与。进度只表示执行到哪里，不表示结论成立。" />
+    <div className="ck-plan">
+      <MainlineCard/>
+      <div className="v8-card"><ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
+        publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
+        onTaskChanged={refreshJobs}/></div>
+    </div>
+    <div className="mp-tiles">
+      <PTile title="语言图谱" done={coverage.language} total={coverage.languageTotal} unit="项" on={tile === 'language'} onClick={() => setTile(tile === 'language' ? '' : 'language')}/>
+      <PTile title="LLM 编码图谱" done={coverage.checked} total={coverage.neuronTotal} unit="单元" on={tile === 'internal'} onClick={() => setTile(tile === 'internal' ? '' : 'internal')}/>
+      <PTile title="关联机制" done={SCORES.filter(score => score.value != null).length} total={SCORES.length} unit="组成绩" on={tile === 'relations'} onClick={() => setTile(tile === 'relations' ? '' : 'relations')}/>
+      <PTile title={census0 ? census0.name : '当前作业'} done={census0?.done} total={census0?.total} unit="分片" empty={census.loading ? '读取中' : '无开放作业'} on={tile === 'census'} onClick={() => setTile(tile === 'census' ? '' : 'census')}/>
+    </div>
+    {tileDetail && <div className="mp-detail"><b>{tileDetail[0]}</b>：{tileDetail[1]} <button type="button" className="v6-linkbtn" onClick={tileDetail[2]}>打开</button></div>}
     <PillTools label="当前研发的更多内容" initial={run ? 'packages' : ''} items={[
       { id: 'jobs', label: `作业明细 · ${ongoing.length + jobs.length}`, render: () => <div className="v8-rnd-dashboard">
         <section className="v8-rnd-progress" aria-label="研究进度">
@@ -353,14 +347,12 @@ function ResearchQueue({ onGo, tools }) {
   const censusJobs = (censusJobsApi.data?.jobs ?? []).filter(job => job.n_shards > 0);
   const mainDone = STAGES.filter(stage => stage.done.length === stage.gates.length).length;
 
-  const colors = { exec: '#183f77', check: '#245ca8', evidence: '#2f8f5b', replica: '#2f8f5b' };
   /* 首屏只有一个核心模块：四关条形图；点一关看是哪几次运行（Phase 333） */
   return <section className="v8-rnd" aria-label="实验与队列">
-    <CoreCard question="已完成的研究运行走到哪一关" hint="四关分开算，软件校验通过不等于科学证据成立 · 点一关看是哪几次运行">
-      <div className="ck-gates">{gates.map(([id, title, done]) =>
-        <GateBar key={id} name={title} n={done} d={RUNS.length} color={colors[id]} onClick={() => setGateSel(gateSel === id ? '' : id)} />)}</div>
-      {gate && <div className="mp-detail"><b>{gate[1]}</b>{RUNS.map(r => <p key={r.id} className="v8-note">{r.id}（Phase {r.phase} · {r.title}）：{gate[3](r)}</p>)}</div>}
-    </CoreCard>
+    <PageHead title="实验与队列" sub="已完成的研究运行走到哪一关。四关分开算，软件校验通过不等于科学证据成立。" />
+    <div className="mp-tiles">{gates.map(([id, title, done]) =>
+      <PTile key={id} title={title} done={done} total={RUNS.length} unit="次运行" on={gateSel === id} onClick={() => setGateSel(gateSel === id ? '' : id)}/>)}</div>
+    {gate && <div className="mp-detail"><b>{gate[1]}</b>{RUNS.map(r => <p key={r.id} className="v8-note">{r.id}（Phase {r.phase} · {r.title}）：{gate[3](r)}</p>)}</div>}
     <PillTools label="实验与队列的更多内容" initial={run ? 'tasks' : ''} items={[
       { id: 'queue', label: '任务队列', render: () => <>
         {censusJobs.map(job => <div className="mp-qrow" key={job.job_id}><span>{[job.model?.name, '神经元普查'].filter(Boolean).join(' · ')}</span>

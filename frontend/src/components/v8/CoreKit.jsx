@@ -1,5 +1,5 @@
-/* 精简版页面的公用部件（Phase 333，AGENTS.md 第 10 节“设计风格”）：
-   每页首屏只放一个可视化的核心模块；其余功能收进 PillTools，默认收起，点一个只展开一项，再点同一个收起。 */
+/* 页面公用部件（Phase 333 / 334，AGENTS.md 第 10 节“设计风格”）。
+   Phase 334 按线上版（server.ai2050.com）的结构调整：页面标题 + 卡片式核心模块 + 左对齐的折叠行。 */
 import { useState } from 'react';
 
 import './core_kit.css';
@@ -16,6 +16,13 @@ export function Ring({ value, label, size = 120, color = '#183f77', ariaLabel })
   </svg>;
 }
 
+/* 细进度条：value 为 0–1；null 时不画 */
+export function Bar({ value, color = '#183f77', label }) {
+  const v = value == null || !Number.isFinite(value) ? null : Math.max(0, Math.min(1, value));
+  return <span className="ck-bar" role={v == null ? undefined : 'progressbar'} aria-label={label} aria-valuenow={v == null ? undefined : Math.round(v * 100)}>
+    {v != null && <i style={{ width: `${v > 0 ? Math.max(v * 100, 1) : 0}%`, background: color }} />}</span>;
+}
+
 /* 条形关卡：n / d */
 export function GateBar({ name, n, d, color = '#183f77', onClick }) {
   const w = d > 0 ? (n / d) * 100 : 0;
@@ -23,25 +30,35 @@ export function GateBar({ name, n, d, color = '#183f77', onClick }) {
   return onClick ? <button type="button" className="ck-gate" onClick={onClick}>{body}</button> : <div className="ck-gate">{body}</div>;
 }
 
-/* 核心模块的外框 */
+/* 页面标题：与线上版一致的 h2 + 一句说明；右侧可放范围或操作 */
+export function PageHead({ title, sub, note, children, id }) {
+  return <header className="v8-overview-heading ck-head"><div>
+    <h2 id={id}>{title}</h2>{sub && <p>{sub}</p>}{note && <p className="v8-note">{note}</p>}</div>{children}</header>;
+}
+
+/* 核心模块的外框：卡片，左上角一个小标题 */
 export function CoreCard({ question, children, hint, label }) {
-  return <section className="ck-core" aria-label={label || question}>
-    {question && <p className="ck-q">{question}</p>}
+  return <section className="v8-card ck-core" aria-label={label || (typeof question === 'string' ? question : undefined)}>
+    {question && <h3 className="ck-q">{question}</h3>}
     {children}
     {hint && <p className="ck-hint">{hint}</p>}
   </section>;
 }
 
-/* 收起的操作台：items = [{ id, label, render, pro }]；pro 只在专业模式显示（沿用 wb-pro） */
+function FoldRow({ item, open }) {
+  const [shown, setShown] = useState(open);
+  return <details className={`v8-card v8-overview-fold ck-fold${item.pro ? ' wb-pro' : ''}`} open={shown} onToggle={event => setShown(event.currentTarget.open)}>
+    <summary><span>{item.label}</span>{item.meta != null && <small className="v8-note">{item.meta}</small>}</summary>
+    {shown && <div className="ck-fold-body">{item.render()}</div>}
+  </details>;
+}
+
+/* 细节：线上版的左对齐折叠行，默认收起，点开才渲染。items = [{ id, label, meta, render, pro }] */
 export function PillTools({ items, label = '更多', initial = '' }) {
-  const [open, setOpen] = useState(initial);
   const shown = items.filter(Boolean);
   if (!shown.length) return null;
-  const cur = shown.find(item => item.id === open);
-  return <>
-    <nav className="ck-pills" aria-label={label}>{shown.map(item =>
-      <button type="button" key={item.id} className={item.pro ? 'wb-pro' : undefined} aria-pressed={open === item.id} aria-expanded={open === item.id}
-        onClick={() => setOpen(o => (o === item.id ? '' : item.id))}>{item.label}</button>)}</nav>
-    {cur && <section className="v8-card ck-panel" aria-label={cur.label}>{cur.render()}</section>}
-  </>;
+  return <div className="ck-folds" role="group" aria-label={label}>
+    {shown.map(item => <FoldRow key={item.id} item={item} open={item.id === initial} />)}
+  </div>;
 }
+export const FoldList = PillTools;

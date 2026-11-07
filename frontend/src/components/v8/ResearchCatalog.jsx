@@ -7,8 +7,8 @@ import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import { fragmentHref } from './researchFragmentUtil.js';
-import { LockboxTable, PowerWizard } from './MainlineProgress.jsx';
-import { CoreCard, PillTools, Ring } from './CoreKit.jsx';
+import { LockboxTable, PTile, PowerWizard } from './MainlineProgress.jsx';
+import { PageHead, PillTools } from './CoreKit.jsx';
 import { useCoverage } from './coverage.js';
 import { PAIRS, SPLITS } from './data/mainline.js';
 
@@ -126,14 +126,6 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
 
   const [stage, setStage] = useState('');
   const pairsBuilt = PAIRS.filter(p => p.built).length, splitsBuilt = SPLITS.filter(s => s.built).length;
-  const pctOf = (done, total) => (done == null || !total ? null : done / total);
-  const label = (done, total) => (done == null || !total ? '—' : `${Math.round(100 * done / total)}%`);
-  const STAGES_M = [
-    ['lang', '语言目录', pctOf(coverage.language, coverage.languageTotal), label(coverage.language, coverage.languageTotal), `${coverage.language ?? '—'} / ${coverage.languageTotal ?? '—'} 项`, '#183f77'],
-    ['pairs', '竞争对材料', pctOf(pairsBuilt, PAIRS.length), label(pairsBuilt, PAIRS.length), `${pairsBuilt} / ${PAIRS.length} 组`, '#183f77'],
-    ['splits', '三个划分', pctOf(splitsBuilt, SPLITS.length), label(splitsBuilt, SPLITS.length), `${splitsBuilt} / ${SPLITS.length} 份`, '#2f8f5b'],
-    ['points', '决策点库', null, '未建', '目标数量在 H1 按功效确定', '#183f77'],
-  ];
   const stageDetail = {
     lang: <p className="v8-note">语言目录 {coverage.languageTotal} 项里，{coverage.language ?? '—'} 项已有当前模型的分析记录。目录本身在“空间 · 语言图谱”。</p>,
     pairs: <><div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>因素对</th><th>决策点设计</th><th>已有基础</th><th>主线材料</th></tr></thead>
@@ -145,12 +137,14 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
 
   /* 首屏只有一个核心模块：材料流向的四个环；其余收进按钮（Phase 333） */
   return <section className="v8-rnd" aria-label="材料与数据">
-    <CoreCard question="主线材料准备到哪里" hint="左到右是材料流向 · 点一个圆看来源与明细">
-      <div className="ck-row4">{STAGES_M.map(([id, name, value, text, sub, color]) =>
-        <button type="button" key={id} className="ck-node" aria-expanded={stage === id} onClick={() => setStage(stage === id ? '' : id)}>
-          <Ring value={value} label={text} size={100} color={color} ariaLabel={`${name} ${text}`} /><b>{name}</b><span className="v8-note">{sub}</span></button>)}</div>
-      {stageDetail && <div className="mp-detail">{stageDetail}</div>}
-    </CoreCard>
+    <PageHead title="材料与数据" sub="主线材料准备到哪里。所有实验用到的句子、语料和模型，都能在下方查到来源。" />
+    <div className="mp-tiles">
+      <PTile title="语言目录" done={coverage.language} total={coverage.languageTotal} unit="项" on={stage === 'lang'} onClick={() => setStage(stage === 'lang' ? '' : 'lang')}/>
+      <PTile title="竞争对材料" done={pairsBuilt} total={PAIRS.length} unit="组" on={stage === 'pairs'} onClick={() => setStage(stage === 'pairs' ? '' : 'pairs')}/>
+      <PTile title="三个划分" done={splitsBuilt} total={SPLITS.length} unit="份" on={stage === 'splits'} onClick={() => setStage(stage === 'splits' ? '' : 'splits')}/>
+      <PTile title="决策点库" empty="未建" on={stage === 'points'} onClick={() => setStage(stage === 'points' ? '' : 'points')}/>
+    </div>
+    {stageDetail && <div className="mp-detail">{stageDetail}</div>}
     <PillTools label="材料与数据的更多内容" initial={runFilter || template ? 'all' : ''} items={[
       { id: 'power', label: '冻结向导（H1）', render: () => <PowerWizard/> },
       { id: 'lockbox', label: '锁箱看管', render: () => <LockboxTable/> },

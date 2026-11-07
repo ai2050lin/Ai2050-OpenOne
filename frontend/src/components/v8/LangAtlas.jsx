@@ -192,7 +192,7 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
   return (
     <div className="v8-atlas-root">
       <header className="v8-atlas-hd">
-        <p className="ck-q">一个语言项在模型里有没有测试结果</p>
+        <h2>语言项实测</h2><p className="v8-note">一个语言项在模型里有没有测试结果：一次只显示一步。</p>
         <div className="ck-steps" role="group" aria-label="实测步骤">{['选数据集', '选类型与样本量', '结果与普遍规律'].map((name, i) =>
           <button type="button" key={name} className={cur_step === i + 1 ? 'now' : cur_step > i + 1 ? 'done' : ''} aria-pressed={cur_step === i + 1}
             onClick={() => setStep(i + 1)}>{i + 1} {name}</button>)}</div>

@@ -1,6 +1,16 @@
 /* 精简版页面公用样式（白色风格，与 assoc_space.css 一致） */
-.ck-core { background: #fff; border: 1px solid #e2e7ef; border-radius: 14px; padding: 20px 22px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ck-core { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 .ck-q { margin: 0; font-size: 15px; font-weight: 600; color: #172033; }
+.ck-head { margin-bottom: 2px; }
+.ck-head p { margin: 4px 0 0; }
+.ck-folds { display: flex; flex-direction: column; gap: 10px; }
+.ck-fold > summary small { margin-left: 8px; }
+.ck-fold-body { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+.ck-bar { display: block; width: 100%; height: 6px; border-radius: 3px; background: #eef1f5; overflow: hidden; }
+.ck-bar i { display: block; height: 100%; border-radius: 3px; }
+.ck-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.ck-cards .v8-overview-card { text-align: left; }
+@media (max-width: 860px) { .ck-cards { grid-template-columns: 1fr; } }
 .ck-hint { margin: 0; font-size: 12px; color: #68748a; text-align: center; }
 .ck-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .ck-pills button { border: 1px solid #e2e7ef; background: #fff; border-radius: 999px; padding: 7px 16px; font-size: 13px; color: #3e4b60; cursor: pointer; }
@@ -56,4 +66,4 @@ button.ck-gate { cursor: pointer; }
 .ck-steps button.done { background: #183f77; color: #fff; border-color: #183f77; }
 .ck-steps button.now { border: 2px solid #183f77; color: #183f77; font-weight: 600; }
 section.v8-rnd.v8-rnd-current { width: 100%; }  /* 与其他精简页同宽 */
-.wb-cfg > .ck-core, .wb-cfg > .ck-pills, .wb-cfg > .ck-panel { column-span: all; margin-bottom: 12px; }  /* 配置页是双栏分栏布局，精简模块占整行 */
+.wb-cfg > .ck-core, .wb-cfg > .ck-folds, .wb-cfg > .ck-pills, .wb-cfg > .ck-panel { column-span: all; margin-bottom: 12px; }  /* 配置页是双栏分栏布局，精简模块占整行 */
