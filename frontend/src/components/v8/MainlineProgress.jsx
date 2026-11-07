@@ -36,6 +36,7 @@ export function GateList({ stage }) {
     <ul className="mp-gates">{stage.gates.map((gate, i) => <li key={gate} className={stage.done.includes(i) ? 'ok' : ''}>
       <span aria-hidden="true" className="mp-box">{stage.done.includes(i) ? '✓' : ''}</span>{gate}
       <span className="mp-sr">{stage.done.includes(i) ? '已满足' : '未满足'}</span></li>)}</ul>
+    {stage.note && <p className="v8-note"><b>最近记录：</b>{stage.note}</p>}
     <p className="v8-note">全部满足才进入下一阶段；每一项都要链接到运行记录。</p>
   </>;
 }
@@ -55,7 +56,7 @@ export function MainlineCard() {
       return <button type="button" key={item.id} className={(finished ? 'done' : item === next ? 'next' : '') + (sel === i ? ' on' : '')}
         aria-expanded={sel === i} title={item.name} onClick={() => setSel(sel === i ? null : i)}>{item.id}</button>;
     })}</div>
-    {stage && <div className="mp-detail"><b>{stage.id} {stage.name}</b> · {stage.done.length === stage.gates.length ? '已完成' : stage === next ? '下一步' : '未开始'}<GateList stage={stage} /></div>}
+    {stage && <div className="mp-detail"><b>{stage.id} {stage.name}</b> · {stage.done.length === stage.gates.length ? '已完成' : stage.done.length ? `进行中 · ${stage.done.length} / ${stage.gates.length} 项` : stage === next ? '下一步' : '未开始'}<GateList stage={stage} /></div>}
     <p className="v8-note">进度只表示执行到哪里，不表示结论成立。</p>
   </section>;
 }

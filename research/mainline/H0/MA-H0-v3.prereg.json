@@ -1,0 +1,444 @@
+{
+ "id": "MA-H0-v3",
+ "revision_note": "v1（sha256 f8f8e319…）、v2（9965f300…）冻结后、任何运行前先后发现中性句含颜色字（“发黄 / yellow”“空白页”的“白”），会泄漏颜色；改为不含颜色字的句子并升版本。v1、v2 均未运行",
+ "schema": "mainline_prereg.v1",
+ "created": "2026-11-07",
+ "basis": "ResearchPlan v6 第 8 节 H0、第 9 节切片 A；Phase 271（CF-v2）",
+ "claim_card": {
+  "stage": "H0",
+  "slice": "A 共同底座：长文属性绑定",
+  "claim": "模型按提问指定的范围与选择键，从长文中取出与正确实体绑定的属性；范围决定读资料还是读常识，选择键决定读哪条记录。",
+  "model": "Qwen3-4B bf16（主线首个模型；之后在 Qwen3-14B、GLM4-9B 复验）",
+  "factors": {
+   "语言": "输入与输出同为中文或同为英文，两种语言分别校准；本阶段不做跨语言输出",
+   "风格与体裁": "固定为说明性资料体，本阶段不变",
+   "上下文逻辑": "范围（资料 / 现实）、选择键（实体名 / 记录号）、错误草稿（无 / 有）",
+   "语法与符号": "记录句式固定为“第 n 条记录：X 是 C 的。”，标点与括号固定；只在选择键上改变指代方式（名词 / “它”）"
+  },
+  "roles": {
+   "目标实体": "X",
+   "目标属性": "K（资料色）",
+   "常识属性": "P（模型无上下文首选色）",
+   "干扰属性": "D（同资料中其他实体的颜色）",
+   "选择键": "实体名或记录号",
+   "范围词": "按这份资料 / 在现实世界里",
+   "草稿": "写错的旧答案，颜色取某个 D"
+  },
+  "readout": "答案前缀末位（“是”/“is”）之后的候选完整答案对数概率；因果可见性：范围、键和全部记录都在读出位置之前",
+  "hypotheses": [
+   {
+    "id": "A1",
+    "name": "按名检索绑定",
+    "mechanism": "答案位置用实体名作检索键，从资料中找到该实体所在记录并读出其颜色",
+    "behavior": "绑定错误少且与目标位置无关；记录号作键需要多一步“号→记录”的对应，准确率下降",
+    "later": "H2–H4：注意力从答案位置读向目标实体名或其颜色 token；修补实体名位置可交换答案"
+   },
+   {
+    "id": "A2",
+    "name": "位置或近因启发",
+    "mechanism": "答案位置偏向读取最近或最显著的颜色，不依赖实体与颜色的绑定",
+    "behavior": "目标在首条时选干扰色的比例明显高于目标在末条时；选择键类型影响小",
+    "later": "H2–H4：注意力集中在最后一条记录的颜色 token，与实体名无关"
+   },
+   {
+    "id": "R1",
+    "name": "范围早门控",
+    "mechanism": "范围词在读取前决定读资料还是读常识，未选中的一路不进入答案位置",
+    "behavior": "与 R2 在行为上相同（都答对）；需要逐层读出区分",
+    "later": "H2：现实范围下资料色在任何层都不领先"
+   },
+   {
+    "id": "R2",
+    "name": "晚仲裁",
+    "mechanism": "两路都被计算，晚层再按范围选择",
+    "behavior": "与 R1 相同",
+    "later": "H2：现实范围下资料色在中层先领先、晚层被改写"
+   },
+   {
+    "id": "D1",
+    "name": "草稿被照抄",
+    "mechanism": "近处的现成答案被直接复制",
+    "behavior": "有草稿时选草稿色的比例明显升高",
+    "later": "把“错误草稿”作为切片 B 的冲突因素"
+   }
+  ],
+  "decisions": [
+   [
+    "行为门大面积未过（多数格 < 0.8）",
+    "先区分是模型做不到还是材料与问法问题；后者改材料升版本（MA-H0-v2），不进入 H1"
+   ],
+   [
+    "只有记录号键的格未过",
+    "记录号键退出主线首批，H1 只冻结实体名键；记录号键单列为待改问法"
+   ],
+   [
+    "门通过，且模型准确率不比最好的单一启发式高 0.2",
+    "不能说模型在做绑定；先改材料让启发式失效，再进入 H1"
+   ],
+   [
+    "门通过，目标首条时的绑定错误明显更多（A2 特征）",
+    "H2 优先测位置性注意力，A1 降为备择"
+   ],
+   [
+    "门通过，记录号键明显更难、位置无影响（A1 特征）",
+    "H2 优先测按名检索的头，A2 降为备择"
+   ],
+   [
+    "草稿使选草稿色的比例明显升高（D1 特征）",
+    "错误草稿进入切片 B 作为冲突因素；否则记为“可同时满足”"
+   ],
+   [
+    "现实范围在有资料时仍答常识色",
+    "复现 Phase 271 的范围切换；R1 与 R2 留到 H2 用逐层读出区分"
+   ]
+  ],
+  "baselines": {
+   "last": "取资料中最后一条记录的颜色",
+   "first": "取第一条记录的颜色",
+   "prior": "取模型无上下文首选色 P",
+   "draft": "有草稿时取草稿色（无草稿时不定义）"
+  },
+  "exposure": "实体词表在 Phase 264–271 已暴露；本阶段只作行为校准，H1 另建新实体与新句式的 discovery / confirm / lockbox"
+ },
+ "text": {
+  "zh": {
+   "intro": "下面是一份资料，记录按收到的先后排列。",
+   "record": "第{n}条记录：{X}是{C}的。",
+   "filler": [
+    "这份资料由档案室统一整理。",
+    "整理时没有改动原始说法。",
+    "各条记录之间没有先后依赖。",
+    "资料里的描述只适用于这份资料。",
+    "记录员每天下午核对一次。",
+    "部分记录来自口头转述。",
+    "资料的纸张已经有些旧了。",
+    "核对时使用的是同一支笔。",
+    "这一页的页码在右下角。",
+    "装订线位于左侧。",
+    "有两条记录的字迹比较潦草。",
+    "资料最后附有一页备注。"
+   ],
+   "draft": "（之前的草稿答案写的是：{X}是{D}的，尚未核对。）",
+   "q": {
+    "doc/name": "问：按这份资料，{X}是什么颜色的？\n答：按这份资料，{X}是",
+    "doc/num": "问：按这份资料，第{n}条记录里的东西是什么颜色的？\n答：按这份资料，它是",
+    "real/name": "问：在现实世界里，{X}通常是什么颜色的？\n答：在现实世界里，{X}通常是",
+    "real/num": "问：第{n}条记录里的东西，在现实世界里通常是什么颜色的？\n答：在现实世界里，它通常是"
+   },
+   "sep": ""
+  },
+  "en": {
+   "intro": "Below is a document; the records are listed in the order they were received.",
+   "record": "Record {n}: the {E} is {C}.",
+   "filler": [
+    "The archive office compiled this document.",
+    "No original wording was changed during compilation.",
+    "The records do not depend on each other.",
+    "The descriptions apply only to this document.",
+    "The clerk checks the records every afternoon.",
+    "Some records come from spoken reports.",
+    "The paper has become slightly worn.",
+    "The same pen was used for checking.",
+    "The page number is in the lower right corner.",
+    "The binding is on the left side.",
+    "Two records are written in messy handwriting.",
+    "A page of notes is attached at the end."
+   ],
+   "draft": "(An earlier draft answer said: the {E} is {D}; it has not been checked.)",
+   "q": {
+    "doc/name": "Q: According to this document, what color is the {E}?\nA: According to this document, the {E} is",
+    "doc/num": "Q: According to this document, what color is the thing in record {n}?\nA: According to this document, it is",
+    "real/name": "Q: In the real world, what color is the {E} usually?\nA: In the real world, the {E} is usually",
+    "real/num": "Q: In the real world, what color is the thing in record {n} usually?\nA: In the real world, it is usually"
+   },
+   "sep": " "
+  }
+ },
+ "cells": [
+  [
+   "doc",
+   "first",
+   2,
+   0,
+   "name"
+  ],
+  [
+   "doc",
+   "first",
+   2,
+   0,
+   "num"
+  ],
+  [
+   "doc",
+   "first",
+   2,
+   1,
+   "name"
+  ],
+  [
+   "doc",
+   "first",
+   2,
+   1,
+   "num"
+  ],
+  [
+   "doc",
+   "first",
+   4,
+   0,
+   "name"
+  ],
+  [
+   "doc",
+   "first",
+   4,
+   0,
+   "num"
+  ],
+  [
+   "doc",
+   "first",
+   4,
+   1,
+   "name"
+  ],
+  [
+   "doc",
+   "first",
+   4,
+   1,
+   "num"
+  ],
+  [
+   "doc",
+   "last",
+   2,
+   0,
+   "name"
+  ],
+  [
+   "doc",
+   "last",
+   2,
+   0,
+   "num"
+  ],
+  [
+   "doc",
+   "last",
+   2,
+   1,
+   "name"
+  ],
+  [
+   "doc",
+   "last",
+   2,
+   1,
+   "num"
+  ],
+  [
+   "doc",
+   "last",
+   4,
+   0,
+   "name"
+  ],
+  [
+   "doc",
+   "last",
+   4,
+   0,
+   "num"
+  ],
+  [
+   "doc",
+   "last",
+   4,
+   1,
+   "name"
+  ],
+  [
+   "doc",
+   "last",
+   4,
+   1,
+   "num"
+  ],
+  [
+   "real",
+   "first",
+   2,
+   0,
+   "name"
+  ],
+  [
+   "real",
+   "first",
+   2,
+   0,
+   "num"
+  ],
+  [
+   "real",
+   "first",
+   2,
+   1,
+   "name"
+  ],
+  [
+   "real",
+   "first",
+   2,
+   1,
+   "num"
+  ],
+  [
+   "real",
+   "first",
+   4,
+   0,
+   "name"
+  ],
+  [
+   "real",
+   "first",
+   4,
+   0,
+   "num"
+  ],
+  [
+   "real",
+   "first",
+   4,
+   1,
+   "name"
+  ],
+  [
+   "real",
+   "first",
+   4,
+   1,
+   "num"
+  ],
+  [
+   "real",
+   "last",
+   2,
+   0,
+   "name"
+  ],
+  [
+   "real",
+   "last",
+   2,
+   0,
+   "num"
+  ],
+  [
+   "real",
+   "last",
+   2,
+   1,
+   "name"
+  ],
+  [
+   "real",
+   "last",
+   2,
+   1,
+   "num"
+  ],
+  [
+   "real",
+   "last",
+   4,
+   0,
+   "name"
+  ],
+  [
+   "real",
+   "last",
+   4,
+   0,
+   "num"
+  ],
+  [
+   "real",
+   "last",
+   4,
+   1,
+   "name"
+  ],
+  [
+   "real",
+   "last",
+   4,
+   1,
+   "num"
+  ]
+ ],
+ "filler_per_gap": 3,
+ "entities": [
+  "aquatic.squid",
+  "aquatic.octopus",
+  "aquatic.catfish",
+  "aquatic.clam",
+  "aquatic.starfish",
+  "aquatic.salamander",
+  "aquatic.mussel",
+  "bird.seagull",
+  "bird.hummingbird",
+  "bird.heron",
+  "bird.eagle",
+  "bird.crow",
+  "bird.parrot",
+  "bird.partridge",
+  "food.congee",
+  "food.chocolate",
+  "food.cinnamon",
+  "food.dumpling",
+  "food.chestnut",
+  "food.tofu",
+  "food.century-egg",
+  "fruit.cherry",
+  "fruit.strawberry",
+  "fruit.gooseberry",
+  "fruit.mangosteen",
+  "fruit.avocado",
+  "fruit.nectarine",
+  "fruit.jujube",
+  "mammal.rabbit",
+  "mammal.monkey",
+  "mammal.beaver",
+  "mammal.badger",
+  "mammal.koala",
+  "mammal.elephant",
+  "mammal.sloth",
+  "plant.willow",
+  "plant.pine",
+  "plant.clover",
+  "plant.lavender",
+  "plant.rose",
+  "plant.cotton",
+  "plant.moss",
+  "vegetable.ginger",
+  "vegetable.bean-sprout",
+  "vegetable.spinach",
+  "vegetable.carrot",
+  "vegetable.celtuce",
+  "vegetable.cauliflower",
+  "vegetable.garlic"
+ ],
+ "colour_rule": "K：先验最低 5 色中按 sha256(MA-H0|id|lang) 选 1；D：同类实体，颜色按 sha256 从剩余颜色中选，与 K、P、其他 D 不同",
+ "scoring": "候选完整答案对数概率，表面形式取最大；英文形式带前导空格，中文直接接在“是”之后",
+ "criteria": {
+  "gate_cell_acc": 0.8,
+  "gate_rule": "每种语言 32 格全部 ≥ gate_cell_acc 才算行为门通过；未过的格单列，不进入内部分析",
+  "beyond_heuristic": 0.2,
+  "effect_min": 0.1,
+  "bootstrap": 2000
+ }
+}
