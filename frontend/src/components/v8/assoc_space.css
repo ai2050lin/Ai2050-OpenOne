@@ -1,0 +1,47 @@
+/* 关联机制：3D 空间 + 收起的操作台（白色风格，与客户端其他页面一致） */
+.as-page { display: flex; flex-direction: column; gap: 12px; }
+.af-stage { background: #fff; border: 1px solid #e2e7ef; border-radius: 14px; overflow: hidden; }
+.af-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #e2e7ef; }
+.af-head h3 { margin: 0; font-size: 15px; }
+.af-seg { display: flex; border: 1px solid #cbd5e2; border-radius: 8px; overflow: hidden; margin-left: auto; }
+.af-seg button { border: 0; background: #fff; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.af-seg button[aria-pressed='true'] { background: #183f77; color: #fff; }
+.af-body { position: relative; }
+.af-body canvas { display: block; width: 100%; height: 540px; touch-action: none; cursor: grab; background: linear-gradient(#fff, #f6f8fb); }
+.af-body canvas:active { cursor: grabbing; }
+.af-overlay { position: absolute; left: 16px; top: 12px; display: flex; flex-direction: column; pointer-events: none; }
+.af-overlay b { font-size: 26px; color: #172033; }
+.af-hint { position: absolute; left: 16px; bottom: 10px; pointer-events: none; }
+.af-card { position: absolute; right: 12px; top: 12px; width: 280px; background: #fff; border: 1px solid #e2e7ef; border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(23, 32, 51, .12); padding: 12px 14px; display: grid; gap: 10px; font-size: 12px; }
+.af-card h4 { margin: 0 0 4px; font-size: 12px; color: #68748a; font-weight: 600; }
+.af-big { font-size: 20px; }
+.af-x { position: absolute; right: 8px; top: 6px; border: 0; background: none; font-size: 18px; color: #68748a; cursor: pointer; }
+.af-meter { display: grid; grid-template-columns: 52px 1fr 40px; gap: 6px; align-items: center; }
+.af-meter i { display: block; height: 8px; background: #eef1f5; border-radius: 4px; position: relative; overflow: hidden; }
+.af-meter i b { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.af-meter i::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: #b8c2d1; }
+.af-row { display: grid; grid-template-columns: 12px 1fr 40px; gap: 6px; align-items: center; }
+.af-row s { display: block; width: 10px; height: 3px; border-radius: 2px; }
+.af-row.off { opacity: .35; }
+.af-player { display: flex; gap: 10px; align-items: center; padding: 10px 14px; border-top: 1px solid #e2e7ef; }
+.af-play { background: #183f77; color: #fff; border: 0; border-radius: 8px; padding: 5px 14px; cursor: pointer; }
+.af-player input[type='range'] { flex: 1; min-width: 120px; accent-color: #245ca8; }
+.af-legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 0 14px 10px; font-size: 11px; }
+.af-legend span { display: inline-flex; gap: 5px; align-items: center; }
+.af-legend i { display: inline-block; width: 12px; height: 8px; border-radius: 2px; }
+.as-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.as-tools button { border: 1px solid #e2e7ef; background: #fff; border-radius: 999px; padding: 7px 16px; font-size: 13px; cursor: pointer; }
+.as-tools button[aria-pressed='true'] { background: #183f77; border-color: #183f77; color: #fff; }
+.as-panel { display: flex; flex-direction: column; gap: 10px; }
+.as-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.as-frow { display: grid; grid-template-columns: 180px 1fr 120px; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #e2e7ef; }
+.as-frow svg { width: 100%; height: 28px; }
+.as-panel tr { cursor: pointer; }
+.as-panel tr.as-sel td { background: #edf4fd; }
+@media (max-width: 860px) {
+  .af-body canvas { height: 420px; }
+  .af-card { position: static; width: auto; margin: 0 12px 12px; box-shadow: none; }
+  .af-overlay b { font-size: 20px; }
+  .as-frow { grid-template-columns: 1fr; }
+}

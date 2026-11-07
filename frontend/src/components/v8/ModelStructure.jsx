@@ -262,7 +262,7 @@ function EmbeddingIndex({ total, index, coordinate, dimensions, values, maxAbs, 
   </div>;
 }
 
-export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical }) {
+export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical, compact = false }) {
   const source = useApi('/api/model/skeleton', { pollWhilePending: true });
   const { snapshot, pmodel } = useResearchContext();
   const [selection, setSelection] = useState(()=>readSelection(view,paramTab));
@@ -404,7 +404,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     onResponse={setArchiveOverlay}/>;
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
-      <div><h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2><p>{VIEW_TEXT[view]?.[1]}</p>{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
+      <div>{!compact && <><h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2><p>{VIEW_TEXT[view]?.[1]}</p></>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
       {models.length > 1 && <label>模型 <select aria-label="结构模型" value={model?.model || ''} onChange={event => {
         const next = models.find(row => row.model === event.target.value);
         if (!next) return;
@@ -426,7 +426,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
       <button type="button" className="fw-tbtn" aria-pressed={structureView==='list'} onClick={()=>setStructureView('list')}>二维列表</button>
       <button type="button" className="fw-tbtn" onClick={()=>onGraphMode?.('language')}>语言图谱</button>
     </div>}
-    {view==='live'&&<><InfoFlowMap model={model?.model}/><AttributionGraph snapshot={boundSnapshot} onOpen={node=>{change({...EMPTY,layer:node.l+1,module:node.k==='m'?'mlp':'attn',index:node.i});onGraphMode?.('structure');}}/></>}
+    {view==='live'&&!compact&&<><InfoFlowMap model={model?.model}/><AttributionGraph snapshot={boundSnapshot} onOpen={node=>{change({...EMPTY,layer:node.l+1,module:node.k==='m'?'mlp':'attn',index:node.i});onGraphMode?.('structure');}}/></>}
     {view==='response'&&<MinimalPairs model={model?.model}/>}
     {trace.controls}
     {['graph','parameters'].includes(view)&&structureView==='list'&&<LayerList tower={towerData.data&&!towerData.data.pending?towerData.data:null} onPick={hs=>{setStructureView('3d');pickLayer(hs);}}/>}
