@@ -10,6 +10,7 @@ import ResearchParticipation from './ResearchParticipation.jsx';
 import ResearchBundleUpload from './ResearchBundleUpload.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
 import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
+import ClaimDraft from './ClaimDraft.jsx';
 import { Fold, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
 import { useCoverage } from './coverage.js';
 import { RUNS, SCORES, SLICES, STAGES } from './data/mainline.js';
@@ -224,6 +225,7 @@ function ResearchPlans({ onGo }) {
       <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>切片</th><th>任务</th><th>产物</th><th>状态</th></tr></thead>
         <tbody>{SLICES.map(slice => <tr key={slice.name}><td>{slice.name}</td><td>{slice.task}</td><td>{slice.output}</td><td>{slice.done ? '已完成' : '未开始'}</td></tr>)}</tbody></table></div>
     </Fold>
+    <Fold title="主张卡草稿（H0 模板）"><ClaimDraft/></Fold>
     <Fold title="当前主张和否定条件">
       <p><b>主张：</b>语言、风格、逻辑和语法通过条件化读写规则共同决定下一个词。这是工作判断，不是结论。</p>
       <p className="v8-note"><b>如果否定：</b>规则在未见组合上超不过词身份、位置和 n-gram 基线，就换对象或换表示。<b>备择机制：</b>H0 要写好至少两个可区分的假设。<b>第一个任务：</b>长文属性绑定，Qwen3-4B bf16，中英文分别校准。</p>

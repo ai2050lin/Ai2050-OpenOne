@@ -27,6 +27,7 @@ import './v8.css';
 import LangGraph3D from './LangGraph3D.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import H2Results from './H2Results.jsx';
+import { AlgorithmPanel, AnomalyDraft, FlowRibbons } from './AssocDeep.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -71,7 +72,7 @@ function curveHs(row, n) {
 export default function SpaceLens(props) {
   if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
     /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
-    return <>{['live', 'response'].includes(props.view) ? <><AssocIntro/>{props.view === 'live' && <H2Results/>}</> : <EncodingLadder/>}
+    return <>{['live', 'response'].includes(props.view) ? <><AssocIntro/>{props.view === 'live' && <><H2Results/><FlowRibbons/><AlgorithmPanel/><AnomalyDraft/></>}</> : <EncodingLadder/>}
       <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
       onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm}
       historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/></>;

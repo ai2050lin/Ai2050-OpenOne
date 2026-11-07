@@ -9,7 +9,7 @@ const DOC = '#2a78d6', REAL = '#eb6834';
 const POS_LABEL = { ans: '答案位置', qname: '问题中的目标名', scope: '范围词', tname: '记录中的目标名', tcol: '记录中的颜色', lastcol: '最后一个颜色' };
 const FACTOR_LABEL = { scope: '范围', draft: '草稿', form: '记录形式', pos: '目标位置', k: '记录数' };
 
-function LineChart({ series, label, yLabel, band, height = 210 }) {
+export function LineChart({ series, label, yLabel, band, height = 210 }) {
   const [hover, setHover] = useState(null);
   const W = 640, H = height, x0 = 44, y0 = 12, w = W - x0 - 64, h = H - y0 - 30;
   const n = series[0].values.length;
@@ -18,12 +18,14 @@ function LineChart({ series, label, yLabel, band, height = 210 }) {
   const Y = v => y0 + h * (1 - (v - lo + pad) / (hi - lo + 2 * pad));
   const X = i => x0 + (w * i) / (n - 1);
   const ticks = [lo, 0, hi].filter((v, i, a) => a.indexOf(v) === i);
-  /* 末端直接标注：两条线末端太近时上下错开，至少相隔 13 像素 */
-  const ends = series.map(s => Y(s.values[n - 1]));
-  if (ends.length === 2 && Math.abs(ends[0] - ends[1]) < 13) {
-    const mid = (ends[0] + ends[1]) / 2, up = ends[0] <= ends[1] ? 0 : 1;
-    ends[up] = mid - 7; ends[1 - up] = mid + 7;
-  }
+  /* 末端直接标注：按纵向位置排序后逐个下推，相邻标签至少相隔 13 像素，整体再居中回原位附近 */
+  const raw = series.map(s => Y(s.values[n - 1]));
+  const order = raw.map((y, i) => [y, i]).sort((a, b) => a[0] - b[0]);
+  const placed = [];
+  order.forEach(([y], j) => { placed[j] = j ? Math.max(y, placed[j - 1] + 13) : y; });
+  const shift = (order.reduce((s, [y]) => s + y, 0) - placed.reduce((s, y) => s + y, 0)) / Math.max(1, placed.length);
+  const ends = [];
+  order.forEach(([, i], j) => { ends[i] = Math.min(y0 + h, Math.max(y0 + 6, placed[j] + shift)); });
   return <figure className="h2-fig">
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} onMouseLeave={() => setHover(null)}>
       {band && <rect x={X(band[0])} y={y0} width={X(band[1]) - X(band[0])} height={h} fill="#eef3fa"/>}
