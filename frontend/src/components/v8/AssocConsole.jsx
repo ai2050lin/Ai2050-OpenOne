@@ -11,7 +11,7 @@ import { LineChart } from './H2Results.jsx';
 import { request } from './MechanismTraceExplorer.jsx';
 import { rewriteCurve } from './data/assocFlow.js';
 
-const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['compare', '对照'], ['method', '方法比较']];
+const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['method', '方法比较']];
 const EXAMPLE_A = '资料：香蕉是蓝色的。\n问：按这份资料，香蕉通常是什么颜色的？';
 const EXAMPLE_B = '资料：香蕉是蓝色的。\n问：在现实世界里，香蕉通常是什么颜色的？';
 

@@ -20,7 +20,7 @@ import SpaceLens from '../v8/SpaceLens.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { useClientMode } from '../v8/ClientGuide.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { ASSOC_TABS, ENC_TABS, LENSES, PIPE_STEPS, ROUTE_VIEWS, SPACE_TARGET, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, spaceMode, spaceTab, visibleStations, writeState } from './workbenchUtil.js';
+import { ENC_TABS, LENSES, PIPE_STEPS, ROUTE_VIEWS, SPACE_TARGET, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, spaceMode, spaceTab, visibleStations, writeState } from './workbenchUtil.js';
 import {useResearchContext} from './researchContext.js';
 import {downloadDataPack,packInfo,storeTick,subscribe} from './rdc_fusion/dataStore.js';
 import {ExtraPackPrompt} from '../open/DataBar.jsx';
@@ -185,7 +185,7 @@ export default function Workbench() {
           {lens === 'spatial' && <SubNav items={SPATIAL_MODES} value={smode}
             onChange={v => set(SPACE_TARGET[v])} label="空间图谱" onHelp={() => setHelpOpen(true)} />}
           {lens === 'spatial' && <div className="wb-space-tabs" role="group" aria-label="本图的视图">
-            {smode !== 'lang' && (smode === 'assoc' ? ASSOC_TABS : ENC_TABS).map(tab => <button type="button" key={tab.id}
+            {smode === 'enc' && ENC_TABS.map(tab => <button type="button" key={tab.id}
               aria-pressed={spaceTab(view, st.gview) === tab.id} onClick={() => set(tab.patch)}>{tab.label}</button>)}
             <button type="button" className="v6-linkbtn wb-copy-link" onClick={copyLink}>{copied ? '链接已复制' : '复制当前链接'}</button>
           </div>}

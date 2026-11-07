@@ -28,7 +28,7 @@ import LanguageFrame from './LanguageFrame.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import AssocSpace from './AssocSpace.jsx';
 import { BasisCompare, RelationBoards } from './ClientGuide.jsx';
-import { PillTools } from './CoreKit.jsx';
+import { PageHead, PillTools } from './CoreKit.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -70,14 +70,40 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
+/* 关联机制的四种模式（Phase 336）：合并原来的四个子页签。路由不变，旧链接照常打开对应模式。 */
+const ASSOC_MODES = [
+  ['live', '运行与路径', '一段文字在全部层里怎样流动、怎样决定下一个词'],
+  ['response', '响应对照', '只改句子里的一处，看模型内部哪里跟着变'],
+  ['langmeasure', '语言项实测', '一项语言能力在哪一层读得出，按数据集批量测'],
+  ['relations', '共享关系', '不同语言能力是否共用同一个读出方向'],
+];
+function assocModeOf(view, graphMode) {
+  if (view === 'live' || view === 'response') return view;
+  return view === 'graph' && ['langmeasure', 'relations'].includes(graphMode) ? graphMode : null;
+}
+function AssocHub({ mode, onMode, children }) {
+  return <div className="v8-route as-page" aria-label="关联机制">
+    <PageHead title="关联机制" sub="把语言图谱里的能力，对到模型内部的层、注意力头和神经元。选一种模式，下面显示对应的内容。" />
+    <div className="as-modes" role="tablist" aria-label="关联机制模式">{ASSOC_MODES.map(([id, label, desc]) =>
+      <button type="button" role="tab" key={id} aria-selected={mode === id} aria-pressed={mode === id} onClick={() => onMode(id)}>
+        <b>{label}</b><span>{desc}</span></button>)}</div>
+    {children}
+  </div>;
+}
+
 export default function SpaceLens(props) {
+  const assocMode = assocModeOf(props.view, props.graphMode);
+  if (assocMode && !props.assocInner) {
+    const onMode = id => (id === 'live' || id === 'response' ? props.setView?.(id) : props.onGraphMode?.(id));
+    return <AssocHub mode={assocMode} onMode={onMode}><SpaceLens {...props} assocInner /></AssocHub>;
+  }
   if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
     /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
     const structure = <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
       onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm} compact
       historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/>;
     /* 关联机制 · 运行与路径：首屏只有 3D 空间，运行一段文字等功能收进操作台（Phase 332） */
-    if (props.view === 'live') return <AssocSpace model={props.model}>{structure}</AssocSpace>;
+    if (props.view === 'live') return <AssocSpace model={props.model} bare>{structure}</AssocSpace>;
     /* 其余结构页与响应对照：首屏只有核心模块（3D 层塔 / 最小对照），说明与看板收进按钮（Phase 333） */
     const tools = props.view === 'response' ? [
       { id: 'modes', label: '三种运行的区别', render: () => <AssocIntro/> },

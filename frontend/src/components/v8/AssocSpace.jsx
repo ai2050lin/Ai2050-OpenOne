@@ -20,7 +20,7 @@ function Spark({ values, color }) {
   return <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true"><path d={d} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
 }
 
-export default function AssocSpace({ model, children }) {
+export default function AssocSpace({ model, children, bare = false }) {
   const [cur, setCur] = useState(36);   // 默认显示完整的流；点播放从词嵌入开始
   const [mode, setMode] = useState('flow');
   const [live, setLive] = useState(null);
@@ -63,7 +63,7 @@ export default function AssocSpace({ model, children }) {
   };
 
   return <div className="v8-route as-page" aria-label="关联机制">
-    <PageHead title="关联机制 · 运行与路径" sub="上面是全部 37 层的 3D 空间和 HiddenState 信息流；下面的控制台可以输入文字生成，也可以切换模式观察和分析。" />
+    {!bare && <PageHead title="关联机制 · 运行与路径" sub="上面是全部 37 层的 3D 空间和 HiddenState 信息流；下面的控制台可以输入文字生成，也可以切换模式观察和分析。" />}
     <AssocFlow3D data={FLOW_DATA} cur={cur} onCur={setCur} facOn={facOn} selHead={selHead} live={live} />
     <AssocConsole mode={mode} onMode={setMode} onLive={setLive} panels={panels} />
     <PillTools label="关联机制的更多内容" items={[
