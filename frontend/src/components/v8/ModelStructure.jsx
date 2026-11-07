@@ -20,10 +20,10 @@ const MODULES = { attn: 1, mlp: 1 };
 const TYPE_COLORS = ['#d6541e', '#7a3fbf', '#0f766e', '#abc2de', '#245ca8', '#e2e7ee'];
 const TYPE_LABELS = ['只认一个词', '认词也看上下文', '偶尔强激活', '经常激活', '负向为主', '其他'];
 const VIEW_TEXT = {
-  graph: ['结构', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
-  parameters: ['结构', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
-  live: ['运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
-  response: ['响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
+  graph: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
+  parameters: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
+  live: ['关联机制 · 运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
+  response: ['关联机制 · 响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
 };
 const EMPTY = { layer: null, module: '', index: null, mode: '', coordinate: null };
 const KEYS = { layer: 'sblock', module: 'smodule', index: 'sindex', mode: 'smode', coordinate:'scoord' };

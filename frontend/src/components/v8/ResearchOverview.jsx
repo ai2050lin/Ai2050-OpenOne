@@ -9,12 +9,13 @@ import ResearchLibrary from './ResearchLibrary.jsx';
 import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { Ev, LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
+import { ScoreBoard } from './SpaceGuides.jsx';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
   ['language', '语言图谱', '语言里有哪些知识、推理和语法现象', '第一部分'],
-  ['internal', 'LLM 内部图谱', '模型的参数是什么，运行时信息怎样流动', '第二部分'],
-  ['relations', '两图谱的关联', '某种语言能力，由模型内部的什么负责', '第三部分'],
+  ['internal', 'LLM 编码图谱', '模型的参数是什么，运行时信息怎样流动', '第二部分'],
+  ['relations', '关联机制', '某种语言能力，由模型内部的什么负责', '第三部分'],
 ];
 const FULL_SNAPSHOT = /^[0-9a-f]{64}$/;
 const reportRef = work => work.stages?.registration_validated?.report_sha256;
@@ -281,6 +282,7 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
         </section>}
       </Fragment>)}
     </div>
+    <ScoreBoard/>
     <LatestFindings onGo={onGo}/>
     <NextStep onGo={onGo}/>
     <details className="v8-card v8-overview-fold wb-pro" open={plan} onToggle={event => setPlan(event.currentTarget.open)}>

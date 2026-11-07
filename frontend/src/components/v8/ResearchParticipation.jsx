@@ -82,6 +82,7 @@ export default function ResearchParticipation({ onGo, publicWork, publicSnapshot
   const latestReceipt = receipts[0];
   let description;
   let action;
+  let scope = null;
   if (!bridge) {
     description = publicWork ? `${publicSnapshot ? '数据包中的开放作业' : '开放作业'} · ${publicWork}`
       : publicLoaded ? '暂无公开排队任务' : '网页端 · 下载后在本机运行';
@@ -105,6 +106,7 @@ export default function ResearchParticipation({ onGo, publicWork, publicSnapshot
   } else if (participation?.available) {
     const available = participation.available;
     description = ['可领取', taskName(available), available.shard].filter(Boolean).join(' · ');
+    scope = available;
     action = <button type="button" className="fw-tbtn primary" disabled={busy} onClick={start}>
       {busy ? '正在启动…' : status.state === 'paused' ? '继续贡献算力' : '一键参与'}
     </button>;
@@ -120,6 +122,10 @@ export default function ResearchParticipation({ onGo, publicWork, publicSnapshot
         <p role="status">{description}</p>
         {action || (active && <button type="button" className="v6-linkbtn" onClick={() => prepare('')}>管理贡献</button>)}
       </div>
+      {scope && <dl className="mp-join-scope" aria-label="开始前说明"><dt>任务</dt><dd>{taskName(scope)}{scope.shard ? ` · ${scope.shard}` : ''}</dd>
+        <dt>资源</dt><dd>本机 GPU，按任务包限制；领取前再检查电量、显存和磁盘</dd>
+        <dt>上传</dt><dd>统计结果与回执；原生全场留在本机</dd></dl>}
+      {scope && <p className="v8-note">点击后才开始，可随时暂停或停止。</p>}
       {current && <div className="v8-rnd-task-progress">
         <small>{current.shard && `分片 ${current.shard} · `}{measured ? `${progress.done} / ${progress.total}`
           : progress?.stage === 'uploading' ? '结果上传中' : '等待节点上报计数'}</small>

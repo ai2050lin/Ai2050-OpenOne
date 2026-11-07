@@ -26,11 +26,32 @@ export const SPATIAL_VIEWS = [
   { id: 'response', label: '响应对照', desc: '模式族全场与点云、规律分析、合并统计' },
   /* 谱图关系（跨模式族共享编码轴 / 概念假设）不再是一级 tab：作为语言图谱里的入口进入（SpaceLens 仍渲染该视图，旧链接 ?view=relations|atlas 照常可用） */
 ];
+/* 空间三张图（2026-11-07 第一批）：语言图谱 / LLM 编码图谱 / 关联机制。
+   路由仍用原来的 view + gview，三张图只是它们的分组，旧链接（?view=live、?gview=language 等）照常打开。 */
 export const SPATIAL_MODES = [
-  { id: 'graph', label: '结构', desc: '3D 模型空间：全部层、Head 和神经元，以及语言图谱' },
-  { id: 'live', label: '运行与路径', desc: '信息流、单句归因图和实际运行响应' },
-  { id: 'response', label: '响应对照', desc: '语言到内部的对应、保真看板和公开基准' },
+  { id: 'lang', label: '语言图谱', desc: '知识网络、推理功能、语法规则三类关系，以及数据集实测与模式目录' },
+  { id: 'enc', label: 'LLM 编码图谱', desc: '词嵌入、注意力头、MLP 的结构、参数与证据阶梯' },
+  { id: 'assoc', label: '关联机制', desc: '一段文字在各层怎样被读取、改写并决定下一个词；运行、对照与共享关系' },
 ];
+export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: { view: 'graph', gview: 'structure' }, assoc: { view: 'live' } };
+export const ASSOC_TABS = [
+  { id: 'live', label: '运行与路径', patch: { view: 'live' } },
+  { id: 'response', label: '响应对照', patch: { view: 'response' } },
+  { id: 'relations', label: '共享关系', patch: { view: 'graph', gview: 'relations' } },
+];
+export const ENC_TABS = [
+  { id: 'structure', label: '结构与参数', patch: { view: 'graph', gview: 'structure' } },
+  { id: 'internal', label: '全部研发成果', patch: { view: 'graph', gview: 'internal' } },
+];
+export function spaceMode(view, gview) {
+  if (view === 'graph' && gview === 'language') return 'lang';
+  if (view === 'live' || view === 'response' || (view === 'graph' && gview === 'relations')) return 'assoc';
+  return 'enc';
+}
+export function spaceTab(view, gview) {
+  if (view === 'graph') return gview;
+  return view === 'parameters' ? 'structure' : view;
+}
 export const GRAPH_LAYERS = [
   {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
 ];

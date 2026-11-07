@@ -89,3 +89,66 @@
   .cg-flow { grid-template-columns: minmax(0, 1fr); }
   .wb-mode button { min-height: 36px; }
 }
+
+/* ---- 研发主线进度（MainlineProgress） ---- */
+.mp-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.mp-t { font-size: 12px; color: #566373; font-weight: 600; }
+.mp-hero { font-size: 44px; font-weight: 700; line-height: 1.15; color: #134584; font-variant-numeric: tabular-nums; }
+.mp-bar { height: 8px; background: #e7ecf2; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+.mp-bar i { display: block; height: 100%; background: #245ca8; border-radius: 4px; }
+.mp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.mp-tile { display: flex; flex-direction: column; align-items: stretch; gap: 2px; text-align: left; background: #fff; border: 1px solid #dfe5ec; border-radius: 10px; padding: 12px 14px; min-width: 0; font: inherit; color: inherit; }
+button.mp-tile { cursor: pointer; }
+button.mp-tile:hover { border-color: #b9c4d2; }
+.mp-tile.on { border-color: #245ca8; box-shadow: 0 0 0 1px #245ca8 inset; }
+.mp-v { font-size: 25px; font-weight: 700; line-height: 1.25; color: #134584; font-variant-numeric: tabular-nums; }
+.mp-v.muted { color: #6b7685; font-size: 20px; }
+.mp-n { font-size: 11.5px; color: #566373; margin-top: 4px; }
+.mp-stages { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; margin-top: 10px; }
+.mp-stages button { border: 1px dashed #c3ccd8; background: #f6f8fa; border-radius: 6px; padding: 5px 0; font-size: 11.5px; color: #566373; cursor: pointer; font-family: ui-monospace, Consolas, monospace; }
+.mp-stages button.next { border: 1.5px solid #245ca8; background: #edf4fd; color: #134584; }
+.mp-stages button.done { border: 1px solid #245ca8; background: #245ca8; color: #fff; }
+.mp-stages button.on { outline: 2px solid #16202c; outline-offset: 1px; }
+.mp-detail { margin-top: 10px; background: #f6f8fa; border: 1px solid #dfe5ec; border-radius: 8px; padding: 9px 12px; font-size: 13px; }
+.mp-gates { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 4px; font-size: 13px; }
+.mp-gates li { display: flex; align-items: center; gap: 7px; }
+.mp-box { width: 14px; height: 14px; border: 1.5px solid #b9c4d2; border-radius: 3px; flex: none; display: grid; place-items: center; font-size: 10px; }
+.mp-gates li.ok .mp-box { background: #245ca8; border-color: #245ca8; color: #fff; }
+.mp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.mp-folds { display: grid; gap: 6px; margin-top: 14px; }
+.mp-fold { background: #fff; border: 1px solid #dfe5ec; border-radius: 10px; }
+.mp-fold > summary { cursor: pointer; padding: 9px 14px; font-size: 13.5px; color: #33404f; }
+.mp-fold[open] > summary { border-bottom: 1px solid #dfe5ec; }
+.mp-fold-body { padding: 12px 14px; min-width: 0; }
+.mp-num { width: 76px; font: inherit; padding: 2px 6px; border: 1px solid #c3ccd8; border-radius: 5px; }
+.mp-tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 11.5px; white-space: nowrap; border: 1px solid #dfe5ec; background: #f4f6f9; color: #566373; }
+.mp-tag.ok { border-color: #8fc9b8; background: #eaf7f2; color: #0b6b55; }
+.mp-tag.warn { border-color: #e8c98f; background: #fff6e6; color: #8a5010; }
+.mp-qrow { display: grid; grid-template-columns: 200px minmax(0, 1fr) 70px; gap: 10px; align-items: center; font-size: 13px; margin-top: 8px; }
+.mp-qrow .mp-bar { margin-top: 0; }
+.mp-qrow > span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.mp-scores { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.mp-scores > div { border: 1px solid #dfe5ec; border-radius: 10px; padding: 10px 12px; background: #fff; }
+.mp-scores b { display: block; font-size: 13.5px; }
+.mp-scores .mp-v { margin-top: 4px; }
+.mp-join-scope { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 2px 8px; font-size: 12.5px; margin-top: 8px; color: #33404f; }
+.mp-join-scope dt { color: #6b7685; }
+.mp-join-scope dd { margin: 0; }
+@media (max-width: 1000px) { .mp-row { grid-template-columns: minmax(0, 1fr); } .mp-tiles, .mp-scores { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .mp-qrow { grid-template-columns: minmax(0, 1fr) 60px; } .mp-qrow .mp-bar { grid-column: 1 / -1; grid-row: 2; } }
+
+/* ---- 语言关系图（LangGraph3D） ---- */
+.lg3-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; }
+.lg3-svg { width: 100%; display: block; cursor: grab; touch-action: pan-y; user-select: none; background: radial-gradient(ellipse at 50% 45%, #fbfcfe, #f1f5f9); border-radius: 9px; margin-top: 8px; }
+.lg3-svg:active { cursor: grabbing; }
+.lg3-node { cursor: pointer; }
+.lg3-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #33404f; margin-top: 6px; align-items: center; }
+.lg3-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.lg3-dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid #566373; background: #fff; display: inline-block; }
+.lg3-dot.full { background: #566373; }
+.lg3-dot.dash { border-style: dashed; }
+.lg3-side h4 { margin: 10px 0 4px; font-size: 13.5px; }
+.lg3-side h4:first-child { margin-top: 0; }
+.lg3-rel { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.lg3-rel li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid #eef1f5; padding: 3px 0; }
+@media (max-width: 1000px) { .lg3-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -7,6 +7,9 @@ import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import { fragmentHref } from './researchFragmentUtil.js';
+import { Fold, LockboxTable, PTile, PowerWizard } from './MainlineProgress.jsx';
+import { useCoverage } from './coverage.js';
+import { PAIRS, SPLITS } from './data/mainline.js';
 
 const STATUS = { supported_in_scope: '范围内支持', not_supported: '未支持', inconclusive: '尚未确定', not_measured: '未测' };
 const METRIC = {
@@ -92,6 +95,7 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
   const [query, setQuery] = useState('');
   const [type, setType] = useState('');
   const [limit, setLimit] = useState(FIRST_PAGE);
+  const coverage = useCoverage();
   const archive = research.data;
   const datasets = archive?.datasets ?? [];
   const linked = new Set((archive?.claims ?? []).filter(({ body }) => body.run_id === runFilter)
@@ -121,7 +125,21 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
 
   return <section className="v8-card v8-rnd" aria-label="材料与数据">
     <h2>材料与数据</h2>
-    <p>所有实验用到的句子、语料和模型，都能在这里查到来源。</p>
+    <p>主线材料准备到哪里。所有实验用到的句子、语料和模型，都能在下方查到来源。</p>
+    <div className="mp-tiles">
+      <PTile title="语言目录" done={coverage.language} total={coverage.languageTotal} unit="项"/>
+      <PTile title="竞争对材料" done={PAIRS.filter(p => p.built).length} total={PAIRS.length} unit="组"/>
+      <PTile title="三个划分" done={SPLITS.filter(s => s.built).length} total={SPLITS.length} unit="份"/>
+      <PTile title="决策点库" empty="未建"/>
+    </div>
+    <p className="v8-note">决策点库的目标数量在 H1 按功效确定，现在没有分母，所以不显示百分比。</p>
+    <div className="mp-folds">
+    <Fold title="冻结向导（H1）· 功效三栏"><PowerWizard/></Fold>
+    <Fold title="锁箱看管"><LockboxTable/></Fold>
+    <Fold title={`竞争对明细（${PAIRS.length}）`}><div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>因素对</th><th>决策点设计</th><th>已有基础</th><th>主线材料</th></tr></thead>
+      <tbody>{PAIRS.map(p => <tr key={p.pair}><td>{p.pair}</td><td>{p.design}</td><td>{p.base}</td><td>{p.built ? '已建' : '未建'}</td></tr>)}</tbody></table></div>
+      <p className="v8-note">旧 CF、FU、AM 材料已暴露，只用于方法调试，不能用于确认。</p></Fold>
+    <Fold title="全部材料（搜索与来源）" open={Boolean(runFilter || template)}>
     <CatalogSummary templates={catalog.data?.items?.length} models={skeleton.data?.models?.length} tokens="1,904 万"/>
     <div className="v8-rnd-search">
       <input type="search" aria-label="搜索材料" placeholder="搜索数据集或模板" value={query}
@@ -156,5 +174,7 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
       <p className="v8-note">评审批次保留各自的来源和评分口径。</p>
       {independentReviews.map(review => <ReviewDetails key={review.id} review={review}/>)}
     </ResearchDisclosure>}
+    </Fold>
+    </div>
   </section>;
 }

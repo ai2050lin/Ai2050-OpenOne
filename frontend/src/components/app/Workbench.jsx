@@ -20,7 +20,7 @@ import SpaceLens from '../v8/SpaceLens.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { useClientMode } from '../v8/ClientGuide.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, visibleStations, writeState } from './workbenchUtil.js';
+import { ASSOC_TABS, ENC_TABS, LENSES, PIPE_STEPS, ROUTE_VIEWS, SPACE_TARGET, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, spaceMode, spaceTab, visibleStations, writeState } from './workbenchUtil.js';
 import {useResearchContext} from './researchContext.js';
 import {downloadDataPack,packInfo,storeTick,subscribe} from './rdc_fusion/dataStore.js';
 import {ExtraPackPrompt} from '../open/DataBar.jsx';
@@ -106,6 +106,10 @@ export default function Workbench() {
   const [st, setSt] = useState(readState);
   const latestState=useRef(st);latestState.current=st;
   const [helpOpen, setHelpOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  /* 地址栏已带 lens / view / run / snapshot 等定位参数，复制它就是分享当前对象 */
+  const copyLink = () => navigator.clipboard?.writeText(window.location.href)
+    .then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }).catch(() => setCopied(false));
   const [clientMode, setClientMode] = useClientMode();
   const [revision,setRevision]=useState(0),context=useResearchContext();
   useEffect(()=>{const pop=()=>{setSt(readState());setRevision(n=>n+1)};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop)},[]);
@@ -127,6 +131,7 @@ export default function Workbench() {
   const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) || st.rtab === 'neuron' ? st.rtab : 'overview';
   const stationGroup=['plan','catalog'].includes(station)?station:'execution';
   const dsOn = dsBound(lens, { view, gview:st.gview });
+  const smode = spaceMode(view, st.gview);
 
   useEffect(() => { writeState({ ...st, lens, station, view, rtab, pstep, csec }); }, [st, lens, station, view, rtab, pstep, csec]);
   const lensLabel = lenses.find(l => l.id === lens)?.label || '';
@@ -177,8 +182,13 @@ export default function Workbench() {
         </nav>
         <div className="wb-body">
           {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab==='neuron'?'overview':rtab} onChange={v => set({ rtab: v, opane: '' })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
-          {lens === 'spatial' && <SubNav items={SPATIAL_MODES} value={view==='parameters'?'graph':view}
-            onChange={v => set({ view: v, ...(v==='graph'?{gview:'structure'}:{}) })} label="空间模式" onHelp={() => setHelpOpen(true)} />}
+          {lens === 'spatial' && <SubNav items={SPATIAL_MODES} value={smode}
+            onChange={v => set(SPACE_TARGET[v])} label="空间图谱" onHelp={() => setHelpOpen(true)} />}
+          {lens === 'spatial' && <div className="wb-space-tabs" role="group" aria-label="本图的视图">
+            {smode !== 'lang' && (smode === 'assoc' ? ASSOC_TABS : ENC_TABS).map(tab => <button type="button" key={tab.id}
+              aria-pressed={spaceTab(view, st.gview) === tab.id} onClick={() => set(tab.patch)}>{tab.label}</button>)}
+            <button type="button" className="v6-linkbtn wb-copy-link" onClick={copyLink}>{copied ? '链接已复制' : '复制当前链接'}</button>
+          </div>}
           {lens === 'process' && <SubNav items={stations.filter(s=>['plan','catalog','execution'].includes(s.id))} value={stationGroup}
             onChange={s => set({ station: s, mrun: '', ...(s === 'catalog' ? { tm: '' } : {}) })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
           {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}

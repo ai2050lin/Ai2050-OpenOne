@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ADMIN_LIVE, API_BASE, useApi } from '../app/rdc_fusion/api.js';
 import { useResearchContext } from '../app/researchContext.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -10,6 +10,9 @@ import ResearchParticipation from './ResearchParticipation.jsx';
 import ResearchBundleUpload from './ResearchBundleUpload.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
 import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
+import { Fold, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
+import { useCoverage } from './coverage.js';
+import { RUNS, SCORES, SLICES, STAGES } from './data/mainline.js';
 
 const STAGE = {
   freeze: '冻结材料', collection: '原场采集', client_acceptance: '客户端回查', validation: '留出验证',
@@ -150,6 +153,8 @@ function ResearchPlans({ onGo }) {
   }, [refreshJobs]);
 
   const { run } = useResearchContext();
+  const coverage = useCoverage();
+  const [tile, setTile] = useState('');
   const all = packages.data?.workpackages ?? [];
   const ids = new Set(all.map(({ body }) => body.run_id));
   const focused = all.find(({ body }) => body.run_id === run);
@@ -169,10 +174,32 @@ function ResearchPlans({ onGo }) {
   const row = entry => <PlanRow key={`${run}:${entry.sha}`} entry={entry} focused={entry === focused} onGo={onGo}
     children={all.filter(child => child !== focused && !ongoing.includes(child) && child.body.parent_run_id === entry.body.run_id)}/>;
 
+  const census0 = jobs.find(job => job.unit === '分片' && job.total > 0);
+  const tileDetail = {
+    language: ['语言图谱', `语言目录 ${coverage.languageTotal} 项里，${coverage.language ?? '—'} 项已有当前模型的分析记录。`, () => onGo('spatial', 'graph', null, { gview: 'language' })],
+    internal: ['LLM 编码图谱', `${coverage.neuronTotal?.toLocaleString() ?? '—'} 个 MLP 单元里，${coverage.checked ?? '—'} 个做过解释检验。注意力头和词嵌入还没有按对象统计，不计入这个百分比。`, () => onGo('spatial', 'graph', null, { gview: 'structure' })],
+    relations: ['关联机制', '四组预测成绩都未测。已登记的连接数在“进展 · 总览”查看，它只表示登记量。', () => onGo('route', null, null, { rtab: 'overview' })],
+    census: ['当前作业', census0 ? `${census0.name}：${census0.done} / ${census0.total} 分片完成，${census0.active} 个运行中。` : '没有开放的普查作业。', () => onGo('execution')],
+  }[tile];
+
   return <section className="v8-card v8-rnd v8-rnd-current" aria-label="当前研发">
-    <h2>参与研究</h2>
-    <p>选一种适合你的方式。不用懂模型，也不一定要有显卡。</p>
-    <ParticipationWays onGo={onGo}/>
+    <h2>当前研发</h2>
+    <p>主线走到哪里，一键加入。细节在下方展开。</p>
+    <div className="mp-row">
+      <MainlineCard/>
+      <div className="v8-card"><ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
+        publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
+        onTaskChanged={refreshJobs}/></div>
+    </div>
+    <div className="mp-tiles">
+      <PTile title="语言图谱" done={coverage.language} total={coverage.languageTotal} unit="项" on={tile === 'language'} onClick={() => setTile(tile === 'language' ? '' : 'language')}/>
+      <PTile title="LLM 编码图谱" done={coverage.checked} total={coverage.neuronTotal} unit="单元" on={tile === 'internal'} onClick={() => setTile(tile === 'internal' ? '' : 'internal')}/>
+      <PTile title="关联机制" done={SCORES.filter(score => score.value != null).length} total={SCORES.length} unit="组成绩" on={tile === 'relations'} onClick={() => setTile(tile === 'relations' ? '' : 'relations')}/>
+      <PTile title={census0 ? census0.name : '当前作业'} done={census0?.done} total={census0?.total} unit="分片" empty={census.loading ? '读取中' : '无开放作业'} on={tile === 'census'} onClick={() => setTile(tile === 'census' ? '' : 'census')}/>
+    </div>
+    {tileDetail && <div className="mp-detail"><b>{tileDetail[0]}</b>：{tileDetail[1]} <button type="button" className="v6-linkbtn" onClick={tileDetail[2]}>打开</button></div>}
+    <div className="mp-folds">
+    <Fold title={`作业明细（${ongoing.length + jobs.length}）`}>
     <div className="v8-rnd-dashboard">
       <section className="v8-rnd-progress" aria-label="研究进度">
         <h3>研究进度</h3>
@@ -191,12 +218,19 @@ function ResearchPlans({ onGo }) {
         {(census.local || queue.local) && <small>任务统计来自已下载的数据包</small>}
         {jobs.length > 0 && (census.error || queue.error) && <small>部分任务统计暂未更新</small>}
       </section>
-      <ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
-        publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
-        onTaskChanged={refreshJobs}/>
     </div>
-    <ResearchGaps/>
-    <AutoExplainCard/>
+    </Fold>
+    <Fold title={`本周期切片 · ${SLICES.filter(slice => slice.done).length} / ${SLICES.length}`}>
+      <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>切片</th><th>任务</th><th>产物</th><th>状态</th></tr></thead>
+        <tbody>{SLICES.map(slice => <tr key={slice.name}><td>{slice.name}</td><td>{slice.task}</td><td>{slice.output}</td><td>{slice.done ? '已完成' : '未开始'}</td></tr>)}</tbody></table></div>
+    </Fold>
+    <Fold title="当前主张和否定条件">
+      <p><b>主张：</b>语言、风格、逻辑和语法通过条件化读写规则共同决定下一个词。这是工作判断，不是结论。</p>
+      <p className="v8-note"><b>如果否定：</b>规则在未见组合上超不过词身份、位置和 n-gram 基线，就换对象或换表示。<b>备择机制：</b>H0 要写好至少两个可区分的假设。<b>第一个任务：</b>长文属性绑定，Qwen3-4B bf16，中英文分别校准。</p>
+    </Fold>
+    <Fold title="不贡献算力也能参与"><ParticipationWays onGo={onGo}/></Fold>
+    <Fold title="研究缺口与自动解释"><ResearchGaps/><AutoExplainCard/></Fold>
+    <Fold title={`研究工作包（${all.length}）`} open={Boolean(run)}>
     {ongoing.length > 0 && <ResearchDisclosure title="进行中的研究详情"><div className="v8-rnd-list">{ongoing.map(row)}</div></ResearchDisclosure>}
     {archiveRows.length > 0 && <ResearchDisclosure key={run} title={archiveLabel ? `研究历史 · ${archiveLabel}` : `研究历史（${archiveRows.length}）`}>
       <div className="v8-rnd-list">{archiveRows.map(row)}</div>
@@ -204,6 +238,9 @@ function ResearchPlans({ onGo }) {
     {plans.length > 0 && <ResearchDisclosure title={`研究计划（${plans.length}）`}><div className="v8-rnd-list">{plans.map(row)}</div></ResearchDisclosure>}
     {packages.error && <ResearchDisclosure title="研究历史"><SourceNotice source={packages} loading="读取研究…"/></ResearchDisclosure>}
     {packages.data && run && !focused && <p className="v8-note">当前资料中未找到链接指定的研究。</p>}
+    {!packages.data && !packages.error && <p className="v8-note">读取研究…</p>}
+    </Fold>
+    </div>
   </section>;
 }
 
@@ -258,6 +295,8 @@ function TaskRow({ task, name, onGo }) {
 function ResearchQueue({ onGo, tools }) {
   const tasks = useApi('/api/tasks', { online: true });
   const catalog = useApi('/api/catalog');
+  const censusJobsApi = useApi('/api/census/jobs', { online: true });
+  const [gateSel, setGateSel] = useState('');
   const { run } = useResearchContext();
   const items = catalog.data?.items ?? [];
   const names = new Map(items.flatMap(item => [item.tm_id, item.pilot_tm_id].filter(Boolean).map(id => [id, item.name])));
@@ -299,9 +338,37 @@ function ResearchQueue({ onGo, tools }) {
   const failures = tasks.data ? `${stats.failed ?? 0} 个失败` : '失败未接入';
   const current = [...active, ...queued];
 
+  const gates = [
+    ['exec', '运行执行', RUNS.filter(r => r.executed).length, r => r.exec],
+    ['check', '软件校验', RUNS.filter(r => r.checked).length, r => r.check],
+    ['evidence', '科学证据', RUNS.filter(r => r.evidence).length, r => r.evidenceText],
+    ['replica', '独立复算', RUNS.filter(r => r.replicated).length, r => r.replicaText],
+  ];
+  const gate = gates.find(g => g[0] === gateSel);
+  const censusJobs = (censusJobsApi.data?.jobs ?? []).filter(job => job.n_shards > 0);
+  const mainDone = STAGES.filter(stage => stage.done.length === stage.gates.length).length;
+
   return <section className="v8-card v8-rnd" aria-label="实验与队列">
     <h2>实验与队列</h2>
-    <p>每个实验回答一个问题。这里看任务进度、待处理事项和研究结果。</p>
+    <p>已完成的研究运行走到哪一关。四关分开算，软件校验通过不等于科学证据成立。</p>
+    <div className="mp-tiles">{gates.map(([id, title, done]) =>
+      <PTile key={id} title={title} done={done} total={RUNS.length} unit="次运行" on={gateSel === id} onClick={() => setGateSel(gateSel === id ? '' : id)}/>)}</div>
+    {gate && <div className="mp-detail"><b>{gate[1]}</b>{RUNS.map(r => <p key={r.id} className="v8-note">{r.id}（Phase {r.phase} · {r.title}）：{gate[3](r)}</p>)}</div>}
+    <section className="v8-card" aria-label="任务队列" style={{ marginTop: 12 }}>
+      <h3>任务队列</h3>
+      {censusJobs.map(job => <div className="mp-qrow" key={job.job_id}><span>{[job.model?.name, '神经元普查'].filter(Boolean).join(' · ')}</span>
+        <PBar done={job.counts?.done ?? 0} total={job.n_shards} label="普查分片完成"/><span>{job.counts?.done ?? 0} / {job.n_shards}</span></div>)}
+      {!censusJobs.length && <p className="v8-note">{censusJobsApi.loading ? '读取普查作业…' : '没有普查作业。'}</p>}
+      <div className="mp-qrow"><span>主线 H0–H7</span><PBar done={mainDone} total={STAGES.length} label="主线完成阶段"/><span>{mainDone} / {STAGES.length}</span></div>
+      <p className="v8-note">四关只统计已登记的研究运行：{RUNS.map(r => r.id).join('、')}。</p>
+    </section>
+    <div className="mp-folds">
+    <Fold title="逐项查看研究运行">
+      <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>运行</th><th>执行进度</th><th>软件校验</th><th>科学证据</th><th>独立复算</th></tr></thead>
+        <tbody>{RUNS.map(r => <tr key={r.id}><td><b>{r.id}</b><small> Phase {r.phase}</small></td><td>{r.exec}</td><td>{r.check}</td><td>{r.evidenceText}</td><td>{r.replicaText}</td></tr>)}</tbody></table></div>
+      <p className="v8-note">证据晋级要写明谁、何时、依据哪次复算；目前两次运行都没有晋级记录。</p>
+    </Fold>
+    <Fold title="节点任务、待审与回执" open={Boolean(run)}>
     <dl className="v8-rnd-metrics">
       <div><dt>运行中</dt><dd>{tasks.data ? stats.claimed ?? 0 : '—'}</dd></div>
       <div><dt>排队</dt><dd>{tasks.data ? stats.queued ?? 0 : '—'}</dd></div>
@@ -313,7 +380,6 @@ function ResearchQueue({ onGo, tools }) {
     </div>
     <SourceNotice source={tasks} loading="读取调度队列…"/>
     {catalog.error && <p className="v8-note">{catalog.error}</p>}
-    <AiLoopCard/>
     <ResearchBundleUpload/>
     {run && <ArchivedExperiment key={run} run={run} onGo={onGo}/>}
     <div className="v8-rnd-list" aria-label="当前任务">
@@ -331,10 +397,13 @@ function ResearchQueue({ onGo, tools }) {
     <ResearchDisclosure title="历史任务">
       {completed.length ? <div className="v8-rnd-list">{completed.map(row)}</div> : <Empty>当前资料中没有已完成任务记录。</Empty>}
     </ResearchDisclosure>
-    {tools.length > 0 && <ResearchDisclosure title="专业工具">
+    </Fold>
+    <Fold title="AI 研究循环"><AiLoopCard/></Fold>
+    {tools.length > 0 && <Fold title="专业工具">
       <div className="v6-toolbar">{tools.map(tool => <button key={tool.id} type="button" className="fw-tbtn"
         onClick={() => onGo(tool.id)}>{tool.label}</button>)}</div>
-    </ResearchDisclosure>}
+    </Fold>}
+    </div>
   </section>;
 }
 

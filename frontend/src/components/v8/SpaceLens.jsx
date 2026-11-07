@@ -24,7 +24,8 @@ import ModelStructure from './ModelStructure.jsx';
 import Tower from './Tower.jsx';
 import { OVERLAYS, READOUT_LABEL, defaultModel, fmtP, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
-import {GRAPH_LAYERS} from '../app/workbenchUtil.js';
+import LangGraph3D from './LangGraph3D.jsx';
+import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -66,24 +67,21 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
-function GraphModes({ graphMode, onGraphMode }) {
-  return <section className="v8-card wb-object-modes"><div className="v6-toolbar" role="group" aria-label="图谱图层">{GRAPH_LAYERS.map(mode =>
-    <button type="button" className={'fw-tbtn' + (graphMode === mode.id ? ' primary' : '')} aria-pressed={graphMode === mode.id}
-      key={mode.id} onClick={() => onGraphMode?.(mode.id)}>{mode.label}</button>)}</div></section>;
-}
-
 export default function SpaceLens(props) {
   if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
-    return <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
+    /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
+    return <>{['live', 'response'].includes(props.view) ? <AssocIntro/> : <EncodingLadder/>}
+      <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
       onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm}
-      historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/>;
+      historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/></>;
   }
   return <SpaceDetailLens {...props} />;
 }
 
-function SpaceDetailLens({ view: routeView, graphMode='language', onGraphMode, paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
+function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
   const view=routeView==='graph'?({language:'lang',internal:'research',relations:'relations'}[graphMode]||'lang'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
-  const modeBar=routeView==='graph'?<GraphModes graphMode={graphMode} onGraphMode={onGraphMode}/>:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;
+  /* 图层切换已由工作台的三张图和视图条承担，这里不再重复一排图层按钮 */
+  const modeBar=routeView==='graph'?null:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;
   const treeApi = useApi('/api/lang/tree');
   const skApi = useApi('/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
@@ -240,7 +238,7 @@ function SpaceDetailLens({ view: routeView, graphMode='language', onGraphMode, p
   if (view === 'live') return <LivePane/>;
   if (view === 'research') return <>{modeBar}<ResearchSpace/></>;
   return (
-    <>{modeBar}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
+    <>{modeBar}{view === 'lang' && <LangGraph3D/>}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
       {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">
