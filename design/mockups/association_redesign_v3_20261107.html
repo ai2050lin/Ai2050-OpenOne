@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>关联机制 v3 方案</title>
+<style>
+:root{--bg:#f5f7fa;--panel:#fff;--soft:#f8fafc;--ink:#16202c;--text:#3e4b60;--muted:#68748a;--line:#e2e7ef;--line2:#cbd5e2;--blue:#245ca8;--blue2:#184f95;--bluebg:#eef4fc;--doc:#2a78d6;--real:#eb6834;--green:#2f8f5b;--greenbg:#eaf6ef;--amber:#a46a00;--amberbg:#fff6e8;--gray:#94a3b8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}h1,h2,h3,h4,p{margin:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.mock{background:#fff8e9;border-bottom:1px solid #eeddb9;color:#6d4c14;padding:6px 20px;font-size:12px;text-align:center}
+/* 与线上工作台一致的顶部与页签 */
+.top{background:#fff;border-bottom:1px solid var(--line);padding:10px 24px;display:flex;gap:14px;align-items:center}
+.top b{font-size:15px}.top small{color:var(--muted)}
+.tabs1,.tabs2{display:flex;gap:6px;padding:8px 24px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs1 button,.tabs2 button{border:1px solid transparent;background:none;border-radius:8px;padding:4px 12px;font-size:13px;color:var(--text)}
+.tabs1 button.on{background:var(--bluebg);border-color:#b9cff0;color:var(--blue2);font-weight:600}
+.tabs2 button.on{background:var(--blue2);color:#fff}
+.main{max-width:1180px;margin:0 auto;padding:22px 24px 60px;display:flex;flex-direction:column;gap:14px}
+h2.t{font-size:22px;line-height:1.35}.sub{color:var(--text);margin-top:4px}
+.note{color:var(--muted);font-size:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.card h3{font-size:16px}
+/* 案例选择 */
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.case{text-align:left;display:flex;flex-direction:column;gap:6px}
+.case.on{border-color:#93b8e8;background:#f1f6fd}
+.case small{color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--bluebg);color:var(--blue2);white-space:nowrap}
+.tag.g{background:var(--greenbg);color:var(--green)}.tag.w{background:var(--amberbg);color:var(--amber)}.tag.n{background:#eef1f5;color:var(--muted)}
+/* 故事：三步 */
+.story{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{display:flex;flex-direction:column;gap:10px}
+.step .k{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}
+.step .k i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--blue2);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.step h4{font-size:15px}
+.big{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.hb{display:grid;grid-template-columns:64px 1fr 44px;gap:8px;align-items:center;font-size:13px}
+.hb i{display:block;height:10px;border-radius:5px;background:#eef1f5;overflow:hidden}.hb i b{display:block;height:100%;border-radius:5px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.chart svg{display:block;width:100%;height:auto}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.rung{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.rung.done{background:var(--greenbg);border-color:#bfe3cc}.rung.now{border-color:#e9cf9b;background:var(--amberbg)}
+.rung b{font-size:13px}
+.next{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:6px 14px;font-size:13px}
+.btn.pri{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 18px}
+details.fold summary{cursor:pointer;font-weight:600}
+details.fold .in{margin-top:10px;font-size:13px;color:var(--text);display:flex;flex-direction:column;gap:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--muted);font-weight:600;font-size:12px}
+/* 自己做实验 */
+.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tool{display:flex;flex-direction:column;gap:8px}
+.tool .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.diff{border:1px dashed var(--line2);border-radius:12px;padding:10px 14px;background:#fff;font-size:12px;color:var(--text)}
+.diff summary{cursor:pointer;color:var(--muted)}.diff ul{margin:6px 0 0;padding-left:18px}
+@media (max-width:900px){.cases,.story,.tools{grid-template-columns:1fr}.ladder{grid-template-columns:repeat(2,minmax(0,1fr))}.main{padding:14px 16px 40px}.top,.tabs1,.tabs2{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+<div class="mock">关联机制 v3 方案草图 · 图表与数字为真实数据（MA-H2 discovery 汇总、主线登记）；按钮在方案页不可用</div>
+<header class="top"><b>研究工作台</b><small>空间</small></header>
+<nav class="tabs1"><button>LLM 编码图谱</button><button class="on">关联机制</button><button>语言图谱</button></nav>
+<nav class="tabs2" id="tabs2"><button data-v="case" class="on">研究案例</button><button data-v="lab">自己做实验</button></nav>
+<main class="main" id="main"></main>
+<script>
+const D = {"n":2520,"final":{"doc":1.0,"real":0.9447278911564626},"lensDoc":[-2.2820000648498535,0.13600000739097595,0.37400001287460327,1.3029999732971191,0.5889999866485596,0.46799999475479126,0.492000013589859,0.3400000035762787,0.5809999704360962,0.8650000095367432,0.1509999930858612,-0.15800000727176666,-0.5580000281333923,-0.7049999833106995,-0.8339999914169312,-0.460999995470047,-0.008999999612569809,-0.04399999976158142,-0.7450000047683716,0.4000000059604645,0.5220000147819519,0.1120000034570694,-0.2639999985694885,0.4580000042915344,0.5799999833106995,2.3959999084472656,1.621000051498413,3.125999927520752,3.1570000648498535,2.881999969482422,6.218999862670898,6.189000129699707,8.612000465393066,13.807000160217285,13.583000183105469,9.99899959564209,11.684000015258789],"lensReal":[1.3170000314712524,-1.1729999780654907,-0.7480000257492065,-0.46700000762939453,0.054999999701976776,-0.4350000023841858,-0.23600000143051147,-0.0560000017285347,-0.5839999914169312,0.11299999803304672,-0.2939999997615814,-0.5839999914169312,-0.746999979019165,-1.1330000162124634,-1.1619999408721924,-0.8949999809265137,-0.2800000011920929,0.02199999988079071,0.1589999943971634,0.17299999296665192,-0.10899999737739563,-0.07000000029802322,-0.5590000152587891,0.11900000274181366,-1.5789999961853027,-1.3170000314712524,-2.7239999771118164,-5.349999904632568,-5.341000080108643,-6.189000129699707,-8.11299991607666,-10.531999588012695,-9.95199966430664,-8.47599983215332,-7.229000091552734,-6.432000160217285,-7.960999965667725],"rank":[[29,11,0.606,0.014],[23,4,0.632,0.079],[28,0,0.613,0.084],[24,23,0.551,0.029],[29,9,0.567,0.045]],"factors":[["范围（资料 / 现实）",[0.0,0.0404,0.0754,0.1447,0.1789,0.2142,0.2233,0.2079,0.2518,0.3023,0.3289,0.4057,0.4312,0.4828,0.5418,0.5566,0.6041,0.6099,0.6361,0.6466,0.6431,0.6684,0.7041,0.7158,0.6964,0.6531,0.6847,0.6559,0.6513,0.651,0.6368,0.6366,0.7171,0.7076,0.6801,0.6562,0.6735]],["目标记录位置",[0.0,0.0035,0.0615,0.077,0.0988,0.0897,0.0943,0.0866,0.0982,0.1001,0.1686,0.1681,0.2223,0.2399,0.4563,0.4276,0.4653,0.4418,0.4883,0.469,0.4555,0.4782,0.4702,0.4192,0.3586,0.3152,0.283,0.2509,0.2361,0.2202,0.2061,0.2016,0.1959,0.197,0.1933,0.1742,0.1721]],["记录条数",[0.0,0.0112,0.0244,0.028,0.03,0.0304,0.0301,0.0279,0.0313,0.0365,0.046,0.0583,0.0653,0.0737,0.1186,0.1294,0.1631,0.163,0.1756,0.1871,0.2099,0.2103,0.2076,0.2142,0.2046,0.1927,0.1887,0.1955,0.1899,0.1896,0.1808,0.1799,0.1807,0.1779,0.1744,0.1681,0.1762]],["错误草稿",[0.0,0.0303,0.0645,0.1096,0.1559,0.1456,0.1496,0.1296,0.1497,0.1539,0.1878,0.2003,0.2078,0.2441,0.3232,0.3299,0.3894,0.4394,0.4539,0.4555,0.4764,0.4969,0.4937,0.5156,0.5055,0.5005,0.5062,0.5151,0.5268,0.5564,0.5259,0.5287,0.548,0.5361,0.5192,0.5058,0.5237]],["记录形式",[0.0,0.0071,0.0121,0.0323,0.0436,0.0412,0.0478,0.0423,0.0502,0.06,0.0926,0.1225,0.131,0.1544,0.2104,0.2314,0.276,0.3229,0.3554,0.3746,0.3834,0.3866,0.3592,0.3474,0.3179,0.294,0.2878,0.2772,0.2616,0.2469,0.2307,0.2244,0.2197,0.2149,0.2127,0.2094,0.2064]]]};
+const pct = v => Math.round(v * 100) + '%';
+function line() {
+  const w = 640, h = 220, m = { l: 34, r: 64, t: 10, b: 22 }, n = 37, lo = -11, hi = 14;
+  const X = i => m.l + i / (n - 1) * (w - m.l - m.r), Y = v => m.t + (hi - v) / (hi - lo) * (h - m.t - m.b);
+  const p = a => a.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join('');
+  let s = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="逐层读出">`;
+  s += `<rect x="${X(24)}" y="${m.t}" width="${X(33) - X(24)}" height="${h - m.t - m.b}" fill="#eef4fc"/><text x="${(X(24) + X(33)) / 2}" y="${m.t + 13}" font-size="11" fill="#184f95" text-anchor="middle">第 24–33 层分开</text>`;
+  [-10, 0, 10].forEach(v => s += `<line x1="${m.l}" x2="${w - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v ? '#f1f5f9' : '#cbd5e1'}"/><text x="${m.l - 6}" y="${Y(v) + 4}" font-size="10" fill="#94a3b8" text-anchor="end">${v > 0 ? '+' : ''}${v}</text>`);
+  [0, 12, 24, 36].forEach(i => s += `<text x="${X(i)}" y="${h - 5}" font-size="10" fill="#94a3b8" text-anchor="middle">${i === 0 ? '词嵌入' : '第 ' + i + ' 层'}</text>`);
+  s += `<path d="${p(D.lensDoc)}" fill="none" stroke="#2a78d6" stroke-width="2.5"/><path d="${p(D.lensReal)}" fill="none" stroke="#eb6834" stroke-width="2.5"/>`;
+  s += `<text x="${X(36) + 6}" y="${Y(D.lensDoc[36]) + 4}" font-size="12" fill="#2a78d6">按资料</text><text x="${X(36) + 6}" y="${Y(D.lensReal[36]) + 4}" font-size="12" fill="#eb6834">按现实</text>`;
+  return s + '</svg>';
+}
+const CASES = [
+  { id: 'scope', q: '按资料还是按现实回答颜色', run: 'MA-H2 · 主线 H2', tag: '<span class="tag w">H3 进行中</span>', on: true },
+  { id: 'atlas', q: '不同模式族是否共用同一个方向', run: 'atlas.v1 · 5 个模式族', tag: '<span class="tag n">已有观察</span>' },
+  { id: 'items', q: '语言目录 69 项各在哪一层读得出', run: '语言项实测 · 9 / 69 项有分析记录', tag: '<span class="tag n">覆盖中</span>' },
+];
+function caseView() {
+  return `<div><h2 class="t">关联机制</h2><p class="sub">把语言图谱里的一项能力，对到模型内部的层、注意力头和神经元。每个案例回答三件事：模型做到了吗、在哪一层、由谁完成。</p></div>
+  <div class="cases">${CASES.map(c => `<button class="card case ${c.on ? 'on' : ''}"><small>${c.run}</small><b style="font-size:15px">${c.q}</b>${c.tag}</button>`).join('')}</div>
+
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="next"><div><h3>按资料还是按现实回答颜色</h3><p class="note">资料里写“香蕉是蓝色的”，问题分别写“按这份资料”和“在现实世界里”。Qwen3-4B bf16 · discovery ${D.n.toLocaleString()} 条</p></div><button class="btn">在 3D 中看全部层 →</button></div>
+    <div class="story">
+      <div class="step"><span class="k"><i>1</i>模型做到了吗</span><h4>两种问法都答对</h4>
+        <div class="hb"><span>按资料</span><i><b style="width:${pct(D.final.doc)};background:var(--doc)"></b></i><b>${pct(D.final.doc)}</b></div>
+        <div class="hb"><span>按现实</span><i><b style="width:${pct(D.final.real)};background:var(--real)"></b></i><b>${pct(D.final.real)}</b></div>
+        <p class="note">最后一层读出的答对比例。答对是前提，答不对的格子不进入内部分析。</p></div>
+      <div class="step" style="grid-column:span 1"><span class="k"><i>2</i>在哪一层决定</span><h4>第 24–33 层分开</h4>
+        <div class="chart">${line()}</div>
+        <p class="note">每层读出“资料色比常识色高多少”。前 24 层两条线几乎重合，之后各走各的。</p></div>
+      <div class="step"><span class="k"><i>3</i>由谁完成</span><h4>几个注意力头在读资料</h4>
+        ${D.rank.slice(0, 5).map(([l, h, d, r]) => `<div class="hb"><span class="mono">L${l}H${h}</span><i><b style="width:${d / 0.65 * 100}%;background:var(--doc)"></b></i><span class="note">${d.toFixed(2)}</span></div>`).join('')}
+        <p class="note">按资料问时看资料颜色的注意力（按现实问时这 5 个头都 ≤ 0.08）。看了不等于用了。</p></div>
+    </div>
+    <div><p class="note" style="margin-bottom:6px">证据走到哪一级</p><div class="ladder">
+      <div class="rung done"><b>✓ 看到过</b><span class="note">MA-H2 discovery（Phase 324）</span></div>
+      <div class="rung now"><b>… 新材料也成立</b><span class="note">H3 冻结后在 confirm 上检验</span></div>
+      <div class="rung"><b>改得动</b><span class="note">H4 路径干预</span></div>
+      <div class="rung"><b>能预测</b><span class="note">H5 未见组合</span></div></div></div>
+    <div class="next" style="border-top:1px solid var(--line);padding-top:12px"><p><b>下一步：</b>H3 用五种方法同题找出负责的组件并冻结，再一次性打开 confirm 检验。<span class="tag w">GPU 排名进行中</span></p><button class="btn">查看主线</button></div>
+  </div>
+
+  <details class="fold"><summary>五个因素各在哪一层可读</summary><div class="in"><table><thead><tr><th>因素</th><th>峰值层</th><th>峰值差异</th></tr></thead><tbody>${D.factors.map(([n, v]) => { const pk = v.indexOf(Math.max(...v)); return `<tr><td>${n}</td><td>第 ${pk} 层</td><td>${v[pk].toFixed(2)}</td></tr>`; }).join('')}</tbody></table><p class="note">“问题中的目标名”位置的差异幅度（std_rms），不是因果作用。</p></div></details>
+  <details class="fold"><summary>五种找组件方法的比较（H3）</summary><div class="in"><p>act_diff、dla、atp、atp_ig、exact 在同一批冻结任务上排名，结果出来后在这里对比保真度、脱靶与成本。</p></div></details>
+  <details class="fold"><summary>怎么算的</summary><div class="in"><p>逐层读出：每层先做最终归一化再接 unembedding，比较资料色与常识色的 logit，是读出近似，早层不可靠。注意力：答案位置对记录颜色 token 的注意力，按两种问法分别对 2,520 条平均。</p></div></details>`;
+}
+function labView() {
+  const T = [
+    ['运行一段文字', '输入任意一句话，看它在 36 层里怎样流动、哪些头在看哪些词。', '需要桌面节点', '原“运行与路径”'],
+    ['只改一处对照', '两句话只差一处（如问句和陈述句），看模型内部哪一层、哪些单元跟着变。', '网页可看已有结果', '原“响应对照”'],
+    ['语言项实测', '从语言目录选一项能力，用数据集测它在哪一层读得出。', '本机执行，结果上传', '原“语言项实测”'],
+    ['共享关系', '不同模式族的读出方向是否相同：同一个方向可能被多种语言能力共用。', '网页可看', '原“共享关系”'],
+  ];
+  return `<div><h2 class="t">自己做实验</h2><p class="sub">研究案例里的每张图都能自己复现。下面四个工具对应原来的四个子页签，功能不变。</p></div>
+  <div class="tools">${T.map(([a, b, c, d]) => `<div class="card tool"><div class="row"><h3>${a}</h3><span class="tag n">${c}</span></div><p class="note" style="font-size:13px;color:var(--text)">${b}</p><div class="row"><span class="note">${d}</span><button class="btn">打开</button></div></div>`).join('')}</div>
+  <p class="note">三种运行方式：观察（一次前向，不产生结论）· 对照（只改一个因素，仍是未登记观察）· 正式（冻结决策点加修补，进入研究记录）。</p>`;
+}
+let view = 'case';
+function render() {
+  document.querySelectorAll('#tabs2 button').forEach(b => b.classList.toggle('on', b.dataset.v === view));
+  document.getElementById('main').innerHTML = (view === 'case' ? caseView() : labView()) + `<details class="diff"><summary>审阅用：和现在的页面比改了什么</summary><ul>
+    <li>子页签从 4 个（运行与路径、响应对照、语言项实测、共享关系）减到 2 个：研究案例、自己做实验。四个工具功能不变，收进“自己做实验”。</li>
+    <li>研究案例按一个问题讲完：模型做到了吗 → 在哪一层决定 → 由谁完成，每一步一张图、一句结论；再给证据走到哪一级和下一步。</li>
+    <li>3D 流不再占首屏，改为“在 3D 中看全部层”按钮打开；播放、视角、范围切换等控件都在 3D 视图里。</li>
+    <li>因素、方法比较、计算口径放在下方折叠行，与线上版的折叠样式一致。</li></ul></details>`;
+}
+document.querySelectorAll('#tabs2 button').forEach(b => b.onclick = () => { view = b.dataset.v; render(); });
+render();
+</script>
+</body>
+</html>
