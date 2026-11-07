@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../app/rdc_fusion/authContext.js';
-import { fmtTime, nodeCall, TASK_KIND_LABEL, useNode } from '../app/rdc_fusion/contributeUtil.js';
+import { fmtTime, nodeCall, TASK_KIND_LABEL, taskSlice, useNode } from '../app/rdc_fusion/contributeUtil.js';
 import { downloadKit } from '../open/openUtil.js';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 
@@ -123,6 +123,7 @@ export default function ResearchParticipation({ onGo, publicWork, publicSnapshot
         {action || (active && <button type="button" className="v6-linkbtn" onClick={() => prepare('')}>管理贡献</button>)}
       </div>
       {scope && <dl className="mp-join-scope" aria-label="开始前说明"><dt>任务</dt><dd>{taskName(scope)}{scope.shard ? ` · ${scope.shard}` : ''}</dd>
+        <dt>所属</dt><dd>{taskSlice(scope)}</dd>
         <dt>资源</dt><dd>本机 GPU，按任务包限制；领取前再检查电量、显存和磁盘</dd>
         <dt>上传</dt><dd>统计结果与回执；原生全场留在本机</dd></dl>}
       {scope && <p className="v8-note">点击后才开始，可随时暂停或停止。</p>}

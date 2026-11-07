@@ -7,7 +7,7 @@ import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 import { shortModel } from './v8Util.js';
-import { BENCH } from './data/mainline.js';
+import { BENCH, FINDINGS } from './data/mainline.js';
 import './client_guide.css';
 
 export const DEMO_SNAPSHOT = '6be1034f0b55a6df';
@@ -59,16 +59,13 @@ export function relationCounts(objects, snapshot) {
   return counts;
 }
 
-const FINDINGS = [
-  ['observation', '排除通用主干后，定位结果才开始显示任务特异', '1% 预算下原始排序没有一格特异；排除主干的 ig_nobb 在 GPT-2 和 Qwen3-4B 上各过 2 / 3，过线的任务不同（Phase 316，候选观测）。', 'SP-v1'],
-  ['heldout', '推理链变长时，一部分神经元被复用', '最后一层 9,728 个神经元中，2,001 个在三步链和六步链上贡献方向一致。', 'QWEN3-4B-B35-RECURSIVE-20261105-v2'],
-  ['intervention', '“代码保持代码”的门控链在三种架构上复现', '在 GLM4-9B 上，只改一个传播方向，就能复现 78% 的修补效应。', ''],
-  ['negative', '字典特征没有赢过原生神经元', '36 层无标注字典里，0 层优于同预算的原生单元。负结果同样保留。', 'MLP-ATLAS-DICTIONARY-20261104-v1'],
-];
-
+/* 最近的发现读研究登记表（data/mainline.js 的 FINDINGS，每个 Phase 追加），按 Phase 倒序，首屏 4 条，其余折叠。 */
 export function LatestFindings({ onGo }) {
+  const list = [...FINDINGS].sort((a, b) => b.phase - a.phase);
+  const card = f => <div key={f.title}><Ev kind={f.kind}/> <small className="v8-note">Phase {f.phase}</small><h4>{f.title}</h4><p className="v8-note">{f.text}</p></div>;
   return <section className="v8-card cg-section" aria-label="最近的发现"><h3>最近的发现</h3>
-    <div className="cg-grid2">{FINDINGS.map(([kind, title, text]) => <div key={title}><Ev kind={kind}/><h4>{title}</h4><p className="v8-note">{text}</p></div>)}</div>
+    <div className="cg-grid2">{list.slice(0, 4).map(card)}</div>
+    {list.length > 4 && <details className="mp-fold"><summary>更早的发现（{list.length - 4}）</summary><div className="mp-fold-body cg-grid2">{list.slice(4).map(card)}</div></details>}
     <div className="v6-toolbar"><button type="button" className="fw-tbtn" onClick={() => onGo('route', null, null, { rtab: 'rules' })}>查看全部成果与证据</button></div>
   </section>;
 }

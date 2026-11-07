@@ -366,7 +366,7 @@ function ResearchQueue({ onGo, tools }) {
     <Fold title="逐项查看研究运行">
       <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>运行</th><th>执行进度</th><th>软件校验</th><th>科学证据</th><th>独立复算</th></tr></thead>
         <tbody>{RUNS.map(r => <tr key={r.id}><td><b>{r.id}</b><small> Phase {r.phase}</small></td><td>{r.exec}</td><td>{r.check}</td><td>{r.evidenceText}</td><td>{r.replicaText}</td></tr>)}</tbody></table></div>
-      <p className="v8-note">证据晋级要写明谁、何时、依据哪次复算；目前两次运行都没有晋级记录。</p>
+      <p className="v8-note">证据晋级要写明谁、何时、依据哪次复算；目前登记的 {RUNS.length} 次运行都没有晋级记录。</p>
     </Fold>
     <Fold title="节点任务、待审与回执" open={Boolean(run)}>
     <dl className="v8-rnd-metrics">

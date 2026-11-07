@@ -7,15 +7,16 @@ import { countMeasuredLanguageItems, languageCatalogCount } from './LanguageCata
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import ResearchLibrary from './ResearchLibrary.jsx';
 import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
-import { Ev, LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
+import { LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
+import { SCORES } from './data/mainline.js';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
   ['language', '语言图谱', '语言里有哪些知识、推理和语法现象', '第一部分'],
+  ['relations', '关联机制', '同一段话里的语言、风格、逻辑和语法，怎样一起决定下一个词？', '第三部分 · 主线'],
   ['internal', 'LLM 编码图谱', '模型的参数是什么，运行时信息怎样流动', '第二部分'],
-  ['relations', '关联机制', '某种语言能力，由模型内部的什么负责', '第三部分'],
 ];
 const FULL_SNAPSHOT = /^[0-9a-f]{64}$/;
 const reportRef = work => work.stages?.registration_validated?.report_sha256;
@@ -209,7 +210,7 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   const summaries = {
     language: coverageLabel(analyzedLanguageCount, languageCatalogCount, '项'),
     internal: coverageLabel(validChecks ? checked.length : null, neuronTotal, '个'),
-    relations: space.data ? `${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条连接` : '读取连接…',
+    relations: `四组成绩 ${SCORES.filter(score => score.value != null).length} / ${SCORES.length} 已测`,
   };
   const scope = { snapshot, model: analysisModel, dataset };
   const related = (open === 'internal' ? internal : open === 'relations' ? reports : scoped)
@@ -234,9 +235,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
       </details>
     </header>
     {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
-    <div className="v8-direction-cards v8-overview-cards">
+    <div className="v8-direction-cards v8-overview-cards v8-core-grid">
       {CARDS.map(([id, title, description, part]) => <Fragment key={id}>
-        <button type="button" className="v8-card v8-direction v8-overview-card" aria-label={title} aria-expanded={open === id}
+        <button type="button" className={`v8-card v8-direction v8-overview-card${id === 'relations' ? ' v8-overview-core' : ''}`} aria-label={title} aria-expanded={open === id}
           aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => onGo('route', null, null, { rtab: 'overview', opane: open === id ? '' : id })}>
           <small>{part}</small>
           <strong>{title}</strong>
@@ -244,7 +245,7 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
           <span className={`v8-overview-metric${id !== 'relations' ? ' v8-overview-ratio' : ''}`}>{summaries[id]}</span>
           {id === 'language' && <span className="v8-note">{sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}</span>}
           {id === 'internal' && <span className="v8-note">静态参数和动态机制分别在“空间”查看</span>}
-          {id === 'relations' && <span className="v8-overview-evidence"><Ev kind="observation">看到过 {relations.observation || 0}</Ev> <Ev kind="heldout">新材料也成立 {relations.heldout || 0}</Ev> <Ev kind="intervention">改动后输出变了 {relations.intervention || 0}</Ev><br/><small>三类分开计数；另有 {relations.negative || 0} 条未成立</small></span>}
+          {id === 'relations' && <span className="v8-note">{space.data ? `已登记连接 ${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条：看到过 ${relations.observation || 0}、新材料也成立 ${relations.heldout || 0}、改动后输出变了 ${relations.intervention || 0}，另有 ${relations.negative || 0} 条未成立。连接数只表示登记量。` : '读取连接…'}</span>}
           <span className="v8-overview-action">{open === id ? '收起 ↑' : '查看详情 →'}</span>
         </button>
         {open === id && <section id="overview-detail" className="v8-card v8-overview-detail" aria-label={`${title}详情`}>
@@ -282,6 +283,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
         </section>}
       </Fragment>)}
     </div>
+    <section className="v8-card cg-next"><div><h3>看一个决策点案例</h3>
+      <p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p></div>
+      <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></section>
     <ScoreBoard/>
     <LatestFindings onGo={onGo}/>
     <NextStep onGo={onGo}/>

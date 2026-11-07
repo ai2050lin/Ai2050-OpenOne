@@ -52,6 +52,23 @@ export const SCORES = [
 export const RUNS = [
   { id: 'MB-v1', phase: 315, title: '统一机制基准', executed: true, exec: '已完成，lockbox 已开封', checked: true, check: '身份门、行为门通过', evidence: null, evidenceText: '候选观测，未登记正式等级', replicated: false, replicaText: '未做' },
   { id: 'SP-v1', phase: 316, title: '特异性细化', executed: true, exec: '已完成，封存划分已开封', checked: true, check: '身份门、行为门通过，两格手工复算一致', evidence: null, evidenceText: '候选观测，未登记正式等级', replicated: false, replicaText: '第二节点未做' },
+  { id: 'MA-H0-v3', phase: 321, title: '主线 H0 行为门（第一版）', executed: true, exec: '已完成，中英各 1,568 条', checked: true, check: '预注册与模型快照一致，逐条记录完整', evidence: null, evidenceText: '行为校准，不作证据；行为门未过，基线判据有误', replicated: false, replicaText: '未做' },
+  { id: 'MA-H0-v4', phase: 322, title: '主线 H0 行为门（第二版）', executed: true, exec: '已完成，中英各 1,568 条', checked: true, check: '预注册与模型快照一致，逐条记录完整', evidence: null, evidenceText: '行为校准，不作证据；发现干扰色与基线两处缺陷', replicated: false, replicaText: '未做' },
+  { id: 'MA-H0-v5', phase: 322, title: '主线 H0 行为门（第三版）', executed: true, exec: '已完成，中英各 1,568 条', checked: true, check: '预注册与模型快照一致，逐条记录完整', evidence: null, evidenceText: '行为校准，不作证据；中文 32 / 32 格通过', replicated: false, replicaText: '未做' },
+  { id: 'MA-H1', phase: 323, title: '主线 H1 材料检查（discovery）', executed: true, exec: '已完成，2,688 条', checked: true, check: '划分 sha256 与预注册一致，确认集与锁箱未读取', evidence: null, evidenceText: '材料检查，不作证据；30 / 32 格通过', replicated: false, replicaText: '未做' },
+  { id: 'MA-H2', phase: 324, title: '主线 H2 全场采集（discovery）', executed: true, exec: '已完成，2,688 条，7.18 GB', checked: true, check: '逐文件 sha256；lm_head 与真实 logits 对账差 0.031', evidence: null, evidenceText: '候选观察，未登记正式等级', replicated: false, replicaText: '第二节点未做' },
+];
+
+/* 最近的发现：按 Phase 登记，界面按 Phase 倒序显示。kind 取证据图例（observation 看到过 / heldout 新材料也成立 /
+   intervention 改动后输出变了 / negative 未成立）。每完成一个 Phase 在这里追加，不改旧条目。 */
+export const FINDINGS = [
+  { phase: 324, kind: 'observation', title: '范围在第 24–33 层分化，几个注意力头只在“按资料”时读资料色', text: 'L23H4、L28H0、L29H11 等头在资料范围读目标颜色约 0.6，现实范围 ≤ 0.08；形态更像读取时门控。discovery 候选观察，待 H4 干预确认。' },
+  { phase: 323, kind: 'observation', title: '“现实范围 + 双实体 + 目标在末条”是稳定的行为难点', text: '英文 v4、v5 与中文新实体上都在同一位置低于 0.8，按预注册排除在内部分析之外，留作切片 B 的冲突候选。' },
+  { phase: 322, kind: 'heldout', title: '排除合理颜色后，中文范围切换在 32 格全部成立', text: 'MA-H0-v5：资料范围 0.99、现实范围 0.97，比位置启发式高 0.6、比不看范围的启发式高约 0.48（行为校准，不作证据）。' },
+  { phase: 316, kind: 'observation', title: '排除通用主干后，定位结果才开始显示任务特异', text: '1% 预算下原始排序没有一格特异；排除主干的 ig_nobb 在 GPT-2 和 Qwen3-4B 上各过 2 / 3，过线的任务不同（候选观测）。' },
+  { phase: 306, kind: 'heldout', title: '推理链变长时，一部分神经元被复用', text: '最后一层 9,728 个神经元中，2,001 个在三步链和六步链上贡献方向一致。' },
+  { phase: 296, kind: 'negative', title: '字典特征没有赢过原生神经元', text: '36 层无标注字典里，0 层优于同预算的原生单元。负结果同样保留。' },
+  { phase: 292, kind: 'intervention', title: '“代码保持代码”的门控链在三种架构上复现', text: '在 GLM4-9B 上，只改一个传播方向，就能复现 78% 的修补效应。' },
 ];
 
 /* 锁箱看管：每个封存划分的状态。opened 后不能用于调参后的确认。 */

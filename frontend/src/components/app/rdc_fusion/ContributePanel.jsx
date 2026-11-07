@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { downloadKit } from '../../open/openUtil.js';
 import { API_BASE, authJson } from './api.js';
 import { useAuth } from './authContext.js';
-import { NODE_STATE, RESULT_LABEL, SUP_STATE, TASK_KIND_LABEL, fmtBytes, fmtTime, nodeBridge, nodeCall, useNode, useRuntime } from './contributeUtil.js';
+import { NODE_STATE, RESULT_LABEL, SUP_STATE, TASK_KIND_LABEL, fmtBytes, fmtTime, nodeBridge, nodeCall, taskSlice, useNode, useRuntime } from './contributeUtil.js';
 import { Card, Empty } from './ui.jsx';
 import ManagedNodes from './ManagedNodes.jsx';
 import './contribute.css';
@@ -317,6 +317,7 @@ function RunCard({ node }) {
         {status.state === 'waiting' && status.reasons?.length > 0 && <><dt>等待原因</dt><dd><ul className="ct-reasons">{status.reasons.map(r => <li key={r}>{r}</li>)}</ul></dd></>}
         <dt>当前任务</dt><dd>{cur ? <>
           <b>{TASK_KIND_LABEL[cur.kind] || cur.kind}</b> · {cur.model || '—'} · 已运行 {Math.round(now - cur.started)} 秒
+          <small>所属：{taskSlice(cur)}</small>
           {p?.total ? <span className="ct-progress"><span style={{ width: `${Math.min(100, (100 * p.done) / p.total)}%` }} /></span> : null}
           {p?.total ? <small>{p.done}/{p.total} 窗口 · {Number(p.tokens || 0).toLocaleString()} token · {Math.round(p.tok_per_s || 0)} tok/s</small> : null}
         </> : '—'}</dd>

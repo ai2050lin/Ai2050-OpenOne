@@ -17,6 +17,16 @@ const DOMAINS = { measurement: '指标与对照', attention: '注意力头', 'at
 const ruleTitle = rule => rule.title || rule.claim;
 const RULE_PARTS = [['', '全部'], ['neuron', '神经元'], ['attention', '注意力'], ['method', '方法与测量']];
 const rulePart = rule => rule.domain === 'mlp' ? 'neuron' : /^att/.test(rule.domain) ? 'attention' : 'method';
+/* 四类因素与共同底座的筛选：账本还没有因素字段，按规则文本、标签和关键词归入，未经人工审定。 */
+const FACTOR_TAGS = [
+  ['language', '语言', /中文|英文|语种|跨语言|双语|翻译/],
+  ['style', '风格', /风格|代码|体裁|散文|论文|语域|文体/],
+  ['logic', '逻辑', /否定|真值|条件|因果|逻辑|推理/],
+  ['grammar', '语法', /语法|主谓|句式|疑问|标点|句法|一致/],
+  ['binding', '知识与绑定', /属性|实体|知识|颜色|范围|绑定|来源/],
+];
+const ruleText = rule => [rule.title, rule.claim, rule.scope, ...(rule.tags || []), ...(rule.keywords || [])].filter(Boolean).join(' ');
+const ruleFactor = (rule, id) => !id || FACTOR_TAGS.find(([key]) => key === id)[2].test(ruleText(rule));
 
 function RuleCheck({ rules, snapshot, disabled, onRule, prepared }) {
   const [query, setQuery] = useState('');
@@ -153,12 +163,13 @@ export default function RuleLedgerPage({ children }) {
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [domain, setDomain] = useState('');
   const [part, setPart] = useState('');
+  const [factor, setFactor] = useState('');
   const focusRule = useRef('');
   const rules = ledger.data?.rules || [];
   const byId = new Map(rules.map(rule => [rule.id, rule]));
   const labels = ledger.data?.labels?.domain || {};
   const pending = rules.filter(rule => !GROUPS.some(item => item.id === rule.status));
-  const active = rules.filter(rule => rule.status === group && (!domain || rule.domain === domain) && (!part || rulePart(rule) === part));
+  const active = rules.filter(rule => rule.status === group && (!domain || rule.domain === domain) && (!part || rulePart(rule) === part) && ruleFactor(rule, factor));
   const ordered = [...active].sort((a, b) => Number(Boolean(b.title)) - Number(Boolean(a.title)));
   const visible = ordered.slice(0, limit);
   const selectedRule = byId.get(selected);
@@ -199,12 +210,16 @@ export default function RuleLedgerPage({ children }) {
       prepared={prepared?.snapshot === snapshot ? prepared.item : null} />
     <div className="v6-toolbar" role="group" aria-label="研究对象">{RULE_PARTS.map(([id, label]) => <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={part === id}
       onClick={() => { setPart(id); setLimit(PAGE_SIZE); }}>{label}{ledger.data ? ` ${id ? rules.filter(rule => rulePart(rule) === id).length : rules.length}` : ''}</button>)}</div>
+    <div className="v6-toolbar" role="group" aria-label="因素">{[['', '全部因素'], ...FACTOR_TAGS.map(([id, label]) => [id, label])].map(([id, label]) =>
+      <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={factor === id} onClick={() => { setFactor(id); setLimit(PAGE_SIZE); }}>
+        {label}{ledger.data && id ? ` ${rules.filter(rule => ruleFactor(rule, id)).length}` : ''}</button>)}
+      <span className="v8-note">因素按规则文本和关键词归入，未经人工审定</span></div>
     <div className="v8-rules-groups" role="group" aria-label="规则分类">
       {GROUPS.map(item => <button key={item.id} type="button" className="v8-card v8-direction v8-rule-group"
         aria-expanded={group === item.id} aria-controls={group === item.id ? 'rule-results' : undefined}
         onClick={() => choose(group === item.id ? '' : item.id)}>
         <strong>{item.label}</strong>
-        <span>{ledger.data ? rules.filter(rule => rule.status === item.id && (!part || rulePart(rule) === part)).length : '—'} 条</span>
+        <span>{ledger.data ? rules.filter(rule => rule.status === item.id && (!part || rulePart(rule) === part) && ruleFactor(rule, factor)).length : '—'} 条</span>
         <span className="v8-rule-group-caret" aria-hidden="true">{group === item.id ? '▴' : '▾'}</span>
         <small>{item.note}</small>
       </button>)}

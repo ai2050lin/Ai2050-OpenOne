@@ -17,6 +17,9 @@ const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
 const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
 
 /* 页内分段（?csec=）：配置项多，一页到底会太长；分段只是阅读顺序，不是导航层级 */
+/* 主线只用 bf16（AGENTS 第 7 节）：名称或仓库里带量化标记的模型标为不进主线 */
+const QUANTIZED = /nf4|int8|int4|4bit|8bit|bnb|gptq|awq|gguf/i;
+
 export const CFG_SECTIONS = [
   { id: 'conn', label: '连接与诊断', desc: '中心服务、运行形态、本机错误记录' },
   { id: 'account', label: '账号与权限', desc: '登录账号、角色和管理权限' },
@@ -173,11 +176,12 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
             {d && !models.length && <Empty>中心没有登记被测模型。公开中心不保管权重，测试需要在本机或贡献节点上用本地权重运行。</Empty>}
             {models.length > 0 && (
               <table className="wb-cfg-table">
-                <thead><tr><th>模型</th><th>仓库 · 修订</th><th>最低显存</th><th>快照 sha256</th></tr></thead>
+                <thead><tr><th>模型</th><th>主线</th><th>仓库 · 修订</th><th>最低显存</th><th>快照 sha256</th></tr></thead>
                 <tbody>
                   {models.map(m => (
                     <tr key={m.name}>
                       <th scope="row">{m.name}</th>
+                      <td>{QUANTIZED.test(`${m.name} ${m.hf_repo || ''}`) ? '量化，不进主线' : 'bf16 可用'}</td>
                       <td className="wb-cfg-mono">{m.hf_repo || '—'}{m.hf_revision ? <small> @{short(m.hf_revision, 8)}</small> : null}</td>
                       <td>{m.min_vram_gib ? `${m.min_vram_gib} GiB` : '—'}</td>
                       <td className="wb-cfg-mono" title={m.snapshot_sha256 || ''}>{m.snapshot_sha256 ? short(m.snapshot_sha256) : '—'}</td>
@@ -186,6 +190,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
                 </tbody>
               </table>
             )}
+            <p className="v8-note">主线只用 bf16 精度：Qwen3-4B 先行，之后是 Qwen3-14B 和 GLM4-9B。int8、4-bit 等量化模型不进入主线，旧的 int8 结果保留并标注。</p>
           </Card>
 
           <section className="wb-cfg-node">

@@ -110,6 +110,13 @@ export const SUP_STATE = {
 };
 
 export const TASK_KIND_LABEL = { census_shard: '神经元普查分片', family_test: '模式族测试', natural_register:'自然生成与语域干预' };
+/* 任务所属的主线切片（ResearchPlan v6 第 9 节）。现有任务类型都在主线之前，不属于切片 A–E；主线任务（MA- 开头）属于切片 A。 */
+export const TASK_SLICE = { census_shard: '基础普查，不属于主线切片 A–E', family_test: '模式族材料，不属于主线切片 A–E', natural_register: '语域研究，不属于主线切片 A–E' };
+export function taskSlice(task) {
+  const ref = String(task?.tm_id || task?.job || '');
+  if (/^MA-/.test(ref)) return '主线切片 A · 共同底座';
+  return TASK_SLICE[task?.kind] || '未登记所属切片';
+}
 
 export const RESULT_LABEL = {
   accepted: ['✓', '中心校验通过', 'good'], done: ['✓', '已上传', 'good'],
