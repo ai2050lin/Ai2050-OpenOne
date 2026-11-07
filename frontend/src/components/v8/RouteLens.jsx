@@ -545,7 +545,7 @@ export default function RouteLens({ tab = 'overview', openPane = '', model: gMod
       {tab === 'neuron' && <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查与解释检验`}>{neuron(model)}</Card>}
       {tab === 'rules' && (
         <RuleLedgerPage>
-          <ResearchDisclosure title="原始报告与版本记录"><ResearchLibrary /></ResearchDisclosure>
+          <ResearchLibrary />
         </RuleLedgerPage>
       )}
     </div>

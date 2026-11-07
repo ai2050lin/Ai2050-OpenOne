@@ -248,17 +248,18 @@ function DataTable({ head, rows, label }) {
     {rows.map(row => <div role="row" key={row[0]}>{row.map((cell, index) => <span role="cell" key={index}>{cell}</span>)}</div>)}</div>;
 }
 
-export function RelationBoards() {
+export function RelationBoards({ only }) {
+  const show = key => !only || only === key;
   return <>
-    <section className="v8-card cg-section"><h3>语言目录映射</h3><p className="v8-note">已登记连接使用实验内部名称。这里是建议归属，审定后才能按语言项筛选。</p><DataTable label="语言目录映射" head={['实验内部名称', '建议语言项', '连接数', '结果']} rows={LANGUAGE_MAP}/></section>
-    <section className="v8-card cg-section"><h3>保真看板</h3><p className="v8-note">这里回答“解释到了多少”。覆盖数量不代表破解进度。</p><DataTable label="保真看板" head={['指标', '当前结果', '对照', '状态']} rows={FIDELITY}/></section>
-    <section className="v8-card cg-section"><h3>方法基准（自建，Phase 315、316）</h3>
+    {show('map') && <section className="v8-card cg-section"><h3>语言目录映射</h3><p className="v8-note">已登记连接使用实验内部名称。这里是建议归属，审定后才能按语言项筛选。</p><DataTable label="语言目录映射" head={['实验内部名称', '建议语言项', '连接数', '结果']} rows={LANGUAGE_MAP}/></section>}
+    {show('fidelity') && <section className="v8-card cg-section"><h3>保真看板</h3><p className="v8-note">这里回答“解释到了多少”。覆盖数量不代表破解进度。</p><DataTable label="保真看板" head={['指标', '当前结果', '对照', '状态']} rows={FIDELITY}/></section>}
+    {show('bench') && <section className="v8-card cg-section"><h3>方法基准（自建，Phase 315、316）</h3>
       <p className="v8-note">同一批冻结任务、同一预算比较定位方法。数字是 lockbox 上 cf 节点的 auc_f，越高说明越少节点就能恢复行为。这是候选观测，不是官方 MIB。</p>
       <DataTable label="MB-v1 方法基准" head={BENCH.mb.head} rows={BENCH.mb.rows}/>
       <p className="v8-note">1% 预算下的特异性（SP-v1）：排除通用主干后，排序才开始显示任务特异。</p>
       <DataTable label="SP-v1 特异性" head={BENCH.sp.head} rows={BENCH.sp.rows}/>
-      <p className="v8-note">来源：{BENCH.source}</p></section>
-    <section className="v8-card cg-section"><h3>公开基准</h3><p className="v8-note">官方 MIB 还没有提交过，所以不给排名。</p><DataTable label="公开基准" head={['MIB 赛道', '原生单元', '字典特征', '路径归因']} rows={[['电路定位', '未测', '未测', '未测'], ['因果变量定位', '未测', '未测', '未测']]}/></section>
+      <p className="v8-note">来源：{BENCH.source}</p></section>}
+    {show('public') && <section className="v8-card cg-section"><h3>公开基准</h3><p className="v8-note">官方 MIB 还没有提交过，所以不给排名。</p><DataTable label="公开基准" head={['MIB 赛道', '原生单元', '字典特征', '路径归因']} rows={[['电路定位', '未测', '未测', '未测'], ['因果变量定位', '未测', '未测', '未测']]}/></section>}
   </>;
 }
 

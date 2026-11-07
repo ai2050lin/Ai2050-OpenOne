@@ -14,6 +14,7 @@ import { shortModel, workbenchHref } from './v8Util.js';
 import { useSpatialTrace } from './SpatialTrace.jsx';
 import { B35LayerResults, B35UnitFeatures, useB35Features, useB35Unit } from './B35RecursiveReport.jsx';
 import { AttributionGraph, BasisCompare, HeadFeature, HeadInternals, InfoFlowMap, LayerList, MinimalPairs, RelationBoards } from './ClientGuide.jsx';
+import './core_kit.css';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const MODULES = { attn: 1, mlp: 1 };
@@ -290,6 +291,8 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const [embedding,setEmbedding]=useState(null),[archiveOverlay,setArchiveOverlay]=useState(null);
   const [featurePlot,setFeaturePlot]=useState('');
   const [narrow, setNarrow] = useState(() => window.innerWidth <= 720);
+  /* 精简版响应对照：首屏只有最小对照，3D 层塔与当前数据点按钮再展开（Phase 333） */
+  const [sceneOpen, setSceneOpen] = useState(() => new URLSearchParams(window.location.search).has('sblock'));
   useEffect(() => {
     const resize = () => setNarrow(window.innerWidth <= 720);
     window.addEventListener('resize', resize);
@@ -402,6 +405,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     onSelectModel={id=>{setEmbedding(null);setArchiveOverlay(null);publishResearchContext({pmodel:id});}}
     onLocate={p=>change({...EMPTY,layer:p.block+1,module:p.kind==='head'?'attn':p.kind,index:p.kind==='head'?p.head:p.unit})}
     onResponse={setArchiveOverlay}/>;
+  const hideScene = compact && view === 'response' && !sceneOpen && index == null;
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
       <div>{!compact && <><h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2><p>{VIEW_TEXT[view]?.[1]}</p></>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
@@ -424,13 +428,14 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     {['graph','parameters'].includes(view)&&<div className="v6-toolbar" role="group" aria-label="结构视图">
       <button type="button" className="fw-tbtn" aria-pressed={structureView==='3d'} onClick={()=>setStructureView('3d')}>3D 模型空间</button>
       <button type="button" className="fw-tbtn" aria-pressed={structureView==='list'} onClick={()=>setStructureView('list')}>二维列表</button>
-      <button type="button" className="fw-tbtn" onClick={()=>onGraphMode?.('language')}>语言图谱</button>
+      {!compact&&<button type="button" className="fw-tbtn" onClick={()=>onGraphMode?.('language')}>语言图谱</button>}
     </div>}
     {view==='live'&&!compact&&<><InfoFlowMap model={model?.model}/><AttributionGraph snapshot={boundSnapshot} onOpen={node=>{change({...EMPTY,layer:node.l+1,module:node.k==='m'?'mlp':'attn',index:node.i});onGraphMode?.('structure');}}/></>}
     {view==='response'&&<MinimalPairs model={model?.model}/>}
-    {trace.controls}
+    {compact&&view==='response'&&<div className="ck-pills"><button type="button" aria-pressed={sceneOpen} aria-expanded={sceneOpen} onClick={()=>setSceneOpen(o=>!o)}>{sceneOpen?'收起 3D 层塔与当前数据':'在 3D 层塔中定位'}</button></div>}
+    {!hideScene&&trace.controls}
     {['graph','parameters'].includes(view)&&structureView==='list'&&<LayerList tower={towerData.data&&!towerData.data.pending?towerData.data:null} onPick={hs=>{setStructureView('3d');pickLayer(hs);}}/>}
-    {source.error&&!local ? <Empty>{source.error}<ExtraPackPrompt pack={source.missingPack} /></Empty>
+    {hideScene ? null : source.error&&!local ? <Empty>{source.error}<ExtraPackPrompt pack={source.missingPack} /></Empty>
       : !source.data || source.data.pending ? <Empty>读取模型骨架…</Empty>
         : !model || !layers ? <Empty>当前模型快照暂无可核对的层结构。</Empty>
           : <div className="v8-structure-layout" hidden={['graph','parameters'].includes(view)&&structureView==='list'}>
@@ -505,7 +510,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
             </section>}
           </div>}
     {linked.error&&index==null&&<Empty>{linked.error}<ExtraPackPrompt pack={linked.missingPack}/></Empty>}
-    {(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
+    {!hideScene&&(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
       <h3>{index==null?'当前数据':module==='embedding'?`Token #${index}`:`B${block} · ${label(module,index)}`}</h3>
       {index!=null&&<div className="v6-toolbar" role="group" aria-label="对象详情">
         {[...(['live','response'].includes(view)?[['data','当前数据']]:[]),...(module==='embedding'?[]:[['feature','特征']]),['parameters','真实参数'],['evidence','研究证据'],['history','历史测试']].map(([key,title])=>
@@ -551,7 +556,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
         {historical}
       </ResearchDisclosure>}
     </section>}
-    {view==='response'&&<RelationBoards/>}
-    {['graph','parameters'].includes(view)&&<BasisCompare/>}
+    {!compact&&view==='response'&&<RelationBoards/>}
+    {!compact&&['graph','parameters'].includes(view)&&<BasisCompare/>}
   </section>;
 }

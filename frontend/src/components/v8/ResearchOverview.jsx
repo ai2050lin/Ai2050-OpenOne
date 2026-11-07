@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { publishResearchContext, useResearchContext } from '../app/researchContext.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -11,13 +11,7 @@ import { LatestFindings, NextStep, languageSections, relationCounts } from './Cl
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
 import { FINDINGS, SCORES } from './data/mainline.js';
-
-function OverviewFold({ title, children }) {
-  const [open, setOpen] = useState(false);
-  return <details className="v8-card v8-overview-fold" open={open} onToggle={event => setOpen(event.currentTarget.open)}>
-    <summary>{title}</summary>{open && children}
-  </details>;
-}
+import { CoreCard, PillTools, Ring } from './CoreKit.jsx';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
@@ -183,8 +177,6 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   const { snapshot, run } = useResearchContext();
   const packages = useApi('/api/research-library/workpackages');
   const [topic, setTopic] = useState('');
-  const [plan, setPlan] = useState(false);
-  const [archive, setArchive] = useState(false);
   const modelList = Object.values(skeletons);
   const matched = snapshot ? modelList.filter(entry => entry.model_snapshot === snapshot) : [];
   const skeleton = snapshot ? matched.find(entry => entry.model === model) || (matched.length === 1 ? matched[0] : null) : skeletons[model];
@@ -223,15 +215,65 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
   const related = (open === 'internal' ? internal : open === 'relations' ? reports : scoped)
     .filter(work => !topic || workTopics(work).some(([id]) => id === topic));
   const relatedRunIds = topic ? new Set(related.map(work => work.run_id)) : null;
+  const pctLabel = (done, total) => {
+    if (done == null || !total) return '—';
+    const r = 100 * done / total;
+    return r > 0 && r < 0.01 ? '<0.01%' : r < 1 ? `${r.toFixed(2)}%` : `${Math.round(r)}%`;
+  };
+  const scored = SCORES.filter(score => score.value != null).length;
+  const rings = {
+    language: { value: analyzedLanguageCount == null ? null : analyzedLanguageCount / languageCatalogCount, label: pctLabel(analyzedLanguageCount, languageCatalogCount), sub: `${countLabel(analyzedLanguageCount)} / ${countLabel(languageCatalogCount)} 项有材料` },
+    relations: { value: scored / SCORES.length, label: `${scored} / ${SCORES.length}`, sub: '四组成绩已测', color: '#2a78d6' },
+    internal: { value: validChecks && neuronTotal ? checked.length / neuronTotal : null, label: validChecks ? pctLabel(checked.length, neuronTotal) : '—', sub: `${countLabel(validChecks ? checked.length : null)} / ${countLabel(neuronTotal)} 个对象已检查` },
+  };
+  const cardOf = id => CARDS.find(card => card[0] === id);
+  const toggle = id => onGo('route', null, null, { rtab: 'overview', opane: open === id ? '' : id });
+  const detail = open && cardOf(open) ? <section id="overview-detail" className="v8-card v8-overview-detail" aria-label={`${cardOf(open)[1]}详情`}>
+    <div className="v8-overview-heading"><h3>{cardOf(open)[1]}</h3><button type="button" className="fw-tbtn" onClick={() => toggle(open)}>收起</button></div>
+    <p className="v8-note">{summaries[open]}{open === 'language' ? ` · ${sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}` : ''}</p>
+    {open === 'language' && <>
+      <p className="v8-note">总览以 {languageCatalogCount} 个目录条目为分母。已有分析记录按当前模型的实际测量去重。</p>
+      {renderLanguage?.(analysisModel || '', snapshot)}
+    </>}
+    {open === 'internal' && <>
+      <p className="v8-note">总数按 MLP 层数 × 每层单元数计算{neuronTotal ? `（${layers} × ${countLabel(width)}）` : ''}。解释检验单独统计，包含已检验但尚未得到解释的单元。</p>
+      {neuronTotal == null ? <p className="v8-note">当前模型暂无可核对的 MLP 总数。</p>
+        : !censusKey ? <p className="v8-note">当前模型暂无可回查的解释检验清单。</p>
+          : checks.error ? <p className="v8-note">解释检验记录暂不可用。{checks.error}</p>
+            : !validChecks ? <p className="v8-note">读取解释检验记录…</p>
+              : <>
+                <ul className="v8-overview-tags">{[...grades].map(([grade, count]) => <li key={grade}>{grade} {count} 个</li>)}</ul>
+                <ResearchDisclosure title="查看已检验神经元">
+                  <NeuronChecks key={censusKey} rows={checked} skeleton={skeleton} onOpenUnit={onOpenUnit} />
+                </ResearchDisclosure>
+              </>}
+      <ResearchDisclosure title="图谱卡片与真实参数">
+        <ModelDetails pane={open} snapshot={skeleton?.model_snapshot || snapshot} runIds={relatedRunIds} onGo={onGo} />
+      </ResearchDisclosure>
+    </>}
+    {open === 'relations' && <>
+      <p className="v8-note">{space.data ? `已登记连接 ${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条：看到过 ${relations.observation || 0}、新材料也成立 ${relations.heldout || 0}、改动后输出变了 ${relations.intervention || 0}，另有 ${relations.negative || 0} 条未成立。连接数只表示登记量。` : '读取连接…'}</p>
+      <ModelDetails pane={open} snapshot={snapshot} runIds={relatedRunIds} onGo={onGo} />
+    </>}
+    <details className="v8-overview-packages">
+      <summary>相关工作包</summary>
+      <div className="v6-toolbar"><label>研究主题 <select value={topic} onChange={event => setTopic(event.target.value)}>
+        <option value="">全部主题</option>
+        {TOPICS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+      </select></label></div>
+      <p className="v8-note">主题依据工作包的标签与冻结材料。未标注工作包可在全部主题下查看。</p>
+      <WorkList key={snapshot + topic} works={related} pane={open} scope={scope} run={run} />
+    </details>
+  </section> : null;
+  const node = id => <button type="button" className="ck-node" aria-expanded={open === id} aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => toggle(id)}>
+    <Ring value={rings[id].value} label={rings[id].label} color={rings[id].color} ariaLabel={`${cardOf(id)[1]} ${rings[id].label}`} />
+    <b>{cardOf(id)[1]}</b><span className="v8-note">{rings[id].sub}</span></button>;
+  /* 首屏只有一个核心模块：三个进度环。其余内容收进按钮（Phase 333） */
   return <div className="v8-route v8-overview">
-    <header className="v8-overview-heading">
-      <div>
-        <h2>我们在破解什么</h2>
-        <p>大模型怎样用有限的参数学会语言？我们把问题分成三部分：语言里有什么、模型里有什么、两边怎样对应。</p>
-        <p className="v8-note wb-pro">{analysisModel ? `覆盖统计 · ${[shortModel(analysisModel), analysisModel.split('|')[2]].filter(Boolean).join(' · ')}` : '当前范围暂无可核对的统计模型。'}</p>
-      </div>
+    {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
+    <CoreCard question="我们在破解什么：语言能力在模型里怎样编码" hint="点一个圆看详情 · 语言图谱是外部能力框架，LLM 编码图谱是模型内部，关联机制把两边对上">
       <details className="v8-overview-scope wb-pro">
-        <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}</summary>
+        <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}{analysisModel ? ` · 统计模型 ${shortModel(analysisModel)}` : ''}</summary>
         <label>模型快照 <select aria-label="总览模型快照" value={snapshot} onChange={event => {
           const next = event.target.value;
           publishResearchContext({ snapshot: next, run: '', trace: '', context_trace: '', pmodel: '' });
@@ -240,69 +282,17 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
           {snapshots.map(value => <option key={value} value={value}>{modelList.find(entry => entry.model_snapshot === value)?.model.split('|')[0] || '快照'} · {value.slice(0, 12)}</option>)}
         </select></label>
       </details>
-    </header>
-    {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
-    <div className="v8-direction-cards v8-overview-cards v8-core-grid">
-      {CARDS.map(([id, title, description, part]) => <Fragment key={id}>
-        <button type="button" className={`v8-card v8-direction v8-overview-card${id === 'relations' ? ' v8-overview-core' : ''}`} aria-label={title} aria-expanded={open === id}
-          aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => onGo('route', null, null, { rtab: 'overview', opane: open === id ? '' : id })}>
-          <small>{part}</small>
-          <strong>{title}</strong>
-          <span className="v8-note">{description}</span>
-          <span className={`v8-overview-metric${id !== 'relations' ? ' v8-overview-ratio' : ''}`}>{summaries[id]}</span>
-          {id === 'language' && <span className="v8-note">{sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}</span>}
-          {id === 'internal' && <span className="v8-note">静态参数和动态机制分别在“空间”查看</span>}
-          {id === 'relations' && <span className="v8-note">{space.data ? `已登记连接 ${(relations.observation || 0) + (relations.heldout || 0) + (relations.intervention || 0)} 条：看到过 ${relations.observation || 0}、新材料也成立 ${relations.heldout || 0}、改动后输出变了 ${relations.intervention || 0}，另有 ${relations.negative || 0} 条未成立。连接数只表示登记量。` : '读取连接…'}</span>}
-          <span className="v8-overview-action">{open === id ? '收起 ↑' : '查看详情 →'}</span>
-        </button>
-        {open === id && <section id="overview-detail" className="v8-card v8-overview-detail" aria-label={`${title}详情`}>
-          <h3>{title}</h3>
-          {id === 'language' && <>
-            <p className="v8-note">总览以 {languageCatalogCount} 个目录条目为分母。已有分析记录按当前模型的实际测量去重。</p>
-            {renderLanguage?.(analysisModel || '', snapshot)}
-          </>}
-          {id === 'internal' && <>
-            <p className="v8-note">总数按 MLP 层数 × 每层单元数计算{neuronTotal ? `（${layers} × ${countLabel(width)}）` : ''}。解释检验单独统计，包含已检验但尚未得到解释的单元。</p>
-            {neuronTotal == null ? <p className="v8-note">当前模型暂无可核对的 MLP 总数。</p>
-              : !censusKey ? <p className="v8-note">当前模型暂无可回查的解释检验清单。</p>
-                : checks.error ? <p className="v8-note">解释检验记录暂不可用。{checks.error}</p>
-                  : !validChecks ? <p className="v8-note">读取解释检验记录…</p>
-                    : <>
-                      <ul className="v8-overview-tags">{[...grades].map(([grade, count]) => <li key={grade}>{grade} {count} 个</li>)}</ul>
-                      <ResearchDisclosure title="查看已检验神经元">
-                        <NeuronChecks key={censusKey} rows={checked} skeleton={skeleton} onOpenUnit={onOpenUnit} />
-                      </ResearchDisclosure>
-                    </>}
-            <ResearchDisclosure title="图谱卡片与真实参数">
-              <ModelDetails pane={id} snapshot={skeleton?.model_snapshot || snapshot} runIds={relatedRunIds} onGo={onGo} />
-            </ResearchDisclosure>
-          </>}
-          {id === 'relations' && <ModelDetails pane={id} snapshot={snapshot} runIds={relatedRunIds} onGo={onGo} />}
-          <details className="v8-overview-packages">
-            <summary>相关工作包</summary>
-            <div className="v6-toolbar"><label>研究主题 <select value={topic} onChange={event => setTopic(event.target.value)}>
-              <option value="">全部主题</option>
-              {TOPICS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-            </select></label></div>
-            <p className="v8-note">主题依据工作包的标签与冻结材料。未标注工作包可在全部主题下查看。</p>
-            <WorkList key={snapshot + topic} works={related} pane={id} scope={scope} run={run} />
-          </details>
-        </section>}
-      </Fragment>)}
-    </div>
-    {/* 三张卡片以下的模块默认折叠，点开才渲染 */}
-    <OverviewFold title="看一个决策点案例"><div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
-      <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></div></OverviewFold>
-    <OverviewFold title={`关联机制的四组成绩 · ${SCORES.filter(score => score.value != null).length} / ${SCORES.length} 已测`}><ScoreBoard bare/></OverviewFold>
-    <OverviewFold title={`最近的发现 · ${FINDINGS.length} 条`}><LatestFindings onGo={onGo} bare/></OverviewFold>
-    <OverviewFold title="下一步可以做什么"><NextStep onGo={onGo}/></OverviewFold>
-    <details className="v8-card v8-overview-fold wb-pro" open={plan} onToggle={event => setPlan(event.currentTarget.open)}>
-      <summary>阶段任务与历史分片</summary>
-      {plan && <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} />}
-    </details>
-    <details className="v8-card v8-overview-fold wb-pro" open={archive} onToggle={event => setArchive(event.currentTarget.open)}>
-      <summary>研究归档与原始来源</summary>
-      {archive && <ResearchLibrary compact />}
-    </details>
+      <div className="ck-trio">{node('language')}<span className="ck-arrow" aria-hidden="true">→</span>{node('relations')}<span className="ck-arrow" aria-hidden="true">←</span>{node('internal')}</div>
+    </CoreCard>
+    {detail}
+    <PillTools label="总览的更多内容" items={[
+      { id: 'case', label: '一个决策点案例', render: () => <div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
+        <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></div> },
+      { id: 'scores', label: `四组成绩 · ${scored} / ${SCORES.length}`, render: () => <ScoreBoard bare/> },
+      { id: 'findings', label: `最近的发现 · ${FINDINGS.length}`, render: () => <LatestFindings onGo={onGo} bare/> },
+      { id: 'next', label: '下一步', render: () => <NextStep onGo={onGo}/> },
+      { id: 'plan', label: '阶段任务与历史分片', pro: true, render: () => <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} /> },
+      { id: 'archive', label: '研究归档与原始来源', pro: true, render: () => <ResearchLibrary compact /> },
+    ]} />
   </div>;
 }

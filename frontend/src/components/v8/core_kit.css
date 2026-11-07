@@ -1,0 +1,59 @@
+/* 精简版页面公用样式（白色风格，与 assoc_space.css 一致） */
+.ck-core { background: #fff; border: 1px solid #e2e7ef; border-radius: 14px; padding: 20px 22px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ck-q { margin: 0; font-size: 15px; font-weight: 600; color: #172033; }
+.ck-hint { margin: 0; font-size: 12px; color: #68748a; text-align: center; }
+.ck-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.ck-pills button { border: 1px solid #e2e7ef; background: #fff; border-radius: 999px; padding: 7px 16px; font-size: 13px; color: #3e4b60; cursor: pointer; }
+.ck-pills button[aria-pressed='true'] { background: #183f77; border-color: #183f77; color: #fff; }
+.ck-panel { display: flex; flex-direction: column; gap: 10px; }
+.ck-panel > .v8-card { border: 0; padding: 0; box-shadow: none; }
+.ck-trio { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; }
+.ck-arrow { color: #c3cbd8; font-size: 22px; text-align: center; }
+.ck-node { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 12px; border: 1px solid transparent; background: none; cursor: pointer; text-align: center; color: inherit; font: inherit; }
+.ck-node:hover, .ck-node[aria-expanded='true'] { border-color: #e2e7ef; background: #f8fafc; }
+.ck-node b { font-size: 15px; }
+.ck-row4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.ck-center { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.ck-steps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.ck-steps span { min-width: 42px; padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e7ef; font-size: 12px; text-align: center; }
+.ck-steps .done { background: #183f77; color: #fff; border-color: #183f77; }
+.ck-steps .now { border: 2px solid #183f77; color: #183f77; font-weight: 600; }
+.ck-mini { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.ck-mini > div { border-top: 1px solid #e2e7ef; padding-top: 8px; text-align: left; }
+.ck-mini b { font-size: 16px; display: block; }
+.ck-gates { display: grid; gap: 10px; width: 100%; max-width: 720px; margin: 0 auto; }
+.ck-gate { display: grid; grid-template-columns: 90px 1fr 70px; gap: 10px; align-items: center; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; }
+button.ck-gate { cursor: pointer; }
+.ck-gate i { display: block; height: 14px; background: #eef1f5; border-radius: 7px; position: relative; overflow: hidden; }
+.ck-gate i b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 7px; }
+.ck-waffle { display: grid; grid-template-columns: repeat(32, 1fr); gap: 3px; max-width: 640px; width: 100%; margin: 0 auto; }
+.ck-waffle button { aspect-ratio: 1; border-radius: 3px; border: 0; padding: 0; cursor: pointer; }
+.ck-waffle button[aria-pressed='true'] { outline: 2px solid #172033; outline-offset: 1px; }
+.ck-legend { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; font-size: 12px; color: #68748a; }
+.ck-legend span { display: inline-flex; gap: 5px; align-items: center; }
+.ck-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.ck-status { display: flex; gap: 16px; align-items: center; max-width: 640px; margin: 6px auto; }
+.ck-dot { width: 18px; height: 18px; border-radius: 50%; flex: none; }
+.ck-dot.ok { background: #2f8f5b; box-shadow: 0 0 0 6px #eaf6ef; }
+.ck-dot.bad { background: #a33e43; box-shadow: 0 0 0 6px #fff0f0; }
+.ck-dot.wait { background: #b07d00; box-shadow: 0 0 0 6px #fff6e8; }
+@media (max-width: 860px) {
+  .ck-trio { grid-template-columns: 1fr; }
+  .ck-arrow { transform: rotate(90deg); }
+  .ck-row4, .ck-mini { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ck-waffle { grid-template-columns: repeat(16, 1fr); }
+  .ck-gate { grid-template-columns: 70px 1fr 54px; }
+  .ck-core { padding: 16px; }
+}
+.ck-plan { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.mp-main-ring { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.ck-join { border: 1px solid #e2e7ef; border-radius: 12px; padding: 12px 14px; background: #f8fafc; min-width: 0; }
+.ck-mini-btn { display: flex; flex-direction: column; gap: 2px; border: 0; border-top: 1px solid #e2e7ef; background: none; padding: 8px 4px 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.ck-mini-btn[aria-expanded='true'] { border-top: 2px solid #183f77; }
+.ck-mini-btn b { font-size: 16px; }
+@media (max-width: 860px) { .ck-plan { grid-template-columns: 1fr; } }
+.ck-steps button { min-width: 42px; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e7ef; background: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+.ck-steps button.done { background: #183f77; color: #fff; border-color: #183f77; }
+.ck-steps button.now { border: 2px solid #183f77; color: #183f77; font-weight: 600; }
+section.v8-rnd.v8-rnd-current { width: 100%; }  /* 与其他精简页同宽 */
+.wb-cfg > .ck-core, .wb-cfg > .ck-pills, .wb-cfg > .ck-panel { column-span: all; margin-bottom: 12px; }  /* 配置页是双栏分栏布局，精简模块占整行 */

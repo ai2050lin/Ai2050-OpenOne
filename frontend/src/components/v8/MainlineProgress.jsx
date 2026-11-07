@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { LOCKBOXES, STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 import './client_guide.css';
+import { Ring } from './CoreKit.jsx';
 
 export function PBar({ done, total, label }) {
   const p = pct(done, total);
@@ -42,14 +43,15 @@ export function GateList({ stage }) {
 }
 
 /* 主线总进度：H0–H7 完成阶段数。 */
-export function MainlineCard() {
+export function MainlineCard({ ring = false }) {
   const [sel, setSel] = useState(null);
   const { done, total, next } = stageProgress();
   const stage = sel == null ? null : STAGES[sel];
-  return <section className="v8-card mp-main" aria-label="主线总进度">
-    <span className="mp-t">主线总进度</span>
-    <div className="mp-hero">{pct(done, total)}%</div>
-    <PBar done={done} total={total} label="主线完成阶段" />
+  return <section className={ring ? 'mp-main mp-main-ring' : 'v8-card mp-main'} aria-label="主线总进度">
+    {ring ? <Ring value={total ? done / total : null} label={`${pct(done, total)}%`} size={150} ariaLabel={`主线总进度 ${pct(done, total)}%`} />
+      : <><span className="mp-t">主线总进度</span>
+        <div className="mp-hero">{pct(done, total)}%</div>
+        <PBar done={done} total={total} label="主线完成阶段" /></>}
     <p className="v8-note">{done} / {total} 阶段完成{next ? <> · 下一步 <b>{next.id} {next.name}</b></> : ''}</p>
     <div className="mp-stages" role="group" aria-label="主线阶段">{STAGES.map((item, i) => {
       const finished = item.done.length === item.gates.length;

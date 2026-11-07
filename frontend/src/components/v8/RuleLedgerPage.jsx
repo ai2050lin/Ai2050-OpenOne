@@ -6,6 +6,7 @@ import { Empty } from '../app/rdc_fusion/ui.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import { checkRules, ruleScope, SCOPE_FIELDS } from './ruleCheck.js';
 import { workbenchHref } from './v8Util.js';
+import { CoreCard, PillTools } from './CoreKit.jsx';
 
 const PAGE_SIZE = 6;
 const GROUPS = [
@@ -203,32 +204,41 @@ export default function RuleLedgerPage({ children }) {
       onPrepare={item => setPrepared({ item: { ...item }, snapshot })} />;
   }
 
+  const STATUS = [['confirmed', '成立', '#2f8f5b'], ['refuted', '未成立', '#c3cbd8'], ['', '待定', '#b07d00']];
+  const statusOf = rule => (GROUPS.some(item => item.id === rule.status) ? rule.status : '');
+  const filtered = rules.filter(rule => (!part || rulePart(rule) === part) && ruleFactor(rule, factor));
+  const order = { confirmed: 0, refuted: 1, '': 2 };
+  const squares = [...filtered].sort((x, y) => order[statusOf(x)] - order[statusOf(y)]);
+  const count = id => filtered.filter(rule => statusOf(rule) === id).length;
+  const filterLabel = [RULE_PARTS.find(([id]) => id === part)?.[1], FACTOR_TAGS.find(([id]) => id === factor)?.[1]].filter((x, i) => (i ? factor : part) && x).join(' · ');
+
+  /* 首屏只有一个核心模块：查重 + 全部规则的方块图；点方块看这条规则（Phase 333） */
   return <section className="v8-route v8-rule-ledger" aria-labelledby="rules-title">
-    <header className="v8-overview-heading"><div><h2 id="rules-title">成果与证据</h2>
-      <p>{ledger.data ? `已登记 ${rules.length} 条规则：${rules.filter(rule => rule.status === 'confirmed').length} 条成立，${rules.filter(rule => rule.status === 'refuted').length} 条未成立，${pending.length} 条待定。` : '读取规则账本…'}未成立的结论能帮后来者少走弯路，所以和成立的放在一起。</p></div></header>
-    <RuleCheck key={snapshot} rules={rules} snapshot={snapshot} disabled={!rules.length} onRule={openRule}
-      prepared={prepared?.snapshot === snapshot ? prepared.item : null} />
-    <div className="v6-toolbar" role="group" aria-label="研究对象">{RULE_PARTS.map(([id, label]) => <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={part === id}
-      onClick={() => { setPart(id); setLimit(PAGE_SIZE); }}>{label}{ledger.data ? ` ${id ? rules.filter(rule => rulePart(rule) === id).length : rules.length}` : ''}</button>)}</div>
-    <div className="v6-toolbar" role="group" aria-label="因素">{[['', '全部因素'], ...FACTOR_TAGS.map(([id, label]) => [id, label])].map(([id, label]) =>
-      <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={factor === id} onClick={() => { setFactor(id); setLimit(PAGE_SIZE); }}>
-        {label}{ledger.data && id ? ` ${rules.filter(rule => ruleFactor(rule, id)).length}` : ''}</button>)}
-      <span className="v8-note">因素按规则文本和关键词归入，未经人工审定</span></div>
-    <div className="v8-rules-groups" role="group" aria-label="规则分类">
-      {GROUPS.map(item => <button key={item.id} type="button" className="v8-card v8-direction v8-rule-group"
-        aria-expanded={group === item.id} aria-controls={group === item.id ? 'rule-results' : undefined}
-        onClick={() => choose(group === item.id ? '' : item.id)}>
-        <strong>{item.label}</strong>
-        <span>{ledger.data ? rules.filter(rule => rule.status === item.id && (!part || rulePart(rule) === part) && ruleFactor(rule, factor)).length : '—'} 条</span>
-        <span className="v8-rule-group-caret" aria-hidden="true">{group === item.id ? '▴' : '▾'}</span>
-        <small>{item.note}</small>
-      </button>)}
-    </div>
-    {ledger.error ? <Empty>规则账本读取失败 · {ledger.error} <button className="fw-tbtn" type="button" onClick={ledger.reload}>重试</button></Empty>
-      : !ledger.data ? <Empty>读取规则账本…</Empty> : null}
-    {group && <section id="rule-results" className="v8-rules-list" aria-label={GROUPS.find(item => item.id === group).label}>
+    <CoreCard label="成果与证据" question={<span id="rules-title">{ledger.data ? `已登记 ${rules.length} 条规则，成立和未成立放在一起` : '读取规则账本…'}</span>}
+      hint="点一个方块看这条规则的证据与反例 · 点图例只看一类">
+      <RuleCheck key={snapshot} rules={rules} snapshot={snapshot} disabled={!rules.length} onRule={openRule}
+        prepared={prepared?.snapshot === snapshot ? prepared.item : null} />
+      {ledger.error ? <Empty>规则账本读取失败 · {ledger.error} <button className="fw-tbtn" type="button" onClick={ledger.reload}>重试</button></Empty>
+        : !ledger.data ? <Empty>读取规则账本…</Empty>
+          : <>
+            <div className="ck-waffle" role="group" aria-label={`规则方块图${filterLabel ? `（${filterLabel}）` : ''}`}>
+              {squares.map(rule => <button type="button" key={rule.id} aria-pressed={selected === rule.id}
+                title={`${rule.id} · ${STATUS.find(s => s[0] === statusOf(rule))[1]}${rule.title ? ` · ${rule.title}` : ''}`}
+                aria-label={`${rule.id} ${STATUS.find(s => s[0] === statusOf(rule))[1]}`}
+                style={{ background: STATUS.find(s => s[0] === statusOf(rule))[2] }} onClick={() => openRule(rule)} />)}
+            </div>
+            <div className="ck-legend">{STATUS.map(([id, label, color]) => <button type="button" key={label} className="fw-tbtn"
+              aria-pressed={id ? group === id : pendingOpen} onClick={() => (id ? choose(group === id ? '' : id) : setPendingOpen(o => !o))}>
+              <i style={{ background: color }} />{label} {count(id)}</button>)}
+              {filterLabel && <button type="button" className="fw-tbtn" onClick={() => { setPart(''); setFactor(''); }}>清除筛选：{filterLabel}</button>}</div>
+          </>}
+    </CoreCard>
+    {group && <section id="rule-results" className="v8-card v8-rules-list" aria-label={GROUPS.find(item => item.id === group).label}>
+      <div className="v8-overview-heading"><h3>{GROUPS.find(item => item.id === group).label} · {active.length} 条</h3>
+        <button type="button" className="fw-tbtn" onClick={() => choose('')}>收起</button></div>
+      <p className="v8-note">{GROUPS.find(item => item.id === group).note}</p>
       <details className="v8-rules-criteria">
-        <summary>筛选规则</summary>
+        <summary>按研究领域筛选</summary>
         <label>研究领域 <select value={domain} onChange={event => { setDomain(event.target.value); setSelected(''); setLimit(PAGE_SIZE); }}>
           <option value="">全部领域</option>
           {[...new Set(rules.filter(rule => rule.status === group).map(rule => rule.domain))].map(key =>
@@ -240,11 +250,20 @@ export default function RuleLedgerPage({ children }) {
         显示更多规则（剩 {active.length - limit} 条）
       </button>}
     </section>}
-    {pending.length > 0 && <details className="v8-card v8-overview-fold" open={pendingOpen}
-      onToggle={event => setPendingOpen(event.currentTarget.open)}>
-      <summary>未决与待验证 · {pending.length} 条</summary>
-      {pendingOpen && <div className="v8-rules-list">{pending.map(renderRule)}</div>}
-    </details>}
-    {children}
+    {pendingOpen && pending.length > 0 && <section className="v8-card v8-rules-list" aria-label="未决与待验证">
+      <div className="v8-overview-heading"><h3>未决与待验证 · {pending.length} 条</h3><button type="button" className="fw-tbtn" onClick={() => setPendingOpen(false)}>收起</button></div>
+      {pending.map(renderRule)}
+    </section>}
+    <PillTools label="成果与证据的更多内容" items={[
+      { id: 'filter', label: filterLabel ? `筛选 · ${filterLabel}` : '筛选', render: () => <>
+        <div className="v6-toolbar" role="group" aria-label="研究对象">{RULE_PARTS.map(([id, label]) => <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={part === id}
+          onClick={() => { setPart(id); setLimit(PAGE_SIZE); }}>{label}{ledger.data ? ` ${id ? rules.filter(rule => rulePart(rule) === id).length : rules.length}` : ''}</button>)}</div>
+        <div className="v6-toolbar" role="group" aria-label="因素">{[['', '全部因素'], ...FACTOR_TAGS.map(([id, label]) => [id, label])].map(([id, label]) =>
+          <button type="button" className="fw-tbtn" key={id || 'all'} aria-pressed={factor === id} onClick={() => { setFactor(id); setLimit(PAGE_SIZE); }}>
+            {label}{ledger.data && id ? ` ${rules.filter(rule => ruleFactor(rule, id)).length}` : ''}</button>)}</div>
+        <p className="v8-note">因素按规则文本和关键词归入，未经人工审定。筛选后方块图只显示符合的规则。</p>
+      </> },
+      children && { id: 'reports', label: '原始报告与版本记录', render: () => children },
+    ]} />
   </section>;
 }

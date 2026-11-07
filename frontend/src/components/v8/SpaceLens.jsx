@@ -27,6 +27,8 @@ import './v8.css';
 import LanguageFrame from './LanguageFrame.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import AssocSpace from './AssocSpace.jsx';
+import { BasisCompare, RelationBoards } from './ClientGuide.jsx';
+import { PillTools } from './CoreKit.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -72,11 +74,22 @@ export default function SpaceLens(props) {
   if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
     /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
     const structure = <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
-      onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm} compact={props.view === 'live'}
+      onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm} compact
       historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/>;
     /* 关联机制 · 运行与路径：首屏只有 3D 空间，运行一段文字等功能收进操作台（Phase 332） */
     if (props.view === 'live') return <AssocSpace model={props.model}>{structure}</AssocSpace>;
-    return <>{props.view === 'response' ? <AssocIntro/> : <EncodingLadder/>}{structure}</>;
+    /* 其余结构页与响应对照：首屏只有核心模块（3D 层塔 / 最小对照），说明与看板收进按钮（Phase 333） */
+    const tools = props.view === 'response' ? [
+      { id: 'modes', label: '三种运行的区别', render: () => <AssocIntro/> },
+      { id: 'map', label: '语言目录映射', render: () => <RelationBoards only="map"/> },
+      { id: 'fidelity', label: '保真看板', render: () => <RelationBoards only="fidelity"/> },
+      { id: 'bench', label: '方法基准', render: () => <RelationBoards only="bench"/> },
+      { id: 'public', label: '公开基准', render: () => <RelationBoards only="public"/> },
+    ] : [
+      { id: 'ladder', label: '证据阶梯', render: () => <EncodingLadder open/> },
+      { id: 'basis', label: '特征基底对比', render: () => <BasisCompare/> },
+    ];
+    return <>{structure}<PillTools label="更多内容" items={tools}/></>;
   }
   return <SpaceDetailLens {...props} />;
 }

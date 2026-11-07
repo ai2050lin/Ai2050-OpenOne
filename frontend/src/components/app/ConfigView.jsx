@@ -12,6 +12,7 @@ import { Card, Empty, StatusPill } from './rdc_fusion/ui.jsx';
 import { siteHref } from '../v8/v8Util.js';
 import { clearErrors, errorCount, exportDiagnostics, getErrors } from '../../diagnostics.js';
 import { PermissionTable } from '../v8/ClientGuide.jsx';
+import { CoreCard, PillTools } from '../v8/CoreKit.jsx';
 
 const AiSettingsPanel = lazy(() => import('./rdc_fusion/AiSettingsPanel.jsx'));
 const ContributePanel = lazy(() => import('./rdc_fusion/ContributePanel.jsx'));
@@ -80,47 +81,62 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
 
       {sec === 'conn' && (
         <>
-          <p>一切正常时不用管这里。连接失败时，这里会显示原因。</p>
-          <Card title="连接与运行形态" sub="决定哪些界面可读、哪些可写">
-            <KV rows={[
-              ['中心服务', <span key="c" className="wb-cfg-mono">{center || '（同源，未配置地址）'}</span>],
-              ['运行形态', MODE[RUNTIME_MODE] || RUNTIME_MODE || '未知'],
-              ['连接状态', <span key="s"><StatusPill status={conn[0]} label={conn[1]} />{cfg?.error ? <small className="wb-cfg-warn"> {cfg.error}</small> : null}</span>],
-              ['数据模式', OFFLINE_CLIENT
-                ? <>只读数据包<small className="wb-cfg-sub">研究浏览读取本机包；账号、主动托管与成果登记在线</small></>
-                : <>在线<small className="wb-cfg-sub">读取与写操作实时连接中心</small></>],
-              ['研发工位', ADMIN_LIVE
-                ? <>可写<small className="wb-cfg-sub">管理工位另需管理员账号</small></>
-                : <>只读<small className="wb-cfg-sub">浏览器只能浏览题库；执行测试与管理在桌面客户端</small></>],
-              ['本机工具', d?.local_tools
-                ? <>可用<small className="wb-cfg-sub">自动测试、读取本机模型权重</small></>
-                : <>不可用<small className="wb-cfg-sub">中心未开放本机工具（公开中心没有被测模型）</small></>],
-              ['沙盒数据', d?.sandbox_synthetic
-                ? <StatusPill status="warn" label="是（合成数据，不可作研究结论）" />
-                : <StatusPill status="pass" label="否（未启用合成数据）" />],
-              REMOTE_CENTER && ['网页版地址', <a key="w" className="wb-cfg-link" href={WEB_URL} target="_blank" rel="noreferrer">{WEB_URL || center}</a>],
-            ]} />
-          </Card>
-
-          <Card title="诊断" sub="未捕获的异常会记在本机；反馈问题时请附上诊断包"
-                extra={<span className="wb-cfg-sub">{errCount ? `${errCount} 条最近错误` : '无记录'}</span>}>
-            {errCount ? (
-              <div className="wb-cfg-act">
-                <button type="button" className="fw-tbtn" onClick={() => {
-                  const blob = new Blob([exportDiagnostics()], { type: 'text/plain;charset=utf-8' });
-                  const a = document.createElement('a');
-                  a.href = URL.createObjectURL(blob);
-                  a.download = `ai2050-diagnostics-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.txt`;
-                  a.click();
-                  URL.revokeObjectURL(a.href);
-                }}>导出诊断包</button>
-                <button type="button" className="fw-tbtn" onClick={() => clearErrors()}>清除记录</button>
-                <small className="wb-cfg-sub">{getErrors()[getErrors().length - 1]?.message || ''}</small>
+          {/* 首屏只有一行连接状态；连接详情与诊断收进按钮（Phase 333） */}
+          <CoreCard label="连接状态" hint="一切正常时只看这一行；连接失败时这里直接给原因">
+            <div className="ck-status">
+              <span className={`ck-dot ${conn[0] === 'pass' ? 'ok' : conn[0] === 'fail' ? 'bad' : 'wait'}`} aria-hidden="true" />
+              <div>
+                <p className="ck-q">{conn[1]} · <span className="wb-cfg-mono">{center || '同源'}</span></p>
+                <p className="v8-note">{MODE[RUNTIME_MODE] || RUNTIME_MODE || '未知形态'} · {OFFLINE_CLIENT ? '只读数据包' : '在线'} · 研发工位{ADMIN_LIVE ? '可写' : '只读'}{d?.sandbox_synthetic ? ' · 沙盒合成数据' : ''}{errCount ? ` · ${errCount} 条最近错误` : ''}</p>
+                {cfg?.error && <p className="wb-cfg-warn">{cfg.error}</p>}
               </div>
-            ) : (
-              <Empty>本页显示运行期未捕获错误（加载失败、脚本异常等）。当前没有记录——如果某个页面显示「没数据」，这里的记录能区分「没下载」和「出错了」。</Empty>
-            )}
-          </Card>
+            </div>
+          </CoreCard>
+          <PillTools label="连接的更多内容" initial={cfg?.error || errCount ? 'diag' : ''} items={[
+            { id: 'detail', label: '连接详情', render: () => <>
+                <Card title="连接与运行形态" sub="决定哪些界面可读、哪些可写">
+                  <KV rows={[
+                    ['中心服务', <span key="c" className="wb-cfg-mono">{center || '（同源，未配置地址）'}</span>],
+                    ['运行形态', MODE[RUNTIME_MODE] || RUNTIME_MODE || '未知'],
+                    ['连接状态', <span key="s"><StatusPill status={conn[0]} label={conn[1]} />{cfg?.error ? <small className="wb-cfg-warn"> {cfg.error}</small> : null}</span>],
+                    ['数据模式', OFFLINE_CLIENT
+                      ? <>只读数据包<small className="wb-cfg-sub">研究浏览读取本机包；账号、主动托管与成果登记在线</small></>
+                      : <>在线<small className="wb-cfg-sub">读取与写操作实时连接中心</small></>],
+                    ['研发工位', ADMIN_LIVE
+                      ? <>可写<small className="wb-cfg-sub">管理工位另需管理员账号</small></>
+                      : <>只读<small className="wb-cfg-sub">浏览器只能浏览题库；执行测试与管理在桌面客户端</small></>],
+                    ['本机工具', d?.local_tools
+                      ? <>可用<small className="wb-cfg-sub">自动测试、读取本机模型权重</small></>
+                      : <>不可用<small className="wb-cfg-sub">中心未开放本机工具（公开中心没有被测模型）</small></>],
+                    ['沙盒数据', d?.sandbox_synthetic
+                      ? <StatusPill status="warn" label="是（合成数据，不可作研究结论）" />
+                      : <StatusPill status="pass" label="否（未启用合成数据）" />],
+                    REMOTE_CENTER && ['网页版地址', <a key="w" className="wb-cfg-link" href={WEB_URL} target="_blank" rel="noreferrer">{WEB_URL || center}</a>],
+                  ]} />
+                </Card>
+            </> },
+            { id: 'diag', label: errCount ? `诊断 · ${errCount}` : '诊断', render: () => <>
+                <Card title="诊断" sub="未捕获的异常会记在本机；反馈问题时请附上诊断包"
+                      extra={<span className="wb-cfg-sub">{errCount ? `${errCount} 条最近错误` : '无记录'}</span>}>
+                  {errCount ? (
+                    <div className="wb-cfg-act">
+                      <button type="button" className="fw-tbtn" onClick={() => {
+                        const blob = new Blob([exportDiagnostics()], { type: 'text/plain;charset=utf-8' });
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `ai2050-diagnostics-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.txt`;
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                      }}>导出诊断包</button>
+                      <button type="button" className="fw-tbtn" onClick={() => clearErrors()}>清除记录</button>
+                      <small className="wb-cfg-sub">{getErrors()[getErrors().length - 1]?.message || ''}</small>
+                    </div>
+                  ) : (
+                    <Empty>本页显示运行期未捕获错误（加载失败、脚本异常等）。当前没有记录——如果某个页面显示「没数据」，这里的记录能区分「没下载」和「出错了」。</Empty>
+                  )}
+                </Card>
+            </> },
+          ]} />
         </>
       )}
 

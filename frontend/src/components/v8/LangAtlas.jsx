@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { apiUrl } from '../../config.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
+import './core_kit.css';
 
 const CAT_ORDER = ['知识网络', '功能推理', '语法规则'];
 
@@ -122,6 +123,7 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
   const [cats, setCats] = useState(CAT_ORDER);
   const [nPer, setNPer] = useState(0);
   const [err, setErr] = useState('');
+  const [step, setStep] = useState(0);   // 0 = 按有无结果自动选；一次只显示一步（Phase 333）
 
   // 进页面先把上次结果读出来：默认数据集要跟着它走，否则会默认落到题量最大的那个、结果区显示「无记录」
   useEffect(() => {
@@ -184,27 +186,31 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
     return { o, shared, mine: mine.size, total: theirs.length };
   }, [show, status]);
   const catsInResult = show ? Object.keys(show.by_category) : [];
+  const cur_step = step || (show || running ? 3 : 1);
   const nLayers = show?.n_heads_scanned ? Math.round(show.n_heads_scanned / 32) : 36;
 
   return (
     <div className="v8-atlas-root">
-      <p className="v8-note" role="status">实测运行使用本机服务已加载的权重，不会由模型筛选器自动换权重。{last&&!modelMatches?`已有结果属于 ${last.model_name}，与当前被测模型不一致，未叠加显示。`:'历史数据集实测按报告原始模型身份回查，不自动升级为完整快照机制证据。'}</p>
       <header className="v8-atlas-hd">
-        <div>
-          <h2>语言图谱 · 数据集实测</h2>
-          <p>先选数据集，再对知识网络 / 分析推理 / 语法规则分别测一遍：答案位置的注意力落在哪个选项，
+        <p className="ck-q">一个语言项在模型里有没有测试结果</p>
+        <div className="ck-steps" role="group" aria-label="实测步骤">{['选数据集', '选类型与样本量', '结果与普遍规律'].map((name, i) =>
+          <button type="button" key={name} className={cur_step === i + 1 ? 'now' : cur_step > i + 1 ? 'done' : ''} aria-pressed={cur_step === i + 1}
+            onClick={() => setStep(i + 1)}>{i + 1} {name}</button>)}</div>
+        <details className="v8-atlas-map"><summary>这一页怎么测</summary>
+          <p className="v8-note">先选数据集，再对知识网络 / 分析推理 / 语法规则分别测一遍：答案位置的注意力落在哪个选项，
             以及每个头对正确字母的 logit 贡献。最后跨类型比对，把「普遍规律」和「类型专属」分开。</p>
-        </div>
+          <p className="v8-note" role="status">实测运行使用本机服务已加载的权重，不会由模型筛选器自动换权重。{last&&!modelMatches?`已有结果属于 ${last.model_name}，与当前被测模型不一致，未叠加显示。`:'历史数据集实测按报告原始模型身份回查，不自动升级为完整快照机制证据。'}</p>
+        </details>
       </header>
 
       {/* ① 数据集 */}
-      <section className="v8-atlas-step">
+      {cur_step === 1 && <section className="v8-atlas-step">
         <h3><span className="k">1</span>选数据集</h3>
         <p className="v8-q">数据集决定样本量与题型。同一批头在不同数据集上的功效差别很大：
           当前三个外部集能映射三类的题量是 {datasets.map(d => `${d.id.split(' ')[0]} ${Object.values(d.by_category || {}).reduce((s, c) => s + (c.n || 0), 0).toLocaleString()}`).join(' / ') || '—'}。</p>
         {!datasets.length && <Empty>{dsApi.error ? `读取数据集失败：${dsApi.error}` : '读取数据集…'}</Empty>}
         <div className="v8-atlas-dsrow">
-          {datasets.map(d => <DatasetCard key={d.id} d={d} active={d.id === active} onPick={pickDs} />)}
+          {datasets.map(d => <DatasetCard key={d.id} d={d} active={d.id === active} onPick={id => { pickDs(id); setStep(2); }} />)}
         </div>
         {/* 数据集来源：题目正文不随发布包分发（C-Eval / M3Exam 是 CC BY-NC-SA，MMLU 是 MIT），
             界面给出原始数据地址与拆分，正文按这个地址在本机取；中心只存题量与科目这些元信息。 */}
@@ -229,10 +235,11 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
             <p className="v8-note">改动映射必须改服务端的 CATEGORY_SUBJECTS，界面不推断类型归属。</p>
           </details>
         )}
-      </section>
+        {cur && <button type="button" className="fw-tbtn primary" onClick={() => setStep(2)}>下一步：选类型与样本量</button>}
+      </section>}
 
       {/* ② 选类型 + 跑 */}
-      <section className="v8-atlas-step">
+      {cur_step === 2 && <section className="v8-atlas-step">
         <h3><span className="k">2</span>选类型与样本量</h3>
         <div className="v8-atlas-ctrl">
           <div className="v8-atlas-catpick">
@@ -256,7 +263,7 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
               <option value={40}>40</option>
             </select>
           </label>
-          <button type="button" className="v8-atlas-run" onClick={start} disabled={running || !totalPick || !canRun}>
+          <button type="button" className="v8-atlas-run" onClick={() => { start(); setStep(3); }} disabled={running || !totalPick || !canRun}>
             {running ? '实测中…' : canRun ? `开始实测${totalPick ? `（${totalPick} 题）` : ''}` : '本机执行'}
           </button>
         </div>
@@ -272,10 +279,11 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
           </div>
         )}
         {status?.state === 'error' && <p className="v8-atlas-err">实测失败：{status.error}</p>}
-      </section>
+        {show && <button type="button" className="fw-tbtn" onClick={() => setStep(3)}>查看已有结果</button>}
+      </section>}
 
       {/* ③ 结果 */}
-      <section className="v8-atlas-step">
+      {cur_step === 3 && <section className="v8-atlas-step">
         <h3><span className="k">3</span>结果与普遍规律</h3>
         {!show && <Empty>{last ? `下面显示的是另一次实测（${last.dataset}）。切换数据集或重新运行后这里会更新。`
           : canRun ? '还没有实测记录：选好数据集与类型后点「开始实测」，169 题约 20 秒。'
@@ -377,7 +385,7 @@ export default function LangAtlas({ ds = '', onDs, researchModel='' }) {
             </details>
           </>
         )}
-      </section>
+      </section>}
     </div>
   );
 }

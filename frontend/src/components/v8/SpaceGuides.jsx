@@ -9,13 +9,13 @@ const n = value => Number.isFinite(value) ? value.toLocaleString() : '—';
 const Unset = ({ children = '未统计' }) => <span className="mp-tag">{children}</span>;
 
 /* LLM 编码图谱：三类原生对象 + 并列的字典特征，按证据阶梯记录。 */
-export function EncodingLadder() {
+export function EncodingLadder({ open = false } = {}) {
   const coverage = useCoverage();
   const arch = useApi(coverage.model ? `/api/model/arch?model_key=${encodeURIComponent(coverage.model)}` : null).data;
   const a = arch?.available ? arch : null;
   const heads = a ? a.n_layers * a.n_heads : null, kv = a ? a.n_layers * a.n_kv_heads : null;
   /* 默认只显示一行摘要，点开再看逐项表格 */
-  return <details className="v8-card v8-overview-fold ladder-fold" aria-label="证据阶梯">
+  return <details className="v8-card v8-overview-fold ladder-fold" aria-label="证据阶梯" open={open || undefined}>
     <summary><b>三类对象的证据阶梯</b>
       <span className="v8-note"> 词嵌入 {a ? n(a.vocab_size) : '—'} 行 · 注意力头 {heads ? n(heads) : '—'} 个 · MLP 单元 {n(coverage.neuronTotal)} 个，已检查 {coverage.checked == null ? '—' : n(coverage.checked)} · 能预测：未测</span></summary>
     <p className="v8-note">每个对象按“已检查 → 读得出 → 改得动 → 能预测”记录，不用一个破解百分比。总量来自模型结构，没有按对象汇总的写“未统计”。</p>

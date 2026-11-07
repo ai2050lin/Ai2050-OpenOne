@@ -7,7 +7,8 @@ import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
 import { fragmentHref } from './researchFragmentUtil.js';
-import { Fold, LockboxTable, PTile, PowerWizard } from './MainlineProgress.jsx';
+import { LockboxTable, PowerWizard } from './MainlineProgress.jsx';
+import { CoreCard, PillTools, Ring } from './CoreKit.jsx';
 import { useCoverage } from './coverage.js';
 import { PAIRS, SPLITS } from './data/mainline.js';
 
@@ -123,58 +124,72 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
   const independentReviews = (archive?.reviews ?? []).filter(review =>
     !review.dataset_versions?.some(id => datasets.some(dataset => dataset.id === id)));
 
-  return <section className="v8-card v8-rnd" aria-label="材料与数据">
-    <h2>材料与数据</h2>
-    <p>主线材料准备到哪里。所有实验用到的句子、语料和模型，都能在下方查到来源。</p>
-    <div className="mp-tiles">
-      <PTile title="语言目录" done={coverage.language} total={coverage.languageTotal} unit="项"/>
-      <PTile title="竞争对材料" done={PAIRS.filter(p => p.built).length} total={PAIRS.length} unit="组"/>
-      <PTile title="三个划分" done={SPLITS.filter(s => s.built).length} total={SPLITS.length} unit="份"/>
-      <PTile title="决策点库" empty="未建"/>
-    </div>
-    <p className="v8-note">决策点库的目标数量在 H1 按功效确定，现在没有分母，所以不显示百分比。</p>
-    <div className="mp-folds">
-    <Fold title="冻结向导（H1）· 功效三栏"><PowerWizard/></Fold>
-    <Fold title="锁箱看管"><LockboxTable/></Fold>
-    <Fold title={`竞争对明细（${PAIRS.length}）`}><div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>因素对</th><th>决策点设计</th><th>已有基础</th><th>主线材料</th></tr></thead>
+  const [stage, setStage] = useState('');
+  const pairsBuilt = PAIRS.filter(p => p.built).length, splitsBuilt = SPLITS.filter(s => s.built).length;
+  const pctOf = (done, total) => (done == null || !total ? null : done / total);
+  const label = (done, total) => (done == null || !total ? '—' : `${Math.round(100 * done / total)}%`);
+  const STAGES_M = [
+    ['lang', '语言目录', pctOf(coverage.language, coverage.languageTotal), label(coverage.language, coverage.languageTotal), `${coverage.language ?? '—'} / ${coverage.languageTotal ?? '—'} 项`, '#183f77'],
+    ['pairs', '竞争对材料', pctOf(pairsBuilt, PAIRS.length), label(pairsBuilt, PAIRS.length), `${pairsBuilt} / ${PAIRS.length} 组`, '#183f77'],
+    ['splits', '三个划分', pctOf(splitsBuilt, SPLITS.length), label(splitsBuilt, SPLITS.length), `${splitsBuilt} / ${SPLITS.length} 份`, '#2f8f5b'],
+    ['points', '决策点库', null, '未建', '目标数量在 H1 按功效确定', '#183f77'],
+  ];
+  const stageDetail = {
+    lang: <p className="v8-note">语言目录 {coverage.languageTotal} 项里，{coverage.language ?? '—'} 项已有当前模型的分析记录。目录本身在“空间 · 语言图谱”。</p>,
+    pairs: <><div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>因素对</th><th>决策点设计</th><th>已有基础</th><th>主线材料</th></tr></thead>
       <tbody>{PAIRS.map(p => <tr key={p.pair}><td>{p.pair}</td><td>{p.design}</td><td>{p.base}</td><td>{p.built ? '已建' : '未建'}</td></tr>)}</tbody></table></div>
-      <p className="v8-note">旧 CF、FU、AM 材料已暴露，只用于方法调试，不能用于确认。</p></Fold>
-    <Fold title="全部材料（搜索与来源）" open={Boolean(runFilter || template)}>
-    <CatalogSummary templates={catalog.data?.items?.length} models={skeleton.data?.models?.length} tokens="1,904 万"/>
-    <div className="v8-rnd-search">
-      <input type="search" aria-label="搜索材料" placeholder="搜索数据集或模板" value={query}
-        onChange={event => { setQuery(event.target.value); setLimit(FIRST_PAGE); }}/>
-      <select aria-label="材料类型" value={type} onChange={event => { setType(event.target.value); setLimit(FIRST_PAGE); }}>
-        <option value="">全部类型</option><option value="dataset">数据集</option><option value="template">模板</option>
-      </select>
-    </div>
-    {runFilter && <div className="v8-rnd-caption"><span>所用材料 · {runFilter}</span>
-      <button className="v6-linkbtn" type="button" onClick={() => onGo('catalog', null, null, { mrun: '', tm: '' })}>查看全部材料</button>
-    </div>}
-    <SourceNotice source={research} label="已登记数据集"/>
-    {!runFilter && <SourceNotice source={catalog} label="测试模板"/>}
-    {catalog.data?.sandbox_synthetic && <p className="v8-note">沙盒题库含合成模型桶，用于流程验证。</p>}
-    {template && catalog.data && !runFilter && !focused && <p className="v8-note">当前题库没有链接指定的模板。</p>}
-    {!rows.length && (research.data || (!runFilter && catalog.data)) && <Empty>
-      {runFilter && !linked.size ? '此研究尚无通过主张登记关联的材料。' : '没有符合条件的材料。'}
-    </Empty>}
-    <div className="v8-rnd-list" aria-label="材料清单">
-      {rows.slice(0, limit).map(row => <ResearchDisclosure key={row.key} initiallyOpen={row === focused} title={<span className="v8-rnd-row">
-        <strong>{row.name}</strong><span className="v8-chip">{row.type === 'dataset' ? '数据集' : '模板'}</span>
-        <small>{row.status}</small>
-      </span>}>
-        {row.type === 'dataset' ? <DatasetDetails entry={row.entry} archive={archive} onGo={onGo}/>
-          : <CatalogItemDetails item={row.entry} onGo={onGo} onAutotest={onAutotest} onStudio={onStudio} embedded/>}
-      </ResearchDisclosure>)}
-    </div>
-    {rows.length > limit && <button className="fw-tbtn" type="button" onClick={() => setLimit(limit + FIRST_PAGE)}>
-      显示更多材料（还有 {rows.length - limit} 条）
-    </button>}
-    {!runFilter && independentReviews.length > 0 && <ResearchDisclosure title={`独立评审批次（${independentReviews.length}）`}>
-      <p className="v8-note">评审批次保留各自的来源和评分口径。</p>
-      {independentReviews.map(review => <ReviewDetails key={review.id} review={review}/>)}
-    </ResearchDisclosure>}
-    </Fold>
-    </div>
+      <p className="v8-note">旧 CF、FU、AM 材料已暴露，只用于方法调试，不能用于确认。</p></>,
+    splits: <LockboxTable/>,
+    points: <p className="v8-note">决策点库的目标数量在 H1 按功效确定，现在没有分母，所以不显示百分比。</p>,
+  }[stage];
+
+  /* 首屏只有一个核心模块：材料流向的四个环；其余收进按钮（Phase 333） */
+  return <section className="v8-rnd" aria-label="材料与数据">
+    <CoreCard question="主线材料准备到哪里" hint="左到右是材料流向 · 点一个圆看来源与明细">
+      <div className="ck-row4">{STAGES_M.map(([id, name, value, text, sub, color]) =>
+        <button type="button" key={id} className="ck-node" aria-expanded={stage === id} onClick={() => setStage(stage === id ? '' : id)}>
+          <Ring value={value} label={text} size={100} color={color} ariaLabel={`${name} ${text}`} /><b>{name}</b><span className="v8-note">{sub}</span></button>)}</div>
+      {stageDetail && <div className="mp-detail">{stageDetail}</div>}
+    </CoreCard>
+    <PillTools label="材料与数据的更多内容" initial={runFilter || template ? 'all' : ''} items={[
+      { id: 'power', label: '冻结向导（H1）', render: () => <PowerWizard/> },
+      { id: 'lockbox', label: '锁箱看管', render: () => <LockboxTable/> },
+      { id: 'all', label: '全部材料（搜索与来源）', render: () => <>
+        <CatalogSummary templates={catalog.data?.items?.length} models={skeleton.data?.models?.length} tokens="1,904 万"/>
+        <div className="v8-rnd-search">
+          <input type="search" aria-label="搜索材料" placeholder="搜索数据集或模板" value={query}
+            onChange={event => { setQuery(event.target.value); setLimit(FIRST_PAGE); }}/>
+          <select aria-label="材料类型" value={type} onChange={event => { setType(event.target.value); setLimit(FIRST_PAGE); }}>
+            <option value="">全部类型</option><option value="dataset">数据集</option><option value="template">模板</option>
+          </select>
+        </div>
+        {runFilter && <div className="v8-rnd-caption"><span>所用材料 · {runFilter}</span>
+          <button className="v6-linkbtn" type="button" onClick={() => onGo('catalog', null, null, { mrun: '', tm: '' })}>查看全部材料</button>
+        </div>}
+        <SourceNotice source={research} label="已登记数据集"/>
+        {!runFilter && <SourceNotice source={catalog} label="测试模板"/>}
+        {catalog.data?.sandbox_synthetic && <p className="v8-note">沙盒题库含合成模型桶，用于流程验证。</p>}
+        {template && catalog.data && !runFilter && !focused && <p className="v8-note">当前题库没有链接指定的模板。</p>}
+        {!rows.length && (research.data || (!runFilter && catalog.data)) && <Empty>
+          {runFilter && !linked.size ? '此研究尚无通过主张登记关联的材料。' : '没有符合条件的材料。'}
+        </Empty>}
+        <div className="v8-rnd-list" aria-label="材料清单">
+          {rows.slice(0, limit).map(row => <ResearchDisclosure key={row.key} initiallyOpen={row === focused} title={<span className="v8-rnd-row">
+            <strong>{row.name}</strong><span className="v8-chip">{row.type === 'dataset' ? '数据集' : '模板'}</span>
+            <small>{row.status}</small>
+          </span>}>
+            {row.type === 'dataset' ? <DatasetDetails entry={row.entry} archive={archive} onGo={onGo}/>
+              : <CatalogItemDetails item={row.entry} onGo={onGo} onAutotest={onAutotest} onStudio={onStudio} embedded/>}
+          </ResearchDisclosure>)}
+        </div>
+        {rows.length > limit && <button className="fw-tbtn" type="button" onClick={() => setLimit(limit + FIRST_PAGE)}>
+          显示更多材料（还有 {rows.length - limit} 条）
+        </button>}
+        {!runFilter && independentReviews.length > 0 && <ResearchDisclosure title={`独立评审批次（${independentReviews.length}）`}>
+          <p className="v8-note">评审批次保留各自的来源和评分口径。</p>
+          {independentReviews.map(review => <ReviewDetails key={review.id} review={review}/>)}
+        </ResearchDisclosure>}
+      </> },
+    ]} />
   </section>;
 }
