@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 import { normalizeState, spaceMode, spaceTab } from '../app/workbenchUtil.js';
-import { EDGES, NODES } from './data/lang_graph_seed.js';
+import { BASIS, EDGES, NODES } from './data/lang_graph_seed.js';
 import { STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 
 describe('空间三张图的路由', () => {
@@ -54,6 +54,16 @@ describe('语言图谱种子', () => {
   const catalogIds = new Set(catalog.domains.flatMap(d => d.groups.flatMap(g => g.items.map(i => i.id))));
   it('每条边的两端都是已有节点', () => {
     for (const [a, b] of EDGES) { expect(ids.has(a)).toBe(true); expect(ids.has(b)).toBe(true); }
+  });
+  it('每条边都有依据，审定删除的边不再出现', () => {
+    for (const edge of EDGES) expect(Object.keys(BASIS)).toContain(edge[3]);
+    expect(EDGES.some(([a, b]) => (a === 'neg' && b === 'but') || (a === 'but' && b === 'neg'))).toBe(false);
+  });
+  it('连词以推理功能为主，也属于语法规则', () => {
+    for (const id of ['but', 'then', 'because']) {
+      const node = NODES.find(n => n.id === id);
+      expect([node.zone, node.also]).toEqual(['RS', 'GR']);
+    }
   });
   it('节点引用的目录条目都存在', () => {
     for (const node of NODES) if (node.cat) expect(catalogIds.has(node.cat)).toBe(true);
