@@ -410,7 +410,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const hideScene = compact && view === 'response' && !sceneOpen && index == null;
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
-      <div>{!(compact && ['live', 'response'].includes(view)) && <h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2>}{!compact && <p>{VIEW_TEXT[view]?.[1]}</p>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
+      <div>{!compact && <h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2>}{!compact && <p>{VIEW_TEXT[view]?.[1]}</p>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
       {models.length > 1 && <label>模型 <select aria-label="结构模型" value={model?.model || ''} onChange={event => {
         const next = models.find(row => row.model === event.target.value);
         if (!next) return;

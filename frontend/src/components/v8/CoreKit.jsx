@@ -62,3 +62,13 @@ export function PillTools({ items, label = '更多', initial = '' }) {
   </div>;
 }
 export const FoldList = PillTools;
+
+/* 页内三级页签：全站同一种样式（下划线）。items = [[id, label, desc]]；选中项的说明显示在页签下面 */
+export function PageTabs({ items, value, onChange, label }) {
+  const cur = items.find(item => item[0] === value);
+  return <div className="ck-tabs-wrap">
+    <div className="ck-tabs" role="tablist" aria-label={label}>{items.map(([id, name]) =>
+      <button type="button" role="tab" key={id} aria-selected={value === id} aria-pressed={value === id} onClick={() => onChange(id)}>{name}</button>)}</div>
+    {cur?.[2] && <p className="v8-note ck-tabs-desc">{cur[2]}</p>}
+  </div>;
+}

@@ -7,7 +7,7 @@
    分隔线之下是本机形态相关的界面（配置、本机工具）。 */
 export const LENSES = [
   { id: 'route', label: '进展', desc: '图谱进展、研究覆盖与验证证据' },          // id 沿用 route，旧链接 ?lens=route 照常可用
-  { id: 'spatial', label: '空间', desc: '真实参数、全部 Head / MLP 索引与语言响应图谱' },
+  { id: 'spatial', label: '空间', desc: 'LLM 编码图谱、关联机制与语言图谱' },
   { id: 'process', label: '研发', desc: '整体研究路线、任务与数据、执行与审计' },
   { id: 'config', label: '配置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
 ];

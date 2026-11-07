@@ -67,3 +67,13 @@ button.ck-gate { cursor: pointer; }
 .ck-steps button.now { border: 2px solid #183f77; color: #183f77; font-weight: 600; }
 section.v8-rnd.v8-rnd-current { width: 100%; }  /* 与其他精简页同宽 */
 .wb-cfg > .ck-core, .wb-cfg > .ck-folds, .wb-cfg > .ck-pills, .wb-cfg > .ck-panel { column-span: all; margin-bottom: 12px; }  /* 配置页是双栏分栏布局，精简模块占整行 */
+/* 三级页签（Phase 337）：全站统一的下划线样式 */
+.ck-tabs-wrap { display: flex; flex-direction: column; gap: 6px; }
+.ck-tabs { display: flex; gap: 4px; border-bottom: 1px solid #e2e7ef; overflow-x: auto; }
+.ck-tabs button { border: 0; background: none; padding: 8px 14px; font-size: 14px; color: #68748a; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.ck-tabs button:hover { color: #172033; }
+.ck-tabs button[aria-pressed='true'] { color: #183f77; border-bottom-color: #183f77; font-weight: 600; }
+.ck-tabs-desc { margin: 0; }
+/* 二级页签行右端：复制链接与帮助按钮 */
+.wb-subnav > .wb-copy-link { margin-left: auto; }
+.wb-subnav > .wb-copy-link + .wb-help-btn { margin-left: 8px; }

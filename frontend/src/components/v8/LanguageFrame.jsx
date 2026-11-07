@@ -5,17 +5,16 @@ import { useState } from 'react';
 import LangGraph3D from './LangGraph3D.jsx';
 import LanguageCatalog from './LanguageCatalog.jsx';
 import WordRing from './WordRing.jsx';
-import { PageHead, PillTools } from './CoreKit.jsx';
+import { PageHead, PageTabs, PillTools } from './CoreKit.jsx';
 
-const VIEWS = [['ring', '词汇关系环图'], ['seed', '关系种子'], ['catalog', '语言目录']];
+const VIEWS = [['ring', '词汇关系环图', '大量词按类别排成环，看它们之间的层级与属性关系'], ['seed', '关系种子', '语言项之间的人工关系（3D）'], ['catalog', '语言目录', '知识网络、推理与功能、语法体系三大类，共 69 项']];
 
 export default function LanguageFrame() {
   const [view, setView] = useState('ring');
   /* 首屏只有当前视图（默认词汇关系环图）；说明文字收进按钮（Phase 333） */
   return <div className="v8-route" aria-label="语言图谱">
-    <PageHead title="语言图谱：外部能力框架" sub="语言里有哪些词和语言项、它们之间是什么关系、哪些已经有测试材料。这一页只描述语言本身，不含模型信息。" />
-    <div className="wb-space-tabs lang-tabs" role="tablist" aria-label="语言图谱视图">{VIEWS.map(([id, label]) =>
-      <button type="button" role="tab" key={id} aria-pressed={view === id} aria-selected={view === id} onClick={() => setView(id)}>{label}</button>)}</div>
+    <PageHead title="语言图谱" sub="外部能力框架：语言里有哪些词和语言项、它们之间是什么关系、哪些已经有测试材料。这一页只描述语言本身，不含模型信息。" />
+    <PageTabs label="语言图谱视图" items={VIEWS} value={view} onChange={setView} />
     {view === 'ring' && <WordRing/>}
     {view === 'seed' && <LangGraph3D/>}
     {view === 'catalog' && <section className="v8-card cg-section" aria-label="语言目录">

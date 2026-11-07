@@ -17,10 +17,11 @@ import { loadLocalPack } from './rdc_fusion/localPack.js';
 import { Empty } from './rdc_fusion/ui.jsx';
 import RouteLens from '../v8/RouteLens.jsx';
 import SpaceLens from '../v8/SpaceLens.jsx';
+import { PageHead } from '../v8/CoreKit.jsx';
 import WorkbenchHelp from './WorkbenchHelp.jsx';
 import { useClientMode } from '../v8/ClientGuide.jsx';
 import { readState as readSpaceState, writeState as writeSpaceState } from '../v8/v8Util.js';
-import { ENC_TABS, LENSES, PIPE_STEPS, ROUTE_VIEWS, SPACE_TARGET, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, spaceMode, spaceTab, visibleStations, writeState } from './workbenchUtil.js';
+import { LENSES, PIPE_STEPS, ROUTE_VIEWS, SPACE_TARGET, SPATIAL_MODES, SPATIAL_VIEWS, dsBound, normalizeState, readState, resolveGo, spaceMode, visibleStations, writeState } from './workbenchUtil.js';
 import {useResearchContext} from './researchContext.js';
 import {downloadDataPack,packInfo,storeTick,subscribe} from './rdc_fusion/dataStore.js';
 import {ExtraPackPrompt} from '../open/DataBar.jsx';
@@ -85,7 +86,7 @@ function LensIcon({ id }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{p}</svg>;
 }
 
-function SubNav({ items, value, onChange, label, onHelp }) {
+function SubNav({ items, value, onChange, label, onHelp, extra }) {
   return (
     <nav className="wb-subnav" aria-label={label}>
       {items.map(it => (
@@ -93,6 +94,7 @@ function SubNav({ items, value, onChange, label, onHelp }) {
           {it.label}
         </button>
       ))}
+      {extra}
       {onHelp && (
         <button type="button" className="wb-help-btn" onClick={onHelp} title="本页功能与原理说明" aria-label="本页功能与原理说明">?</button>
       )}
@@ -183,30 +185,23 @@ export default function Workbench() {
         <div className="wb-body">
           {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab==='neuron'?'overview':rtab} onChange={v => set({ rtab: v, opane: '' })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
           {lens === 'spatial' && <SubNav items={SPATIAL_MODES} value={smode}
-            onChange={v => set(SPACE_TARGET[v])} label="空间图谱" onHelp={() => setHelpOpen(true)} />}
-          {lens === 'spatial' && <div className="wb-space-tabs" role="group" aria-label="本图的视图">
-            {smode === 'enc' && ENC_TABS.map(tab => <button type="button" key={tab.id}
-              aria-pressed={spaceTab(view, st.gview) === tab.id} onClick={() => set(tab.patch)}>{tab.label}</button>)}
-            <button type="button" className="v6-linkbtn wb-copy-link" onClick={copyLink}>{copied ? '链接已复制' : '复制当前链接'}</button>
-          </div>}
+            onChange={v => set(SPACE_TARGET[v])} label="空间图谱" onHelp={() => setHelpOpen(true)}
+            extra={<button type="button" className="v6-linkbtn wb-copy-link" onClick={copyLink}>{copied ? '链接已复制' : '复制当前链接'}</button>} />}
           {lens === 'process' && <SubNav items={stations.filter(s=>['plan','catalog','execution'].includes(s.id))} value={stationGroup}
             onChange={s => set({ station: s, mrun: '', ...(s === 'catalog' ? { tm: '' } : {}) })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
           {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
           {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
           {/* 图谱覆盖在摘要旁选模型，在数据集实测里选题库；空间继续使用全局维度条。 */}
           {!(lens==='process'&&station==='plan') && (context.run || context.trace || context.context_trace || (context.snapshot && (lens !== 'route' || !['overview','lang'].includes(rtab)))) && <div className="wb-research-context wb-pro" aria-label="当前研究上下文"><span>研究：{context.run||'未绑定实验'}</span>{context.snapshot&&<span title={context.snapshot}>来源快照 {context.snapshot.slice(0,16)} · 页面内核验</span>}{(context.trace||context.context_trace)&&view!=='live'&&<button type="button" className="v6-linkbtn" onClick={()=>set({lens:'spatial',view:'live'})}>回到来源样本</button>}</div>}
-          {lens === 'spatial' && view==='graph'&&['langmeasure','relations'].includes(st.gview) && (
-            <Gctx ds={st.ds || ''} mdl={st.mdl || ''} dsBound={dsOn} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
-                  scope={view === 'graph' ? '当前图层的数据来源与被测模型；不同快照分别查看'
-                    : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）'} />
-          )}
           <main className="wb-main">
-            {lens==='config'&&<details className="v8-card"><summary>高级与兼容工具</summary><button className="fw-tbtn" onClick={()=>set({csec:'platform'})}>平台信息</button>{localTools&&<button className="fw-tbtn" onClick={()=>set({csec:'legacy'})}>旧版兼容与教学工具</button>}</details>}
+            {lens==='config'&&CFG_SECTIONS.some(s=>s.id===csec)&&<PageHead title={CFG_SECTIONS.find(s=>s.id===csec).label} sub={CFG_SECTIONS.find(s=>s.id===csec).desc} />}
             {lens==='process'&&stationGroup==='execution'&&station!=='execution'&&<button className="fw-tbtn" type="button" onClick={()=>go('execution')}>返回实验与队列</button>}
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens==='process'&&['plan','execution'].includes(station)&&<ResearchExecution plan={station==='plan'} onGo={go}
                 tools={stations.filter(s=>!['plan','execution','catalog'].includes(s.id))}/>}
-              {lens === 'spatial' && <SpaceLens key={`${revision}:${researchGraph?st.gview:'workbench'}`} view={view} graphMode={st.gview}
+              {lens === 'spatial' && <SpaceLens contextBar={view==='graph'&&['langmeasure','relations'].includes(st.gview) ? <Gctx ds={st.ds || ''} mdl={st.mdl || ''} dsBound={dsOn} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
+                  scope={view === 'graph' ? '当前图层的数据来源与被测模型；不同快照分别查看'
+                    : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）'} /> : null} key={`${revision}:${researchGraph?st.gview:'workbench'}`} view={view} graphMode={st.gview}
                                                   onGraphMode={gview=>set({view:'graph',gview})} paramTab={st.ptab} onParamTab={ptab=>set({ptab})} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })}
                                                   model={st.mdl || ''} onModel={mdl=>set({mdl})} ds={st.ds || ''} onDs={v => set({ ds: v })}
                                                   localPack={<LocalPack />} />}
@@ -219,6 +214,7 @@ export default function Workbench() {
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
               {lens === 'route' && <RouteLens tab={rtab} openPane={st.opane} model={st.mdl || ''} ds={st.ds || ''} onGoSpace={goSpace} onGo={go} />}
               {lens === 'config' && csec!=='legacy' && <ConfigView cfg={cfg} onGo={go} section={csec} nodeStep={st.cstep} />}
+              {lens==='config'&&<details className="v8-card v8-overview-fold"><summary>高级与兼容工具</summary><div className="v6-toolbar"><button className="fw-tbtn" onClick={()=>set({csec:'platform'})}>平台信息</button>{localTools&&<button className="fw-tbtn" onClick={()=>set({csec:'legacy'})}>旧版兼容与教学工具</button>}</div></details>}
               {lens === 'config' && csec==='legacy' && (localTools?<><section className="v8-card"><h2>旧版兼容与教学工具</h2><p className="v8-note">此处保留历史实测与显式教学演示；演示不进入研究统计。正式前向请进入运行与路径。</p><button className="fw-tbtn" onClick={()=>go('spatial','live')}>打开真实运行与路径</button></section><LensSpatial on onGo={go}/></>:<Empty>旧版工具只在本机中心开放；正式研究使用空间中的图谱、参数和运行页面。</Empty>)}
             </Suspense>
           </main>

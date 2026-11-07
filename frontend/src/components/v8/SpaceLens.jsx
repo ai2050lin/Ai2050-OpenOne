@@ -28,7 +28,7 @@ import LanguageFrame from './LanguageFrame.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import AssocSpace from './AssocSpace.jsx';
 import { BasisCompare, RelationBoards } from './ClientGuide.jsx';
-import { PageHead, PillTools } from './CoreKit.jsx';
+import { PageHead, PageTabs, PillTools } from './CoreKit.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -81,12 +81,24 @@ function assocModeOf(view, graphMode) {
   if (view === 'live' || view === 'response') return view;
   return view === 'graph' && ['langmeasure', 'relations'].includes(graphMode) ? graphMode : null;
 }
-function AssocHub({ mode, onMode, children }) {
+function AssocHub({ mode, onMode, contextBar, children }) {
   return <div className="v8-route as-page" aria-label="关联机制">
-    <PageHead title="关联机制" sub="把语言图谱里的能力，对到模型内部的层、注意力头和神经元。选一种模式，下面显示对应的内容。" />
-    <div className="as-modes" role="tablist" aria-label="关联机制模式">{ASSOC_MODES.map(([id, label, desc]) =>
-      <button type="button" role="tab" key={id} aria-selected={mode === id} aria-pressed={mode === id} onClick={() => onMode(id)}>
-        <b>{label}</b><span>{desc}</span></button>)}</div>
+    <PageHead title="关联机制" sub="把语言图谱里的能力，对到模型内部的层、注意力头和神经元。" />
+    <PageTabs label="关联机制模式" items={ASSOC_MODES} value={mode} onChange={onMode} />
+    {contextBar}
+    {children}
+  </div>;
+}
+
+/* LLM 编码图谱：结构与参数、全部研发成果 */
+const ENC_MODES = [
+  ['structure', '结构与参数', '词嵌入、36 层的注意力头和 MLP 单元；点一层看它的 Head 与 MLP，再看真实参数与证据'],
+  ['internal', '全部研发成果', '全部研究对象的 3D 总图，按证据来源回查'],
+];
+function EncHub({ mode, onMode, children }) {
+  return <div className="v8-route as-page" aria-label="LLM 编码图谱">
+    <PageHead title="LLM 编码图谱" sub="模型里有什么：词嵌入、注意力头和 MLP 单元，以及它们各自的证据。" />
+    <PageTabs label="LLM 编码图谱视图" items={ENC_MODES} value={mode} onChange={onMode} />
     {children}
   </div>;
 }
@@ -95,7 +107,12 @@ export default function SpaceLens(props) {
   const assocMode = assocModeOf(props.view, props.graphMode);
   if (assocMode && !props.assocInner) {
     const onMode = id => (id === 'live' || id === 'response' ? props.setView?.(id) : props.onGraphMode?.(id));
-    return <AssocHub mode={assocMode} onMode={onMode}><SpaceLens {...props} assocInner /></AssocHub>;
+    return <AssocHub mode={assocMode} onMode={onMode} contextBar={props.contextBar}><SpaceLens {...props} assocInner /></AssocHub>;
+  }
+  const encMode = props.view === 'parameters' || (props.view === 'graph' && (!props.graphMode || ['structure', 'internal'].includes(props.graphMode)))
+    ? (props.view === 'graph' && props.graphMode === 'internal' ? 'internal' : 'structure') : null;
+  if (encMode && !props.assocInner) {
+    return <EncHub mode={encMode} onMode={id => props.onGraphMode?.(id)}><SpaceLens {...props} assocInner /></EncHub>;
   }
   if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
     /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
