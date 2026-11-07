@@ -25,7 +25,7 @@ button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer}h1
 .sseg{display:flex;border:1px solid #cbd5e2;border-radius:8px;overflow:hidden}
 .sseg button{border:0;background:transparent;color:var(--stagemuted);padding:4px 10px;font-size:12px}
 .sseg button.on{background:var(--blue2);color:#fff}
-.stage-body{display:grid;grid-template-columns:minmax(0,1fr) 250px}
+
 canvas{display:block;width:100%;height:560px;touch-action:none;cursor:grab}
 canvas:active{cursor:grabbing}
 .hud{border-left:1px solid #e2e7ef;padding:12px 14px;display:grid;gap:10px;align-content:start;font-size:12px}
@@ -73,162 +73,147 @@ tbody tr{cursor:pointer}
 .chart svg{width:100%;height:auto;display:block}
 .frow{display:grid;grid-template-columns:150px 1fr 120px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
 .frow svg{width:100%;height:28px}
+.stage-body{position:relative}
+.overlay{position:absolute;left:16px;top:12px;pointer-events:none}
+.overlay .big{font-size:26px;font-weight:700;color:var(--ink)}
+.layercard{position:absolute;right:12px;top:12px;width:270px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(23,32,51,.12);padding:12px 14px;display:none;gap:10px;font-size:12px}
+.layercard.on{display:grid}
+.layercard h4{font-size:12px;color:var(--muted);font-weight:600}
+.layercard .big{font-size:20px;font-weight:700}
+.layercard .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:18px;color:var(--muted)}
+.hint{position:absolute;left:16px;bottom:10px;color:var(--muted);font-size:12px;pointer-events:none}
+.vbtn{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:4px 10px;font-size:12px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tools button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px;font-size:13px;color:var(--text)}
+.tools button.on{background:var(--blue2);border-color:var(--blue2);color:#fff}
+.console{padding:14px 16px}
+.console .cpanel{display:none;gap:10px}.console .cpanel.on{display:grid}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tlist{display:flex;gap:8px;flex-wrap:wrap}
 details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff}
 details summary{cursor:pointer;font-weight:600}
 @media (max-width:860px){
-  .stage-body{grid-template-columns:1fr}.hud{border-left:0;border-top:1px solid #e2e7ef;grid-template-columns:1fr 1fr}
+  .layercard{position:static;width:auto;margin:0 12px 12px;box-shadow:none}.overlay .big{font-size:20px}
   canvas{height:440px}.grid2,.grid3{grid-template-columns:1fr}.frow{grid-template-columns:1fr}
   .main{padding:12px 16px 40px}.top,.bar{padding-left:16px;padding-right:16px}
 }
 </style>
 </head>
 <body>
-<header class="top"><b>空间 · 关联机制</b><small>方案 v2：上面是全部层的 3D 空间，下面是操作台</small></header>
-<div class="bar">方案草图。3D 与图表用的是 MA-H2 的真实汇总（Qwen3-4B bf16，中文 discovery，2,520 条）；“运行”等按钮在方案页不可用。</div>
+<header class="top"><b>空间 · 关联机制</b><small>方案 v2（精简）</small></header>
+<div class="bar">方案草图 · 数据为 MA-H2 真实汇总（Qwen3-4B bf16，2,520 条）</div>
 
 <main class="main">
 
 <section class="stage" aria-label="全部层的 3D 空间">
   <div class="stage-head">
-    <h2>HiddenState 流 · 词嵌入 + 36 层</h2>
-    <span class="sub">案例：按资料还是按现实回答颜色（MA-H2）</span>
+    <div><h2>一段文字怎样决定下一个词</h2><span class="sub">看 HiddenState 从词嵌入往上流过 36 层</span></div>
     <div class="sseg" role="group" aria-label="范围" style="margin-left:auto">
-      <button data-scope="doc" class="on">资料范围</button><button data-scope="real">现实范围</button><button data-scope="diff">差值</button>
+      <button data-scope="doc" class="on">按资料</button><button data-scope="real">按现实</button><button data-scope="diff">差值</button>
     </div>
-    <div class="sseg" role="group" aria-label="视角">
-      <button data-view="iso" class="on">斜视</button><button data-view="side">侧视</button><button data-view="top">俯视当前层</button>
-    </div>
+    <button class="vbtn" id="vbtn" title="切换视角">视角：斜视</button>
   </div>
   <div class="stage-body">
-    <canvas id="c" aria-label="37 块层板自下而上排列；每块左半是 32 个注意力头，右半是 MLP；中间的流线是读出位置的 HiddenState"></canvas>
-    <aside class="hud" aria-live="polite">
-      <div><h4>当前层</h4><div class="big" id="hL">第 0 层</div><div class="note" style="color:var(--stagemuted)" id="hLsub">词嵌入</div></div>
-      <div><h4>逐层读出：资料色 − 常识色（logit）</h4>
-        <div class="meter"><span>资料</span><i><b id="mDoc"></b></i><span id="vDoc">0</span></div>
-        <div class="meter"><span>现实</span><i><b id="mReal"></b></i><span id="vReal">0</span></div>
-        <div class="note" style="color:var(--stagemuted)">右侧为正：读出偏向资料里写的颜色。</div></div>
-      <div><h4>因素在答案位置的差异（std_rms）</h4><div id="hF"></div></div>
-      <div><h4>本层最读资料色的头</h4><div id="hH"></div></div>
+    <canvas id="c" aria-label="37 块层板自下而上排列；每块左半是 32 个注意力头，右半是 MLP；中间的线是 HiddenState"></canvas>
+    <div class="overlay" aria-live="polite"><div class="big" id="oL">第 0 层</div><div id="oR" class="note"></div></div>
+    <aside class="layercard" id="card" aria-label="当前层详情">
+      <button class="x" id="cardX" aria-label="关闭">×</button>
+      <div><div class="big" id="hL">第 0 层</div><div class="note" id="hLsub">词嵌入</div></div>
+      <div><h4>逐层读出：资料色 − 常识色</h4>
+        <div class="meter"><span>按资料</span><i><b id="mDoc"></b></i><span id="vDoc">0</span></div>
+        <div class="meter"><span>按现实</span><i><b id="mReal"></b></i><span id="vReal">0</span></div></div>
+      <div><h4>各因素的差异</h4><div id="hF"></div></div>
+      <div><h4>最看资料颜色的头</h4><div id="hH"></div></div>
     </aside>
+    <div class="hint" id="hint">点任一层板看详情 · 拖动旋转</div>
   </div>
   <div class="player">
     <button class="play" id="play">▶ 播放</button>
     <input type="range" id="scrub" min="0" max="36" step="0.01" value="0" aria-label="层位">
-    <span class="lbl" id="plbl">第 0 层 / 36</span>
-    <label class="note" style="color:var(--stagemuted)">速度 <select id="speed"><option value="4">慢</option><option value="8" selected>中</option><option value="16">快</option></select></label>
+    <select id="speed" aria-label="速度"><option value="4">慢</option><option value="8" selected>中</option><option value="16">快</option></select>
   </div>
   <div class="legend">
-    <span><i style="background:linear-gradient(90deg,#eef3fa,#7aa6e0,#1f5fbf)"></i>头对资料色的注意力 0 → 0.63</span>
-    <span><i style="background:#e4e7ec"></i>MLP（本案例未分析，灰色）</span>
-    <span><i style="background:#172033;height:3px"></i>HiddenState 主干</span>
-    <span>彩线 = 各因素在该层的差异幅度（离主干越远越大）</span>
-    <span>拖动旋转 · 点层板选层</span>
+    <span><i style="background:linear-gradient(90deg,#eef3fa,#7aa6e0,#1f5fbf)"></i>头越蓝，越看资料里的颜色</span>
+    <span><i style="background:#172033;height:3px"></i>HiddenState</span>
+    <span><i style="background:linear-gradient(90deg,#7050a0,#087b70,#b07d00,#c0392b,#4a7fd0);height:3px"></i>各因素（离中线越远差异越大）</span>
   </div>
 </section>
 
-<section class="console" aria-label="操作台">
-  <div class="ctabs" role="tablist">
-    <button data-tab="run" class="on">输入与运行</button>
-    <button data-tab="lens">逐层读出</button>
-    <button data-tab="factor">因素</button>
-    <button data-tab="heads">注意力头</button>
-    <button data-tab="method">方法比较</button>
-    <button data-tab="tools">工具</button>
-  </div>
-  <div class="cbody">
+<nav class="tools" aria-label="操作台">
+  <button data-tab="run">输入文字</button>
+  <button data-tab="lens">逐层读出</button>
+  <button data-tab="factor">因素</button>
+  <button data-tab="heads">注意力头</button>
+  <button data-tab="method">方法比较</button>
+  <button data-tab="tools">更多工具</button>
+</nav>
 
-    <div class="cpanel on" data-p="run">
-      <div class="grid2">
-        <div>
-          <h4 style="font-size:13px;margin-bottom:6px">输入一段文字</h4>
-          <textarea id="txt">资料：香蕉是蓝色的。
+<section class="console" id="console" hidden>
+  <div class="cpanel" data-p="run">
+    <textarea id="txt">资料：香蕉是蓝色的。
 问：按这份资料，香蕉通常是什么颜色的？
 答：</textarea>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
-            <div class="seg" id="mode"><button class="on" data-m="0">观察</button><button data-m="1">对照</button><button data-m="2">正式</button></div>
-            <button class="btn pri" disabled>运行</button>
-            <span class="note" id="modeNote"></span>
-          </div>
-        </div>
-        <div class="box">
-          <h4>运行后 3D 空间显示什么</h4>
-          <p class="note">这段文字的 HiddenState 在每层的读出、各头看向哪个词，按层播放。现在显示的是 MA-H2 的 2,520 条平均。</p>
-          <h4 style="margin-top:8px">三种运行的边界</h4>
-          <table><tbody>
-            <tr><td><b>观察</b></td><td>一次前向，几秒</td><td>只看读数，不产生研究结论</td></tr>
-            <tr><td><b>对照</b></td><td>只改一个因素</td><td>3D 叠两条流，显示差值；仍是未登记观察</td></tr>
-            <tr><td><b>正式</b></td><td>冻结决策点 + 修补</td><td>进入研究记录，按预注册判据判定</td></tr>
-          </tbody></table>
-          <p class="note" style="margin-top:6px">需要桌面节点；网页版只能看已有结果。</p>
-        </div>
-      </div>
+    <div class="row">
+      <div class="seg" id="mode"><button class="on" data-m="0">观察</button><button data-m="1">对照</button><button data-m="2">正式</button></div>
+      <button class="btn pri" disabled>运行</button>
+      <span class="note" id="modeNote"></span>
     </div>
+    <details><summary>三种运行有什么区别</summary><table><tbody>
+      <tr><td><b>观察</b></td><td>一次前向，几秒</td><td>只看读数，不产生研究结论</td></tr>
+      <tr><td><b>对照</b></td><td>只改一个因素</td><td>3D 叠两条流显示差值，仍是未登记观察</td></tr>
+      <tr><td><b>正式</b></td><td>冻结决策点 + 修补</td><td>进入研究记录，按预注册判据判定</td></tr>
+    </tbody></table><p class="note">需要桌面节点；网页版只能看已有结果。</p></details>
+  </div>
 
-    <div class="cpanel" data-p="lens">
-      <p class="note">每层先做最终归一化再接 unembedding，看资料色比常识色高多少。竖线跟随 3D 播放的当前层。这是读出近似，早层不可靠。</p>
-      <div class="chart" id="lensChart"></div>
-      <div class="grid3" style="margin-top:8px">
-        <div class="box"><h4>资料范围</h4><p class="note">第 25 层起明显上升，第 33 层最高 +13.8，第 36 层 +11.7。最终读出正确 <b id="fDoc"></b>。</p></div>
-        <div class="box"><h4>现实范围</h4><p class="note">第 24 层起持续下降，第 31 层最低 −10.5，第 36 层 −8.0。最终读出正确 <b id="fReal"></b>。</p></div>
-        <div class="box"><h4>分歧区间</h4><p class="note">两种范围在第 24–33 层分开。预注册的 R1 / R2 判据对噪声敏感，不可用。</p></div>
-      </div>
+  <div class="cpanel" data-p="lens">
+    <div class="chart" id="lensChart"></div>
+    <p class="note">第 24–33 层两种问法分开：按资料最终 +11.7（读对 <b id="fDoc"></b>），按现实 −8.0（读对 <b id="fReal"></b>）。</p>
+    <details><summary>怎么算的</summary><p class="note">每层先做最终归一化再接 unembedding，比较资料色与常识色的 logit。这是读出近似，早层不可靠；预注册的 R1 / R2 判据对噪声敏感，不可用。</p></details>
+  </div>
+
+  <div class="cpanel" data-p="factor">
+    <div id="factorRows"></div>
+    <p class="note">勾选决定 3D 里显示哪几条线。曲线是差异幅度，不是因果作用。</p>
+  </div>
+
+  <div class="cpanel" data-p="heads">
+    <div class="scroll"><table id="headTable"><thead><tr><th>头</th><th>按资料</th><th>按现实</th><th>状态</th></tr></thead><tbody></tbody></table></div>
+    <div class="row"><button class="btn" id="moreHeads">显示全部 12 个</button><span class="note">点一行跳到该层。因果要到 H4 干预。</span></div>
+  </div>
+
+  <div class="cpanel" data-p="method">
+    <div class="scroll"><table>
+      <thead><tr><th>方法</th><th>做法</th><th>成本</th><th>MA-H3</th></tr></thead>
+      <tbody>
+        <tr><td>act_diff</td><td>两种条件的激活差</td><td>低</td><td><span class="tag w">排名中</span></td></tr>
+        <tr><td>dla</td><td>直接写到答案 logit</td><td>低</td><td><span class="tag w">排名中</span></td></tr>
+        <tr><td>atp</td><td>一阶近似修补</td><td>中</td><td><span class="tag w">排名中</span></td></tr>
+        <tr><td>atp_ig</td><td>积分梯度修补</td><td>中高</td><td><span class="tag w">排名中</span></td></tr>
+        <tr><td>exact</td><td>逐组件真实修补</td><td>高</td><td><span class="tag w">排名中</span></td></tr>
+      </tbody></table></div>
+    <p class="note">结果出来后，各方法选出的组件在 3D 里描边显示。</p>
+  </div>
+
+  <div class="cpanel" data-p="tools">
+    <div class="tlist">
+      <button class="btn" disabled>响应点云</button><button class="btn" disabled>共享关系</button><button class="btn" disabled>语言项实测</button>
+      <button class="btn" disabled>数据集实测</button><button class="btn" disabled>这句反常</button><button class="btn" disabled>演示（教学）</button>
     </div>
-
-    <div class="cpanel" data-p="factor">
-      <p class="note">勾选的因素在 3D 中显示为彩线。曲线是该因素在答案位置各层的差异幅度（std_rms），不是因果作用。</p>
-      <div id="factorRows"></div>
-    </div>
-
-    <div class="cpanel" data-p="heads">
-      <p class="note">每个头在记录颜色的位置上的注意力（资料范围与现实范围各自平均）。点一行，3D 跳到该层并高亮该头。这是观察，因果要到 H4 的路径干预。</p>
-      <div class="scroll"><table id="headTable"><thead><tr><th>#</th><th>头</th><th>资料范围</th><th>现实范围</th><th>差值</th><th>状态</th></tr></thead><tbody></tbody></table></div>
-    </div>
-
-    <div class="cpanel" data-p="method">
-      <p class="note">同一批冻结任务上比较不同的找组件方法。只用 discovery 排序，确认后再打开 confirm。</p>
-      <div class="scroll"><table>
-        <thead><tr><th>方法</th><th>做法</th><th>成本</th><th>MA-H3</th></tr></thead>
-        <tbody>
-          <tr><td>act_diff</td><td>两种条件的激活差</td><td>低</td><td><span class="tag w">排名进行中</span></td></tr>
-          <tr><td>dla</td><td>组件对答案 logit 的直接写出</td><td>低</td><td><span class="tag w">排名进行中</span></td></tr>
-          <tr><td>atp</td><td>一阶近似的修补归因</td><td>中</td><td><span class="tag w">排名进行中</span></td></tr>
-          <tr><td>atp_ig</td><td>积分梯度版修补归因</td><td>中高</td><td><span class="tag w">排名进行中</span></td></tr>
-          <tr><td>exact</td><td>逐组件真实修补</td><td>高</td><td><span class="tag w">排名进行中</span></td></tr>
-        </tbody></table></div>
-      <p class="note" style="margin-top:6px">结果出来后，每种方法选出的组件在 3D 中用不同描边显示，可以直接看哪些层、哪些头被多种方法同时选中。保真度、脱靶与自然文本 KL 放在表格里。</p>
-    </div>
-
-    <div class="cpanel" data-p="tools">
-      <div class="grid3">
-        <div class="box"><h4>响应点云</h4><p class="note">选一层、一个读出位置，看样本按因素是否分开（二维）。</p><button class="btn" disabled>打开</button></div>
-        <div class="box"><h4>共享关系</h4><p class="note">一个方向是否跨因素、跨模式族共用。</p><button class="btn" disabled>打开</button></div>
-        <div class="box"><h4>语言项实测</h4><p class="note">从语言图谱选一项，看它在这个模型里有没有测试结果（原“语言实测”页）。</p><button class="btn" disabled>打开</button></div>
-        <div class="box"><h4>数据集实测</h4><p class="note">按冻结材料批量运行，结果进队列。</p><button class="btn" disabled>打开</button></div>
-        <div class="box"><h4>这句反常</h4><p class="note">把当前输入存成文法草稿，进入预注册流程（只存本机）。</p><button class="btn" disabled>打开</button></div>
-        <div class="box"><h4>演示 <span class="tag w">教学</span></h4><p class="note">三句话的归因示例，单独标注为教学内容。</p><button class="btn" disabled>打开</button></div>
-      </div>
-    </div>
-
   </div>
 </section>
 
-<section class="card">
-  <h3>和现在的页面怎样对应</h3>
-  <div class="scroll"><table class="map"><thead><tr><th>现在</th><th>v2 中的位置</th></tr></thead><tbody>
-    <tr><td>H2 结果卡、HiddenState 流带</td><td>合并成上面的 3D 空间 + 播放条</td></tr>
-    <tr><td>逐层读出图、注意力图</td><td>操作台「逐层读出」「注意力头」，与 3D 同步</td></tr>
-    <tr><td>因素证据表、生命周期</td><td>操作台「因素」</td></tr>
-    <tr><td>算法面板、同题比较</td><td>操作台「方法比较」</td></tr>
-    <tr><td>运行一段文字、三种运行说明</td><td>操作台「输入与运行」</td></tr>
-    <tr><td>响应点云、共享关系、语言实测、反常草稿、演示</td><td>操作台「工具」</td></tr>
+<details class="meta"><summary>方案说明（审阅用，正式页面不显示）</summary>
+  <p class="note">首屏只有 3D 空间和播放条；层详情点层板后出现；操作台默认收起，点按钮只展开一项；解释类文字放进“怎么算的”等折叠项。</p>
+  <div class="scroll"><table><thead><tr><th>现在</th><th>v2 中的位置</th></tr></thead><tbody>
+    <tr><td>H2 结果卡、HiddenState 流带</td><td>3D 空间 + 播放条</td></tr>
+    <tr><td>逐层读出图、注意力图</td><td>「逐层读出」「注意力头」，与 3D 同步</td></tr>
+    <tr><td>因素证据表、生命周期</td><td>「因素」</td></tr>
+    <tr><td>算法面板、同题比较</td><td>「方法比较」</td></tr>
+    <tr><td>运行一段文字、三种运行说明</td><td>「输入文字」</td></tr>
+    <tr><td>响应点云、共享关系、语言实测、反常草稿、演示</td><td>「更多工具」</td></tr>
   </tbody></table></div>
-  <h3 style="margin-top:12px">请确认</h3>
-  <ol class="note" style="margin:4px 0 0;padding-left:18px">
-    <li>3D 空间放在页面最上方、全宽，操作台在下面，可以吗？</li>
-    <li>MLP 半边目前没有本案例的数据，先灰显；以后接入 MLP 单元的选择性。</li>
-    <li>操作台六个页签的顺序和归类是否合适。</li>
-  </ol>
-</section>
+  <p class="note">MLP 半边本案例没有数据，先灰显。</p>
+</details>
 </main>
 
 <script>
@@ -344,7 +329,9 @@ cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, y
 cv.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
   st.yaw = drag.yaw + dx * 0.008; st.pitch = Math.max(-0.2, Math.min(1.45, drag.pitch + dy * 0.006)); draw(); });
 cv.addEventListener('pointerup', e => { const d = drag; drag = null; if (d && !d.moved) { const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-  for (let i = plates.length - 1; i >= 0; i--) if (inPoly(x, y, plates[i].poly)) { setLayer(plates[i].l); break; } } });
+  for (let i = plates.length - 1; i >= 0; i--) if (inPoly(x, y, plates[i].poly)) { setLayer(plates[i].l); openCard(); break; } } });
+function openCard() { $('card').classList.add('on'); $('hint').hidden = true; document.querySelector('.overlay').hidden = true; }
+document.getElementById('cardX').onclick = () => { $('card').classList.remove('on'); document.querySelector('.overlay').hidden = false; };
 
 /* ---------- 播放与同步 ---------- */
 const $ = id => document.getElementById(id);
@@ -352,7 +339,8 @@ function setLayer(l, keepPlay) { st.cur = Math.max(0, Math.min(36, l)); if (!kee
 function sync() {
   const ci = Math.round(st.cur);
   $('hL').textContent = `第 ${ci} 层`; $('hLsub').textContent = ci === 0 ? '词嵌入（只有词身份，基线）' : `第 ${ci} 块输出 · hs[${ci}]`;
-  $('plbl').textContent = `第 ${ci} 层 / 36`;
+  $('oL').textContent = ci === 0 ? '词嵌入' : `第 ${ci} 层`;
+  $('oR').textContent = `按资料 ${D.lensDoc[ci] > 0 ? '+' : ''}${D.lensDoc[ci].toFixed(1)} · 按现实 ${D.lensReal[ci] > 0 ? '+' : ''}${D.lensReal[ci].toFixed(1)}`;
   const sc = 14, mset = (bar, val, el, col) => { const v = Math.max(-sc, Math.min(sc, val)), w = Math.abs(v) / sc * 50;
     bar.style.left = (v >= 0 ? 50 : 50 - w) + '%'; bar.style.width = w + '%'; bar.style.background = col; el.textContent = (val > 0 ? '+' : '') + val.toFixed(1); };
   mset($('mDoc'), D.lensDoc[ci], $('vDoc'), 'var(--doc)'); mset($('mReal'), D.lensReal[ci], $('vReal'), 'var(--real)');
@@ -373,15 +361,19 @@ $('scrub').oninput = e => { stop(); st.cur = +e.target.value; sync(); };
 $('speed').onchange = e => st.speed = +e.target.value;
 document.querySelectorAll('[data-scope]').forEach(b => b.onclick = () => { st.scope = b.dataset.scope; document.querySelectorAll('[data-scope]').forEach(x => x.classList.toggle('on', x === b)); draw(); });
 const VIEWS = { iso: [-0.65, 0.42], side: [0, 0.05], top: [-0.4, 1.2] };
-document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { st.view = b.dataset.view; [st.yaw, st.pitch] = VIEWS[st.view];
-  document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b)); draw(); });
+const VNAME = { iso: '斜视', side: '侧视', top: '俯视当前层' }, VORDER = ['iso', 'side', 'top'];
+$('vbtn').onclick = () => { st.view = VORDER[(VORDER.indexOf(st.view) + 1) % 3]; [st.yaw, st.pitch] = VIEWS[st.view]; $('vbtn').textContent = '视角：' + VNAME[st.view]; draw(); };
 document.addEventListener('keydown', e => { if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (e.key === 'ArrowUp' || e.key === 'ArrowRight') setLayer(Math.round(st.cur) + 1); if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') setLayer(Math.round(st.cur) - 1);
   if (e.key === ' ') { e.preventDefault(); st.playing ? stop() : play(); } });
 
 /* ---------- 操作台 ---------- */
-document.querySelectorAll('.ctabs button').forEach(b => b.onclick = () => { document.querySelectorAll('.ctabs button').forEach(x => x.classList.toggle('on', x === b));
-  document.querySelectorAll('.cpanel').forEach(p => p.classList.toggle('on', p.dataset.p === b.dataset.tab)); drawLens(); });
+/* 操作台默认收起；点一个按钮只展开一项，再点同一个收起 */
+document.querySelectorAll('.tools button').forEach(b => b.onclick = () => {
+  const open = !b.classList.contains('on');
+  document.querySelectorAll('.tools button').forEach(x => x.classList.toggle('on', open && x === b));
+  document.querySelectorAll('.cpanel').forEach(p => p.classList.toggle('on', open && p.dataset.p === b.dataset.tab));
+  $('console').hidden = !open; drawLens(); });
 const MODE = ['一次前向：3D 显示这段文字的流', '再输入一段只改一个因素的文字：3D 叠两条流并显示差值', '选冻结材料与决策点：结果进队列，按判据判定'];
 document.querySelectorAll('#mode button').forEach(b => b.onclick = () => { document.querySelectorAll('#mode button').forEach(x => x.classList.toggle('on', x === b)); $('modeNote').textContent = MODE[b.dataset.m]; });
 $('modeNote').textContent = MODE[0];
@@ -406,11 +398,11 @@ function drawLens() {
 function spark(arr, col) { const w = 300, h = 28, mx = 0.75, p = arr.map((v, i) => (i ? 'L' : 'M') + (i / 36 * w).toFixed(1) + ',' + (h - 2 - v / mx * (h - 4)).toFixed(1)).join('');
   return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${p}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`; }
 $('factorRows').innerHTML = FAC.map(([k, n, col]) => { const a = D.factor[k], pk = a.indexOf(Math.max(...a));
-  return `<div class="frow"><label><input type="checkbox" data-f="${k}" checked> ${n}</label>${spark(a, col)}<span class="note">峰值第 ${pk} 层 ${a[pk].toFixed(2)}</span></div>`; }).join('') +
-  '<p class="note" style="margin-top:8px">每个因素的卡片（读得出、行为、改得动、负面结果）在点开后显示，内容沿用现在的因素证据表。</p>';
+  return `<div class="frow"><label><input type="checkbox" data-f="${k}" checked> ${n}</label>${spark(a, col)}<span class="note">峰值第 ${pk} 层 ${a[pk].toFixed(2)}</span></div>`; }).join('');
 document.querySelectorAll('[data-f]').forEach(c => c.onchange = () => { facOn[c.dataset.f] = c.checked; sync(); });
 const tb = document.querySelector('#headTable tbody');
-tb.innerHTML = topHeads.map((x, i) => `<tr data-i="${i}"><td>${i + 1}</td><td>L${x.l}H${x.h}</td><td>${x.d.toFixed(2)}</td><td>${x.r.toFixed(2)}</td><td>${(x.d - x.r).toFixed(2)}</td><td><span class="tag w">候选 · 未干预</span></td></tr>`).join('');
+tb.innerHTML = topHeads.map((x, i) => `<tr data-i="${i}"${i >= 5 ? ' hidden' : ''}><td>L${x.l}H${x.h}</td><td>${x.d.toFixed(2)}</td><td>${x.r.toFixed(2)}</td><td><span class="tag w">候选</span></td></tr>`).join('');
+$('moreHeads').onclick = e => { tb.querySelectorAll('tr').forEach(r => r.hidden = false); e.target.hidden = true; };
 tb.querySelectorAll('tr').forEach(tr => tr.onclick = () => { const x = topHeads[+tr.dataset.i]; st.selHead = x; tb.querySelectorAll('tr').forEach(r => r.classList.toggle('sel', r === tr)); setLayer(x.l + 1); });
 
 window.addEventListener('resize', resize); resize(); sync();
