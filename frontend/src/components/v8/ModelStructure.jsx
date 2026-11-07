@@ -55,7 +55,8 @@ function readSelection(view, paramTab) {
     return {...EMPTY,layer:(integer('tblock')??0)+1,module:head?'attn':'mlp',index:integer(head?'thead':'tunit')??0};
   }
   if (view === 'response' && integer('rlayer') != null) return {...EMPTY,layer:integer('rlayer')};
-  return EMPTY;
+  /* layer: undefined = 用户还没选过层；结构页据此默认打开最后一层（Phase 334）。点“返回全层”会显式设为 null */
+  return { ...EMPTY, layer: undefined };
 }
 
 function writeSelection(selection) {
@@ -300,7 +301,8 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   }, []);
 
   const layers = count(model?.n_layers);
-  const layer = numbered(selection.layer) && selection.layer <= layers ? selection.layer : null;
+  const layer = selection.layer === undefined && ['graph','parameters'].includes(view) && layers > 0 ? layers
+    : numbered(selection.layer) && selection.layer <= layers ? selection.layer : null;
   const arch = useApi(layer != null && model ? `/api/model/arch?model_key=${encodeURIComponent(model.model)}` : null, { online: true });
   const module = layer===0?'embedding':layer>0&&['attn','mlp'].includes(selection.module)?selection.module:'';
   const candidates = needLocalDimensions ? (localModels.data?.models || []).filter(({ config }) =>
