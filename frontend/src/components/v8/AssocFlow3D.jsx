@@ -76,29 +76,29 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
       if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
     };
     const headVal = (b, h) => (scope === 'doc' ? data.heads.doc[b][h] : scope === 'real' ? data.heads.real[b][h] : data.heads.doc[b][h] - data.heads.real[b][h]);
-    const mix = (c, e) => `rgb(${238 + (c[0] - 238) * e | 0},${242 + (c[1] - 242) * e | 0},${247 + (c[2] - 247) * e | 0})`;
+    const mix = (c, e) => `rgb(${203 + (c[0] - 203) * e | 0},${215 + (c[1] - 215) * e | 0},${232 + (c[2] - 232) * e | 0})`;  // 低值也有可见底色
     const colorFor = v => {
-      if (scope === 'diff') { const t = Math.max(-1, Math.min(1, v / hmax)); return mix(t >= 0 ? [31, 95, 191] : [235, 104, 52], Math.abs(t) ** 0.6); }
-      return mix([31, 95, 191], Math.max(0, Math.min(1, v / hmax)) ** 0.6);
+      if (scope === 'diff') { const t = Math.max(-1, Math.min(1, v / hmax)); return mix(t >= 0 ? [31, 95, 191] : [235, 104, 52], Math.abs(t) ** 0.5); }
+      return mix([22, 72, 160], Math.max(0, Math.min(1, v / hmax)) ** 0.5);
     };
     const headXZ = (h, dx = 0, dz = 0) => [-PW + 0.04 + (h & 7) * 0.115 + dx, -PD + 0.05 + (h >> 3) * 0.25 + dz];
     ctx.clearRect(0, 0, W, H);
     const plates = [];
     for (let l = 0; l < L; l++) {
       const y = LY(l), isCur = l === ci, active = l <= cur + 0.001;
-      ctx.globalAlpha = view === 'top' ? (isCur ? 1 : 0.1) : isCur ? 1 : active ? 0.62 : 0.16;
+      ctx.globalAlpha = view === 'top' ? (isCur ? 1 : 0.1) : isCur ? 1 : active ? 0.92 : 0.6;
       const c = [[-PW, -PD], [PW, -PD], [PW, PD], [-PW, PD]].map(([x, z]) => proj(x, y, z));
       plates.push({ l, poly: c });
-      quad(c, l === 0 ? '#e9edf3' : '#f8fafc', isCur ? '#d29a00' : '#c3cbd8', isCur ? 2 : 1);
-      if (l === 0) { ctx.fillStyle = '#68748a'; ctx.font = '11px sans-serif'; const p = proj(-PW, y, PD); ctx.fillText('词嵌入', p[0] - 44, p[1] + 4); }
+      quad(c, l === 0 ? '#dbe3ee' : '#eef2f7', isCur ? '#d29a00' : '#7b8aa3', isCur ? 2.5 : 1.2);
+      if (l === 0) { ctx.fillStyle = '#334155'; ctx.font = '12px sans-serif'; const p = proj(-PW, y, PD); ctx.fillText('词嵌入', p[0] - 44, p[1] + 4); }
       else {
         for (let h = 0; h < NH; h++) {
           const [x0, z0] = headXZ(h), hi = selHead && selHead.l === l - 1 && selHead.h === h;
           quad([[x0, z0], [x0 + 0.1, z0], [x0 + 0.1, z0 + 0.22], [x0, z0 + 0.22]].map(([a, b]) => proj(a, y, b)), colorFor(headVal(l - 1, h)), hi ? '#d29a00' : null, 2);
         }
-        quad([[0.04, -PD + 0.05], [PW - 0.04, -PD + 0.05], [PW - 0.04, PD - 0.05], [0.04, PD - 0.05]].map(([a, b]) => proj(a, y, b)), '#e4e7ec', null);
+        quad([[0.04, -PD + 0.05], [PW - 0.04, -PD + 0.05], [PW - 0.04, PD - 0.05], [0.04, PD - 0.05]].map(([a, b]) => proj(a, y, b)), '#b8c2d1', '#94a3b8', 1);
       }
-      if (l % 6 === 0 || isCur) { ctx.fillStyle = isCur ? '#b07d00' : '#8a95a8'; ctx.font = `${isCur ? 'bold ' : ''}11px sans-serif`; const p = proj(PW, y, -PD); ctx.fillText(`L${l}`, p[0] + 6, p[1] + 4); }
+      if (l % 6 === 0 || isCur) { ctx.fillStyle = isCur ? '#8a5a00' : '#475569'; ctx.font = `${isCur ? 'bold ' : ''}12px sans-serif`; const p = proj(PW, y, -PD); ctx.fillText(`L${l}`, p[0] + 6, p[1] + 4); }
     }
     platesRef.current = plates;
     ctx.globalAlpha = 1;
@@ -191,8 +191,8 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
       <select aria-label="播放速度" value={speed} onChange={e => setSpeed(Number(e.target.value))}><option value={4}>慢</option><option value={8}>中</option><option value={16}>快</option></select>
     </div>
     <div className="af-legend v8-note">
-      <span><i style={{ background: 'linear-gradient(90deg,#eef3fa,#7aa6e0,#1f5fbf)' }} />头越蓝，越看资料里的颜色</span>
-      <span><i style={{ background: '#e4e7ec' }} />MLP（本案例未分析）</span>
+      <span><i style={{ background: 'linear-gradient(90deg,#cbd7e8,#6f95cf,#1648a0)' }} />头越蓝，越看资料里的颜色</span>
+      <span><i style={{ background: '#b8c2d1' }} />MLP（本案例未分析）</span>
       <span><i style={{ background: '#172033', height: 3 }} />HiddenState</span>
       {live?.curve && <span><i style={{ background: '#d29a00', borderRadius: '50%', width: 10, height: 10 }} />本次输入每层改写幅度</span>}
       <span><i style={{ background: 'linear-gradient(90deg,#7050a0,#087b70,#b07d00,#c0392b,#4a7fd0)', height: 3 }} />各因素（离中线越远差异越大）</span>

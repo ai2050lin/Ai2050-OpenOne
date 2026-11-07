@@ -21,7 +21,7 @@ function Spark({ values, color }) {
 }
 
 export default function AssocSpace({ model, children }) {
-  const [cur, setCur] = useState(0);
+  const [cur, setCur] = useState(36);   // 默认显示完整的流；点播放从词嵌入开始
   const [mode, setMode] = useState('flow');
   const [live, setLive] = useState(null);
   const [facOn, setFacOn] = useState(() => Object.fromEntries(FLOW_DATA.factors.map(([k]) => [k, true])));
