@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全站精简方案</title>
+<style>
+:root{--bg:#f4f6f9;--panel:#fff;--soft:#f8fafc;--ink:#172033;--text:#3e4b60;--muted:#68748a;--line:#e2e7ef;--line2:#cbd5e2;--blue:#245ca8;--blue2:#183f77;--bluebg:#edf4fd;--green:#2f8f5b;--greenbg:#eaf6ef;--amber:#b07d00;--amberbg:#fff6e8;--red:#a33e43;--gray:#c3cbd8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}h1,h2,h3,h4,p{margin:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.top b{font-size:15px}.note{color:var(--muted);font-size:12px}
+.bar{background:#fff8e9;border-bottom:1px solid #eeddb9;color:#6d4c14;padding:6px 20px;font-size:12px;text-align:center}
+.shell{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:calc(100vh - 80px)}
+.nav{background:#fff;border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+.nav h4{font-size:11px;color:var(--muted);margin:10px 8px 4px;font-weight:600}
+.nav button{border:0;background:none;text-align:left;padding:6px 10px;border-radius:8px;font-size:13px;color:var(--text)}
+.nav button.on{background:var(--bluebg);color:var(--blue2);font-weight:600}
+.nav button small{color:var(--muted);font-weight:400}
+.main{padding:18px 22px 60px;display:flex;flex-direction:column;gap:12px;min-width:0;max-width:1180px}
+.crumb{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.crumb h2{font-size:18px}
+.core{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-width:0}
+.q{font-size:15px;font-weight:600;margin-bottom:12px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pills button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px;font-size:13px;color:var(--text)}
+.pills button.on{background:var(--blue2);border-color:var(--blue2);color:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--text)}
+.panel .tag{margin-left:6px}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--bluebg);color:var(--blue2)}
+.tag.w{background:var(--amberbg);color:#8a5010}.tag.g{background:var(--greenbg);color:var(--green)}
+.btn{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:6px 14px;font-size:13px}
+.btn.pri{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.center{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.trio{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center}
+.trio .arrow{color:var(--gray);font-size:22px}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:12px;border:1px solid transparent;background:none}
+.node:hover{border-color:var(--line);background:var(--soft)}
+.node b{font-size:15px}
+.ring text{font-weight:700}
+.waffle{display:grid;grid-template-columns:repeat(32,1fr);gap:3px;max-width:640px;margin:0 auto}
+.waffle i{aspect-ratio:1;border-radius:3px;display:block}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;gap:5px;align-items:center}.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.search{display:flex;gap:8px;max-width:640px;margin:0 auto 14px}.search input{flex:1;border:1px solid var(--line2);border-radius:8px;padding:7px 10px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.steps span{min-width:42px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);font-size:12px;text-align:center}
+.steps .done{background:var(--blue2);color:#fff;border-color:var(--blue2)}.steps .now{border:2px solid var(--blue2);color:var(--blue2);font-weight:600}
+.mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px;width:100%}
+.mini div{border-top:1px solid var(--line);padding-top:8px;text-align:left}.mini b{font-size:16px}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:relative}
+.pipe .st{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.gates{display:grid;gap:10px;max-width:720px;margin:0 auto}
+.gate{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center}
+.gate i{display:block;height:14px;background:#eef1f5;border-radius:7px;position:relative;overflow:hidden}.gate i b{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+.tower{display:block;margin:0 auto;max-width:100%}
+.status{display:flex;gap:16px;align-items:center;max-width:620px;margin:0 auto}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px var(--greenbg);flex:none}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pair div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap}.subtabs span{font-size:12px;padding:3px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--muted)}.subtabs span.on{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+details.meta{background:#fff;border:1px dashed var(--line2);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--text)}
+details.meta summary{cursor:pointer;color:var(--muted)}
+details.meta ul{margin:6px 0 0;padding-left:18px}
+.demo{font-size:11px;color:#8a5010;background:var(--amberbg);padding:1px 6px;border-radius:6px}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}.nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px 16px}.nav h4{display:none}.nav button{white-space:nowrap}
+  .main{padding:14px 16px 40px}.top,.bar{padding-left:16px;padding-right:16px}
+  .trio{grid-template-columns:1fr}.trio .arrow{transform:rotate(90deg);text-align:center}
+  .waffle{grid-template-columns:repeat(16,1fr)}.mini,.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}.pair{grid-template-columns:1fr}
+  .gate{grid-template-columns:70px 1fr 54px}
+}
+</style>
+</head>
+<body>
+<header class="top"><b>研究工作台 · 全站精简方案</b><small class="note">每页一个核心模块，细节点按钮后再出现</small></header>
+<div class="bar">方案草图 · 数字取自 2026-11-07 本机中心的实际页面；标“示意”的图形只表示版式</div>
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="页面"></nav>
+  <main class="main" id="main"></main>
+</div>
+<script>
+/* 环形进度 */
+function ring(p, label, size = 120, color = '#183f77') {
+  const r = size / 2 - 9, c = 2 * Math.PI * r, v = Math.max(0, Math.min(1, p));
+  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${label}">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#eef1f5" stroke-width="10"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
+      stroke-dasharray="${(c*v).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${size/2} ${size/2})"/>
+    <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" font-size="${size/5.2}" fill="#172033">${label}</text></svg>`;
+}
+const gate = (name, n, d, col) => `<div class="gate"><span>${name}</span><i><b style="width:${n/d*100}%;background:${col}"></b></i><span class="note">${n} / ${d}</span></div>`;
+function tower() { let s = '<svg class="tower" width="420" height="300" viewBox="0 0 420 300" role="img" aria-label="层塔示意">';
+  for (let l = 0; l < 37; l++) { const y = 270 - l * 6.6, cur = l === 24;
+    s += `<polygon points="${110},${y} ${250},${y-26} ${330},${y} ${190},${y+26}" fill="${cur ? '#edf4fd' : '#f8fafc'}" stroke="${cur ? '#d29a00' : '#c3cbd8'}" stroke-width="${cur ? 2 : 1}" opacity="${cur ? 1 : .75}"/>`; }
+  return s + '<text x="340" y="112" font-size="11" fill="#b07d00">B23</text></svg>'; }
+const waffle = () => { let s = '<div class="waffle" role="img" aria-label="128 条规则：31 条成立，94 条未成立，3 条待定">';
+  for (let i = 0; i < 128; i++) s += `<i style="background:${i < 31 ? '#2f8f5b' : i < 125 ? '#c3cbd8' : '#b07d00'}"></i>`; return s + '</div>'; };
+
+/* 每页：核心模块 + 收起的按钮。before = 现在首屏的模块数 */
+const PAGES = [
+ { g: '进展', id: 'overview', name: '总览', before: 5, core: `
+   <p class="q">我们在破解什么：语言能力在模型里怎样编码</p>
+   <div class="trio">
+     <button class="node">${ring(.1304, '13%')}<b>语言图谱</b><span class="note">9 / 69 项有材料</span></button><span class="arrow">→</span>
+     <button class="node">${ring(0, '0 / 4', 120, '#2a78d6')}<b>关联机制</b><span class="note">四组成绩已测</span></button><span class="arrow">←</span>
+     <button class="node">${ring(.0008, '0.08%')}<b>LLM 编码图谱</b><span class="note">265 / 350,208 个对象</span></button></div>
+   <p class="hint">点任一个圆进入对应的空间页</p>`,
+   pills: [['一个决策点案例', '“按资料还是按现实回答颜色”：资料范围第 25 层起偏向资料色，现实范围第 24 层起偏离（MA-H2）。'], ['四组成绩', '保真度、因果、推广、成本四组，0 / 4 已测。'], ['最近的发现', '7 条，按时间倒序，点开回到证据。'], ['下一步', 'H3：同题比较五种找组件方法（排名进行中）。']] },
+ { g: '进展', id: 'rules', name: '成果与证据', before: 6, core: `
+   <p class="q">已登记 128 条规则，成立和未成立放在一起</p>
+   <div class="search"><input placeholder="输入实验、关键词或规则编号查重"><button class="btn pri">查重</button></div>${waffle()}
+   <div class="legend"><span><i style="background:#2f8f5b"></i>成立 31</span><span><i style="background:#c3cbd8"></i>未成立 94</span><span><i style="background:#b07d00"></i>待定 3</span></div>
+   <p class="hint">点一个方块看这条规则的证据与反例</p>`,
+   pills: [['筛选', '对象：神经元 26 · 注意力 29 · 方法与测量 73；因素：语言 2 · 风格 1 · 逻辑 10 · 语法 4 · 知识与绑定 9（按关键词归入，未经人工审定）。'], ['核对口径', '模型、数据与实验口径。'], ['未决与待验证', '3 条。'], ['原始报告与版本记录', '按 Phase 与运行 ID 回查。']] },
+ { g: '空间 · LLM 编码图谱', id: 'enc', name: '结构与参数', before: 4, core: `
+   <div class="subtabs"><span class="on">结构与参数</span><span>全部研发成果</span></div>
+   <p class="q" style="margin-top:10px">模型里有什么：词嵌入、36 层的注意力头和 MLP 单元</p>${tower()}
+   <p class="hint">沿用现有 3D 层塔 · 点一层，右侧弹出该层的 Head 与 MLP</p>`,
+   pills: [['证据阶梯', '词嵌入 151,936 行 · 注意力头 1,152 个 · MLP 单元 350,208 个，按已检查 → 读得出 → 改得动 → 能预测记录。'], ['二维列表', '逐层表格，键盘可用。'], ['特征基底对比', '神经元原子与字典特征的对比（Phase 262）。']] },
+ { g: '空间 · 关联机制', id: 'live', name: '运行与路径', before: 1, done: true, core: `
+   <p class="q">已按此规则改完（Phase 332）</p><p class="note">首屏是全部层的 3D HiddenState 流，下面一排按钮：输入文字、逐层读出、因素、注意力头、方法比较、更多工具。</p>`, pills: [] },
+ { g: '空间 · 关联机制', id: 'response', name: '响应对照', before: 9, core: `
+   <p class="q">只改一处，看内部哪里变了</p>
+   <div class="pair"><div><span class="note">句子 A</span><p>我想吃，火是热的。</p></div><div><span class="note">句子 B</span><p>我想吃，火是热的吗？</p></div></div>
+   <svg viewBox="0 0 640 120" width="100%" role="img" aria-label="逐层差异示意" style="margin-top:12px">${Array.from({ length: 37 }, (_, i) => { const h = 12 + 80 * Math.exp(-((i - 26) ** 2) / 60); return `<rect x="${12 + i * 16.8}" y="${104 - h}" width="12" height="${h}" rx="3" fill="#7aa6e0"/>`; }).join('')}</svg>
+   <p class="hint"><span class="demo">示意</span> 真实页面画当前数据的逐层差异 · 点一层看哪些 Head / MLP 变化最大</p>`,
+   pills: [['三种运行的区别', '观察 / 对照 / 正式。'], ['当前数据', '所选样本的原始读数。'], ['模板响应汇总与历史对照', ''], ['语言目录映射', ''], ['保真看板', ''], ['方法基准', '自建，Phase 315、316。'], ['公开基准', '']] },
+ { g: '空间 · 关联机制', id: 'langm', name: '语言项实测', before: 5, core: `
+   <p class="q">一个语言项在模型里有没有测试结果</p>
+   <div class="steps"><span class="now">① 选数据集</span><span>② 选类型与样本量</span><span>③ 结果与普遍规律</span></div>
+   <div class="search" style="margin-top:14px"><select style="flex:1;border:1px solid var(--line2);border-radius:8px;padding:7px"><option>选择数据集…</option></select><button class="btn pri">下一步</button></div>
+   <p class="hint">一次只显示一步，做完一步再出现下一步</p>`,
+   pills: [['类型 ↔ 科目映射', '显式表，可审阅。']] },
+ { g: '空间 · 关联机制', id: 'rel', name: '共享关系', before: 1, core: `
+   <p class="q">保持：页面本身就是一张关系图</p><p class="note">只把图外的说明文字收进右上角“?”。</p>`, pills: [] },
+ { g: '空间 · 语言图谱', id: 'lang', name: '语言图谱', before: 2, core: `
+   <div class="subtabs"><span class="on">词汇关系环图</span><span>关系种子</span><span>语言目录</span></div>
+   <p class="q" style="margin-top:10px">保持词汇关系环图为核心</p><p class="note">顶部两段说明文字收进“?”，首屏只留环图。</p>`, pills: [['这一页是什么', '外部能力框架，只描述语言本身，不含模型信息。']] },
+ { g: '研发', id: 'plan', name: '当前研发', before: 9, core: `
+   <div class="center"><p class="q">主线走到哪里</p>${ring(.38, '38%', 150)}
+   <div class="steps"><span class="done">H0</span><span class="done">H1</span><span class="done">H2</span><span class="now">H3</span><span>H4</span><span>H5</span><span>H6</span><span>H7</span></div>
+   <p class="note">3 / 8 阶段完成 · 下一步：H3 方法比较（排名进行中）</p><button class="btn pri">一键参与</button>
+   <div class="mini"><div><span class="note">语言图谱</span><br><b>13%</b></div><div><span class="note">LLM 编码图谱</span><br><b>0.08%</b></div><div><span class="note">关联机制</span><br><b>0 / 4</b></div><div><span class="note">神经元普查</span><br><b>0 / 16 分片</b></div></div></div>`,
+   pills: [['作业明细', '1 项。'], ['本周期切片', '0 / 5。'], ['主张卡草稿', 'H0 模板。'], ['当前主张和否定条件', ''], ['不贡献算力也能参与', ''], ['研究缺口与自动解释', ''], ['研究工作包', '32 个。']] },
+ { g: '研发', id: 'catalog', name: '材料与数据', before: 5, core: `
+   <p class="q">主线材料准备到哪里</p>
+   <div class="pipe">
+     <div class="st">${ring(.13, '13%', 100)}<b>语言目录</b><span class="note">9 / 69 项</span></div>
+     <div class="st">${ring(0, '0%', 100)}<b>竞争对材料</b><span class="note">0 / 6 组</span></div>
+     <div class="st">${ring(1, '100%', 100, '#2f8f5b')}<b>三个划分</b><span class="note">3 / 3 份</span></div>
+     <div class="st">${ring(0, '未建', 100)}<b>决策点库</b><span class="note">目标数量在 H1 按功效确定</span></div></div>
+   <p class="hint">左到右是材料流向；点一个圆看它的来源与明细</p>`,
+   pills: [['冻结向导（H1）', '功效三栏。'], ['锁箱看管', ''], ['竞争对明细', '6 组。'], ['全部材料', '搜索与来源。']] },
+ { g: '研发', id: 'exec', name: '实验与队列', before: 5, core: `
+   <p class="q">已完成的研究运行走到哪一关</p>
+   <div class="gates">${gate('运行执行', 7, 7, '#183f77')}${gate('软件校验', 7, 7, '#245ca8')}${gate('科学证据', 0, 7, '#2f8f5b')}${gate('独立复算', 0, 7, '#2f8f5b')}</div>
+   <p class="hint">四关分开算，软件校验通过不等于科学证据成立 · 点一关看是哪几次运行</p>`,
+   pills: [['任务队列', '神经元普查 0 / 18 · 主线 H0–H7 3 / 8。'], ['逐项查看研究运行', 'MB-v1、SP-v1、MA-H0-v3/v4/v5、MA-H1、MA-H2。'], ['节点任务、待审与回执', ''], ['AI 研究循环', '']] },
+ { g: '配置', id: 'config', name: '连接与诊断', before: 3, core: `
+   <div class="subtabs"><span class="on">连接与诊断</span><span>账号与权限</span><span>本机算力</span><span>模型与 AI</span></div>
+   <div class="status" style="margin-top:18px"><span class="dot"></span><div><p class="q" style="margin:0">已连接 · http://localhost:5010</p><p class="note">网页版（与中心同源托管）· 只读数据包 · 研究工位只读</p></div></div>
+   <p class="hint">一切正常时只显示这一行；连接失败时这里直接给原因和修复按钮</p>`,
+   pills: [['诊断详情', '中心地址、运行形态、连接状态、数据模式、本机算力、计量数据。'], ['高级与兼容工具', '']] },
+];
+
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+let cur = 'overview';
+function renderNav() { let g = '', s = '';
+  PAGES.forEach(p => { if (p.g !== g) { g = p.g; s += `<h4>${g}</h4>`; } s += `<button data-id="${p.id}" class="${p.id === cur ? 'on' : ''}">${p.name}${p.done ? ' <small>已改</small>' : ''}</button>`; });
+  nav.innerHTML = s; nav.querySelectorAll('button').forEach(b => b.onclick = () => { cur = b.dataset.id; render(); }); }
+function render() {
+  renderNav(); const p = PAGES.find(x => x.id === cur);
+  main.innerHTML = `<div class="crumb"><span class="note">${p.g}</span><h2>${p.name}</h2></div>
+    <section class="core" aria-label="核心模块">${p.core}</section>
+    ${p.pills.length ? `<nav class="pills" aria-label="更多">${p.pills.map((x, i) => `<button data-i="${i}">${x[0]}</button>`).join('')}</nav><section class="panel" id="panel" hidden></section>` : ''}
+    <details class="meta"><summary>审阅用：这页改了什么</summary><ul>
+      <li>现在首屏约 ${p.before} 个模块 → 精简后首屏 1 个核心模块${p.pills.length ? `，其余 ${p.pills.length} 项收进按钮` : ''}。</li>
+      <li>按钮默认收起；点一个只展开一项，再点同一个收起。</li><li>功能和数据来源都不变，只改摆放与显示时机。</li></ul></details>`;
+  main.querySelectorAll('.pills button').forEach(b => b.onclick = () => {
+    const open = !b.classList.contains('on'), panel = document.getElementById('panel'), x = p.pills[+b.dataset.i];
+    main.querySelectorAll('.pills button').forEach(o => o.classList.toggle('on', open && o === b));
+    panel.hidden = !open; panel.innerHTML = `<b>${x[0]}</b><p class="note" style="margin-top:4px">${x[1] || '沿用现有模块的内容。'}</p>`; });
+}
+render();
+</script>
+</body>
+</html>
