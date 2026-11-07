@@ -1,0 +1,60 @@
+{
+ "id": "MA-H3-v3",
+ "revision_note": "v1（sha256 c2c35194…）只在问题里放范围词，答案前缀为“X是”；discovery 现实范围准确率 0.14，16 个现实格全部未过，按预注册无法组成成对材料。v2（951c5a1b…）在答案前缀里也放范围词，现实范围准确率 0.30，仍全部未过。v3 在两种范围的问题与答案前缀里都加“通常”（等长、末 token 相同），其余不变",
+ "question_v1": {
+  "doc": "问：在这份资料里，{X}是什么颜色的？\n答：{X}是",
+  "real": "问：在现实世界里，{X}是什么颜色的？\n答：{X}是"
+ },
+ "question_v2": {
+  "doc": "问：在这份资料里，{X}是什么颜色的？\n答：在这份资料里，{X}是",
+  "real": "问：在现实世界里，{X}是什么颜色的？\n答：在现实世界里，{X}是"
+ },
+ "schema": "mainline_prereg.v1",
+ "created": "2026-11-07",
+ "stage": "H3",
+ "basis": "Phase 324（MA-H2）：答案前缀混淆、候选读颜色头；MB-v1 的定位方法与引擎",
+ "question": {
+  "doc": "问：在这份资料里，{X}通常是什么颜色的？\n答：在这份资料里，{X}通常是",
+  "real": "问：在现实世界里，{X}通常是什么颜色的？\n答：在现实世界里，{X}通常是"
+ },
+ "materials": "MA-H1 的实体与划分不变；discovery 按 sha256(MA-H3|id) 在每类内对半分为 fit / eval；confirm 在冻结后开封一次",
+ "methods": [
+  "act_diff",
+  "dla",
+  "atp",
+  "atp_ig",
+  "exact"
+ ],
+ "budgets": [
+  0.001,
+  0.002,
+  0.005,
+  0.01,
+  0.02,
+  0.05,
+  0.1,
+  0.2,
+  0.5,
+  1.0
+ ],
+ "criteria": {
+  "gate_cell_acc": 0.8,
+  "gate_rule": "问法 v2 在 discovery 上逐格强制选择准确率；未过的格与 MA-H1 排除的两格一起排除，成对材料只用两种范围都可用的格",
+  "pair_gate": "MB-v1 行为门：干净句 m > 0 的比例 ≥ 0.8，且干净与反事实的平均 m 相差 ≥ 1 nat",
+  "n_fit": 256,
+  "n_evalfit": 320,
+  "batch": 8,
+  "method_rule": "在 discovery-eval 半上，cf 保留曲线的 auc_f 最高的方法；并列取 auc_f 区间下界更高者",
+  "budget_rule": "所选方法在 discovery-eval 半上平均 f ≥ 0.8 的最小预算；没有则取 10%，并记“未达 0.8”",
+  "confirm_predictions": {
+   "P1_sufficiency": "只保留 C（其余换成现实范围的激活）时 f(C) ≥ 0.7，且比同预算的 3 组随机集合与 3 组分层匹配随机集合中最高者高 ≥ 0.3，实体 bootstrap 95% 区间下界 > 0",
+   "P2_necessity": "只把 C 换成现实范围的激活时，资料范围相对现实范围的差距保留比例 f_remove ≤ 0.5",
+   "P3_replication": "|f_confirm(C) − f_disc_eval(C)| ≤ 0.15"
+  },
+  "multiple_comparison": "P1–P3 用 Holm 校正时按三项通过 / 未通过计；P1 的区间按 Holm 调整后的水平 α/3 报告",
+  "residual": "未解释部分 = 1 − f(C)，按记录形式、目标位置、k、草稿拆分报告",
+  "dictionary": "字典方法只在第 30 块有 transcoder，不能与全模型组件同题比较，本阶段不纳入，记为“未纳入”",
+  "bootstrap": 2000
+ },
+ "h1_power": "MA-H1 的 T1–T3 针对 H4 / H5 的配对二值检验；本阶段的 f 曲线不是 McNemar 口径，按 MB-v1 的实体 bootstrap 报告区间"
+}
