@@ -221,7 +221,7 @@ export default function Workbench() {
           {/* 「问 AI」侧栏：只在桌面客户端（Key 在主进程）；网页版不显示 */}
           {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => set({ lens: 'config', csec: 'model' })} /></Suspense>}
         </div>
-        {helpOpen && <WorkbenchHelp lens={lens} onClose={() => setHelpOpen(false)} />}
+        {helpOpen && <WorkbenchHelp base={lens==='route'?`route/${rtab==='neuron'?'overview':rtab}`:lens==='spatial'?`spatial/${smode}`:lens==='process'?`process/${station}`:`config/${csec}`} onClose={() => setHelpOpen(false)} />}
         {st.importing&&<ImportDataDialog onClose={()=>set({importing:false})}/>}
       </div>
     </div>
