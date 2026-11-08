@@ -1,6 +1,6 @@
 /* 页面公用部件（Phase 333 / 334，AGENTS.md 第 10 节“设计风格”）。
    Phase 334 按线上版（server.ai2050.com）的结构调整：页面标题 + 卡片式核心模块 + 左对齐的折叠行。 */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './core_kit.css';
 
@@ -30,10 +30,25 @@ export function GateBar({ name, n, d, color = '#183f77', onClick }) {
   return onClick ? <button type="button" className="ck-gate" onClick={onClick}>{body}</button> : <div className="ck-gate">{body}</div>;
 }
 
-/* 页面标题：与线上版一致的 h2 + 一句说明；右侧可放范围或操作 */
+/* 页面标题：只显示标题；说明收进右上角的“说明”弹窗，保持页面简洁（Phase 338） */
 export function PageHead({ title, sub, note, children, id }) {
-  return <header className="v8-overview-heading ck-head"><div>
-    <h2 id={id}>{title}</h2>{sub && <p>{sub}</p>}{note && <p className="v8-note">{note}</p>}</div>{children}</header>;
+  const [open, setOpen] = useState(false);
+  const box = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = event => { if (event.key === 'Escape' || (event.type === 'mousedown' && !box.current?.contains(event.target))) setOpen(false); };
+    document.addEventListener('keydown', close); document.addEventListener('mousedown', close);
+    return () => { document.removeEventListener('keydown', close); document.removeEventListener('mousedown', close); };
+  }, [open]);
+  return <header className="v8-overview-heading ck-head">
+    <h2 id={id}>{title}</h2>
+    <div className="ck-head-right">{children}
+      {(sub || note) && <div className="ck-info" ref={box}>
+        <button type="button" className="ck-info-btn" aria-expanded={open} aria-label={`${title}说明`} onClick={() => setOpen(o => !o)}>说明</button>
+        {open && <div className="ck-info-pop" role="dialog" aria-label={`${title}说明`}>{sub && <p>{sub}</p>}{note && <p className="v8-note">{note}</p>}</div>}
+      </div>}
+    </div>
+  </header>;
 }
 
 /* 核心模块的外框：卡片，左上角一个小标题 */
@@ -65,10 +80,8 @@ export const FoldList = PillTools;
 
 /* 页内三级页签：全站同一种样式（下划线）。items = [[id, label, desc]]；选中项的说明显示在页签下面 */
 export function PageTabs({ items, value, onChange, label }) {
-  const cur = items.find(item => item[0] === value);
   return <div className="ck-tabs-wrap">
     <div className="ck-tabs" role="tablist" aria-label={label}>{items.map(([id, name]) =>
-      <button type="button" role="tab" key={id} aria-selected={value === id} aria-pressed={value === id} onClick={() => onChange(id)}>{name}</button>)}</div>
-    {cur?.[2] && <p className="v8-note ck-tabs-desc">{cur[2]}</p>}
+      <button type="button" role="tab" key={id} title={items.find(item => item[0] === id)?.[2]} aria-selected={value === id} aria-pressed={value === id} onClick={() => onChange(id)}>{name}</button>)}</div>
   </div>;
 }

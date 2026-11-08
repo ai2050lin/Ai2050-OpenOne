@@ -157,7 +157,7 @@ export default function Workbench() {
     <div className="fw-root wb-root" data-client-mode={clientMode}>
       <header className="wb-top">
         <a className="wb-brand" href={window.location.protocol === 'file:' ? window.location.pathname : '/'}><span className="op-logo" aria-hidden="true">A2</span><span><b>研究工作台</b><small>返回首页</small></span></a>
-        <span className="wb-lens-title">{lensLabel}<small>{lenses.find(l => l.id === lens)?.desc}</small></span>
+        <span className="wb-lens-title" title={lenses.find(l => l.id === lens)?.desc}>{lensLabel}</span>
         <div className="wb-top-right">
           <div className="wb-mode" role="group" aria-label="显示模式">{[['simple','简明'],['pro','专业']].map(([id,label])=><button type="button" key={id} aria-pressed={clientMode===id} onClick={()=>setClientMode(id)}>{label}</button>)}</div>
           <button type="button" className="fw-tbtn" onClick={()=>set({lens:'config',csec:'node'})}>贡献算力</button>
