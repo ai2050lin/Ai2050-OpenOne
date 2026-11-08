@@ -192,7 +192,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const [view, setView] = useState('iso');
   const [max, setMax] = useState(false);
   const [pop, setPop] = useState(null);
-  const [opt, setOpt] = useState({ hsNorm: 'global', hsClip: 0.99, mlpClip: 0.99, headTarget: 'follow', headMax: 0.5, diffAlign: 'named', speed: 200 });
+  const [opt, setOpt] = useState({ hsNorm: 'global', hsClip: 0.99, mlpClip: 0.99, headTarget: 'follow', headMax: 0.5, diffAlign: 'named' });
   const [hide, setHide] = useState(() => new Set());
   const [listed, setListed] = useState(() => new Set(['hs', 'mlp', 'heads', 'delta', 'diff', 'lens']));
   const [openOpt, setOpenOpt] = useState(() => new Set(['hs']));
@@ -201,7 +201,6 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const [float, setFloat] = useState({ x: 16, y: 96 });
   const [text, setText] = useState('');
   const [gen, setGen] = useState({ busy: false, res: null, err: '' });
-  const [playing, setPlaying] = useState(false);
   const skel = useApi('/api/model/skeleton');
   const models = (skel.data?.models || []).filter(m => Number.isInteger(m.n_layers));
 
@@ -274,7 +273,6 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const toggle = id => setOn(s => { const n = new Set(s); if (n.has(id)) n.delete(id); else { n.add(id); setTab(id); if (MODE_IDS.has(id)) onMode(id); } return n; });
 
   /* 逐层播放 */
-  useEffect(() => { if (!playing) return undefined; if (layer >= NL - 1) { setPlaying(false); return undefined; } const t = setTimeout(() => setLayer(l => l + 1), opt.speed); return () => clearTimeout(t); }, [playing, layer, NL, opt.speed]);
   useEffect(() => { const k = e => { if (e.key === 'Escape') setMax(false); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, []);
 
   async function generate() {
@@ -328,7 +326,6 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
       <div className="aw-r"><span>token</span><select value={pos} onChange={e => setPos(+e.target.value)}>{positions.map((p, i) => <option key={p} value={i}>{POSN[p] || p}{k ? `（${k.tokpos[i]}）` : ''}</option>)}</select></div>
       <div className="aw-r"><span>层</span><span className="aw-row"><input type="range" min="0" max={NL - 1} value={layer} onChange={e => setLayer(+e.target.value)} /><b>{layer}</b></span></div>
       <div className="aw-r"><span>视角</span><span className="aw-seg">{VORDER.map(v => <button type="button" key={v} aria-pressed={view === v} onClick={() => setView(v)}>{VIEWS[v][2]}</button>)}</span></div>
-      <div className="aw-r"><span>播放速度</span><Sel o="speed" items={[['400', '慢'], ['200', '中'], ['80', '快']]} num /></div>
       <div className="aw-r"><span>数据</span><span className="v8-note">{native ? 'MA-H2 discovery 冻结样本 · 原生 float16 · 节点本地' : '案例汇总（MA-H2，2,520 条）'}</span></div>
       <h4>插件</h4>
       {ALL.filter(p => listed.has(p.id)).map(p => { const en = on.has(p.id), dis = p.native && !native, vis = en && !hide.has(p.id);
@@ -407,8 +404,6 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
         <b>{shortModel(m.model)}</b><small>{m.n_layers} 层{m.d_ff ? ` · MLP ${m.d_ff}` : ''}</small><span className={isMain && native ? 'ok' : 'warn'}>{isMain ? (native ? '冻结样本 · 原生数据' : '案例汇总') : '暂无冻结样本'}</span></button>; })}</div>
     <section className={`aw-space${max ? ' max' : ''}`}>
       <Scene dims={{ NL, describe }} objs={objs} layer={layer} view={view} tex={TX} marks={marks} onPick={onPick} overlays={overlays} live={gen.res} />
-      <div className="aw-ov tl"><button type="button" onClick={() => setView(VORDER[(VORDER.indexOf(view) + 1) % 3])}>视角：{VIEWS[view][2]}</button>
-        <button type="button" onClick={() => { if (playing) setPlaying(false); else { setLayer(0); setPlaying(true); } }}>{playing ? '❚❚ 暂停' : '▶ 逐层运行'}</button></div>
       <div className="aw-ov tr"><button type="button" onClick={() => { setMax(m => !m); setPop(null); }}>{max ? '退出全屏（Esc）' : '⛶ 全屏'}</button></div>
       <div className="aw-big"><b>{layer ? `第 ${layer} 层` : '词嵌入'}</b><span className="v8-note">{POSN[positions[pos]] || ''}{k ? `（token ${k.tokpos[pos]}）· ‖h‖ ${norm(sa.hs(pos, layer)).toFixed(1)}` : ''}</span></div>
       <div className="aw-legend v8-note"><span><i style={{ background: '#e5def3' }} />注意力</span><span><i style={{ background: '#dcefe4' }} />MLP</span><span><i style={{ background: '#172033' }} />残差主干</span>
@@ -420,9 +415,15 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     </section>
     <section className="v8-card aw-cons" aria-label="控制台">
       <div className="aw-chead"><h3>控制台</h3><span className="v8-note">输入一段文本，看模型逐层怎样运行；用插件观察和研究</span></div>
-      <div className="aw-cin"><div><textarea value={text} onChange={e => setText(e.target.value)} placeholder="输入一段文字，点“生成”后模型做一次前向，3D 主干上叠加本次每层的改写幅度（需要桌面节点或本机后端）" />
+      <div className="aw-cin"><div><textarea value={text} onChange={e => setText(e.target.value)} placeholder="输入一段文字，点“执行”后模型做一次前向，3D 主干上叠加本次每层的改写幅度（需要桌面节点或本机后端）；不输入时“执行”显示当前样本的完整运行，“下一步”逐层前进" />
         <p className="v8-note">{native ? `现在显示的是冻结样本 #${run.i}：实体 ${k.entity}，资料里写的颜色 = ${nameK}，常识颜色 = ${nameP}。` : reason}</p>{gen.err && <p className="ac-err" role="alert">{gen.err}</p>}</div>
-        <button type="button" className="fw-tbtn primary" disabled={!live.base || live.status?.available === false || gen.busy || !text.trim()} title={live.base ? '' : '没有连接到可用的本机模型：生成需要桌面节点或本机后端'} onClick={generate}>{gen.busy ? '生成中…' : '生成'}</button></div>
+        <div className="aw-run">
+          <button type="button" className="fw-tbtn primary" disabled={gen.busy || (text.trim() && (!live.base || live.status?.available === false))}
+            title={text.trim() ? (live.base ? '用本机模型运行这段文字' : '没有连接到可用的本机模型：运行需要桌面节点或本机后端') : '显示当前样本的完整运行（到最后一层）'}
+            onClick={() => { if (text.trim()) generate(); else setLayer(NL - 1); }}>{gen.busy ? '执行中…' : '执行'}</button>
+          <button type="button" className="fw-tbtn" title="前进一层；到最后一层后从词嵌入重新开始" onClick={() => setLayer(l => (l >= NL - 1 ? 0 : l + 1))}>下一步</button>
+          <span className="v8-note">{layer ? `第 ${layer} / ${NL - 1} 层` : `词嵌入 / ${NL - 1} 层`}</span>
+        </div></div>
       {k && <div className="aw-toks"><span className="v8-note">token（{k.ntok} 个；有名字的是读出位置）</span>{Array.from({ length: k.ntok }, (_, t) => { const i = k.tokpos.indexOf(t);
         return i >= 0 ? <button type="button" key={t} className={i === pos ? 'on' : ''} title={POSN[positions[i]]} onClick={() => setPos(i)}>{t}</button> : <span key={t} title={`token ${t}`}>·</span>; })}</div>}
       <div className="aw-body">{!max && ops}<div className="aw-right"><div className="aw-tabs" role="tablist">{tabs.map(t => <button type="button" role="tab" key={t.id} aria-selected={cur === t.id} onClick={() => { setTab(t.id); if (MODE_IDS.has(t.id)) onMode(t.id); }}>{t.name}</button>)}</div>{panel}</div></div>
