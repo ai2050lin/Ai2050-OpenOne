@@ -37,9 +37,10 @@ import mainline_h1 as H1  # noqa: E402
 from shared.dist_protocol import mech_bench as B  # noqa: E402
 
 OUT = ROOT / 'research/mainline/H3'
-VERSION = 'v3'
+VERSION = 'v4'
 PREREG = OUT / f'MA-H3-{VERSION}.prereg.json'
-CHECK = OUT / f'check_{VERSION}.json'
+# v4 与 v3 问法相同，只把批大小 8 → 2（v3 的 discover 在 16 GB 卡上显存溢出到系统内存，14 小时无进度），行为检查沿用 check_v3
+CHECK = OUT / 'check_v3.json'
 FROZEN = OUT / 'frozen.json'
 SEED = 'MA-H1'           # 材料构造与 MA-H1 相同
 SPLIT_SEED = 'MA-H3'
@@ -50,7 +51,7 @@ Q_V2 = {'doc': '问：在这份资料里，{X}是什么颜色的？\n答：在�
 # v2 现实范围准确率 0.30（check_v2.json），仍全部未过。与 MA-H0-v5（0.97）的差别只剩“通常”。
 # v3：两种范围的问题与答案前缀都带“通常”，仍等长、末 token 相同，唯一差别是“这份资料 / 现实世界”
 Q_V3 = {'doc': '问：在这份资料里，{X}通常是什么颜色的？\n答：在这份资料里，{X}通常是', 'real': '问：在现实世界里，{X}通常是什么颜色的？\n答：在现实世界里，{X}通常是'}
-Q_CUR = {'v2': Q_V2, 'v3': Q_V3}[VERSION]
+Q_CUR = {'v2': Q_V2, 'v3': Q_V3, 'v4': Q_V3}[VERSION]
 METHODS = B.METHODS
 BUDGETS = B.BUDGETS
 H1_EXCLUDED = [('real', 'last', 3, 0, 'pair'), ('real', 'last', 3, 1, 'pair')]
@@ -58,7 +59,8 @@ H1_EXCLUDED = [('real', 'last', 3, 0, 'pair'), ('real', 'last', 3, 1, 'pair')]
 CRITERIA = {
     'gate_cell_acc': 0.8, 'gate_rule': '问法 v2 在 discovery 上逐格强制选择准确率；未过的格与 MA-H1 排除的两格一起排除，成对材料只用两种范围都可用的格',
     'pair_gate': 'MB-v1 行为门：干净句 m > 0 的比例 ≥ 0.8，且干净与反事实的平均 m 相差 ≥ 1 nat',
-    'n_fit': 256, 'n_evalfit': 320, 'batch': 8,
+    'n_fit': 256, 'n_evalfit': 320, 'batch': 2,
+    'vram_fraction': 0.95, 'vram_rule': '缓存分配器上限为显存的 95%，超出时报错停止，不溢出到系统内存',
     'method_rule': '在 discovery-eval 半上，cf 保留曲线的 auc_f 最高的方法；并列取 auc_f 区间下界更高者',
     'budget_rule': '所选方法在 discovery-eval 半上平均 f ≥ 0.8 的最小预算；没有则取 10%，并记“未达 0.8”',
     'confirm_predictions': {
@@ -75,8 +77,9 @@ CRITERIA = {
 
 def prereg_doc():
     return {'id': f'MA-H3-{VERSION}', 'revision_note': 'v1（sha256 c2c35194…）只在问题里放范围词，答案前缀为“X是”；discovery 现实范围准确率 0.14，16 个现实格全部未过，按预注册无法组成成对材料。'
-                                                      'v2（951c5a1b…）在答案前缀里也放范围词，现实范围准确率 0.30，仍全部未过。v3 在两种范围的问题与答案前缀里都加“通常”（等长、末 token 相同），其余不变',
-            'question_v1': Q_V1, 'question_v2': Q_V2, 'schema': 'mainline_prereg.v1', 'created': '2026-11-07', 'stage': 'H3',
+                                                      'v2（951c5a1b…）在答案前缀里也放范围词，现实范围准确率 0.30，仍全部未过。v3 在两种范围的问题与答案前缀里都加“通常”（等长、末 token 相同），其余不变。'
+                                                      'v4 问法、材料、方法与判据同 v3，行为检查沿用 check_v3；只把批大小 8 → 2，并限制显存上限：v3 的 discover 在 16 GB 卡上显存溢出到系统内存，运行 14 小时无进度输出后停止，未产生结果',
+            'question_v1': Q_V1, 'question_v2': Q_V2, 'question_v3': Q_V3, 'schema': 'mainline_prereg.v1', 'created': '2026-11-08' if VERSION == 'v4' else '2026-11-07', 'stage': 'H3',
             'basis': 'Phase 324（MA-H2）：答案前缀混淆、候选读颜色头；MB-v1 的定位方法与引擎', 'question': Q_CUR,
             'materials': 'MA-H1 的实体与划分不变；discovery 按 sha256(MA-H3|id) 在每类内对半分为 fit / eval；confirm 在冻结后开封一次',
             'methods': METHODS, 'budgets': BUDGETS, 'criteria': CRITERIA,
@@ -165,9 +168,39 @@ def balanced(pairs, n, salt):
     return out
 
 
+class Progress:
+    """定时进度日志（AGENTS.md 第 0 节第 9 条）：每 every 秒或结束时写一行，含已完成 / 总数、用时、预计剩余与显存。
+    共享显存按“缓存分配器保留量 − 设备实际占用”估计，大于 0 说明溢出到了系统内存。"""
+
+    def __init__(self, label, total, every=120):
+        self.label, self.total, self.every = label, total, every
+        self.done, self.t0, self.last = 0, time.time(), 0.0
+        self.line()
+
+    def vram(self):
+        import torch
+        free, tot = torch.cuda.mem_get_info()
+        used, res = (tot - free) / 2**30, torch.cuda.memory_reserved() / 2**30
+        return f'显存 设备占用 {used:.1f}/{tot / 2**30:.1f} GB · 分配器保留 {res:.1f} GB · 峰值 {torch.cuda.max_memory_allocated() / 2**30:.1f} GB · 共享≈{max(0.0, res - used):.1f} GB'
+
+    def line(self):
+        el = time.time() - self.t0
+        eta = el / self.done * (self.total - self.done) if self.done else float('nan')
+        print(f'[{datetime.now():%H:%M:%S}] {self.label} {self.done}/{self.total} · 已用 {el / 60:.1f} 分 · 预计剩余 '
+              f'{eta / 60:.1f} 分 · {self.vram()}', flush=True)
+        self.last = time.time()
+
+    def __call__(self, n):
+        self.done += n
+        if self.done >= self.total or time.time() - self.last >= self.every:
+            self.line()
+
+
 def setup(model_path):
     import torch
     import mech_bench_run as R
+    if 'vram_fraction' in CRITERIA:
+        torch.cuda.set_per_process_memory_fraction(CRITERIA['vram_fraction'])
     model, tok, dtype = R.load(model_path, 'cuda')
     eng = R.Engine(model, 'cuda')
     torch.set_grad_enabled(True)
@@ -216,7 +249,7 @@ def do_discover(model_path):
     fit, ev = discovery_pairs(model, tok, palette, forms)
     sub = balanced(fit, CRITERIA['n_fit'], 'fit')
     t0 = time.time()
-    res = R.discover_task(eng, sub, CRITERIA['batch'], 'cuda')
+    res = R.discover_task(eng, sub, CRITERIA['batch'], 'cuda', progress=Progress('discover', len(sub)))
     ranks = {m: R.rank(res['node'][m]) for m in METHODS}
     np.savez(OUT / 'rankings.npz', **{f'rank_{m}': ranks[m] for m in METHODS}, **{f'score_{m}': res['node'][m] for m in METHODS},
              signed_dla=res['signed_dla'])
@@ -230,9 +263,10 @@ def node_name(eng, i):
     return f'L{i // eng.H}H{i % eng.H}' if i < eng.L * eng.H else f'MLP{i - eng.L * eng.H}'
 
 
-def run_plan(R, eng, items, plan):
+def run_plan(R, eng, items, plan, label='plan'):
     import torch
     n = len(items)
+    prog = Progress(label, n)
     raw = {k: np.zeros(n, dtype=np.float32) for k, _ in plan}
     raw['clean'], raw['corrupt'], raw['empty'] = np.zeros(n, np.float32), np.zeros(n, np.float32), np.zeros(n, np.float32)
     none = torch.zeros(eng.n_nodes, dtype=torch.bool)
@@ -248,6 +282,7 @@ def run_plan(R, eng, items, plan):
                 eng.set_nodes(keep, cf)
                 raw[key][idx] = eng.ld(clean, a, b).cpu().numpy()
             eng.clear()
+            prog(len(idx))
     return raw
 
 
@@ -278,7 +313,7 @@ def do_evalfit(model_path):
         for d in range(3):
             plan.append((f'keep|random{d}|{b}', R.keep_from(rng.permutation(n), k, n)))
     t0 = time.time()
-    raw = run_plan(R, eng, items, plan)
+    raw = run_plan(R, eng, items, plan, 'evalfit')
     clusters = [p['family'] for p in items]
     res = {'n_items': len(items), 'seconds': round(time.time() - t0, 1), 'gate': B.behavior_gate(raw['clean'], raw['corrupt']), 'methods': {}}
     for m in METHODS + ['random0', 'random1', 'random2']:
@@ -349,7 +384,7 @@ def do_confirm(model_path):
     for b, k in zip(BUDGETS, B.budget_counts(n, BUDGETS)):
         plan.append((f'curve|{b}', R.keep_from(z[f'rank_{fz["method"]}'], k, n)))
     t0 = time.time()
-    raw = run_plan(R, eng, items, plan)
+    raw = run_plan(R, eng, items, plan, 'confirm')
     clusters = [p['family'] for p in items]
     nb = CRITERIA['bootstrap']
     fC = f_of(raw, 'keep|C')

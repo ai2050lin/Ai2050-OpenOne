@@ -230,7 +230,8 @@ def code_hash():
 
 # ---------------- discover ----------------
 
-def discover_task(eng, items, batch, dev):
+def discover_task(eng, items, batch, dev, progress=None):
+    """progress：可选回调 progress(已完成条数)，每批结束调用一次；不传时行为不变（MB-v1 / SP-v1）。"""
     L, H, F = eng.L, eng.H, eng.F
     n = len(items)
     zero = lambda: {'node': torch.zeros(eng.n_nodes, device=dev, dtype=torch.float64), 'unit': torch.zeros(L, F, device=dev, dtype=torch.float64)}
@@ -303,6 +304,8 @@ def discover_task(eng, items, batch, dev):
                 eng.set_nodes(keep, cf)
                 exact[c] += (eng.ld(clean, a, b) - base).sum().double()
             eng.clear()
+        if progress is not None:
+            progress(int(len(idx)))
     scale = 1.0 / n
     return {
         'node': {'act_diff': (act['node'] * scale).cpu().numpy(), 'dla': (dla['node'] * scale).abs().cpu().numpy(),
