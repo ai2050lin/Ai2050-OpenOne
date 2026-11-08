@@ -69,5 +69,15 @@ class MainlineSampleTest(unittest.TestCase):
             self.M.sample(9)
 
 
+    def test_local_backends_mount_route(self):
+        """桌面客户端连线上中心时从本机 :5002 / :5001 读冻结样本：两个本机入口都要挂这条路由（之前只有开发中心有）"""
+        from server.live_only_app import app
+        paths = set(app.openapi()['paths'])
+        self.assertIn('/api/traces/mainline/ma-h2/samples', paths)
+        self.assertIn('/api/traces/mainline/ma-h2/sample/{i}', paths)
+        src = (Path(__file__).resolve().parents[2] / 'server' / 'server.py').read_text(encoding='utf-8')
+        self.assertIn('mainline_sample_router', src)
+
+
 if __name__ == '__main__':
     unittest.main()

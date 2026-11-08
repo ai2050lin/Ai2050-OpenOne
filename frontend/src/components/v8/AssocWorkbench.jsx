@@ -6,6 +6,7 @@
    网页版与没有原生数据时，只用案例汇总（FLOW_DATA），需要原生数据的插件置灰并说明原因。 */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { DESKTOP } from '../../config.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { TestsPanel, TopTokens } from './AssocConsole.jsx';
 import { liveSampler, runOnce, useLiveBase, useLiveModel, useLocalBase } from './liveRun.js';
@@ -237,7 +238,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const sa = isLive ? saL : saF, sb = isLive ? null : sbF;
   const native = Boolean(sa);
   const reason = isLive ? (LB.error || (!sa ? '读取实时运行…' : ''))
-    : !nat.checked ? '正在查找本机数据…' : samples?.error || A.error || (base == null ? '网页版不公开原生全场：原生数据保存在采集节点，桌面客户端或本机后端可用' : !sa ? '读取冻结样本…' : '');
+    : !nat.checked ? '正在查找本机数据…' : samples?.error || A.error || (base == null ? (DESKTOP ? '没有找到提供冻结样本的本机后端（:5001 完整中心或 :5002 实时前向服务）：请确认本机服务已启动，原生全场在 AI2050_NATIVE_DIR 下' : '网页版不公开原生全场：原生数据保存在采集节点，桌面客户端或本机后端可用') : !sa ? '读取冻结样本…' : '');
   const positions = isLive ? gen.res.tokens : (samples?.positions || ['ans']);
   const pos = isLive ? livePos : fpos;
   const setPos = isLive ? setLivePos : setFpos;

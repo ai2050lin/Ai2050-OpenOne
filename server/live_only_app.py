@@ -1,4 +1,4 @@
-"""最小实时前向服务（live-only）——只挂 /api/live/*，不做数据包预热、不挂普查/图谱。
+"""最小实时前向服务（live-only）——只挂 /api/live/*、实时轨迹与关联机制冻结样本，不做数据包预热、不挂普查/图谱。
 
 用途：Electron 客户端等场景下，「空间 · 实时分析」需要一个能跑真实前向的本地进程，
 但完整中心（server/server.py）启动要做数据包预热（数分钟）。本入口秒级就绪：
@@ -27,6 +27,8 @@ app.add_middleware(
     allow_headers=['*'],
 )
 app.include_router(router)
+from server.mainline_sample_service import router as mainline_sample_router
+app.include_router(mainline_sample_router)   # 关联机制工作台的冻结样本：桌面客户端连线上中心时从这里读本机原生全场
 from server.mechanism_trace_service import router as trace_router
 app.include_router(trace_router)
 

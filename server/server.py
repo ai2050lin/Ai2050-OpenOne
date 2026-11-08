@@ -312,6 +312,8 @@ from deploy.research_library import router as research_library_router
 from deploy.parameter_service import router as parameter_browser_router
 app.include_router(research_library_router)
 app.include_router(parameter_browser_router)
+from server.mainline_sample_service import router as mainline_sample_router
+app.include_router(mainline_sample_router)   # 关联机制工作台：MA-H2 冻结样本（本机原生全场）
 from server.mechanism_trace_service import router as mechanism_trace_router
 app.include_router(mechanism_trace_router)
 from deploy.node_control import router as node_control_router
