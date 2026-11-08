@@ -364,7 +364,7 @@ def do_confirm(model_path):
     if any(o.get('split') == 'confirm' for o in splits['custody']['opened']):
         raise SystemExit('confirm 已开封过：只评估一次')
     splits['custody']['opened'].append({'split': 'confirm', 'when': datetime.now().isoformat(timespec='seconds'),
-                                        'by': 'Claude（用户 2026-11-07 授权“做 H3”）', 'purpose': 'H3 冻结后的一次性评估',
+                                        'by': 'Claude（用户 2026-11-08 在对话中明确指示“Unseal confirm”）', 'purpose': 'H3 冻结后的一次性评估',
                                         'frozen_before': FROZEN.with_suffix('.sha256').read_text().strip()})
     H1.SPLITS.write_text(json.dumps(splits, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
     _, eng, model, tok = setup(model_path)

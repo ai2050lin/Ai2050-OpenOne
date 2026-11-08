@@ -1,0 +1,127 @@
+{
+ "id": "MA-H3-confirm",
+ "split": "confirm",
+ "n_items": 1176,
+ "n_entities": 84,
+ "seconds": 875.8,
+ "frozen_sha256": "f880b9214db30ebb60caa7ff98b6756796cff5265183777aeda6e60d7808559a",
+ "method": "atp_ig",
+ "budget": 0.5,
+ "k": 594,
+ "gate": {
+  "clean_acc": 1.0,
+  "gap": 15.842713356018066,
+  "clean_ld": 9.136638641357422,
+  "corrupt_ld": -6.7060747146606445,
+  "pass": true
+ },
+ "P1_sufficiency": {
+  "f_C": 0.9884567856788635,
+  "controls": {
+   "keep|random0": 0.0004579054075293243,
+   "keep|matched0": 0.13151948153972626,
+   "keep|random1": 8.805873949313536e-05,
+   "keep|matched1": 0.09292880445718765,
+   "keep|random2": -5.283523933030665e-05,
+   "keep|matched2": 0.03712639957666397
+  },
+  "best_control": "keep|matched0",
+  "margin": 0.8569373041391373,
+  "margin_ci95": [
+   0.8222189463675023,
+   0.8914786864072084
+  ],
+  "pass": true
+ },
+ "P2_necessity": {
+  "f_remove": 3.103022027062252e-05,
+  "pass": true
+ },
+ "P3_replication": {
+  "f_disc_eval": 0.9915,
+  "f_confirm": 0.9884567856788635,
+  "pass": true
+ },
+ "methods_at_k": {
+  "act_diff": 0.051687125116586685,
+  "dla": 0.04094144329428673,
+  "atp": -0.0023247506469488144,
+  "atp_ig": 0.9884567856788635,
+  "exact": 0.10937230288982391
+ },
+ "curve": {
+  "0.001": -2.34823291975772e-05,
+  "0.002": -7.380160241154954e-05,
+  "0.005": -1.17411645987886e-05,
+  "0.01": -7.464025838999078e-05,
+  "0.02": -0.0002138569252565503,
+  "0.05": -0.003412485821172595,
+  "0.1": -0.00832364708185196,
+  "0.2": 0.029435938224196434,
+  "0.5": 0.9884567856788635,
+  "1.0": 1.0
+ },
+ "residual": {
+  "pos=first": {
+   "n": 672,
+   "f_C": 0.9526,
+   "unexplained": 0.0474
+  },
+  "pos=last": {
+   "n": 504,
+   "f_C": 1.0345,
+   "unexplained": -0.0345
+  },
+  "k=2": {
+   "n": 672,
+   "f_C": 0.9999,
+   "unexplained": 0.0001
+  },
+  "k=3": {
+   "n": 504,
+   "f_C": 0.9737,
+   "unexplained": 0.0263
+  },
+  "draft=0": {
+   "n": 588,
+   "f_C": 0.9934,
+   "unexplained": 0.0066
+  },
+  "draft=1": {
+   "n": 588,
+   "f_C": 0.983,
+   "unexplained": 0.017
+  },
+  "form=pair": {
+   "n": 504,
+   "f_C": 0.9854,
+   "unexplained": 0.0146
+  },
+  "form=single": {
+   "n": 672,
+   "f_C": 0.9908,
+   "unexplained": 0.0092
+  }
+ },
+ "criteria": {
+  "gate_cell_acc": 0.8,
+  "gate_rule": "问法 v2 在 discovery 上逐格强制选择准确率；未过的格与 MA-H1 排除的两格一起排除，成对材料只用两种范围都可用的格",
+  "pair_gate": "MB-v1 行为门：干净句 m > 0 的比例 ≥ 0.8，且干净与反事实的平均 m 相差 ≥ 1 nat",
+  "n_fit": 256,
+  "n_evalfit": 320,
+  "batch": 2,
+  "vram_fraction": 0.95,
+  "vram_rule": "缓存分配器上限为显存的 95%，超出时报错停止，不溢出到系统内存",
+  "method_rule": "在 discovery-eval 半上，cf 保留曲线的 auc_f 最高的方法；并列取 auc_f 区间下界更高者",
+  "budget_rule": "所选方法在 discovery-eval 半上平均 f ≥ 0.8 的最小预算；没有则取 10%，并记“未达 0.8”",
+  "confirm_predictions": {
+   "P1_sufficiency": "只保留 C（其余换成现实范围的激活）时 f(C) ≥ 0.7，且比同预算的 3 组随机集合与 3 组分层匹配随机集合中最高者高 ≥ 0.3，实体 bootstrap 95% 区间下界 > 0",
+   "P2_necessity": "只把 C 换成现实范围的激活时，资料范围相对现实范围的差距保留比例 f_remove ≤ 0.5",
+   "P3_replication": "|f_confirm(C) − f_disc_eval(C)| ≤ 0.15"
+  },
+  "multiple_comparison": "P1–P3 用 Holm 校正时按三项通过 / 未通过计；P1 的区间按 Holm 调整后的水平 α/3 报告",
+  "residual": "未解释部分 = 1 − f(C)，按记录形式、目标位置、k、草稿拆分报告",
+  "dictionary": "字典方法只在第 30 块有 transcoder，不能与全模型组件同题比较，本阶段不纳入，记为“未纳入”",
+  "bootstrap": 2000
+ }
+}
