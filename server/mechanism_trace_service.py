@@ -103,6 +103,38 @@ def hidden_at(trace_id,layer,position):
         'boundary':'embedding' if layer==0 else 'hidden_state','shape':[len(v)],'values':v.tolist(),'source':'native_BF16_bits_cached_current_token'}
 
 
+@router.get('/{trace_id}/bundle')
+def bundle(trace_id:str,position:int=Query(...,ge=0),query:int=Query(-1)):
+    """关联机制工作台（Phase 348）：一次取一个 token 的全部层，避免逐层逐头上千次请求。
+    hs = 该 token 的 HiddenState（词嵌入 + 每层，deep 轨迹全部位置都有）；attn = 查询位置 query（缺省最后一个 token）
+    的每块每头注意力行；该 token 是模块读出位置时另给 MLP 激活 A、注意力写入与 MLP 写入。数值为原生 bf16 解码后的 float32。"""
+    return checked(_bundle,trace_id,position,query)
+def _b64(a):
+    import base64
+    a=np.ascontiguousarray(a,dtype='<f4');return {'shape':list(a.shape),'dtype':'float32','b64':base64.b64encode(a.tobytes()).decode()}
+def _bundle(trace_id,position,query):
+    d,_=store().manifest(trace_id);L,T=d['n_layers'],d['n_tokens']
+    if not 0<=position<T:raise ValueError('position outside trace')
+    q=T-1 if query<0 else query
+    if not 0<=q<T:raise ValueError('query outside trace')
+    hs=np.stack([np.asarray(store().hidden(trace_id,l,position)['values'],dtype=np.float32) for l in range(L+1)])
+    nh,nkv,hd=d['n_heads'],d['n_kv_heads'],d['head_dim'];rows=np.zeros((L,nh,T),np.float32)
+    ro=d['readout_positions'];mod=position in ro;mlp=ao=mo=None
+    if mod:mlp,ao,mo=[],[],[]
+    for b in range(L):
+        z=store().block(trace_id,b)
+        if q in ro:rows[b]=unbits(z['attention_rows'][ro.index(q)])[:,:T]
+        elif d['deep']:
+            for h in range(nh):
+                qq=unbits(z['q'][h,q]);k=unbits(z['k'][h//(nh//nkv)]);s=k@qq/np.sqrt(hd);s[np.arange(len(s))>q]=-np.inf;s-=s.max();v=np.exp(s);rows[b,h]=v/v.sum()
+        else:raise KeyError('query position not captured')
+        if mod:
+            r=ro.index(position);mlp.append(unbits(z['activation'][r]));ao.append(unbits(z['attention_output'][r]));mo.append(unbits(z['mlp_output'][r]))
+    out={'schema':'mechanism_bundle.v1','trace_id':trace_id,'position':position,'query':q,'n_layers':L,'n_tokens':T,'n_heads':nh,
+         'readout_positions':ro,'model_snapshot':d['model_snapshot'],'hs':_b64(hs),'attn':_b64(rows),
+         'note':'注意力行是由真实 post-RoPE Q/K 重算的权重，不是因果重要性；MLP 与写入只在模块读出位置采集'}
+    if mod:out.update({'mlp':_b64(np.stack(mlp)),'attn_out':_b64(np.stack(ao)),'mlp_out':_b64(np.stack(mo))})
+    return out
 @router.get('/{trace_id}/attention-row')
 def attention_row(trace_id:str,block:int=Query(0,ge=0),head:int=Query(0,ge=0),query:int=Query(...,ge=0)):
     d,_=checked(store().manifest,trace_id)

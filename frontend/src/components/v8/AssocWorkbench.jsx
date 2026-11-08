@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
 import { TestsPanel, TopTokens } from './AssocConsole.jsx';
-import { runOnce, useLiveBase, useLiveModel, useLocalBase } from './liveRun.js';
+import { liveSampler, runOnce, useLiveBase, useLiveModel, useLocalBase } from './liveRun.js';
 import { request } from './MechanismTraceExplorer.jsx';
 import { FLOW_DATA } from './data/assocFlow.js';
 import { PageHead } from './CoreKit.jsx';
@@ -58,6 +58,18 @@ function f16(o) {      // float16 小端 → Float32Array
     out[i] = e === 0 ? s * m * 2 ** -24 : e === 31 ? (m ? NaN : s * Infinity) : s * (1 + m / 1024) * 2 ** (e - 15);
   }
   return { a: out, shape: o.shape };
+}
+/* 实时运行：一次取一个 token 的全部层（/api/traces/{id}/bundle），查询位置固定为最后一个 token */
+function useBundle(base, id, position) {
+  const [s, set] = useState({});
+  useEffect(() => {
+    if (!base || !id || position == null) return undefined;
+    let dead = false;
+    request(base, `/api/traces/${id}/bundle?position=${position}`).then(d => { if (!dead) set({ key: `${id}:${position}`, data: d }); })
+      .catch(e => { if (!dead) set({ key: `${id}:${position}`, error: e.message }); });
+    return () => { dead = true; };
+  }, [base, id, position]);
+  return s.key === `${id}:${position}` ? s : {};
 }
 function useSample(base, i) {
   const [s, set] = useState({});
@@ -185,7 +197,10 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const base = nat.base;
   const [samples, setSamples] = useState(null);
   const [run, setRun] = useState({ i: 0, other: null });
-  const [pos, setPos] = useState(0);
+  const [fpos, setFpos] = useState(0);           // 冻结样本里的读出位置
+  const [livePos, setLivePos] = useState(0);     // 实时运行里的 token 序号
+  const [src, setSrc] = useState('frozen');      // frozen = 冻结样本；live = 本次实时运行
+  const [gen, setGen] = useState({ busy: false, res: null, err: '' });
   const [layer, setLayer] = useState(24);
   const [on, setOn] = useState(() => new Set(['hs', 'heads']));
   const [tab, setTab] = useState('hs');
@@ -201,7 +216,6 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const [mini, setMini] = useState(false);
   const [float, setFloat] = useState({ x: 16, y: 96 });
   const [text, setText] = useState('');
-  const [gen, setGen] = useState({ busy: false, res: null, err: '' });
   const skel = useApi('/api/model/skeleton');
   const models = (skel.data?.models || []).filter(m => Number.isInteger(m.n_layers));
 
@@ -210,17 +224,27 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     let dead = false;
     Promise.resolve(nat.status).then(d => { if (dead || !d?.items) return; setSamples(d);
       const it = d.items[0], twin = d.items.find(x => x.entity === it.entity && x.cell[0] !== it.cell[0] && x.cell.slice(1).join() === it.cell.slice(1).join());
-      setRun({ i: 0, other: twin?.i ?? null }); setPos(d.positions.indexOf('ans')); })
+      setRun({ i: 0, other: twin?.i ?? null }); setFpos(d.positions.indexOf('ans')); })
       .catch(e => { if (!dead) setSamples({ error: e.message }); });
     return () => { dead = true; };
   }, [base, nat.status]);
   const A = useSample(samples?.items ? base : null, samples?.items ? run.i : null);
   const B = useSample(samples?.items && run.other != null ? base : null, run.other);
-  const sa = useMemo(() => sampler(A.data), [A.data]), sb = useMemo(() => sampler(B.data), [B.data]);
+  const saF = useMemo(() => sampler(A.data), [A.data]), sbF = useMemo(() => sampler(B.data), [B.data]);
+  const isLive = src === 'live' && Boolean(gen.res);
+  const LB = useBundle(live.base, isLive ? gen.res.id : null, isLive ? livePos : null);
+  const saL = useMemo(() => liveSampler(LB.data, gen.res), [LB.data, gen.res]);
+  const sa = isLive ? saL : saF, sb = isLive ? null : sbF;
   const native = Boolean(sa);
-  const reason = !nat.checked ? '正在查找本机数据…' : samples?.error || A.error || (base == null ? '网页版不公开原生全场：原生数据保存在采集节点，桌面客户端或本机后端可用' : !sa ? '读取冻结样本…' : '');
-  const positions = samples?.positions || ['ans'];
-  const ANS = positions.indexOf('ans');
+  const reason = isLive ? (LB.error || (!sa ? '读取实时运行…' : ''))
+    : !nat.checked ? '正在查找本机数据…' : samples?.error || A.error || (base == null ? '网页版不公开原生全场：原生数据保存在采集节点，桌面客户端或本机后端可用' : !sa ? '读取冻结样本…' : '');
+  const positions = isLive ? gen.res.tokens : (samples?.positions || ['ans']);
+  const pos = isLive ? livePos : fpos;
+  const setPos = isLive ? setLivePos : setFpos;
+  const ANS = isLive ? gen.res.tokens.length - 1 : positions.indexOf('ans');
+  const mlpOk = isLive ? Boolean(sa?.hasMlp) : pos === ANS;     // 实时运行只在模块读出位置（首 / 中 / 末）采了 MLP
+  const tokText = t => String(t ?? '').replace(/\n/g, '⏎') || '␣';
+  const posName = i => (isLive ? `token ${i}「${tokText(positions[i])}」` : (POSN[positions[i]] || positions[i] || ''));
   const NL = sa?.NL || 37, NB = NL - 1, NH = sa?.NH || 32, DM = sa?.DM || 2560, NF = sa?.NF || 9728;
   const [hw, hh] = grid(DM), [mw, mh] = grid(NF);
   const aligned = sa && sb && sa.T === sb.T && sa.d.tokpos.join() === sb.d.tokpos.join();
@@ -233,11 +257,11 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     if (shown('hs') && sa) { const v = l => { const a = sa.hs(pos, l); if (!diffOn) return a; const b = sb.hs(pos, l); return a.map((x, i) => x - b[i]); };
       const vals = Array.from({ length: NL }, (_, l) => v(l)), sc = pct(vals.slice(0, NL - 1), opt.hsClip);
       out.hs = vals.map(x => { const m = opt.hsNorm === 'layer' ? absMax(x) : sc; return tex(hw, hh, d => { for (let i = 0; i < hw * hh; i++) put(d, i, i < DM ? divc(x[i], m) : [246, 248, 251]); }); }); }
-    if (shown('mlp') && sa) { const ok = pos === ANS, v = b => { const a = sa.mlp(b); if (!diffOn) return a; const c = sb.mlp(b); return a.map((x, i) => x - c[i]); };
+    if (shown('mlp') && sa) { const ok = mlpOk, v = b => { const a = sa.mlp(b); if (!diffOn) return a; const c = sb.mlp(b); return a.map((x, i) => x - c[i]); };
       const vals = ok ? Array.from({ length: NB }, (_, b) => v(b)) : null, sc = ok ? pct(vals, opt.mlpClip) : 1;
       out.mlp = Array.from({ length: NB }, (_, b) => tex(mw, mh, d => { for (let i = 0; i < mw * mh; i++) put(d, i, i >= NF ? [246, 248, 251] : vals ? divc(vals[b][i], sc) : [214, 222, 232]); })); }
     if (shown('heads')) {
-      const target = opt.headTarget === 'follow' ? pos : positions.indexOf(opt.headTarget);
+      const target = opt.headTarget === 'follow' || isLive ? pos : positions.indexOf(opt.headTarget);
       out.heads = Array.from({ length: NB }, (_, b) => tex(8, Math.ceil(NH / 8), d => { for (let h = 0; h < NH; h++) {
         let val, rgb;
         if (sa) { val = sa.att(b, h)[sa.d.tokpos[target]]; rgb = diffOn ? divc(val - sb.att(b, h)[sb.d.tokpos[target]], opt.headMax * 0.8) : seqc(val, opt.headMax); }
@@ -259,7 +283,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const describe = h => {
     if (h.o === 'llm') return `第 ${h.l} 层 · ${h.l ? h.part : '词嵌入'}`;
     if (h.o === 'hs') return sa && h.idx < DM ? `HiddenState · 第 ${h.l} 层 · 坐标 ${h.idx} · ${sa.hs(pos, h.l)[h.idx].toFixed(4)}` : '';
-    if (h.o === 'mlp') return sa && h.idx < NF ? `MLP · 块 ${h.l - 1} · 单元 ${h.idx}${pos === ANS ? ' · A ' + sa.mlp(h.l - 1)[h.idx].toFixed(4) : ''}` : '';
+    if (h.o === 'mlp') return sa && h.idx < NF ? `MLP · 块 ${h.l - 1} · 单元 ${h.idx}${mlpOk ? ' · A ' + sa.mlp(h.l - 1)[h.idx].toFixed(4) : ''}` : '';
     if (h.o === 'heads') return h.idx < NH ? `注意力 · L${h.l - 1}H${h.idx} · ${sa ? sa.att(h.l - 1, h.idx)[sa.d.tokpos[pos]].toFixed(4) : (FLOW_DATA.heads.doc[h.l - 1]?.[h.idx] ?? 0).toFixed(3) + '（案例汇总）'}` : '';
     return '';
   };
@@ -278,7 +302,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
 
   async function generate() {
     setGen({ busy: true, res: null, err: '' });
-    try { const r = await runOnce(live.base, text); setGen({ busy: false, res: r, err: '' }); setTab('result'); }
+    try { const r = await runOnce(live.base, text); setGen({ busy: false, res: r, err: '' }); setTab('result'); setSrc('live'); setLivePos(r.tokens.length - 1); setLayer(36); }
     catch (e) { setGen({ busy: false, res: null, err: e.message }); }
   }
 
@@ -286,7 +310,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const overlays = useCallback(({ ctx, proj, LY, llm, alpha }) => {
     if (shown('delta') && sa) { const v = []; for (let l = 1; l < NL - 1; l++) v.push(norm(sa.hs(pos, l).map((x, i) => x - sa.hs(pos, l - 1)[i])));
       const mx = Math.max(...v) || 1; v.forEach((x, k) => { const l = k + 1, p = proj(llm.x - llm.w / 2, LY(l), llm.d / 2); ctx.globalAlpha = alpha(l); ctx.fillStyle = '#7050a0'; ctx.fillRect(p[0] - 40 - 60 * x / mx, p[1] - 2, 60 * x / mx, 3); ctx.globalAlpha = 1; }); }
-    if (on.has('lens')) { const L = sa ? [sa.d.lens.map(r => r[0] - r[1]), sb ? sb.d.lens.map(r => r[0] - r[1]) : null] : [FLOW_DATA.lensDoc, FLOW_DATA.lensReal];
+    if (on.has('lens') && !isLive) { const L = sa ? [sa.d.lens.map(r => r[0] - r[1]), sb ? sb.d.lens.map(r => r[0] - r[1]) : null] : [FLOW_DATA.lensDoc, FLOW_DATA.lensReal];
       for (let l = 0; l < NL; l++) { const p = proj(llm.x + llm.w / 2, LY(l), -llm.d / 2); ctx.globalAlpha = alpha(l);
         ctx.fillStyle = '#2a78d6'; ctx.fillRect(p[0] + 8, p[1] - 4, Math.max(-60, Math.min(60, (L[0][l] || 0) * 4)), 3);
         if (L[1]) { ctx.fillStyle = '#d4622b'; ctx.fillRect(p[0] + 8, p[1], Math.max(-60, Math.min(60, (L[1][l] || 0) * 4)), 3); } ctx.globalAlpha = 1; } }
@@ -301,7 +325,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const CLIP = [['0.95', '95% 分位'], ['0.99', '99% 分位'], ['0.999', '99.9% 分位'], ['1', '最大值']];
   const OPTS = {
     hs: () => <><div className="aw-r"><span>着色口径</span><Seg o="hsNorm" items={[['global', '全图'], ['layer', '逐层']]} /></div><div className="aw-r"><span>色标截断</span><Sel o="hsClip" items={CLIP} num /></div><div className="aw-r"><span>排列</span><span className="v8-note">原生编号 · {hw} × {hh}</span></div></>,
-    mlp: () => <><div className="aw-r"><span>色标截断</span><Sel o="mlpClip" items={CLIP} num /></div>{pos !== ANS && <p className="v8-note">当前 token 不是答案位置：MA-H2 只在答案位置存 MLP，模型显示为灰。</p>}</>,
+    mlp: () => <><div className="aw-r"><span>色标截断</span><Sel o="mlpClip" items={CLIP} num /></div>{!mlpOk && <p className="v8-note">{isLive ? '实时运行只在模块读出位置（首 / 中 / 末 token）采集 MLP，这个 token 显示为灰。' : '当前 token 不是答案位置：MA-H2 只在答案位置存 MLP，模型显示为灰。'}</p>}</>,
     heads: () => <><div className="aw-r"><span>看向</span><Sel o="headTarget" items={[['follow', '跟随所选 token'], ...positions.map(p => [p, POSN[p] || p])]} /></div><div className="aw-r"><span>色标上限</span><Sel o="headMax" items={[['0.25', '0.25'], ['0.5', '0.5'], ['1', '1.0']]} num /></div></>,
     diff: () => <><div className="aw-r"><span>对照运行</span><span>{run.other != null ? `#${run.other}` : '—'}</span></div><div className="aw-r"><span>对齐</span><Seg o="diffAlign" items={[['strict', '严格'], ['named', '命名位置']]} /></div>
       {sb && !aligned && <p className="v8-note">两句 token 数不同（{sa?.T} / {sb.T}）：{opt.diffAlign === 'strict' ? '严格对齐时不显示差值。' : '按命名读出位置比较，差值含前缀差异。'}</p>}</>,
@@ -322,12 +346,13 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     <div className="aw-in">
       <h4>运行参数</h4>
       <div className="aw-r"><span>模型</span><span>{k ? `Qwen3-4B · bf16 · ${k.model_snapshot.slice(0, 8)}` : '—'}</span></div>
-      <div className="aw-r"><span>输入</span>{samples?.items ? <select value={run.i} onChange={e => { const i = +e.target.value, it = samples.items[i], twin = samples.items.find(x => x.entity === it.entity && x.cell[0] !== it.cell[0] && x.cell.slice(1).join() === it.cell.slice(1).join()); setRun({ i, other: twin?.i ?? null }); }}>
+      <div className="aw-r"><span>来源</span><span className="aw-seg"><button type="button" aria-pressed={!isLive} onClick={() => setSrc('frozen')}>冻结样本</button><button type="button" aria-pressed={isLive} disabled={!gen.res} onClick={() => setSrc('live')}>实时运行</button></span></div>
+      <div className="aw-r"><span>输入</span>{isLive ? <span className="v8-note">本次输入的文字（{gen.res.tokens.length} token）</span> : samples?.items ? <select value={run.i} onChange={e => { const i = +e.target.value, it = samples.items[i], twin = samples.items.find(x => x.entity === it.entity && x.cell[0] !== it.cell[0] && x.cell.slice(1).join() === it.cell.slice(1).join()); setRun({ i, other: twin?.i ?? null }); }}>
         {samples.items.slice(0, 200).map(x => <option key={x.i} value={x.i}>#{x.i} · {x.entity} · {x.cell[0] === 'doc' ? '按资料' : '按现实'} · {x.cell.slice(1).join('/')}</option>)}</select> : <span className="v8-note">{reason}</span>}</div>
-      <div className="aw-r"><span>token</span><select value={pos} onChange={e => setPos(+e.target.value)}>{positions.map((p, i) => <option key={p} value={i}>{POSN[p] || p}{k ? `（${k.tokpos[i]}）` : ''}</option>)}</select></div>
+      <div className="aw-r"><span>token</span><select value={pos} onChange={e => setPos(+e.target.value)}>{positions.map((p, i) => <option key={i} value={i}>{isLive ? `${i} · ${tokText(p)}` : `${POSN[p] || p}${k ? `（${k.tokpos[i]}）` : ''}`}</option>)}</select></div>
       <div className="aw-r"><span>层</span><span className="aw-row"><input type="range" min="0" max={NL - 1} value={layer} onChange={e => setLayer(+e.target.value)} /><b>{layer}</b></span></div>
       <div className="aw-r"><span>视角</span><span className="aw-seg">{VORDER.map(v => <button type="button" key={v} aria-pressed={view === v} onClick={() => setView(v)}>{VIEWS[v][2]}</button>)}</span></div>
-      <div className="aw-r"><span>数据</span><span className="v8-note">{native ? 'MA-H2 discovery 冻结样本 · 原生 float16 · 节点本地' : '案例汇总（MA-H2，2,520 条）'}</span></div>
+      <div className="aw-r"><span>数据</span><span className="v8-note">{isLive ? `实时运行 · ${gen.res.tokens.length} token · 原生 bf16 · 未登记观察` : native ? 'MA-H2 discovery 冻结样本 · 原生 float16 · 节点本地' : '案例汇总（MA-H2，2,520 条）'}</span></div>
       <h4>插件</h4>
       {ALL.filter(p => listed.has(p.id)).map(p => { const en = on.has(p.id), dis = p.native && !native, vis = en && !hide.has(p.id);
         return <div key={p.id} className={`aw-pl${en ? '' : ' off'}`}>
@@ -342,7 +367,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
       <h4>当前对象</h4>
       <div className="aw-kv"><span>层</span><span>{layer ? `第 ${layer} 层（块 ${layer - 1} 输出）` : '词嵌入'}</span><span>token</span><span>{POSN[positions[pos]] || positions[pos]}</span>
         {sa && sel.coord != null && <><span>坐标</span><span>{sel.coord} = {sa.hs(pos, layer)[sel.coord].toFixed(4)}</span></>}
-        {sa && sel.unit != null && layer > 0 && pos === ANS && <><span>MLP 单元</span><span>B{Bk}·U{sel.unit} = {sa.mlp(Bk)[sel.unit].toFixed(4)}</span></>}
+        {sa && sel.unit != null && layer > 0 && mlpOk && <><span>MLP 单元</span><span>B{Bk}·U{sel.unit} = {sa.mlp(Bk)[sel.unit].toFixed(4)}</span></>}
         {sel.head != null && layer > 0 && <><span>注意力头</span><span>L{Bk}H{sel.head}</span></>}</div>
       {max && <p className="v8-note">Esc 或右上角按钮退出全屏。</p>}
     </div>
@@ -360,25 +385,26 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const needNative = <p className="v8-note">{reason}</p>;
   const P = {
     hs: () => !sa ? [needNative] : (() => { const v = sa.hs(pos, layer), top = [...v].map((x, i) => [i, x]).sort((p, q) => Math.abs(q[1]) - Math.abs(p[1])).slice(0, 8);
-      return [<><h4>第 {layer} 层 · {POSN[positions[pos]]} · ‖h‖ {norm(v).toFixed(1)}</h4><table className="v6-table"><tbody>{top.map(([i, x]) => <tr key={i} className={sel.coord === i ? 'on' : ''} onClick={() => setSel(s => ({ ...s, coord: i }))}><td>坐标 {i}</td><td className="num">{x.toFixed(4)}</td></tr>)}</tbody></table></>,
+      return [<><h4>第 {layer} 层 · {posName(pos)} · ‖h‖ {norm(v).toFixed(1)}</h4><table className="v6-table"><tbody>{top.map(([i, x]) => <tr key={i} className={sel.coord === i ? 'on' : ''} onClick={() => setSel(s => ({ ...s, coord: i }))}><td>坐标 {i}</td><td className="num">{x.toFixed(4)}</td></tr>)}</tbody></table></>,
         sel.coord != null ? <><h4>坐标 {sel.coord} 跨层</h4>{line([{ v: Array.from({ length: NL }, (_, l) => sa.hs(pos, l)[sel.coord]), color: '#2a78d6', name: '本运行' }, ...(sb ? [{ v: Array.from({ length: NL }, (_, l) => sb.hs(pos, l)[sel.coord]), color: '#d4622b', name: '对照运行', dash: true }] : [])], layer, 2)}</>
           : <><h4>每层 ‖h‖</h4>{line([{ v: Array.from({ length: NL }, (_, l) => norm(sa.hs(pos, l))), color: '#2a78d6', name: '本运行' }], layer)}<p className="v8-note">点 3D 里的 HiddenState 模型选一个坐标。</p></>,
         '坐标按原生编号排成网格，网格位置没有含义；颜色按全图 |值| 的分位截断，悬停或点击看原值（float16）。']; })(),
-    mlp: () => !sa ? [needNative] : pos !== ANS ? [<p key="m" className="v8-note">MA-H2 只在答案位置存了 MLP 激活；把 token 切到答案位置。</p>] : layer === 0 ? [<p key="m" className="v8-note">词嵌入层没有 MLP。</p>] : (() => { const a = sa.mlp(Bk), top = [...a.keys()].sort((x, y) => Math.abs(a[y]) - Math.abs(a[x])).slice(0, 8); if (sel.unit != null && !top.includes(sel.unit)) top.push(sel.unit);
+    mlp: () => !sa ? [needNative] : !mlpOk ? [<p key="m" className="v8-note">{isLive ? '实时运行只在模块读出位置（首 / 中 / 末 token）采集 MLP；在 token 条里选这几个位置。' : 'MA-H2 只在答案位置存了 MLP 激活；把 token 切到答案位置。'}</p>] : layer === 0 ? [<p key="m" className="v8-note">词嵌入层没有 MLP。</p>] : (() => { const a = sa.mlp(Bk), top = [...a.keys()].sort((x, y) => Math.abs(a[y]) - Math.abs(a[x])).slice(0, 8); if (sel.unit != null && !top.includes(sel.unit)) top.push(sel.unit);
       return [<><h4>块 {Bk} · 最活跃的单元（A = silu(G)⊙V）</h4><table className="v6-table"><thead><tr><th>单元</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{top.map(u => <tr key={u} className={sel.unit === u ? 'on' : ''} onClick={() => setSel(s => ({ ...s, unit: u }))}><td>U{u}</td><td className="num">{a[u].toFixed(3)}</td><td className="num">{sb ? sb.mlp(Bk)[u].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
         <p className="v8-note">正式版在这里接普查单元卡、gate 输入的来源分解与四级状态。</p>, '单元按原生编号排成网格，网格位置没有含义；激活大小不说明它被使用。']; })(),
     heads: () => layer === 0 ? [<p key="h" className="v8-note">词嵌入层没有注意力头。</p>] : !sa ? [<><h4>块 {Bk} · 案例汇总：答案位置对资料颜色的注意力</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">按资料</th><th className="num">按现实</th></tr></thead><tbody>{[...Array(NH).keys()].sort((x, y) => FLOW_DATA.heads.doc[Bk][y] - FLOW_DATA.heads.doc[Bk][x]).slice(0, 8).map(h => <tr key={h}><td>L{Bk}H{h}</td><td className="num">{FLOW_DATA.heads.doc[Bk][h].toFixed(3)}</td><td className="num">{FLOW_DATA.heads.real[Bk][h].toFixed(3)}</td></tr>)}</tbody></table></>, needNative, '注意力去向不等于计算使用。']
       : (() => { const tp = sa.d.tokpos[pos], rank = [...Array(NH).keys()].sort((x, y) => sa.att(Bk, y)[tp] - sa.att(Bk, x)[tp]).slice(0, 8);
-        return [<><h4>块 {Bk} · 答案位置看“{POSN[positions[pos]]}”最多的头</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{rank.map(h => <tr key={h} className={sel.head === h ? 'on' : ''} onClick={() => setSel(s => ({ ...s, head: h }))}><td>L{Bk}H{h}</td><td className="num">{sa.att(Bk, h)[tp].toFixed(3)}</td><td className="num">{sb ? sb.att(Bk, h)[sb.d.tokpos[pos]].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
+        return [<><h4>块 {Bk} · 答案位置看“{posName(pos)}”最多的头</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{rank.map(h => <tr key={h} className={sel.head === h ? 'on' : ''} onClick={() => setSel(s => ({ ...s, head: h }))}><td>L{Bk}H{h}</td><td className="num">{sa.att(Bk, h)[tp].toFixed(3)}</td><td className="num">{sb ? sb.att(Bk, h)[sb.d.tokpos[pos]].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
           sel.head != null ? <><h4>L{Bk}H{sel.head} 对全部 {sa.T} 个 token</h4>{line([{ v: Array.from(sa.att(Bk, sel.head)), color: '#b07d00', name: '虚线 = 所选位置' }], tp, 2)}</> : <p className="v8-note">点 3D 里的注意力模型或表中一行。</p>, '注意力去向不等于计算使用。']; })(),
     delta: () => !sa ? [needNative] : (() => { const dn = [], cs = []; for (let l = 1; l < NL; l++) { const a = sa.hs(pos, l), b = sa.hs(pos, l - 1); dn.push(l === NL - 1 ? NaN : norm(a.map((x, i) => x - b[i]))); cs.push(l === NL - 1 ? NaN : cosv(a, b)); }
-      return [<><h4>每层总变化 ‖Δh‖（3D：LLM 左侧紫条）</h4>{line([{ v: dn, color: '#7050a0', name: '‖h_l − h_(l−1)‖' }], layer - 1)}</>, <><h4>相邻层方向 cos(h_l, h_(l−1))</h4>{line([{ v: cs, color: '#183f77', name: '越接近 1 改写越少' }], layer - 1, 2)}</>,
-        '最后一层的 hs 已过最终归一化，不与前层比较。注意力 / MLP 写入的拆分需要原生权重（待接入）。']; })(),
-    diff: () => !sa || !sb ? [needNative] : (() => { if (!aligned && opt.diffAlign === 'strict') return [<p key="d">对齐检查：token 数 {sa.T} / {sb.T} ✗。严格对齐时不显示差值。</p>, '', '差值是观察，原因要靠干预。'];
+      const split = sa.hasSplit ? [{ v: Array.from({ length: NB }, (_, b) => norm(sa.ao(b))), color: '#7050a0', name: '注意力写入', dash: true }, { v: Array.from({ length: NB }, (_, b) => norm(sa.mo(b))), color: '#2f8f5b', name: 'MLP 写入' }] : [];
+      return [<><h4>每层总变化 ‖Δh‖{sa.hasSplit ? ' 与注意力 / MLP 写入（本次实时运行，真实采集）' : '（3D：LLM 左侧紫条）'}</h4>{line([{ v: dn, color: '#183f77', name: '‖h_l − h_(l−1)‖' }, ...split], layer - 1)}</>, <><h4>相邻层方向 cos(h_l, h_(l−1))</h4>{line([{ v: cs, color: '#183f77', name: '越接近 1 改写越少' }], layer - 1, 2)}</>,
+        sa.hasSplit ? '注意力写入与 MLP 写入是 o_proj 与 down_proj 的真实输出（本次运行在模块读出位置采集）；最后一层的 hs 已过最终归一化。' : isLive ? '这个 token 不是模块读出位置，没有写入拆分；在 token 条里选首 / 中 / 末位置。' : '最后一层的 hs 已过最终归一化，不与前层比较。冻结样本的注意力 / MLP 写入拆分需要原生权重（待接入）。']; })(),
+    diff: () => isLive ? [<p key="d" className="v8-note">实时运行没有对照运行：资料 / 现实成对的比较只在冻结样本里。切回“冻结样本”使用。</p>, '', ''] : !sa || !sb ? [needNative] : (() => { if (!aligned && opt.diffAlign === 'strict') return [<p key="d">对齐检查：token 数 {sa.T} / {sb.T} ✗。严格对齐时不显示差值。</p>, '', '差值是观察，原因要靠干预。'];
       const rel = Array.from({ length: NL }, (_, l) => { const a = sa.hs(pos, l), b = sb.hs(pos, l); return norm(a.map((x, i) => x - b[i])) / norm(a); });
       return [<><p>对齐检查：同一快照 ✓ · token 数 {sa.T} / {sb.T} {aligned ? '✓' : '✗（按命名读出位置比较）'}</p><p className="v8-note">3D 里各插件模型显示本运行 − 对照运行的差值。</p></>, <><h4>每层相对差异</h4>{line([{ v: rel, color: '#a33e43', name: POSN[positions[pos]] }], layer, 2)}</>, '差值是观察，原因要靠干预；不对齐时差值含前缀差异。']; })(),
-    lens: () => { const L = sa ? [{ v: sa.d.lens.map(r => r[0] - r[1]), color: '#2a78d6', name: '本运行' }, ...(sb ? [{ v: sb.d.lens.map(r => r[0] - r[1]), color: '#d4622b', name: '对照运行' }] : [])] : [{ v: FLOW_DATA.lensDoc, color: '#2a78d6', name: '按资料（案例汇总）' }, { v: FLOW_DATA.lensReal, color: '#d4622b', name: '按现实（案例汇总）' }];
-      return [<><h4>Logit Lens · 答案位置 · {nameK}色 − {nameP}色</h4>{line(L, layer)}</>, <p className="v8-note">3D：LLM 右缘的条。正式版另给每层前 5 个 token。</p>, '读出近似，早层不可靠。']; },
+    lens: () => isLive ? [<p key="l" className="v8-note">实时运行的逐层读出待接入（需要本机权重）；本次的最终输出见“运行结果”。</p>, '', ''] : (() => { const L = sa ? [{ v: sa.d.lens.map(r => r[0] - r[1]), color: '#2a78d6', name: '本运行' }, ...(sb ? [{ v: sb.d.lens.map(r => r[0] - r[1]), color: '#d4622b', name: '对照运行' }] : [])] : [{ v: FLOW_DATA.lensDoc, color: '#2a78d6', name: '按资料（案例汇总）' }, { v: FLOW_DATA.lensReal, color: '#d4622b', name: '按现实（案例汇总）' }];
+      return [<><h4>Logit Lens · 答案位置 · {nameK}色 − {nameP}色</h4>{line(L, layer)}</>, <p className="v8-note">3D：LLM 右缘的条。正式版另给每层前 5 个 token。</p>, '读出近似，早层不可靠。']; })(),
     tests: () => [<TestsPanel key="t" />, '', ''],
     result: () => gen.res ? [<><h4>下一个词的预测 · {gen.res.tokens.length} 个 token · {gen.res.elapsed} ms</h4><TopTokens top={gen.res.top} /></>, <><h4>每层改写幅度（3D 主干上的金色圆点）</h4>{line([{ v: gen.res.curve, color: '#d29a00', name: '1 − cos(h_l, h_(l−1))，最后一个位置' }], layer, 2)}</>, '实时生成是一次前向的未登记观察，不产生研究结论。'] : [<p key="r" className="v8-note">还没有运行。</p>],
   };
@@ -393,7 +419,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     if (h.o === 'hs' && sa && h.idx < DM) { const vals = Array.from({ length: NL }, (_, l) => sa.hs(pos, l)[h.idx]);
       return <><h4>HiddenState · 第 {h.l} 层 · 坐标 {h.idx}</h4><div className="aw-kv"><span>值</span><span><b>{vals[h.l].toFixed(4)}</b></span>{sb && <><span>对照运行</span><span>{sb.hs(pos, h.l)[h.idx].toFixed(4)}</span></>}<span>本层 ‖h‖</span><span>{norm(sa.hs(pos, h.l)).toFixed(1)}</span></div>
         {line([{ v: vals, color: '#2a78d6', name: '这个坐标跨层' }], h.l, 2)}<p className="v8-note">相邻坐标：{[-2, -1, 1, 2].map(d => h.idx + d).filter(i => i >= 0 && i < DM).map(i => `${i}: ${sa.hs(pos, h.l)[i].toFixed(2)}`).join('　')}</p></>; }
-    if (h.o === 'mlp' && sa && h.idx < NF) return pos !== ANS ? <p className="v8-note">MA-H2 只在答案位置存了 MLP 激活。</p> : <><h4>MLP · 块 {h.l - 1} · 单元 {h.idx}</h4><div className="aw-kv"><span>A</span><span><b>{sa.mlp(h.l - 1)[h.idx].toFixed(4)}</b></span>{sb && <><span>对照运行</span><span>{sb.mlp(h.l - 1)[h.idx].toFixed(4)}</span></>}</div></>;
+    if (h.o === 'mlp' && sa && h.idx < NF) return !mlpOk ? <p className="v8-note">这个位置没有采集 MLP 激活。</p> : <><h4>MLP · 块 {h.l - 1} · 单元 {h.idx}</h4><div className="aw-kv"><span>A</span><span><b>{sa.mlp(h.l - 1)[h.idx].toFixed(4)}</b></span>{sb && <><span>对照运行</span><span>{sb.mlp(h.l - 1)[h.idx].toFixed(4)}</span></>}</div></>;
     if (h.o === 'heads' && h.idx < NH) return <><h4>注意力头 L{h.l - 1}H{h.idx}</h4><p>{describe(h)}</p></>;
     return <><h4>第 {h.l} 层</h4><p className="v8-note">{h.l ? h.part : '词嵌入'}。打开 HiddenState、MLP 神经元或注意力头插件，在旁边看这一层的具体数值。</p></>; })();
 
@@ -418,7 +444,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     <section className={`aw-space${max ? ' max' : ''}`}>
       <Scene dims={{ NL, describe }} objs={objs} layer={layer} view={view} tex={TX} marks={marks} onPick={onPick} overlays={overlays} live={gen.res} />
       <div className="aw-ov tr"><button type="button" onClick={() => { setMax(m => !m); setPop(null); }}>{max ? '退出全屏（Esc）' : '⛶ 全屏'}</button></div>
-      <div className="aw-big"><b>{layer ? `第 ${layer} 层` : '词嵌入'}</b><span className="v8-note">{POSN[positions[pos]] || ''}{k ? `（token ${k.tokpos[pos]}）· ‖h‖ ${norm(sa.hs(pos, layer)).toFixed(1)}` : ''}</span></div>
+      <div className="aw-big"><b>{layer ? `第 ${layer} 层` : '词嵌入'}</b><span className="v8-note">{isLive ? '实时运行 · ' : '冻结样本 · '}{posName(pos)}{k ? `（token ${k.tokpos[pos]}）· ‖h‖ ${norm(sa.hs(pos, layer)).toFixed(1)}` : ''}</span></div>
       <div className="aw-legend v8-note"><span><i style={{ background: '#e5def3' }} />注意力</span><span><i style={{ background: '#dcefe4' }} />MLP</span><span><i style={{ background: '#172033' }} />残差主干</span>
         {(shown('hs') || shown('mlp')) && <span><i style={{ background: 'linear-gradient(90deg,#d4622b,#fff,#1f5fbf)' }} />{diffOn ? '差值：蓝 = 本运行大' : '蓝正橙负'}</span>}
         {shown('heads') && <span><i style={{ background: 'linear-gradient(90deg,#fff,#1e5fbf)' }} />头越蓝，越看所选 token</span>}
@@ -429,15 +455,19 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     <section className="v8-card aw-cons" aria-label="控制台">
       <div className="aw-chead"><h3>控制台</h3><span className="v8-note">输入一段文本，看模型逐层怎样运行；用插件观察和研究</span></div>
       <div className="aw-cin"><div><textarea value={text} onChange={e => setText(e.target.value)} placeholder="输入一段文字，点“执行”后模型做一次前向，3D 主干上叠加本次每层的改写幅度（需要桌面节点或本机后端）；不输入时“执行”显示当前样本的完整运行，“下一步”逐层前进" />
-        <p className="v8-note">{native ? `现在显示的是冻结样本 #${run.i}：实体 ${k.entity}，资料里写的颜色 = ${nameK}，常识颜色 = ${nameP}。` : reason}</p>{gen.err && <p className="ac-err" role="alert">{gen.err}</p>}</div>
+        <p className="v8-note">{isLive ? `现在显示的是本次实时运行（Qwen3-4B 真实前向，${gen.res.tokens.length} 个 token，用时 ${gen.res.elapsed} ms）：3D 与插件都读这次运行的原生值。` : native ? `现在显示的是冻结样本 #${run.i}：实体 ${k.entity}，资料里写的颜色 = ${nameK}，常识颜色 = ${nameP}。` : reason}</p>{gen.err && <p className="ac-err" role="alert">{gen.err}</p>}</div>
         <div className="aw-run">
           <button type="button" className="fw-tbtn primary" disabled={gen.busy || (text.trim() && (!live.base || live.status?.available === false))}
             title={text.trim() ? (live.base ? '用本机模型运行这段文字' : '没有连接到可用的本机模型：运行需要桌面节点或本机后端') : '显示当前样本的完整运行（到最后一层）'}
             onClick={() => { if (text.trim()) generate(); else setLayer(NL - 1); }}>{gen.busy ? '执行中…' : '执行'}</button>
           <button type="button" className="fw-tbtn" title="前进一层；到最后一层后从词嵌入重新开始" onClick={() => setLayer(l => (l >= NL - 1 ? 0 : l + 1))}>下一步</button>
           <span className="v8-note">{layer ? `第 ${layer} / ${NL - 1} 层` : `词嵌入 / ${NL - 1} 层`}</span>
+          <span className="aw-seg aw-src" role="group" aria-label="数据来源"><button type="button" aria-pressed={!isLive} onClick={() => setSrc('frozen')}>冻结样本</button>
+            <button type="button" aria-pressed={isLive} disabled={!gen.res} title={gen.res ? '本次实时运行' : '先用“执行”运行一段文字'} onClick={() => setSrc('live')}>实时运行</button></span>
         </div></div>
-      {k && <div className="aw-toks"><span className="v8-note">token（{k.ntok} 个；有名字的是读出位置）</span>{Array.from({ length: k.ntok }, (_, t) => { const i = k.tokpos.indexOf(t);
+      {isLive ? <div className="aw-toks live"><span className="v8-note">本次输入的 {positions.length} 个 token（点一个看它的各层；带下划线的是模块读出位置，有 MLP 与写入拆分）</span>
+        {positions.map((t, i) => <button type="button" key={i} className={`${i === pos ? 'on' : ''}${gen.res.readout?.includes(i) ? ' ro' : ''}`} title={`token ${i}`} onClick={() => setLivePos(i)}>{tokText(t)}</button>)}</div>
+        : k && <div className="aw-toks"><span className="v8-note">token（{k.ntok} 个；有名字的是读出位置）</span>{Array.from({ length: k.ntok }, (_, t) => { const i = k.tokpos.indexOf(t);
         return i >= 0 ? <button type="button" key={t} className={i === pos ? 'on' : ''} title={POSN[positions[i]]} onClick={() => setPos(i)}>{t}</button> : <span key={t} title={`token ${t}`}>·</span>; })}</div>}
       <div className="aw-body">{!max && ops}<div className="aw-right"><div className="aw-tabs" role="tablist">{tabs.map(t => <button type="button" role="tab" key={t.id} aria-selected={cur === t.id} onClick={() => { setTab(t.id); if (MODE_IDS.has(t.id)) onMode(t.id); }}>{t.name}</button>)}</div>{panel}</div></div>
       <p className="v8-note aw-foot">实时生成是一次前向的未登记观察，不产生研究结论。操作面板与全屏时的浮窗是同一个面板。</p>

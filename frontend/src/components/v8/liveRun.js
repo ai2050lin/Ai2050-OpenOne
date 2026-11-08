@@ -53,5 +53,26 @@ export async function runOnce(base, text) {
     const f = await request(base, `/api/traces/${d.trace_id}/field?block=${l}&position=${pos}&boundary=${l ? 'hidden_state' : 'embedding'}`);
     hidden.push(f.values);
   }
-  return { id: d.trace_id, tokens: d.tokens, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
+  return { id: d.trace_id, tokens: d.tokens, readout: d.readout_positions, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
+}
+
+/* 实时运行 bundle（/api/traces/{id}/bundle，float32 小端）→ 与冻结样本相同接口的取值器 */
+export function f32(o) {     // float32 小端（实时轨迹 bundle）
+  const bin = atob(o.b64), u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return { a: new Float32Array(u.buffer), shape: o.shape };
+}
+export function liveSampler(b, res) {
+  if (!b || !res) return null;
+  const hs = f32(b.hs), at = f32(b.attn), mlp = b.mlp ? f32(b.mlp) : null, ao = b.attn_out ? f32(b.attn_out) : null, mo = b.mlp_out ? f32(b.mlp_out) : null;
+  const [NL, DM] = hs.shape, [NB, NH, T] = at.shape, NF = mlp ? mlp.shape[1] : 9728;
+  const row = (m, i, w) => m.a.subarray(i * w, (i + 1) * w);
+  return {
+    P: 1, NL, DM, NB, NF, NH, T, live: true, hasMlp: Boolean(mlp), hasSplit: Boolean(ao && mo),
+    d: { tokpos: Array.from({ length: T }, (_, i) => i), lens: null, model_snapshot: b.model_snapshot, ntok: T, readout: b.readout_positions, tokens: res.tokens },
+    hs: (_p, l) => row(hs, l, DM),
+    mlp: blk => (mlp ? row(mlp, blk, NF) : null),
+    att: (blk, h) => at.a.subarray((blk * NH + h) * T, (blk * NH + h + 1) * T),
+    ao: blk => (ao ? row(ao, blk, DM) : null), mo: blk => (mo ? row(mo, blk, DM) : null),
+  };
 }
