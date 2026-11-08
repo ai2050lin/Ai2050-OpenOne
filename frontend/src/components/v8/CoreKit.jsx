@@ -1,6 +1,8 @@
 /* 页面公用部件（Phase 333 / 334，AGENTS.md 第 10 节“设计风格”）。
    Phase 334 按线上版（server.ai2050.com）的结构调整：页面标题 + 卡片式核心模块 + 左对齐的折叠行。 */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { clearPageInfo, setPageInfo } from './pageInfo.js';
 
 import './core_kit.css';
 
@@ -30,25 +32,17 @@ export function GateBar({ name, n, d, color = '#183f77', onClick }) {
   return onClick ? <button type="button" className="ck-gate" onClick={onClick}>{body}</button> : <div className="ck-gate">{body}</div>;
 }
 
-/* 页面标题：只显示标题；说明收进右上角的“说明”弹窗，保持页面简洁（Phase 338） */
+/* 页面标题与说明：页面上不显示，登记给右上角“?”窗口（Phase 338）。屏幕阅读器仍可读到标题；children（如范围选择）照常显示在右侧 */
 export function PageHead({ title, sub, note, children, id }) {
-  const [open, setOpen] = useState(false);
-  const box = useRef(null);
   useEffect(() => {
-    if (!open) return undefined;
-    const close = event => { if (event.key === 'Escape' || (event.type === 'mousedown' && !box.current?.contains(event.target))) setOpen(false); };
-    document.addEventListener('keydown', close); document.addEventListener('mousedown', close);
-    return () => { document.removeEventListener('keydown', close); document.removeEventListener('mousedown', close); };
-  }, [open]);
-  return <header className="v8-overview-heading ck-head">
-    <h2 id={id}>{title}</h2>
-    <div className="ck-head-right">{children}
-      {(sub || note) && <div className="ck-info" ref={box}>
-        <button type="button" className="ck-info-btn" aria-expanded={open} aria-label={`${title}说明`} onClick={() => setOpen(o => !o)}>说明</button>
-        {open && <div className="ck-info-pop" role="dialog" aria-label={`${title}说明`}>{sub && <p>{sub}</p>}{note && <p className="v8-note">{note}</p>}</div>}
-      </div>}
-    </div>
-  </header>;
+    const info = { title, sub, note };
+    setPageInfo(info);
+    return () => clearPageInfo(info);
+  }, [title, sub, note]);
+  return <>
+    <h2 id={id} className="ck-sr">{title}</h2>
+    {children && <div className="ck-head-tools">{children}</div>}
+  </>;
 }
 
 /* 核心模块的外框：卡片，左上角一个小标题 */

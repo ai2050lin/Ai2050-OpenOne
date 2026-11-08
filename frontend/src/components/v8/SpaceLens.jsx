@@ -299,7 +299,7 @@ function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weig
   if (view === 'research') return <>{modeBar}<ResearchSpace/></>;
   if (view === 'langframe') return <LanguageFrame/>;
   return (
-    <>{modeBar}{view === 'lang' && <p className="v8-note">语言项实测：语言图谱里的每一项能力，在模型上能不能读出、在哪一层、由哪些单元承载。外部框架本身在“空间 · 语言图谱”。</p>}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
+    <>{modeBar}<div className={'v8-space' + (showTower ? '' : ' wide') + (split ? ' split' : '')}>
       {showTower && (
       <aside className="v8-tower">
         <div className="v8-tower-hd">

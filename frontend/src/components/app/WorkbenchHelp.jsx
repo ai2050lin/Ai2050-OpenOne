@@ -4,6 +4,7 @@
 import { useEffect } from 'react';
 import {ROUTE_VIEWS,SPATIAL_MODES,STATIONS} from './workbenchUtil.js';
 import {CFG_SECTIONS} from './ConfigView.jsx';
+import { usePageInfo } from '../v8/pageInfo.js';
 
 const HELP = {
   route:{title:'进展 · 功能与原理',intro:'总览按外部语言图谱、内部模型图谱和两者的关联与验证组织。点击卡片查看具体材料、模型快照和证据，冻结分片在阶段任务中单独查看。',sections:[]},
@@ -13,6 +14,7 @@ const HELP = {
 };
 
 export default function WorkbenchHelp({ lens, onClose }) {
+  const page=usePageInfo();
   const original=HELP[lens]||HELP.route;
   const items=lens==='route'?ROUTE_VIEWS:lens==='spatial'?SPATIAL_MODES:lens==='process'?STATIONS.filter(s=>['plan','catalog','execution'].includes(s.id)):CFG_SECTIONS;
   const help={...original,sub:items.map(x=>x.label).join(' / '),sections:[{h:'页面入口',points:items.map(x=>`${x.label}：${x.desc}`)},...original.sections]};
@@ -32,6 +34,7 @@ export default function WorkbenchHelp({ lens, onClose }) {
           <button type="button" className="wb-help-close" onClick={onClose} aria-label="关闭说明">×</button>
         </header>
         <div className="wb-help-body">
+          {page && <section className="wb-help-page"><h3>本页：{page.title}</h3>{page.sub && <p>{page.sub}</p>}{page.note && <p className="wb-help-foot">{page.note}</p>}</section>}
           <p className="wb-help-intro">{help.intro}</p>
           {help.sections.map(s => (
             <section key={s.h}>
