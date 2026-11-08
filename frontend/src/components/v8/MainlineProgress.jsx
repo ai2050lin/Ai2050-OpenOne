@@ -2,7 +2,7 @@
    约束：百分比只在分母明确时显示；进度只表示执行到哪里，不表示结论成立。 */
 import { useState } from 'react';
 
-import { LOCKBOXES, STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
+import { CLAIMS, LOCKBOXES, STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 import './client_guide.css';
 import { Ring } from './CoreKit.jsx';
 
@@ -42,25 +42,41 @@ export function GateList({ stage }) {
   </>;
 }
 
-/* 主线总进度：H0–H7 完成阶段数。 */
-export function MainlineCard({ ring = false }) {
+/* 研究进度（Phase 340）：当前主张 + H0–H7 阶段条。默认只显示当前阶段一行；点阶段才展开过门项。 */
+export function MainlineCard({ ring = false, claim = CLAIMS[0] }) {
   const [sel, setSel] = useState(null);
   const { done, total, next } = stageProgress();
   const stage = sel == null ? null : STAGES[sel];
-  return <section className={ring ? 'mp-main mp-main-ring' : 'v8-card mp-main'} aria-label="主线总进度">
-    {ring ? <Ring value={total ? done / total : null} label={`${pct(done, total)}%`} size={150} ariaLabel={`主线总进度 ${pct(done, total)}%`} />
-      : <><span className="mp-t">主线总进度</span>
-        <div className="mp-hero">{pct(done, total)}%</div>
-        <PBar done={done} total={total} label="主线完成阶段" /></>}
-    <p className="v8-note">{done} / {total} 阶段完成{next ? <> · 下一步 <b>{next.id} {next.name}</b></> : ''}</p>
+  if (ring) return <section className="mp-main mp-main-ring" aria-label="主线总进度">
+    <Ring value={total ? done / total : null} label={`${pct(done, total)}%`} size={150} ariaLabel={`主线总进度 ${pct(done, total)}%`} />
+    <p className="v8-note">{done} / {total} 阶段完成</p>
+  </section>;
+  return <section className="v8-card mp-main" aria-label="研究进度">
+    <h3>研究进度</h3>
+    {claim && <p className="mp-claim"><small>当前主张 · {claim.id}</small><b>{claim.title}</b></p>}
     <div className="mp-stages" role="group" aria-label="主线阶段">{STAGES.map((item, i) => {
       const finished = item.done.length === item.gates.length;
       return <button type="button" key={item.id} className={(finished ? 'done' : item === next ? 'next' : '') + (sel === i ? ' on' : '')}
-        aria-expanded={sel === i} title={item.name} onClick={() => setSel(sel === i ? null : i)}>{item.id}</button>;
+        aria-expanded={sel === i} title={`${item.id} ${item.name}`} onClick={() => setSel(sel === i ? null : i)}>{item.id}</button>;
     })}</div>
-    {stage && <div className="mp-detail"><b>{stage.id} {stage.name}</b> · {stage.done.length === stage.gates.length ? '已完成' : stage.done.length ? `进行中 · ${stage.done.length} / ${stage.gates.length} 项` : stage === next ? '下一步' : '未开始'}<GateList stage={stage} /></div>}
-    <p className="v8-note">进度只表示执行到哪里，不表示结论成立。</p>
+    {stage ? <div className="mp-detail"><b>{stage.id} {stage.name}</b> · {stage.done.length === stage.gates.length ? '已完成' : stage.done.length ? `进行中 · ${stage.done.length} / ${stage.gates.length} 项` : stage === next ? '进行中' : '未开始'}<GateList stage={stage} />
+      {stage === next && claim?.run && <p className="v8-note"><b>运行记录：</b>{claim.run}</p>}</div>
+      : next && <div className="mp-now"><span><b>{next.id} {next.name}</b> · 进行中</span>
+        {claim?.run && <p className="v8-note">{claim.run}</p>}
+        <p className="v8-note">{done} / {total} 阶段完成 · 点一个阶段看过门项。进度只表示执行到哪里，不表示结论成立。</p></div>}
   </section>;
+}
+
+/* 当前主张的内容与否定条件（折叠行里用） */
+export function ClaimSummary({ claim = CLAIMS[0] }) {
+  return <div className="mp-claim-body">
+    <p><b>{claim.id}</b> · {claim.source} · {claim.model}</p>
+    <p>{claim.claim}</p>
+    <p><b>至少两个可区分的解释</b></p>
+    <ol>{claim.alts.map(alt => <li key={alt}>{alt}</li>)}</ol>
+    <p className="v8-note"><b>什么结果会否定它：</b>{claim.refute}</p>
+    <p className="v8-note"><b>预算与时间盒：</b>{claim.budget || '未登记'}</p>
+  </div>;
 }
 
 /* 冻结向导：AGENTS 第 13 节的功效三栏。只做计算，不写入任何冻结记录。 */

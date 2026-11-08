@@ -1,8 +1,4 @@
 /* 三部分研究框架的共用样式 */
-.wb-root[data-client-mode="simple"] .wb-pro { display: none !important; }
-.wb-mode { display: inline-flex; border: 1px solid var(--fw-border-strong); border-radius: 7px; overflow: hidden; }
-.wb-mode button { border: 0; background: #fff; padding: 5px 11px; font: inherit; font-size: 12px; cursor: pointer; color: var(--fw-text-2); min-height: 30px; }
-.wb-mode button[aria-pressed="true"] { background: #184f95; color: #fff; font-weight: 600; }
 .cg-section { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .cg-section h3, .cg-section h4 { margin: 0; }
 .cg-section p { margin: 0; }
@@ -87,7 +83,6 @@
 @media (max-width: 720px) {
   .cg-grid3, .cg-grid2, .cg-pair, .cg-head-grid { grid-template-columns: minmax(0, 1fr); }
   .cg-flow { grid-template-columns: minmax(0, 1fr); }
-  .wb-mode button { min-height: 36px; }
 }
 
 /* ---- 研发主线进度（MainlineProgress） ---- */
@@ -109,6 +104,25 @@ button.mp-tile:hover { border-color: #b9c4d2; }
 .mp-stages button.next { border: 1.5px solid #245ca8; background: #edf4fd; color: #134584; }
 .mp-stages button.done { border: 1px solid #245ca8; background: #245ca8; color: #fff; }
 .mp-stages button.on { outline: 2px solid #16202c; outline-offset: 1px; }
+.cm h3 { margin: 0 0 2px; font-size: 15px; }
+.cm-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+.cm-table th { font-size: 11.5px; font-weight: 400; color: #566373; padding: 4px 6px; text-align: center; white-space: nowrap; }
+.cm-table th:first-child, .cm-table td:first-child { text-align: left; white-space: nowrap; }
+.cm-table td { padding: 4px 6px; text-align: center; border-top: 1px solid #f0f2f6; }
+.cm-table tbody tr:not(.cm-group) { cursor: pointer; }
+.cm-table tbody tr:not(.cm-group):hover td, .cm-table tr.on td { background: #f4f8fd; }
+.cm-table tr.cm-group td { font-size: 11.5px; color: #566373; padding-top: 10px; border-top: 0; }
+.cm-table .mp-tag { margin-left: 6px; }
+.cm-cell { display: block; height: 14px; min-width: 44px; border-radius: 3px; background: #f1f3f6; }
+.cm-cell.on { background: #5f88c4; }
+.mp-main > h3 { margin: 0 0 6px; font-size: 15px; }
+.mp-claim { margin: 0 0 4px; display: flex; flex-direction: column; gap: 2px; }
+.mp-claim small { font-size: 12px; color: #566373; }
+.mp-claim b { font-size: 14px; color: #16202c; }
+.mp-now { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.mp-now p { margin: 0; }
+.mp-claim-body p { margin: 0 0 6px; }
+.mp-claim-body ol { margin: 0 0 6px; padding-left: 20px; }
 .mp-detail { margin-top: 10px; background: #f6f8fa; border: 1px solid #dfe5ec; border-radius: 8px; padding: 9px 12px; font-size: 13px; }
 .mp-gates { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 4px; font-size: 13px; }
 .mp-gates li { display: flex; align-items: center; gap: 7px; }

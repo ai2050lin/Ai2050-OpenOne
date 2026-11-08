@@ -1,7 +1,7 @@
 /* 研究工作台 · 三部分研究框架的共用内容。
    语言图谱、LLM 内部图谱、两图谱关联贯穿各页；这里放页面共用的白话摘要、归因图和保真看板。
    约束：研究数字来自接口或登记过的记录；归因图是未预注册的界面演示，不计入研究证据；没有跑过的实验写“未测”。 */
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -11,23 +11,6 @@ import { BENCH, FINDINGS } from './data/mainline.js';
 import './client_guide.css';
 
 export const DEMO_SNAPSHOT = '6be1034f0b55a6df';
-const MODE_KEY = 'ai2050.clientMode';
-const modeListeners = new Set();
-
-function readMode() {
-  try { return window.localStorage.getItem(MODE_KEY) === 'pro' ? 'pro' : 'simple'; } catch { return 'simple'; }
-}
-
-/* 简明 / 专业只改变显示密度，不改变权限和数据。 */
-export function useClientMode() {
-  const mode = useSyncExternalStore(listener => { modeListeners.add(listener); return () => modeListeners.delete(listener); }, readMode, () => 'simple');
-  const setMode = next => {
-    try { window.localStorage.setItem(MODE_KEY, next); } catch { /* 私密窗口里只保留默认模式 */ }
-    modeListeners.forEach(listener => listener());
-  };
-  return [mode, setMode];
-}
-
 export const EVIDENCE = {
   observation: ['obs', '看到过'], heldout: ['held', '新材料也成立'], intervention: ['int', '改动后输出变了'],
   negative: ['neg', '未成立'], parameter_source: ['read', '权重可算'],

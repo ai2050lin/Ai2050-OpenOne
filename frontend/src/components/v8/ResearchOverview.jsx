@@ -10,7 +10,8 @@ import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
-import { FINDINGS, SCORES } from './data/mainline.js';
+import { CLAIMS, FINDINGS, SCORES } from './data/mainline.js';
+import CapabilityMatrix from './CapabilityMatrix.jsx';
 import { Bar, PageHead, PillTools } from './CoreKit.jsx';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
@@ -271,7 +272,7 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
       aria-expanded={open === id} aria-controls={open === id ? 'overview-detail' : undefined} onClick={() => toggle(id)}>
       <small>{part}</small>
       <strong>{title}</strong>
-      <span className="v8-overview-metric v8-overview-ratio">{id === 'relations' ? `四组成绩 ${rings.relations.label} 已测` : summaries[id]}</span>
+      <span className="v8-overview-metric v8-overview-ratio">{id === 'relations' ? `${CLAIMS.length} 条主张 · 四组成绩 ${rings.relations.label}` : summaries[id]}</span>
       <Bar value={rings[id].value} color={rings[id].color} label={`${title}进度`} />
       <span className="v8-note">{description}</span>
       {id === 'language' && <span className="v8-note">{sections.map(section => `${section.name} ${section.done} / ${section.total}`).join(' · ')}</span>}
@@ -296,8 +297,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
       </details>
     </PageHead>
     {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
-    <div className="ck-cards">{['language', 'relations', 'internal'].map(card)}</div>
+    <div className="ck-cards">{['language', 'internal', 'relations'].map(card)}</div>
     {detail}
+    <CapabilityMatrix onOpenClaim={() => onGo('process', 'plan')} />
     <PillTools label="总览的更多内容" items={[
       { id: 'case', label: '一个决策点案例', render: () => <div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
         <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></div> },

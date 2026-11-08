@@ -12,6 +12,7 @@ import Tower, { towerIndexPosition } from './Tower.jsx';
 import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { shortModel, workbenchHref } from './v8Util.js';
 import { useSpatialTrace } from './SpatialTrace.jsx';
+import UnitStates from './UnitStates.jsx';
 import { B35LayerResults, B35UnitFeatures, useB35Features, useB35Unit } from './B35RecursiveReport.jsx';
 import { AttributionGraph, BasisCompare, HeadFeature, HeadInternals, InfoFlowMap, LayerList, MinimalPairs, RelationBoards } from './ClientGuide.jsx';
 import './core_kit.css';
@@ -488,6 +489,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
                   style={pointValues?{backgroundColor:`rgba(${pointValues[head]<0?'235,104,52':'42,120,214'},${.08+.58*Math.abs(pointValues[head])/headScale})`}:undefined}
                   onClick={() => pickIndex(head)}>H{head}</button>)}
               </div>}
+              {module === 'attn' && n > 0 && index != null && <UnitStates snapshot={model.model_snapshot} block={block} head={index} />}
               {module === 'mlp' && n > 0 && <label>单元索引 <input aria-label="定位 MLP 单元" type="number" min={0} max={n - 1} value={index ?? ''}
                 placeholder={`0–${n - 1}`} onChange={event => {
                   const v = event.target.value;

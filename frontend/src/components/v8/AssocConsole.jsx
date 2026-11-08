@@ -10,8 +10,9 @@ import { AlgorithmPanel } from './AssocDeep.jsx';
 import { LineChart } from './H2Results.jsx';
 import { request } from './MechanismTraceExplorer.jsx';
 import { rewriteCurve } from './data/assocFlow.js';
+import { CLAIMS, TESTS } from './data/mainline.js';
 
-const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['method', '方法比较']];
+const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['method', '方法比较'], ['tests', '三类检验']];
 const EXAMPLE_A = '资料：香蕉是蓝色的。\n问：按这份资料，香蕉通常是什么颜色的？';
 const EXAMPLE_B = '资料：香蕉是蓝色的。\n问：在现实世界里，香蕉通常是什么颜色的？';
 
@@ -40,6 +41,20 @@ async function runOnce(base, text) {
     hidden.push(f.values);
   }
   return { id: d.trace_id, tokens: d.tokens, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
+}
+
+/* 三类检验（Phase 340）：每类与同信息预算的简单基线并列；数据来自冻结运行，不来自实时生成。未测就写未测。 */
+function TestsPanel() {
+  return <>
+    <p className="ac-k">三类检验 · 主张 {CLAIMS[0].id}</p>
+    <div className="v8-weight-scroll"><table className="v6-table">
+      <thead><tr><th>检验</th><th>项目</th><th>结果</th></tr></thead>
+      <tbody>{TESTS.flatMap(test => test.rows.map(([name, value], i) => <tr key={`${test.id}:${name}`}>
+        {i === 0 && <td rowSpan={test.rows.length} title={test.desc}><b>{test.name}</b><br /><span className="v8-note">{test.stage}</span></td>}
+        <td>{name}</td><td>{value == null ? <span className="mp-tag">未测</span> : value}</td></tr>))}</tbody>
+    </table></div>
+    <p className="v8-note">响应预测：只用允许的前缀和冻结规则预测未见材料的内部响应。输出预测：预测全词表分布、生成与具体错误。原生机制检验：交换对应因素的自然状态，查变化与不变项。结果只读冻结运行，左边的实时生成不计入。</p>
+  </>;
 }
 
 function TopTokens({ top }) {
@@ -101,6 +116,7 @@ export default function AssocConsole({ mode, onMode, onLive, panels, children })
         </> : <div className="ac-empty"><p className="ac-k">对照</p><p className="v8-note">两句只差一处（例如“按这份资料”和“在现实世界里”），分别生成后比较预测的下一个词和每层改写幅度。看到差别只是观察；要说明原因需要正式运行的修补实验。</p></div>)}
         {['lens', 'heads', 'factor'].includes(mode) && <>{panels[mode]}</>}
         {mode === 'method' && <AlgorithmPanel />}
+        {mode === 'tests' && <TestsPanel />}
       </div>
     </div>
     {children}

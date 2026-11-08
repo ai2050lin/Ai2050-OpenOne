@@ -40,6 +40,64 @@ export const SPLITS = [
   { id: 'lockbox', use: '一次性留出', built: true },
 ];
 
+/* 主张登记（ResearchPlan_Final：每项研究挂到一个 claim_id）。预算与时间盒未登记时写 null，界面显示“未登记”。 */
+export const CLAIMS = [
+  { id: 'C-001', title: '资料 / 现实范围怎样决定读取哪个颜色', source: '上下文读取与绑定', model: 'Qwen3-4B bf16', snapshot: '6be1034f0b55a6df', stage: 'H3',
+    claim: '同一份资料里，问题写“在这份资料里”还是“在现实世界里”，模型分别按资料颜色或常识颜色作答；范围词改变中后层的读取，最终改变下一个词。这是工作主张，不是结论。',
+    alts: ['提问时就阻止读取资料色：候选头只在资料范围读资料色（读取门控）', '两种颜色都读进来，到末层再按范围选择'],
+    refute: 'MA-H3 预注册 P1–P3：confirm 上只保留候选载体时恢复比例 f(C) < 0.7 或不比同预算随机集合高 0.3；只移除载体后差距保留比例 > 0.5；confirm 与 discovery 相差 > 0.15。任一项成立，主张按范围收窄或否定。',
+    budget: null,
+    run: 'MA-H3 问法 v3 已冻结。discover 第一次运行（批大小 8）显存溢出到系统内存，14 小时没有进度输出，已停止，未产生结果；下一步降低批大小、升版本重新冻结后重跑（材料与判据不变）。' },
+];
+
+/* 生命周期六环节（ResearchPlan_Final）。life 里 band 为 3D 层板序号（0 = 词嵌入，l = 第 l−1 块输出），只登记有观察依据的层段。 */
+export const LIFECYCLE = [
+  ['entry', '进入', '词身份提供多少信息'],
+  ['bind', '汇集与绑定', '实体、属性、角色何时组合'],
+  ['read', '选择与读取', 'QK 选中哪里，V/O 写到哪里'],
+  ['transform', '条件变换', 'MLP 在当前条件下怎样变换'],
+  ['relay', '接续与交互', '跨层、跨位置、生成步保持或竞争'],
+  ['output', '输出与反馈', '哪些信息影响下一词，生成怎样改变历史'],
+];
+export const CLAIM_LIFE = {
+  'C-001': {
+    entry: { band: null, text: '问题中的目标名位置 hs[0] 各条相同；答案位置两种范围的末 token 不同，范围效应在那里被词身份混淆（Phase 324）。' },
+    bind: { band: null, text: '未分析。H2 有答案位置之前的读出位置，可从这里开始。' },
+    read: { band: [24, 30], text: '第 23–29 块的若干头（L23H4、L28H0、L29H11 等）在资料范围读目标颜色约 0.6，现实范围 ≤ 0.08（discovery 观察，未干预）。' },
+    transform: { band: null, text: '未分析：MA-H2 没有分析 MLP 的条件变换。' },
+    relay: { band: [24, 33], text: '逐层读出：两种范围在第 24 层前不分高下，第 24–33 层同时分化（discovery 观察）。' },
+    output: { band: [36, 36], text: '最后一层的读出决定下一个词；多步生成与历史在 H6 采集。' },
+  },
+};
+
+/* 三类检验（ResearchPlan_Final）：每类都与同信息预算的简单基线并列。value 为 null 表示未测。 */
+export const TESTS = [
+  { id: 'response', name: '响应预测', stage: 'H3 / H5', desc: '只用允许的前缀和冻结规则，预测未见材料的内部响应与角色绑定。', rows: [['候选载体 f(C)（confirm）', null], ['基线：同预算随机集合', null], ['基线：词身份 hs[0]', null]] },
+  { id: 'output', name: '输出预测', stage: 'H5 / H6', desc: '图谱自己维护状态与历史，预测全词表分布、自由生成、首个分叉和具体错误。', rows: [['全词表 KL', null], ['具体错误一致率', null], ['基线：位置 / n-gram', null]] },
+  { id: 'native', name: '原生机制检验', stage: 'H4', desc: '交换对应因素的自然状态，查预测的变化与不变项；加匹配负对照、恢复与能力保持。', rows: [['解释 1：读取门控', null], ['解释 2：末层选择', null], ['匹配负对照', null]] },
+];
+
+/* 能力矩阵：行 = 能力操作（按三种能力来源分组），列 = 六级证据状态。level 为已到达的最高一级（0 起），来源可回查。
+   模式族报告的“未见词表可读出”只到“内部已观察”；干预、选择性与自然生成在协议里记为 not_run，不升级。 */
+export const CAP_LEVELS = ['已定义', '已有材料', '行为已校准', '内部已观察', '机制已检验', '推广已测'];
+export const CAPABILITIES = [
+  ['参数知识提取', [
+    { op: '属性获取', family: 'KN-ATTR', level: 3, src: 'TG-KN-ATTR-20261016-185728：行为门 36 格通过；3 个模型在未见词表上可读出', claim: null },
+    { op: '类别归属', family: 'KN-ISA', level: 3, src: 'TG-KN-ISA-20261016-182829：行为门 90 格通过；3 个模型在未见词表上可读出', claim: null },
+  ]],
+  ['上下文读取与绑定', [
+    { op: '范围选择（资料 / 现实）', family: 'MA', level: 3, src: 'MA-H0-v5 行为门（Phase 322）；MA-H2 第 24–33 层分化与读资料色的头（Phase 324，discovery 观察）', claim: 'C-001' },
+    { op: '目标记录位置', family: 'MA', level: 3, src: 'MA-H0-v5 行为门（Phase 322）；MA-H2 因素差异幅度（Phase 324，观察）', claim: null },
+    { op: '错误草稿排除', family: 'MA', level: 3, src: 'MA-H0-v5 行为门（Phase 322）；MA-H2 因素差异幅度（Phase 324，观察）', claim: null },
+  ]],
+  ['组合推断与规则应用', [
+    { op: '疑问与陈述', family: 'GR-Q', level: 3, src: 'TG-GR-Q-20261019-055247：行为门 6 格通过；3 个模型在未见词表上可读出', claim: null },
+    { op: '否定', family: 'GR-NEG', level: 3, src: 'TG-GR-NEG-20261018-055951：行为门 12 格通过；3 个模型在未见词表上可读出', claim: null },
+    { op: '跨语言实体保持', family: 'ENT-XF', level: 3, src: 'TG-ENT-XF-20261017-034525：行为门部分通过（168 格中 46 格排除）；3 个模型在未见词表上可读出', claim: null },
+    { op: '简单关系组合', family: '—', level: 0, src: '已在研究方案中定义，尚无材料', claim: null },
+  ]],
+];
+
 /* 四组成绩：v6 第 11 节。全部未测。 */
 export const SCORES = [
   ['新条件的响应和绑定预测', '只看前缀，预测内部响应和实体与属性的绑定'],

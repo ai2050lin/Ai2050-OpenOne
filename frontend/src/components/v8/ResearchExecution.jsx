@@ -11,10 +11,9 @@ import ResearchBundleUpload from './ResearchBundleUpload.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
 import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
 import ClaimDraft from './ClaimDraft.jsx';
-import { MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
+import { ClaimSummary, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
 import { PageHead, PillTools } from './CoreKit.jsx';
-import { useCoverage } from './coverage.js';
-import { RUNS, SCORES, SLICES, STAGES } from './data/mainline.js';
+import { CLAIMS, RUNS, SLICES, STAGES } from './data/mainline.js';
 
 const STAGE = {
   freeze: '冻结材料', collection: '原场采集', client_acceptance: '客户端回查', validation: '留出验证',
@@ -155,8 +154,6 @@ function ResearchPlans({ onGo }) {
   }, [refreshJobs]);
 
   const { run } = useResearchContext();
-  const coverage = useCoverage();
-  const [tile, setTile] = useState('');
   const all = packages.data?.workpackages ?? [];
   const ids = new Set(all.map(({ body }) => body.run_id));
   const focused = all.find(({ body }) => body.run_id === run);
@@ -176,15 +173,7 @@ function ResearchPlans({ onGo }) {
   const row = entry => <PlanRow key={`${run}:${entry.sha}`} entry={entry} focused={entry === focused} onGo={onGo}
     children={all.filter(child => child !== focused && !ongoing.includes(child) && child.body.parent_run_id === entry.body.run_id)}/>;
 
-  const census0 = jobs.find(job => job.unit === '分片' && job.total > 0);
-  const tileDetail = {
-    language: ['语言图谱', `语言目录 ${coverage.languageTotal} 项里，${coverage.language ?? '—'} 项已有当前模型的分析记录。`, () => onGo('spatial', 'graph', null, { gview: 'language' })],
-    internal: ['LLM 编码图谱', `${coverage.neuronTotal?.toLocaleString() ?? '—'} 个 MLP 单元里，${coverage.checked ?? '—'} 个做过解释检验。注意力头和词嵌入还没有按对象统计，不计入这个百分比。`, () => onGo('spatial', 'graph', null, { gview: 'structure' })],
-    relations: ['关联机制', '四组预测成绩都未测。已登记的连接数在“进展 · 总览”查看，它只表示登记量。', () => onGo('route', null, null, { rtab: 'overview' })],
-    census: ['当前作业', census0 ? `${census0.name}：${census0.done} / ${census0.total} 分片完成，${census0.active} 个运行中。` : '没有开放的普查作业。', () => onGo('execution')],
-  }[tile];
-
-  /* 首屏只有一个核心模块：主线进度环 + 阶段 + 一键参与；其余收进按钮（Phase 333） */
+  /* 线上版结构（Phase 340）：研究进度（当前主张 + 阶段）与参与研发并排；其余收进折叠行 */
   return <section className="v8-rnd v8-rnd-current" aria-label="当前研发">
     <PageHead title="当前研发" sub="主线走到哪里，现在能怎样参与。进度只表示执行到哪里，不表示结论成立。" />
     <div className="ck-plan">
@@ -193,14 +182,8 @@ function ResearchPlans({ onGo }) {
         publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
         onTaskChanged={refreshJobs}/></div>
     </div>
-    <div className="mp-tiles">
-      <PTile title="语言图谱" done={coverage.language} total={coverage.languageTotal} unit="项" on={tile === 'language'} onClick={() => setTile(tile === 'language' ? '' : 'language')}/>
-      <PTile title="LLM 编码图谱" done={coverage.checked} total={coverage.neuronTotal} unit="单元" on={tile === 'internal'} onClick={() => setTile(tile === 'internal' ? '' : 'internal')}/>
-      <PTile title="关联机制" done={SCORES.filter(score => score.value != null).length} total={SCORES.length} unit="组成绩" on={tile === 'relations'} onClick={() => setTile(tile === 'relations' ? '' : 'relations')}/>
-      <PTile title={census0 ? census0.name : '当前作业'} done={census0?.done} total={census0?.total} unit="分片" empty={census.loading ? '读取中' : '无开放作业'} on={tile === 'census'} onClick={() => setTile(tile === 'census' ? '' : 'census')}/>
-    </div>
-    {tileDetail && <div className="mp-detail"><b>{tileDetail[0]}</b>：{tileDetail[1]} <button type="button" className="v6-linkbtn" onClick={tileDetail[2]}>打开</button></div>}
     <PillTools label="当前研发的更多内容" initial={run ? 'packages' : ''} items={[
+      { id: 'claim', label: `主张、两个解释与否定条件 · ${CLAIMS[0].id}`, render: () => <ClaimSummary/> },
       { id: 'jobs', label: `作业明细 · ${ongoing.length + jobs.length}`, render: () => <div className="v8-rnd-dashboard">
         <section className="v8-rnd-progress" aria-label="研究进度">
           {ongoing.map(({ body }) => <div className="v8-rnd-progress-title" key={body.run_id}>
@@ -222,10 +205,10 @@ function ResearchPlans({ onGo }) {
       { id: 'slices', label: `本周期切片 · ${SLICES.filter(slice => slice.done).length} / ${SLICES.length}`, render: () =>
         <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>切片</th><th>任务</th><th>产物</th><th>状态</th></tr></thead>
           <tbody>{SLICES.map(slice => <tr key={slice.name}><td>{slice.name}</td><td>{slice.task}</td><td>{slice.output}</td><td>{slice.done ? '已完成' : '未开始'}</td></tr>)}</tbody></table></div> },
-      { id: 'claim', label: '主张卡草稿', render: () => <ClaimDraft/> },
-      { id: 'thesis', label: '当前主张和否定条件', render: () => <>
+      { id: 'draft', label: '写一张新的主张卡（草稿）', render: () => <ClaimDraft/> },
+      { id: 'thesis', label: '总体工作判断', render: () => <>
         <p><b>主张：</b>语言、风格、逻辑和语法通过条件化读写规则共同决定下一个词。这是工作判断，不是结论。</p>
-        <p className="v8-note"><b>如果否定：</b>规则在未见组合上超不过词身份、位置和 n-gram 基线，就换对象或换表示。<b>备择机制：</b>H0 要写好至少两个可区分的假设。<b>第一个任务：</b>长文属性绑定，Qwen3-4B bf16，中英文分别校准。</p>
+        <p className="v8-note"><b>如果否定：</b>规则在未见组合上超不过词身份、位置和 n-gram 基线，就换对象或换表示。</p>
       </> },
       { id: 'ways', label: '不贡献算力也能参与', render: () => <ParticipationWays onGo={onGo}/> },
       { id: 'gaps', label: '研究缺口与自动解释', render: () => <><ResearchGaps/><AutoExplainCard/></> },

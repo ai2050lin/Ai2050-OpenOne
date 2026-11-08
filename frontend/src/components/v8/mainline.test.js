@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 import { normalizeState, spaceMode, spaceTab } from '../app/workbenchUtil.js';
 import { BASIS, EDGES, NODES } from './data/lang_graph_seed.js';
-import { STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
+import { CAPABILITIES, CAP_LEVELS, CLAIMS, CLAIM_LIFE, LIFECYCLE, STAGES, TESTS, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 
 describe('空间三张图的路由', () => {
   const mode = input => { const st = normalizeState(input); return [spaceMode(st.view, st.gview), spaceTab(st.view, st.gview)]; };
@@ -69,5 +69,39 @@ describe('语言图谱种子', () => {
   });
   it('节点引用的目录条目都存在', () => {
     for (const node of NODES) if (node.cat) expect(catalogIds.has(node.cat)).toBe(true);
+  });
+});
+
+describe('主张、生命周期与能力矩阵的登记表（Phase 340）', () => {
+  const claimIds = new Set(CLAIMS.map(claim => claim.id));
+  it('每条主张至少两个可区分的解释，并写明否定条件与所在阶段', () => {
+    for (const claim of CLAIMS) {
+      expect(claim.alts.length).toBeGreaterThanOrEqual(2);
+      expect(claim.refute).toBeTruthy();
+      expect(STAGES.some(stage => stage.id === claim.stage)).toBe(true);
+    }
+  });
+  it('生命周期证据只用已定义的环节，层段落在 0–36 且有文字依据', () => {
+    const ids = new Set(LIFECYCLE.map(([id]) => id));
+    for (const [claim, life] of Object.entries(CLAIM_LIFE)) {
+      expect(claimIds.has(claim)).toBe(true);
+      for (const [id, entry] of Object.entries(life)) {
+        expect(ids.has(id)).toBe(true);
+        expect(entry.text).toBeTruthy();
+        if (entry.band) expect(entry.band[0] >= 0 && entry.band[0] <= entry.band[1] && entry.band[1] <= 36).toBe(true);
+      }
+    }
+  });
+  it('能力矩阵的等级有来源，没有干预就不到“机制已检验”', () => {
+    for (const [, ops] of CAPABILITIES) for (const op of ops) {
+      expect(op.level >= 0 && op.level < CAP_LEVELS.length).toBe(true);
+      expect(op.level).toBeLessThan(CAP_LEVELS.indexOf('机制已检验'));
+      expect(op.src).toBeTruthy();
+      if (op.claim) expect(claimIds.has(op.claim)).toBe(true);
+    }
+  });
+  it('三类检验未测时不填数值', () => {
+    expect(TESTS.map(test => test.id)).toEqual(['response', 'output', 'native']);
+    for (const test of TESTS) for (const [, value] of test.rows) expect(value).toBeNull();
   });
 });

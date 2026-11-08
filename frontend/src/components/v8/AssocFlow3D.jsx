@@ -23,7 +23,8 @@ function inPoly(x, y, poly) {
 }
 
 /* data: { lensDoc[37], lensReal[37], heads: { doc[36][32], real[36][32] }, factors: [[key, label, color, values[37]]] } */
-export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) {
+/* band：生命周期环节在本主张里有观察依据的层段 [lo, hi]（层板序号），高亮显示；claim / toolbar 由外层传入（Phase 340） */
+export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live, band = null, claim = '', toolbar = null }) {
   const canvasRef = useRef(null);
   const viewRef = useRef({ yaw: -0.65, pitch: 0.42 });
   const platesRef = useRef([]);
@@ -85,11 +86,11 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
     ctx.clearRect(0, 0, W, H);
     const plates = [];
     for (let l = 0; l < L; l++) {
-      const y = LY(l), isCur = l === ci, active = l <= cur + 0.001;
+      const y = LY(l), isCur = l === ci, active = l <= cur + 0.001, inBand = band && l >= band[0] && l <= band[1];
       ctx.globalAlpha = view === 'top' ? (isCur ? 1 : 0.1) : isCur ? 1 : active ? 0.92 : 0.6;
       const c = [[-PW, -PD], [PW, -PD], [PW, PD], [-PW, PD]].map(([x, z]) => proj(x, y, z));
       plates.push({ l, poly: c });
-      quad(c, l === 0 ? '#dbe3ee' : '#eef2f7', isCur ? '#d29a00' : '#7b8aa3', isCur ? 2.5 : 1.2);
+      quad(c, inBand ? '#d6e4f7' : l === 0 ? '#dbe3ee' : '#eef2f7', isCur ? '#d29a00' : inBand ? '#2a5fae' : '#7b8aa3', isCur ? 2.5 : inBand ? 2 : 1.2);
       if (l === 0) { ctx.fillStyle = '#334155'; ctx.font = '12px sans-serif'; const p = proj(-PW, y, PD); ctx.fillText('词嵌入', p[0] - 44, p[1] + 4); }
       else {
         for (let h = 0; h < NH; h++) {
@@ -141,7 +142,7 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
         ctx.fillStyle = '#8a5010'; ctx.font = '11px sans-serif'; ctx.fillText(`L${ci - 1}H${h}`, hx - 18, hy - 6);
       });
     }
-  }, [cur, ci, scope, view, facOn, selHead, tick, data, hmax, live]);
+  }, [cur, ci, scope, view, facOn, selHead, tick, data, hmax, live, band]);
 
   /* 拖动旋转、点层板选层 */
   const drag = useRef(null);
@@ -164,11 +165,12 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
 
   return <section className="af-stage" aria-label="全部层的 3D 空间">
     <div className="af-head">
-      <div><h3>一段文字怎样决定下一个词</h3><span className="v8-note">看 HiddenState 从词嵌入往上流过 36 层 · MA-H2 真实汇总（Qwen3-4B bf16，{data.n.toLocaleString()} 条）{live ? ' · 金色圆点为本次输入' : ''}</span></div>
+      <div><h3>一段文字怎样决定下一个词</h3><span className="v8-note">看 HiddenState 从词嵌入往上流过 36 层 · MA-H2 真实汇总（Qwen3-4B bf16，{data.n.toLocaleString()} 条）{claim ? ` · 主张 ${claim}` : ''}{live ? ' · 金色圆点为本次输入' : ''}</span></div>
       <div className="af-seg" role="group" aria-label="问法范围">{SCOPES.map(([id, label]) =>
         <button type="button" key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
       <button type="button" className="fw-tbtn" onClick={() => { const next = VORDER[(VORDER.indexOf(view) + 1) % 3]; viewRef.current = { yaw: VIEWS[next][0], pitch: VIEWS[next][1] }; setView(next); }}>视角：{VIEWS[view][2]}</button>
     </div>
+    {toolbar}
     <div className="af-body">
       <canvas ref={canvasRef} tabIndex={0} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onKeyDown={onKey}
         aria-label={`37 块层板自下而上排列，当前第 ${ci} 层。方向键换层，回车看详情。`} />
@@ -193,6 +195,7 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live }) 
     <div className="af-legend v8-note">
       <span><i style={{ background: 'linear-gradient(90deg,#cbd7e8,#6f95cf,#1648a0)' }} />头越蓝，越看资料里的颜色</span>
       <span><i style={{ background: '#b8c2d1' }} />MLP（本案例未分析）</span>
+      {band && <span><i style={{ background: '#d6e4f7', border: '1px solid #2a5fae' }} />所选环节有观察依据的层段</span>}
       <span><i style={{ background: '#172033', height: 3 }} />HiddenState</span>
       {live?.curve && <span><i style={{ background: '#d29a00', borderRadius: '50%', width: 10, height: 10 }} />本次输入每层改写幅度</span>}
       <span><i style={{ background: 'linear-gradient(90deg,#7050a0,#087b70,#b07d00,#c0392b,#4a7fd0)', height: 3 }} />各因素（离中线越远差异越大）</span>

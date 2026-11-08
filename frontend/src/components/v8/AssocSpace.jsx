@@ -11,6 +11,7 @@ import { AttributionGraph, DEMO_SNAPSHOT, InfoFlowMap } from './ClientGuide.jsx'
 import { LineChart } from './H2Results.jsx';
 import { AssocIntro } from './SpaceGuides.jsx';
 import { FLOW_DATA, rankHeads } from './data/assocFlow.js';
+import { CLAIMS, CLAIM_LIFE, LIFECYCLE } from './data/mainline.js';
 import { PageHead, PillTools } from './CoreKit.jsx';
 import './assoc_space.css';
 
@@ -27,6 +28,9 @@ export default function AssocSpace({ model, children, bare = false }) {
   const [facOn, setFacOn] = useState(() => Object.fromEntries(FLOW_DATA.factors.map(([k]) => [k, true])));
   const [selHead, setSelHead] = useState(null);
   const [allHeads, setAllHeads] = useState(false);
+  const [stage, setStage] = useState('');
+  const claim = CLAIMS[0], life = CLAIM_LIFE[claim.id] || {};
+  const lifeNow = stage ? life[stage] : null;
   const top = useMemo(() => rankHeads(), []);
   const ci = Math.round(cur);
   const pct = v => `${Math.round(v * 100)}%`;
@@ -64,7 +68,13 @@ export default function AssocSpace({ model, children, bare = false }) {
 
   return <div className="v8-route as-page" aria-label="关联机制">
     {!bare && <PageHead title="关联机制 · 运行与路径" sub="上面是全部 37 层的 3D 空间和 HiddenState 信息流；下面的控制台可以输入文字生成，也可以切换模式观察和分析。" />}
-    <AssocFlow3D data={FLOW_DATA} cur={cur} onCur={setCur} facOn={facOn} selHead={selHead} live={live} />
+    <AssocFlow3D data={FLOW_DATA} cur={cur} onCur={setCur} facOn={facOn} selHead={selHead} live={live} claim={claim.id}
+      band={lifeNow?.band || null} toolbar={<div className="as-life">
+        <div className="as-life-chips" role="group" aria-label="生命周期环节"><span className="v8-note">生命周期</span>
+          {[['', '全部', ''], ...LIFECYCLE].map(([id, label, desc]) => <button type="button" key={id || 'all'} aria-pressed={stage === id} title={desc}
+            onClick={() => { setStage(id); const band = id && life[id]?.band; if (band) setCur(band[1]); }}>{label}</button>)}</div>
+        {lifeNow && <p className="v8-note"><b>{LIFECYCLE.find(([id]) => id === stage)[1]}</b>：{lifeNow.text}{lifeNow.band ? ` 高亮第 ${lifeNow.band[0]}–${lifeNow.band[1]} 层板。` : ' 没有观察依据，不标层段。'}层段来自本主张已有的观察，不是固定的模型分区。</p>}
+      </div>} />
     <AssocConsole mode={mode} onMode={setMode} onLive={setLive} panels={panels} />
     <PillTools label="关联机制的更多内容" items={[
       { id: 'trace', label: '原生轨迹查看器（逐层、逐头、逐个 MLP 单元）', render: () => children },
