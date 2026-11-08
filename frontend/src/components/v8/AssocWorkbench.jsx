@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
 import { TestsPanel, TopTokens } from './AssocConsole.jsx';
-import { runOnce, useLiveBase, useLocalBase } from './liveRun.js';
+import { runOnce, useLiveBase, useLiveModel, useLocalBase } from './liveRun.js';
 import { request } from './MechanismTraceExplorer.jsx';
 import { FLOW_DATA } from './data/assocFlow.js';
 import { PageHead } from './CoreKit.jsx';
@@ -180,6 +180,7 @@ function Scene({ dims, objs, layer, view, tex: TX, marks, onPick, overlays, live
 /* ---------- 主组件 ---------- */
 export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const live = useLiveBase();                                   // 实时生成
+  const lm = useLiveModel(live.base);                           // 本机模型的加载 / 卸载
   const nat = useLocalBase('/api/traces/mainline/ma-h2/samples'); // 冻结样本的原生数据（只在本机可读）
   const base = nat.base;
   const [samples, setSamples] = useState(null);
@@ -401,7 +402,19 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     <div className="aw-models" role="group" aria-label="模型">{(models.length ? models : [{ model: 'qwen3-4b', n_layers: 36 }]).map(m => {
       const isMain = /qwen3-4b/i.test(m.model);
       return <button type="button" key={m.model} aria-pressed={isMain} title={isMain ? '' : '这个模型还没有工作台的冻结样本'} disabled={!isMain}>
-        <b>{shortModel(m.model)}</b><small>{m.n_layers} 层{m.d_ff ? ` · MLP ${m.d_ff}` : ''}</small><span className={isMain && native ? 'ok' : 'warn'}>{isMain ? (native ? '冻结样本 · 原生数据' : '案例汇总') : '暂无冻结样本'}</span></button>; })}</div>
+        <b>{shortModel(m.model)}</b><small>{m.n_layers} 层{m.d_ff ? ` · MLP ${m.d_ff}` : ''}</small><span className={isMain && native ? 'ok' : 'warn'}>{isMain ? (native ? '冻结样本 · 原生数据' : '案例汇总') : '暂无冻结样本'}</span></button>; })}
+      <div className="aw-load" aria-label="本机模型">{(() => {
+        const s = lm.status, state = !live.checked ? 'checking' : !live.base ? 'none' : s?.status || 'checking';
+        const label = { checking: '查找本机模型…', none: '没有本机模型服务', unavailable: '本机没有模型权重', idle: '未加载', loading: `加载中${s?.progress ? ` · ${s.progress}` : ''}…`, ready: `已加载${s?.vram_gb != null ? ` · 显存 ${s.vram_gb} GB` : ''}`, error: '加载出错' }[state] || state;
+        return <>
+          <span className="v8-note">本机模型</span>
+          <b className={`aw-ls ${state}`}>{s?.model_name ? `${s.model_name} · ` : ''}{label}</b>
+          <span className="aw-row">
+            <button type="button" className="fw-tbtn primary" disabled={!live.base || lm.busy || !['idle', 'error'].includes(state)} title={live.base ? '把模型加载到 GPU（占用显存）' : '需要桌面节点或本机后端（:5001 / :5002）'} onClick={lm.load}>加载</button>
+            <button type="button" className="fw-tbtn" disabled={!live.base || lm.busy || !['ready', 'loading'].includes(state)} title="卸载模型，释放 GPU 显存" onClick={lm.unload}>卸载</button>
+          </span>
+          {(lm.msg || s?.error || (state === 'unavailable' && s?.reason)) && <small className="v8-note">{lm.msg || s?.error || s?.reason}</small>}
+        </>; })()}</div></div>
     <section className={`aw-space${max ? ' max' : ''}`}>
       <Scene dims={{ NL, describe }} objs={objs} layer={layer} view={view} tex={TX} marks={marks} onPick={onPick} overlays={overlays} live={gen.res} />
       <div className="aw-ov tr"><button type="button" onClick={() => { setMax(m => !m); setPop(null); }}>{max ? '退出全屏（Esc）' : '⛶ 全屏'}</button></div>
