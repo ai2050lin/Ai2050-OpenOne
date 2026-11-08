@@ -1,0 +1,924 @@
+{
+ "schema": "lang_map.structure.v1",
+ "version": 1,
+ "note": "语言图谱的人工结构（上三层）与虚词草稿。改这里后运行 python scripts/build_lang_map.py 重建 lang_map.json 与词层；结构是展示与研究组织方式，不是模型内部结构。",
+ "domains": [
+  {
+   "id": "KN",
+   "name": "知识网络",
+   "desc": "世界里有什么、各自有什么性质和关系",
+   "subs": [
+    {
+     "id": "KN.entity",
+     "name": "实体与类别",
+     "items": [
+      {
+       "catalog": "SEM.CATEGORY"
+      },
+      {
+       "catalog": "SEM.ISA"
+      },
+      {
+       "catalog": "SEM.IDENTITY"
+      }
+     ]
+    },
+    {
+     "id": "KN.attribute",
+     "name": "属性",
+     "items": [
+      {
+       "catalog": "SEM.ATTRIBUTE"
+      }
+     ]
+    },
+    {
+     "id": "KN.relation",
+     "name": "实体关系",
+     "items": [
+      {
+       "catalog": "SEM.PART"
+      },
+      {
+       "catalog": "SEM.ORIGIN"
+      },
+      {
+       "id": "KN.USE",
+       "name": "用途与功能",
+       "example": "「剪刀」用来剪东西，「杯子」用来盛水。"
+      }
+     ]
+    },
+    {
+     "id": "KN.event",
+     "name": "事件与情景",
+     "items": [
+      {
+       "catalog": "SEM.EVENT"
+      }
+     ]
+    },
+    {
+     "id": "KN.quantity",
+     "name": "数量与时空",
+     "items": [
+      {
+       "catalog": "SEM.QUANTITY"
+      },
+      {
+       "catalog": "SEM.SPACETIME"
+      }
+     ]
+    },
+    {
+     "id": "KN.sense",
+     "name": "词义",
+     "items": [
+      {
+       "catalog": "SEM.SENSE"
+      },
+      {
+       "catalog": "SEM.LEXREL"
+      },
+      {
+       "id": "KN.COLLOC",
+       "name": "搭配",
+       "example": "「浓茶」常说，「厚茶」不常说。"
+      }
+     ]
+    },
+    {
+     "id": "KN.source",
+     "name": "知识来源",
+     "items": [
+      {
+       "catalog": "SEM.SOURCE"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "RS",
+   "name": "推理功能",
+   "desc": "由已有信息得出什么、怎样在语境里取用信息",
+   "subs": [
+    {
+     "id": "RS.logic",
+     "name": "逻辑运算",
+     "items": [
+      {
+       "catalog": "LOG.NEG"
+      },
+      {
+       "catalog": "LOG.QUANT"
+      },
+      {
+       "catalog": "LOG.CONNECTIVE"
+      },
+      {
+       "catalog": "LOG.COMPARE"
+      }
+     ]
+    },
+    {
+     "id": "RS.infer",
+     "name": "推理类型",
+     "items": [
+      {
+       "catalog": "LOG.COND"
+      },
+      {
+       "catalog": "LOG.CAUSE"
+      },
+      {
+       "catalog": "LOG.CHAIN"
+      },
+      {
+       "catalog": "LOG.QUANTITATIVE"
+      },
+      {
+       "catalog": "LOG.CONSTRAINT"
+      },
+      {
+       "id": "RS.ANALOGY",
+       "name": "类比",
+       "example": "「手之于手套，如同脚之于？」答「袜子」。"
+      },
+      {
+       "id": "RS.COUNTER",
+       "name": "反事实",
+       "example": "「假如香蕉是蓝色的，香蕉奶昔会是什么颜色？」"
+      }
+     ]
+    },
+    {
+     "id": "RS.context",
+     "name": "语境读取与绑定",
+     "items": [
+      {
+       "catalog": "DIS.COREF"
+      },
+      {
+       "catalog": "DIS.COMMONGROUND"
+      },
+      {
+       "catalog": "DIS.CONSISTENCY"
+      },
+      {
+       "id": "RS.SCOPE",
+       "name": "范围选择（资料 / 现实）",
+       "example": "资料说「香蕉是蓝色的」：问「按这份资料」答蓝，问「在现实世界里」答黄。"
+      },
+      {
+       "id": "RS.RECORD",
+       "name": "记录选择",
+       "example": "两条记录分别写香蕉和柠檬的颜色，问哪一条就读哪一条。"
+      },
+      {
+       "id": "RS.DRAFT",
+       "name": "错误信息排除",
+       "example": "资料里先有一份被划掉的错误草稿，作答时应忽略。"
+      }
+     ]
+    },
+    {
+     "id": "RS.discourse",
+     "name": "篇章",
+     "items": [
+      {
+       "catalog": "DIS.TOPIC"
+      },
+      {
+       "catalog": "DIS.RELATION"
+      },
+      {
+       "catalog": "DIS.TURN"
+      }
+     ]
+    },
+    {
+     "id": "RS.pragmatic",
+     "name": "交际意图",
+     "items": [
+      {
+       "catalog": "DIS.ACT"
+      },
+      {
+       "catalog": "DIS.PRESUP"
+      },
+      {
+       "catalog": "DIS.IMPLICATURE"
+      },
+      {
+       "catalog": "VAR.POLITENESS"
+      }
+     ]
+    },
+    {
+     "id": "RS.task",
+     "name": "任务功能",
+     "items": [
+      {
+       "catalog": "TASK.CUE"
+      },
+      {
+       "catalog": "TASK.PRIORITY"
+      },
+      {
+       "catalog": "TASK.FORMAT"
+      },
+      {
+       "catalog": "TASK.TRANSLATION"
+      },
+      {
+       "catalog": "TASK.SUMMARY"
+      },
+      {
+       "catalog": "TASK.EXTRACTION"
+      },
+      {
+       "catalog": "TASK.COMPLETION"
+      },
+      {
+       "catalog": "TASK.FORMAL"
+      },
+      {
+       "catalog": "TASK.TOOL"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "GR",
+   "name": "语法规则",
+   "desc": "词怎样构成、怎样分类、怎样组合成句",
+   "subs": [
+    {
+     "id": "GR.form",
+     "name": "书写与构词",
+     "items": [
+      {
+       "catalog": "FORM.BOUNDARY"
+      },
+      {
+       "catalog": "FORM.PUNCT"
+      },
+      {
+       "catalog": "FORM.NOTATION"
+      },
+      {
+       "catalog": "FORM.AFFIX"
+      },
+      {
+       "catalog": "FORM.COMPOUND"
+      },
+      {
+       "catalog": "FORM.REDUP"
+      },
+      {
+       "catalog": "FORM.SPELL"
+      },
+      {
+       "catalog": "FORM.ABBR"
+      },
+      {
+       "catalog": "FORM.TYPO"
+      }
+     ]
+    },
+    {
+     "id": "GR.pos",
+     "name": "词类",
+     "items": [
+      {
+       "id": "GR.POS.N",
+       "name": "名词",
+       "example": "表示人、事物、地点、时间。"
+      },
+      {
+       "id": "GR.POS.V",
+       "name": "动词",
+       "example": "表示动作、变化、存在。"
+      },
+      {
+       "id": "GR.POS.A",
+       "name": "形容词",
+       "example": "表示性质、状态。"
+      },
+      {
+       "id": "GR.POS.NUM",
+       "name": "数词",
+       "example": "一、二、三、半、几。"
+      },
+      {
+       "id": "GR.POS.CL",
+       "name": "量词",
+       "example": "「一只鸟」的「只」。"
+      },
+      {
+       "id": "GR.POS.PRON",
+       "name": "代词",
+       "example": "我、你、这、那、谁、什么。"
+      },
+      {
+       "id": "GR.POS.ADV",
+       "name": "副词",
+       "example": "不、很、都、也、已经。"
+      },
+      {
+       "id": "GR.POS.PREP",
+       "name": "介词",
+       "example": "在、从、把、被、比。"
+      },
+      {
+       "id": "GR.POS.CONJ",
+       "name": "连词",
+       "example": "和、但是、因为、如果。"
+      },
+      {
+       "id": "GR.POS.PART",
+       "name": "助词",
+       "example": "的、了、着、过、吗。"
+      },
+      {
+       "id": "GR.POS.INTJ",
+       "name": "叹词",
+       "example": "啊、哎、哦。"
+      },
+      {
+       "id": "GR.POS.ONO",
+       "name": "拟声词",
+       "example": "哗哗、叮当。"
+      }
+     ]
+    },
+    {
+     "id": "GR.phrase",
+     "name": "短语与组合",
+     "items": [
+      {
+       "catalog": "SYN.PHRASE"
+      },
+      {
+       "catalog": "SYN.EMBED"
+      },
+      {
+       "catalog": "SYN.DISTANCE"
+      }
+     ]
+    },
+    {
+     "id": "GR.clause",
+     "name": "句类与句式",
+     "items": [
+      {
+       "catalog": "SYN.MOOD"
+      },
+      {
+       "catalog": "SYN.COMMAND"
+      },
+      {
+       "catalog": "SYN.CONSTRUCTION"
+      }
+     ]
+    },
+    {
+     "id": "GR.argument",
+     "name": "论元与角色",
+     "items": [
+      {
+       "catalog": "SYN.ROLE"
+      },
+      {
+       "catalog": "SYN.VALENCY"
+      }
+     ]
+    },
+    {
+     "id": "GR.order",
+     "name": "语序与标记",
+     "items": [
+      {
+       "catalog": "SYN.ORDER"
+      },
+      {
+       "catalog": "SYN.AGREEMENT"
+      },
+      {
+       "catalog": "SYN.CASE"
+      }
+     ]
+    },
+    {
+     "id": "GR.tam",
+     "name": "时体与情态",
+     "items": [
+      {
+       "catalog": "SYN.TAM"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "dims": [
+  {
+   "catalog": "VAR.LANGUAGE"
+  },
+  {
+   "catalog": "VAR.SWITCH"
+  },
+  {
+   "catalog": "VAR.ALIGNMENT"
+  },
+  {
+   "catalog": "VAR.DIALECT"
+  },
+  {
+   "catalog": "VAR.REGISTER"
+  },
+  {
+   "catalog": "VAR.FIGURATIVE"
+  },
+  {
+   "catalog": "VAR.FRAME"
+  },
+  {
+   "catalog": "VAR.PARAPHRASE"
+  }
+ ],
+ "also": {
+  "LOG.NEG": [
+   "GR.clause"
+  ],
+  "SYN.MOOD": [
+   "RS.pragmatic"
+  ],
+  "LOG.COMPARE": [
+   "GR.clause"
+  ],
+  "SEM.QUANTITY": [
+   "RS.infer"
+  ],
+  "DIS.COREF": [
+   "GR.phrase"
+  ],
+  "VAR.POLITENESS": [
+   "GR.clause"
+  ]
+ },
+ "tree_compat": {
+  "KN.ISA": "SEM.ISA",
+  "KN.CAT": "SEM.CATEGORY",
+  "KN.ATTR": "SEM.ATTRIBUTE",
+  "KN.PART": "SEM.PART",
+  "KN.ORIGIN": "SEM.ORIGIN",
+  "RS.NEG": "LOG.NEG",
+  "RS.COND": "LOG.COND",
+  "RS.CAUSE": "LOG.CAUSE",
+  "RS.COMPARE": "LOG.COMPARE",
+  "RS.TASK": "TASK.CUE",
+  "GR.Q": "SYN.MOOD",
+  "GR.ROLE": "SYN.ROLE",
+  "GR.CONSTR": "SYN.CONSTRUCTION",
+  "EXT.LANG": "VAR.LANGUAGE",
+  "EXT.FRAME": "VAR.FRAME"
+ },
+ "extra_templates": {
+  "RS.SCOPE": [
+   "MA-H0–H3"
+  ],
+  "RS.RECORD": [
+   "MA-H0–H3"
+  ],
+  "RS.DRAFT": [
+   "MA-H0–H3"
+  ]
+ },
+ "function_words": {
+  "status": "draft",
+  "source": "按常用汉语语法整理的常用虚词（Claude 起草，2026-11-08），待审定",
+  "items": {
+   "GR.POS.ADV": [
+    {
+     "zh": "不",
+     "en": "not",
+     "fn": [
+      "LOG.NEG"
+     ]
+    },
+    {
+     "zh": "没",
+     "en": "not (past)",
+     "fn": [
+      "LOG.NEG",
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "别",
+     "en": "don't",
+     "fn": [
+      "LOG.NEG",
+      "SYN.COMMAND"
+     ]
+    },
+    {
+     "zh": "都",
+     "en": "all",
+     "fn": [
+      "LOG.QUANT"
+     ]
+    },
+    {
+     "zh": "也",
+     "en": "also",
+     "fn": [
+      "DIS.RELATION"
+     ]
+    },
+    {
+     "zh": "只",
+     "en": "only",
+     "fn": [
+      "LOG.QUANT"
+     ]
+    },
+    {
+     "zh": "很",
+     "en": "very",
+     "fn": []
+    },
+    {
+     "zh": "更",
+     "en": "more",
+     "fn": [
+      "LOG.COMPARE"
+     ]
+    },
+    {
+     "zh": "最",
+     "en": "most",
+     "fn": [
+      "LOG.COMPARE"
+     ]
+    },
+    {
+     "zh": "已经",
+     "en": "already",
+     "fn": [
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "正在",
+     "en": "in progress",
+     "fn": [
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "可能",
+     "en": "maybe",
+     "fn": [
+      "SYN.TAM"
+     ]
+    }
+   ],
+   "GR.POS.PREP": [
+    {
+     "zh": "在",
+     "en": "at / in",
+     "fn": [
+      "SEM.SPACETIME"
+     ]
+    },
+    {
+     "zh": "从",
+     "en": "from",
+     "fn": [
+      "SEM.SPACETIME",
+      "SEM.ORIGIN"
+     ]
+    },
+    {
+     "zh": "把",
+     "en": "BA",
+     "fn": [
+      "SYN.CONSTRUCTION"
+     ]
+    },
+    {
+     "zh": "被",
+     "en": "BEI (passive)",
+     "fn": [
+      "SYN.CONSTRUCTION",
+      "SYN.ROLE"
+     ]
+    },
+    {
+     "zh": "比",
+     "en": "than",
+     "fn": [
+      "LOG.COMPARE"
+     ]
+    },
+    {
+     "zh": "按",
+     "en": "according to",
+     "fn": [
+      "RS.SCOPE"
+     ]
+    },
+    {
+     "zh": "对",
+     "en": "toward",
+     "fn": [
+      "SYN.ROLE"
+     ]
+    },
+    {
+     "zh": "给",
+     "en": "to / for",
+     "fn": [
+      "SYN.ROLE"
+     ]
+    },
+    {
+     "zh": "关于",
+     "en": "about",
+     "fn": [
+      "DIS.TOPIC"
+     ]
+    }
+   ],
+   "GR.POS.CONJ": [
+    {
+     "zh": "和",
+     "en": "and",
+     "fn": [
+      "LOG.CONNECTIVE"
+     ]
+    },
+    {
+     "zh": "或者",
+     "en": "or",
+     "fn": [
+      "LOG.CONNECTIVE"
+     ]
+    },
+    {
+     "zh": "但是",
+     "en": "but",
+     "fn": [
+      "DIS.RELATION"
+     ]
+    },
+    {
+     "zh": "因为",
+     "en": "because",
+     "fn": [
+      "LOG.CAUSE"
+     ]
+    },
+    {
+     "zh": "所以",
+     "en": "so",
+     "fn": [
+      "LOG.CAUSE"
+     ]
+    },
+    {
+     "zh": "如果",
+     "en": "if",
+     "fn": [
+      "LOG.COND"
+     ]
+    },
+    {
+     "zh": "虽然",
+     "en": "although",
+     "fn": [
+      "DIS.RELATION"
+     ]
+    },
+    {
+     "zh": "即使",
+     "en": "even if",
+     "fn": [
+      "LOG.COND"
+     ]
+    },
+    {
+     "zh": "而且",
+     "en": "moreover",
+     "fn": [
+      "DIS.RELATION"
+     ]
+    }
+   ],
+   "GR.POS.PART": [
+    {
+     "zh": "的",
+     "en": "DE (attributive)",
+     "fn": [
+      "SYN.PHRASE"
+     ]
+    },
+    {
+     "zh": "地",
+     "en": "DE (adverbial)",
+     "fn": [
+      "SYN.PHRASE"
+     ]
+    },
+    {
+     "zh": "得",
+     "en": "DE (complement)",
+     "fn": [
+      "SYN.PHRASE"
+     ]
+    },
+    {
+     "zh": "了",
+     "en": "LE (perfective)",
+     "fn": [
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "着",
+     "en": "ZHE (durative)",
+     "fn": [
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "过",
+     "en": "GUO (experiential)",
+     "fn": [
+      "SYN.TAM"
+     ]
+    },
+    {
+     "zh": "吗",
+     "en": "MA (yes-no question)",
+     "fn": [
+      "SYN.MOOD"
+     ]
+    },
+    {
+     "zh": "呢",
+     "en": "NE",
+     "fn": [
+      "SYN.MOOD",
+      "DIS.TOPIC"
+     ]
+    },
+    {
+     "zh": "吧",
+     "en": "BA (suggestion)",
+     "fn": [
+      "DIS.ACT"
+     ]
+    }
+   ],
+   "GR.POS.CL": [
+    {
+     "zh": "个",
+     "en": "general",
+     "fn": [
+      "SEM.QUANTITY"
+     ]
+    },
+    {
+     "zh": "只",
+     "en": "animals",
+     "fn": [
+      "SEM.QUANTITY",
+      "SEM.CATEGORY"
+     ]
+    },
+    {
+     "zh": "条",
+     "en": "long things",
+     "fn": [
+      "SEM.QUANTITY",
+      "SEM.CATEGORY"
+     ]
+    },
+    {
+     "zh": "张",
+     "en": "flat things",
+     "fn": [
+      "SEM.QUANTITY"
+     ]
+    },
+    {
+     "zh": "本",
+     "en": "books",
+     "fn": [
+      "SEM.QUANTITY"
+     ]
+    },
+    {
+     "zh": "棵",
+     "en": "trees",
+     "fn": [
+      "SEM.QUANTITY",
+      "SEM.CATEGORY"
+     ]
+    }
+   ],
+   "GR.POS.PRON": [
+    {
+     "zh": "我",
+     "en": "I",
+     "fn": [
+      "DIS.COREF"
+     ]
+    },
+    {
+     "zh": "他",
+     "en": "he",
+     "fn": [
+      "DIS.COREF"
+     ]
+    },
+    {
+     "zh": "这",
+     "en": "this",
+     "fn": [
+      "DIS.COREF"
+     ]
+    },
+    {
+     "zh": "那",
+     "en": "that",
+     "fn": [
+      "DIS.COREF"
+     ]
+    },
+    {
+     "zh": "谁",
+     "en": "who",
+     "fn": [
+      "SYN.MOOD"
+     ]
+    },
+    {
+     "zh": "什么",
+     "en": "what",
+     "fn": [
+      "SYN.MOOD"
+     ]
+    }
+   ],
+   "GR.POS.NUM": [
+    {
+     "zh": "一",
+     "en": "one",
+     "fn": [
+      "SEM.QUANTITY"
+     ]
+    },
+    {
+     "zh": "半",
+     "en": "half",
+     "fn": [
+      "SEM.QUANTITY"
+     ]
+    },
+    {
+     "zh": "几",
+     "en": "how many",
+     "fn": [
+      "SEM.QUANTITY",
+      "SYN.MOOD"
+     ]
+    }
+   ],
+   "GR.POS.INTJ": [
+    {
+     "zh": "啊",
+     "en": "ah",
+     "fn": []
+    },
+    {
+     "zh": "哦",
+     "en": "oh",
+     "fn": []
+    }
+   ],
+   "GR.POS.ONO": [
+    {
+     "zh": "哗哗",
+     "en": "splash",
+     "fn": []
+    }
+   ]
+  }
+ }
+}

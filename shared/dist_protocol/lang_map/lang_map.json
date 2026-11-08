@@ -1,0 +1,1893 @@
+{
+ "schema": "lang_map.v1",
+ "version": 1,
+ "status": [
+  "已定义",
+  "有例句",
+  "有词表",
+  "有测试模板"
+ ],
+ "domains": [
+  {
+   "id": "KN",
+   "name": "知识网络",
+   "desc": "世界里有什么、各自有什么性质和关系",
+   "subs": [
+    {
+     "id": "KN.entity",
+     "name": "实体与类别",
+     "items": [
+      {
+       "id": "SEM.CATEGORY",
+       "name": "名词语义类别",
+       "example": "「扳手」属于工具类，「鲤鱼」属于动物类。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "ENT-XF",
+        "KN-LOOP"
+       ],
+       "n_words": 407,
+       "flags": [
+        true,
+        true,
+        true,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "只",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "条",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "棵",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SEM.ISA",
+       "name": "上下位关系",
+       "example": "「苹果是一种水果」表达类别归属。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "KN-ISA"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SEM.IDENTITY",
+       "name": "实体身份与别名",
+       "example": "在相关语境中辨别「鲁迅」和「周树人」指的是同一人。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "KN.attribute",
+     "name": "属性",
+     "items": [
+      {
+       "id": "SEM.ATTRIBUTE",
+       "name": "属性绑定",
+       "example": "「红杯子旁有个蓝碗」要求把颜色分别绑定给两个实体。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "KN-ATTR"
+       ],
+       "n_words": 13,
+       "flags": [
+        true,
+        true,
+        true,
+        true
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "KN.relation",
+     "name": "实体关系",
+     "items": [
+      {
+       "id": "SEM.PART",
+       "name": "部分与整体",
+       "example": "「轮子是汽车的一部分」表达组成关系。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SEM.ORIGIN",
+       "name": "来源与产地",
+       "example": "「葡萄酒由葡萄酿成」表达原料来源。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "从",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "KN.USE",
+       "name": "用途与功能",
+       "example": "「剪刀」用来剪东西，「杯子」用来盛水。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "KN.event",
+     "name": "事件与情景",
+     "items": [
+      {
+       "id": "SEM.EVENT",
+       "name": "事件与常识脚本",
+       "example": "餐厅语境中「点菜」和「结账」通常处在不同阶段。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "KN.quantity",
+     "name": "数量与时空",
+     "items": [
+      {
+       "id": "SEM.QUANTITY",
+       "name": "数值、计量与单位",
+       "example": "「两升水」结合数量、单位和所计量的对象。",
+       "origin": "catalog",
+       "also": [
+        "RS.infer"
+       ],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "个",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "只",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "条",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "张",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "本",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "棵",
+         "item": "GR.POS.CL",
+         "review": "draft"
+        },
+        {
+         "zh": "一",
+         "item": "GR.POS.NUM",
+         "review": "draft"
+        },
+        {
+         "zh": "半",
+         "item": "GR.POS.NUM",
+         "review": "draft"
+        },
+        {
+         "zh": "几",
+         "item": "GR.POS.NUM",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SEM.SPACETIME",
+       "name": "空间与时间关系",
+       "example": "「杯子在书的左侧」「会议在午饭后」分别描述相对位置和顺序。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "在",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        },
+        {
+         "zh": "从",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "KN.sense",
+     "name": "词义",
+     "items": [
+      {
+       "id": "SEM.SENSE",
+       "name": "多义与词义消歧",
+       "example": "「花钱」中的「花」与「一朵花」中的「花」含义不同。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SEM.LEXREL",
+       "name": "近义与反义",
+       "example": "「高兴」与「愉快」意思相近，「开」与「关」在某些语境中相反。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "KN.COLLOC",
+       "name": "搭配",
+       "example": "「浓茶」常说，「厚茶」不常说。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "KN.source",
+     "name": "知识来源",
+     "items": [
+      {
+       "id": "SEM.SOURCE",
+       "name": "知识来源与冲突",
+       "example": "设定资料和现实知识不一致时，按问题指定的来源作答。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "RS",
+   "name": "推理功能",
+   "desc": "由已有信息得出什么、怎样在语境里取用信息",
+   "subs": [
+    {
+     "id": "RS.logic",
+     "name": "逻辑运算",
+     "items": [
+      {
+       "id": "LOG.NEG",
+       "name": "否定与真值",
+       "example": "「灯亮着」和「灯没有亮」给出相反的状态描述。",
+       "origin": "catalog",
+       "also": [
+        "GR.clause"
+       ],
+       "templates": [
+        "ENT-XF",
+        "GR-NEG"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "不",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "没",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "别",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "LOG.QUANT",
+       "name": "量词与作用域",
+       "example": "「不是所有人都到了」允许部分人已经到达。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "都",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "只",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "LOG.CONNECTIVE",
+       "name": "命题连接与蕴含",
+       "example": "在通常的合取读法下，「下雨且刮风」蕴含「下雨」。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "和",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        },
+        {
+         "zh": "或者",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "LOG.COMPARE",
+       "name": "比较判断",
+       "example": "「甲比乙高」要求正确处理被比较对象和比较方向。",
+       "origin": "catalog",
+       "also": [
+        "GR.clause"
+       ],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "更",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "最",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "比",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "RS.infer",
+     "name": "推理类型",
+     "items": [
+      {
+       "id": "LOG.COND",
+       "name": "条件推理",
+       "example": "给出「若缺电则停机」与「缺电」，推得「停机」。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "如果",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        },
+        {
+         "zh": "即使",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "LOG.CAUSE",
+       "name": "因果关系",
+       "example": "「水管冻裂导致漏水」给出一个有方向的因果关系。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "因为",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        },
+        {
+         "zh": "所以",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "LOG.CHAIN",
+       "name": "传递与多步推断",
+       "example": "若甲早于乙、乙早于丙，可推得甲早于丙。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "LOG.QUANTITATIVE",
+       "name": "数量与时间计算",
+       "example": "「下午三点出发，两小时后到达」要求推算到达时间。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "LOG.CONSTRAINT",
+       "name": "约束一致性与反例",
+       "example": "在同一时刻、同一意义下，「门开着」和「门关着」互相冲突。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "RS.ANALOGY",
+       "name": "类比",
+       "example": "「手之于手套，如同脚之于？」答「袜子」。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "RS.COUNTER",
+       "name": "反事实",
+       "example": "「假如香蕉是蓝色的，香蕉奶昔会是什么颜色？」",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "RS.context",
+     "name": "语境读取与绑定",
+     "items": [
+      {
+       "id": "DIS.COREF",
+       "name": "指代、照应与省略恢复",
+       "example": "从「李明借了本书。他读完了」恢复「他」与省略的宾语。",
+       "origin": "catalog",
+       "also": [
+        "GR.phrase"
+       ],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "我",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        },
+        {
+         "zh": "他",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        },
+        {
+         "zh": "这",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        },
+        {
+         "zh": "那",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "DIS.COMMONGROUND",
+       "name": "共同知识与视角",
+       "example": "角色甲看见了信息，角色乙没看见，后续对话需分开两人的已知信息。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "DIS.CONSISTENCY",
+       "name": "跨段一致与信息更新",
+       "example": "后文应使用人物新公布的地址，并能区分旧址和新址。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "RS.SCOPE",
+       "name": "范围选择（资料 / 现实）",
+       "example": "资料说「香蕉是蓝色的」：问「按这份资料」答蓝，问「在现实世界里」答黄。",
+       "origin": "new",
+       "also": [],
+       "templates": [
+        "MA-H0–H3"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "按",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "RS.RECORD",
+       "name": "记录选择",
+       "example": "两条记录分别写香蕉和柠檬的颜色，问哪一条就读哪一条。",
+       "origin": "new",
+       "also": [],
+       "templates": [
+        "MA-H0–H3"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "RS.DRAFT",
+       "name": "错误信息排除",
+       "example": "资料里先有一份被划掉的错误草稿，作答时应忽略。",
+       "origin": "new",
+       "also": [],
+       "templates": [
+        "MA-H0–H3"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "RS.discourse",
+     "name": "篇章",
+     "items": [
+      {
+       "id": "DIS.TOPIC",
+       "name": "主题延续与信息焦点",
+       "example": "连续几句谈天气后，「至于交通」切换讨论主题。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "关于",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        },
+        {
+         "zh": "呢",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "DIS.RELATION",
+       "name": "转折、解释与篇章关系",
+       "example": "「路很远，不过交通方便」用转折衔接两句。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "也",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "但是",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        },
+        {
+         "zh": "虽然",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        },
+        {
+         "zh": "而且",
+         "item": "GR.POS.CONJ",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "DIS.TURN",
+       "name": "说话人、轮次与引语",
+       "example": "区分「他说我明天去」中转述者与被转述者。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "RS.pragmatic",
+     "name": "交际意图",
+     "items": [
+      {
+       "id": "DIS.ACT",
+       "name": "言语行为与间接请求",
+       "example": "在合适语境中，「你能关窗吗？」可以是在请求关窗。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "吧",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "DIS.PRESUP",
+       "name": "预设",
+       "example": "「她又迟到了」通常预设此前有过迟到。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "DIS.IMPLICATURE",
+       "name": "会话含义",
+       "example": "「我读了一部分」在一些场合暗示没有读完，含义依赖语境。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "VAR.POLITENESS",
+       "name": "礼貌与表达强度",
+       "example": "「关窗」「请关窗」和「方便关一下窗吗」可请求同一行动。",
+       "origin": "catalog",
+       "also": [
+        "GR.clause"
+       ],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "RS.task",
+     "name": "任务功能",
+     "items": [
+      {
+       "id": "TASK.CUE",
+       "name": "任务线索识别",
+       "example": "同一文本前的「翻译」「判断」「续写」指向不同任务。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "ENT-XF"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.PRIORITY",
+       "name": "多条指令与约束冲突",
+       "example": "「保留所有数字」与「省略统计细节」并存时，需要确定适用范围。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.FORMAT",
+       "name": "格式与长度约束",
+       "example": "「用两句中文回答，并给出日期」同时规定语言、长度和内容。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.TRANSLATION",
+       "name": "翻译",
+       "example": "在目标语言中表达原句事件、角色和语气。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.SUMMARY",
+       "name": "摘要与信息取舍",
+       "example": "将一篇报道缩写成一段，保留关键事实和限制条件。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.EXTRACTION",
+       "name": "问答与信息抽取",
+       "example": "从通知中抽取活动时间、地点和报名截止日。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.COMPLETION",
+       "name": "补全、续写与润色",
+       "example": "续写故事时保持角色和已建立情节一致。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.FORMAL",
+       "name": "程序与数学表达",
+       "example": "把「选出所有大于 10 的数」转换成筛选条件或代码。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "TASK.TOOL",
+       "name": "工具调用与结构化输出",
+       "example": "将「查周五上海的天气」转换为含地点与日期的查询参数。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "GR",
+   "name": "语法规则",
+   "desc": "词怎样构成、怎样分类、怎样组合成句",
+   "subs": [
+    {
+     "id": "GR.form",
+     "name": "书写与构词",
+     "items": [
+      {
+       "id": "FORM.BOUNDARY",
+       "name": "词界与分词",
+       "example": "「研究生命起源」切成「研究 / 生命 / 起源」，语言词界可与模型 token 边界分别记录。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.PUNCT",
+       "name": "标点与段落边界",
+       "example": "「他说：『走吧。』」的冒号和引号标出说话内容。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.NOTATION",
+       "name": "数字、日期与符号写法",
+       "example": "「三点五」与「3.5」可以表示同一数值。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.AFFIX",
+       "name": "词缀与派生",
+       "example": "英文 kind 加前缀 un- 形成 unkind。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.COMPOUND",
+       "name": "复合词",
+       "example": "「火车站」由「火车」和「站」组合，整体指一种设施。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.REDUP",
+       "name": "重叠",
+       "example": "「看看」与「看」词形相关，在请求中的语气可能不同。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.SPELL",
+       "name": "拼写和字形变体",
+       "example": "英文 colour 与 color 的拼写不同。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.ABBR",
+       "name": "缩写与简称",
+       "example": "「北京大学」可在适当语境中简称「北大」。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "FORM.TYPO",
+       "name": "错字与变体恢复",
+       "example": "在「我收道了邮件」中结合上下文恢复「收到」。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "GR.pos",
+     "name": "词类",
+     "items": [
+      {
+       "id": "GR.POS.N",
+       "name": "名词",
+       "example": "表示人、事物、地点、时间。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.V",
+       "name": "动词",
+       "example": "表示动作、变化、存在。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.A",
+       "name": "形容词",
+       "example": "表示性质、状态。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.NUM",
+       "name": "数词",
+       "example": "一、二、三、半、几。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 3,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.CL",
+       "name": "量词",
+       "example": "「一只鸟」的「只」。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 6,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.PRON",
+       "name": "代词",
+       "example": "我、你、这、那、谁、什么。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 6,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.ADV",
+       "name": "副词",
+       "example": "不、很、都、也、已经。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 12,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.PREP",
+       "name": "介词",
+       "example": "在、从、把、被、比。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 9,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.CONJ",
+       "name": "连词",
+       "example": "和、但是、因为、如果。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 9,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.PART",
+       "name": "助词",
+       "example": "的、了、着、过、吗。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 9,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.INTJ",
+       "name": "叹词",
+       "example": "啊、哎、哦。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 2,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "GR.POS.ONO",
+       "name": "拟声词",
+       "example": "哗哗、叮当。",
+       "origin": "new",
+       "also": [],
+       "templates": [],
+       "n_words": 1,
+       "flags": [
+        true,
+        true,
+        true,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "GR.phrase",
+     "name": "短语与组合",
+     "items": [
+      {
+       "id": "SYN.PHRASE",
+       "name": "短语结构与修饰归属",
+       "example": "「新买的木桌」中「新买的」修饰「木桌」。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "的",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "地",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "得",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SYN.EMBED",
+       "name": "并列、从句与嵌套",
+       "example": "「我知道他认为这很重要」包含多层从句。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SYN.DISTANCE",
+       "name": "长距离句法依存",
+       "example": "「我昨天遇到的那位老师来了」中，主语与主要谓语之间可插入较长修饰。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "GR.clause",
+     "name": "句类与句式",
+     "items": [
+      {
+       "id": "SYN.MOOD",
+       "name": "疑问与陈述",
+       "example": "「我想知道他来不来。」有嵌入式疑问，句末仍可用句号。",
+       "origin": "catalog",
+       "also": [
+        "RS.pragmatic"
+       ],
+       "templates": [
+        "GR-NEG",
+        "GR-Q",
+        "KN-ATTR",
+        "KN-ISA"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "吗",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "呢",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "谁",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        },
+        {
+         "zh": "什么",
+         "item": "GR.POS.PRON",
+         "review": "draft"
+        },
+        {
+         "zh": "几",
+         "item": "GR.POS.NUM",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SYN.COMMAND",
+       "name": "祈使与感叹",
+       "example": "「请关门」用于请求；「多美的景色啊」表达感叹。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "别",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SYN.CONSTRUCTION",
+       "name": "主动、把字与被字句",
+       "example": "「他打破了杯子」与「杯子被他打破了」可描述同一事件。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "GR-ROLE"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "把",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        },
+        {
+         "zh": "被",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "GR.argument",
+     "name": "论元与角色",
+     "items": [
+      {
+       "id": "SYN.ROLE",
+       "name": "施事与受事",
+       "example": "「小王推开了门」中小王是施事，门是受事。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [
+        "GR-ROLE"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
+       ],
+       "fn_words": [
+        {
+         "zh": "被",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        },
+        {
+         "zh": "对",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        },
+        {
+         "zh": "给",
+         "item": "GR.POS.PREP",
+         "review": "draft"
+        }
+       ]
+      },
+      {
+       "id": "SYN.VALENCY",
+       "name": "配价与论元省略",
+       "example": "「她送了我一本书」涉及赠送者、接收者和物品。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "GR.order",
+     "name": "语序与标记",
+     "items": [
+      {
+       "id": "SYN.ORDER",
+       "name": "语序与成分移动",
+       "example": "「这本书我已经看了」把讨论对象置于句首。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SYN.AGREEMENT",
+       "name": "一致关系",
+       "example": "英文 The book is here 与 The books are here 的主谓数一致。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "SYN.CASE",
+       "name": "格、助词与结构标记",
+       "example": "「我的书」中「的」标记领属修饰关系。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": []
+      }
+     ]
+    },
+    {
+     "id": "GR.tam",
+     "name": "时体与情态",
+     "items": [
+      {
+       "id": "SYN.TAM",
+       "name": "时、体与情态",
+       "example": "「已经完成」「正在完成」「可能完成」表达不同的时间结构或可能性。",
+       "origin": "catalog",
+       "also": [],
+       "templates": [],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        false
+       ],
+       "fn_words": [
+        {
+         "zh": "没",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "已经",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "正在",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "可能",
+         "item": "GR.POS.ADV",
+         "review": "draft"
+        },
+        {
+         "zh": "了",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "着",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        },
+        {
+         "zh": "过",
+         "item": "GR.POS.PART",
+         "review": "draft"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "dims": [
+  {
+   "id": "VAR.LANGUAGE",
+   "name": "语种识别",
+   "example": "区分中文「早上好」与英文 Good morning。",
+   "templates": [
+    "ENT-XF"
+   ]
+  },
+  {
+   "id": "VAR.SWITCH",
+   "name": "语码混用",
+   "example": "「这个 meeting 改到明天了」在一句话中混用两种语言。",
+   "templates": []
+  },
+  {
+   "id": "VAR.ALIGNMENT",
+   "name": "跨语言语义对齐",
+   "example": "在具体语境中对齐中文「明天」与英文 tomorrow 的时间指向。",
+   "templates": []
+  },
+  {
+   "id": "VAR.DIALECT",
+   "name": "地域变体与方言词汇",
+   "example": "比较不同地区如何称呼同一种事物，并保留说话地区。",
+   "templates": []
+  },
+  {
+   "id": "VAR.REGISTER",
+   "name": "正式、口语与专业语域",
+   "example": "「请尽快回复」和「有空赶紧回我」在语气和场合上有所差异。",
+   "templates": []
+  },
+  {
+   "id": "VAR.FIGURATIVE",
+   "name": "隐喻、习语与反讽",
+   "example": "「给项目踩刹车」可指降低进度，具体含义取决于上下文。",
+   "templates": []
+  },
+  {
+   "id": "VAR.FRAME",
+   "name": "提问表述变体",
+   "example": "用不同提示框架询问同一分类问题，保持预期任务一致。",
+   "templates": [
+    "KN-LOOP"
+   ]
+  },
+  {
+   "id": "VAR.PARAPHRASE",
+   "name": "同义改写与意义保持",
+   "example": "「会议推迟到周五」可改写为「会议改在周五举行」。",
+   "templates": []
+  }
+ ],
+ "tree_compat": {
+  "KN.ISA": "SEM.ISA",
+  "KN.CAT": "SEM.CATEGORY",
+  "KN.ATTR": "SEM.ATTRIBUTE",
+  "KN.PART": "SEM.PART",
+  "KN.ORIGIN": "SEM.ORIGIN",
+  "RS.NEG": "LOG.NEG",
+  "RS.COND": "LOG.COND",
+  "RS.CAUSE": "LOG.CAUSE",
+  "RS.COMPARE": "LOG.COMPARE",
+  "RS.TASK": "TASK.CUE",
+  "GR.Q": "SYN.MOOD",
+  "GR.ROLE": "SYN.ROLE",
+  "GR.CONSTR": "SYN.CONSTRUCTION",
+  "EXT.LANG": "VAR.LANGUAGE",
+  "EXT.FRAME": "VAR.FRAME"
+ },
+ "stats": {
+  "domains": 3,
+  "subs": 20,
+  "items": 80,
+  "catalog_items": 69,
+  "new_items": 19,
+  "dims": 8,
+  "words": 477,
+  "draft_words": 57
+ },
+ "sources": {
+  "catalog": "lang_catalog.json v3",
+  "lexicons": [
+   "EA-v2",
+   "ENT-XF v2"
+  ],
+  "function_words": "按常用汉语语法整理的常用虚词（Claude 起草，2026-11-08），待审定"
+ },
+ "note": "只描述语言本身，不含模型信息；分类与布局是组织方式，不是模型内部结构。"
+}

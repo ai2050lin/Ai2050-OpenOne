@@ -217,6 +217,8 @@ HiddenState 有统一的数组形式，适合系统观察；这不自动意味�
 
 22. **统一机制基准（mech_bench.v1）**：`shared/dist_protocol/mech_bench.py`（材料、切分、判据 `CRITERIA`）与 `scripts/mech_bench_run.py`（discover / eval / dict / report）。同一批冻结任务上比较 act_diff、dla、atp、atp_ig、exact，报告保真度、消融口径、脱靶、自然文本 KL 与成本；只用 discovery 排序，确认后才一次性打开 lockbox。这是自建节点级基准，不是官方 MIB。改动后运行 `tests/dist_protocol/test_mech_bench.py`，保留植入找回与负对照。特异性细化（mech_spec.v1）在 `shared/dist_protocol/mech_spec.py` 与 `scripts/mech_spec_run.py`（prepare / eval / report）：用不与 MB-v1 重叠的封存材料比较细预算、对比排序、排除或固定自然文本主干与迭代移除，封存划分只评估一次，改代码后须重跑 prepare。改动后运行 `tests/dist_protocol/test_mech_spec.py`，保留植入找回与负对照。
 
+23. **语言图谱结构（lang_map.v1）**：研究引用语言对象的基础 ID。四层：领域（知识网络 KN / 推理功能 RS / 语法规则 GR）→ 子领域 → 语言项 → 词；语种、方言、语域、修辞、表述变换等是横切维度（标签），不单独成域。人工结构只改 `shared/dist_protocol/lang_map/structure.json`，再运行 `python scripts/build_lang_map.py` 生成 `lang_map.json`、`words.json` 与含 sha256 的 `manifest.json`（校验不通过不写文件）；`shared/dist_protocol/lang_map.py` 负责生成、校验与读取。语言目录 v3 的每一项恰好一处主归属，旧语言树 `lang_tree.json` 的条目经 `tree_compat` 映射；词、义项与 token 分开，虚词草稿标 `review: draft` 待审定。只描述语言本身，不含模型信息。中心只读端点在 `deploy/lang_map_service.py`（`/api/lang/map`、`/api/lang/map/words/{id}`），进主数据包；客户端在空间 · 语言图谱 · 结构图谱（`LangMap.jsx`）。改动后运行 `tests/dist_protocol/test_lang_map.py`（重建一致、目录全部归位、负对照、篡改拒读、端点）。
+
 ## 7. 自回归、采集与数值控制
 
 按生成步连接：当前 token 前缀、位置及历史状态、跨层响应、输出读出，以及追加新 token 后的下一步计算。

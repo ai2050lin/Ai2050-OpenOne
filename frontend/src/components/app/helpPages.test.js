@@ -4,7 +4,7 @@ import { HELP_PAGES, helpKey } from './helpPages.js';
 import { ROUTE_VIEWS, SPATIAL_MODES, STATIONS } from './workbenchUtil.js';
 
 const CFG = ['conn', 'account', 'node', 'model'];
-const INNER = { enc: ['structure', 'internal'], assoc: ['live', 'response', 'langmeasure', 'relations'], lang: ['ring', 'seed', 'catalog'] };
+const INNER = { enc: ['structure', 'internal'], assoc: ['live', 'response', 'langmeasure', 'relations'], lang: ['map', 'ring', 'seed'] };
 
 describe('help pages', () => {
   it('every tab has its own help entry', () => {

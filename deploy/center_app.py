@@ -45,6 +45,7 @@ def create_app():
     import census_service
     import data_admin_service
     import distributed_service
+    import lang_map_service
     import platform_service
     from server import neuron_census_service
 
@@ -81,6 +82,7 @@ def create_app():
     app.include_router(platform_service.router)
     app.include_router(platform_service.auth_router)
     app.include_router(platform_service.lang_router)
+    app.include_router(lang_map_service.router)          # 语言图谱结构 lang_map.v1（只读）
     app.include_router(neuron_census_service.router)
     from deploy.research_library import router as library_router
     from deploy.parameter_service import router as parameter_router

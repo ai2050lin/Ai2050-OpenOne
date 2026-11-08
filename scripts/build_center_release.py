@@ -27,7 +27,7 @@ INCLUDE = [
     'deploy/research_library.py', 'deploy/node_control.py', 'deploy/parameter_service.py', 'deploy/parameter_reader.py',
     'design/platform_spec_v1.md',
     'VERSION', 'LICENSE', 'NOTICE', 'README.md', '.github/CONTRIBUTING.md',
-    'deploy/center_app.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/data_admin_service.py', 'deploy/platform_service.py',
+    'deploy/center_app.py', 'deploy/lang_map_service.py', 'deploy/distributed_service.py', 'deploy/census_service.py', 'deploy/data_admin_service.py', 'deploy/platform_service.py',
     'deploy/node_agent.py', 'deploy/node_service.py', 'deploy/admin_tool.py', 'deploy/reset_password.py', 'deploy/import_center_data.py', 'deploy/snapshot_worker.py', 'deploy/datapack.py', 'deploy/dist_templates_seed.py', 'deploy/dist_runner_tm.py',
     'deploy/install_center.sh', 'deploy/upgrade_center.sh', 'deploy/ai2050-center.service', 'deploy/nginx-ai2050-center.conf',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md', 'deploy/README_RESEARCH_UPLOAD.md',

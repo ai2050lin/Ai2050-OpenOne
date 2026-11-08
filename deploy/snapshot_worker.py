@@ -127,8 +127,10 @@ def build_datapack(fp: str, guard: 'Guard', force: bool = False, log=print):
         from server.rule_ledger_service import LEDGER
         from deploy.research_library import library
         rule_stamp = hashlib.sha256(LEDGER.read_bytes()).hexdigest()[:12] if LEDGER.is_file() else 'norules'
+        lm = REPO / 'shared' / 'dist_protocol' / 'lang_map' / 'manifest.json'     # 语言图谱结构（lang_map.v1）换版本时重建数据包
+        map_stamp = hashlib.sha256(lm.read_bytes().replace(b'\r\n', b'\n')).hexdigest()[:12] if lm.is_file() else 'nomap'
         version = (f"{fp}-{DP.research_stamp(NS.research_root())}-{stored_fingerprint('lang_atlas') or 'nolang'}"
-                   f"-{neuron_layer_stamp()}-{library().fingerprint()}-{rule_stamp}-arch1")
+                   f"-{neuron_layer_stamp()}-{library().fingerprint()}-{rule_stamp}-{map_stamp}-arch1")
         meta = DP.read_meta(D._DATA_DIR)
         if not guard.skip('datapack') and (force or not meta or meta.get('version') != version):
             guard.start('datapack')

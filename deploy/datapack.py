@@ -62,6 +62,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     from deploy.research_library import overview as library_overview, graph as library_graph, progress as library_progress, artifacts as library_artifacts, workpackages as library_workpackages
     import census_service as CS
     import distributed_service as D
+    import lang_map_service as LM
     import platform_service as PS
     from server import neuron_census_service as NS
     from server.rule_ledger_service import overview as rule_overview
@@ -88,6 +89,10 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
         ('/api/neurons/index', NS.index),
         ('/api/neurons/space/index', NS.space_index),
     ]
+    # 语言图谱结构（lang_map.v1，随版本发布的文件，体积小）：上三层与每个语言项的词层都进主数据包
+    plan.append(('/api/lang/map', LM.map_ep))
+    for item_id in LM.item_ids():
+        plan.append((f'/api/lang/map/words/{item_id}', (lambda i=item_id: LM.words_ep(i))))
     for name in ('catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
         plan.append((f'/api/platform/snapshot/{name}', (lambda n=name: PS.snapshot(n))))
     lang = PS._lang_atlas()                            # 语言谱图（体积小，进主数据包）：还没生成时不放条目，下一版数据包再补
