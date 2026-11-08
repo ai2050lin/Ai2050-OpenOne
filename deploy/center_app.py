@@ -83,6 +83,8 @@ def create_app():
     app.include_router(platform_service.auth_router)
     app.include_router(platform_service.lang_router)
     app.include_router(lang_map_service.router)          # 语言图谱结构 lang_map.v1（只读）
+    from server.mainline_sample_service import router as mainline_sample_router
+    app.include_router(mainline_sample_router)           # 关联机制工作台：MA-H2 冻结样本（/api/traces/ 下，按本机工具规则拦截）
     app.include_router(neuron_census_service.router)
     from deploy.research_library import router as library_router
     from deploy.parameter_service import router as parameter_router

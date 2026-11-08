@@ -1,0 +1,93 @@
+/* 关联机制工作台（Phase 346） */
+.aw { display: flex; flex-direction: column; gap: 10px; }
+.aw-models { display: flex; gap: 8px; flex-wrap: wrap; }
+.aw-models button { border: 1px solid #e2e7ef; background: #fff; border-radius: 10px; padding: 6px 12px; font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; line-height: 1.35; min-width: 160px; }
+.aw-models button b { font-size: 13.5px; }
+.aw-models button small { font-size: 11.5px; color: #68748a; }
+.aw-models button[aria-pressed='true'] { border-color: #183f77; background: #f4f8fd; }
+.aw-models button:disabled { cursor: not-allowed; opacity: .75; }
+.aw-models .ok { font-size: 11px; color: #0b6b55; } .aw-models .warn { font-size: 11px; color: #a8670a; }
+.aw-space { position: relative; background: linear-gradient(#fff, #f3f6fa); border: 1px solid #e2e7ef; border-radius: 10px; overflow: hidden; }
+.aw-space.max { position: fixed; inset: 0; z-index: 60; border-radius: 0; border: 0; }
+.aw-canvas canvas { display: block; width: 100%; height: 560px; cursor: grab; touch-action: none; }
+.aw-space.max .aw-canvas canvas { height: 100vh; }
+.aw-tip { position: absolute; pointer-events: none; background: #172033; color: #fff; font-size: 11.5px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; z-index: 8; }
+.aw-ov { position: absolute; display: flex; gap: 6px; align-items: center; }
+.aw-ov.tl { left: 12px; top: 10px; } .aw-ov.tr { right: 12px; top: 10px; }
+.aw-ov button { border: 1px solid #cbd5e2; background: rgba(255, 255, 255, .92); border-radius: 8px; padding: 2px 9px; font: inherit; font-size: 12px; color: #3e4b60; cursor: pointer; }
+.aw-big { position: absolute; left: 14px; top: 42px; pointer-events: none; }
+.aw-big b { font-size: 24px; display: block; line-height: 1.15; }
+.aw-legend { position: absolute; left: 12px; right: 12px; bottom: 8px; display: flex; gap: 12px; flex-wrap: wrap; }
+.aw-legend i, .aw-key i { display: inline-block; width: 12px; height: 8px; border-radius: 2px; margin-right: 4px; }
+.aw-key { margin-right: 10px; }
+.aw-pop { position: absolute; z-index: 9; width: 300px; background: #fff; border: 1px solid #e2e7ef; border-radius: 10px; box-shadow: 0 8px 24px rgba(23, 32, 51, .14); padding: 10px 12px; font-size: 12px; }
+.aw-pop h4 { margin: 0 0 4px; font-size: 13px; }
+.aw-pop .x { position: absolute; right: 8px; top: 4px; border: 0; background: none; font-size: 16px; color: #68748a; cursor: pointer; }
+.aw-kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; }
+.aw-kv span:nth-child(odd) { color: #68748a; }
+.aw-line { width: 100%; height: 130px; }
+/* 控制台 */
+.aw-cons { padding: 0 !important; display: flex; flex-direction: column; }
+.aw-chead { display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid #e2e7ef; }
+.aw-chead h3 { margin: 0; font-size: 15px; }
+.aw-cin { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #e2e7ef; align-items: start; }
+.aw-cin textarea { width: 100%; height: 58px; border: 1px solid #cbd5e2; border-radius: 8px; padding: 6px 8px; font: inherit; resize: vertical; }
+.aw-cin p { margin: 2px 0 0; }
+.aw-toks { display: flex; gap: 2px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid #e2e7ef; align-items: center; }
+.aw-toks > .v8-note { margin-right: 6px; }
+.aw-toks span:not(.v8-note), .aw-toks button { min-width: 14px; height: 20px; border-radius: 3px; background: #eef1f5; font-size: 10px; color: #68748a; text-align: center; padding: 0 3px; line-height: 20px; border: 0; font-family: inherit; }
+.aw-toks button { background: #e3edf9; color: #183f77; font-weight: 600; cursor: pointer; }
+.aw-toks button.on { outline: 2px solid #d29a00; }
+.aw-body { display: grid; grid-template-columns: 320px minmax(0, 1fr); min-height: 360px; }
+.aw-right { min-width: 0; display: flex; flex-direction: column; }
+.aw-tabs { display: flex; gap: 2px; padding: 6px 10px 0; border-bottom: 1px solid #e2e7ef; flex-wrap: wrap; }
+.aw-tabs button { border: 0; background: none; padding: 5px 10px; font: inherit; font-size: 12.5px; color: #68748a; border-bottom: 2px solid transparent; cursor: pointer; }
+.aw-tabs button[aria-selected='true'] { color: #183f77; border-color: #183f77; font-weight: 600; }
+.aw-pbody { padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.aw-pbody > div { min-width: 0; }
+.aw-pbody h4 { margin: 0 0 4px; font-size: 13px; }
+.aw-pbody p { margin: 0 0 4px; }
+.aw-pbody tr { cursor: pointer; } .aw-pbody tr.on td { background: #eef4fc; }
+.aw-pbody .num { text-align: right; font-variant-numeric: tabular-nums; }
+.aw-bound { grid-column: 1 / -1; border-left: 3px solid #e3c27a; background: #fffaf0; padding: 6px 10px; border-radius: 0 6px 6px 0; font-size: 12px; color: #6b5320; }
+.aw-mode { padding: 10px 12px; min-width: 0; }
+.aw-foot { margin: 0; padding: 6px 14px; border-top: 1px solid #e2e7ef; }
+/* 操作面板：停靠 / 浮窗 */
+.aw-ops { font-size: 12.5px; background: #fff; display: flex; flex-direction: column; min-width: 0; }
+.aw-ops.docked { border-right: 1px solid #e2e7ef; max-height: 640px; }
+.aw-ops.float { position: absolute; width: 290px; max-height: calc(100% - 140px); border: 1px solid #e2e7ef; border-radius: 12px; box-shadow: 0 10px 30px rgba(23, 32, 51, .16); z-index: 10; overflow: hidden; background: rgba(255, 255, 255, .97); }
+.aw-ops.min .aw-in, .aw-ops.min .aw-cfg { display: none; }
+.aw-bar { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #e2e7ef; background: #f8fafc; user-select: none; }
+.aw-ops.float .aw-bar { cursor: move; }
+.aw-bar b { flex: 1; }
+.aw-bar button { border: 0; background: none; font-size: 14px; color: #68748a; cursor: pointer; padding: 0 4px; }
+.aw-bar button.on { color: #183f77; }
+.aw-cfg { border-bottom: 1px solid #e2e7ef; background: #fbfcfe; padding: 8px 12px; max-height: 45vh; overflow: auto; }
+.aw-cfg h5 { margin: 6px 0 3px; font-size: 11.5px; color: #68748a; }
+.aw-cfg label { display: flex; gap: 6px; align-items: center; padding: 2px 0; cursor: pointer; }
+.aw-cfg label small { color: #68748a; font-size: 10.5px; margin-left: auto; }
+.aw-acts { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.aw-acts button { border: 1px solid #cbd5e2; background: #fff; border-radius: 6px; font: inherit; font-size: 11.5px; padding: 1px 8px; cursor: pointer; }
+.aw-in { padding: 10px 12px; overflow: auto; }
+.aw-in h4 { margin: 10px 0 6px; font-size: 12px; color: #68748a; }
+.aw-in h4:first-child { margin-top: 0; }
+.aw-r { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 6px; align-items: center; margin-bottom: 6px; }
+.aw-r > span:first-child { color: #68748a; }
+.aw-r select { width: 100%; font: inherit; font-size: 12px; border: 1px solid #cbd5e2; border-radius: 6px; padding: 1px 4px; background: #fff; min-width: 0; }
+.aw-row { display: flex; gap: 6px; align-items: center; } .aw-row input { flex: 1; min-width: 0; }
+.aw-seg { display: inline-flex; border: 1px solid #cbd5e2; border-radius: 7px; overflow: hidden; }
+.aw-seg button { border: 0; border-left: 1px solid #cbd5e2; background: #fff; padding: 1px 8px; font: inherit; font-size: 11.5px; color: #3e4b60; cursor: pointer; }
+.aw-seg button:first-child { border-left: 0; } .aw-seg button[aria-pressed='true'] { background: #183f77; color: #fff; }
+.aw-pl { border: 1px solid #e2e7ef; border-radius: 8px; margin-bottom: 6px; }
+.aw-pl > div:first-child { display: flex; align-items: center; gap: 6px; padding: 5px 8px; cursor: pointer; }
+.aw-pl > div:first-child b { flex: 1; font-size: 12.5px; }
+.aw-pl.off > div:first-child b { color: #68748a; font-weight: 500; }
+.aw-eye { border: 1px solid #cbd5e2; border-radius: 6px; background: #fff; font: inherit; font-size: 11px; padding: 0 6px; cursor: pointer; color: #68748a; }
+.aw-eye[aria-pressed='true'] { background: #183f77; border-color: #183f77; color: #fff; }
+.aw-opt { padding: 4px 8px 8px; border-top: 1px solid #f0f2f6; }
+.aw-why { margin: 0; padding: 0 8px 6px; }
+@media (max-width: 900px) {
+  .aw-body, .aw-pbody { grid-template-columns: 1fr; }
+  .aw-ops.docked { border-right: 0; border-bottom: 1px solid #e2e7ef; }
+  .aw-canvas canvas { height: 420px; }
+}

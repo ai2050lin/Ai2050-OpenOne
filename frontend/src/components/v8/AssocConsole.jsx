@@ -3,48 +3,20 @@
      再按层取回最后一个位置的隐态（/api/traces/{id}/field），算每层的改写幅度 1 − cos(h_l, h_{l−1})，叠加到 3D。
    - 模式：信息流、逐层读出、注意力头、因素、对照、方法比较。后四项里标“案例”的数据来自 MA-H2 汇总。
    没有本机后端时诚实显示不可用，不做模拟。实时观察是未登记观察，不产生研究结论。 */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { API_BASE } from '../app/rdc_fusion/api.js';
 import { AlgorithmPanel } from './AssocDeep.jsx';
 import { LineChart } from './H2Results.jsx';
-import { request } from './MechanismTraceExplorer.jsx';
-import { rewriteCurve } from './data/assocFlow.js';
+import { API_BASE } from '../app/rdc_fusion/api.js';
+import { runOnce, useLiveBase } from './liveRun.js';
 import { CLAIMS, TESTS } from './data/mainline.js';
 
 const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['method', '方法比较'], ['tests', '三类检验']];
 const EXAMPLE_A = '资料：香蕉是蓝色的。\n问：按这份资料，香蕉通常是什么颜色的？';
 const EXAMPLE_B = '资料：香蕉是蓝色的。\n问：在现实世界里，香蕉通常是什么颜色的？';
 
-/* 找一个能做真实前向的后端：同源中心或本机节点 */
-function useLiveBase() {
-  const [state, setState] = useState({ base: null, status: null, checked: false });
-  useEffect(() => {
-    let dead = false;
-    (async () => {
-      for (const b of [...new Set([API_BASE, 'http://127.0.0.1:5001', 'http://127.0.0.1:5002'])]) {
-        try { const s = await request(b, '/api/live/status'); if (!dead) setState({ base: b, status: s, checked: true }); return; } catch { /* 试下一个 */ }
-      }
-      if (!dead) setState({ base: null, status: null, checked: true });
-    })();
-    return () => { dead = true; };
-  }, []);
-  return state;
-}
-
-async function runOnce(base, text) {
-  const d = await request(base, '/api/live/run', { method: 'POST', body: JSON.stringify({ text, max_tokens: 1024 }) });
-  const pos = d.readout_positions.at(-1);
-  const hidden = [];
-  for (let l = 0; l <= d.n_layers; l++) {
-    const f = await request(base, `/api/traces/${d.trace_id}/field?block=${l}&position=${pos}&boundary=${l ? 'hidden_state' : 'embedding'}`);
-    hidden.push(f.values);
-  }
-  return { id: d.trace_id, tokens: d.tokens, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
-}
-
 /* 三类检验（Phase 340）：每类与同信息预算的简单基线并列；数据来自冻结运行，不来自实时生成。未测就写未测。 */
-function TestsPanel() {
+export function TestsPanel() {
   return <>
     <p className="ac-k">三类检验 · 主张 {CLAIMS[0].id}</p>
     <div className="v8-weight-scroll"><table className="v6-table">
@@ -57,7 +29,7 @@ function TestsPanel() {
   </>;
 }
 
-function TopTokens({ top }) {
+export function TopTokens({ top }) {
   return <ol className="ac-top">{top.slice(0, 8).map(t => <li key={t.token_id}><code>{JSON.stringify(t.text).slice(1, -1) || '␣'}</code>
     <i><b style={{ width: `${Math.round(t.probability * 100)}%` }} /></i><span>{(t.probability * 100).toFixed(1)}%</span></li>)}</ol>;
 }

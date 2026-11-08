@@ -33,7 +33,7 @@ INCLUDE = [
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md', 'deploy/README_RESEARCH_UPLOAD.md',
     'deploy/research_pack_stream.py', 'deploy/research_ingest_bundle.py',
     'server/__init__.py', 'server/neuron_census_service.py', 'server/rule_ledger_service.py', 'data/rules/ledger.json',
-    'server/research_space_service.py', 'server/trace_catalog.py',
+    'server/research_space_service.py', 'server/trace_catalog.py', 'server/mainline_sample_service.py',
     'data/lang_bench/meta.json', 'data/lang_bench/results.json',
     # 数据集清单靠这份摘要：题量、科目、三类分布、许可、源地址都在 by_dataset 里。
     # 题目正文不进包（见下面 QUESTIONS_ONLY 的说明）——中心没有正文也能回答「有哪些数据集、各多少题」。

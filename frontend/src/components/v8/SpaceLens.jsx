@@ -27,6 +27,7 @@ import './v8.css';
 import LanguageFrame from './LanguageFrame.jsx';
 import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import AssocSpace from './AssocSpace.jsx';
+import AssocWorkbench from './AssocWorkbench.jsx';
 import { BasisCompare, RelationBoards } from './ClientGuide.jsx';
 import { PageHead, PageTabs, PillTools } from './CoreKit.jsx';
 
@@ -70,24 +71,14 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
-/* 关联机制的四种模式（Phase 336）：合并原来的四个子页签。路由不变，旧链接照常打开对应模式。 */
-const ASSOC_MODES = [
-  ['live', '运行与路径', '一段文字在全部层里怎样流动、怎样决定下一个词'],
-  ['response', '响应对照', '只改句子里的一处，看模型内部哪里跟着变'],
-  ['langmeasure', '语言项实测', '一项语言能力在哪一层读得出，按数据集批量测'],
-  ['relations', '共享关系', '不同语言能力是否共用同一个读出方向'],
-];
+/* 关联机制的四种模式（Phase 336）：Phase 346 起是工作台里的“分析视角”插件（AssocWorkbench.MODE_PLUGINS）。路由不变，旧链接照常打开对应模式。 */
 function assocModeOf(view, graphMode) {
   if (view === 'live' || view === 'response') return view;
   return view === 'graph' && ['langmeasure', 'relations'].includes(graphMode) ? graphMode : null;
 }
+/* 关联机制工作台（Phase 346）：3D 模型结构为核心，原来的四种模式变成“分析视角”插件，面板里仍是原来的页面 */
 function AssocHub({ mode, onMode, contextBar, children }) {
-  return <div className="v8-route as-page" aria-label="关联机制">
-    <PageHead title="关联机制" sub="把语言图谱里的能力，对到模型内部的层、注意力头和神经元。" />
-    <PageTabs label="关联机制模式" items={ASSOC_MODES} value={mode} onChange={onMode} />
-    {contextBar}
-    {children}
-  </div>;
+  return <AssocWorkbench mode={mode} onMode={onMode} contextBar={contextBar}>{children}</AssocWorkbench>;
 }
 
 /* LLM 编码图谱：结构与参数、全部研发成果 */
