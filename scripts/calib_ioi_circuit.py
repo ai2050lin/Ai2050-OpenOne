@@ -55,6 +55,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--model', default='D:/develop/model/gpt2-local')
     ap.add_argument('--out', default='research/calibration/C2-ioi-circuit')
+    ap.add_argument('--repl', default='mean', choices=['mean', 'cf'],
+                    help='mean = ABC 分布按模板逐位置的均值（论文设定）；cf = 每句自己的 ABC 反事实激活（C2b，Phase 347）')
     a = ap.parse_args()
     from transformers import AutoTokenizer, GPT2LMHeadModel
     from provenance import write_result
@@ -93,6 +95,13 @@ def main() -> int:
             repl.clear(); model(ids)
             means[t] = {l: store[l].mean(0) for l in range(L)}
 
+    cfz = {}                                  # 模板 → 层 → [b, t, n_embd] 每句自己的反事实激活（--repl cf）
+    if a.repl == 'cf':
+        with torch.no_grad():
+            for t, gr in groups.items():
+                repl.clear(); model(tok([r['corrupt'] for r in gr], return_tensors='pt').input_ids.to(dev))
+                cfz[t] = {l: store[l].clone() for l in range(L)}
+
     def ld_with(keep: set) -> np.ndarray:
         out = []
         with torch.no_grad():
@@ -101,7 +110,7 @@ def main() -> int:
                 repl.clear()
                 for l in range(L):
                     mask = torch.tensor([f'{l}.{h}' not in keep for h in range(H)])
-                    repl[l] = (mask, means[t][l])
+                    repl[l] = (mask, cfz[t][l] if a.repl == 'cf' else means[t][l])
                 logits = model(ids).logits[:, -1]
                 io = torch.tensor([tok.encode(r['io'])[0] for r in gr], device=dev)
                 s = torch.tensor([tok.encode(r['s'])[0] for r in gr], device=dev)
@@ -133,12 +142,12 @@ def main() -> int:
     c = res['sets']['circuit']['faith']
     res['verdict'] = {'circuit_faith': c, 'best_random': best_rand,
                       'reproduces_paper': bool(c >= CRITERIA['circuit_faith_min'] and c - best_rand >= CRITERIA['random_margin_min'])}
-    res.update({'criteria': CRITERIA, 'circuit': CIRCUIT, 'n_prompts': len(rows), 'seconds': round(time.time() - t0, 1),
+    res.update({'replacement': a.repl, 'criteria': CRITERIA, 'circuit': CIRCUIT, 'n_prompts': len(rows), 'seconds': round(time.time() - t0, 1),
                 'torch': torch.__version__, 'device': dev})
     out = ROOT / a.out
     out.mkdir(parents=True, exist_ok=True)
     (out / 'report.json').write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding='utf-8')
-    print('C2', write_result('calib-ioi-circuit', res, model_path=a.model, seed=CRITERIA['seed'], tool='scripts/calib_ioi_circuit.py'))
+    print('C2', write_result(f'calib-ioi-circuit-{a.repl}', res, model_path=a.model, seed=CRITERIA['seed'], tool='scripts/calib_ioi_circuit.py'))
     print(json.dumps({k: {kk: (round(vv, 3) if isinstance(vv, float) else vv) for kk, vv in v.items() if kk != 'heads'} for k, v in res['sets'].items()}, ensure_ascii=False, indent=1))
     print('verdict', res['verdict'])
     return 0

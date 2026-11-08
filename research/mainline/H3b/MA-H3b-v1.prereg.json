@@ -1,0 +1,42 @@
+{
+ "id": "MA-H3b-v1",
+ "schema": "mainline_prereg.v1",
+ "created": "2026-11-08",
+ "stage": "H3b",
+ "basis": "Phase 342–343（MA-H3 载体占一半组件）；Phase 345（GPT-2 IOI 上 H3 的保留检验找不回已知电路，atp_ig 在 Qwen3 上偏重前段）；Phase 347（C2b 校准）",
+ "question": {
+  "doc": "问：在这份资料里，{X}通常是什么颜色的？\n答：在这份资料里，{X}通常是",
+  "real": "问：在现实世界里，{X}通常是什么颜色的？\n答：在现实世界里，{X}通常是"
+ },
+ "materials": "MA-H1 discovery 的 fit / eval 两半（与 MA-H3-v4 相同）；确认用新实体 MA-H1b，另建另开封",
+ "methods": [
+  "exact",
+  "atp",
+  "atp_ig"
+ ],
+ "criteria": {
+  "metric": "保留 = 载体头取资料范围（干净句）的激活，其余头换成同一条现实范围反事实的激活，MLP 全部保留并重新计算；移除 = 只把载体头换成反事实激活。f = (LD − LD_∅) / (LD_全 − LD_∅)，∅ = 全部头换成反事实、MLP 保留",
+  "calibration": "C2b（GPT-2 IOI，同一口径）：已知 26 头电路 0.69、3 组随机 ≤ 0.04、exact 前 26 头 0.72（Phase 347）",
+  "ranking": "MA-H3-v4 discover（fit 半 256 对）的 exact 头分数；atp、atp_ig 只作对比",
+  "fracs": [
+   0.005,
+   0.01,
+   0.02,
+   0.05,
+   0.1,
+   0.2
+  ],
+  "n_evalfit": 320,
+  "batch": 2,
+  "vram_fraction": 0.95,
+  "freeze_rule": "方法固定为 exact；在 eval 半上平均 f_keep ≥ 0.6 的最小比例；没有则记“≤ 20% 的头不充分”，不冻结载体",
+  "confirm_predictions": {
+   "P1b_sufficiency": "新材料 MA-H1b 上 f(C) ≥ 0.6，且比 3 组随机与 3 组按层匹配随机头中最好的高 ≥ 0.3，实体 bootstrap 95% 区间下界 > 0",
+   "P2b_necessity": "只把 C 换成反事实激活时，f_remove ≤ 0.5",
+   "P3b_replication": "|f_MA-H1b(C) − f_eval(C)| ≤ 0.15"
+  },
+  "power": "f 曲线不是逐题二值结果，不用 McNemar 口径；按实体 bootstrap（2000 次）报告区间，与 MA-H3 相同",
+  "bootstrap": 2000
+ },
+ "rankings_sha256": "e815f413e533a64f7e2a5e3f30029d469e474d76b94d1517f3bbf6ac69115348"
+}
