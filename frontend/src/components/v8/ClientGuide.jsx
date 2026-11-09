@@ -1,3 +1,4 @@
+import { useMainline } from './data/mainlineState.js';
 /* 研究工作台 · 三部分研究框架的共用内容。
    语言图谱、LLM 内部图谱、两图谱关联贯穿各页；这里放页面共用的白话摘要、归因图和保真看板。
    约束：研究数字来自接口或登记过的记录；归因图是未预注册的界面演示，不计入研究证据；没有跑过的实验写“未测”。 */
@@ -7,7 +8,7 @@ import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 import { shortModel } from './v8Util.js';
-import { BENCH, FINDINGS } from './data/mainline.js';
+
 import './client_guide.css';
 
 export const DEMO_SNAPSHOT = '6be1034f0b55a6df';
@@ -44,6 +45,7 @@ export function relationCounts(objects, snapshot) {
 
 /* 最近的发现读研究登记表（data/mainline.js 的 FINDINGS，每个 Phase 追加），按 Phase 倒序，首屏 4 条，其余折叠。 */
 export function LatestFindings({ onGo, bare = false }) {
+  const { FINDINGS } = useMainline();
   const list = [...FINDINGS].sort((a, b) => b.phase - a.phase);
   const card = f => <div key={f.title}><Ev kind={f.kind}/> <small className="v8-note">Phase {f.phase}</small><h4>{f.title}</h4><p className="v8-note">{f.text}</p></div>;
   return <section className={bare ? "cg-section" : "v8-card cg-section"} aria-label="最近的发现">{!bare && <h3>最近的发现</h3>}
@@ -232,6 +234,7 @@ function DataTable({ head, rows, label }) {
 }
 
 export function RelationBoards({ only }) {
+  const { BENCH } = useMainline();
   const show = key => !only || only === key;
   return <>
     {show('map') && <section className="v8-card cg-section"><h3>语言目录映射</h3><p className="v8-note">已登记连接使用实验内部名称。这里是建议归属，审定后才能按语言项筛选。</p><DataTable label="语言目录映射" head={['实验内部名称', '建议语言项', '连接数', '结果']} rows={LANGUAGE_MAP}/></section>}

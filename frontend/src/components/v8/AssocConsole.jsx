@@ -1,3 +1,4 @@
+import { useMainline } from './data/mainlineState.js';
 /* 关联机制 · 控制台（Phase 335）：在 3D 空间下面。
    - 输入一段文字 → 本机后端做一次真实前向（/api/live/run，保存全部 37 层隐态），返回下一个词的预测；
      再按层取回最后一个位置的隐态（/api/traces/{id}/field），算每层的改写幅度 1 − cos(h_l, h_{l−1})，叠加到 3D。
@@ -9,7 +10,7 @@ import { AlgorithmPanel } from './AssocDeep.jsx';
 import { LineChart } from './H2Results.jsx';
 import { API_BASE } from '../app/rdc_fusion/api.js';
 import { runOnce, useLiveBase } from './liveRun.js';
-import { CLAIMS, TESTS } from './data/mainline.js';
+
 
 const MODES = [['flow', '信息流'], ['lens', '逐层读出'], ['heads', '注意力头'], ['factor', '因素'], ['method', '方法比较'], ['tests', '三类检验']];
 const EXAMPLE_A = '资料：香蕉是蓝色的。\n问：按这份资料，香蕉通常是什么颜色的？';
@@ -17,6 +18,7 @@ const EXAMPLE_B = '资料：香蕉是蓝色的。\n问：在现实世界里，�
 
 /* 三类检验（Phase 340）：每类与同信息预算的简单基线并列；数据来自冻结运行，不来自实时生成。未测就写未测。 */
 export function TestsPanel() {
+  const { CLAIMS, TESTS, METHOD_RESULTS } = useMainline();
   return <>
     <p className="ac-k">三类检验 · 主张 {CLAIMS[0].id}</p>
     <div className="v8-weight-scroll"><table className="v6-table">
@@ -26,6 +28,10 @@ export function TestsPanel() {
         <td>{name}</td><td>{value == null ? <span className="mp-tag">未测</span> : value}</td></tr>))}</tbody>
     </table></div>
     <p className="v8-note">响应预测：只用允许的前缀和冻结规则预测未见材料的内部响应。输出预测：预测全词表分布、生成与具体错误。原生机制检验：交换对应因素的自然状态，查变化与不变项。结果只读冻结运行，左边的实时生成不计入。</p>
+    <details className="mp-fold"><summary>已完成的范围内方法检验（与独立预测分开）</summary><div className="mp-fold-body">
+      {METHOD_RESULTS.map(result => <p className="v8-note" key={result.run_id}><b>{result.run_id} · {result.label}：{result.value.toFixed(4)} {result.unit}</b><br />{result.scope}<br />
+        <a href={`${API_BASE}/api/research-library/artifacts/${result.artifact_sha256}`} target="_blank" rel="noreferrer">回查原始报告</a> · <a href={`?lens=spatial&view=research&run=${result.run_id}`}>在 3D 空间定位组成员</a></p>)}
+    </div></details>
   </>;
 }
 

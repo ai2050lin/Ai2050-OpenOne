@@ -1,7 +1,8 @@
-/* 语言图谱 · 关系图（种子，2026-11-07 审定）。可拖动或用方向键旋转的 3D 视图，右侧是同一节点的二维详情和键盘查询。
+/* 语言图谱 · 关系图（种子，2026-11-07 审定）。可左键拖动平移，右键拖动或用方向键旋转的 3D 视图，右侧是同一节点的二维详情和键盘查询。
    布局是人工展示：区域 = 语言目录三大类，纵向 = 抽象程度；距离不代表模型几何。
    边按依据区分浓淡：有材料 / 只有标签或目录 / 人工定义无材料。本图只描述语言本身，不含模型信息。 */
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { panScene, useScenePointer } from '../scenePointer.js';
 
 import { BASIS, EDGES, EDGE_TYPES, NODES, STATE_LABEL, ZONES, neighbors } from './data/lang_graph_seed.js';
 import './client_guide.css';
@@ -10,7 +11,7 @@ const W = 760, H = 480, SCALE = 172;
 function project(view, x, y, z) {
   const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
   const X = x * cy + z * sy, Z = -x * sy + z * cy, Y = y * cp - Z * sp, D = y * sp + Z * cp, f = 3.4 / (3.4 + D);
-  return { x: W / 2 + X * SCALE * f, y: H / 2 - Y * SCALE * f, d: D, f };
+  return { x: W / 2 + (view.panX ?? 0) + X * SCALE * f, y: H / 2 + (view.panY ?? 0) - Y * SCALE * f, d: D, f };
 }
 
 export default function LangGraph3D() {
@@ -18,12 +19,22 @@ export default function LangGraph3D() {
   const [sel, setSel] = useState('apple');
   const [zone, setZone] = useState('');
   const [focus, setFocus] = useState(false);
-  const drag = useRef(null);
   const node = NODES.find(item => item.id === sel);
   const near = useMemo(() => neighbors(sel), [sel]);
   const visible = item => focus ? near.has(item.id) : !zone || item.zone === zone || item.also === zone;
   const pts = Object.fromEntries(NODES.map(item => [item.id, project(view, item.x, item.y, item.z)]));
-  const rotate = (dYaw, dPitch) => setView(v => ({ yaw: v.yaw + dYaw, pitch: Math.max(-0.2, Math.min(1, v.pitch + dPitch)) }));
+  const rotate = (dYaw, dPitch) => setView(v => ({ ...v, yaw: v.yaw + dYaw, pitch: Math.max(-0.2, Math.min(1, v.pitch + dPitch)) }));
+  const pointer = useScenePointer({
+    onPan: (dx, dy, svg) => {
+      const scale = svg.getScreenCTM()?.a || 1;
+      setView(v => panScene(v, dx / scale, dy / scale));
+    },
+    onRotate: (dx, dy) => rotate(dx * 0.008, dy * 0.006),
+    onPick: (_event, target) => {
+      const id = target.closest('[data-lang-node]')?.getAttribute('data-lang-node');
+      if (id) setSel(id);
+    },
+  });
   const rel = EDGES.filter(([a, b]) => a === sel || b === sel).map(([a, b, t, basis]) => [NODES.find(item => item.id === (a === sel ? b : a)), t, basis]);
   const counts = Object.fromEntries(Object.keys(STATE_LABEL).map(k => [k, NODES.filter(item => item.st === k).length]));
 
@@ -37,11 +48,8 @@ export default function LangGraph3D() {
             <button type="button" key={label} className="fw-tbtn" aria-pressed={!focus && zone === k} onClick={() => { setZone(k); setFocus(false); }}>{label}</button>)}
           <button type="button" className="fw-tbtn" aria-pressed={focus} onClick={() => setFocus(!focus)}>只看相邻</button>
         </div>
-        <svg className="lg3-svg" viewBox={`0 0 ${W} ${H}`} tabIndex={0} role="img" aria-label="语言关系图三维视图，拖动或用方向键旋转；右侧可用列表查询"
-          onPointerDown={e => { drag.current = { x: e.clientX, y: e.clientY, moved: 0 }; }}
-          onPointerMove={e => { const d = drag.current; if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y; d.moved += Math.abs(dx) + Math.abs(dy); d.x = e.clientX; d.y = e.clientY; if (d.moved > 4) rotate(dx * 0.008, dy * 0.006); }}
-          onPointerUp={() => { setTimeout(() => { drag.current = null; }, 0); }}
-          onPointerLeave={() => { drag.current = null; }}
+        <svg className="lg3-svg" viewBox={`0 0 ${W} ${H}`} tabIndex={0} role="img" aria-label="语言关系图三维视图，左键拖动平移，右键拖动或用方向键旋转；右侧可用列表查询"
+          {...pointer}
           onKeyDown={e => { const m = { ArrowLeft: [-0.12, 0], ArrowRight: [0.12, 0], ArrowUp: [0, 0.08], ArrowDown: [0, -0.08] }[e.key]; if (m) { e.preventDefault(); rotate(...m); } }}>
           {!focus && Object.entries(ZONES).filter(([k]) => !zone || zone === k).map(([k, z]) => { const p = project(view, z.x, 1.18, 0);
             return <text key={k} x={p.x} y={p.y} fontSize="13" fontWeight="650" fill="#16202c" textAnchor="middle">{z.name}</text>; })}
@@ -55,7 +63,7 @@ export default function LangGraph3D() {
           })}
           {NODES.filter(visible).sort((a, b) => pts[b.id].d - pts[a.id].d).map(item => {
             const p = pts[item.id], c = ZONES[item.zone].color, on = item.id === sel, r = (on ? 10 : 7.5) * p.f;
-            return <g key={item.id} className="lg3-node" onClick={() => { if (!drag.current || drag.current.moved <= 4) setSel(item.id); }}>
+            return <g key={item.id} className="lg3-node" data-lang-node={item.id}>
               <title>{`${item.name} · ${STATE_LABEL[item.st]}`}</title>
               <circle cx={p.x} cy={p.y} r={r + 7} fill="transparent"/>
               <circle cx={p.x} cy={p.y} r={r} fill={item.st === 'real' ? c : '#fff'} stroke={c} strokeWidth={on ? 3 : 2} strokeDasharray={item.st === 'new' ? '3 3' : undefined}/>
@@ -63,7 +71,7 @@ export default function LangGraph3D() {
             </g>;
           })}
         </svg>
-        <p className="v8-note">拖动或用方向键旋转。纵向是抽象程度，三个区域是展示分类，节点间的距离只为排版，没有含义。</p>
+        <p className="v8-note">左键拖动平移，右键拖动或用方向键旋转。纵向是抽象程度，三个区域是展示分类，节点间的距离只为排版，没有含义。</p>
         <div className="lg3-legend">
           <span><i className="lg3-dot full"/>已有项目材料 {counts.real}</span><span><i className="lg3-dot"/>目录已有，未测 {counts.cat}</span><span><i className="lg3-dot dash"/>需新增 {counts.new}</span>
         </div>

@@ -1,3 +1,4 @@
+import { useMainline } from './data/mainlineState.js';
 /* 空间 · 关联机制 · 运行与路径（Phase 332 → 335）。
    上面：全部 37 层的 3D 空间与 HiddenState 信息流（案例 MA-H2 汇总；生成后叠加本次输入的逐层改写幅度）。
    下面：控制台——输入文字生成，选择模式（信息流、逐层读出、注意力头、因素、对照、方法比较）进行观察和分析。 */
@@ -11,7 +12,7 @@ import { AttributionGraph, DEMO_SNAPSHOT, InfoFlowMap } from './ClientGuide.jsx'
 import { LineChart } from './H2Results.jsx';
 import { AssocIntro } from './SpaceGuides.jsx';
 import { FLOW_DATA, rankHeads } from './data/assocFlow.js';
-import { CLAIMS, CLAIM_LIFE, LIFECYCLE } from './data/mainline.js';
+
 import { PageHead, PillTools } from './CoreKit.jsx';
 import './assoc_space.css';
 
@@ -22,6 +23,7 @@ function Spark({ values, color }) {
 }
 
 export default function AssocSpace({ model, children, bare = false }) {
+  const { CLAIMS, CLAIM_LIFE, LIFECYCLE } = useMainline();
   const [cur, setCur] = useState(36);   // 默认显示完整的流；点播放从词嵌入开始
   const [mode, setMode] = useState('flow');
   const [live, setLive] = useState(null);

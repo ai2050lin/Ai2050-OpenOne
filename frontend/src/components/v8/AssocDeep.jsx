@@ -1,6 +1,7 @@
 /* 关联机制 · 深入部分：HiddenState 流（3D）、算法分析页签、反常句生成文法草稿。
    数据只来自主线已有产物（MA-H2 报告、MA-H0–H3 记录）；没有测过的写“未测”，不放示例数值。 */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { panScene, useScenePointer } from '../scenePointer.js';
 
 import report from '../../../../research/mainline/H2/report.json';
 import { LineChart } from './H2Results.jsx';
@@ -17,7 +18,7 @@ const confounded = (f, p) => (report.effects[f][p].auc[0] ?? 0) >= 0.9;
 function project(v, x, y, z, W, H, s) {
   const cy = Math.cos(v.yaw), sy = Math.sin(v.yaw), cp = Math.cos(v.pitch), sp = Math.sin(v.pitch);
   const X = x * cy + z * sy, Z = -x * sy + z * cy, Y = y * cp - Z * sp, D = y * sp + Z * cp, f = 3.4 / (3.4 + D);
-  return { x: W / 2 + X * s * f, y: H / 2 - Y * s * f, d: D, f };
+  return { x: W / 2 + (v.panX ?? 0) + X * s * f, y: H / 2 + (v.panY ?? 0) - Y * s * f, d: D, f };
 }
 
 export function FlowRibbons() {
@@ -25,7 +26,6 @@ export function FlowRibbons() {
   const [layer, setLayer] = useState(36);
   const [view, setView] = useState({ yaw: -0.5, pitch: 0.18 });
   const [playing, setPlaying] = useState(false);
-  const drag = useRef(null);
   useEffect(() => {
     if (!playing) return undefined;
     const t = setInterval(() => setLayer(l => { if (l >= L - 1) { setPlaying(false); return l; } return l + 1; }), 200);
@@ -50,7 +50,14 @@ export function FlowRibbons() {
     return { d: project(view, 0, Y(l), 0, W, H, S).d + 0.5, el: <polygon key={`p${l}`} points={c.map(q => `${q.x},${q.y}`).join(' ')} fill={l <= layer ? '#eef3fa' : '#fff'} fillOpacity="0.6" stroke="#cbd5e2" strokeWidth="0.7"/> };
   });
   const tag = l => { const p = project(view, -1.12, Y(l), 0.32, W, H, S); return <text key={`l${l}`} x={p.x} y={p.y} fontSize="10" fill="#566373" textAnchor="end">{l === 0 ? '词嵌入' : `第 ${l} 层`}</text>; };
-  const rotate = (a, b) => setView(v => ({ yaw: v.yaw + a, pitch: Math.max(-0.2, Math.min(1, v.pitch + b)) }));
+  const rotate = (a, b) => setView(v => ({ ...v, yaw: v.yaw + a, pitch: Math.max(-0.2, Math.min(1, v.pitch + b)) }));
+  const pointer = useScenePointer({
+    onPan: (dx, dy, svg) => {
+      const scale = svg.getScreenCTM()?.a || 1;
+      setView(v => panScene(v, dx / scale, dy / scale));
+    },
+    onRotate: (dx, dy) => rotate(dx * 0.008, dy * 0.006),
+  });
   return <section className="v8-card cg-section" aria-label="HiddenState 流">
     <h3>HiddenState 流：各因素在每一层能区分多少 <span className="mp-tag ok">真实数据 · MA-H2</span></h3>
     <p className="v8-note">线宽 = 该因素两个水平在这一层的标准化差异（各坐标差值除以组内标准差的均方根），读出位置可切换。宽说明读得出，不说明被使用；线的位置和走向是布局，不代表模型几何。</p>
@@ -61,11 +68,9 @@ export function FlowRibbons() {
       <label className="v8-note">层 {layer} <input type="range" min="0" max={L - 1} value={layer} onChange={e => { setPlaying(false); setLayer(Number(e.target.value)); }} aria-label="选择层"/></label>
     </div>
     <div className="lg3-grid">
-      <svg className="lg3-svg" viewBox={`0 0 ${W} ${H}`} tabIndex={0} role="img" aria-label="各因素逐层标准化差异的三维视图，拖动或方向键旋转"
-        onPointerDown={e => { drag.current = { x: e.clientX, y: e.clientY }; }}
-        onPointerMove={e => { const d = drag.current; if (!d) return; rotate((e.clientX - d.x) * 0.008, (e.clientY - d.y) * 0.006); drag.current = { x: e.clientX, y: e.clientY }; }}
-        onPointerUp={() => { drag.current = null; }} onPointerLeave={() => { drag.current = null; }}
-        onKeyDown={e => { const m = { ArrowLeft: [-0.12, 0], ArrowRight: [0.12, 0], ArrowUp: [0, 0.08], ArrowDown: [0, -0.08] }[e.key]; if (m) { e.preventDefault(); rotate(...m); } }}>
+      <svg className="lg3-svg" viewBox={`0 0 ${W} ${H}`} tabIndex={0} role="img" aria-label="各因素逐层标准化差异的三维视图，左键拖动平移，右键拖动或方向键旋转"
+        {...pointer}
+          onKeyDown={e => { const m = { ArrowLeft: [-0.12, 0], ArrowRight: [0.12, 0], ArrowUp: [0, 0.08], ArrowDown: [0, -0.08] }[e.key]; if (m) { e.preventDefault(); rotate(...m); } }}>
         {[...plates, ...segs].sort((a, b) => b.d - a.d).map(s => s.el)}
         {[0, 12, 24, 36].map(tag)}
       </svg>

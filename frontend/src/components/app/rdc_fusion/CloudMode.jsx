@@ -98,23 +98,26 @@ export default function CloudMode({tpl}){
 
     const onMove=e=>{
       if(!dragRef.current) return;
-      if(dragRef.current.btn===2){
-        /* 右键：平移视角位置（上下左右皆可），不改变任何角度 */
+      const drag = dragRef.current;
+      if (!drag.moved && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) <= 4) return;
+      drag.moved = true;
+      if(dragRef.current.btn === 0){
+        /* 左键：平移视角位置（上下左右皆可），不改变任何角度 */
         cam.panX=Math.max(-800,Math.min(800,(cam.panX||0)+(e.clientX-dragRef.current.x)));
         cam.panY=Math.max(-800,Math.min(800,(cam.panY||0)+(e.clientY-dragRef.current.y)));
       }else{
-        /* 左键：旋转视角，上下左右都改变角度 */
+        /* 右键：旋转视角，上下左右都改变角度 */
         cam.th+=(e.clientX-dragRef.current.x)*0.006;
         cam.ph=Math.max(-1.2,Math.min(1.2,cam.ph+(e.clientY-dragRef.current.y)*0.006));
       }
-      dragRef.current={x:e.clientX,y:e.clientY,btn:dragRef.current.btn};
+      drag.x = e.clientX; drag.y = e.clientY;
     };
     let autoT=null;
-    const onUp=()=>{ dragRef.current=null; autoT=setTimeout(()=>{cam.auto=true;},2500); };
+    const onUp = e => { if (dragRef.current?.btn !== e.button) return; dragRef.current = null; autoT=setTimeout(()=>{cam.auto=true;},2500); };
     const onWheel=e=>{ e.preventDefault(); cam.zoom=Math.max(110,Math.min(340,cam.zoom-e.deltaY*0.4)); };
     const onDown=e=>{
-      if(e.button!==0&&e.button!==2) return;
-      dragRef.current={x:e.clientX,y:e.clientY,btn:e.button};
+      if (dragRef.current || (e.button !== 0 && e.button !== 2)) return;
+      dragRef.current={x:e.clientX,y:e.clientY,btn: e.button, moved: false };
       cam.auto=false;
       if(autoT){clearTimeout(autoT);autoT=null;}   /* 取消旧的恢复定时器，防止拖拽中 auto-rotate 被唤醒 */
     };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Text, MeshTransmissionMaterial, MeshDistortMaterial } from '@react-three/drei';
+import { PerspectiveCamera, Text, MeshTransmissionMaterial, MeshDistortMaterial } from '@react-three/drei';
+import SceneOrbitControls from './SceneOrbitControls.jsx';
 import * as THREE from 'three';
 
 /**
@@ -476,7 +477,7 @@ export default function DNNAnalysis3DVisualization({
     <div style={{ width: '100%', height: '100%', minHeight: '400px' }}>
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={50} />
-        <OrbitControls enableDamping dampingFactor={0.05} />
+        <SceneOrbitControls enableDamping dampingFactor={0.05} />
         
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={0.8} />

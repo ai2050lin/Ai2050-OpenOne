@@ -1,5 +1,6 @@
 import { API_BASE } from './config.js';
-import { Html, Line, OrbitControls, PerspectiveCamera, Sphere, Stars, TransformControls } from '@react-three/drei';
+import { Html, Line, PerspectiveCamera, Sphere, Stars, TransformControls } from '@react-three/drei';
+import SceneOrbitControls from './components/SceneOrbitControls.jsx';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -440,7 +441,7 @@ export default function GlassMatrix3D() {
 
       <Canvas shadows dpr={[1, 2]}>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={50} />
-        <OrbitControls ref={controlsRef} enableDamping dampingFactor={0.05} />
+        <SceneOrbitControls ref={controlsRef} enableDamping dampingFactor={0.05} />
         <AutoFitCamera points={currentPoints} controlsRef={controlsRef} />
 
         <ambientLight intensity={0.2} />

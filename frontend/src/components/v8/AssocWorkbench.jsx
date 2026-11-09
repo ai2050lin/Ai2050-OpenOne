@@ -1,10 +1,17 @@
 /* 空间 · 关联机制工作台（Phase 346）。
-   上：模型列表；中：3D 里的基础 LLM（每层 = 注意力 + MLP，中间是残差主干），打开插件后旁边出现单独的 HiddenState / MLP / 注意力模型，
+   保留页面布局；3D 里显示完整 LLM 层塔，旁边放大选中层的 Head / HiddenState / MLP，
    点格子看具体数值；可全屏。下：控制台——输入文本运行、token 条、操作面板（全屏时变成浮窗，同一个面板）、插件面板。
    原来的四个页签（运行与路径 / 响应对照 / 语言项实测 / 共享关系）是“分析视角”插件，面板里是原来的页面。
    数据：本机后端可读时，从 /api/traces/mainline/ma-h2/ 读 MA-H2 discovery 冻结样本的原生值（float16）；
    网页版与没有原生数据时，只用案例汇总（FLOW_DATA），需要原生数据的插件置灰并说明原因。 */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SCENE_MOUSE_HINT } from '../scenePointer.js';
+import Scene from './AssocLayerScene.jsx';
+import { ASSOC_VIEWS as VIEWS } from './assocLayerGeometry.js';
+import MlpUnitNeighborhood, { collectMlpNeighbors, useTailNeighborhood } from './MlpUnitNeighborhood.jsx';
+import { GraphCards, researchGraph } from './ModelStructure.jsx';
+import ResearchDisclosure from './ResearchDisclosure.jsx';
+import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 
 import { DESKTOP } from '../../config.js';
 import { useApi } from '../app/rdc_fusion/api.js';
@@ -27,9 +34,9 @@ const MODE_PLUGINS = [
 const PLUGINS = [
   ['分析视角', MODE_PLUGINS],
   ['观察', [
-    { id: 'hs', name: 'HiddenState', tag: 'on', native: true, desc: '在 LLM 旁边显示单独的 HiddenState 模型（每层全部坐标），点格子看具体数值' },
-    { id: 'mlp', name: 'MLP 神经元', tag: 'on', native: true, desc: '单独的 MLP 单元模型（每块全部中间单元）；MA-H2 只在答案位置存了 MLP' },
-    { id: 'heads', name: '注意力头', tag: 'on', desc: '单独的注意力模型：头的颜色 = 答案位置对所选 token 的注意力；没有原生数据时用案例汇总' },
+    { id: 'hs', name: 'HiddenState', tag: 'on', native: true, desc: '放大当前层全部 HiddenState 坐标，点格子看原生值与研究记录' },
+    { id: 'mlp', name: 'MLP 神经元', tag: 'on', native: true, desc: '当前块全部 MLP 中间单元；点选查看真实激活、特征与前后层关联' },
+    { id: 'heads', name: '注意力头', tag: 'on', desc: '当前块全部 Head；颜色为采集查询位置对目标 token 的注意力，缺原生数据时注明案例汇总' },
     { id: 'delta', name: '层间变化', tag: 'on', native: true, desc: '每层 HiddenState 的总变化 ‖Δh‖ 与方向变化；注意力 / MLP 拆分需要原生权重（待接入）' },
     { id: 'diff', name: '条件对照', tag: 'on', native: true, desc: '按资料与按现实两条运行的差值（先查对齐）' },
   ]],
@@ -79,11 +86,11 @@ function useSample(base, i) {
     let dead = false;
     request(base, `/api/traces/mainline/ma-h2/sample/${i}`).then(d => {
       if (dead) return;
-      set({ i, data: { ...d, hs: f16(d.hs), mlp: f16(d.mlp), attn: f16(d.attn) } });
-    }).catch(e => { if (!dead) set({ i, error: e.message }); });
+      set({ key: `${base}:${i}`, data: { ...d, hs: f16(d.hs), mlp: f16(d.mlp), attn: f16(d.attn) } });
+    }).catch(e => { if (!dead) set({ key: `${base}:${i}`, error: e.message }); });
     return () => { dead = true; };
   }, [base, i]);
-  return s.i === i ? s : {};
+  return s.key === `${base}:${i}` ? s : {};
 }
 const norm = v => { let s = 0; for (const x of v) s += x * x; return Math.sqrt(s); };
 const cosv = (u, v) => { let a = 0, b = 0, c = 0; for (let i = 0; i < u.length; i++) { a += u[i] * v[i]; b += u[i] * u[i]; c += v[i] * v[i]; } return a / Math.sqrt(b * c); };
@@ -107,88 +114,7 @@ function sampler(d) {
   };
 }
 
-/* ---------- 3D ---------- */
-const VIEWS = { iso: [-0.5, 0.45, '斜视'], side: [0, 0.05, '侧视'], top: [-0.25, 1.2, '俯视'] };
 const VORDER = ['iso', 'side', 'top'];
-function Scene({ dims, objs, layer, view, tex: TX, marks, onPick, overlays, live }) {
-  const cv = useRef(null), st = useRef({ yaw: VIEWS[view][0], pitch: VIEWS[view][1], view, zoom: 1, hits: [], W: 0, H: 0, dpr: 1 });
-  const [tick, setTick] = useState(0);
-  const [tip, setTip] = useState(null);
-  useEffect(() => {
-    const el = cv.current, ro = new ResizeObserver(() => { const r = el.getBoundingClientRect(), s = st.current; s.dpr = window.devicePixelRatio || 1; s.W = r.width; s.H = r.height; el.width = r.width * s.dpr; el.height = r.height * s.dpr; setTick(t => t + 1); });
-    ro.observe(el);
-    const wheel = e => { e.preventDefault(); st.current.zoom = Math.max(0.5, Math.min(3, st.current.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); setTick(t => t + 1); };
-    el.addEventListener('wheel', wheel, { passive: false });
-    return () => { ro.disconnect(); el.removeEventListener('wheel', wheel); };
-  }, []);
-  const NL = dims.NL, LY = l => (l - (NL - 1) / 2) * (2.7 / NL);
-  const span = Math.max(...objs.map(o => o.x + o.w / 2)) - Math.min(...objs.map(o => o.x - o.w / 2)) + 0.9;
-  const proj = (x, y, z) => { const s = st.current, cy = Math.cos(s.yaw), sy = Math.sin(s.yaw), cp = Math.cos(s.pitch), sp = Math.sin(s.pitch);
-    const x1 = x * cy - z * sy, z1 = x * sy + z * cy, y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, k = Math.min(s.W / (span * 1.12 + 0.5), s.H / 3.6) * s.zoom;
-    return [s.W * 0.5 + x1 * k, s.H * 0.53 - y1 * k, z2]; };
-  useEffect(() => {
-    const el = cv.current, ctx = el.getContext('2d'), s = st.current;
-    if (s.view !== view) { s.view = view; s.yaw = VIEWS[view][0]; s.pitch = VIEWS[view][1]; }   // 换视角
-    if (!s.W) return;
-    ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0); ctx.clearRect(0, 0, s.W, s.H); s.hits = [];
-    const quad = (pts, fill, stroke, lw = 1) => { ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); } };
-    const drawTex = (img, x0, x1, z0, z1, y, a) => { const p00 = proj(x0, y, z0), p10 = proj(x1, y, z0), p01 = proj(x0, y, z1);
-      ctx.save(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false;
-      ctx.setTransform(s.dpr * (p10[0] - p00[0]) / img.width, s.dpr * (p10[1] - p00[1]) / img.width, s.dpr * (p01[0] - p00[0]) / img.height, s.dpr * (p01[1] - p00[1]) / img.height, s.dpr * p00[0], s.dpr * p00[1]); ctx.drawImage(img, 0, 0); ctx.restore(); };
-    const alpha = l => view === 'top' ? (l === layer ? 1 : 0.07) : l === layer ? 1 : l > layer ? 0.13 : 0.85;
-    const llm = objs[0];
-    for (const o of objs) {
-      const x0 = o.x - o.w / 2, x1 = o.x + o.w / 2, z0 = -o.d / 2, z1 = o.d / 2;
-      for (let l = 0; l < NL; l++) {
-        if (o.id !== 'llm' && o.id !== 'hs' && l === 0) continue;
-        const y = LY(l), a = alpha(l), cur = l === layer, c = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(([x, z]) => proj(x, y, z));
-        ctx.globalAlpha = a;
-        if (o.id === 'llm') {
-          quad(c, '#f7f9fc', cur ? '#d29a00' : '#97a6bb', cur ? 2.2 : 0.8);
-          if (l > 0) { quad([[x0 + 0.05, z0 + 0.06], [o.x - 0.12, z0 + 0.06], [o.x - 0.12, z1 - 0.06], [x0 + 0.05, z1 - 0.06]].map(([x, z]) => proj(x, y, z)), '#e5def3');
-            quad([[o.x + 0.12, z0 + 0.06], [x1 - 0.05, z0 + 0.06], [x1 - 0.05, z1 - 0.06], [o.x + 0.12, z1 - 0.06]].map(([x, z]) => proj(x, y, z)), '#dcefe4'); }
-          else quad(c, '#e8ecf2');
-        } else {
-          quad(c, '#fff', cur ? '#d29a00' : '#b4bfce', cur ? 2 : 0.6);
-          const t = TX[o.id]?.[o.id === 'hs' ? l : l - 1]; if (t) drawTex(t, x0, x1, z0, z1, y, a);
-        }
-        ctx.globalAlpha = 1; s.hits.push({ o, l, y, x0, x1, z0, z1 });
-      }
-      const pt = proj(o.x, LY(NL - 1), z0); ctx.fillStyle = '#3e4b60'; ctx.font = `${o.id === 'llm' ? 'bold 12px' : '12px'} sans-serif`; ctx.textAlign = 'center'; ctx.fillText(o.name, pt[0], pt[1] - 12); ctx.textAlign = 'left';
-      if (o.id !== 'llm' && !(o.id !== 'hs' && layer === 0)) { const a = proj(o.x > llm.x ? llm.x + llm.w / 2 : llm.x - llm.w / 2, LY(layer), 0), b = proj(o.x > llm.x ? x0 : x1, LY(layer), 0);
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = '#d29a00'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); }
-    }
-    ctx.strokeStyle = '#172033'; ctx.lineWidth = 2.5; ctx.beginPath(); for (let l = 0; l < NL; l++) { const p = proj(llm.x, LY(l), 0); l ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); } ctx.stroke();
-    for (let l = 0; l < NL; l += 6) { const p = proj(llm.x - llm.w / 2, LY(l), llm.d / 2); ctx.fillStyle = '#68748a'; ctx.font = '10.5px sans-serif'; ctx.textAlign = 'right'; ctx.fillText(l ? `L${l}` : '词嵌入', p[0] - 6, p[1] + 4); ctx.textAlign = 'left'; }
-    overlays?.({ ctx, proj, LY, llm, alpha });
-    if (live?.curve) { const mx = Math.max(...live.curve.slice(1)) || 1; for (let l = 1; l < Math.min(NL, live.curve.length); l++) { const [x, y] = proj(llm.x, LY(l), 0), r = 2 + 9 * (live.curve[l] / mx); ctx.fillStyle = 'rgba(210,154,0,.55)'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); } }
-    const pc = proj(llm.x, LY(layer), 0), g = ctx.createRadialGradient(pc[0], pc[1], 0, pc[0], pc[1], 15); g.addColorStop(0, 'rgba(210,154,0,.9)'); g.addColorStop(1, 'rgba(210,154,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pc[0], pc[1], 15, 0, 7); ctx.fill();
-    for (const m of marks) { const h = s.hits.find(t => t.o.id === m.id && t.l === layer); if (!h || !h.o.grid) continue; const [gw, gh] = h.o.grid;
-      const x = h.x0 + (h.x1 - h.x0) * ((m.idx % gw) + 0.5) / gw, z = h.z0 + (h.z1 - h.z0) * (Math.floor(m.idx / gw) + 0.5) / gh, p = proj(x, LY(layer), z);
-      ctx.strokeStyle = '#a33e43'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], 6, 0, 7); ctx.stroke(); }
-  });   // 每次渲染都重画（纹理、对象和视角都可能变）
-  const pick = (mx, my) => {
-    const s = st.current, order = view === 'top' ? s.hits.filter(h => h.l === layer) : [...s.hits].sort((a, b) => b.l - a.l);
-    for (const h of order) { if (view !== 'top' && h.l > layer) continue;
-      const p00 = proj(h.x0, h.y, h.z0), p10 = proj(h.x1, h.y, h.z0), p01 = proj(h.x0, h.y, h.z1), ax = p10[0] - p00[0], ay = p10[1] - p00[1], bx = p01[0] - p00[0], by = p01[1] - p00[1], det = ax * by - ay * bx, dx = mx - p00[0], dy = my - p00[1];
-      const u = (dx * by - dy * bx) / det, v = (ax * dy - ay * dx) / det; if (u < 0 || u > 1 || v < 0 || v > 1) continue;
-      if (!h.o.grid) return { o: h.o.id, l: h.l, part: u < 0.5 ? '注意力' : 'MLP' };
-      const [gw, gh] = h.o.grid; return { o: h.o.id, l: h.l, idx: Math.floor(v * gh) * gw + Math.floor(u * gw) };
-    }
-    return null;
-  };
-  const drag = useRef(null);
-  return <div className="aw-canvas">
-    <canvas ref={cv} data-tick={tick} aria-label={`LLM 的 3D 结构：${NL - 1} 层，从下到上；当前第 ${layer} 层`}
-      onPointerDown={e => { drag.current = { x: e.clientX, y: e.clientY, yaw: st.current.yaw, pitch: st.current.pitch, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); }}
-      onPointerMove={e => { const d = drag.current, r = e.currentTarget.getBoundingClientRect();
-        if (d) { const dx = e.clientX - d.x, dy = e.clientY - d.y; if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true; st.current.yaw = d.yaw + dx * 0.006; st.current.pitch = Math.max(-0.1, Math.min(1.4, d.pitch + dy * 0.005)); setTick(t => t + 1); return; }
-        const h = pick(e.clientX - r.left, e.clientY - r.top); setTip(h ? { x: e.clientX - r.left, y: e.clientY - r.top, h } : null); }}
-      onPointerLeave={() => setTip(null)}
-      onPointerUp={e => { const d = drag.current; drag.current = null; if (!d || d.moved) return; const r = e.currentTarget.getBoundingClientRect(), h = pick(e.clientX - r.left, e.clientY - r.top); onPick(h, e.clientX - r.left, e.clientY - r.top); }} />
-    {tip && <div className="aw-tip" style={{ left: tip.x + 12, top: tip.y + 12 }}>{dims.describe(tip.h)}</div>}
-  </div>;
-}
 
 /* ---------- 主组件 ---------- */
 export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
@@ -203,12 +129,14 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const [src, setSrc] = useState('frozen');      // frozen = 冻结样本；live = 本次实时运行
   const [gen, setGen] = useState({ busy: false, res: null, err: '' });
   const [layer, setLayer] = useState(24);
-  const [on, setOn] = useState(() => new Set(['hs', 'heads']));
+  const [on, setOn] = useState(() => new Set(['hs', 'mlp', 'heads']));
   const [tab, setTab] = useState('hs');
   const [sel, setSel] = useState({ coord: null, unit: null, head: null });
   const [view, setView] = useState('iso');
   const [max, setMax] = useState(false);
   const [pop, setPop] = useState(null);
+  const [locator, setLocator] = useState(false);
+  const [findKind, setFindKind] = useState('mlp');
   const [opt, setOpt] = useState({ hsNorm: 'global', hsClip: 0.99, mlpClip: 0.99, headTarget: 'follow', headMax: 0.5, diffAlign: 'named' });
   const [hide, setHide] = useState(() => new Set());
   const [listed, setListed] = useState(() => new Set(['hs', 'mlp', 'heads', 'delta', 'diff', 'lens']));
@@ -235,7 +163,9 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const isLive = src === 'live' && Boolean(gen.res);
   const LB = useBundle(live.base, isLive ? gen.res.id : null, isLive ? livePos : null);
   const saL = useMemo(() => liveSampler(LB.data, gen.res), [LB.data, gen.res]);
-  const sa = isLive ? saL : saF, sb = isLive ? null : sbF;
+  const sa = isLive ? saL : saF;
+  const compatible = sa && sbF && sa.d.model_snapshot === sbF.d.model_snapshot && ['NL', 'DM', 'NF', 'NH', 'P'].every(key => sa[key] === sbF[key]);
+  const sb = !isLive && compatible ? sbF : null;
   const native = Boolean(sa);
   const reason = isLive ? (LB.error || (!sa ? '读取实时运行…' : ''))
     : !nat.checked ? '正在查找本机数据…' : samples?.error || A.error || (base == null ? (DESKTOP ? '没有找到提供冻结样本的本机后端（:5001 完整中心或 :5002 实时前向服务）：请确认本机服务已启动，原生全场在 AI2050_NATIVE_DIR 下' : '网页版不公开原生全场：原生数据保存在采集节点，桌面客户端或本机后端可用') : !sa ? '读取冻结样本…' : '');
@@ -250,7 +180,10 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const [hw, hh] = grid(DM), [mw, mh] = grid(NF);
   const aligned = sa && sb && sa.T === sb.T && sa.d.tokpos.join() === sb.d.tokpos.join();
   const diffOn = on.has('diff') && sb && (aligned || opt.diffAlign === 'named');
-  const shown = id => on.has(id) && !hide.has(id) && (id === 'heads' || native);
+  const shown = id => on.has(id) && !hide.has(id);
+  const headTarget = opt.headTarget === 'follow' || isLive ? pos : positions.indexOf(opt.headTarget);
+  const scope = `${base}:${isLive ? gen.res.id : run.i}:${sa?.d.model_snapshot || ''}:${pos}`;
+  const visiblePop = pop?.scope === scope && pop.h.l === layer ? pop : null;
 
   /* 纹理 */
   const TX = useMemo(() => {
@@ -262,7 +195,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
       const vals = ok ? Array.from({ length: NB }, (_, b) => v(b)) : null, sc = ok ? pct(vals, opt.mlpClip) : 1;
       out.mlp = Array.from({ length: NB }, (_, b) => tex(mw, mh, d => { for (let i = 0; i < mw * mh; i++) put(d, i, i >= NF ? [246, 248, 251] : vals ? divc(vals[b][i], sc) : [214, 222, 232]); })); }
     if (shown('heads')) {
-      const target = opt.headTarget === 'follow' || isLive ? pos : positions.indexOf(opt.headTarget);
+      const target = headTarget;
       out.heads = Array.from({ length: NB }, (_, b) => tex(8, Math.ceil(NH / 8), d => { for (let h = 0; h < NH; h++) {
         let val, rgb;
         if (sa) { val = sa.att(b, h)[sa.d.tokpos[target]]; rgb = diffOn ? divc(val - sb.att(b, h)[sb.d.tokpos[target]], opt.headMax * 0.8) : seqc(val, opt.headMax); }
@@ -272,30 +205,70 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
     return out;
   }, [sa, sb, pos, on, hide, opt, diffOn]);   // eslint-disable-line react-hooks/exhaustive-deps
 
-  const objs = useMemo(() => {
-    const o = [{ id: 'llm', x: 0, w: 1.3, d: 0.6, name: `${sa ? 'Qwen3-4B' : '模型'} · ${NB} 层` }];
-    let r = 1.1, l = -1.1;
-    if (shown('hs')) { o.push({ id: 'hs', x: r + 0.55, w: 1.1, d: 1.1 * hh / hw, name: `HiddenState · ${DM} 坐标`, grid: [hw, hh] }); r += 1.55; }
-    if (shown('mlp')) { o.push({ id: 'mlp', x: r + 0.65, w: 1.3, d: 1.3 * mh / mw, name: `MLP 单元 · ${NF}`, grid: [mw, mh] }); r += 1.75; }
-    if (shown('heads')) { o.push({ id: 'heads', x: l - 0.45, w: 0.9, d: 0.9 * Math.ceil(NH / 8) / 8, name: `注意力 · ${NH} 头${sa ? '' : '（案例汇总）'}`, grid: [8, Math.ceil(NH / 8)] }); l -= 1.35; }
-    const cx = (r + l) / 2; o.forEach(x => { x.x -= cx; }); return o;
-  }, [sa, on, hide, hw, hh, mw, mh]);   // eslint-disable-line react-hooks/exhaustive-deps
+  const objs = [
+    { id: 'llm', name: `${sa ? 'Qwen3-4B' : '模型结构'} · ${NB} 层` },
+    ...(shown('heads') ? [{ id: 'heads', name: `Head · ${NH}${sa ? '' : '（案例汇总）'}`, grid: [8, Math.ceil(NH / 8)], count: NH }] : []),
+    ...(shown('hs') ? [{ id: 'hs', name: `HiddenState · ${DM}${sa ? '' : '（未采集）'}`, grid: [hw, hh], count: DM }] : []),
+    ...(shown('mlp') ? [{ id: 'mlp', name: `MLP · ${NF}${sa && mlpOk ? '' : '（未采集）'}`, grid: [mw, mh], count: NF }] : []),
+  ];
 
   const describe = h => {
     if (h.o === 'llm') return `第 ${h.l} 层 · ${h.l ? h.part : '词嵌入'}`;
-    if (h.o === 'hs') return sa && h.idx < DM ? `HiddenState · 第 ${h.l} 层 · 坐标 ${h.idx} · ${sa.hs(pos, h.l)[h.idx].toFixed(4)}` : '';
-    if (h.o === 'mlp') return sa && h.idx < NF ? `MLP · 块 ${h.l - 1} · 单元 ${h.idx}${mlpOk ? ' · A ' + sa.mlp(h.l - 1)[h.idx].toFixed(4) : ''}` : '';
-    if (h.o === 'heads') return h.idx < NH ? `注意力 · L${h.l - 1}H${h.idx} · ${sa ? sa.att(h.l - 1, h.idx)[sa.d.tokpos[pos]].toFixed(4) : (FLOW_DATA.heads.doc[h.l - 1]?.[h.idx] ?? 0).toFixed(3) + '（案例汇总）'}` : '';
+    if (h.o === 'hs') return `HiddenState · 第 ${h.l} 层 · 坐标 ${h.idx} · ${sa && h.idx < DM ? sa.hs(pos, h.l)[h.idx].toFixed(4) : '未采集'}`;
+    if (h.o === 'mlp') return `MLP · 块 ${h.l - 1} · 单元 ${h.idx}${sa && mlpOk && h.idx < NF ? ' · A ' + sa.mlp(h.l - 1)[h.idx].toFixed(4) : ' · 未采集'}`;
+    if (h.o === 'heads') return h.idx < NH ? `注意力 · L${h.l - 1}H${h.idx} · ${sa ? sa.att(h.l - 1, h.idx)[sa.d.tokpos[headTarget]].toFixed(4) : (FLOW_DATA.heads.doc[h.l - 1]?.[h.idx] ?? 0).toFixed(3) + '（案例汇总）'}` : '';
     return '';
   };
   const onPick = (h, x, y) => {
     if (!h) { setPop(null); return; }
     setLayer(h.l);
-    if (h.o === 'hs' && h.idx < DM) { setSel(s => ({ ...s, coord: h.idx })); setTab('hs'); }
-    if (h.o === 'mlp' && h.idx < NF) { setSel(s => ({ ...s, unit: h.idx })); setTab('mlp'); }
-    if (h.o === 'heads' && h.idx < NH) { setSel(s => ({ ...s, head: h.idx })); setTab('heads'); }
-    setPop({ h, x, y });
+    if (h.o === 'llm') setSel({ coord: null, unit: null, head: null });
+    if (h.o === 'hs' && h.idx < DM) { setSel({ coord: h.idx, unit: null, head: null }); setTab('hs'); }
+    if (h.o === 'mlp' && h.idx < NF) { setSel({ coord: null, unit: h.idx, head: null }); setTab('mlp'); }
+    if (h.o === 'heads' && h.idx < NH) { setSel({ coord: null, unit: null, head: h.idx }); setTab('heads'); }
+    setPop(h.o === 'llm' ? null : { h, x, y, scope });
   };
+  const snapshot = sa?.d.model_snapshot;
+  const selected = useMemo(() => sel.unit != null && layer > 0 ? { layer, module: 'mlp', index: sel.unit }
+    : sel.head != null && layer > 0 ? { layer, module: 'attn', index: sel.head }
+      : sel.coord != null ? { layer, module: 'hs', index: sel.coord } : null, [sel, layer]);
+  const archive = useApi(selected && snapshot ? '/api/traces/research-space' : null);
+  const graph = useMemo(() => researchGraph(archive.data, snapshot, selected || {}, NB, { heads: NH, units: NF }), [archive.data, snapshot, selected, NB, NH, NF]);
+  const tail = useTailNeighborhood({ snapshot, block: layer - 1, unit: selected?.index, width: NF, enabled: selected?.module === 'mlp' });
+  const neighbors = useMemo(() => collectMlpNeighbors({ block: layer - 1, layers: NB, width: NF, links: graph.links, observations: tail.observations }), [layer, NB, NF, graph.links, tail.observations]);
+  const sceneLinks = selected?.module === 'mlp' ? [...neighbors.upstream.slice(0, 3), ...neighbors.downstream.slice(0, 3)].map(row => ({
+    o: 'mlp', l: row.location.layer, idx: row.location.index, kind: row.evidence.every(e => e.kind === 'observation') ? 'observation' : 'registered',
+  })) : selected?.module === 'attn' ? graph.links.filter(row => row.location).map(row => ({
+    o: row.location.module === 'mlp' ? 'mlp' : 'heads', l: row.location.layer, idx: row.location.index, kind: 'registered',
+  })) : [];
+  const locate = location => {
+    const o = location.module === 'mlp' ? 'mlp' : location.module === 'attn' ? 'heads' : 'hs';
+    setOn(s => new Set([...s, o])); setHide(s => { const next = new Set(s); next.delete(o); return next; });
+    onPick({ o, l: location.layer, idx: location.index }, 20, 100);
+  };
+  const objectEvidence = selected && snapshot ? <div className="aw-evidence">
+    <p className="v8-note">{archive.loading ? '研究卡读取中' : `已定位研究卡 ${graph.cards.length}`} · {selected.module === 'mlp' ? `前层 ${neighbors.upstream.length} / 后层 ${neighbors.downstream.length} 个关联` : `已登记关联 ${graph.links.length}`}</p>
+    <ResearchDisclosure key={`${snapshot}:${selected.module}:${layer}:${selected.index}`} title="特征与前后层关联">
+      <p className="v8-note">档案按相同模型快照与原生索引定位，各有其测试语境。共同响应不等于因果连接。</p>
+      {selected.module === 'mlp' && <MlpUnitNeighborhood model={models.find(m => m.model_snapshot === snapshot)} snapshot={snapshot} selected={selected} layers={NB}
+        graph={graph} tail={tail} neighbors={neighbors} candidate={{}} onLocate={locate}/>}
+      <GraphCards graph={graph} archive={archive} snapshot={snapshot}/>
+      {selected.module === 'hs' && <p className="v8-note">跨层曲线只比较同编号坐标的响应，未据此认定同一语义或因果接续。当前登记器尚未提供该原生坐标的特征映射。</p>}
+      {selected.module !== 'mlp' && graph.links.map(row => <div key={row.entry.id}>
+        <p>{row.other?.label || row.otherId} · {EVIDENCE_LABEL[row.entry.body.evidence?.level] || '已有登记'}</p>
+        {row.location && <button type="button" className="v6-linkbtn" onClick={() => locate(row.location)}>定位 B{row.location.layer - 1} · {row.location.module === 'mlp' ? 'U' : 'H'}{row.location.index}</button>}
+        <ResearchDisclosure title="关联范围与原始记录"><pre className="v8-artifact-json">{JSON.stringify(row.entry.body, null, 2)}</pre></ResearchDisclosure>
+      </div>)}
+      {selected.module === 'attn' && !graph.links.length && <p className="v8-note">该 Head 暂无可定位的跨层证据；注意力分布只表示看向哪些 token，不能当作上下游因果链。</p>}
+    </ResearchDisclosure>
+    <ResearchDisclosure key={`${scope}:${layer}:${selected.module}:${selected.index}`} title="数据来源与完整数组">
+      <pre className="v8-artifact-json">{JSON.stringify({ model_snapshot: snapshot, source: isLive ? gen.res.id : `MA-H2 sample ${run.i}`, split: isLive ? 'unregistered' : 'discovery',
+        token_position: sa.d.tokpos[pos], object: selected, boundary: selected.module === 'hs' ? layer === 0 ? 'embedding' : layer === NL - 1 ? 'hidden_state_final_norm' : 'hidden_state' : selected.module === 'mlp' ? 'silu(gate)*value' : 'attention_probability',
+        attention_query: sa.T - 1, attention_target: sa.d.tokpos[headTarget],
+        values: selected.module === 'hs' ? Array.from(sa.hs(pos, layer)) : selected.module === 'mlp' ? mlpOk ? Array.from(sa.mlp(layer - 1)) : null : Array.from(sa.att(layer - 1, selected.index)),
+      }, null, 2)}</pre>
+    </ResearchDisclosure>
+  </div> : null;
   const toggle = id => setOn(s => { const n = new Set(s); if (n.has(id)) n.delete(id); else { n.add(id); setTab(id); if (MODE_IDS.has(id)) onMode(id); } return n; });
 
   /* 逐层播放 */
@@ -317,7 +290,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
         if (L[1]) { ctx.fillStyle = '#d4622b'; ctx.fillRect(p[0] + 8, p[1], Math.max(-60, Math.min(60, (L[1][l] || 0) * 4)), 3); } ctx.globalAlpha = 1; } }
   }, [sa, sb, pos, on, hide, NL]);   // eslint-disable-line react-hooks/exhaustive-deps
 
-  const marks = [sel.coord != null && { id: 'hs', idx: sel.coord }, sel.unit != null && { id: 'mlp', idx: sel.unit }, sel.head != null && { id: 'heads', idx: sel.head }].filter(Boolean);
+  const marks = selected ? [{ id: selected.module === 'attn' ? 'heads' : selected.module, idx: selected.index }] : [];
   const k = sa?.d, Bk = layer - 1;
 
   /* ---------- 操作面板（非全屏停靠在控制台，全屏时浮在 3D 上：同一个组件） ---------- */
@@ -386,24 +359,24 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
   const needNative = <p className="v8-note">{reason}</p>;
   const P = {
     hs: () => !sa ? [needNative] : (() => { const v = sa.hs(pos, layer), top = [...v].map((x, i) => [i, x]).sort((p, q) => Math.abs(q[1]) - Math.abs(p[1])).slice(0, 8);
-      return [<><h4>第 {layer} 层 · {posName(pos)} · ‖h‖ {norm(v).toFixed(1)}</h4><table className="v6-table"><tbody>{top.map(([i, x]) => <tr key={i} className={sel.coord === i ? 'on' : ''} onClick={() => setSel(s => ({ ...s, coord: i }))}><td>坐标 {i}</td><td className="num">{x.toFixed(4)}</td></tr>)}</tbody></table></>,
+      return [<><h4>第 {layer} 层 · {posName(pos)} · ‖h‖ {norm(v).toFixed(1)}</h4><table className="v6-table"><tbody>{top.map(([i, x]) => <tr key={i} className={sel.coord === i ? 'on' : ''} onClick={() => onPick({ o: 'hs', l: layer, idx: i }, 20, 100)}><td>坐标 {i}</td><td className="num">{x.toFixed(4)}</td></tr>)}</tbody></table></>,
         sel.coord != null ? <><h4>坐标 {sel.coord} 跨层</h4>{line([{ v: Array.from({ length: NL }, (_, l) => sa.hs(pos, l)[sel.coord]), color: '#2a78d6', name: '本运行' }, ...(sb ? [{ v: Array.from({ length: NL }, (_, l) => sb.hs(pos, l)[sel.coord]), color: '#d4622b', name: '对照运行', dash: true }] : [])], layer, 2)}</>
-          : <><h4>每层 ‖h‖</h4>{line([{ v: Array.from({ length: NL }, (_, l) => norm(sa.hs(pos, l))), color: '#2a78d6', name: '本运行' }], layer)}<p className="v8-note">点 3D 里的 HiddenState 模型选一个坐标。</p></>,
+          : <><h4>每层 ‖h‖</h4>{line([{ v: Array.from({ length: NL }, (_, l) => norm(sa.hs(pos, l))), color: '#2a78d6', name: '本运行' }], layer)}<p className="v8-note">点旁边的 HiddenState 网格选择原生坐标。</p></>,
         '坐标按原生编号排成网格，网格位置没有含义；颜色按全图 |值| 的分位截断，悬停或点击看原值（float16）。']; })(),
     mlp: () => !sa ? [needNative] : !mlpOk ? [<p key="m" className="v8-note">{isLive ? '实时运行只在模块读出位置（首 / 中 / 末 token）采集 MLP；在 token 条里选这几个位置。' : 'MA-H2 只在答案位置存了 MLP 激活；把 token 切到答案位置。'}</p>] : layer === 0 ? [<p key="m" className="v8-note">词嵌入层没有 MLP。</p>] : (() => { const a = sa.mlp(Bk), top = [...a.keys()].sort((x, y) => Math.abs(a[y]) - Math.abs(a[x])).slice(0, 8); if (sel.unit != null && !top.includes(sel.unit)) top.push(sel.unit);
-      return [<><h4>块 {Bk} · 最活跃的单元（A = silu(G)⊙V）</h4><table className="v6-table"><thead><tr><th>单元</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{top.map(u => <tr key={u} className={sel.unit === u ? 'on' : ''} onClick={() => setSel(s => ({ ...s, unit: u }))}><td>U{u}</td><td className="num">{a[u].toFixed(3)}</td><td className="num">{sb ? sb.mlp(Bk)[u].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
-        <p className="v8-note">正式版在这里接普查单元卡、gate 输入的来源分解与四级状态。</p>, '单元按原生编号排成网格，网格位置没有含义；激活大小不说明它被使用。']; })(),
+      return [<><h4>块 {Bk} · 最活跃的单元（A = silu(G)⊙V）</h4><table className="v6-table"><thead><tr><th>单元</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{top.map(u => <tr key={u} className={sel.unit === u ? 'on' : ''} onClick={() => onPick({ o: 'mlp', l: layer, idx: u }, 20, 100)}><td>U{u}</td><td className="num">{a[u].toFixed(3)}</td><td className="num">{sb ? sb.mlp(Bk)[u].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
+        (selected?.module === 'mlp' && objectEvidence) || <p className="v8-note">点单元查看真实激活、已有研究特征和前后层关联。</p>, '单元按原生编号排成网格，网格位置没有含义；激活大小不说明它被使用。']; })(),
     heads: () => layer === 0 ? [<p key="h" className="v8-note">词嵌入层没有注意力头。</p>] : !sa ? [<><h4>块 {Bk} · 案例汇总：答案位置对资料颜色的注意力</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">按资料</th><th className="num">按现实</th></tr></thead><tbody>{[...Array(NH).keys()].sort((x, y) => FLOW_DATA.heads.doc[Bk][y] - FLOW_DATA.heads.doc[Bk][x]).slice(0, 8).map(h => <tr key={h}><td>L{Bk}H{h}</td><td className="num">{FLOW_DATA.heads.doc[Bk][h].toFixed(3)}</td><td className="num">{FLOW_DATA.heads.real[Bk][h].toFixed(3)}</td></tr>)}</tbody></table></>, needNative, '注意力去向不等于计算使用。']
-      : (() => { const tp = sa.d.tokpos[pos], rank = [...Array(NH).keys()].sort((x, y) => sa.att(Bk, y)[tp] - sa.att(Bk, x)[tp]).slice(0, 8);
-        return [<><h4>块 {Bk} · 答案位置看“{posName(pos)}”最多的头</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{rank.map(h => <tr key={h} className={sel.head === h ? 'on' : ''} onClick={() => setSel(s => ({ ...s, head: h }))}><td>L{Bk}H{h}</td><td className="num">{sa.att(Bk, h)[tp].toFixed(3)}</td><td className="num">{sb ? sb.att(Bk, h)[sb.d.tokpos[pos]].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
-          sel.head != null ? <><h4>L{Bk}H{sel.head} 对全部 {sa.T} 个 token</h4>{line([{ v: Array.from(sa.att(Bk, sel.head)), color: '#b07d00', name: '虚线 = 所选位置' }], tp, 2)}</> : <p className="v8-note">点 3D 里的注意力模型或表中一行。</p>, '注意力去向不等于计算使用。']; })(),
+      : (() => { const tp = sa.d.tokpos[headTarget], rank = [...Array(NH).keys()].sort((x, y) => sa.att(Bk, y)[tp] - sa.att(Bk, x)[tp]).slice(0, 8);
+        return [<><h4>块 {Bk} · 采集查询位置看“{posName(headTarget)}”最多的头</h4><table className="v6-table"><thead><tr><th>头</th><th className="num">本运行</th><th className="num">对照</th></tr></thead><tbody>{rank.map(h => <tr key={h} className={sel.head === h ? 'on' : ''} onClick={() => onPick({ o: 'heads', l: layer, idx: h }, 20, 100)}><td>L{Bk}H{h}</td><td className="num">{sa.att(Bk, h)[tp].toFixed(3)}</td><td className="num">{sb ? sb.att(Bk, h)[sb.d.tokpos[headTarget]].toFixed(3) : '—'}</td></tr>)}</tbody></table></>,
+          sel.head != null ? <><h4>L{Bk}H{sel.head} 对全部 {sa.T} 个 token</h4>{line([{ v: Array.from(sa.att(Bk, sel.head)), color: '#b07d00', name: '虚线 = 所选位置' }], tp, 2)}</> : <p className="v8-note">点旁边的 Head 网格或表中一行。</p>, '注意力去向不等于计算使用。']; })(),
     delta: () => !sa ? [needNative] : (() => { const dn = [], cs = []; for (let l = 1; l < NL; l++) { const a = sa.hs(pos, l), b = sa.hs(pos, l - 1); dn.push(l === NL - 1 ? NaN : norm(a.map((x, i) => x - b[i]))); cs.push(l === NL - 1 ? NaN : cosv(a, b)); }
       const split = sa.hasSplit ? [{ v: Array.from({ length: NB }, (_, b) => norm(sa.ao(b))), color: '#7050a0', name: '注意力写入', dash: true }, { v: Array.from({ length: NB }, (_, b) => norm(sa.mo(b))), color: '#2f8f5b', name: 'MLP 写入' }] : [];
       return [<><h4>每层总变化 ‖Δh‖{sa.hasSplit ? ' 与注意力 / MLP 写入（本次实时运行，真实采集）' : '（3D：LLM 左侧紫条）'}</h4>{line([{ v: dn, color: '#183f77', name: '‖h_l − h_(l−1)‖' }, ...split], layer - 1)}</>, <><h4>相邻层方向 cos(h_l, h_(l−1))</h4>{line([{ v: cs, color: '#183f77', name: '越接近 1 改写越少' }], layer - 1, 2)}</>,
         sa.hasSplit ? '注意力写入与 MLP 写入是 o_proj 与 down_proj 的真实输出（本次运行在模块读出位置采集）；最后一层的 hs 已过最终归一化。' : isLive ? '这个 token 不是模块读出位置，没有写入拆分；在 token 条里选首 / 中 / 末位置。' : '最后一层的 hs 已过最终归一化，不与前层比较。冻结样本的注意力 / MLP 写入拆分需要原生权重（待接入）。']; })(),
-    diff: () => isLive ? [<p key="d" className="v8-note">实时运行没有对照运行：资料 / 现实成对的比较只在冻结样本里。切回“冻结样本”使用。</p>, '', ''] : !sa || !sb ? [needNative] : (() => { if (!aligned && opt.diffAlign === 'strict') return [<p key="d">对齐检查：token 数 {sa.T} / {sb.T} ✗。严格对齐时不显示差值。</p>, '', '差值是观察，原因要靠干预。'];
+    diff: () => isLive ? [<p key="d" className="v8-note">实时运行没有对照运行：资料 / 现实成对的比较只在冻结样本里。切回“冻结样本”使用。</p>, '', ''] : !sa || !sb ? [<p key="d" className="v8-note">{sa && sbF && !compatible ? '对照模型快照或数组维度不匹配，已停止比较。' : reason || B.error || '没有可比较的对照样本。'}</p>] : (() => { if (!aligned && opt.diffAlign === 'strict') return [<p key="d">对齐检查：token 数 {sa.T} / {sb.T} ✗。严格对齐时不显示差值。</p>, '', '差值是观察，原因要靠干预。'];
       const rel = Array.from({ length: NL }, (_, l) => { const a = sa.hs(pos, l), b = sb.hs(pos, l); return norm(a.map((x, i) => x - b[i])) / norm(a); });
-      return [<><p>对齐检查：同一快照 ✓ · token 数 {sa.T} / {sb.T} {aligned ? '✓' : '✗（按命名读出位置比较）'}</p><p className="v8-note">3D 里各插件模型显示本运行 − 对照运行的差值。</p></>, <><h4>每层相对差异</h4>{line([{ v: rel, color: '#a33e43', name: POSN[positions[pos]] }], layer, 2)}</>, '差值是观察，原因要靠干预；不对齐时差值含前缀差异。']; })(),
+      return [<><p>对齐检查：同一快照 ✓ · token 数 {sa.T} / {sb.T} {aligned ? '✓' : '✗（按命名读出位置比较）'}</p><p className="v8-note">3D 中当前层网格显示本运行 − 对照运行的差值；单元详情保留原值。</p></>, <><h4>每层相对差异</h4>{line([{ v: rel, color: '#a33e43', name: POSN[positions[pos]] }], layer, 2)}</>, '差值是观察，原因要靠干预；不对齐时差值含前缀差异。']; })(),
     lens: () => isLive ? [<p key="l" className="v8-note">实时运行的逐层读出待接入（需要本机权重）；本次的最终输出见“运行结果”。</p>, '', ''] : (() => { const L = sa ? [{ v: sa.d.lens.map(r => r[0] - r[1]), color: '#2a78d6', name: '本运行' }, ...(sb ? [{ v: sb.d.lens.map(r => r[0] - r[1]), color: '#d4622b', name: '对照运行' }] : [])] : [{ v: FLOW_DATA.lensDoc, color: '#2a78d6', name: '按资料（案例汇总）' }, { v: FLOW_DATA.lensReal, color: '#d4622b', name: '按现实（案例汇总）' }];
       return [<><h4>Logit Lens · 答案位置 · {nameK}色 − {nameP}色</h4>{line(L, layer)}</>, <p className="v8-note">3D：LLM 右缘的条。正式版另给每层前 5 个 token。</p>, '读出近似，早层不可靠。']; })(),
     tests: () => [<TestsPanel key="t" />, '', ''],
@@ -416,17 +389,15 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
       : P[cur] ? (() => { const [a, b, bound] = P[cur](); return <div className="aw-pbody"><div>{a}</div><div>{b}</div>{bound && <div className="aw-bound">{bound}</div>}</div>; })()
         : (() => { const p = ALL.find(x => x.id === cur); return <div className="aw-pbody"><div><h4>{p.name}</h4><p>{p.desc}</p></div><div><p className="v8-note">{p.tag === 'have' ? '项目里已有实现，正式接成插件后读同一个观察对象，并在 3D 上画自己的图层。' : '待接入：按插件规范声明需要的数据、3D 图层与面板。'}</p></div></div>; })();
 
-  const popBody = pop && (() => { const { h } = pop;
+  const popBody = visiblePop && (() => { const { h } = visiblePop;
     if (h.o === 'hs' && sa && h.idx < DM) { const vals = Array.from({ length: NL }, (_, l) => sa.hs(pos, l)[h.idx]);
       return <><h4>HiddenState · 第 {h.l} 层 · 坐标 {h.idx}</h4><div className="aw-kv"><span>值</span><span><b>{vals[h.l].toFixed(4)}</b></span>{sb && <><span>对照运行</span><span>{sb.hs(pos, h.l)[h.idx].toFixed(4)}</span></>}<span>本层 ‖h‖</span><span>{norm(sa.hs(pos, h.l)).toFixed(1)}</span></div>
-        {line([{ v: vals, color: '#2a78d6', name: '这个坐标跨层' }], h.l, 2)}<p className="v8-note">相邻坐标：{[-2, -1, 1, 2].map(d => h.idx + d).filter(i => i >= 0 && i < DM).map(i => `${i}: ${sa.hs(pos, h.l)[i].toFixed(2)}`).join('　')}</p></>; }
+        {line([{ v: vals, color: '#2a78d6', name: '同编号坐标的跨层响应（非因果链）' }], h.l, 2)}<p className="v8-note">{h.l === NL - 1 ? '本层已过最终归一化。' : ''}相邻坐标：{[-2, -1, 1, 2].map(d => h.idx + d).filter(i => i >= 0 && i < DM).map(i => `${i}: ${sa.hs(pos, h.l)[i].toFixed(2)}`).join('　')}</p></>; }
     if (h.o === 'mlp' && sa && h.idx < NF) return !mlpOk ? <p className="v8-note">这个位置没有采集 MLP 激活。</p> : <><h4>MLP · 块 {h.l - 1} · 单元 {h.idx}</h4><div className="aw-kv"><span>A</span><span><b>{sa.mlp(h.l - 1)[h.idx].toFixed(4)}</b></span>{sb && <><span>对照运行</span><span>{sb.mlp(h.l - 1)[h.idx].toFixed(4)}</span></>}</div></>;
-    if (h.o === 'heads' && h.idx < NH) return <><h4>注意力头 L{h.l - 1}H{h.idx}</h4><p>{describe(h)}</p></>;
-    return <><h4>第 {h.l} 层</h4><p className="v8-note">{h.l ? h.part : '词嵌入'}。打开 HiddenState、MLP 神经元或注意力头插件，在旁边看这一层的具体数值。</p></>; })();
+    if (h.o === 'heads' && h.idx < NH) return <><h4>注意力头 B{h.l - 1} · H{h.idx}</h4><p>{describe(h)}</p><p className="v8-note">{sa ? `查询 token ${sa.T - 1} → 目标 token ${sa.d.tokpos[headTarget]}（${posName(headTarget)}）` : 'MA-H2 案例汇总，非当前样本值'}。注意力概率不是权重参数，也不代表因果重要性。</p></>;
+    return <><h4>{describe(h)}</h4><p className="v8-note">{reason || '该位置没有原生采集值。'}</p></>; })();
 
-  return <div className="v8-route aw" aria-label="关联机制">
-    <PageHead title="关联机制" sub="以 3D 里的模型结构为核心，用插件观察和研究：HiddenState、神经元、注意力、读出、对照，以及行业常用的归因与干预工具。" />
-    <div className="aw-models" role="group" aria-label="模型">{(models.length ? models : [{ model: 'qwen3-4b', n_layers: 36 }]).map(m => {
+  const modelControls = <div className="aw-models" role="group" aria-label="模型">{(models.length ? models : [{ model: 'qwen3-4b', n_layers: 36 }]).map(m => {
       const isMain = /qwen3-4b/i.test(m.model);
       return <button type="button" key={m.model} aria-pressed={isMain} title={isMain ? '' : '这个模型还没有工作台的冻结样本'} disabled={!isMain}>
         <b>{shortModel(m.model)}</b><small>{m.n_layers} 层{m.d_ff ? ` · MLP ${m.d_ff}` : ''}</small><span className={isMain && native ? 'ok' : 'warn'}>{isMain ? (native ? '冻结样本 · 原生数据' : '案例汇总') : '暂无冻结样本'}</span></button>; })}
@@ -441,20 +412,34 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
             <button type="button" className="fw-tbtn" disabled={!live.base || lm.busy || !['ready', 'loading'].includes(state)} title="卸载模型，释放 GPU 显存" onClick={lm.unload}>卸载</button>
           </span>
           {(lm.msg || s?.error || (state === 'unavailable' && s?.reason)) && <small className="v8-note">{lm.msg || s?.error || s?.reason}</small>}
-        </>; })()}</div></div>
+        </>; })()}</div></div>;
+
+  return <div className="v8-route aw" aria-label="关联机制">
+    <PageHead title="关联机制" sub="以 3D 里的模型结构为核心，用插件观察和研究：HiddenState、神经元、注意力、读出、对照，以及行业常用的归因与干预工具。" />
     <section className={`aw-space${max ? ' max' : ''}`}>
-      <Scene dims={{ NL, describe }} objs={objs} layer={layer} view={view} tex={TX} marks={marks} onPick={onPick} overlays={overlays} live={gen.res} />
-      <div className="aw-ov tr"><button type="button" onClick={() => { setMax(m => !m); setPop(null); }}>{max ? '退出全屏（Esc）' : '⛶ 全屏'}</button></div>
+      <Scene dims={{ NL, describe }} objs={objs} layer={layer} view={view} tex={TX} marks={marks} onPick={onPick} overlays={overlays} live={isLive ? gen.res : null} links={sceneLinks} />
+      <div className="aw-ov tr"><button type="button" aria-expanded={locator} onClick={() => { setLocator(v => !v); setPop(null); }}>精确定位</button><button type="button" onClick={() => { setMax(m => !m); setPop(null); }}>{max ? '退出全屏（Esc）' : '⛶ 全屏'}</button></div>
+      {locator && <form className="aw-locator" aria-label="原生索引定位" onSubmit={event => {
+        event.preventDefault(); const form = new FormData(event.currentTarget), l = +form.get('layer'), index = +form.get('index');
+        if (!Number.isInteger(l) || !Number.isInteger(index) || l < (findKind === 'hs' ? 0 : 1) || l >= NL || index < 0 || index >= (findKind === 'hs' ? DM : findKind === 'mlp' ? NF : NH)) return;
+        locate({ layer: l, module: findKind, index }); setLocator(false);
+      }}>
+        <label>层（L0 = 词嵌入）<input name="layer" type="number" min={findKind === 'hs' ? 0 : 1} max={NL - 1} defaultValue={Math.max(findKind === 'hs' ? 0 : 1, layer)} required/></label>
+        <label>对象<select aria-label="定位对象类型" value={findKind} onChange={e => setFindKind(e.target.value)}><option value="mlp">MLP 单元</option><option value="attn">Head</option><option value="hs">HiddenState 坐标</option></select></label>
+        <label>原生编号（从 0 开始）<input name="index" type="number" min="0" max={(findKind === 'hs' ? DM : findKind === 'mlp' ? NF : NH) - 1} defaultValue="0" required/></label>
+        <button type="submit" className="fw-tbtn primary">定位单元</button><p className="v8-note">L1 对应块 B0。所有原生编号均可查询。</p>
+      </form>}
       <div className="aw-big"><b>{layer ? `第 ${layer} 层` : '词嵌入'}</b><span className="v8-note">{isLive ? '实时运行 · ' : '冻结样本 · '}{posName(pos)}{k ? `（token ${k.tokpos[pos]}）· ‖h‖ ${norm(sa.hs(pos, layer)).toFixed(1)}` : ''}</span></div>
       <div className="aw-legend v8-note"><span><i style={{ background: '#e5def3' }} />注意力</span><span><i style={{ background: '#dcefe4' }} />MLP</span><span><i style={{ background: '#172033' }} />残差主干</span>
         {(shown('hs') || shown('mlp')) && <span><i style={{ background: 'linear-gradient(90deg,#d4622b,#fff,#1f5fbf)' }} />{diffOn ? '差值：蓝 = 本运行大' : '蓝正橙负'}</span>}
         {shown('heads') && <span><i style={{ background: 'linear-gradient(90deg,#fff,#1e5fbf)' }} />头越蓝，越看所选 token</span>}
-        <span>拖动旋转 · 滚轮缩放 · 点格子看数值 · 当前层以上半透明</span></div>
-      {pop && <div className="aw-pop" style={{ left: Math.min(pop.x + 16, 9999), top: pop.y + 10 }}><button type="button" className="x" aria-label="关闭" onClick={() => setPop(null)}>×</button>{popBody}</div>}
+        <span>{sceneLinks.length > 0 && '紫虚线 = 留出共同响应 · 蓝线 = 登记关联 · '}{SCENE_MOUSE_HINT} · 点格子看数值 · 点层展开 · 灰色 = 未采集 · 金虚线 = 局部放大</span></div>
+      {visiblePop && <div className="aw-pop" role="dialog" aria-label="单元详情" style={{ left: `clamp(8px, ${visiblePop.x + 16}px, calc(100% - 344px))`, top: `clamp(64px, ${visiblePop.y + 10}px, calc(100% - 260px))` }}><button type="button" className="x" aria-label="关闭" onClick={() => setPop(null)}>×</button>{popBody}<p className="v8-note">{posName(pos)} · {sa ? `快照 ${sa.d.model_snapshot.slice(0, 12)}` : '未连接原生数据'}</p>{objectEvidence}</div>}
       {max && ops}
     </section>
     <section className="v8-card aw-cons" aria-label="控制台">
       <div className="aw-chead"><h3>控制台</h3><span className="v8-note">输入一段文本，看模型逐层怎样运行；用插件观察和研究</span></div>
+      {modelControls}
       <div className="aw-cin"><div><textarea value={text} onChange={e => setText(e.target.value)} placeholder="输入一段文字，点“执行”后模型做一次前向，3D 主干上叠加本次每层的改写幅度（需要桌面节点或本机后端）；不输入时“执行”显示当前样本的完整运行，“下一步”逐层前进" />
         <p className="v8-note">{isLive ? `现在显示的是本次实时运行（Qwen3-4B 真实前向，${gen.res.tokens.length} 个 token，用时 ${gen.res.elapsed} ms）：3D 与插件都读这次运行的原生值。` : native ? `现在显示的是冻结样本 #${run.i}：实体 ${k.entity}，资料里写的颜色 = ${nameK}，常识颜色 = ${nameP}。` : reason}</p>{gen.err && <p className="ac-err" role="alert">{gen.err}</p>}</div>
         <div className="aw-run">
@@ -470,7 +455,7 @@ export default function AssocWorkbench({ mode, onMode, contextBar, children }) {
         {positions.map((t, i) => <button type="button" key={i} className={`${i === pos ? 'on' : ''}${gen.res.readout?.includes(i) ? ' ro' : ''}`} title={`token ${i}`} onClick={() => setLivePos(i)}>{tokText(t)}</button>)}</div>
         : k && <div className="aw-toks"><span className="v8-note">token（{k.ntok} 个；有名字的是读出位置）</span>{Array.from({ length: k.ntok }, (_, t) => { const i = k.tokpos.indexOf(t);
         return i >= 0 ? <button type="button" key={t} className={i === pos ? 'on' : ''} title={POSN[positions[i]]} onClick={() => setPos(i)}>{t}</button> : <span key={t} title={`token ${t}`}>·</span>; })}</div>}
-      <div className="aw-body">{!max && ops}<div className="aw-right"><div className="aw-tabs" role="tablist">{tabs.map(t => <button type="button" role="tab" key={t.id} aria-selected={cur === t.id} onClick={() => { setTab(t.id); if (MODE_IDS.has(t.id)) onMode(t.id); }}>{t.name}</button>)}</div>{panel}</div></div>
+      <div className="aw-body">{!max && ops}<div className="aw-right"><div className="aw-tabs" role="tablist">{tabs.map(t => <button type="button" role="tab" key={t.id} aria-selected={cur === t.id} onClick={() => { setPop(null); setTab(t.id); if (MODE_IDS.has(t.id)) onMode(t.id); }}>{t.name}</button>)}</div>{panel}</div></div>
       <p className="v8-note aw-foot">实时生成是一次前向的未登记观察，不产生研究结论。操作面板与全屏时的浮窗是同一个面板。</p>
     </section>
   </div>;

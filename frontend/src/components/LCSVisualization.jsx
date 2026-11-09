@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Html, Tube, Box, Sphere, Line } from '@react-three/drei';
+import { Stars, Text, Html, Tube, Box, Sphere, Line } from '@react-three/drei';
+import SceneOrbitControls from './SceneOrbitControls.jsx';
 import * as THREE from 'three';
 
 const LAYER_COUNT = 5;
@@ -255,7 +256,7 @@ export default function LCSVisualization() {
         <FunctionalParticles />
 
         <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-        <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+        <SceneOrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
       </Canvas>
       
       {/* UI Overlay */}

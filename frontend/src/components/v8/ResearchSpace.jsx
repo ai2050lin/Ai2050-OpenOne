@@ -1,9 +1,12 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
+import { panFixedCanvas, pitchedScreenY, useScenePointer } from '../scenePointer.js';
 import {useApi} from '../app/rdc_fusion/api.js';
 import {Empty} from '../app/rdc_fusion/ui.jsx';
 import ResearchInterventionReport from './ResearchInterventionReport.jsx';
 import {publishResearchContext} from '../app/researchContext.js';
+import {useMainline} from './data/mainlineState.js';
 const COLORS={hypothesis:'#94a3b8',observation:'#8b99aa',heldout:'#2d83c4',intervention:'#db7943',parameter_source:'#305a86',negative:'#9c6457'};
+const NATIVE_TAIL_ATLASES=new Set(['MLP-TAIL-GOODFIRE-20261108-v1','MLP-TAIL-B28-B35-ATLAS-v2']);
 export function nativePoint(object,model){
   const c=object.body,i=c.index||{},l=c.layer;if(!model?.n_layers||!Number.isInteger(l)||l<0||l>=model.n_layers)return null;
   const y=-1.5+3*(l+1)/(model.n_layers+1);
@@ -18,9 +21,10 @@ export function nativePoint(object,model){
 }
 
 function ArchiveScene({objects,artifacts,model,selected,onPick}){
-  const ref=useRef(null),hits=useRef([]),drag=useRef(null);const [yaw,setYaw]=useState(-.4);
+  const ref=useRef(null),hits=useRef([]);const [view, setView] = useState({ yaw: -.4, pitch: 0 });
+  const { yaw, pitch, panX = 0, panY = 0 } = view;
   useEffect(()=>{const cv=ref.current,ctx=cv?.getContext('2d');if(!ctx)return;ctx.clearRect(0,0,900,600);hits.current=[];
-    const project=([x,y,z])=>[370+100*(x*Math.cos(yaw)-z*Math.sin(yaw)),300-125*y+25*(x*Math.sin(yaw)+z*Math.cos(yaw))];
+    const project=([x,y,z])=>[370+panX+100*(x*Math.cos(yaw)-z*Math.sin(yaw)),300+panY+pitchedScreenY(y,x*Math.sin(yaw)+z*Math.cos(yaw),pitch,125,25)];
     const line=(a,b,color,dash=false)=>{ctx.beginPath();ctx.moveTo(...project(a));ctx.lineTo(...project(b));ctx.strokeStyle=color;ctx.setLineDash(dash?[3,3]:[]);ctx.stroke();ctx.setLineDash([])};
     for(let l=0;model?.n_layers&&l<=model.n_layers;l++){const y=-1.5+3*l/(model.n_layers+1);line([-1,y,-.7],[1,y,-.7],'#b5c6d8');line([-1,y,.7],[1,y,.7],'#d8bdad');line([-1,y,-.7],[-1,y,.7],'#d8dee6');line([1,y,-.7],[1,y,.7],'#d8dee6')}
     const points=new Map(),unlocated=[];
@@ -32,14 +36,23 @@ function ArchiveScene({objects,artifacts,model,selected,onPick}){
     ctx.fillStyle='#475569';ctx.font='13px sans-serif';ctx.fillText('外部语言关系',45,55);ctx.fillText('真实原生层 / Head / MLP 索引',250,55);ctx.fillText(`产物架 · ${rack.length}项`,610,55);
     ctx.font='12px sans-serif';ctx.fillText(`全部显示 ${points.size} 个已定位卡；${unlocated.length} 个未定位卡；${artifacts.length} 个产物版本`,35,555);
     ctx.fillText('板内按原生索引定位，层级写出和缓存标在板侧。距离仅用于布局，边按登记证据绘制。',35,580);
-  },[objects,artifacts,model,yaw,selected]);
+  },[objects,artifacts,model,yaw,pitch,panX,panY,selected]);
+  const pointer = useScenePointer({
+    onPan: (dx, dy, canvas) => setView(v => panFixedCanvas(v, dx, dy, canvas)),
+    onRotate: (dx, dy) => setView(v => ({ ...v, yaw: v.yaw + dx / 180, pitch: Math.max(-1, Math.min(1, v.pitch + dy / 180)) })),
+    onPick: e => {
+      const b=e.currentTarget.getBoundingClientRect(),x=(e.clientX-b.left)*900/b.width,y=(e.clientY-b.top)*600/b.height;const h=hits.current.filter(h=>Math.hypot(h.x-x,h.y-y)<8).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(h)onPick(h.o)
+    },
+  });
   return <canvas ref={ref} width="900" height="600" style={{width:'100%',touchAction:'none',cursor:'grab'}} aria-label="全部归档成果3D索引：原生参数定位与未定位产物架"
-    onPointerDown={e=>{drag.current={x:e.clientX,moved:false};e.currentTarget.setPointerCapture(e.pointerId)}} onPointerMove={e=>{if(drag.current&&e.buttons){const dx=e.clientX-drag.current.x;if(Math.abs(dx)>2)drag.current.moved=true;setYaw(v=>v+dx/160);drag.current.x=e.clientX}}}
-    onPointerUp={e=>{if(drag.current&&!drag.current.moved){const b=e.currentTarget.getBoundingClientRect(),x=(e.clientX-b.left)*900/b.width,y=(e.clientY-b.top)*600/b.height;const h=hits.current.filter(h=>Math.hypot(h.x-x,h.y-y)<8).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(h)onPick(h.o)}drag.current=null}}/>;
+    title="左键拖动平移 · 右键拖动旋转" {...pointer} />;
 }
 
 export default function ResearchSpace(){
+  const {revision}=useMainline();
   const index=useApi('/api/traces/research-space');const [snapshot,setSnapshot]=useState(()=>new URLSearchParams(window.location.search).get('snapshot')||''),[run,setRun]=useState(()=>new URLSearchParams(window.location.search).get('run')||''),[selected,setSelected]=useState(null),[mode,setMode]=useState('study'),[page,setPage]=useState(0),[search,setSearch]=useState(''),[showArchive,setShowArchive]=useState(false);
+  const {reload:reloadIndex}=index;
+  useEffect(() => { reloadIndex(); },[revision,reloadIndex]);
   const data=index.data;
   const visibleStudies=data?.studies.filter(s=>!snapshot||!s.model_snapshot||s.model_snapshot===snapshot)||[];
   const study=visibleStudies.find(s=>s.run_id===run);
@@ -52,6 +65,7 @@ export default function ResearchSpace(){
   useEffect(()=>{publishResearchContext({snapshot,run})},[snapshot,run]);
   if(index.error)return <Empty>{index.error}；归档索引未连接，不显示模拟图谱。</Empty>;
   if(!data)return <Empty>读取全部归档研究与原生定位…</Empty>;
+  if(revision&&data.mainline_revision!==revision)return <Empty>3D 索引与研究记录尚未同步，正在等待同一版本。<button className="fw-tbtn" onClick={index.reload}>重新读取 3D 索引</button></Empty>;
   const selectStudy=key=>{
     const next=visibleStudies.find(s=>s.study_key===key);
     if(next?.model_snapshot)setSnapshot(next.model_snapshot);
@@ -62,7 +76,7 @@ export default function ResearchSpace(){
     <p className="v8-note">{data.counts.studies} 个工作包，{data.counts.objects} 个最新图谱对象，{data.counts.artifacts} 个产物版本；原始产物架保留全部模型，按工作包筛选的是原生定位卡。当前模型快照不与其他模型平均。</p>
     <label className="v8-note"><input type="checkbox" checked={showArchive} onChange={e=>setShowArchive(e.target.checked)}/> 叠加历史产物架（档案排列，不是机制节点）</label>
     {!model?.n_layers&&<p className="v8-note">选择具体模型快照可查看原生层与参数定位。全部模型的报告和产物均可从下方打开。</p>}
-    {(model?.n_layers||showArchive)&&<ArchiveScene objects={objects} artifacts={showArchive?artifacts:[]} model={model} selected={selected} onPick={o=>{setSelected(o);setMode('evidence')}}/>}
+    {(model?.n_layers||showArchive)&&(!NATIVE_TAIL_ATLASES.has(study?.run_id)||showArchive)&&<ArchiveScene objects={objects} artifacts={showArchive?artifacts:[]} model={model} selected={selected} onPick={o=>{setSelected(o);setMode('evidence')}}/>}
     <div className="v6-toolbar">{Object.entries(COLORS).map(([k,c])=><span key={k} style={{color:c}}>● {({hypothesis:'假设',observation:'观察',heldout:'留出',intervention:'范围干预',parameter_source:'参数来源',negative:'负结果'})[k]}</span>)}</div></section>
     <section className="v8-card"><div className="v6-toolbar">{[['study','研究报告与实验'],['features','定位卡与关联'],['evidence','选中证据'],['archive','全部产物版本']].map(([k,t])=><button className="fw-tbtn" key={k} onClick={()=>setMode(k)} aria-pressed={mode===k}>{t}</button>)}</div>
       {mode==='study'&&<>{!study?<Empty>选择一个工作包，直接在空间内阅读报告、剂量、能力保持和反例。</Empty>:<><p><strong>{study.title}</strong></p><p className="v8-note">{study.localization==='native_binding'?'已绑定真实原生轨迹':study.localization==='native_bank'?'原生归档已接入。采集层、字段和样本范围见研究报告。':study.localization==='native_aggregate'?'全量原生单元统计已接入；组统计与单样本轨迹分别回查。':'当前只有研究元数据；不补画未采集的参数或激活。'}</p>{study.traces.map(t=><p key={t.trace_id}><a href={`?lens=spatial&view=live&trace=${t.trace_id}&tblock=${t.layer||0}&thead=${t.head||0}&tunit=${t.unit||0}`}>{t.sample_id||t.trace_id.slice(0,12)} → 原始输入、完整数组与参数路径</a></p>)}{study.report_sha256?<ResearchInterventionReport rawFallback sha={study.report_sha256} planSha={study.stages.native_mlp_plan?.plan_sha256} capabilityInputsSha={study.stages.client_acceptance?.capability_inputs_sha256}/>:<Empty>尚未登记正式报告；阶段与原始产物仍保留。</Empty>}<details><summary>全部阶段与状态</summary><pre className="v8-artifact-json">{JSON.stringify(study.stages,null,2)}</pre></details></>}</>}

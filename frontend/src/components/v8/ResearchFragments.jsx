@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { atMainlineRevision, useMainline } from './data/mainlineState.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
@@ -6,7 +7,10 @@ import { EVIDENCE_LABEL,fragmentHref } from './researchFragmentUtil.js';
 
 export default function ResearchFragments({onArtifact}){
   const [offset,setOffset]=useState(0);
-  const data=useApi(`/api/research-library/fragments?offset=${offset}&limit=50`);
+  const {revision}=useMainline();
+  const data=atMainlineRevision(useApi(`/api/research-library/fragments?offset=${offset}&limit=50`),revision);
+  const {reload:reloadFragments}=data;
+  useEffect(() => { reloadFragments(); },[revision,reloadFragments]);
   return <section className="v8-fragments"><div className="v6-toolbar"><h3>图谱拼图 · 当前修订</h3><button className="fw-tbtn" onClick={data.reload}>刷新拼图</button></div>
     <p className="v8-note">同一模型与特征保留完整历史，当前显示最近登记版本。负结果会如实替换当前声明；关联不等于因果。</p>
     {data.error?<Empty>{data.error}<ExtraPackPrompt pack={data.missingPack}/></Empty>:!data.data?<Empty>读取拼图…</Empty>:!data.data.features.length?<Empty>尚无显式特征碎片。完成研究后登记特征卡、条件、证据与反例。</Empty>:<div className="v8-fragment-list">{data.data.features.map(f=><article className="v8-card" key={f.id}><div className="v6-toolbar"><h4>{f.body.label||f.id}</h4><span className="v8-fragment-grade">{EVIDENCE_LABEL[f.body.evidence.level]||f.body.evidence.level}</span></div>

@@ -19,6 +19,10 @@ import MlpEarlyReadReport from './MlpEarlyReadReport.jsx';
 import MlpFactorSteerReport from './MlpFactorSteerReport.jsx';
 import B35RecursiveReport from './B35RecursiveReport.jsx';
 import AttributePrefixTransferReport from './AttributePrefixTransferReport.jsx';
+import MainlineReport from './MainlineReport.jsx';
+import MlpTailAtlas from './MlpTailAtlas.jsx';
+import MlpB34ConfirmReport from './MlpB34ConfirmReport.jsx';
+import MlpConditionReport from './MlpConditionReport.jsx';
 
 const NI={noninferior:'通过非劣效门',inferior:'超过允许损失',inconclusive:'能力保持尚未证实',not_tested:'未测试'};
 const pct=x=>Number.isFinite(x)?`${(100*x).toFixed(2)}%`:'—';
@@ -54,6 +58,10 @@ export default function ResearchInterventionReport({sha,planSha,capabilityInputs
   if(report.error)return <Empty>{report.error}<ExtraPackPrompt pack={report.missingPack}/></Empty>;
   if(!report.data)return <Empty>读取研究闭环报告…</Empty>;
   const d=report.data;
+  if(d.schema==='mlp_conditional_report.v1')return <MlpConditionReport doc={d}/>;
+  if(d.schema==='mlp_tail_atlas_report.v1')return <MlpTailAtlas/>;
+  if(['mlp_b34_confirm_report.v1','mlp_b31_authority_report.v1'].includes(d.schema))return <MlpB34ConfirmReport doc={d}/>;
+  if(d.schema==='mainline_run_report.v1')return <MainlineReport doc={d}/>;
   if(d.schema==='research_native_function_report.v1')return <NativeFunctionReport doc={d}/>;
   if(d.schema==='mlp_reverse_inventory_report.v1')return <MlpInventoryReport doc={d}/>;
   if(d.schema==='mlp_atlas_code_report.v1')return <MlpCodeStudyReport doc={d}/>;

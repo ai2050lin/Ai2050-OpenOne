@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { atMainlineRevision, useMainline } from './data/mainlineState.js';
+import { useEffect, useState } from 'react';
 import { publishResearchContext, useResearchContext } from '../app/researchContext.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -10,7 +11,7 @@ import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { LatestFindings, NextStep, languageSections, relationCounts } from './ClientGuide.jsx';
 import { itemLevel, shortModel, workbenchHref } from './v8Util.js';
 import { ScoreBoard } from './SpaceGuides.jsx';
-import { CLAIMS, FINDINGS, SCORES } from './data/mainline.js';
+
 import CapabilityMatrix from './CapabilityMatrix.jsx';
 import { Bar, PageHead, PillTools } from './CoreKit.jsx';
 
@@ -108,7 +109,10 @@ function NeuronChecks({ rows, skeleton, onOpenUnit }) {
 }
 
 function ModelDetails({ pane, snapshot, runIds, onGo }) {
-  const index = useApi('/api/traces/research-space');
+  const { revision } = useMainline();
+  const index = atMainlineRevision(useApi('/api/traces/research-space'), revision);
+  const { reload: reloadIndex } = index;
+  useEffect(() => { reloadIndex(); }, [revision, reloadIndex]);
   const scoped = (index.data?.objects || []).filter(object =>
     (!snapshot || object.model_snapshot === snapshot) && (!runIds || runIds.has(object.body.run_id)));
   const features = scoped.filter(object => object.type === 'feature');
@@ -175,8 +179,9 @@ function FrozenTemplates({ snapshot, onGo }) {
 }
 
 export default function ResearchOverview({ onGo, tree, skeletons = {}, model, dataset, open = '', renderLanguage, onOpenUnit }) {
+  const { CLAIMS, FINDINGS, SCORES, revision } = useMainline();
   const { snapshot, run } = useResearchContext();
-  const packages = useApi('/api/research-library/workpackages');
+  const packages = atMainlineRevision(useApi('/api/research-library/workpackages'), revision);
   const [topic, setTopic] = useState('');
   const modelList = Object.values(skeletons);
   const matched = snapshot ? modelList.filter(entry => entry.model_snapshot === snapshot) : [];
@@ -187,7 +192,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
     : null;
   const measured = new Set((tree?.models?.includes(analysisModel) ? tree.items : []).filter(item => itemLevel(item, analysisModel) >= 1).map(item => item.id));
   const sections = languageSections(measured);
-  const space = useApi('/api/traces/research-space');
+  const space = atMainlineRevision(useApi('/api/traces/research-space'), revision);
+  const { reload: reloadPackages } = packages, { reload: reloadSpace } = space;
+  useEffect(() => { reloadPackages(); reloadSpace(); }, [revision, reloadPackages, reloadSpace]);
   const relations = relationCounts(space.data?.objects, skeleton?.model_snapshot || snapshot);
   const layers = skeleton?.n_layers;
   const width = skeleton?.d_ff;

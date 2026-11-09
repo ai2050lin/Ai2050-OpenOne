@@ -7,6 +7,7 @@
      edges   跨层连线（神经元上下游电路）：{hs1, hs2, p1:[x,z], p2:[x,z], color}，x∈[-1,1]、z∈[-D,D]；
              起终点画端点圆点、沿线在 75% 处画方向箭头（上游→目标 / 目标→下游）。
      target  选中单元在层板上的位置 {hs, x, z}：红圈标记。
+     relatedPoints 可点击的跨层端点 {hs, x, z, color, location, label, info}。
      modules 传入时，每层板面画两个模块盒（后半 = Attention、前半 = MLP），可点击（onPickModule(hs, mod)）；
              不传 = 与旧版像素级一致。盒上的文字只在选中层画，避免透视下多层标签撞字。
      arch    模型结构参数（/api/model/arch）：有机块时模块盒画成有厚度的实体，
@@ -14,15 +15,16 @@
              嵌入层画成一块宽而厚的「词表板」。没有 arch 时退回原来的平面色带。
      selModule 当前选中的模块 {hs, mod}：加粗描边。
      height  画布高度（选中单元聚焦时更高）。
-   零依赖 canvas 投影：左键拖动旋转、滚轮/按钮缩放。层板只是排列，不代表模型几何。 */
+   零依赖 canvas 投影：左键拖动平移、右键拖动旋转、滚轮/按钮缩放。层板只是排列，不代表模型几何。 */
 import { useEffect, useRef, useState } from 'react';
 
+import { panScene, useScenePointer } from '../scenePointer.js';
 import { fmtP, hsLabel, seq } from './v8Util.js';
 
 const DEG = Math.PI / 180;
 const MARK = '#1baf7a';
 const ZOOM_MAX = 4;
-const INITIAL_VIEW = { yaw: -30 * DEG, pitch: 22 * DEG, zoom: 1, dx: 0, dy: 0 };
+const INITIAL_VIEW = { yaw: -30 * DEG, pitch: 22 * DEG, zoom: 1, panX: 0, panY: 0 };
 
 /* 层内两个模块：色与 v8 的分类色一致（蓝 = 注意力、橙 = MLP），与研究上「同一层是两条通路」对应。
    z 轴分前后两半：z<0 后半给注意力、z>0 前半给 MLP。36 层叠瓦时，两条带在透视下各自形成一列纵向色柱，
@@ -54,8 +56,8 @@ export function towerIndexPosition(kind, count, index) {
   return [-.94 + 1.88 * ((index % cols) + .5) / cols, z + depth * (Math.floor(index / cols) + .5) / rows];
 }
 
-export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption, edges, target, modules, selModule, onPickModule, arch, height = 600, focusKey = '', focusModules = false, cells, onPickIndex, panControls = false, fit = 1 }) {
-  const cv = useRef(null), hits = useRef([]), drag = useRef(null);
+export default function Tower({ nLayers, selected, onPick, values, marks, peak, valueLabel = '叠加量', markLabel = '', allowEmbedding = true, caption, edges, target, relatedPoints, onPickRelated, modules, selModule, onPickModule, arch, height = 600, focusKey = '', focusModules = false, cells, onPickIndex, panControls = false, fit = 1 }) {
+  const cv = useRef(null), hits = useRef([]), relatedHits = useRef([]);
   const cellGrid = useRef(null);
   const [view, setView] = useState(INITIAL_VIEW);
   const [pan, setPan] = useState(false);
@@ -88,7 +90,7 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
     const P = (x, y, z) => {
       const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
-      return [w / 2 + x1 * s + view.dx, H / 2 - (y * cp - z1 * sp) * s + view.dy];
+      return [w / 2 + x1 * s + view.panX, H / 2 - (y * cp - z1 * sp) * s + view.panY];
     };
     const nums = (values || []).filter(v => v != null);
     const max = nums.length ? Math.max(1e-9, ...nums) : 1;
@@ -236,15 +238,17 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       ctx.globalAlpha = 0.9;
       ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]);
       ctx.lineWidth = e.width || 1.8; ctx.strokeStyle = e.color; ctx.setLineDash(e.dash || []); ctx.stroke(); ctx.setLineDash([]);
-      const t = 0.75, u = 1 - t;
-      const q = [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
-      const tx = 2 * u * (c[0] - a[0]) + 2 * t * (b[0] - c[0]), ty = 2 * u * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
-      const tl = Math.max(1e-6, Math.hypot(tx, ty)), nx = tx / tl, ny = ty / tl, ah = 6;
-      ctx.beginPath();
-      ctx.moveTo(q[0] - ah * nx - ah * 0.5 * -ny, q[1] - ah * ny - ah * 0.5 * nx);
-      ctx.lineTo(q[0], q[1]);
-      ctx.lineTo(q[0] - ah * nx + ah * 0.5 * -ny, q[1] - ah * ny + ah * 0.5 * nx);
-      ctx.lineWidth = e.width || 1.8; ctx.strokeStyle = e.color; ctx.stroke();
+      if (e.arrow !== false) {
+        const t = 0.75, u = 1 - t;
+        const q = [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
+        const tx = 2 * u * (c[0] - a[0]) + 2 * t * (b[0] - c[0]), ty = 2 * u * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
+        const tl = Math.max(1e-6, Math.hypot(tx, ty)), nx = tx / tl, ny = ty / tl, ah = 6;
+        ctx.beginPath();
+        ctx.moveTo(q[0] - ah * nx - ah * 0.5 * -ny, q[1] - ah * ny - ah * 0.5 * nx);
+        ctx.lineTo(q[0], q[1]);
+        ctx.lineTo(q[0] - ah * nx + ah * 0.5 * -ny, q[1] - ah * ny + ah * 0.5 * nx);
+        ctx.lineWidth = e.width || 1.8; ctx.strokeStyle = e.color; ctx.stroke();
+      }
       for (const p of [a, b]) { ctx.beginPath(); ctx.arc(p[0], p[1], 2.6, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); }
       ctx.globalAlpha = 1;
     }
@@ -257,6 +261,12 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
         drawModule(mb, selModule.hs, y, true, { split: true, label: true });
       }
     }
+    relatedHits.current = (relatedPoints || []).map(point => {
+      const [sx, sy] = P(point.x, yOf(point.hs), point.z);
+      ctx.beginPath(); ctx.arc(sx, sy, 4.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = point.color; ctx.lineWidth = 1.9; ctx.stroke();
+      return { ...point, sx, sy };
+    });
     if (target) {                                           // 选中单元：层板上的红圈标记
       const p = P(target.x, yOf(target.hs), target.z);
       ctx.beginPath(); ctx.arc(p[0], p[1], 5.5, 0, Math.PI * 2);
@@ -264,11 +274,16 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
       ctx.beginPath(); ctx.arc(p[0], p[1], 2, 0, Math.PI * 2); ctx.fillStyle = '#e34948'; ctx.fill();
     }
     hits.current = out.reverse();
-  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w, H, edges, target, modules, selModule, arch, focusModules, cells, fit]);
+  }, [nLayers, selected, values, marks, peak, allowEmbedding, view, w, H, edges, target, relatedPoints, modules, selModule, arch, focusModules, cells, fit]);
   const locate = e => {
     const r = cv.current.getBoundingClientRect();
     const pt = [e.clientX - r.left, e.clientY - r.top];
-    return { pt, hit: hits.current.find(h => inside(pt, h.pts)) };
+    let nearest = null, distance = 7;
+    for (const point of relatedHits.current) {
+      const candidate = Math.hypot(pt[0] - point.sx, pt[1] - point.sy);
+      if (candidate < distance) { nearest = point; distance = candidate; }
+    }
+    return { pt, hit: nearest || hits.current.find(h => inside(pt, h.pts)) };
   };
   function indexAt([x, y]) {
     const grid = cellGrid.current;
@@ -289,39 +304,28 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
     return () => c?.removeEventListener('wheel', wheel);
   }, []);
   const zoomBy = f => setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(ZOOM_MAX, v.zoom * f)) }));
+  const pointer = useScenePointer({
+    touchPan: pan,
+    onPan: (dx, dy) => setView(v => panScene(v, dx, dy)),
+    onRotate: (dx, dy) => setView(v => ({ ...v, yaw: v.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, v.pitch + dy * 0.008)) })),
+    onHover: event => {
+      const { pt, hit } = locate(event);
+      setHover(hit ? { ...hit, x: pt[0], y: pt[1] } : null);
+    },
+    onLeave: () => setHover(null),
+    onPick: event => {
+      const { pt, hit } = locate(event);
+      const cell = indexAt(pt);
+      if (hit?.location && onPickRelated) onPickRelated(hit.location);
+      else if (cell != null && onPickIndex) onPickIndex(cell);
+      else if (hit?.mod && onPickModule) onPickModule(hit.hs, hit.mod);
+      else if (hit?.hs != null) onPick?.(hit.hs);
+    },
+  });
   return (
     <div className="v8-tower-canvas">
       <canvas ref={cv} style={{ width: w, height: H, touchAction: 'none' }} role="img" aria-label={caption || `${nLayers} 个块的层塔`}
-        onPointerDown={e => {
-          if (!e.isPrimary || ![0, 2].includes(e.button)) return;
-          drag.current = { x: e.clientX, y: e.clientY, view, moved: false, pan: panControls && (pan || e.shiftKey || e.button === 2) };
-          e.currentTarget.setPointerCapture(e.pointerId);
-        }}
-        onPointerMove={e => {
-          if (drag.current) {
-            const d = drag.current, dx = e.clientX - d.x, dy = e.clientY - d.y;
-            if (Math.abs(dx) + Math.abs(dy) <= 3 && !d.moved) return;
-            d.moved = true;
-            setHover(null);
-            setView(d.pan ? { ...d.view, dx: d.view.dx + dx, dy: d.view.dy + dy }
-              : { ...d.view, yaw: d.view.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, d.view.pitch + dy * 0.008)) });
-            return;
-          }
-          const { pt, hit } = locate(e);
-          setHover(hit ? { ...hit, x: pt[0], y: pt[1] } : null);
-        }}
-        onPointerUp={e => {
-          const d = drag.current; drag.current = null;
-          if (!d || d.moved || e.button === 2) return;
-          const { pt, hit } = locate(e);
-          const cell = indexAt(pt);
-          if (cell != null && onPickIndex) onPickIndex(cell);
-          else if (hit?.mod && onPickModule) onPickModule(hit.hs, hit.mod);
-          else if (hit?.hs != null) onPick?.(hit.hs);
-        }}
-        onPointerCancel={() => { drag.current = null; setHover(null); }}
-        onPointerLeave={() => setHover(null)}
-        onContextMenu={panControls ? e => e.preventDefault() : undefined} />
+        {...pointer} />
       {hover && (
         <div className="v8-tip" style={{ left: Math.max(0, Math.min(hover.x + 12, w - 250)), top: hover.y + 10 }}>
           {hover.label}
@@ -331,7 +335,7 @@ export default function Tower({ nLayers, selected, onPick, values, marks, peak, 
         </div>
       )}
       <div className="v8-tower-btns">
-        {panControls && <button type="button" className="fw-tbtn ghost" aria-pressed={pan} onClick={() => setPan(value => !value)}>平移</button>}
+        {panControls && <button type="button" className="fw-tbtn ghost v8-touch-pan" aria-pressed={pan} onClick={() => setPan(value => !value)}>触控平移</button>}
         <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1.3)}>放大</button>
         <button type="button" className="fw-tbtn ghost" onClick={() => zoomBy(1 / 1.3)}>缩小</button>
         <button type="button" className="fw-tbtn ghost v8-reset" onClick={() => { setView(INITIAL_VIEW); setPan(false); }}>重置视角</button>

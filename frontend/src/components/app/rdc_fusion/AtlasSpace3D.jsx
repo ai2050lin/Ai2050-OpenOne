@@ -2,8 +2,9 @@
    坐标 = 该层全部特征单位方向的经典 MDS（距离 √(2−2cos)），方向相近的特征靠在一起。只在同一模型内有意义。
    颜色 = 模式族（类别色板固定顺序）；实心 = 稳定特征（未见词表复现），空心环 = 不稳定，菱形 = 只出现在留出句式的水平；
    点大小 = 效应/噪声；连线 = 跨族边（同一共享编码轴的成员之间），轴在成员中心处直接标注概念名。
-   拖动旋转、滚轮缩放、悬停查看、点击选中。 */
+   左键拖动平移、右键拖动旋转、滚轮缩放、悬停查看、点击选中。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, SCENE_MOUSE_HINT, useScenePointer } from '../../scenePointer.js';
 import { familyPalette } from './atlasUtil.js';
 
 const OTHER = '#94a3b8';
@@ -25,7 +26,7 @@ function drawNode(ctx, shape, x, y, r, color) {
 export default function AtlasSpace3D({ graph, layer, axisId, nodeId, onSelectNode, showUnstable = true, height = 540 }) {
   const wrapRef = useRef(null);
   const cvRef = useRef(null);
-  const cam = useRef({ yaw: 0.6, pitch: 0.3, zoom: 1, drag: null, moved: false });
+  const cam = useRef({ yaw: 0.6, pitch: 0.3, zoom: 1 });
   const projected = useRef([]);
   const [hover, setHover] = useState(null);
   const [tick, setTick] = useState(0);
@@ -62,14 +63,14 @@ export default function AtlasSpace3D({ graph, layer, axisId, nodeId, onSelectNod
     cv.style.width = W + 'px'; cv.style.height = H + 'px';
     const ctx = cv.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const { yaw, pitch, zoom } = cam.current;
+    const { yaw, pitch, zoom, panX = 0, panY = 0 } = cam.current;
     const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
     const scale = Math.min(W, H) * 0.24 * zoom;
     const proj = (x, y, z) => {
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
       const y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
       const f = 6 / (6 + z2);
-      return [W / 2 + x1 * scale * f, H / 2 - y1 * scale * f, z2, f];
+      return [W / 2 + panX + x1 * scale * f, H / 2 + panY - y1 * scale * f, z2, f];
     };
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc';
@@ -138,8 +139,6 @@ export default function AtlasSpace3D({ graph, layer, axisId, nodeId, onSelectNod
     return () => { window.removeEventListener('resize', onResize); if (cv) cv.removeEventListener('wheel', onWheel); };
   }, [scene]);
 
-  if (!scene) return <div className="v6-empty">该层没有谱图坐标。</div>;
-
   const nearest = (e) => {
     const box = cvRef.current.getBoundingClientRect();
     const mx = e.clientX - box.left, my = e.clientY - box.top;
@@ -150,32 +149,30 @@ export default function AtlasSpace3D({ graph, layer, axisId, nodeId, onSelectNod
     }
     return { best, mx, my };
   };
-  const onDown = e => { cam.current.drag = { x: e.clientX, y: e.clientY, yaw: cam.current.yaw, pitch: cam.current.pitch }; cam.current.moved = false; };
-  const onUp = e => {
-    const d = cam.current.drag;
-    cam.current.drag = null;
-    if (d && !cam.current.moved && e) {
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { cam.current = panScene(cam.current, dx, dy); setTick(t => t + 1); },
+    onRotate: (dx, dy) => {
+      cam.current.yaw += dx * 0.01;
+      cam.current.pitch = Math.max(-1.4, Math.min(1.4, cam.current.pitch + dy * 0.01));
+      setTick(t => t + 1);
+    },
+    onHover: e => {
+      const { best, mx, my } = nearest(e);
+      setHover(best ? { x: mx, y: my, p: best.p, scene } : null);
+    },
+    onLeave: () => setHover(null),
+    onPick: e => {
       const { best } = nearest(e);
       onSelectNode?.(best ? best.p.n.id : null);
-    }
-  };
-  const onMove = e => {
-    const d = cam.current.drag;
-    if (d) {
-      if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 3) cam.current.moved = true;
-      cam.current.yaw = d.yaw + (e.clientX - d.x) * 0.01;
-      cam.current.pitch = Math.max(-1.4, Math.min(1.4, d.pitch + (e.clientY - d.y) * 0.01));
-      setTick(t => t + 1);
-      return;
-    }
-    const { best, mx, my } = nearest(e);
-    setHover(best ? { x: mx, y: my, p: best.p, scene } : null);
-  };
+    },
+  });
+
+  if (!scene) return <div className="v6-empty">该层没有谱图坐标。</div>;
+
   const fams = Object.entries(scene.pal);
   return (
     <div className="v6-space3d v6-atlas3d" ref={wrapRef}>
-      <canvas ref={cvRef} onMouseDown={onDown} onMouseUp={onUp} onMouseLeave={() => { cam.current.drag = null; setHover(null); }}
-        onMouseMove={onMove} role="img" aria-label={`特征谱图空间：${layer} 层，${scene.nodes.length} 个特征，${scene.edges.length} 条跨族边`} />
+      <canvas ref={cvRef} {...pointer} title={SCENE_MOUSE_HINT} role="img" aria-label={`特征谱图空间：${layer} 层，${scene.nodes.length} 个特征，${scene.edges.length} 条跨族边`} />
       {hover && hover.scene === scene && (
         <div className="v6-tip" style={{ left: hover.x + 14, top: hover.y + 14 }}>
           {hover.p.n.family} · {hover.p.n.factor}={hover.p.n.level}{hover.p.n.concept ? `（概念：${hover.p.n.concept}）` : ''}{'\n'}

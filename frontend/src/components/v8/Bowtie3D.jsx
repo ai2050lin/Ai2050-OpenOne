@@ -7,8 +7,9 @@
        下游落在写轴 (cosθ,sinθ) 附近 ⇔ 它读的正是目标写的
      所以「前后是否一致」= 这个蝴蝶结是否收拢：三块层板（前一层 / 本层 / 后一层）上节点的横向偏离。
    层板只是排列，平面坐标才是数据；点击任一节点沿电路走过去（换目标单元重算）。
-   零依赖 canvas 投影：拖动旋转、滚轮缩放。 */
+   零依赖 canvas 投影：左键拖动平移、右键拖动旋转、滚轮缩放。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, SCENE_MOUSE_HINT, useScenePointer, useSceneWheel } from '../scenePointer.js';
 
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -26,7 +27,7 @@ const proj = (view, w, h, s) => (x, y, z) => {
   const cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
   const x1 = x * cy - z * sy;
   const z1 = x * sy + z * cy;
-  return [w / 2 + x1 * s, h / 2 - (y * cp - z1 * sp) * s];
+  return [w / 2 + (view.panX ?? 0) + x1 * s, h / 2 + (view.panY ?? 0) - (y * cp - z1 * sp) * s];
 };
 
 function quad(ctx, P, y) {
@@ -75,7 +76,6 @@ export default function Bowtie3D({ census, run, block, unit, onPick, height = 46
   const d = api.data && api.data.available ? api.data : null;
   const cv = useRef(null);
   const hits = useRef([]);
-  const drag = useRef(null);
   const [view, setView] = useState({ yaw: -28 * DEG, pitch: 16 * DEG, zoom: 1 });
   const [w, setW] = useState(560);
   const [hover, setHover] = useState(null);
@@ -206,12 +206,19 @@ export default function Bowtie3D({ census, run, block, unit, onPick, height = 46
     hits.current = out;
   }, [d, geom, view, w, H]);
 
-  useEffect(() => {
-    const c = cv.current;
-    const wheel = e => { e.preventDefault(); setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(3.5, v.zoom * (e.deltaY < 0 ? 1.09 : 0.92))) })); };
-    c?.addEventListener('wheel', wheel, { passive: false });
-    return () => c?.removeEventListener('wheel', wheel);
-  }, []);
+  useSceneWheel(cv, delta => setView(v => ({ ...v, zoom: Math.max(0.5, Math.min(3.5, v.zoom * (delta < 0 ? 1.09 : 0.92))) })), Boolean(d));
+  const locate = e => {
+    const r = cv.current.getBoundingClientRect();
+    const pt = [e.clientX - r.left, e.clientY - r.top];
+    return { pt, hit: hits.current.find(h => Math.hypot(pt[0] - h.x, pt[1] - h.y) <= h.r)?.node || null };
+  };
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => setView(v => panScene(v, dx, dy)),
+    onRotate: (dx, dy) => setView(v => ({ ...v, yaw: v.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, v.pitch + dy * 0.008)) })),
+    onHover: e => { const { pt, hit } = locate(e); setHover(hit ? { ...hit, x: pt[0], y: pt[1] } : null); },
+    onLeave: () => setHover(null),
+    onPick: e => { const { hit } = locate(e); if (hit) onPick?.(hit.block, hit.unit); },
+  });
 
   if (block == null || unit == null) return <Empty>先在左侧层塔或单元阵列里选一个 MLP 单元，这里显示它的前后锥。</Empty>;
   const retry = <button type="button" className="v8-retry" onClick={api.reload}>重新计算</button>;
@@ -222,11 +229,6 @@ export default function Bowtie3D({ census, run, block, unit, onPick, height = 46
 
   const c = d.consistency;
   const pct = v => (v == null ? '—' : `${Math.round(v * 100)}%`);
-  const locate = e => {
-    const r = cv.current.getBoundingClientRect();
-    const pt = [e.clientX - r.left, e.clientY - r.top];
-    return { pt, hit: hits.current.find(h => Math.hypot(pt[0] - h.x, pt[1] - h.y) <= h.r)?.node || null };
-  };
   return (
     <div className="v8-bowtie">
       <div className="v8-bowtie-hd">
@@ -249,22 +251,7 @@ export default function Bowtie3D({ census, run, block, unit, onPick, height = 46
       <div className="v8-bowtie-canvas">
         <canvas ref={cv} style={{ width: w, height: H }} role="img"
           aria-label={`块 ${d.block} 单元 ${d.unit} 的上下游前后锥：自洽角 ${d.target.angle_deg} 度，上游 ${d.upstream.length} 个、下游 ${d.downstream.length} 个`}
-          onMouseDown={e => { drag.current = { x: e.clientX, y: e.clientY, view, moved: false }; }}
-          onMouseMove={e => {
-            if (drag.current) {
-              const dx = e.clientX - drag.current.x, dy = e.clientY - drag.current.y;
-              if (Math.abs(dx) + Math.abs(dy) > 3) drag.current.moved = true;
-              setView({ ...drag.current.view, yaw: drag.current.view.yaw + dx * 0.008, pitch: Math.max(-1.2, Math.min(1.2, drag.current.view.pitch + dy * 0.008)) });
-              return;
-            }
-            const { pt, hit } = locate(e);
-            setHover(hit ? { ...hit, x: pt[0], y: pt[1] } : null);
-          }}
-          onMouseUp={e => {
-            const dd = drag.current; drag.current = null;
-            if (dd && !dd.moved) { const { hit } = locate(e); if (hit) onPick?.(hit.block, hit.unit); }
-          }}
-          onMouseLeave={() => { drag.current = null; setHover(null); }} />
+          title={SCENE_MOUSE_HINT} {...pointer} />
         {hover && (
           <div className="v8-tip" style={{ left: Math.min(hover.x + 12, w - 230), top: hover.y + 10 }}>
             <b>B{hover.block}·U{hover.unit}</b>

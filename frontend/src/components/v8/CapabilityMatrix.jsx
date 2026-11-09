@@ -1,11 +1,13 @@
+import { useMainline } from './data/mainlineState.js';
 /* 能力矩阵（Phase 340，ResearchPlan_Final）：行 = 能力操作，按三种能力来源分组；列 = 六级证据状态。
    每格只读 data/mainline.js 的登记表；等级只描述证据走到哪一级，不代表机制已破解。点一行看来源与主张。 */
 import { useState } from 'react';
 
-import { CAPABILITIES, CAP_LEVELS, CLAIMS } from './data/mainline.js';
+
 import './client_guide.css';
 
 export default function CapabilityMatrix({ onOpenClaim }) {
+  const { CAPABILITIES, CAP_LEVELS, CLAIMS } = useMainline();
   const [sel, setSel] = useState('');
   const rows = CAPABILITIES.flatMap(([, ops]) => ops);
   const row = rows.find(item => item.op === sel);

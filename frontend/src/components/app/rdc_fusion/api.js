@@ -15,7 +15,8 @@ export { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL }
 const ONLINE_PATHS = new Set(['/api/platform/config']);
 const RESEARCH_INDEX = '/api/traces/research-space';
 const isResearchArtifact = path => /^\/api\/research-library\/artifacts\/[0-9a-f]{64}$/.test(path);
-const isPublishedResearch = path => path === RESEARCH_INDEX || isResearchArtifact(path);
+const PUBLISHED_METADATA = new Set([RESEARCH_INDEX, '/api/research/mainline', '/api/research-library/workpackages', '/api/research-library/fragments']);
+const isPublishedResearch = path => typeof path === 'string' && (PUBLISHED_METADATA.has(path.split('?')[0]) || path.startsWith('/api/research/mlp-tail') || isResearchArtifact(path));
 
 /* 离线客户端：从本机数据包取一条；没有时抛出带 pack（应下载的附加包 id）的错误。 */
 async function offlineJson(path) {
@@ -48,7 +49,8 @@ function withTimeout(signal, timeoutMs) {
   try { return AbortSignal.any([signal, timer]); } catch { return signal; }
 }
 
-export async function getJson(path, { signal, online = false, timeoutMs } = {}) {
+export async function getJson(path, { signal, online = false, timeoutMs, networkOnly = false } = {}) {
+  if (networkOnly && isPublishedResearch(path)) return fetchJson(path, { signal, timeoutMs });
   if (OFFLINE_CLIENT && isPublishedResearch(path)) {
     if (isResearchArtifact(path)) {
       const cached = getLocal(path) ?? await getExtraEntry(path);
@@ -130,7 +132,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
   const [state, setState] = useState({ key: null, data: null, error: '', pack: null });
   const [nonce, setNonce] = useState(0);
   const live = online && ADMIN_LIVE;                     // 管理工位的实时读取
-  const useLocal = !live && path !== RESEARCH_INDEX && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
+  const useLocal = !live && !isPublishedResearch(path) && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
   const needFetch = Boolean(path) && (live || ready || isPublishedResearch(path)) && !useLocal;
   const extrasKey = OFFLINE_CLIENT && path && !ONLINE_PATHS.has(path.split('?')[0])
     ? JSON.stringify(packInfo().extras) : '';                // 附加包下载后重读（站点配置不受影响）

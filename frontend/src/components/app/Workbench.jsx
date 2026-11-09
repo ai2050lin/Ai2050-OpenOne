@@ -1,3 +1,4 @@
+import { MainlineProvider, MainlineStatus } from '../v8/MainlineProvider.jsx';
 /* 正式研究工作台：进展 / 空间 / 研发 / 配置。
    图谱浏览统一语言模式、内部特征与跨族映射；结构参数与原生特征共享入口。
    顶栏提供本机算力与数据同步，旧本机工具仅在配置的高级兼容区访问。
@@ -68,7 +69,7 @@ function DataSyncActions(){
   useSyncExternalStore(subscribe,storeTick);
   const info=packInfo(),remote=useApi('/api/platform/config').data?.datapack;
   const [message,setMessage]=useState(''),[busy,setBusy]=useState(false);
-  async function update(){setBusy(true);try{await downloadDataPack(API_BASE,(got,total)=>setMessage(total?`下载 ${Math.round(100*got/total)}%`:`已下载 ${got} bytes`));setMessage('数据包已更新，相关页面将读取新版本。')}catch(e){setMessage(e.message)}finally{setBusy(false)}}
+  async function update(){setBusy(true);try{await downloadDataPack(API_BASE,(got,total)=>setMessage(total?`下载 ${Math.round(100*got/total)}%`:`已下载 ${got} bytes`));window.dispatchEvent(new Event('ai2050:research-refresh'));setMessage('数据包已更新，相关页面将读取新版本。')}catch(e){setMessage(e.message)}finally{setBusy(false)}}
   return <section className="v8-card"><strong>中心研究数据</strong><p className="v8-note">本机版本：{info.version||'未下载'}；中心版本：{remote?.version||'未发布或不可达'}。完整原场和快照按各自产物记录回查。</p><button className="fw-tbtn" disabled={busy||!remote?.version} onClick={update}>{busy?'下载中…':'下载或更新主数据包'}</button><p className="v8-note" role="status">{message}</p><ExtraPackPrompt pack="research-library"/></section>;
 }
 
@@ -101,7 +102,7 @@ function SubNav({ items, value, onChange, label, onHelp, extra }) {
   );
 }
 
-export default function Workbench() {
+function WorkbenchContent() {
   const cfg = useApi('/api/platform/config');
   const localTools = Boolean(cfg.data?.local_tools);
   const [st, setSt] = useState(readState);
@@ -191,6 +192,7 @@ export default function Workbench() {
           {/* 图谱覆盖在摘要旁选模型，在数据集实测里选题库；空间继续使用全局维度条。 */}
           {!(lens==='process'&&station==='plan') && (context.run || context.trace || context.context_trace || (context.snapshot && (lens !== 'route' || !['overview','lang'].includes(rtab)))) && <div className="wb-research-context wb-pro" aria-label="当前研究上下文"><span>研究：{context.run||'未绑定实验'}</span>{context.snapshot&&<span title={context.snapshot}>来源快照 {context.snapshot.slice(0,16)} · 页面内核验</span>}{(context.trace||context.context_trace)&&view!=='live'&&<button type="button" className="v6-linkbtn" onClick={()=>set({lens:'spatial',view:'live'})}>回到来源样本</button>}</div>}
           <main className="wb-main">
+            <MainlineStatus/>
             {lens==='config'&&CFG_SECTIONS.some(s=>s.id===csec)&&<PageHead title={CFG_SECTIONS.find(s=>s.id===csec).label} sub={CFG_SECTIONS.find(s=>s.id===csec).desc} />}
             {lens==='process'&&stationGroup==='execution'&&station!=='execution'&&<button className="fw-tbtn" type="button" onClick={()=>go('execution')}>返回实验与队列</button>}
             <Suspense fallback={<Empty>加载中…</Empty>}>
@@ -224,3 +226,5 @@ export default function Workbench() {
     </div>
   );
 }
+
+export default function Workbench(props) { return <MainlineProvider><WorkbenchContent {...props}/></MainlineProvider>; }

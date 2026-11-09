@@ -8,6 +8,7 @@
    纪律（scheme §0/§7）：前端零标签生成——未入册点只显示数字；feature 标记 = 特征级 registry 回链，
    不声称占据神经元坐标；位置恒注记「坐标索引，非模型真实几何」。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, SCENE_MOUSE_HINT, useScenePointer, useSceneWheel } from '../../scenePointer.js';
 import { API_BASE } from '../../../config.js';
 
 const MODELS = ['qwen3-4b', 'qwen3-14b', 'glm4-9b'];
@@ -81,7 +82,7 @@ export default function NeuronSpace() {
   const [tickV, setTickV] = useState(0);          // 相机变化 → 重绘
   const bump = () => setTickV(t => t + 1);
   const cvRef = useRef(null);
-  const cam = useRef({ yaw: 0.55, pitch: 0.42, zoom: 1, drag: null, moved: false, panX: 0, panY: 0 });
+  const cam = useRef({ yaw: 0.55, pitch: 0.42, zoom: 1, panX: 0, panY: 0 });
   const projected = useRef([]);
 
   /* neuron3d 派生档（grid/白名单/npz 清单） */
@@ -148,7 +149,7 @@ export default function NeuronSpace() {
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
       const y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
       const f = 6 / (6 + z2);
-      return [W / 2 + (x1 * scale + panX) * f, H / 2 - (y1 * scale + panY) * f, z2];
+      return [W / 2 + panX + x1 * scale * f, H / 2 + panY - y1 * scale * f, z2];
     };
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc';
@@ -223,31 +224,29 @@ export default function NeuronSpace() {
     }
     return { best, mx, my };
   };
-  const onDown = e => { cam.current.drag = { x: e.clientX, y: e.clientY, yaw: cam.current.yaw, pitch: cam.current.pitch, panX: cam.current.panX, panY: cam.current.panY, btn: e.button }; cam.current.moved = false; };
-  const onMove = e => {
-    const d = cam.current.drag;
-    if (d) {
-      if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 3) cam.current.moved = true;
-      if (d.btn === 2) { cam.current.panX = d.panX + (e.clientX - d.x); cam.current.panY = d.panY + (e.clientY - d.y); }
-      else {
-        cam.current.yaw = d.yaw + (e.clientX - d.x) * 0.008;
-        cam.current.pitch = Math.max(-1.3, Math.min(1.3, d.pitch + (e.clientY - d.y) * 0.008));
-      }
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { cam.current = panScene(cam.current, dx, dy); bump(); },
+    onRotate: (dx, dy) => {
+      cam.current.yaw += dx * 0.008;
+      cam.current.pitch = Math.max(-1.3, Math.min(1.3, cam.current.pitch + dy * 0.008));
       bump();
-      return;
-    }
-    if (sliceState === 'ready') {
-      const { best, mx, my } = nearest(e);
-      setHover(best ? { x: mx, y: my, dim: best.dim } : null);
-    }
-  };
-  const onUp = e => {
-    const d = cam.current.drag; cam.current.drag = null;
-    if (d && !cam.current.moved && sliceState === 'ready') {
-      const { best } = nearest(e);
-      setSel(best ? { layer, dim: best.dim } : null);
-    }
-  };
+    },
+    onHover: e => {
+      if (sliceState === 'ready') {
+        const { best, mx, my } = nearest(e);
+        setHover(best ? { x: mx, y: my, dim: best.dim } : null);
+      }
+    },
+    onLeave: () => setHover(null),
+    onPick: e => {
+      if (sliceState === 'ready') {
+        const { best } = nearest(e);
+        setSel(best ? { layer, dim: best.dim } : null);
+      }
+    },
+  });
+  useSceneWheel(cvRef, delta => { cam.current.zoom = Math.max(0.35, Math.min(6, cam.current.zoom * (delta > 0 ? 0.9 : 1.1))); bump(); });
+
   const doJump = () => {
     const m = String(jump || '').trim().match(/^L(\d+)[\s.,:D]*D?(\d+)$/i);
     if (!m) return;
@@ -270,11 +269,7 @@ export default function NeuronSpace() {
           <b className="fw-mono" style={{ fontSize: 12 }}>L{layer}</b>
         </div>
         <canvas ref={cvRef}
-          onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp}
-          onMouseLeave={() => { cam.current.drag = null; setHover(null); }}
-          onWheel={e => { e.preventDefault(); cam.current.zoom = Math.max(0.35, Math.min(6, cam.current.zoom * (e.deltaY > 0 ? 0.9 : 1.1))); bump(); }}
-          onContextMenu={e => e.preventDefault()}
-          style={{ width: '100%', height: '100%', display: 'block', cursor: hover ? 'pointer' : 'grab' }}
+          {...pointer} title={SCENE_MOUSE_HINT} style={{ width: '100%', height: '100%', display: 'block', cursor: hover ? 'pointer' : 'grab' }}
           role="img" aria-label={`封存激活 3D：${model} L${layer}，${nDims} 个残差坐标`} />
         {hover && slice && (
           <div className="v6-tip" style={{ left: hover.x + 14, top: hover.y + 14 }}>
@@ -285,7 +280,7 @@ export default function NeuronSpace() {
         {sliceState === 'fail' && <div className="v6-empty" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>切片加载失败（服务未启动或 npz 缺失）</div>}
         <div style={{ position: 'absolute', bottom: 8, left: 12, right: 12, fontSize: 10.5, color: '#64748b', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
           <span>位置 = 原生坐标索引（不重排），非模型真实几何 · 数据 = phase3169 封存 collect npz{npz?.file_sha256_8 ? ` · sha8 ${npz.file_sha256_8}` : ''}</span>
-          <span>左键旋转 · 右键平移 · 滚轮缩放 · 点击坐标看证据</span>
+          <span>{SCENE_MOUSE_HINT} · 点击坐标看证据</span>
         </div>
       </div>
 

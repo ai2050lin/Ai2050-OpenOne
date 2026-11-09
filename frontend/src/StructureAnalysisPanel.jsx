@@ -1,5 +1,6 @@
 ﻿import { API_BASE } from './config.js';
-import { OrbitControls, Text } from '@react-three/drei';
+import { Text } from '@react-three/drei';
+import SceneOrbitControls from './components/SceneOrbitControls.jsx';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
 import {
@@ -1987,7 +1988,7 @@ export function StructureAnalysisControls({
                                 <ambientLight intensity={0.5} />
                                 <pointLight position={[10, 10, 10]} />
                                 <TrainingDynamics3D t={tSafe} />
-                                <OrbitControls />
+                                <SceneOrbitControls />
                             </Canvas>
                         </div>
                     )}
@@ -2553,7 +2554,7 @@ export default function StructureAnalysisPanel({
                         <Canvas camera={{ position: [25, 25, 25], fov: 50 }}>
                             <ambientLight intensity={0.4} />
                             <pointLight position={[15, 15, 15]} intensity={1.2} />
-                            <OrbitControls makeDefault />
+                            <SceneOrbitControls makeDefault />
 
                             {/* PGRF Background for SNN context */}
                             <ResonanceField3D activeTab="global_topology" />
@@ -2571,7 +2572,7 @@ export default function StructureAnalysisPanel({
                         <Canvas camera={{ position: [15, 10, 15], fov: 50 }}>
                             <ambientLight intensity={0.5} />
                             <pointLight position={[10, 15, 10]} intensity={1.2} />
-                            <OrbitControls makeDefault />
+                            <SceneOrbitControls makeDefault />
 
                             {/* PGRF Background for Validity context */}
                             <ResonanceField3D activeTab="global_topology" />
@@ -2610,7 +2611,7 @@ export default function StructureAnalysisPanel({
                                             <ambientLight intensity={0.5} />
                                             <pointLight position={[10, 10, 10]} intensity={1} />
                                             <spotLight position={[-10, 10, -10]} intensity={0.5} />
-                                            <OrbitControls makeDefault />
+                                            <SceneOrbitControls makeDefault />
                                             <FiberBundleVisualization3D result={analysisResult} t={tSafe} />
                                         </Canvas>
                                     </div> :

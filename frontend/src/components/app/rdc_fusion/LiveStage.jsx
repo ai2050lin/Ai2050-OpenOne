@@ -29,7 +29,7 @@
      ① 未连接 → 只画结构轮廓（虚线，显式标注「未连接」），绝不画数值着色；
      ② 每格只显示已真实取回的数值，未取回的格保持「待采」暗态；
      ③ 面板固定标注抽样口径（32×64 行块 / 全量遍历），不把采样值说成全量。
-   交互：左键旋转 / 右键平移 / 滚轮缩放；点层盘选中该层 → 柱阵展开 + 右侧参数表。
+   交互：左键平移 / 右键旋转 / 滚轮缩放；点层盘选中该层 → 柱阵展开 + 右侧参数表。
 */
 import { API_BASE } from '../../../config.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -912,28 +912,31 @@ export default function LiveStage({ conn, scan, scanState, modelSlot, onOpenNeur
       const mx = (e.clientX - r.left) * (cv.width / r.width);
       const my = (e.clientY - r.top) * (cv.height / r.height);
       if (dragRef.current) {
+        const drag = dragRef.current;
+        if (!drag.moved && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) <= 4) return;
+        drag.moved = true;
         const dx = e.clientX - dragRef.current.x, dy = e.clientY - dragRef.current.y;
-        if (dragRef.current.btn === 2) {
+        if (dragRef.current.btn === 0) {
           M.panX = Math.max(-900, Math.min(900, M.panX + dx));
           M.panY = Math.max(-900, Math.min(900, M.panY + dy));
         } else {
           M.yaw += dx * 0.0062;
           M.pitch = Math.max(-0.28, Math.min(1.22, M.pitch + dy * 0.0052));
         }
-        dragRef.current = { x: e.clientX, y: e.clientY, btn: dragRef.current.btn };
+        drag.x = e.clientX; drag.y = e.clientY;
         return;
       }
       const l = pick(mx, my);
       cv.style.cursor = l >= 0 ? 'pointer' : 'grab';
     };
     const onDown = e => {
-      if (e.button !== 0 && e.button !== 2) return;
-      dragRef.current = { x: e.clientX, y: e.clientY, btn: e.button };
+      if (dragRef.current || (e.button !== 0 && e.button !== 2)) return;
+      dragRef.current = { x: e.clientX, y: e.clientY, btn: e.button, moved: false };
     };
     const onUp = e => {
+      if (dragRef.current?.btn !== e.button) return;
       if (dragRef.current && dragRef.current.btn === 0) {
-        const moved = Math.abs(e.clientX - dragRef.current.x) + Math.abs(e.clientY - dragRef.current.y);
-        if (moved < 5) {
+        if (!dragRef.current.moved) {
           const r = cv.getBoundingClientRect();
           const mx = (e.clientX - r.left) * (cv.width / r.width);
           const my = (e.clientY - r.top) * (cv.height / r.height);

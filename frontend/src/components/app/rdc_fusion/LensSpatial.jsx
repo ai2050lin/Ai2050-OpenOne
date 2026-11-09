@@ -267,17 +267,17 @@ export default function LensSpatial({ on, onGo }) {
         )}
         {mode === 'stack' && (top === 'live' ? (
           <span style={{ color: 'var(--fw-text-3)' }}>
-            参数星河 · 实时权重（自底向上 L0 → 顶层）· <b>左键=旋转 · 右键=平移 · 滚轮缩放</b> ·
+            参数星河 · 实时权重（自底向上 L0 → 顶层）· <b>左键=平移 · 右键=旋转 · 滚轮缩放</b> ·
             <b> 运行</b>=逐层读取真实权重数值 · <b>下一步</b>=单层步进 · 点击层盘看该层参数表
           </span>
         ) : (
-          <span style={{ color: 'var(--fw-text-3)' }}>全部 36 层平放（L0 → L35）· 玻璃盒=层结构 · <b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放 · 点击层盒 → 右侧全部参数 → 可下钻神经元级</span>
+          <span style={{ color: 'var(--fw-text-3)' }}>全部 36 层平放（L0 → L35）· 玻璃盒=层结构 · <b>左键=平移（上下左右） · 右键=旋转（上下左右）</b> · 滚轮缩放 · 点击层盒 → 右侧全部参数 → 可下钻神经元级</span>
         ))}
         {mode === 'neuron' && (
-          <span style={{ color: 'var(--fw-text-3)' }}><b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放 · L{neuronLayer} 层内部 16,384 点独立选中 · 底部时间轴播放 token 步（激活/变化/写入）· 选中单元看 t 轴曲线 + ℓ 轴跨层基座</span>
+          <span style={{ color: 'var(--fw-text-3)' }}><b>左键=平移（上下左右） · 右键=旋转（上下左右）</b> · 滚轮缩放 · L{neuronLayer} 层内部 16,384 点独立选中 · 底部时间轴播放 token 步（激活/变化/写入）· 选中单元看 t 轴曲线 + ℓ 轴跨层基座</span>
         )}
         {mode === 'cloud' && (
-          <span style={{ color: 'var(--fw-text-3)' }}><b>左键=旋转（上下左右） · 右键=平移（上下左右）</b> · 滚轮缩放</span>
+          <span style={{ color: 'var(--fw-text-3)' }}><b>左键=平移（上下左右） · 右键=旋转（上下左右）</b> · 滚轮缩放</span>
         )}
         {mode === 'sealed' && (
           <span style={{ color: 'var(--fw-text-3)' }}>封存全场激活（phase3169 npz 实测，非 demo）· 层滑块/搜索跳转 · <b>点击神经元 → 正/负极 + registry 回链</b> · 前端零标签生成（未入册点只显示数字）</span>

@@ -2,8 +2,9 @@
    坐标轴：LDA（白化空间中该因子组质心的判别方向，discovery 拟合）或原始 PCA（discovery 前三主成分）；
    所有划分的样本都投影到同一组由 discovery 拟合的轴上，所以 lockbox / lockbox_frame 的点落在哪里，
    就是「未见材料能否被发现期的结构解释」的直观检查。层堆叠模式：每层 2D LDA，相邻层 Procrustes 对齐，z = 层序。
-   零依赖 canvas 投影（与结构示意视图同一实现方式）；左键拖动旋转、滚轮缩放、悬停查看样本。 */
+   零依赖 canvas 投影（与结构示意视图同一实现方式）；左键拖动平移、右键拖动旋转、滚轮缩放、悬停查看样本。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, SCENE_MOUSE_HINT, useScenePointer } from '../../scenePointer.js';
 
 export const CATEGORICAL = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'];
 const OTHER = '#94a3b8';
@@ -43,7 +44,7 @@ function drawShape(ctx, shape, x, y, r, color) {
 export default function Space3D({ analysis, layerTag, method, colorBy, visibleSplits, height = 520 }) {
   const wrapRef = useRef(null);
   const cvRef = useRef(null);
-  const cam = useRef({ yaw: 0.7, pitch: 0.35, zoom: 1, drag: null });
+  const cam = useRef({ yaw: 0.7, pitch: 0.35, zoom: 1 });
   const projected = useRef([]);
   const [hover, setHover] = useState(null);
   const [tick, setTick] = useState(0);
@@ -107,7 +108,7 @@ export default function Space3D({ analysis, layerTag, method, colorBy, visibleSp
     cv.style.width = W + 'px'; cv.style.height = H + 'px';
     const ctx = cv.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const { yaw, pitch, zoom } = cam.current;
+    const { yaw, pitch, zoom, panX = 0, panY = 0 } = cam.current;
     const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
     const scale = Math.min(W, H) * 0.26 * zoom;
     const proj = (x, y, z) => {
@@ -116,7 +117,7 @@ export default function Space3D({ analysis, layerTag, method, colorBy, visibleSp
       const y1 = y * cp - z1 * sp;
       const z2 = y * sp + z1 * cp;
       const f = 6 / (6 + z2);
-      return [W / 2 + x1 * scale * f, H / 2 - y1 * scale * f, z2, f];
+      return [W / 2 + panX + x1 * scale * f, H / 2 + panY - y1 * scale * f, z2, f];
     };
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc';
@@ -184,32 +185,31 @@ export default function Space3D({ analysis, layerTag, method, colorBy, visibleSp
     return () => { window.removeEventListener('resize', onResize); if (cv) cv.removeEventListener('wheel', onWheel); };
   }, [scene]);
 
-  if (!scene) return <div className="v6-empty">该层没有 3D 坐标（样本不足或该视图不可用）。</div>;
-
-  const onDown = e => { cam.current.drag = { x: e.clientX, y: e.clientY, yaw: cam.current.yaw, pitch: cam.current.pitch }; };
-  const onUp = () => { cam.current.drag = null; };
-  const onMove = e => {
-    const d = cam.current.drag;
-    if (d) {
-      cam.current.yaw = d.yaw + (e.clientX - d.x) * 0.01;
-      cam.current.pitch = Math.max(-1.4, Math.min(1.4, d.pitch + (e.clientY - d.y) * 0.01));
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { cam.current = panScene(cam.current, dx, dy); setTick(t => t + 1); },
+    onRotate: (dx, dy) => {
+      cam.current.yaw += dx * 0.01;
+      cam.current.pitch = Math.max(-1.4, Math.min(1.4, cam.current.pitch + dy * 0.01));
       setTick(t => t + 1);
-      return;
-    }
-    const box = cvRef.current.getBoundingClientRect();
-    const mx = e.clientX - box.left, my = e.clientY - box.top;
-    let best = null, bd = 100;
-    for (const p of projected.current) {
-      const dd = (p.sx - mx) ** 2 + (p.sy - my) ** 2;
-      if (dd < bd) { bd = dd; best = p; }
-    }
-    setHover(best ? { x: mx, y: my, p: best.it.p, layer: best.it.layer, scene } : null);
-  };
+    },
+    onHover: e => {
+      const box = cvRef.current.getBoundingClientRect();
+      const mx = e.clientX - box.left, my = e.clientY - box.top;
+      let best = null, bd = 100;
+      for (const p of projected.current) {
+        const dd = (p.sx - mx) ** 2 + (p.sy - my) ** 2;
+        if (dd < bd) { bd = dd; best = p; }
+      }
+      setHover(best ? { x: mx, y: my, p: best.it.p, layer: best.it.layer, scene } : null);
+    },
+    onLeave: () => setHover(null),
+  });
+
+  if (!scene) return <div className="v6-empty">该层没有 3D 坐标（样本不足或该视图不可用）。</div>;
 
   return (
     <div className="v6-space3d" ref={wrapRef}>
-      <canvas ref={cvRef} onMouseDown={onDown} onMouseUp={onUp} onMouseLeave={() => { onUp(); setHover(null); }}
-        onMouseMove={onMove} role="img" aria-label="3D 响应空间：每个点是一条样本在该层的投影" />
+      <canvas ref={cvRef} {...pointer} title={SCENE_MOUSE_HINT} role="img" aria-label="3D 响应空间：每个点是一条样本在该层的投影" />
       {hover && hover.scene === scene && (   /* 场景变化后旧的悬停坐标失效 */
         <div className="v6-tip" style={{ left: hover.x + 14, top: hover.y + 14 }}>
           {hover.p.text || hover.p.id}{'\n'}

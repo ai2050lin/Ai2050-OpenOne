@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
+import { panFixedCanvas, pitchedScreenY, useScenePointer, SCENE_MOUSE_HINT, useSceneWheel } from '../scenePointer.js';
 
 const colour=(v,max)=>v>=0?`rgba(42,120,214,${.08+.85*Math.abs(v)/(max||1)})`:`rgba(235,104,52,${.08+.85*Math.abs(v)/(max||1)})`;
 
@@ -15,10 +16,11 @@ export function NativeArray({values:inputValues,selected=0,onPick,label='原生�
 }
 
 export default function MechanismScene({manifest:d,block,head,unit,embedding=[],activation=[],headZ=[],headOverlay,caption,connections,onBlock,onHead,onUnit,showUnitMarker=true}){
-  const ref=useRef(null),hits=useRef([]),drag=useRef(null);const [yaw,setYaw]=useState(-.45),[zoom,setZoom]=useState(1);
+  const ref=useRef(null),hits=useRef([]);const [view, setView] = useState({ yaw: -.45, pitch: 0, zoom: 1 });
+  const { yaw, pitch, panX = 0, panY = 0, zoom } = view;
   useEffect(()=>{
     const cv=ref.current;if(!cv||!d)return;const ctx=cv.getContext('2d');if(!ctx)return;const W=760,H=600;ctx.clearRect(0,0,W,H);hits.current=[];
-    const scale=135*zoom;const P=(x,y,z)=>[W/2+scale*(x*Math.cos(yaw)-z*Math.sin(yaw)),H/2-scale*(y*.88-(x*Math.sin(yaw)+z*Math.cos(yaw))*.35)];
+    const scale=135*zoom;const P=(x,y,z)=>[W/2+panX+scale*(x*Math.cos(yaw)-z*Math.sin(yaw)), H/2+panY+scale*pitchedScreenY(y,x*Math.sin(yaw)+z*Math.cos(yaw),pitch,.88,.35)];
     const Y=l=>-1.65+3.3*l/(d.n_layers+1);
     const polygon=(pts,fill,stroke)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.stroke()};
     for(let l=0;l<=d.n_layers;l++){
@@ -46,13 +48,20 @@ export default function MechanismScene({manifest:d,block,head,unit,embedding=[],
       ctx.fillStyle='#334155';ctx.font='12px sans-serif';ctx.fillText(`H${head} → U${unit}：固定RMS的局部贡献`,35,35)}
     ctx.fillStyle='#334155';ctx.font='12px sans-serif';ctx.fillText(`B${block} · ${d.n_heads}Q / ${d.n_kv_heads}KV · 完整MLP索引 ${d.d_ff}`,35,560);
     if(caption){ctx.font='11px sans-serif';ctx.fillText(caption,35,540)}
-    ctx.fillStyle='#64748b';ctx.font='11px sans-serif';ctx.fillText('层高=原生层序；板内=索引布局；距离不是语义几何。拖动旋转，点蓝色头联动。',35,584);
-  },[d,block,head,unit,embedding,activation,headZ,headOverlay,caption,connections,yaw,zoom,showUnitMarker]);
+    ctx.fillStyle='#64748b';ctx.font='11px sans-serif';ctx.fillText('层高=原生层序；板内=索引布局；距离不是语义几何。点蓝色头联动。',35,584);
+  },[d,block,head,unit,embedding,activation,headZ,headOverlay,caption,connections,yaw,pitch,panX,panY,zoom,showUnitMarker]);
+  const pointer = useScenePointer({
+    onPan: (dx, dy, canvas) => setView(v => panFixedCanvas(v, dx, dy, canvas)),
+    onRotate: (dx, dy) => setView(v => ({ ...v, yaw: v.yaw + dx / 180, pitch: Math.max(-1, Math.min(1, v.pitch + dy / 180)) })),
+    onPick: e => {
+      const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)*760/r.width,y=(e.clientY-r.top)*600/r.height;
+            const candidates=hits.current.filter(h=>Math.hypot(h.x-x,h.y-y)<h.r),hit=candidates.find(h=>h.kind==='head')||candidates.find(h=>h.kind==='block')||candidates.sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(hit?.kind==='head')onHead(hit.i);if(hit?.kind==='block')onBlock(hit.i);if(hit?.kind==='unit')onUnit(hit.i)
+    },
+  });
+  const zoomBy = delta => setView(v => ({ ...v, zoom: Math.max(0.7, Math.min(1.7, v.zoom + delta)) }));
+  useSceneWheel(ref, delta => zoomBy(delta < 0 ? 0.1 : -0.1));
   return <div><canvas ref={ref} width="760" height="600" style={{width:'100%',maxWidth:'74vh',display:'block',margin:'0 auto',touchAction:'none',cursor:'grab'}} aria-label="真实轨迹三模块3D空间，灰Embedding、蓝Attention、橙MLP"
-    onPointerDown={e=>{drag.current={x:e.clientX,y:e.clientY,moved:false};e.currentTarget.setPointerCapture(e.pointerId)}}
-    onPointerMove={e=>{if(drag.current&&e.buttons){const dx=e.clientX-drag.current.x;if(Math.abs(dx)>2)drag.current.moved=true;setYaw(v=>v+dx/180);drag.current.x=e.clientX}}}
-    onPointerUp={e=>{if(drag.current&&!drag.current.moved){const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)*760/r.width,y=(e.clientY-r.top)*600/r.height;
-      const candidates=hits.current.filter(h=>Math.hypot(h.x-x,h.y-y)<h.r),hit=candidates.find(h=>h.kind==='head')||candidates.find(h=>h.kind==='block')||candidates.sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(hit?.kind==='head')onHead(hit.i);if(hit?.kind==='block')onBlock(hit.i);if(hit?.kind==='unit')onUnit(hit.i)}drag.current=null}}/>
-    <div className="v6-toolbar"><button className="fw-tbtn" onClick={()=>setZoom(z=>Math.min(1.7,z+.1))}>放大轨迹</button><button className="fw-tbtn" onClick={()=>setZoom(z=>Math.max(.7,z-.1))}>缩小轨迹</button><button className="fw-tbtn" onClick={()=>{setZoom(1);setYaw(-.45)}}>重置轨迹视角</button></div><p className="v8-note">颜色按当前Embedding、MLP、Head各自的最大绝对值缩放，未采集的模块只显示结构位置；板内不按激活排序。</p>
+    title={SCENE_MOUSE_HINT} {...pointer} />
+    <div className="v6-toolbar"><button className="fw-tbtn" onClick={()=>zoomBy(0.1)}>放大轨迹</button><button className="fw-tbtn" onClick={()=>zoomBy(-0.1)}>缩小轨迹</button><button className="fw-tbtn" onClick={()=>setView({ yaw: -.45, pitch: 0, zoom: 1 })}>重置轨迹视角</button></div><p className="v8-note">颜色按当前Embedding、MLP、Head各自的最大绝对值缩放，未采集的模块只显示结构位置；板内不按激活排序。</p>
   </div>;
 }

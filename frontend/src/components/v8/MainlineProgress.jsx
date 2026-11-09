@@ -1,8 +1,9 @@
+import { useMainline } from './data/mainlineState.js';
 /* 研发主线的进度部件：进度条、进度块、阶段条、过门清单、冻结向导与锁箱看管。
    约束：百分比只在分母明确时显示；进度只表示执行到哪里，不表示结论成立。 */
 import { useState } from 'react';
 
-import { CLAIMS, LOCKBOXES, STAGES, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
+import { achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 import './client_guide.css';
 import { Ring } from './CoreKit.jsx';
 
@@ -38,14 +39,17 @@ export function GateList({ stage }) {
       <span aria-hidden="true" className="mp-box">{stage.done.includes(i) ? '✓' : ''}</span>{gate}
       <span className="mp-sr">{stage.done.includes(i) ? '已满足' : '未满足'}</span></li>)}</ul>
     {stage.note && <p className="v8-note"><b>最近记录：</b>{stage.note}</p>}
+    {stage.id === 'H1' && <LockboxTable/>}
     <p className="v8-note">全部满足才进入下一阶段；每一项都要链接到运行记录。</p>
   </>;
 }
 
 /* 研究进度（Phase 340）：当前主张 + H0–H7 阶段条。默认只显示当前阶段一行；点阶段才展开过门项。 */
-export function MainlineCard({ ring = false, claim = CLAIMS[0] }) {
+export function MainlineCard({ ring = false, claim: suppliedClaim }) {
+  const { CLAIMS, STAGES, state } = useMainline();
+  const claim = suppliedClaim || CLAIMS[0];
   const [sel, setSel] = useState(null);
-  const { done, total, next } = stageProgress();
+  const { done, total, next } = stageProgress(STAGES);
   const stage = sel == null ? null : STAGES[sel];
   if (ring) return <section className="mp-main mp-main-ring" aria-label="主线总进度">
     <Ring value={total ? done / total : null} label={`${pct(done, total)}%`} size={150} ariaLabel={`主线总进度 ${pct(done, total)}%`} />
@@ -61,14 +65,16 @@ export function MainlineCard({ ring = false, claim = CLAIMS[0] }) {
     })}</div>
     {stage ? <div className="mp-detail"><b>{stage.id} {stage.name}</b> · {stage.done.length === stage.gates.length ? '已完成' : stage.done.length ? `进行中 · ${stage.done.length} / ${stage.gates.length} 项` : stage === next ? '进行中' : '未开始'}<GateList stage={stage} />
       {stage === next && claim?.run && <p className="v8-note"><b>运行记录：</b>{claim.run}</p>}</div>
-      : next && <div className="mp-now"><span><b>{next.id} {next.name}</b> · 进行中</span>
+      : next && <div className="mp-now"><span><b>当前分支 {state.active_branch.id}</b> · {state.active_branch.status === 'not_supported' ? '当前判据未支持，保留负结果' : state.active_branch.summary}；下一阶段 {next.id} {next.name} 待验收</span>
         {claim?.run && <p className="v8-note">{claim.run}</p>}
         <p className="v8-note">{done} / {total} 阶段完成 · 点一个阶段看过门项。进度只表示执行到哪里，不表示结论成立。</p></div>}
   </section>;
 }
 
 /* 当前主张的内容与否定条件（折叠行里用） */
-export function ClaimSummary({ claim = CLAIMS[0] }) {
+export function ClaimSummary({ claim: suppliedClaim }) {
+  const { CLAIMS } = useMainline();
+  const claim = suppliedClaim || CLAIMS[0];
   return <div className="mp-claim-body">
     <p><b>{claim.id}</b> · {claim.source} · {claim.model}</p>
     <p>{claim.claim}</p>
@@ -103,6 +109,7 @@ export function PowerWizard() {
 
 const LOCK_STATE = { opened: ['已开封', 'warn'], sealed: ['封存中', 'ok'], not_built: ['未建', 'gap'] };
 export function LockboxTable() {
+  const { LOCKBOXES } = useMainline();
   return <div className="v8-weight-scroll"><table className="v6-table">
     <thead><tr><th>锁箱</th><th>状态</th><th>记录</th></tr></thead>
     <tbody>{LOCKBOXES.map(box => <tr key={box.id}><td>{box.id}</td>

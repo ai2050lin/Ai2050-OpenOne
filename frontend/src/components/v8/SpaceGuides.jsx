@@ -1,8 +1,9 @@
+import { useMainline } from './data/mainlineState.js';
 /* 空间三张图与总览共用的说明部件：编码图谱的证据阶梯、关联机制的三种运行、四组成绩。
    约束：总量来自模型结构接口，已检查数来自解释检验接口；没有统计的写“未统计”，没有测的写“未测”。 */
 import { useApi } from '../app/rdc_fusion/api.js';
 import { useCoverage } from './coverage.js';
-import { SCORES } from './data/mainline.js';
+
 import './client_guide.css';
 
 const n = value => Number.isFinite(value) ? value.toLocaleString() : '—';
@@ -47,6 +48,7 @@ export function AssocIntro() {
 
 /* 四组成绩：v6 第 11 节的主指标。 */
 export function ScoreBoard({ bare = false }) {
+  const { SCORES } = useMainline();
   return <section className={bare ? "cg-section" : "v8-card cg-section"} aria-label="关联机制的四组成绩">
     {!bare && <h3>关联机制的四组成绩</h3>}
     <p className="v8-note">这是衡量破解程度的主指标。覆盖数和连接数只表示执行量，不计入这里。</p>

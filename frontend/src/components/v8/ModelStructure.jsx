@@ -13,6 +13,8 @@ import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { shortModel, workbenchHref } from './v8Util.js';
 import { useSpatialTrace } from './SpatialTrace.jsx';
 import UnitStates from './UnitStates.jsx';
+import MlpTailAtlas from './MlpTailAtlas.jsx';
+import MlpUnitNeighborhood, { collectMlpNeighbors, MLP_LINK_COLORS, useTailNeighborhood } from './MlpUnitNeighborhood.jsx';
 import { B35LayerResults, B35UnitFeatures, useB35Features, useB35Unit } from './B35RecursiveReport.jsx';
 import { AttributionGraph, BasisCompare, HeadFeature, HeadInternals, InfoFlowMap, LayerList, MinimalPairs, RelationBoards } from './ClientGuide.jsx';
 import './core_kit.css';
@@ -108,7 +110,7 @@ function line(from, to, color, dash, width) {
   return { hs1: from.hs, hs2: to.hs, p1: [from.x, from.z], p2: [to.x, to.z], color, dash, width };
 }
 
-function researchGraph(archive, snapshot, selected, nLayers, dims) {
+export function researchGraph(archive, snapshot, selected, nLayers, dims) {
   if (!archive || !snapshot || selected.index == null) return { cards: [], links: [], lines: [] };
   const objects = (archive.objects || []).filter(item => item.model_snapshot === snapshot);
   const features = new Map(objects.filter(item => item.type === 'feature').map(item => [item.id, item]));
@@ -184,7 +186,7 @@ function RecursiveExamples({ censusKey, layers, units, onPick }) {
   </li>)}</ul> : <p className="v8-note">该模型暂无标为递归泛化的解释检验。</p>;
 }
 
-function GraphCards({ graph, archive, snapshot }) {
+export function GraphCards({ graph, archive, snapshot }) {
   if (archive.error) return <Empty>{archive.error}<ExtraPackPrompt pack={archive.missingPack} /></Empty>;
   if (!archive.data) return <p className="v8-note">读取已登记的研究卡…</p>;
   if (!graph.cards.length) return <p className="v8-note">该索引暂无已定位的研究卡。</p>;
@@ -302,10 +304,16 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   }, []);
 
   const layers = count(model?.n_layers);
-  const layer = selection.layer === undefined && ['graph','parameters'].includes(view) && layers > 0 ? layers
+  const isStructureView = view === 'graph' || view === 'parameters';
+  const layer = selection.layer === undefined && isStructureView && layers > 0 ? layers
     : numbered(selection.layer) && selection.layer <= layers ? selection.layer : null;
   const arch = useApi(layer != null && model ? `/api/model/arch?model_key=${encodeURIComponent(model.model)}` : null, { online: true });
-  const module = layer===0?'embedding':layer>0&&['attn','mlp'].includes(selection.module)?selection.module:'';
+  let module = '';
+  if (layer === 0) module = 'embedding';
+  else if (layer > 0) {
+    if (['attn', 'mlp'].includes(selection.module)) module = selection.module;
+    else if (isStructureView && selection.index == null) module = 'mlp';
+  }
   const candidates = needLocalDimensions ? (localModels.data?.models || []).filter(({ config }) =>
     config.num_hidden_layers === layers && config.hidden_size === model?.d_model &&
     (!model.d_ff || config.intermediate_size === model.d_ff)) : [];
@@ -330,6 +338,10 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
       url.searchParams.delete('prow');url.searchParams.delete('pcol');
       window.history.replaceState(null,'',url);
       if(legacy.tab)setLegacy(current=>({...current,tab:'',head:null}));
+      if (isStructureView && next.module === 'mlp' && next.index != null) {
+        setPanel('feature');
+        setShowRelations(true);
+      }
     }
     setSelection(next);writeSelection(next);
   };
@@ -360,13 +372,15 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const unit = useApi(query ? `/api/neurons/unit?${query}` : null);
   const card = unit.data?.schema === 'unit_card.v1' && unit.data.model_snapshot === model?.model_snapshot &&
     unit.data.layer === block && unit.data.unit === index ? unit.data : null;
+  const mlpNeighborhood = isStructureView && module === 'mlp' && index != null;
+  const tail = useTailNeighborhood({ snapshot: boundSnapshot, block, unit: index, width: n, enabled: mlpNeighborhood });
   const isB35 = module==='mlp' && block===35 && n===9728 && Boolean(boundSnapshot);
   const archive = useApi((index != null && model?.model_snapshot) || isB35 ? '/api/traces/research-space' : null);
-  const b35 = useB35Features(archive.data,boundSnapshot,isB35);
-  const b35Unit = useB35Unit(b35.data,index);
+  const b35 = useB35Features(archive.data,boundSnapshot,isB35 || (mlpNeighborhood && block === 34 && n === 9728));
+  const b35Unit = useB35Unit(isB35 ? b35.data : null,index);
   const graph = useMemo(() => researchGraph(archive.data, model?.model_snapshot, selected, layers, dims),
     [archive.data, model?.model_snapshot, selected, layers, dims]);
-  const circuitQuery = showRelations || mode ? query : '';
+  const circuitQuery = showRelations || mode || mlpNeighborhood ? query : '';
   const censusKey=model?.census_run?model.census_key:'';
   const towerData=useApi(censusKey&&['graph','parameters'].includes(view)?`/api/neurons/tower?model_key=${encodeURIComponent(censusKey)}`:null);
   const layerData=useApi(censusKey&&module==='mlp'&&colorMode!=='index'?`/api/neurons/layer?model_key=${encodeURIComponent(censusKey)}&block=${block}&run=${encodeURIComponent(model.census_run)}`:null);
@@ -378,14 +392,32 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const target = index != null && module!=='embedding' ? toPoint(selected, dims) : null;
   const showLinks = showRelations || mode;
   const edges = showLinks ? [...graph.lines] : [];
-  if (showLinks && paths && target) {
+  const related = mlpNeighborhood ? collectMlpNeighbors({ block, layers, width: n, links: graph.links, paths,
+    observations: tail.observations, recursive: b35Unit.data }) : null;
+  const relatedPoints = [];
+  if (showLinks && related && target) {
+    for (const direction of ['upstream', 'downstream']) {
+      for (const row of related[direction]) {
+        const point = toPoint(row.location, dims);
+        const color = MLP_LINK_COLORS[direction];
+        const { location, evidence } = row;
+        relatedPoints.push({ ...point, color, location, label: `B${location.layer - 1} · U${location.index}`,
+          info: evidence.map(entry => entry.label).join(' / ') });
+        if (evidence.some(entry => entry.kind === 'registered')) continue;
+        const observed = evidence.some(entry => entry.kind === 'observation');
+        const [from, to] = direction === 'upstream' ? [point, target] : [target, point];
+        edges.push({ ...line(from, to, observed ? MLP_LINK_COLORS.observation : color, observed ? [2, 4] : [5, 3], 1.5), arrow: !observed });
+      }
+    }
+  }
+  if (!mlpNeighborhood && showLinks && paths && target) {
     const point = row => toPoint({ layer: row.block + 1, module: 'mlp', index: row.unit }, dims);
     const strongest = Math.max(1e-9, ...[...paths.upstream, ...paths.downstream].map(row => row.score));
     const width = row => 1 + 3 * row.score / strongest;
     for (const row of paths.upstream) edges.push(line(point(row), target, '#b4531c', [4, 3], width(row)));
     for (const row of paths.downstream) edges.push(line(target, point(row), '#1f6fb0', [4, 3], width(row)));
   }
-  if (showLinks && target && b35Unit.data) {
+  if (!mlpNeighborhood && showLinks && target && b35Unit.data) {
     const upstream = new Set(Object.values(b35Unit.data.upstream).flatMap(rows=>rows.map(row=>row.unit)));
     for(const unit of upstream)
       if(!paths?.upstream.some(row=>row.block===34&&row.unit===unit))
@@ -408,17 +440,19 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     onSelectModel={id=>{setEmbedding(null);setArchiveOverlay(null);publishResearchContext({pmodel:id});}}
     onLocate={p=>change({...EMPTY,layer:p.block+1,module:p.kind==='head'?'attn':p.kind,index:p.kind==='head'?p.head:p.unit})}
     onResponse={setArchiveOverlay}/>;
+  const locateRelated = location => change({ ...location, mode });
+  const showMlpFeatures = related && (panel === 'feature' || mode);
   const hideScene = compact && view === 'response' && !sceneOpen && index == null;
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
       <div>{!compact && <h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2>}{!compact && <p>{VIEW_TEXT[view]?.[1]}</p>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
-      {models.length > 1 && <label>模型 <select aria-label="结构模型" value={model?.model || ''} onChange={event => {
+      {models.length > 1 && <label className={isStructureView ? 'v8-structure-model-picker' : undefined}>模型 <select aria-label="结构模型" value={model?.model || ''} onChange={event => {
         const next = models.find(row => row.model === event.target.value);
         if (!next) return;
         onModel?.(next.model);
         publishResearchContext({ snapshot: next.model_snapshot || '', run: '', trace: '', context_trace: '', pmodel: '' });
         setEmbedding(null);setArchiveOverlay(null);
-        change(EMPTY);
+        change(isStructureView ? { ...EMPTY, layer: undefined } : EMPTY);
       }}>
         {!model && <option value="">选择已有模型</option>}
         {models.map(row => <option key={row.model} value={row.model}>{shortModel(row.model)}{row.precision ? ` · ${row.precision}` : ''}</option>)}
@@ -452,16 +486,18 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
                   <option value="type">按类型</option><option value="activity">按活跃度</option><option value="index">不着色</option>
                 </select></label>}
                 <button type="button" className="fw-tbtn" aria-pressed={showRelations} onClick={()=>setShowRelations(value=>!value)}>前后关系</button>
-                <span className="v8-note">拖动旋转 · 平移按钮或 Shift 拖动 · 滚轮缩放</span>
+                <span className="v8-note">左键拖动平移 · 右键拖动旋转 · 滚轮缩放</span>
               </div>
               <Tower key={model.model} nLayers={layers} selected={layer} onPick={pickLayer} allowEmbedding
                 modules={MODULES} focusModules panControls fit={0.92} arch={dims.arch} onPickModule={pickModule}
                 selModule={module ? { hs: layer, mod: module } : null} height={narrow ? 335 : 540}
-                caption={`LLM 全部 ${layers} 层的 3D 层塔${n ? `，B${block} 显示全部 ${n} 个${module === 'attn' ? ' Head' : ' MLP 单元'}` : ''}`}
-                cells={n > 0 ? { hs: layer, kind: module, count: n, values:measuredPlot||activityValues, colors:module==='mlp'&&!measuredPlot?typeColors:null } : null} onPickIndex={pickIndex} target={target} edges={edges} />
-              <p className="v8-note">{layer == null ? '点击层板查看 Head 和 MLP。底部为词嵌入，顶部为输出头。'
+                caption={`LLM 全部 ${layers} 层的 3D 层塔${n ? `，B${block} 显示全部 ${n} 个${module === 'attn' ? ' Head' : ' MLP 单元'}` : ''}${relatedPoints.length ? `，显示 ${relatedPoints.length} 个前后层关联端点` : ''}`}
+                cells={n > 0 ? { hs: layer, kind: module, count: n, values:measuredPlot||activityValues, colors:module==='mlp'&&!measuredPlot?typeColors:null } : null} onPickIndex={pickIndex} target={target} edges={edges}
+                relatedPoints={relatedPoints} onPickRelated={locateRelated} />
+              {related && showLinks ? <p className="v8-note" aria-label="跨层连线图例">前层 {related.upstream.length} · 后层 {related.downstream.length}。橙圈为前层，蓝圈为后层。实线为登记关系，紫色点线为留出共同响应，虚线为权重候选。点击端点可定位。</p>
+                : <p className="v8-note">{layer == null ? '点击层板查看 Head 和 MLP。底部为词嵌入，顶部为输出头。'
                 : showLinks && index != null ? '实线为已登记关系。橙色虚线是上游权重候选，蓝色虚线是下游权重候选；线越粗权重越强，候选不等于实际因果。'
-                  : '板内位置按原始编号排列，选中点以红圈标出。'}</p>
+                  : '板内位置按原始编号排列，选中点以红圈标出。'}</p>}
               {module==='mlp'&&colorMode!=='index'&&layerData.missingPack&&<p className="v8-note">下载神经元数据后可以按类型或活跃度着色。<ExtraPackPrompt pack={layerData.missingPack}/></p>}
               {module==='mlp'&&colorMode==='type'&&<div className="v6-toolbar" aria-label="神经元类型图例">{TYPE_LABELS.map((name,type)=><span className="v8-note" key={name}><i className="cg-swatch" style={{background:TYPE_COLORS[type]}}/>{name}</span>)}</div>}
             </section>
@@ -524,17 +560,23 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
         {module!=='embedding'&&<button type="button" className="fw-tbtn" aria-pressed={Boolean(mode)}
           onClick={()=>change({...selected,mode:mode?'':'relations'})}>关联模式</button>}
       </div>}
-      {mode ? <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths} recursive={recursive}
-        onPick={location=>change({...location,mode})}/> :
-        (panel==='data'||index==null) && (view==='live'||view==='response') ? trace.detail : null}
-      {mode&&b35.data&&<B35UnitFeatures row={b35Unit} index={b35.data} recursive
+      {showMlpFeatures && <MlpUnitNeighborhood model={model} snapshot={boundSnapshot} selected={selected} layers={layers}
+        card={card} unit={unit} graph={graph} tail={tail} neighbors={related} candidate={circuit} b35Index={b35.data} b35Unit={b35Unit} onLocate={locateRelated}/>}
+      {mode && (related ? <ResearchDisclosure title="完整关联记录">
+        <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths} recursive={recursive} onPick={locateRelated}/>
+        {isB35 && b35.data && <B35UnitFeatures row={b35Unit} index={b35.data} recursive
+          onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
+      </ResearchDisclosure> : <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths}
+        recursive={recursive} onPick={locateRelated}/>)}
+      {!mode && (panel==='data'||index==null) && (view==='live'||view==='response') && trace.detail}
+      {mode&&!related&&isB35&&b35.data&&<B35UnitFeatures row={b35Unit} index={b35.data} recursive
         onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
       {!mode&&index!=null&&(panel==='parameters'||(panel==='feature'&&module==='embedding'))&&weights}
       {!mode&&index!=null&&panel==='parameters'&&module==='attn'&&<HeadInternals snapshot={boundSnapshot} block={block} head={index}/>}
       {!mode&&index!=null&&panel==='feature'&&module==='attn'&&<HeadFeature snapshot={boundSnapshot} block={block} head={index}/>}
-      {!mode&&index!=null&&panel==='feature'&&module==='mlp'&&(card?<NeuronUnitCardContent data={card}/>:<p className="v8-note">{unit.error||(unit.loading?'读取神经元卡片…':'暂无与当前快照匹配的神经元卡片。')}<ExtraPackPrompt pack={unit.missingPack}/></p>)}
+      {!mlpNeighborhood&&!mode&&index!=null&&panel==='feature'&&module==='mlp'&&(card?<NeuronUnitCardContent data={card}/>:<p className="v8-note">{unit.error||(unit.loading?'读取神经元卡片…':'暂无与当前快照匹配的神经元卡片。')}<ExtraPackPrompt pack={unit.missingPack}/></p>)}
       {!mode&&index!=null&&panel==='evidence'&&<>
-        {b35.data&&<><B35UnitFeatures row={b35Unit} index={b35.data}/>
+        {isB35&&b35.data&&<><B35UnitFeatures row={b35Unit} index={b35.data}/>
           <ResearchDisclosure title="本单元的递归泛化"><B35UnitFeatures row={b35Unit} index={b35.data} recursive
             onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/></ResearchDisclosure></>}
         {card ? <>
@@ -542,7 +584,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
           {recursive&&<p className="v8-note">解释检验记录 · 递归泛化线索</p>}
           <ul className="v8-overview-tags">{[['读出','read'],['控制','control'],['解释','explain']].map(([name,key])=>
             <li key={key}>{name} · {card.evidence_axes?.[key] || '未登记'}</li>)}</ul>
-        </> : query&&!b35.data ? <div className="v8-note">{unit.error || (unit.loading ? '读取单元检验…' : '暂无与当前快照匹配的单元卡。')}<ExtraPackPrompt pack={unit.missingPack}/></div> : null}
+        </> : query&&!(isB35&&b35.data) ? <div className="v8-note">{unit.error || (unit.loading ? '读取单元检验…' : '暂无与当前快照匹配的单元卡。')}<ExtraPackPrompt pack={unit.missingPack}/></div> : null}
         <GraphCards key={`${module}:${block}:${index}`} graph={graph} archive={archive} snapshot={boundSnapshot}/>
       </>}
       {!mode&&index!=null&&panel==='history'&&<>
@@ -562,5 +604,6 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     </section>}
     {!compact&&view==='response'&&<RelationBoards/>}
     {!compact&&['graph','parameters'].includes(view)&&<BasisCompare/>}
+    {!compact&&boundSnapshot==='6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'&&<ResearchDisclosure title="尾层 MLP · 全量单元特性与上下游关联"><MlpTailAtlas/></ResearchDisclosure>}
   </section>;
 }

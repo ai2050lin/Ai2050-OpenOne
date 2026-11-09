@@ -2,15 +2,16 @@
    属性空间：x = 因果作用 ΔL̂（symlog），y = 激活密度（log），z = 直接读出占比 —— 三个轴都是实测量。
    读出语义空间：读出向量（W_U(γ⊙W_down[:,j])）单位化后的 PCA 前三维，轴端标注该主方向最推高的 token；降维会失真。
    点 = 一个 MLP 神经元；颜色 = 类型；大小 = 因果作用排序；带环并标注的点 = 触发点消融已确认（L30-v3）。
-   拖动旋转、滚轮缩放、悬停查看、点击打开单元卡。布局只是展示，距离不代表模型内部的计算关系。 */
+   左键拖动平移、右键拖动旋转、滚轮缩放、悬停查看、点击打开单元卡。布局只是展示，距离不代表模型内部的计算关系。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, SCENE_MOUSE_HINT, useScenePointer } from '../../scenePointer.js';
 
 import { SPACE_TOPN, SPACE_TYPES, SPACE_TYPE_COLOR, fmtNum } from './neuronUtil.js';
 
 export default function NeuronSpace3D({ data, view, selected, onSelect, height = 560 }) {
   const wrapRef = useRef(null);
   const cvRef = useRef(null);
-  const cam = useRef({ yaw: 0.7, pitch: 0.35, zoom: 1, drag: null, moved: false });
+  const cam = useRef({ yaw: 0.7, pitch: 0.35, zoom: 1 });
   const proj = useRef([]);
   const [hover, setHover] = useState(null);
   const [tick, setTick] = useState(0);
@@ -37,14 +38,14 @@ export default function NeuronSpace3D({ data, view, selected, onSelect, height =
     cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
     const ctx = cv.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const { yaw, pitch, zoom } = cam.current;
+    const { yaw, pitch, zoom, panX = 0, panY = 0 } = cam.current;
     const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
     const scale = Math.min(W, H) * 0.26 * zoom;
     const P = (x, y, z) => {
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
       const y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
       const f = 6 / (6 + z2);
-      return [W / 2 + x1 * scale * f, H / 2 - y1 * scale * f, z2];
+      return [W / 2 + panX + x1 * scale * f, H / 2 + panY - y1 * scale * f, z2];
     };
     ctx.fillStyle = '#fbfcfd'; ctx.fillRect(0, 0, W, H);
     // 轴：-1.6 … +1.6，轴端写名称（属性空间带刻度）
@@ -127,28 +128,24 @@ export default function NeuronSpace3D({ data, view, selected, onSelect, height =
     }
     return best ? { o: best, mx, my } : null;
   };
-  const onDown = e => { cam.current.drag = [e.clientX, e.clientY]; cam.current.moved = false; };
-  const onMove = e => {
-    const c = cam.current;
-    if (c.drag) {
-      const dx = e.clientX - c.drag[0], dy = e.clientY - c.drag[1];
-      if (Math.abs(dx) + Math.abs(dy) > 2) c.moved = true;
-      c.yaw += dx * 0.008; c.pitch = Math.max(-1.4, Math.min(1.4, c.pitch + dy * 0.008));
-      c.drag = [e.clientX, e.clientY];
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { cam.current = panScene(cam.current, dx, dy); setTick(t => t + 1); },
+    onRotate: (dx, dy) => {
+      cam.current.yaw += dx * 0.008;
+      cam.current.pitch = Math.max(-1.4, Math.min(1.4, cam.current.pitch + dy * 0.008));
       setTick(t => t + 1);
-      return;
-    }
-    const h = nearest(e);
-    setHover(h ? { u: h.o.p.u, x: h.mx, y: h.my } : null);
-  };
-  const onUp = e => {
-    const c = cam.current;
-    if (!c.moved) {
+    },
+    onHover: e => {
+      const h = nearest(e);
+      setHover(h ? { u: h.o.p.u, x: h.mx, y: h.my } : null);
+    },
+    onLeave: () => setHover(null),
+    onPick: e => {
       const h = nearest(e);
       if (h) onSelect(h.o.p.u.u);
-    }
-    c.drag = null;
-  };
+    },
+  });
+
   const counts = useMemo(() => Object.fromEntries(SPACE_TYPES.map(t => [t, data.units.filter(u => u.t === t).length])), [data]);
   const nOk = data.units.filter(u => u.ok).length;
 
@@ -169,13 +166,11 @@ export default function NeuronSpace3D({ data, view, selected, onSelect, height =
             {SPACE_TOPN.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
           </select>
           <label className="nu-note"><input type="checkbox" checked={labels} onChange={e => setLabels(e.target.checked)} /> 标注已确认单元</label>
-          <button type="button" className="ns3-reset" onClick={() => { cam.current = { yaw: 0.7, pitch: 0.35, zoom: 1, drag: null, moved: false }; setTick(t => t + 1); }}>重置视角</button>
+          <button type="button" className="ns3-reset" onClick={() => { cam.current = { yaw: 0.7, pitch: 0.35, zoom: 1 }; setTick(t => t + 1); }}>重置视角</button>
         </div>
       </div>
       <div ref={wrapRef} className="ns3-canvas">
-        <canvas ref={cvRef} onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp}
-                onMouseLeave={() => { cam.current.drag = null; setHover(null); }}
-                role="img" aria-label={`第 ${data.layer} 层 ${pts.length} 个神经元的 3D 散点`} />
+        <canvas ref={cvRef} {...pointer} title={SCENE_MOUSE_HINT} role="img" aria-label={`第 ${data.layer} 层 ${pts.length} 个神经元的 3D 散点`} />
         {hover && (
           <div className="ns3-tip" style={{ left: hover.x + 14, top: hover.y + 10 }}>
             <b>L{data.layer}.U{hover.u.u}</b> · {hover.u.t} {data.type_names[hover.u.t]}

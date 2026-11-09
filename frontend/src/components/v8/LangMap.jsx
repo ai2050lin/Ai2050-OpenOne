@@ -1,13 +1,18 @@
 /* 空间 · 语言图谱 · 结构图谱（Phase 341，lang_map.v1）。
-   四层：领域 → 子领域 → 语言项 → 词。数据来自中心只读端点 /api/lang/map 与 /api/lang/map/words/{id}（随版本发布、带 sha256）。
+   四层：领域 → 子领域 → 语言项 → 词。优先读中心接口或数据包，缺少整图时读随版本发布的图谱和词表。
    3D 总览与 2D 树共用同一个选中对象；右侧是详情。只描述语言本身，不含模型信息；布局距离不代表语义距离或模型几何。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { panScene, SCENE_MOUSE_HINT, useScenePointer } from '../scenePointer.js';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import './lang_map.css';
+import bundledMap from '../../../../shared/dist_protocol/lang_map/lang_map.json';
+import bundledWords from '../../../../shared/dist_protocol/lang_map/words.json';
+import bundledManifest from '../../../../shared/dist_protocol/lang_map/manifest.json';
 
+const RELEASE_MAP = { ...bundledMap, manifest: bundledManifest };
 const COL = { KN: '#2a78d6', RS: '#d4622b', GR: '#2f8f5b' };
 const WORD_CAP = 48;               // 3D 里一个语言项最多展开的词数；其余在右侧列表
 const DOM_ANG = { KN: -Math.PI / 2, RS: -Math.PI / 2 + 2 * Math.PI / 3, GR: -Math.PI / 2 + 4 * Math.PI / 3 };
@@ -60,12 +65,12 @@ function Map3D({ N, sel, focus, words, onPick }) {
   useEffect(() => {
     const el = cv.current, ctx = el.getContext('2d'), { W, H } = size.current;
     if (!W) return;
-    const { yaw, pitch, zoom } = view.current;
+    const { yaw, pitch, zoom, panX = 0, panY = 0 } = view.current;
     const proj = ([x, y, z]) => {
       const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy, y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
       const s = Math.min(W, H) / 10.5 * zoom, f = 12 / (12 + z2);
-      return [W / 2 + x1 * s * f, H * 0.5 - y1 * s * f, z2, f];
+      return [W / 2 + panX + x1 * s * f, H * 0.5 + panY - y1 * s * f, z2, f];
     };
     const ids = ['ROOT', ...N.get('ROOT').kids];
     for (const d of N.get('ROOT').kids) for (const s of N.get(d).kids) { ids.push(s); ids.push(...N.get(s).kids); }
@@ -112,14 +117,19 @@ function Map3D({ N, sel, focus, words, onPick }) {
     ctx.globalAlpha = 1;
   }, [N, sel, focus, words, tick]);
 
-  const drag = useRef(null);
-  const down = e => { drag.current = { x: e.clientX, y: e.clientY, ...view.current, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); };
-  const move = e => { const d = drag.current; if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y; if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
-    view.current = { ...view.current, yaw: d.yaw + dx * 0.006, pitch: Math.max(-0.2, Math.min(1.3, d.pitch + dy * 0.005)) }; setTick(t => t + 1); };
-  const up = e => { const d = drag.current; drag.current = null; if (!d || d.moved) return;
+  const pick = e => {
     const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     let best = null, bd = 14; for (const { id, p } of pts.current) { const dd = Math.hypot(p[0] - x, p[1] - y); if (dd < bd) { bd = dd; best = id; } }
     if (best) onPick(best); };
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { view.current = panScene(view.current, dx, dy); setTick(t => t + 1); },
+    onRotate: (dx, dy) => {
+      const { yaw, pitch } = view.current;
+      view.current = { ...view.current, yaw: yaw + dx * 0.006, pitch: Math.max(-0.2, Math.min(1.3, pitch + dy * 0.005)) };
+      setTick(t => t + 1);
+    },
+    onPick: pick,
+  });
   useEffect(() => {
     const el = cv.current;
     const wheel = e => { e.preventDefault(); view.current = { ...view.current, zoom: Math.max(0.6, Math.min(2.6, view.current.zoom * (e.deltaY < 0 ? 1.1 : 0.9))) }; setTick(t => t + 1); };
@@ -127,8 +137,8 @@ function Map3D({ N, sel, focus, words, onPick }) {
     return () => el.removeEventListener('wheel', wheel);
   }, []);
   return <div className="lm-3d">
-    <canvas ref={cv} onPointerDown={down} onPointerMove={move} onPointerUp={up} aria-label="语言图谱 3D 总览：三个领域分成三个扇区，从上到下是领域、子领域、语言项和词" />
-    <div className="lm-hint v8-note">拖动旋转 · 滚轮缩放 · 点节点选中；选中语言项后展开它的词</div>
+    <canvas ref={cv} {...pointer} aria-label="语言图谱 3D 总览：三个领域分成三个扇区，从上到下是领域、子领域、语言项和词" />
+    <div className="lm-hint v8-note">{SCENE_MOUSE_HINT} · 点节点选中；选中语言项后展开它的词</div>
     <div className="lm-legend v8-note"><span><i style={{ borderColor: '#c3cad5' }} />层级</span><span><i style={{ borderColor: '#d29a00', borderTopStyle: 'dashed' }} />交叉归属</span>
       <span><i style={{ borderColor: '#7050a0' }} />词 → 功能</span><span>实心 = 有测试模板 · 空心 = 只有定义与例句 · 虚线外圈 = 新增</span></div>
   </div>;
@@ -182,7 +192,7 @@ function Detail({ N, map, sel, words, wordsApi, onPick }) {
         <div className="lm-chips">{n.fn_words.map(w => <button type="button" key={`${w.item}:${w.zh}`} onClick={() => onPick(w.item)}>{w.zh}</button>)}</div></>}
       {n.n_words > 0 ? <>
         <p className="v8-note">词层 · {n.n_words} 个{words?.some(w => w.review !== 'reviewed') ? ' · 含草稿，待审定' : ''}</p>
-        {wordsApi.error ? <Empty>{wordsApi.error}<ExtraPackPrompt pack={wordsApi.missingPack} /></Empty>
+        {wordsApi.error && !words ? <Empty>{wordsApi.error}<ExtraPackPrompt pack={wordsApi.missingPack} /></Empty>
           : !words ? <p className="v8-note">读取词层…</p>
             : <div className="lm-chips">{words.map(w => <button type="button" key={w.id} title={w.note || ''} onClick={() => onPick(w.id)}>{w.name}</button>)}</div>}
       </> : <p className="v8-note">还没有词层。</p>}
@@ -198,21 +208,24 @@ function Detail({ N, map, sel, words, wordsApi, onPick }) {
 
 export default function LangMap() {
   const api = useApi('/api/lang/map');
-  const map = api.data?.domains ? api.data : null;
+  const useReleaseMap = !api.data?.domains && !api.loading;
+  const map = useReleaseMap ? RELEASE_MAP : api.data?.domains ? api.data : null;
   const N = useMemo(() => (map ? buildIndex(map) : null), [map]);
   const [sel, setSel] = useState('ROOT');
   const [focus, setFocus] = useState(null);
   const [mode, setMode] = useState('3d');
   const [q, setQ] = useState('');
   const itemId = sel.includes('#') ? sel.split('#')[0] : N?.get(sel)?.level === 3 ? sel : null;
-  const wordsApi = useApi(itemId && N?.get(itemId)?.n_words ? `/api/lang/map/words/${itemId}` : null);
+  const wordsApi = useApi(!useReleaseMap && itemId && N?.get(itemId)?.n_words ? `/api/lang/map/words/${itemId}` : null);
+  const matchingWords = map?.manifest?.files?.['words.json'] === bundledManifest.files['words.json'];
+  const wordRows = useReleaseMap || (wordsApi.error && matchingWords) ? bundledWords.items[itemId]
+    : wordsApi.data?.item === itemId ? wordsApi.data?.words : null;
   const words = useMemo(() => {
-    if (!itemId || !wordsApi.data?.words || wordsApi.data.item !== itemId) return null;
-    const it = N.get(itemId), list = wordsApi.data.words;
-    return list.map((w, wi) => ({ id: `${itemId}#${wi}`, name: w.zh, en: w.en, note: w.note, src: w.src, fn: w.fn, review: w.review,
-      level: 4, dom: it.dom, parent: itemId, wi, total: list.length }));
-  }, [itemId, wordsApi.data, N]);
-  if (api.error) return <section className="v8-card"><Empty>语言图谱暂不可用。{api.error}<ExtraPackPrompt pack={api.missingPack} /></Empty></section>;
+    const it = N?.get(itemId);
+    if (!it || !wordRows) return null;
+    return wordRows.map((w, wi) => ({ id: `${itemId}#${wi}`, name: w.zh, en: w.en, note: w.note, src: w.src, fn: w.fn, review: w.review,
+      level: 4, dom: it.dom, parent: itemId, wi, total: wordRows.length }));
+  }, [itemId, wordRows, N]);
   if (!map) return <section className="v8-card"><p className="v8-note">读取语言图谱…</p></section>;
   const pick = id => { setSel(id); const n = N.get(id); if (n?.dom && focus && n.dom !== focus) setFocus(null); };
   const search = () => {
@@ -238,7 +251,7 @@ export default function LangMap() {
       <div className="lm-view">{mode === '3d' ? <Map3D N={N} sel={sel} focus={focus} words={words} onPick={pick} /> : <Tree N={N} sel={sel} words={words} onPick={pick} />}</div>
       <Detail N={N} map={map} sel={sel} words={words} wordsApi={wordsApi} onPick={pick} />
     </section>
-    <p className="v8-note">版本 {map.version} · {map.manifest?.created?.slice(0, 10)} · lang_map.json sha256 {map.manifest?.files?.['lang_map.json']?.slice(0, 12)}… · {map.note}</p>
+    <p className="v8-note">{useReleaseMap && '随版本发布的图谱 · '}版本 {map.version} · {map.manifest?.created?.slice(0, 10)} · lang_map.json sha256 {map.manifest?.files?.['lang_map.json']?.slice(0, 12)}… · {map.note}</p>
   </div>;
 }
 

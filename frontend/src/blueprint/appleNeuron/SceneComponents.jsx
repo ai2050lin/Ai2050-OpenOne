@@ -3,7 +3,8 @@
  * 从 AppleNeuron3DTab.jsx 拆分而来
  */
 
-import { Html, Line, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
+import { Html, Line, PerspectiveCamera, Text } from '@react-three/drei';
+import SceneOrbitControls from '../../components/SceneOrbitControls.jsx';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { ANIMATION_SCENARIOS, DIMENSION_VIEWS } from '../../config/panels';
@@ -1986,7 +1987,7 @@ function AppleNeuronScene({
       <pointLight position={[-14, -8, -15]} intensity={30} color="#ff9e6b" />
 
       <PerspectiveCamera makeDefault position={[16, 12, 26]} fov={42} />
-      <OrbitControls enablePan enableZoom minDistance={10} />
+      <SceneOrbitControls enablePan enableZoom minDistance={10} />
 
       <AppleNeuronSceneContent
         nodes={nodes}

@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Line, Html } from '@react-three/drei';
+import { Text, Line, Html } from '@react-three/drei';
+import SceneOrbitControls from './components/SceneOrbitControls.jsx';
 import * as THREE from 'three';
 
 // 语义节点数据 (Man -> King -> Queen -> Woman -> Man)
@@ -117,7 +118,7 @@ export default function HolonomyLoopVisualizer({ layer = 0, deviation = 0.0 }) {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Scene layerDeviation={deviation} />
-        <OrbitControls />
+        <SceneOrbitControls />
         <gridHelper args={[20, 20, 0x222222, 0x111111]} rotation={[Math.PI / 2, 0, 0]} />
       </Canvas>
       

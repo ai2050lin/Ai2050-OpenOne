@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text, Line } from '@react-three/drei';
+import { Text, Line } from '@react-three/drei';
+import SceneOrbitControls from '../SceneOrbitControls.jsx';
 import * as THREE from 'three';
 import { API_CONFIG } from '../../config/api';
 import './RdcFeatureAtlas.css';
@@ -222,7 +223,7 @@ function RdcRunView({run,onRunChange}) {
             {(isContinuity||isConditionalView||['field','prediction','contribution','mlp_units','parameter_path','output_ledger','output_units','source_ledger'].includes(view))&&data&&<FieldPoints data={data} colorScale={colorScale} gain={gain} onSelect={setSelected}/>}
             {view==='external'&&<ExternalGraph row={row} samples={samples} onSelectSample={id=>{setFollow(false);setSample(id);}}/>}
             {view==='algorithms'&&<AlgorithmBars rows={chartRows}/>}
-            <gridHelper args={[26,26,'#263d56','#15263a']} position={[0,-2.5,0]}/><OrbitControls makeDefault />
+            <gridHelper args={[26,26,'#263d56','#15263a']} position={[0,-2.5,0]}/><SceneOrbitControls makeDefault />
           </Canvas>
           {!data&&(isContinuity||isConditionalView||['field','prediction','contribution','mlp_units','parameter_path','output_ledger','output_units','source_ledger'].includes(view))&&<div className="rdc-empty">等待有效坐标切片；未完成的样本不会显示为完成。</div>}
         </div>

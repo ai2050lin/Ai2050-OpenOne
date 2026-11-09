@@ -531,7 +531,7 @@ export default function ResponseExplorer({ initialTm, initialBucket, initialLaye
                       <label key={sp} className="fw-chk"><input type="checkbox" checked={!hiddenSplits.has(sp)}
                         onChange={() => setHiddenSplits(prev => { const n = new Set(prev); if (n.has(sp)) n.delete(sp); else n.add(sp); return n; })} /> {SPLIT_LABEL[sp]}</label>
                     ))}
-                    <span className="v6-note">{an.n_items} 条样本 · 向量空间 {an.space}{an.n_excluded ? ` · 行为门排除 ${an.n_excluded} 条` : ''} · 拖动旋转、滚轮缩放、悬停看样本</span>
+                    <span className="v6-note">{an.n_items} 条样本 · 向量空间 {an.space}{an.n_excluded ? ` · 行为门排除 ${an.n_excluded} 条` : ''} · 左键拖动平移、右键拖动旋转、滚轮缩放、悬停看样本</span>
                   </div>
                   <Space3D analysis={an} layerTag={layerTag} method={methodV} colorBy={colorByV} visibleSplits={visibleSplits} />
                   <p className="v6-note">

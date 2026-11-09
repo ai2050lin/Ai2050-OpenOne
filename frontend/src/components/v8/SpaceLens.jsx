@@ -323,7 +323,7 @@ function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weig
           </div>
         </div>
         {/* 塔的读法放在塔上方：默认态整页要在一屏内说完，说明行不能掉到最底部被浮动按钮压住 */}
-        <p className="v8-note v8-note-top">每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。拖动旋转、滚轮缩放。
+        <p className="v8-note v8-note-top">每块板 = 一层：下=嵌入层、上=输出头；颜色按最大值归一化（浅→深）。左键拖动平移、右键拖动旋转、滚轮缩放。
           {!census && skeleton ? ` ${shortModel(model)} 还没有自然语料普查：没有神经元数据。` : ''}</p>
         {nLayers ? (
           <Tower nLayers={nLayers} selected={cfg.selected} values={cfg.values} marks={cfg.marks} peak={cfg.peak} onPick={cfg.onPick}

@@ -1,5 +1,6 @@
 ﻿import { API_BASE } from './config.js';
-import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
+import { ContactShadows, PerspectiveCamera, Text } from '@react-three/drei';
+import SceneOrbitControls from './components/SceneOrbitControls.jsx';
 import { Canvas } from '@react-three/fiber';
 import axios from 'axios';
 import {
@@ -4323,7 +4324,7 @@ export default function App() {
                     <ErrorBoundary>
                       <Canvas>
                         <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-                        <OrbitControls enableDamping dampingFactor={0.05} />
+                        <SceneOrbitControls enableDamping dampingFactor={0.05} />
                         <ambientLight intensity={0.4} />
                         <pointLight position={[10, 10, 10]} intensity={0.8} />
                         <pointLight position={[-10, -10, 10]} intensity={0.3} color="#00d2ff" />
@@ -4340,7 +4341,7 @@ export default function App() {
                       color: '#666',
                       textAlign: 'center'
                     }}>
-                      💡 拖动旋转 • 滚轮缩放 • 右键平移
+                      💡 左键拖动平移 • 右键拖动旋转 • 滚轮缩放
                     </div>
                   </div>
                 )}
@@ -4792,7 +4793,7 @@ export default function App() {
             position={isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
             fov={isEncoding3DTab ? 46 : 50}
           />
-          <OrbitControls
+          <SceneOrbitControls
             makeDefault
             target={[0, 0, 0]}
             enablePan

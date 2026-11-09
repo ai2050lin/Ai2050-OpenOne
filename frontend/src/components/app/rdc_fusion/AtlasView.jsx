@@ -225,7 +225,7 @@ export default function AtlasView({ localAtlas, localName, onOpenFamily, snapsho
               <button type="button" className={view === 'space' ? 'on' : ''} onClick={() => setView('space')}>3D 空间</button>
             </div>
             <span className="v6-mx-switch-hint">
-              {view === 'matrix' ? '账本判据原样上表，不做降维；点格子看具体边。' : 'MDS 前三维点云，拖动旋转；坐标轴没有语义，仅表示方向远近的近似。'}
+              {view === 'matrix' ? '账本判据原样上表，不做降维；点格子看具体边。' : 'MDS 前三维点云，左键拖动平移、右键拖动旋转；坐标轴没有语义，仅表示方向远近的近似。'}
             </span>
           </div>
           {view === 'matrix' ? (

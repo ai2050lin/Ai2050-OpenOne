@@ -291,16 +291,19 @@ export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState,
       const mx=(e.clientX-r.left)*(cv.width/r.width);
       const my=(e.clientY-r.top)*(cv.height/r.height);
       if(dragRef.current){
-        if(dragRef.current.btn===2){
-          /* 右键：平移视角位置（上下左右皆可），不改变任何角度 */
+        const drag = dragRef.current;
+        if (!drag.moved && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) <= 4) return;
+        drag.moved = true;
+        if(dragRef.current.btn === 0){
+          /* 左键：平移视角位置（上下左右皆可），不改变任何角度 */
           cam.panX=Math.max(-800,Math.min(800,(cam.panX||0)+(e.clientX-dragRef.current.x)));
           cam.panY=Math.max(-800,Math.min(800,(cam.panY||0)+(e.clientY-dragRef.current.y)));
         }else{
-          /* 左键：旋转视角，上下左右都改变角度 */
+          /* 右键：旋转视角，上下左右都改变角度 */
           cam.th+=(e.clientX-dragRef.current.x)*0.006;
           cam.ph=Math.max(-0.1,Math.min(1.15,cam.ph+(e.clientY-dragRef.current.y)*0.006));
         }
-        dragRef.current={x:e.clientX,y:e.clientY,btn:dragRef.current.btn};
+        drag.x = e.clientX; drag.y = e.clientY;
         return;
       }
       const hov=pick(mx,my);
@@ -309,16 +312,16 @@ export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState,
     };
     let autoT=null;
     const onDown=e=>{
-      if(e.button!==0&&e.button!==2) return;
-      dragRef.current={x:e.clientX,y:e.clientY,btn:e.button};
+      if (dragRef.current || (e.button !== 0 && e.button !== 2)) return;
+      dragRef.current={x:e.clientX,y:e.clientY,btn: e.button, moved: false };
       cam.auto=false;
       if(autoT){clearTimeout(autoT);autoT=null;}   /* 取消旧的恢复定时器，防止拖拽中 auto-rotate 被唤醒 */
     };
     const onUp=e=>{
+      if (dragRef.current?.btn !== e.button) return;
       if(dragRef.current){
         if(dragRef.current.btn===0){   /* 仅左键做点选 */
-          const moved=Math.abs(e.clientX-dragRef.current.x)+Math.abs(e.clientY-dragRef.current.y);
-          if(moved<5){
+          if (!dragRef.current.moved){
             const r=cv.getBoundingClientRect();
             const dpr=window.devicePixelRatio||1;
             const mx=(e.clientX-r.left)*dpr, my=(e.clientY-r.top)*dpr;

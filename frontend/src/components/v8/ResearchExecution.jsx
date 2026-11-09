@@ -1,3 +1,4 @@
+import { atMainlineRevision, useMainline } from './data/mainlineState.js';
 import { useCallback, useEffect, useState } from 'react';
 import { ADMIN_LIVE, API_BASE, useApi } from '../app/rdc_fusion/api.js';
 import { useResearchContext } from '../app/researchContext.js';
@@ -13,7 +14,7 @@ import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './
 import ClaimDraft from './ClaimDraft.jsx';
 import { ClaimSummary, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
 import { PageHead, PillTools } from './CoreKit.jsx';
-import { CLAIMS, RUNS, SLICES, STAGES } from './data/mainline.js';
+
 
 const STAGE = {
   freeze: '冻结材料', collection: '原场采集', client_acceptance: '客户端回查', validation: '留出验证',
@@ -22,6 +23,7 @@ const STAGE = {
   interface: '统一采集接口', calibration: '行为校准', prediction: '未见组合预测', native_mlp_plan: 'MLP 主线规划',
   registration_discovery: '登记观察', dataset_atlas_plan: '数据与图谱方案',
   semantic_mechanism: '语义机制验证', semantic_causal_closure: '语义因果闭环',
+  independent_prediction: '图谱独立预测', replication: '独立复算',
 };
 const STAGE_STATE = {
   done: '已完成', completed: '已完成', passed: '通过', not_supported: '△ 未支持', not_tested: '未测试',
@@ -54,9 +56,9 @@ function planStatus(body) {
   const pending = stages.find(([, stage]) => stageState(stage) === 'running') ||
     stages.find(([, stage]) => REMAINING.has(stageState(stage)));
   return {
-    status: pending ? STAGE_STATE[stageState(pending[1])] ?? '待处理'
+    status: body.research_status === 'not_supported' ? '当前判据未支持' : body.research_status === 'scoped_result' ? '已归档 · 范围结果' : pending ? STAGE_STATE[stageState(pending[1])] ?? '待处理'
       : body.stages?.registration_validated?.report_sha256 ? '已有归档' : '已登记',
-    next: pending ? STAGE[pending[0]] ?? pending[0] : '',
+    next: body.next_action || (pending ? STAGE[pending[0]] ?? pending[0] : ''),
   };
 }
 
@@ -90,6 +92,7 @@ function PlanRow({ entry, focused, children = [], onGo }) {
     <div className="v6-toolbar">
       <button className="fw-tbtn" type="button" onClick={() => onGo('catalog', null, null, { ...context, mrun: body.run_id, tm: '' })}>查看所用材料</button>
       <button className="fw-tbtn" type="button" onClick={() => onGo('execution', null, null, context)}>查看实验</button>
+      {report && <a className="fw-tbtn" href={`?lens=spatial&view=research&run=${encodeURIComponent(body.run_id)}&snapshot=${body.model_snapshot}`}>3D 中查看结果与组成员</a>}
     </div>
     <ResearchDisclosure title="阶段与验收"><PlanStages stages={body.stages}/></ResearchDisclosure>
     {brief?.sample && <ResearchDisclosure title="查看一条真实样本"><ResearchSample sha={report}/></ResearchDisclosure>}
@@ -137,7 +140,10 @@ function currentWork(census, queue) {
 }
 
 function ResearchPlans({ onGo }) {
-  const packages = useApi(workpackagePath);
+  const { CLAIMS, SLICES, revision } = useMainline();
+  const packages = atMainlineRevision(useApi(workpackagePath), revision);
+  const { reload: reloadPackages } = packages;
+  useEffect(() => { reloadPackages(); }, [revision, reloadPackages]);
   const census = useApi('/api/census/jobs', { online: true });
   const queue = useApi('/api/tasks', { online: true });
   const { reload: reloadCensus } = census;
@@ -227,7 +233,10 @@ function ResearchPlans({ onGo }) {
 }
 
 function ArchivedExperiment({ run, onGo }) {
-  const packages = useApi(workpackagePath);
+  const { revision } = useMainline();
+  const packages = atMainlineRevision(useApi(workpackagePath), revision);
+  const { reload: reloadPackages } = packages;
+  useEffect(() => { reloadPackages(); }, [revision, reloadPackages]);
   const body = packages.data?.workpackages?.find(entry => entry.body.run_id === run)?.body;
   const report = body?.stages?.registration_validated?.report_sha256;
   return <section className="v8-rnd-linked" aria-label="链接指定的实验">
@@ -275,6 +284,7 @@ function TaskRow({ task, name, onGo }) {
 }
 
 function ResearchQueue({ onGo, tools }) {
+  const { RUNS, STAGES } = useMainline();
   const tasks = useApi('/api/tasks', { online: true });
   const catalog = useApi('/api/catalog');
   const censusJobsApi = useApi('/api/census/jobs', { online: true });

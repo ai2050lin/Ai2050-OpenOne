@@ -3,6 +3,7 @@
    中线 = HiddenState；彩线 = 各因素在“问题中的目标名”位置的差异幅度（std_rms），离中线越远越大。
    都是 discovery 上的候选观察：注意力去向不等于计算使用，逐层读出是近似。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { panScene, useScenePointer } from '../scenePointer.js';
 
 import './assoc_space.css';
 
@@ -65,12 +66,12 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live, ba
   useEffect(() => {
     const cv = canvasRef.current, ctx = cv.getContext('2d'), { W, H } = sizeRef.current;
     if (!W) return;
-    const { yaw, pitch } = viewRef.current;
+    const { yaw, pitch, panX = 0, panY = 0 } = viewRef.current;
     const proj = (x, y, z) => {
       const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
       const x1 = x * cy - z * sy, z1 = x * sy + z * cy, y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
       const s = Math.min(W * 0.95, H * 1.15) / 2.8, f = 7 / (7 + z2);
-      return [W / 2 + x1 * s * f, H * 0.5 - y1 * s * f];
+      return [W / 2 + panX + x1 * s * f, H * 0.5 + panY - y1 * s * f];
     };
     const quad = (pts, fill, stroke, lw = 1) => {
       ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
@@ -144,15 +145,18 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live, ba
     }
   }, [cur, ci, scope, view, facOn, selHead, tick, data, hmax, live, band]);
 
-  /* 拖动旋转、点层板选层 */
-  const drag = useRef(null);
-  const onDown = e => { drag.current = { x: e.clientX, y: e.clientY, ...viewRef.current, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); };
-  const onMove = e => { const d = drag.current; if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
-    viewRef.current = { yaw: d.yaw + dx * 0.008, pitch: Math.max(-0.2, Math.min(1.45, d.pitch + dy * 0.006)) }; setTick(t => t + 1); };
-  const onUp = e => { const d = drag.current; drag.current = null; if (!d || d.moved) return;
-    const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, plates = platesRef.current;
-    for (let i = plates.length - 1; i >= 0; i--) if (inPoly(x, y, plates[i].poly)) { setPlaying(false); onCur(plates[i].l); setCard(true); break; } };
+  const pointer = useScenePointer({
+    onPan: (dx, dy) => { viewRef.current = panScene(viewRef.current, dx, dy); setTick(t => t + 1); },
+    onRotate: (dx, dy) => {
+      const v = viewRef.current;
+      viewRef.current = { ...v, yaw: v.yaw + dx * 0.008, pitch: Math.max(-0.2, Math.min(1.45, v.pitch + dy * 0.006)) };
+      setTick(t => t + 1);
+    },
+    onPick: e => {
+      const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, plates = platesRef.current;
+      for (let i = plates.length - 1; i >= 0; i--) if (inPoly(x, y, plates[i].poly)) { setPlaying(false); onCur(plates[i].l); setCard(true); break; }
+    },
+  });
   const onKey = e => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); setPlaying(false); onCur(Math.min(36, ci + 1)); }
     if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); setPlaying(false); onCur(Math.max(0, ci - 1)); }
@@ -172,11 +176,11 @@ export default function AssocFlow3D({ data, cur, onCur, facOn, selHead, live, ba
     </div>
     {toolbar}
     <div className="af-body">
-      <canvas ref={canvasRef} tabIndex={0} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onKeyDown={onKey}
+      <canvas ref={canvasRef} tabIndex={0} {...pointer} onKeyDown={onKey}
         aria-label={`37 块层板自下而上排列，当前第 ${ci} 层。方向键换层，回车看详情。`} />
       {!card && <div className="af-overlay" aria-live="polite"><b>{ci === 0 ? '词嵌入' : `第 ${ci} 层`}</b>
         <span className="v8-note">按资料 {sign(data.lensDoc[ci])} · 按现实 {sign(data.lensReal[ci])}</span></div>}
-      {!card && <div className="af-hint v8-note">点任一层板看详情 · 拖动旋转</div>}
+      {!card && <div className="af-hint v8-note">点任一层板看详情 · 左键拖动平移 · 右键拖动旋转</div>}
       {card && <aside className="af-card" aria-label="当前层详情">
         <button type="button" className="af-x" aria-label="关闭详情" onClick={() => setCard(false)}>×</button>
         <div><b className="af-big">{ci === 0 ? '词嵌入' : `第 ${ci} 层`}</b><div className="v8-note">{ci === 0 ? '只有词身份，作基线' : `第 ${ci - 1} 块输出 · hs[${ci}]`}</div></div>
