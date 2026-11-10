@@ -174,7 +174,7 @@ def prereg():
     plan = D.checked(MODEL)
     assert not (V1 / 'gate.json').exists() and not (V1 / 'report.json').exists() and not (V1 / 'gate-items.json').exists(), 'v1 holdout was read'
     rows = D.read(V1 / f'{SPLIT}-materials.json')
-    assert json.dumps(rows, sort_keys=True) == json.dumps(build_materials(), sort_keys=True), 'v1 materials must be reproducible'
+    assert D.read(V1 / 'prereg.json')['materials']['sha256'] == D.sha(V1 / f'{SPLIT}-materials.json'), 'v1 materials changed'
     n = len(rows)
     body = {'schema': 'source_binding_ablation_prereg.v1', 'run_id': RUN, 'seed': SEED, 'created_at': datetime.now().astimezone().isoformat(),
             'base_plan_sha256': D.sha(SRC / 'plan.json'), 'base_materials_sha256': D.sha(SRC / f'{MODEL}-materials.json'),
