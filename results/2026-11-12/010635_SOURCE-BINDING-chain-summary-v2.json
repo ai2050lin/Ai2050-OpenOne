@@ -1,0 +1,1441 @@
+{
+ "schema": "result.v1",
+ "name": "SOURCE-BINDING-chain-summary-v2",
+ "provenance": {
+  "git_sha": "c62069e6d30dab5cf71ac818e1d3b4de67a16ae1",
+  "git_dirty": true,
+  "model_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\Qwen3-14B",
+  "model_revision": "sha8:e73c3664",
+  "seed": 0,
+  "tool": "SOURCE-BINDING-CHAIN-20261112-v2",
+  "created_at": "2026-11-12T01:06:35"
+ },
+ "payload": {
+  "run": "SOURCE-BINDING-CHAIN-20261112-v2",
+  "kind": "summary of Claude Phases 396-411, revision 2 of the Phase 408 summary; no model run",
+  "supersedes": "results/2026-11-11/202044_SOURCE-BINDING-chain-summary.json (kept; revision 1)",
+  "task": "SOURCE-BINDING-20261110-v1",
+  "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+  "natural_short_chain": [
+   "E1",
+   "E2",
+   "N1",
+   "N2",
+   "E8"
+  ],
+  "backup_routes": [
+   "E3",
+   "E4",
+   "E5",
+   "E6",
+   "E7",
+   "N3"
+  ],
+  "cards": [
+   {
+    "id": "SB.H.21.5",
+    "kind": "attention_head",
+    "block": 21,
+    "heads": [
+     5,
+     7
+    ],
+    "position": "entity-name tokens of the question",
+    "role": "reads the four records into the entity-name tokens; either head alone suffices",
+    "causal": [
+     {
+      "phase": 407,
+      "value": 0.921,
+      "what": "only head 21.5 may use the edge (floor 0.626, random heads 0.62-0.65)"
+     },
+     {
+      "phase": 407,
+      "value": 0.686,
+      "what": "necessary set (32 heads, rule not met, flagged) blocked and edge closed after window; random 1.000"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 407,
+      "key": "qent.H1_sufficient",
+      "verdict": "supported"
+     },
+     {
+      "phase": 407,
+      "key": "qent.H2_necessary_in_window",
+      "verdict": "supported"
+     },
+     {
+      "phase": 407,
+      "key": "qent.H3_no_later_compensation",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "blocking 21.5 or 21.7 alone has no effect (mutual backup); no small necessary set found; H2 passed narrowly (0.686 against 0.70)",
+    "grade": "in-scope intervention, held-out entities, pre-registered",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "revised_in": null,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.H.early8",
+    "kind": "attention_head_set",
+    "block": "4-11",
+    "heads": [
+     [
+      9,
+      3
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      4,
+      10
+     ],
+     [
+      5,
+      15
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      9,
+      1
+     ],
+     [
+      9,
+      37
+     ],
+     [
+      11,
+      38
+     ]
+    ],
+    "position": "archive-name token of the question",
+    "role": "reads the header line of the requested archive into the archive-name token",
+    "causal": [
+     {
+      "phase": 407,
+      "value": 0.814,
+      "what": "only these 8 heads may use the edge (floor 0.569, random heads 0.57)"
+     },
+     {
+      "phase": 407,
+      "value": 0.587,
+      "what": "12-head necessary set blocked and edge closed after window; random 0.89"
+     },
+     {
+      "phase": 407,
+      "value": 1.0,
+      "what": "12-head set blocked, later blocks untouched: no loss"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 407,
+      "key": "qsrc.H1_sufficient",
+      "verdict": "supported"
+     },
+     {
+      "phase": 407,
+      "key": "qsrc.H2_necessary_in_window",
+      "verdict": "supported"
+     },
+     {
+      "phase": 407,
+      "key": "qsrc.H3_no_later_compensation",
+      "verdict": "not_supported"
+     }
+    ],
+    "counter": "later blocks compensate (H3 not supported); window end rule not met (flagged); strongest single head reaches only 0.744",
+    "grade": "in-scope intervention, held-out entities, pre-registered; distributed and redundant in time",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "revised_in": null,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.qsrc.block",
+    "kind": "residual_state",
+    "block": "16-22",
+    "position": "archive-name token of the question",
+    "role": "carries which archive block (first / second) holds the requested record",
+    "causal": [
+     {
+      "phase": 406,
+      "value": 0.809,
+      "what": "state swapped from other-archive-order donor at block 16: other-archive answers"
+     },
+     {
+      "phase": 406,
+      "value": 0.981,
+      "what": "same at block 22"
+     },
+     {
+      "phase": 409,
+      "value": 0.9801,
+      "what": "archive-name token exchanged at block 18, 15 donor relations: agreement of the graph"
+     },
+     {
+      "phase": 409,
+      "value": 0.9974,
+      "what": "same at block 22"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 406,
+      "key": "N1_carriers",
+      "verdict": "supported"
+     },
+     {
+      "phase": 406,
+      "key": "N2_non_carriers",
+      "verdict": "supported"
+     },
+     {
+      "phase": 409,
+      "key": "F3",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "the pre-registered position prediction for this series was wrong (it carries only the block dimension), so N2 is vacuous for it; effect gone by block 26",
+    "grade": "in-scope intervention, held-out entities, natural configuration",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.qent.line",
+    "kind": "residual_state",
+    "block": 22,
+    "position": "entity-name tokens of the question",
+    "role": "carries, for each archive block, the line that holds the requested entity (a map block -> line), not one line",
+    "causal": [
+     {
+      "phase": 406,
+      "value": 0.874,
+      "what": "state swapped from other-entity-order donor at block 22: other-entity answers"
+     },
+     {
+      "phase": 406,
+      "value": 0.996,
+      "what": "both names swapped at block 22: answer follows position"
+     },
+     {
+      "phase": 409,
+      "value": 0.9299,
+      "what": "entity-name tokens exchanged at block 22: agreement of the map reading"
+     },
+     {
+      "phase": 409,
+      "value": 0.4544,
+      "what": "same edits: agreement of the single-line reading"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 406,
+      "key": "N1_carriers",
+      "verdict": "supported"
+     },
+     {
+      "phase": 409,
+      "key": "F1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 409,
+      "key": "F2",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "absent before block 22 (0.000-0.008 at blocks 16-20); 0.408 at block 24",
+    "grade": "in-scope intervention, held-out entities, natural configuration",
+    "role_revision_1": "carries which line inside an archive block holds the requested entity",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.R.pointer",
+    "kind": "residual_state",
+    "block": "20-24",
+    "position": "relay R (line break after the user turn)",
+    "role": "two separable dimensions: archive block and line; mostly ordinal position, partly content",
+    "causal": [
+     {
+      "phase": 404,
+      "value": 0.999,
+      "what": "only archive name readable: archive right"
+     },
+     {
+      "phase": 404,
+      "value": 0.514,
+      "what": "only archive name readable: entity at chance"
+     },
+     {
+      "phase": 404,
+      "value": 0.932,
+      "what": "archive dimension swapped at block 24: other-archive answers"
+     },
+     {
+      "phase": 404,
+      "value": 0.927,
+      "what": "entity dimension swapped: other-entity answers"
+     },
+     {
+      "phase": 404,
+      "value": 0.755,
+      "what": "two single-dimension shifts added: both-wrong record (random vector keeps 0.892)"
+     },
+     {
+      "phase": 405,
+      "value": 0.893,
+      "what": "conflict donor (both layout factors): follows position"
+     },
+     {
+      "phase": 405,
+      "value": 0.02,
+      "what": "same donor: follows content"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 403,
+      "key": "W1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 404,
+      "key": "K1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 404,
+      "key": "K2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 404,
+      "key": "X1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 404,
+      "key": "X2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 404,
+      "key": "X3",
+      "verdict": "supported"
+     },
+     {
+      "phase": 405,
+      "key": "L1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 405,
+      "key": "L2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 405,
+      "key": "L3",
+      "verdict": "supported"
+     },
+     {
+      "phase": 405,
+      "key": "L4",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "line dimension only about two thirds positional (0.66-0.68 against 0.32-0.34 content); measured in the isolated configuration; in the natural one R also reads the question at blocks 24-27",
+    "grade": "in-scope intervention, held-out entities and held-out layout factor, pre-registered",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.R.query",
+    "kind": "residual_state",
+    "block": "24-25",
+    "position": "relay R",
+    "role": "the query that selects the record for head 30.4; formed from several redundant sources",
+    "causal": [
+     {
+      "phase": 402,
+      "value": 0.331,
+      "what": "R reads nothing from block 24 on"
+     },
+     {
+      "phase": 402,
+      "value": 0.994,
+      "what": "R reads nothing from block 26 on: query already formed"
+     },
+     {
+      "phase": 402,
+      "value": 0.273,
+      "what": "four source groups blocked together"
+     },
+     {
+      "phase": 402,
+      "value": 0.919,
+      "what": "only the four records readable"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 402,
+      "key": "V1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 402,
+      "key": "V2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 402,
+      "key": "V3",
+      "verdict": "supported"
+     },
+     {
+      "phase": 402,
+      "key": "A1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 402,
+      "key": "A2",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "no single group is necessary; the necessary set is not complete",
+    "grade": "in-scope intervention, held-out entities, pre-registered",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.H.28.21",
+    "kind": "attention_head",
+    "block": 28,
+    "heads": [
+     21
+    ],
+    "position": "relay R",
+    "role": "assists head 30.4; attends to the correct record",
+    "causal": [
+     {
+      "phase": 400,
+      "value": 0.958,
+      "what": "only 30.4 and 28.21 may read the correct record (random heads 0.000)"
+     },
+     {
+      "phase": 400,
+      "value": 0.949,
+      "what": "28.21 alone blocked in window"
+     },
+     {
+      "phase": 411,
+      "value": 0.9388,
+      "what": "the same head at the FINAL position, natural run: alone sufficient for the direct fetch (card SB.H.28.21.final)"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 400,
+      "key": "H1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P1",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "alone neither sufficient (0.005) nor necessary (0.949)",
+    "grade": "in-scope intervention, held-out entities, pre-registered",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.H.30.4",
+    "kind": "attention_head",
+    "block": 30,
+    "heads": [
+     4
+    ],
+    "position": "relay R",
+    "role": "reads the value token of the record the query points to and writes the value into R",
+    "causal": [
+     {
+      "phase": 400,
+      "value": 0.29,
+      "what": "blocked inside the window (random head of block 30: 0.997)"
+     },
+     {
+      "phase": 400,
+      "value": 0.216,
+      "what": "blocked, everything else untouched"
+     },
+     {
+      "phase": 401,
+      "value": 0.964,
+      "what": "attention mass on the correct record"
+     },
+     {
+      "phase": 401,
+      "value": 0.957,
+      "what": "query swapped from a donor asking for another record: answer follows donor"
+     },
+     {
+      "phase": 401,
+      "value": 0.953,
+      "what": "head output swapped: answer follows donor"
+     },
+     {
+      "phase": 401,
+      "value": 0.997,
+      "what": "may read only the value token"
+     },
+     {
+      "phase": 401,
+      "value": 0.232,
+      "what": "may not read the value token"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 400,
+      "key": "H1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 400,
+      "key": "H2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 400,
+      "key": "H3",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P2a",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P2b",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P3",
+      "verdict": "supported"
+     },
+     {
+      "phase": 401,
+      "key": "P4",
+      "verdict": "supported"
+     }
+    ],
+    "counter": "alone sufficient only to 0.217; a same-request donor with reversed archive order moves only 0.42 of the attention mass (the query is positional)",
+    "grade": "in-scope intervention, held-out entities, pre-registered; necessary single head",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "revised_in": 412,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.final.centre",
+    "kind": "residual_subspace",
+    "block": 36,
+    "position": "final position",
+    "role": "the answer sits in the 15-dimensional subspace spanned by the answer-word class means, not in the output-weight subspace",
+    "causal": [
+     {
+      "phase": 396,
+      "value": 0.279,
+      "what": "centre subspace deleted and all context blocked"
+     },
+     {
+      "phase": 396,
+      "value": 0.806,
+      "what": "norm-matched nuisance subspace deleted and all context blocked"
+     },
+     {
+      "phase": 396,
+      "value": 0.969,
+      "what": "output-weight subspace deleted and all context blocked"
+     },
+     {
+      "phase": 396,
+      "value": 0.856,
+      "what": "centre subspace deleted only: later blocks re-fetch"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 396,
+      "key": "36.Q2b",
+      "verdict": "supported"
+     },
+     {
+      "phase": 396,
+      "key": "36.Q1",
+      "verdict": "inconclusive"
+     },
+     {
+      "phase": 396,
+      "key": "36.Q2",
+      "verdict": "not_supported"
+     }
+    ],
+    "counter": "single-layer deletion is not a test of necessity (Q1 inconclusive); main layer chosen after the discovery pilot; seen answer words only",
+    "grade": "in-scope intervention, held-out entities, pre-registered main layer",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "revised_in": null,
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "output-weight subspace deletion keeps 0.969: the answer is not mainly in that subspace",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.H.25.18",
+    "kind": "attention_head",
+    "block": 25,
+    "heads": [
+     18
+    ],
+    "position": "final position (outputs the answer)",
+    "role": "reads the archive-name token and the entity-name tokens of the question directly; the same head for both",
+    "causal": [
+     {
+      "phase": 410,
+      "value": 0.9805,
+      "what": "archive name: only the final position may read it, only in blocks 24-25, only head 25.18 (random heads 0.4987)"
+     },
+     {
+      "phase": 410,
+      "value": 0.9049,
+      "what": "entity name: same (random heads 0.5)"
+     },
+     {
+      "phase": 410,
+      "value": 0.5391,
+      "what": "archive name: blocks 24-25 open, heads 25.18 / 25.15 / 25.16 cut (random heads 1.0)"
+     },
+     {
+      "phase": 410,
+      "value": 0.6536,
+      "what": "entity name: blocks 24-25 open, heads 25.18 / 25.15 cut"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 410,
+      "key": "qsrc.H0",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qsrc.H0w",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qsrc.H1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qsrc.H2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qsrc.H3",
+      "verdict": "not_supported"
+     },
+     {
+      "phase": 410,
+      "key": "qent.H0",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qent.H0w",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qent.H1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qent.H2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 410,
+      "key": "qent.H3",
+      "verdict": "not_supported"
+     }
+    ],
+    "counter": "compensated in the natural run: cutting these heads alone keeps 1.000 / 0.974; with the final position unable to read the names at all 0.969 / 0.781 remain (other positions read them). What the head reads (pointer or name) is not separated",
+    "grade": "in-scope intervention, held-out entities, pre-registered",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.H.28.21.final",
+    "kind": "attention_head",
+    "block": 28,
+    "heads": [
+     21
+    ],
+    "position": "final position (outputs the answer)",
+    "role": "attends to the four code-word tokens and selects the one of the requested record (direct fetch)",
+    "causal": [
+     {
+      "phase": 411,
+      "value": 0.9388,
+      "what": "in blocks >= 26 the final position sees only the four code words, only in block 28, only head 28.21 (random heads 0.3203)"
+     },
+     {
+      "phase": 411,
+      "value": 0.6901,
+      "what": "block 28 open, six heads cut (random six heads 0.9974)"
+     },
+     {
+      "phase": 411,
+      "value": 0.0352,
+      "what": "natural run, only the correct code word hidden: the head copies another record"
+     }
+    ],
+    "verdicts": [
+     {
+      "phase": 411,
+      "key": "final.H0",
+      "verdict": "supported"
+     },
+     {
+      "phase": 411,
+      "key": "final.H0w",
+      "verdict": "supported"
+     },
+     {
+      "phase": 411,
+      "key": "final.H1",
+      "verdict": "supported"
+     },
+     {
+      "phase": 411,
+      "key": "final.H2",
+      "verdict": "supported"
+     },
+     {
+      "phase": 411,
+      "key": "final.H3",
+      "verdict": "not_supported"
+     }
+    ],
+    "counter": "compensated in the natural run: cutting the six heads keeps 0.997, hiding all four code words keeps 1.000. QK / OV not decomposed. The necessary-set verdict passes close to its threshold (0.690 against 0.70)",
+    "grade": "in-scope intervention, held-out entities, pre-registered",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   },
+   {
+    "id": "SB.S.answer.copies",
+    "kind": "state_structure",
+    "block": "26-39",
+    "position": "relay R; the four tokens of the empty think block",
+    "role": "each already holds an answer the final position can copy; with the direct fetch three mutually redundant sources",
+    "causal": [
+     {
+      "phase": 411,
+      "value": 1.0,
+      "what": "in blocks >= 26 the final position sees only R"
+     },
+     {
+      "phase": 411,
+      "value": 1.0,
+      "what": "only the think block"
+     },
+     {
+      "phase": 411,
+      "value": 0.9948,
+      "what": "only the four code words"
+     },
+     {
+      "phase": 411,
+      "value": 0.8685,
+      "what": "code words and R hidden"
+     },
+     {
+      "phase": 411,
+      "value": 0.418,
+      "what": "code words, R and the think block hidden"
+     },
+     {
+      "phase": 411,
+      "value": 0.3203,
+      "what": "everything hidden"
+     }
+    ],
+    "verdicts": [],
+    "counter": "descriptive arms, no pre-registered verdict. Where the answer at the think positions comes from is not tested. With the sources in conflict the direct fetch wins (0.0352 when only the correct code word is hidden)",
+    "grade": "in-scope intervention, held-out entities, descriptive",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "model": "Qwen3-14B bf16",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "natural_corpus_statistics": "not measured",
+    "unembedding_readout": "not measured",
+    "formal_promotion": 0
+   }
+  ],
+  "edges": [
+   {
+    "id": "E1",
+    "source": "header line of the requested archive",
+    "target": "SB.S.qsrc.block",
+    "via": "SB.H.early8",
+    "blocks": "4-11",
+    "type": "in-scope intervention (attention edge, per head)",
+    "numbers": [
+     {
+      "phase": 407,
+      "value": 0.814,
+      "what": "sufficient set only"
+     },
+     {
+      "phase": 407,
+      "value": 0.587,
+      "what": "necessary set blocked, edge closed later"
+     }
+    ],
+    "status": "supported, but redundant in time: blocks from 12 on can re-read the header line",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E2",
+    "source": "the four records",
+    "target": "SB.S.qent.line",
+    "via": "SB.H.21.5",
+    "blocks": "18-25",
+    "type": "in-scope intervention (attention edge, per head)",
+    "numbers": [
+     {
+      "phase": 407,
+      "value": 0.921,
+      "what": "head 21.5 only"
+     },
+     {
+      "phase": 407,
+      "value": 0.686,
+      "what": "32 heads blocked"
+     }
+    ],
+    "status": "supported; 21.5 and 21.7 back each other up",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E3",
+    "source": "SB.S.qsrc.block",
+    "target": "SB.S.R.pointer",
+    "via": "not located (R attends to the archive-name token)",
+    "blocks": "20-23",
+    "type": "in-scope intervention (attention mask, all heads; state swap)",
+    "numbers": [
+     {
+      "phase": 404,
+      "value": 0.999,
+      "what": "only archive name readable: archive right"
+     },
+     {
+      "phase": 403,
+      "value": 0.999,
+      "what": "natural configuration: blocking the question in 20-23 costs nothing"
+     }
+    ],
+    "status": "supported in the isolated configuration; in the natural one a direct route at blocks 24-27 replaces it",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E4",
+    "source": "SB.S.qent.line",
+    "target": "SB.S.R.pointer",
+    "via": "not located (R attends to the entity-name tokens)",
+    "blocks": "20-23",
+    "type": "in-scope intervention (attention mask, all heads; state swap)",
+    "numbers": [
+     {
+      "phase": 404,
+      "value": 0.587,
+      "what": "only entity name readable: archive at chance, entity 1.000"
+     }
+    ],
+    "status": "supported in the isolated configuration",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E5",
+    "source": "SB.S.R.pointer",
+    "target": "SB.S.R.query",
+    "via": "not decomposed",
+    "blocks": "24-25",
+    "type": "in-scope intervention (state swap, query swap)",
+    "numbers": [
+     {
+      "phase": 404,
+      "value": 0.932,
+      "what": "pointer state swapped: other record chosen"
+     },
+     {
+      "phase": 401,
+      "value": 0.957,
+      "what": "query of head 30.4 swapped: answer follows"
+     }
+    ],
+    "status": "supported end to end; the map from pointer state to the query vector is not decomposed",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E6",
+    "source": "value token of the pointed record",
+    "target": "relay R (answer value)",
+    "via": "SB.H.30.4 with SB.H.28.21",
+    "blocks": "28-31",
+    "type": "in-scope intervention (attention edge per head; query and output swaps)",
+    "numbers": [
+     {
+      "phase": 399,
+      "value": 0.884,
+      "what": "R may read only the correct record"
+     },
+     {
+      "phase": 399,
+      "value": 0.004,
+      "what": "R may not read the correct record: a definite wrong value"
+     },
+     {
+      "phase": 400,
+      "value": 0.958,
+      "what": "two heads only"
+     },
+     {
+      "phase": 400,
+      "value": 0.29,
+      "what": "head 30.4 blocked in window"
+     }
+    ],
+    "status": "supported; single route without redundancy",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E7",
+    "source": "relay R (answer value)",
+    "target": "SB.S.final.centre",
+    "via": "not located (final position attends to R)",
+    "blocks": "24-36",
+    "type": "in-scope intervention (attention mask, all heads)",
+    "numbers": [
+     {
+      "phase": 397,
+      "value": 1.0,
+      "what": "final position may read only R"
+     },
+     {
+      "phase": 397,
+      "value": 0.401,
+      "what": "R, the line break after </think> and the records blocked together"
+     },
+     {
+      "phase": 397,
+      "value": 0.262,
+      "what": "all context blocked"
+     }
+    ],
+    "status": "supported; one of three redundant routes, the joint block leaves 0.401",
+    "configuration": "isolated configuration (final position restricted to R); in the natural run a backup route: exchanging the state of R never changes the answer (Phase 409), only R visible to the final position still gives 1.000 (Phase 411)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "E8",
+    "source": "SB.S.final.centre",
+    "target": "output answer word",
+    "via": "blocks 36-39 and unembedding",
+    "blocks": "36-39",
+    "type": "in-scope intervention (subspace deletion)",
+    "numbers": [
+     {
+      "phase": 396,
+      "value": 0.279,
+      "what": "centre deleted"
+     },
+     {
+      "phase": 396,
+      "value": 0.806,
+      "what": "norm-matched control deleted"
+     }
+    ],
+    "status": "supported at the pre-registered main layer",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "N1",
+    "source": "SB.S.qsrc.block, SB.S.qent.line",
+    "target": "final position (pointer read)",
+    "via": "SB.H.25.18 (25.15, 25.16 assist)",
+    "blocks": "24-25",
+    "type": "in-scope intervention (attention mask, per head)",
+    "numbers": [
+     {
+      "phase": 410,
+      "value": 1.0,
+      "what": "only the final position may read the name token (both tokens)"
+     },
+     {
+      "phase": 410,
+      "value": 0.9805,
+      "what": "head 25.18 alone, archive name"
+     },
+     {
+      "phase": 410,
+      "value": 0.9049,
+      "what": "head 25.18 alone, entity name"
+     }
+    ],
+    "status": "supported as a sufficient route; redundant in the natural run",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "N2",
+    "source": "code-word token of the pointed record",
+    "target": "final position (answer value)",
+    "via": "SB.H.28.21.final",
+    "blocks": "28",
+    "type": "in-scope intervention (attention mask, per head)",
+    "numbers": [
+     {
+      "phase": 411,
+      "value": 0.9974,
+      "what": "the four code words visible only in block 28"
+     },
+     {
+      "phase": 411,
+      "value": 0.9388,
+      "what": "head 28.21 alone"
+     }
+    ],
+    "status": "supported as a sufficient route; redundant in the natural run",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   },
+   {
+    "id": "N3",
+    "source": "SB.S.answer.copies",
+    "target": "final position (answer value)",
+    "via": "not located",
+    "blocks": "26-39",
+    "type": "in-scope intervention (attention mask, all heads), descriptive",
+    "numbers": [
+     {
+      "phase": 411,
+      "value": 1.0,
+      "what": "only R visible"
+     },
+     {
+      "phase": 411,
+      "value": 0.418,
+      "what": "all three sources hidden"
+     }
+    ],
+    "status": "descriptive; replaces the reading of E7 as the main route",
+    "configuration": "natural run (nothing restricted except the edit itself)",
+    "scope": "Qwen3-14B bf16; source-binding four-way choice (chance 0.25); new entity names, seen answer words and frames; one model, one task",
+    "formal_promotion": 0
+   }
+  ],
+  "fidelity": {
+   "phase": 409,
+   "numbers": [
+    {
+     "phase": 409,
+     "value": 0.9833,
+     "what": "name-token edits never run before: agreement of the graph"
+    },
+    {
+     "phase": 409,
+     "value": 0.7045,
+     "what": "same edits: best baseline (name only)"
+    },
+    {
+     "phase": 409,
+     "value": 0.5907,
+     "what": "R and other question tokens: agreement of the revision-1 graph (no effect: 1.0)"
+    }
+   ]
+  },
+  "gaps": [
+   "how reading the header line (blocks 4-11) becomes the block pointer on the archive-name token (blocks 14-16)",
+   "which heads move the pointers from the name tokens to R (blocks 20-23) and from the question to R directly (24-27)",
+   "how the pointer state at R is turned into the query vector of head 30.4 (blocks 24-27); MLP role not tested",
+   "the residual of every step (sufficient sets reach 0.81-0.96, not 1.00)",
+   "no dictionary features, no natural-corpus activation statistics, no unembedding read-out of the heads",
+   "one model, one task, seen answer words and frames; GLM-4-9B did not pass the behaviour gate of this task",
+   "what head 25.18 reads from the name tokens (position pointer or name) and how the final position turns it into the query of 28.21",
+   "where the answer at the think positions comes from; which heads let the final position copy from R and from the think block",
+   "arbitration between the three sources is known only for one conflict (correct code word hidden: the direct fetch wins)",
+   "fidelity was measured for one family of edits (state exchange of name tokens and R), four candidate words; see Phases 409 and 412"
+  ],
+  "sources": {
+   "396": {
+    "result_file": "results/2026-11-10/175250_SOURCE-BINDING-ablation-holdout.json",
+    "result_sha8": "916e9e3b",
+    "report": "tests/glm5/result/source_binding_ablation_v2/report.json",
+    "report_sha256": "195e75ba96546e3412a79cd154d3cbb05b26a3ec01c01d75892338ddb8f5e80c",
+    "run": "SOURCE-BINDING-ABLATION-20261110-v2",
+    "git_sha": "f5864bf6fd537dda73e110e8f680011f423bf790",
+    "seed": 202611100396,
+    "verdicts": {
+     "24": {
+      "controls_valid": true,
+      "equal_removal_matched": true,
+      "Q1_equal_removal": "not_supported",
+      "Q2_refetch": "not_supported",
+      "Q2b_necessary_without_refetch": "not_testable"
+     },
+     "28": {
+      "controls_valid": true,
+      "equal_removal_matched": true,
+      "Q1_equal_removal": "not_supported",
+      "Q2_refetch": "not_supported",
+      "Q2b_necessary_without_refetch": "not_testable"
+     },
+     "32": {
+      "controls_valid": true,
+      "equal_removal_matched": true,
+      "Q1_equal_removal": "inconclusive",
+      "Q2_refetch": "not_supported",
+      "Q2b_necessary_without_refetch": "not_testable"
+     },
+     "36": {
+      "controls_valid": true,
+      "equal_removal_matched": true,
+      "Q1_equal_removal": "inconclusive",
+      "Q2_refetch": "not_supported",
+      "Q2b_necessary_without_refetch": "supported"
+     }
+    }
+   },
+   "397": {
+    "result_file": "results/2026-11-10/224039_SOURCE-BINDING-relay-holdout.json",
+    "result_sha8": "01826f71",
+    "report": "tests/glm5/result/source_binding_relay_v1/report.json",
+    "report_sha256": "b7413200901b7e30263aab61d03060169f95a6fb69602b28805353f306da5dce",
+    "run": "SOURCE-BINDING-RELAY-20261110-v1",
+    "git_sha": "49f7de15c26a357e64ae9c1a46c73c6db0cddf91",
+    "seed": 202611100397,
+    "verdicts": {
+     "controls_valid": true,
+     "R1_sufficient": "supported",
+     "R2_necessary": "supported",
+     "R3_redundant_routes": "supported"
+    }
+   },
+   "399": {
+    "result_file": "results/2026-11-11/003104_SOURCE-BINDING-upstream-holdout.json",
+    "result_sha8": "fdf3ba0a",
+    "report": "tests/glm5/result/source_binding_upstream_v1/report.json",
+    "report_sha256": "75e7e4a7d2b650ad255054c77725cdde4886c546b8810a4a2a7c957ee757d34c",
+    "run": "SOURCE-BINDING-UPSTREAM-20261110-v1",
+    "git_sha": "f9cad6061b6aaa056c8c2cd8fb782f3554d53b8a",
+    "seed": 202611100398,
+    "verdicts": {
+     "controls_valid": true,
+     "U1_sufficient": "supported",
+     "U2_necessary": "supported",
+     "U3_redundant_routes": "not_applicable"
+    }
+   },
+   "400": {
+    "result_file": "results/2026-11-11/025431_SOURCE-BINDING-heads-holdout.json",
+    "result_sha8": "ac2b4329",
+    "report": "tests/glm5/result/source_binding_heads_v1/report.json",
+    "report_sha256": "dc173efa0ac09ec79d627226c658b4f061eab073e10d2de24a0ec8c2baacf4bc",
+    "run": "SOURCE-BINDING-HEADS-20261111-v1",
+    "git_sha": "37c6094435eacf78b4e6ab1d2aa3e3fc4ba0fe30",
+    "seed": 202611110400,
+    "verdicts": {
+     "controls_valid": true,
+     "H1_sufficient": "supported",
+     "H2_necessary_in_window": "supported",
+     "H3_no_later_compensation": "supported"
+    }
+   },
+   "401": {
+    "result_file": "results/2026-11-11/034145_SOURCE-BINDING-qkov-holdout.json",
+    "result_sha8": "d81dd98c",
+    "report": "tests/glm5/result/source_binding_qkov_v1/report.json",
+    "report_sha256": "148707fc312155e00c5ef0f5a86a173fecc62b921638966b12f083ca6164d41a",
+    "run": "SOURCE-BINDING-QKOV-20261111-v1",
+    "git_sha": "2971d313fc3e8b3760036a4052fc6bd0445ab142",
+    "seed": 202611110401,
+    "verdicts": {
+     "controls_valid": true,
+     "P1_attends_correct_record": "supported",
+     "P2a_query_redirects_attention": "supported",
+     "P2b_query_redirects_answer": "supported",
+     "P3_output_carries_value": "supported",
+     "P4_reads_value_token": "supported"
+    }
+   },
+   "402": {
+    "result_file": "results/2026-11-11/045534_SOURCE-BINDING-query-holdout.json",
+    "result_sha8": "8c9e86f4",
+    "report": "tests/glm5/result/source_binding_query_v1/report.json",
+    "report_sha256": "b28b08becbb31c6b8273b22abed5bd6c98037bbe4a6ae553385a77f92672e892",
+    "run": "SOURCE-BINDING-QUERY-20261111-v1",
+    "git_sha": "6c4960bc13e9f7d2254fd87de9664943433a1180",
+    "seed": 202611110402,
+    "verdicts": {
+     "controls_valid": true,
+     "V1_sufficient": "supported",
+     "V2_necessary": "supported",
+     "V3_redundant_routes": "supported",
+     "A1_query_formed_from_S": "supported",
+     "A2_query_lost_without_N": "supported"
+    }
+   },
+   "403": {
+    "result_file": "results/2026-11-11/052237_SOURCE-BINDING-request-holdout.json",
+    "result_sha8": "8bd92c9d",
+    "report": "tests/glm5/result/source_binding_request_v1/report.json",
+    "report_sha256": "9d4d1903aae4315dedcee0771041f61b5d661eadbeec09f4333882319d4e9583",
+    "run": "SOURCE-BINDING-REQUEST-20261111-v1",
+    "git_sha": "a9c5637a5de48f00b3e7da5be8f9f8afc4b19486",
+    "seed": 202611110403,
+    "verdicts": {
+     "controls_valid": true,
+     "W1_sufficient": "supported",
+     "W2_necessary": "supported",
+     "W3_redundant_routes": "supported",
+     "W4_direct_route_compensates": "supported"
+    }
+   },
+   "404": {
+    "result_file": "results/2026-11-11/055856_SOURCE-BINDING-twodim-holdout.json",
+    "result_sha8": "3d21ac7f",
+    "report": "tests/glm5/result/source_binding_twodim_v1/report.json",
+    "report_sha256": "47307facc530ca4692664db5f0d0cdae6487d00960e01148a6ab476016051ff7",
+    "run": "SOURCE-BINDING-TWODIM-20261111-v1",
+    "git_sha": "77c102bea7995e8aa66fd905fffdcf893908f9df",
+    "seed": 202611110404,
+    "verdicts": {
+     "controls_valid": true,
+     "K1_archive_name_gives_archive_only": "supported",
+     "K2_entity_name_gives_entity_only": "supported",
+     "X1_state_carries_archive": "supported",
+     "X2_state_carries_entity": "supported",
+     "X3_additive": "supported"
+    }
+   },
+   "405": {
+    "result_file": "results/2026-11-11/061629_SOURCE-BINDING-pointer-holdout.json",
+    "result_sha8": "7c2759d1",
+    "report": "tests/glm5/result/source_binding_pointer_v1/report.json",
+    "report_sha256": "dea01d080afe2107f681d3952f96af43649c4388be9f096ba4568ab25f2dfdca",
+    "run": "SOURCE-BINDING-POINTER-20261111-v1",
+    "git_sha": "8e8f0595192feba3ba5dfab8c2e21039b603bd7e",
+    "seed": 202611110405,
+    "verdicts": {
+     "controls_valid": true,
+     "L1_archive_order": "supported",
+     "L2_entity_order": "supported",
+     "L3_both_orders": "supported",
+     "L4_crossed": "supported"
+    }
+   },
+   "406": {
+    "result_file": "results/2026-11-11/064309_SOURCE-BINDING-nameloc-holdout.json",
+    "result_sha8": "c1163cc3",
+    "report": "tests/glm5/result/source_binding_nameloc_v1/report.json",
+    "report_sha256": "4ccc4c67864c84af131371296ecf75d8cc98ffd1842cbe83244e269322ee9b78",
+    "run": "SOURCE-BINDING-NAMELOC-20261111-v1",
+    "git_sha": "682dc847bf2cb03a490cadb5980dd2d114ec2a7a",
+    "seed": 202611110406,
+    "verdicts": {
+     "controls_valid": true,
+     "N1_carriers": "supported",
+     "N2_non_carriers": "supported"
+    }
+   },
+   "407": {
+    "result_file": "results/2026-11-11/105440_SOURCE-BINDING-writers-holdout.json",
+    "result_sha8": "e977659b",
+    "report": "tests/glm5/result/source_binding_writers_v1/report.json",
+    "report_sha256": "57c6ea6f629769a364d2ee683261b6547e31122871f269ece8d0d97840468ca8",
+    "run": "SOURCE-BINDING-WRITERS-20261111-v1",
+    "git_sha": "6820844951c1f0e7a167accc2dc2e3ee2556c929",
+    "seed": 202611110407,
+    "verdicts": {
+     "qsrc": {
+      "controls_valid": true,
+      "H1_sufficient": "supported",
+      "H2_necessary_in_window": "supported",
+      "H3_no_later_compensation": "not_supported"
+     },
+     "qent": {
+      "controls_valid": true,
+      "H1_sufficient": "supported",
+      "H2_necessary_in_window": "supported",
+      "H3_no_later_compensation": "supported"
+     }
+    }
+   },
+   "409": {
+    "result_file": "results/2026-11-11/213220_SOURCE-BINDING-fidelity-holdout.json",
+    "result_sha8": "c97b790e",
+    "report": "tests/glm5/result/source_binding_fidelity_v1/report.json",
+    "report_sha256": "c540363eb3b99fd0109eeef2e1835495c5c82bf731db0c2a55fd382e69fdd7f1",
+    "run": "SOURCE-BINDING-FIDELITY-20261111-v1",
+    "git_sha": "8f2dbbd897fb4247b53b3fe9c4769bdaf1295987",
+    "seed": 202611110409,
+    "verdicts": {
+     "controls_valid": true,
+     "F1_fidelity_in_scope": "supported",
+     "F2_beats_baselines": "supported",
+     "F3_replication": "supported"
+    }
+   },
+   "410": {
+    "result_file": "results/2026-11-12/000153_SOURCE-BINDING-readers-holdout.json",
+    "result_sha8": "15170e96",
+    "report": "tests/glm5/result/source_binding_readers_v1/report.json",
+    "report_sha256": "998d5483e913cad4656874c2c9e2f8d747c822f79610b76788a63881244b25c3",
+    "run": "SOURCE-BINDING-READERS-20261111-v1",
+    "git_sha": "42d8e4b3dde19b1d4d366262dec738c18e7b0c4d",
+    "seed": 202611110410,
+    "verdicts": {
+     "qsrc": {
+      "controls_valid": true,
+      "H0_edge_sufficient": "supported",
+      "H0w_window_sufficient": "supported",
+      "H1_heads_sufficient": "supported",
+      "H2_heads_necessary_in_route": "supported",
+      "H3_not_compensated_in_natural_run": "not_supported"
+     },
+     "qent": {
+      "controls_valid": true,
+      "H0_edge_sufficient": "supported",
+      "H0w_window_sufficient": "supported",
+      "H1_heads_sufficient": "supported",
+      "H2_heads_necessary_in_route": "supported",
+      "H3_not_compensated_in_natural_run": "not_supported"
+     }
+    }
+   },
+   "411": {
+    "result_file": "results/2026-11-12/004654_SOURCE-BINDING-fetch-holdout.json",
+    "result_sha8": "0c235f2c",
+    "report": "tests/glm5/result/source_binding_fetch_v1/report.json",
+    "report_sha256": "1cafa7d57eae0cb7f78972e9ad6454dec7eaf66823c50d1df2208531eb05b8be",
+    "run": "SOURCE-BINDING-FETCH-20261112-v1",
+    "git_sha": "01ed586e0d6d18e8b037dfe64e61b93d99e07624",
+    "seed": 202611120411,
+    "verdicts": {
+     "final": {
+      "controls_valid": true,
+      "H0_edge_sufficient": "supported",
+      "H0w_window_sufficient": "supported",
+      "H1_heads_sufficient": "supported",
+      "H2_heads_necessary_in_route": "supported",
+      "H3_not_compensated_in_natural_run": "not_supported"
+     }
+    }
+   }
+  },
+  "checks": {
+   "numbers_checked_against_reports": 79,
+   "reports_hash_matched": 14,
+   "verdicts_read_from_result_files": 55
+  },
+  "formal_promotion": 0
+ },
+ "sha8": "10666991"
+}
