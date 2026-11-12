@@ -111,7 +111,8 @@ CRITERIA = {
                   'block 24 with the best of none / identity / position; its own design count showed that position coincides with the '
                   'graph on every edit of that tier, so G2 could not be supported by construction. This was noticed after the '
                   'behaviour gate (unedited prompts only) and before any edit was run; v2b changes only the competitor set of G2. '
-                  'Materials, design, thresholds and all other rules are unchanged.',
+                  'Materials, thresholds and all other rules are unchanged; the donor draws were redrawn by the same rule because '
+                  'the seed stream contains the run id (design.json of v2: sha256 bdf3a087...).',
 }
 
 
