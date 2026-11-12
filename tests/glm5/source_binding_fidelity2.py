@@ -36,7 +36,7 @@ from source_binding_runtime import Runtime
 
 SRC, MODEL = D.OUT, 'qwen14'
 OUT = D.ROOT / 'tests/glm5/result/source_binding_fidelity_v2'
-RUN, SEED = 'SOURCE-BINDING-FIDELITY-20261112-v2', 202611120412
+RUN, SEED = 'SOURCE-BINDING-FIDELITY-20261112-v2b', 202611120412
 SPLIT, FAMILIES = 'holdout_fid2', 48
 CHUNK, BATCH, NB, NH, R_FROM_END, TOL, REPS = 256, 128, 40, 40, UP.R_FROM_END, 1.0, 4
 NAME_SITES, BACKUP_SITES = ('qsrc', 'qent', 'names'), ('R', 'think', 'Rthink', 'qrest')
@@ -89,8 +89,11 @@ CRITERIA = {
     'predictions_on_holdout': {
         'controls_valid': 'tail recomputation control holds',
         'G1_replication': {'supported': 'repl tier: agreement of graph >= 0.95', 'not_supported': '< 0.85'},
-        'G2_block_24': {'supported': 'new tier: agreement of graph >= 0.80, and graph minus the best of none / identity / position >= '
-                                     '0.10 with a family-bootstrap lower bound > 0', 'not_supported': 'agreement < 0.65 or difference <= 0'},
+        'G2_block_24': {'supported': 'new tier: agreement of graph >= 0.80, and graph minus the better of none / identity >= 0.10 with a '
+                                     'family-bootstrap lower bound > 0', 'not_supported': 'agreement < 0.65 or difference <= 0',
+                        'note': 'at a single layer the position baseline is the same rule as the graph (0 of 9,216 edits differ), so it '
+                                'cannot be a competitor here; the competitors are no effect (which is also graph_v1 at this layer) and '
+                                'name only'},
         'G3_backups': {'supported': 'backup tier: agreement of graph >= 0.95', 'not_supported': '< 0.85',
                        'note': 'not discriminating against the none baseline by construction; it tests that exchanging R and think, '
                                'separately and together, leaves the answer unchanged'}},
@@ -103,7 +106,12 @@ CRITERIA = {
     'disclosure': 'the rules restate results of panels that are already open (Phases 404-411); those panels are not reused. The rule for '
                   'R and qrest was changed after Phase 409 showed the revision-1 rule wrong, so on those sites this run is a '
                   'confirmation on a new panel, not an independent prediction. The engine was smoke-tested on 2 exposed families of '
-                  'pilot_name (Phase 406) before pre-registration, printing only the tail-recomputation control and counts.',
+                  'pilot_name (Phase 406) before pre-registration, printing only the tail-recomputation control and counts. '
+                  'Version v2 of this pre-registration (kept as prereg-superseded.json, sha256 0f9a4169...) compared the graph at '
+                  'block 24 with the best of none / identity / position; its own design count showed that position coincides with the '
+                  'graph on every edit of that tier, so G2 could not be supported by construction. This was noticed after the '
+                  'behaviour gate (unedited prompts only) and before any edit was run; v2b changes only the competitor set of G2. '
+                  'Materials, design, thresholds and all other rules are unchanged.',
 }
 
 
@@ -431,6 +439,9 @@ def summarise(results, arms, rows):
         best = max(BASELINES, key=lambda m: body['agreement'][m]['rate'])
         body['best_baseline'] = best
         body['graph_minus_best_baseline'] = rate(A['graph'].astype(float) - A[best].astype(float), keep)
+        alt = max(('none', 'identity'), key=lambda m: body['agreement'][m]['rate'])
+        body['better_of_none_identity'] = alt
+        body['graph_minus_better_of_none_identity'] = rate(A['graph'].astype(float) - A[alt].astype(float), keep)
         body['where_graph_and_baseline_disagree'] = {
             b: {'n': int((keep & (A['graph'] != A[b])).sum()),
                 'graph_right': round(float(A['graph'][keep & (A['graph'] != A[b])].mean()), 4) if (keep & (A['graph'] != A[b])).any() else None}
@@ -491,7 +502,7 @@ def run():
         if v['controls_valid']:
             T = s['tiers']
             ag = lambda t: T[t]['agreement']['graph']['rate']
-            d = T['new']['graph_minus_best_baseline']
+            d = T['new']['graph_minus_better_of_none_identity']
             v['G1_replication'] = tri(ag('repl') >= .95, ag('repl') < .85)
             v['G2_block_24'] = tri(ag('new') >= .80 and d['rate'] >= .10 and d['ci95'][0] > 0, ag('new') < .65 or d['rate'] <= 0)
             v['G3_backups'] = tri(ag('backup') >= .95, ag('backup') < .85)
