@@ -32,6 +32,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENT = ROOT / 'deploy' / 'node_agent.py'
+sys.path.insert(0, str(ROOT))
+from deploy.storage_policy import StorageBlocked, check_write, stop_with_notice, storage_dir
 
 
 def http(base, path, method='GET', payload=None, admin=''):
@@ -101,12 +103,13 @@ def fmt(v, d=3):
 
 
 def write_report(args, family, tm, analysis, report, scoreboard, out_dir: Path):
-    out_dir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime('%Y%m%d-%H%M%S')
     tag = 'SYNTHETIC-' if args.synthetic else ''
     base = out_dir / f'{tag}{tm}-{stamp}'
-    base.with_suffix('.json').write_text(json.dumps({'analysis': analysis, 'report': report}, ensure_ascii=False, indent=1),
-                                         encoding='utf-8')
+    content = json.dumps({'analysis': analysis, 'report': report}, ensure_ascii=False, indent=1).encode('utf-8')
+    result = check_write(base.with_suffix('.json'), len(content), operation='模式族报告')
+    result.parent.mkdir(parents=True, exist_ok=True)
+    result.write_bytes(content)
     L = []
     if args.synthetic:
         L += ['> **SYNTHETIC — 方法与流程验证。** 数据由 runner_v3 合成模式按已知规律生成，不代表任何真实模型，不得写入研究记录。', '']
@@ -147,7 +150,8 @@ def write_report(args, family, tm, analysis, report, scoreboard, out_dir: Path):
     L += ['', '## 可视化', '', '客户端 → 空间 → 实验响应 → 选择模板 `' + tm + '` → 「3D 响应空间」「规律分析」。', '',
           '## 边界', '', '- 规律陈述来自观测统计与留出预测，属于候选稳定观测；选择性/充分性、必要性与自然生成需要干预实验。',
           '- 证据等级在 Research OS 登记；本报告不自动晋级。']
-    base.with_suffix('.md').write_text('\n'.join(L) + '\n', encoding='utf-8')
+    summary = ('\n'.join(L) + '\n').encode('utf-8')
+    check_write(base.with_suffix('.md'), len(summary), operation='模式族报告').write_bytes(summary)
     return base.with_suffix('.md')
 
 
@@ -162,7 +166,7 @@ def main():
     ap.add_argument('--dtype', default='bf16')
     ap.add_argument('--gpu', default='')
     ap.add_argument('--node-name', default='family-runner')
-    ap.add_argument('--data-dir', default=str(Path.home() / '.ai2050_agent'))
+    ap.add_argument('--data-dir', default=str(storage_dir('client', 'family-agent') if os.name == 'nt' else Path.home() / '.ai2050_agent'))
     ap.add_argument('--python', default=sys.executable)
     ap.add_argument('--run-timeout', type=float, default=7200.0)
     ap.add_argument('--pilot-per-cell', type=int, default=3)
@@ -177,6 +181,7 @@ def main():
     PROGRESS = args.progress
 
     env = dict(os.environ)
+    args.data_dir = str(check_write(args.data_dir, operation='模式族任务'))
     if args.synthetic:
         args.model_id = args.model_id or 'synthetic-family'
         args.model_rev = args.model_rev or 'synthetic-v1'
@@ -193,6 +198,7 @@ def main():
         args.model_id = args.model_id or Path(args.model_path).name
         args.model_rev = args.model_rev or model_rev_of(args.model_path)
         env.pop('AI2050_RUNNER_MODE', None)
+    args.report_dir = str(check_write(args.report_dir, operation='模式族报告'))
 
     progress(1, '文法预览', f'{args.family} × {args.model_id}')
     lib = http(args.center, '/api/grammar/library')
@@ -283,4 +289,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except StorageBlocked as error:
+        stop_with_notice(error)

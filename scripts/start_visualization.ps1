@@ -6,6 +6,7 @@ param(
     [ValidateRange(1, 65535)]
     [int]$Port = 5173,
     [switch]$Install,
+    [switch]$LocalBackend,
     # 守护方式（默认：VSCode 终端里自动脱管，普通终端里前台守护）
     #   -Detach     强制脱管：守护进程独立于本终端，VSCode reload / 关终端都不影响服务
     #   -Foreground 前台守护：Ctrl+C 停止，便于现场观察
@@ -173,6 +174,26 @@ try {
             exit $LASTEXITCODE
         }
         'client' {
+            if ($LocalBackend) {
+                $backendLauncher = Join-Path $PSScriptRoot 'start_backend.ps1'
+                $env:AI2050_HOST = '127.0.0.1'
+                $env:AI2050_PORT = '5001'
+                & $backendLauncher
+                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+                $backendUrl = 'http://127.0.0.1:5001'
+                try {
+                    $health = Invoke-RestMethod -Uri "$backendUrl/health" -UseBasicParsing -TimeoutSec 3
+                    if ($health.status -ne 'ok' -or $null -eq $health.interceptor_ready) {
+                        throw 'Unexpected health response.'
+                    }
+                } catch {
+                    throw "AI2050 backend health check failed at $backendUrl/health. See .run/backend/backend.err.log. $($_.Exception.Message)"
+                }
+                $env:AI2050_CLIENT_SERVER = $backendUrl
+                Write-Host "[AI2050] Electron backend -> $backendUrl" -ForegroundColor Green
+            }
+
             # 1) vite dev 由守护器托管（幂等复用、就绪后才返回）
             & $nodeExecutable $devServer --port "$Port" --detach
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -184,6 +205,10 @@ try {
                 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $electronExe)) { throw "Electron binary not installed: $electronExe" }
             }
             # 3) 客户端加载 dev 服务器（只在未打包时生效，见 electron/main.js 的 AI2050_CLIENT_DEV_URL）
+            # Electron 宿主环境（VSCode/CodeBuddy 等 IDE）可能向下注入 ELECTRON_RUN_AS_NODE=1，
+            # 它会让 electron.exe 以纯 Node 模式运行：不弹窗口、main.js 当脚本跑完即退。
+            # 启动客户端前必须清除。
+            Remove-Item Env:\ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
             $env:AI2050_CLIENT_DEV_URL = "http://localhost:$Port/"
             Write-Host "[AI2050] Electron client -> $($env:AI2050_CLIENT_DEV_URL)" -ForegroundColor Green
             & $electronExe $frontendRoot

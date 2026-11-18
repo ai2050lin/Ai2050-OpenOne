@@ -16,6 +16,15 @@ const memory = new Map();          // IndexedDB 不可用时的退路
 let dbPromise = null;
 let initPromise = null;
 
+async function checkCache(chars, interactive = true) {
+  const desktop = globalThis.ai2050Desktop;
+  if (!desktop?.checkCache) return true;
+  // Allow for serialized strings, indexes and temporary copies during commit.
+  const result = await desktop.checkCache(chars * 4 + 1024 * 1024, interactive);
+  if (!result.ok && interactive) throw new Error(result.error);
+  return result.ok;
+}
+
 function emit() {
   state.tick += 1;
   listeners.forEach(fn => fn());
@@ -90,8 +99,10 @@ async function idb(op, key, value) {
       const tx = db.transaction(STORE, op === 'get' ? 'readonly' : 'readwrite');
       const st = tx.objectStore(STORE);
       const req = op === 'get' ? st.get(key) : op === 'put' ? st.put(value, key) : op === 'clear' ? st.clear() : st.delete(key);
-      req.onsuccess = () => resolve(op === 'get' ? req.result : true);
+      if (op === 'get') req.onsuccess = () => resolve(req.result);
+      else tx.oncomplete = () => resolve(true);
       req.onerror = () => resolve(undefined);
+      tx.onabort = () => resolve(undefined);
     } catch {
       resolve(undefined);
     }
@@ -106,17 +117,17 @@ async function idbPutMany(pairs, deleteKeys = []) {
     pairs.forEach(([k, v]) => memory.set(k, v));
     return;
   }
-  await new Promise(resolve => {
+  await new Promise((resolve, reject) => {
     try {
       const tx = db.transaction(STORE, 'readwrite');
       const st = tx.objectStore(STORE);
       deleteKeys.forEach(k => st.delete(k));
       pairs.forEach(([k, v]) => st.put(v, k));
       tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-      tx.onabort = () => resolve();
-    } catch {
-      resolve();
+      tx.onerror = () => reject(new Error('本机存储写入失败'));
+      tx.onabort = () => reject(new Error('本机存储提交中断'));
+    } catch (error) {
+      reject(error);
     }
   });
 }
@@ -163,6 +174,7 @@ export async function getOnDemand(path) {
 
 export async function putOnDemand(path, data) {
   if (!state.version || data?.pending) return;
+  if (globalThis.ai2050Desktop?.checkCache && !await checkCache(JSON.stringify(data)?.length || 0, false)) return;
   await idb('put', `od|${state.version}|${canonical(path)}`, data);
 }
 
@@ -186,15 +198,19 @@ async function fetchPack(url, onProgress) {
   }
   const blob = new Blob(chunks);
   const text = await new Response(blob.stream().pipeThrough(new DecompressionStream('gzip'))).text();
-  return { doc: JSON.parse(text), bytes: got };
+  return { doc: JSON.parse(text), bytes: got, chars: text.length };
 }
 
 /* 下载并保存主数据包。 */
 export async function downloadDataPack(apiBase, onProgress) {
-  const { doc, bytes } = await fetchPack(`${apiBase}/api/platform/datapack`, onProgress);
+  await checkCache(0);
+  const { doc, bytes, chars } = await fetchPack(`${apiBase}/api/platform/datapack`, onProgress);
   if (doc.schema !== 'datapack.v1') throw new Error('不是 datapack.v1 数据包');
+  await checkCache(chars);
   const old = state.version;
-  await idb('put', 'pack', { version: doc.version, created_at: doc.created_at, bytes, entries: doc.entries });
+  if (!await idb('put', 'pack', { version: doc.version, created_at: doc.created_at, bytes, entries: doc.entries })) {
+    throw new Error('本机存储写入失败，原版本保持可用');
+  }
   state.version = doc.version;
   state.createdAt = doc.created_at;
   state.bytes = bytes;
@@ -206,15 +222,17 @@ export async function downloadDataPack(apiBase, onProgress) {
 
 /* 下载并保存一个附加包（替换同一个包的旧条目）。 */
 export async function downloadExtra(apiBase, id, onProgress) {
+  await checkCache(0);
   if(id==='research-library')return downloadResearchStream(apiBase,id,onProgress);
-  const { doc, bytes } = await fetchPack(`${apiBase}/api/platform/datapack/extra/${encodeURIComponent(id)}`, onProgress);
+  const { doc, bytes, chars } = await fetchPack(`${apiBase}/api/platform/datapack/extra/${encodeURIComponent(id)}`, onProgress);
   if (doc.schema !== 'datapack_extra.v1' || doc.id !== id) throw new Error('不是对应的附加包');
+  await checkCache(chars);
   const oldKeys = (await idb('get', `xkeys|${id}`)) || [];
   const keys = Object.keys(doc.entries).map(k => `x|${k}`);
-  await idbPutMany([...Object.entries(doc.entries).map(([k, v]) => [`x|${k}`, v]), [`xkeys|${id}`, keys]],
+  const next = { ...state.extras, [id]: { version: doc.version, created_at: doc.created_at, bytes, n: keys.length } };
+  await idbPutMany([...Object.entries(doc.entries).map(([k, v]) => [`x|${k}`, v]), [`xkeys|${id}`, keys], ['xmeta', next]],
     oldKeys.filter(k => !keys.includes(k)));
-  state.extras = { ...state.extras, [id]: { version: doc.version, created_at: doc.created_at, bytes, n: keys.length } };
-  await idb('put', 'xmeta', state.extras);
+  state.extras = next;
   emit();
   return state.extras[id];
 }
@@ -232,9 +250,16 @@ async function downloadResearchStream(apiBase,id,onProgress){
     tx.oncomplete=resolve;tx.onerror=()=>reject(Error('本机存储写入失败，原版本保持可用'));tx.onabort=()=>reject(Error('本机存储提交中断，原版本保持可用'));
   });
   try{
-    const {header,count}=await consumeResearchStream(stream,{id,onEntry:async(path,data)=>{const key=prefix+canonical(path);if(keys.includes(key))throw Error('附加包含重复条目');keys.push(key);await transaction([[key,data]])}});
+    const {header,count}=await consumeResearchStream(stream,{id,onEntry:async(path,data,chars)=>{
+      const key=prefix+canonical(path);
+      if(keys.includes(key))throw Error('附加包含重复条目');
+      await checkCache(chars);
+      keys.push(key);
+      await transaction([[key,data]]);
+    }});
     const oldKeys=(await idb('get',`xkeys|${id}`))||[];
     const next={...state.extras,[id]:{version:header.version,created_at:header.created_at,bytes:got,n:count,key_prefix:prefix}};
+    await checkCache(keys.reduce((sum, key) => sum + key.length, 0));
     await transaction([[`xkeys|${id}`,keys],['xmeta',next]],oldKeys);
     state.extras=next;emit();return state.extras[id];
   }catch(error){await transaction([],keys).catch(()=>{});throw error}

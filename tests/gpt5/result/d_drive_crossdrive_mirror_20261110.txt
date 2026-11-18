@@ -1,0 +1,61 @@
+CROSS-DRIVE MIRROR CHECK (READ-ONLY)  2026-11-10 01:36:31
+
+[1] C: research-storage experiment dirs
+    found 9 experiment dirs
+    qwen14_mlp_atlas_v1                      26.95 GB     268 files  1a045-c160-7150-acad-c557907e4e8a\research-storage\qwen14_mlp_atlas_v1
+    state_formation_v1                       25.21 GB    8307 files  a1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\state_formation_v1
+    record_selection_v3                      18.23 GB    6692 files  1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\record_selection_v3
+    mlp_puzzle_v1                             2.52 GB    1863 files  08\01a1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\mlp_puzzle_v1
+    mlp_trigger_v1                            0.17 GB    1996 files  3\01a1a045-c160-7150-acad-c557907e4e8a\research-storage\mlp_trigger_v1
+    source_output_v1                          0.13 GB     611 files  01a1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\source_output_v1
+    mlp_trigger_read100_v1                    0.07 GB     589 files  45-c160-7150-acad-c557907e4e8a\research-storage\mlp_trigger_read100_v1
+    record_selection_v2                       0.05 GB      79 files  1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\record_selection_v2
+    record_selection_v1                       0.04 GB      84 files  1bbc6-0c76-7430-aec3-194dcd9f7933\research-storage\record_selection_v1
+
+[2] D: ai2050_native\visualization-research experiment dirs
+    found 11 experiment dirs
+    qwen14_mlp_atlas_v1                      26.95 GB     268 files
+    state_formation_v1                       25.21 GB    8307 files
+    record_selection_v3                      18.23 GB    6692 files
+    mlp_puzzle_v1                             2.52 GB    1863 files
+    mlp_trigger_v1                            0.17 GB    1996 files
+    source_output_v1                          0.13 GB     611 files
+    mlp_trigger_read100_v1                    0.07 GB     589 files
+    record_selection_v2                       0.05 GB      79 files
+    record_selection_v1                       0.04 GB      84 files
+    phase2809                                 0.01 GB      62 files
+    client-atlas-preview                      0.00 GB       1 files
+
+[3] MIRROR COMPARISON (same name on C: and D:)
+    qwen14_mlp_atlas_v1                    C=26.95 GB   D=26.95 GB   MIRROR-BOTH
+    state_formation_v1                     C=25.21 GB   D=25.21 GB   MIRROR-BOTH
+    record_selection_v3                    C=18.23 GB   D=18.23 GB   MIRROR-BOTH
+    mlp_puzzle_v1                          C=2.52 GB    D=2.52 GB    MIRROR-BOTH
+    mlp_trigger_v1                         C=0.17 GB    D=0.17 GB    MIRROR-BOTH
+    source_output_v1                       C=0.13 GB    D=0.13 GB    MIRROR-BOTH
+    mlp_trigger_read100_v1                 C=0.07 GB    D=0.07 GB    MIRROR-BOTH
+    record_selection_v2                    C=0.05 GB    D=0.05 GB    MIRROR-BOTH
+    record_selection_v1                    C=0.04 GB    D=0.04 GB    MIRROR-BOTH
+    phase2809                              C=-          D=0.01 GB    D-ONLY
+    client-atlas-preview                   C=-          D=0.00 GB    D-ONLY
+    paired totals: C=73.36 GB  D=73.36 GB
+
+[4] JUNCTION HEALTH (result-side -> C: target)
+    OK    mlp_puzzle_v1                      -> 2.52 GB / 1863 files 0c76-7430-aec3-194dcd9f7933\research-storage\mlp_puzzle_v1
+    OK    mlp_trigger_read100_v1             -> 0.07 GB / 589 files -acad-c557907e4e8a\research-storage\mlp_trigger_read100_v1
+    OK    mlp_trigger_v1                     -> 0.17 GB / 1996 files 160-7150-acad-c557907e4e8a\research-storage\mlp_trigger_v1
+    OK    qwen14_mlp_atlas_v1                -> 26.95 GB / 268 files 150-acad-c557907e4e8a\research-storage\qwen14_mlp_atlas_v1
+    OK    record_selection_v1                -> 0.04 GB / 84 files 430-aec3-194dcd9f7933\research-storage\record_selection_v1
+    OK    record_selection_v2                -> 0.05 GB / 79 files 430-aec3-194dcd9f7933\research-storage\record_selection_v2
+    OK    record_selection_v3                -> 18.23 GB / 6692 files 430-aec3-194dcd9f7933\research-storage\record_selection_v3
+    OK    source_output_v1                   -> 0.13 GB / 611 files 6-7430-aec3-194dcd9f7933\research-storage\source_output_v1
+    OK    state_formation_v1                 -> 25.21 GB / 8307 files 7430-aec3-194dcd9f7933\research-storage\state_formation_v1
+    healthy=9 broken=0
+
+[5] CONCLUSION INPUT
+    If all C: targets are healthy, the D: ai2050_native\visualization-research
+    copy is a redundant intermediate mirror and can be deleted without
+    breaking the client endpoints (they resolve through the C: junctions).
+    If any C: target is broken/missing, keep its D: counterpart until restored.
+
+=== END (READ-ONLY) ===

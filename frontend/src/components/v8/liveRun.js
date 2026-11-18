@@ -45,15 +45,23 @@ export function useLiveModel(base) {
   return { ...st, load: () => act('load'), unload: () => act('unload'), refresh };
 }
 
-export async function runOnce(base, text) {
+export async function runOnce(base, text, expectedSnapshot) {
   const d = await request(base, '/api/live/run', { method: 'POST', body: JSON.stringify({ text, max_tokens: 1024 }) });
-  const pos = d.readout_positions.at(-1);
-  const hidden = [];
-  for (let l = 0; l <= d.n_layers; l++) {
-    const f = await request(base, `/api/traces/${d.trace_id}/field?block=${l}&position=${pos}&boundary=${l ? 'hidden_state' : 'embedding'}`);
-    hidden.push(f.values);
+  if (expectedSnapshot && d.model_snapshot !== expectedSnapshot) {
+    throw Error('采集轨迹与当前模型快照不一致。请选择与本机权重匹配的模型档案。');
   }
-  return { id: d.trace_id, tokens: d.tokens, readout: d.readout_positions, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
+  const pos = d.readout_positions.at(-1);
+  if (pos !== d.tokens.length - 1 || pos < 0) throw Error('轨迹缺少最终输入位置的读出。');
+  const bundle = await request(base, `/api/traces/${d.trace_id}/bundle?position=${pos}`);
+  if (bundle.trace_id !== d.trace_id || bundle.model_snapshot !== d.model_snapshot || bundle.position !== pos) {
+    throw Error('读出的轨迹、模型或位置与本次采集不一致。');
+  }
+  const { a, shape: [layers, width] } = f32(bundle.hs);
+  if (layers !== d.n_layers + 1 || width !== d.d_model || a.length !== layers * width || !a.every(Number.isFinite)) {
+    throw Error('最终位置的逐层 HiddenState 缺失或损坏。');
+  }
+  const hidden = Array.from({ length: layers }, (_, l) => a.subarray(l * width, (l + 1) * width));
+  return { id: d.trace_id, base, snapshot: d.model_snapshot, bundle, hidden, tokens: d.tokens, readout: d.readout_positions, top: d.output_top || [], curve: rewriteCurve(hidden), elapsed: d.elapsed_ms };
 }
 
 /* 实时运行 bundle（/api/traces/{id}/bundle，float32 小端）→ 与冻结样本相同接口的取值器 */

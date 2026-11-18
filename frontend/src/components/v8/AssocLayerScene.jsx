@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { panScene, useScenePointer } from '../scenePointer.js';
 
 import { ASSOC_VIEWS, assocHit, assocProject } from './assocLayerGeometry.js';
+import { EVIDENCE_COLORS } from './researchLocation.js';
 
 const ZONES = {
   heads: { x0: -8, x1: 143, z0: -147, z1: -34 },
@@ -9,7 +10,7 @@ const ZONES = {
   mlp: { x0: -8, x1: 491, z0: 31, z1: 203 },
 };
 
-export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, marks, links = [], onPick, overlays, live }) {
+export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, marks, links = [], onPick, overlays, live, archive }) {
   const cv = useRef(null), st = useRef({ yaw: ASSOC_VIEWS[view][0], pitch: ASSOC_VIEWS[view][1], view, zoom: 1, hits: [], linkHits: [], W: 0, H: 0, dpr: 1 });
   const [tick, setTick] = useState(0), [tip, setTip] = useState(null);
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
     const ctx = cv.current.getContext('2d'), s = st.current;
     if (s.view !== view) { s.view = view; s.yaw = ASSOC_VIEWS[view][0]; s.pitch = ASSOC_VIEWS[view][1]; }
     if (!s.W) return;
-    ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0); ctx.clearRect(0, 0, s.W, s.H); s.hits = []; s.linkHits = [];
+    ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0); ctx.clearRect(0, 0, s.W, s.H); s.hits = []; s.linkHits = []; s.archiveHits=[];
     const fontScale = Math.max(0.68, Math.min(1, s.W / 760));
     const label = (text, p, color = '#3e4b60', size = 12) => { ctx.fillStyle = color; ctx.font = `${size * fontScale}px sans-serif`; ctx.fillText(text, p[0], p[1]); };
     const quad = (h, fill, stroke, lw = 1) => {
@@ -69,6 +70,12 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
       quad(h, '#e4eaf1', '#b4bfce');
       const t = TX[o.id]?.[o.id === 'hs' ? layer : layer - 1];
       if (t) drawTex(t, h);
+      // Native-index grid lines remain visible even when no response was collected.
+      const [columns, rows] = o.grid;
+      ctx.strokeStyle = t ? 'rgba(120,140,164,.22)' : 'rgba(120,140,164,.45)'; ctx.lineWidth = .5; ctx.beginPath();
+      for (let col = 1; col < columns; col++) { const x = h.x0 + (h.x1 - h.x0) * col / columns; ctx.moveTo(...proj(x, h.y, h.z0)); ctx.lineTo(...proj(x, h.y, h.z1)); }
+      for (let row = 1; row < rows; row++) { const z = h.z0 + (h.z1 - h.z0) * row / rows; ctx.moveTo(...proj(h.x0, h.y, z)); ctx.lineTo(...proj(h.x1, h.y, z)); }
+      ctx.stroke();
       quad(h, null, '#9cadc4'); s.hits.push(h);
       const p = proj(h.x0, 20, h.z0); label(o.name, [p[0], p[1] - 10]);
     }
@@ -85,6 +92,19 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
       return proj(h.x0 + (h.x1 - h.x0) * ((m.idx % gw) + 0.5) / gw, h.y,
         h.z0 + (h.z1 - h.z0) * (Math.floor(m.idx / gw) + 0.5) / gh);
     };
+    if(archive){
+      const counts=new Map();
+      for(const entry of archive.points){
+        counts.set(entry.layer,(counts.get(entry.layer)||0)+1);
+        if(entry.layer!==layer)continue;
+        const id=entry.module==='attn'?'heads':entry.module==='hs'?'hs':entry.module;
+        const p=point({id,idx:entry.index});if(!p)continue;
+        ctx.fillStyle=EVIDENCE_COLORS[entry.level]||EVIDENCE_COLORS.observation;ctx.beginPath();ctx.arc(...p,2,0,Math.PI*2);ctx.fill();
+        s.archiveHits.push({x:p[0],y:p[1],entry,h:{o:id,l:entry.layer,idx:entry.index}});
+      }
+      for(const [l,n] of counts){const p=proj(llm.x+110,LY(l),45.5);label(String(n),[p[0]+4,p[1]+3],'#305a86',10);}
+      label(`成果分布 · ${archive.points.length} 张原生定位卡`,[14,82],'#305a86',11);
+    }
     for (const m of marks) { const p = point(m); if (!p) continue; ctx.strokeStyle = '#a33e43'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(...p, 6, 0, 7); ctx.stroke(); }
     const origin = marks[0] && point(marks[0]);
     if (origin) {
@@ -107,6 +127,8 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
     const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = st.current;
     const link = [...s.linkHits].reverse().find(h => x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h);
     if (link) return { h: link.link, x, y };
+    const entry=s.archiveHits?.find(hit=>Math.hypot(hit.x-x,hit.y-y)<3);
+    if(entry)return {h:entry.h,x,y,entry:entry.entry};
     for (const h of [...s.hits].reverse()) { const hit = assocHit(h, proj, x, y); if (hit) return { h: hit, x, y }; }
     return { h: null, x, y };
   };
@@ -114,10 +136,10 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
     onPan: (dx, dy) => { st.current = panScene(st.current, dx, dy); setTick(t => t + 1); },
     onRotate: (dx, dy) => { st.current.yaw += dx * 0.006; st.current.pitch = Math.max(0.05, Math.min(1.4, st.current.pitch + dy * 0.005)); setTick(t => t + 1); },
     onHover: e => { const hit = pickAt(e); setTip(hit.h ? { ...hit, left: Math.max(4, Math.min(hit.x + 12, st.current.W - 280)), top: Math.min(hit.y + 12, st.current.H - 60) } : null); }, onLeave: () => setTip(null),
-    onPick: e => { const { h, x, y } = pickAt(e); onPick(h, x, y); },
+    onPick: e => { const { h, x, y, entry } = pickAt(e); if(entry)archive?.onPick?.(entry);onPick(h, x, y); },
   });
   return <div className="aw-canvas">
-    <canvas ref={cv} data-tick={tick} aria-label={`LLM 全部 ${NL - 1} 层；当前第 ${layer} 层的 Head、HiddenState 与 MLP 原生单元；可用精确定位选择`} {...pointer}/>
+    <canvas ref={cv} data-tick={tick} data-archive-count={archive?.points.length||0} aria-label={`LLM 全部 ${NL - 1} 层；当前第 ${layer} 层的 Head、HiddenState 与 MLP 原生单元；可用精确定位选择`} {...pointer}/>
     {tip && <div className="aw-tip" style={{ left: tip.left, top: tip.top }}>{dims.describe(tip.h)}</div>}
   </div>;
 }

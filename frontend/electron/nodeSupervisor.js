@@ -14,6 +14,7 @@ const fs = require('fs');
 const http = require('http');
 const os = require('os');
 const path = require('path');
+const { checkedDir, storageDir, StorageBlocked } = require('./storagePolicy');
 
 /* 界面可调用的接口（/shutdown 只由主进程在退出时调用） */
 const ROUTES = new Set([
@@ -28,7 +29,8 @@ const FAIL_WINDOW = 10 * 60 * 1000;
 
 function nodeHome() {
   if (process.env.AI2050_NODE_HOME) return process.env.AI2050_NODE_HOME;
-  const base = process.env.AI2050_HOME || path.join(os.homedir(), '.ai2050');
+  const base = process.env.AI2050_HOME || (process.platform === 'win32'
+    ? storageDir('client', 'node-state') : path.join(os.homedir(), '.ai2050'));
   return path.join(base, 'node_service');           // 与 node_service.default_home() 相同：命令行与客户端共用凭据
 }
 
@@ -71,12 +73,14 @@ function httpJson(port, token, method, route, body, timeoutMs = 15000) {
 }
 
 class NodeSupervisor {
-  constructor({ app, readConfig, writeConfig, onChange, runtimePython }) {
+  constructor({ app, readConfig, writeConfig, onChange, runtimePython, onStorageBlocked }) {
     this.app = app;
     this.readConfig = readConfig;
     this.writeConfig = writeConfig;
     this.onChange = onChange || (() => {});
     this.runtimePython = runtimePython || (() => '');
+    this.onStorageBlocked = onStorageBlocked || (() => {});
+    this.downloads = new Set();
     this.home = nodeHome();
     this.synthetic = process.env.AI2050_NODE_SYNTHETIC === '1';
     this.server = '';
@@ -168,11 +172,17 @@ class NodeSupervisor {
     const t0 = Date.now() / 1000;
     let child;
     try {
+      checkedDir(this.home, 0, '本机节点数据');
       child = spawn(this.python, args, {
         cwd: path.dirname(this.script), windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' },
       });
     } catch (e) {
+      if (e instanceof StorageBlocked) {
+        this.onStorageBlocked(e);
+        this._set('failed', e.message);
+        return this.info();
+      }
       this._fail(`无法启动 Python：${e.message}`);
       return this.info();
     }
@@ -245,7 +255,17 @@ class NodeSupervisor {
     const allowed = ROUTES.has(`${m} ${bare}`) || (m === 'GET' && /^\/probes\/GF-L\d+-U\d+-\d{8}-\d{6}$/.test(bare));
     if (!allowed) return { status: 403, data: { detail: '不允许的本机接口' } };
     if (!this.port || !this.token) return { status: 0, data: { detail: '本机节点服务没有运行' } };
+    const startsDownload = m === 'POST' && bare === '/models/download' && typeof body?.snapshot === 'string';
+    if (startsDownload) this.downloads.add(body.snapshot);
     const r = await httpJson(this.port, this.token, m, p, body);
+    if (startsDownload && r.status !== 200) this.downloads.delete(body.snapshot);
+    if (m === 'GET' && bare === '/models' && Array.isArray(r.data?.models)) {
+      for (const model of r.data.models) {
+        if (!this.downloads.has(model.snapshot) || !['error', 'ok', 'cancelled', 'mismatch'].includes(model.status)) continue;
+        this.downloads.delete(model.snapshot);
+        if (model.storage_blocked) this.onStorageBlocked(new Error(model.error));
+      }
+    }
     if (r.status === 0 && this.state === 'attached') this._set('failed', '接管的本机节点服务已不可达');
     return r;
   }

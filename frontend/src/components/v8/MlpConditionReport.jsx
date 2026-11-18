@@ -8,21 +8,22 @@ const pct=v=>Number.isFinite(v)?`${(100*v).toFixed(1)}%`:'未测';
 const pairs={broad:[29,17,30,2],rare:[33,1521,34,6097]};
 const name={broad:'广泛关联候选',rare:'稀有强响应候选'};
 
-function ConditionAtlas({doc}) {
+export function ConditionAtlas({doc,initialBlock=29,initialUnit=17,hideScene=false,historyLabel=''}) {
   const path=b=>doc.condition_layers?.[b]?`/api/research-library/artifacts/${doc.condition_layers[b]}`:null;
   const b28=useApi(path(28)),b29=useApi(path(29)),b30=useApi(path(30)),b31=useApi(path(31)),
     b32=useApi(path(32)),b33=useApi(path(33)),b34=useApi(path(34)),b35=useApi(path(35));
   const parameter=useApi(doc.native_parameter_sha256?`/api/research-library/artifacts/${doc.native_parameter_sha256}`:null);
-  const [block,setBlock]=useState(29),[unit,setUnit]=useState(17),[metric,setMetric]=useState('within_token_variance_fraction'),[coordinate,setCoordinate]=useState(0);
+  const [block,setBlock]=useState(initialBlock),[unit,setUnit]=useState(initialUnit),[metric,setMetric]=useState('within_token_variance_fraction'),[coordinate,setCoordinate]=useState(0);
+  const [relationMetric,setRelationMetric]=useState('spearman');
   const all=[b28,b29,b30,b31,b32,b33,b34,b35],blocks=[28,29,30,31,32,33,34,35];
   const layers=Object.fromEntries(blocks.map((b,i)=>[b,all[i].data]));
   const error=all.find(r=>r.error)?.error;
   const ready=blocks.every(b=>layers[b]?.model_snapshot===doc.model_snapshot&&layers[b]?.block===b);
   const chosen=Object.entries(pairs).find(([,p])=>(p[0]===block&&p[1]===unit)||(p[2]===block&&p[3]===unit));
   let relation=null;
-  if(chosen&&Number.isFinite(doc.observations[chosen[0]].pearson)){
+  if(chosen&&Number.isFinite(doc.observations[chosen[0]][relationMetric])){
     const [src,u,dst,v]=chosen[1],incoming=block===dst,values=Array(9728).fill(null);
-    values[incoming?u:v]=doc.observations[chosen[0]].pearson;
+    values[incoming?u:v]=doc.observations[chosen[0]][relationMetric];
     relation={source:src,target:dst,direction:incoming?'incoming':'outgoing',values};
   }
   const weights=parameter.data?.parameters?.[`B${block}/U${unit}`];
@@ -32,9 +33,11 @@ function ConditionAtlas({doc}) {
       <label>单元 <input aria-label="条件图谱单元" type="number" min="0" max="9727" value={unit} onChange={e=>setUnit(Math.max(0,Math.min(9727,Number(e.target.value)||0)))}/></label>
       <label>观察指标 <select aria-label="条件图谱指标" value={metric} onChange={e=>setMetric(e.target.value)}>{[['within_token_variance_fraction','同token内变化'],['sign_mix','正负写入并存'],['token_predictor_fvu','词身份预测误差'],['double_negative_energy','负门控与负value']].map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>
       {Object.entries(pairs).map(([k,p])=><button key={k} className="fw-tbtn" onClick={()=>{setBlock(p[0]);setUnit(p[1])}}>{name[k]}</button>)}</div>
-    {error?<p>服务器图谱读取失败：{error}</p>:ready?<TailScene blocks={blocks} layers={layers} metric={metric} block={block} unit={unit} relation={relation} allEdges={false} onPick={(b,u)=>{setBlock(b);setUnit(u)}}/>:<p>正在读取服务器 {all.filter(r=>r.data).length}/8 层条件记录…</p>}
+    <label>已测连线 <select aria-label="条件图谱关联口径" value={relationMetric} onChange={e=>setRelationMetric(e.target.value)}><option value="spearman">排序关联（较少受极值影响）</option><option value="pearson">Pearson（包含极值）</option><option value="winsorized">削弱两端极值后的关联</option></select></label>
+    {chosen&&<span> 当前值 {num(doc.observations[chosen[0]][relationMetric])}</span>}
+    {!hideScene&&(error?<p>服务器图谱读取失败：{error}</p>:ready?<TailScene blocks={blocks} layers={layers} metric={metric} block={block} unit={unit} relation={relation} colorRelations={false} allEdges={false} onPick={(b,u)=>{setBlock(b);setUnit(u)}}/>:<p>正在读取服务器 {all.filter(r=>r.data).length}/8 层条件记录…</p>)}
     <p className="v8-note">连线只显示本轮已测单元对的共同响应；其余关系为未测，不填零。预测和因果验收见相应页签。</p>
-    {ready&&<ConditionDetails data={layers[block]} block={block} unit={unit}/>}
+    {ready&&(historyLabel?<details><summary>{historyLabel}</summary><p>以下是历史采样条件卡；其样本量、判据和结论属于历史研究，不覆盖或替代当前报告。</p><ConditionDetails data={layers[block]} block={block} unit={unit}/></details>:<ConditionDetails data={layers[block]} block={block} unit={unit}/>)}
     <details><summary>完整原生参数与复算定位</summary>{weights?Object.entries(weights).map(([k,v])=><div key={k}><p>{k} · 坐标 {coordinate} = {v.values[coordinate]}</p><NativeArray values={v.values} selected={coordinate} onPick={setCoordinate} label={`条件卡完整${k}参数`}/><details><summary>全部2560个BF16原值与来源哈希</summary><pre className="v8-artifact-json">{JSON.stringify(v)}</pre></details></div>):<p>本轮包携带4个受控单元的完整参数。当前单元的全参数仍从原生尾层档案查询：<a href={`?lens=spatial&view=graph&gview=internal&run=MLP-TAIL-B28-B35-ATLAS-v2&snapshot=${doc.model_snapshot}&tail_block=${block}&tail_unit=${unit}`}>打开原生档案</a>；原档案未部署时会明确显示缺件。</p>}</details>
   </>;
 }
@@ -51,19 +54,20 @@ function Curve({rows}) {
   </svg>;
 }
 
-export default function MlpConditionReport({doc}) {
+export default function MlpConditionReport({doc,hideScene=false}) {
   const [tab,setTab]=useState('result'),[family,setFamily]=useState('broad'),[page,setPage]=useState(0);
+  const [focus,setFocus]=useState([29,17]);
   const obs=doc.observations[family],rows=doc.dose_curve.filter(r=>r.pair===family);
   const errors=doc.counterexamples.filter(r=>r.pair===family);
   const [src,u,dst,v]=pairs[family];
-  const link=(b,i)=>`?lens=spatial&view=graph&gview=internal&run=MLP-TAIL-B28-B35-ATLAS-v2&snapshot=${doc.model_snapshot}&tail_block=${b}&tail_unit=${i}`;
+  const focusUnit=(b,i)=>{setFocus([b,i]);setTab('atlas')};
   return <section aria-label="MLP条件响应与预测验证报告">
     <p><strong>条件响应与跨层预测</strong> · Qwen3-4B BF16 · 512 个新文本家族 × 16 种配平条件</p>
     <p className="v8-note">词身份、角色、证据位置和答案映射独立交叉。预测器先在发现集冻结，再执行留出与原模型干预。材料是四类角色任务的人工长文本；数字门通过仍需审计，不自动晋级为语义机制。</p>
     <div className="v6-toolbar">{Object.keys(pairs).map(k=><button className="fw-tbtn" key={k} aria-pressed={family===k} onClick={()=>{setFamily(k);setPage(0)}}>{name[k]}</button>)}</div>
-    <p><a href={link(src,u)}>B{src}/U{u} 条件卡与参数</a> — <a href={link(dst,v)}>B{dst}/U{v} 条件卡与参数</a></p>
-    <div className="v6-toolbar">{[['result','预测与条件'],['atlas','3D条件图谱'],['dose','干预与能力'],['errors',`反例（${errors.length}）`],['evidence','材料与证据']].map(([k,label])=><button className="fw-tbtn" key={k} aria-pressed={tab===k} onClick={()=>setTab(k)}>{label}</button>)}</div>
-    {tab==='atlas'&&<ConditionAtlas doc={doc}/>}
+    <p><button className="fw-tbtn" onClick={()=>focusUnit(src,u)}>B{src}/U{u} 条件卡与参数</button> — <button className="fw-tbtn" onClick={()=>focusUnit(dst,v)}>B{dst}/U{v} 条件卡与参数</button></p>
+    <div className="v6-toolbar">{[['result','预测与条件'],['atlas',hideScene?'条件档案':'3D条件图谱'],['dose','干预与能力'],['errors',`反例（${errors.length}）`],['evidence','材料与证据']].map(([k,label])=><button className="fw-tbtn" key={k} aria-pressed={tab===k} onClick={()=>setTab(k)}>{label}</button>)}</div>
+    {tab==='atlas'&&<ConditionAtlas key={focus.join(':')} doc={doc} initialBlock={focus[0]} initialUnit={focus[1]} hideScene={hideScene}/>}
     {tab==='result'&&<>
       <p>条件预测：<strong>{obs.conditional.passed?'通过冻结判据':'未通过冻结判据'}</strong>。相对条件基线的均方误差 {num(obs.conditional.relative_mse)}，在 {obs.conditional.family_wins}/{obs.conditional.families} 个家族上更好。</p>
       <p className="v8-note">预测使用同位置的源单元响应，不是只凭语言图谱独立预测整个模型。低于 1 表示优于基线。</p>

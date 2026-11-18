@@ -1,0 +1,16 @@
+DELETE -> EMPTY -> FREE CLOSED LOOP  2026-11-09 23:40:46
+
+[1] D RECYCLE BIN subdirs (pre-existing remainder)
+   S-1-5-21-1651485847-2059353982-4082544634-1000        1.33 GB /  132 files
+
+[2] probe file: D:\AI2050\Ai2050-OpenOne\tests\glm5\result\b35_recursive_v2\confirm-native.npz (44.53 MB) in b35_recursive_v2
+    BEFORE  D_free=35.17 GB  bin=1.33 GB/132 files
+[3] after os.remove: gone=True  D_free=35.17 GB (0 B)  bin=1.38 GB/134 files (+2 files, 44.53 MB)
+[4] after SHEmptyRecycleBinW: HRESULT=0x00000000  D_free=35.22 GB (44.54 MB vs start)  bin=1.33 GB/132 files
+
+    loop: bin_gain=44.53 MB -> bin_after_empty=0 B ; free_gain=44.54 MB
+
+[5] VERDICT = LOOP_OK
+    delete -> empty bin -> space freed, and the newly created bin item was removed. P2 batching is safe.
+
+=== END LOOP VERIFY ===

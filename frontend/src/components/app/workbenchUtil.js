@@ -7,7 +7,7 @@
    分隔线之下是本机形态相关的界面（配置、本机工具）。 */
 export const LENSES = [
   { id: 'route', label: '进展', desc: '图谱进展、研究覆盖与验证证据' },          // id 沿用 route，旧链接 ?lens=route 照常可用
-  { id: 'spatial', label: '空间', desc: 'LLM 编码图谱、关联机制与语言图谱' },
+  { id: 'spatial', label: '空间', desc: '模型探索与外部语言图谱' },
   { id: 'process', label: '研发', desc: '整体研究路线、任务与数据、执行与审计' },
   { id: 'config', label: '配置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
 ];
@@ -26,14 +26,12 @@ export const SPATIAL_VIEWS = [
   { id: 'response', label: '响应对照', desc: '模式族全场与点云、规律分析、合并统计' },
   /* 谱图关系（跨模式族共享编码轴 / 概念假设）不再是一级 tab：作为语言图谱里的入口进入（SpaceLens 仍渲染该视图，旧链接 ?view=relations|atlas 照常可用） */
 ];
-/* 空间三张图（2026-11-07 第一批）：语言图谱 / LLM 编码图谱 / 关联机制。
-   路由仍用原来的 view + gview，三张图只是它们的分组，旧链接（?view=live、?gview=language 等）照常打开。 */
+/* 两个产品入口；原 view/gview 保留为统一工作台的观察方式及旧链接。 */
 export const SPATIAL_MODES = [
-  { id: 'enc', label: 'LLM 编码图谱', desc: '词嵌入、注意力头、MLP 的结构、参数与证据阶梯' },
-  { id: 'assoc', label: '关联机制', desc: '一段文字在各层怎样被读取、改写并决定下一个词；运行、对照与共享关系' },
+  { id: 'assoc', label: '模型探索', desc: '模型结构、真实参数、运行响应、条件对照与研究档案' },
   { id: 'lang', label: '语言图谱', desc: '外部能力框架：知识网络、推理功能、语法规则的语言项与关系，不含模型信息' },
 ];
-export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: { view: 'graph', gview: 'structure' }, assoc: { view: 'live' } };
+export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: { view: 'graph', gview: 'structure' }, assoc: { view: 'graph', gview: 'structure' } };
 export const ASSOC_TABS = [
   { id: 'live', label: '运行与路径', patch: { view: 'live' } },
   { id: 'response', label: '响应对照', patch: { view: 'response' } },
@@ -46,8 +44,7 @@ export const ENC_TABS = [
 ];
 export function spaceMode(view, gview) {
   if (view === 'graph' && gview === 'language') return 'lang';
-  if (view === 'live' || view === 'response' || (view === 'graph' && ['relations', 'langmeasure'].includes(gview))) return 'assoc';
-  return 'enc';
+  return 'assoc';
 }
 export function spaceTab(view, gview) {
   if (view === 'graph') return gview;
@@ -56,7 +53,7 @@ export function spaceTab(view, gview) {
 export const GRAPH_LAYERS = [
   {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'langmeasure',label:'语言项实测'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
 ];
-/* 语言图谱只放外部能力框架（gview=language）；语言项在模型上的读出、层塔、数据集实测属于关联机制（gview=langmeasure）。
+/* 语言图谱只放外部能力框架（gview=language）；语言项在模型上的读出、层塔、数据集实测属于模型探索（gview=langmeasure）。
    旧别名 ?view=lang 原本指语言项实测页，归到 langmeasure。 */
 
 /* 研发工位：网页只能浏览；执行测试（神经元测试）与管理都在桌面客户端。

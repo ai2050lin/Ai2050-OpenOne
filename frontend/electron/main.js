@@ -19,36 +19,66 @@ const https = require('https');
 const { NodeSupervisor } = require('./nodeSupervisor');
 const { RuntimeInstaller, readRuntime } = require('./runtimeInstaller');
 const { AiAssistant } = require('./aiAssistant');
+const { checkWrite, checkedDir, storageDir, StorageBlocked } = require('./storagePolicy');
 
 const DEFAULT_SERVER = 'https://server.ai2050.com';
+const legacyConfig = path.join(app.getPath('userData'), 'config.json');
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
+
+function readSavedConfig() {
+  const active = CONFIG_FILE();
+  try {
+    const config = JSON.parse(fs.readFileSync(fs.existsSync(active) ? active : legacyConfig, 'utf8'));
+    return config && typeof config === 'object' && !Array.isArray(config) ? config : {};
+  } catch {
+    return {};
+  }
+}
+
+function notifyStorage(error) {
+  dialog.showErrorBox('AI2050 磁盘检查', String(error.message || error));
+}
+
+function configureStorage() {
+  if (process.platform !== 'win32') return;
+  const profile = checkedDir(storageDir('client', 'profile'), 0, '桌面配置');
+  app.setPath('userData', profile);
+  app.setPath('sessionData', checkedDir(storageDir('client', 'session'), 0, '桌面会话及离线数据'));
+  app.setPath('crashDumps', checkedDir(storageDir('client', 'crash-dumps'), 0, '桌面崩溃日志'));
+  const temporary = checkedDir(storageDir('scratch', 'desktop'), 0, '桌面临时数据');
+  app.setPath('temp', temporary);
+  const hf = checkedDir(storageDir('reusable', 'huggingface'), 0, '模型复用缓存');
+  Object.assign(process.env, {
+    TEMP: temporary, TMP: temporary, TMPDIR: temporary, PYTHONDONTWRITEBYTECODE: '1',
+    HF_HOME: hf, HF_HUB_CACHE: checkWrite(path.join(hf, 'hub'), 0, '模型复用缓存'),
+    HF_MODULES_CACHE: checkWrite(path.join(hf, 'modules'), 0, '模型复用缓存'),
+    TORCH_HOME: checkWrite(storageDir('reusable', 'torch'), 0, '模型复用缓存'),
+  });
+  delete process.env.TRANSFORMERS_CACHE;
+  app.setAppLogsPath(checkedDir(storageDir('client', 'logs'), 0, '桌面日志'));
+}
 
 /* ── 配置读写 ─────────────────────────────────────────────── */
 function readConfig() {
+  const cfg = readSavedConfig();
   /* 沙盒联调：AI2050_CLIENT_SERVER 直接指定中心，不读写用户配置里的服务器 */
   if (process.env.AI2050_CLIENT_SERVER) {
-    let saved = {};
-    try { saved = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8')); } catch { /* 无配置 */ }
-    return { ...saved, server: normalizeServer(process.env.AI2050_CLIENT_SERVER), verified: true };
+    return { ...cfg, server: normalizeServer(process.env.AI2050_CLIENT_SERVER), verified: true };
   }
-  try {
-    const cfg = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8'));
-    if (typeof cfg.server === 'string' && cfg.server.trim()) return cfg;
-  } catch {
-    /* 首次运行 / 文件损坏 → 走询问流程 */
-  }
+  if (typeof cfg.server === 'string' && cfg.server.trim()) return cfg;
   return null;
 }
 
 function writeConfig(cfg) {
   if (process.env.AI2050_CLIENT_SERVER) {
-    let saved = {};
-    try { saved = JSON.parse(fs.readFileSync(CONFIG_FILE(), 'utf8')); } catch { /* 无配置 */ }
+    const saved = readSavedConfig();
     cfg = { ...cfg, server: saved.server, verified: saved.verified };     // 环境变量指定的中心不写进用户配置
     if (!cfg.server) delete cfg.server;
   }
-  fs.mkdirSync(path.dirname(CONFIG_FILE()), { recursive: true });
-  fs.writeFileSync(CONFIG_FILE(), JSON.stringify(cfg, null, 2), 'utf8');
+  const content = JSON.stringify(cfg, null, 2);
+  const file = checkWrite(CONFIG_FILE(), Buffer.byteLength(content), '桌面配置');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, content, 'utf8');
 }
 
 const LOCAL_HOSTS = /^(localhost|127\.0\.0\.1|\[::1\]|::1)(:\d+)?$/i;
@@ -331,13 +361,15 @@ function ensureLiveOnly() {
       if (await hasLive('http://127.0.0.1:5001')) return;   // 完整中心已有前向能力，不必另起
       if (await hasLive('http://127.0.0.1:5002')) return;   // live-only 已在跑
       try {
-        const out = fs.openSync(path.join(repo, 'tempdata', 'live_only.log'), 'a');
+        const logfile = checkWrite(path.join(app.getPath('logs'), 'live_only.log'), 0, '实时服务日志');
+        const out = fs.openSync(logfile, 'a');
         const child = spawn(py, [entry], {
           cwd: repo,
           env: { ...process.env, AI2050_HOST: '127.0.0.1', AI2050_PORT: '5002' },
           stdio: ['ignore', out, out],
         });
-        console.log(`[client] 已自动拉起本机实时前向服务 :5002 (pid ${child.pid})，日志 tempdata/live_only.log`);
+        fs.closeSync(out);
+        console.log(`[client] 已自动拉起本机实时前向服务 :5002 (pid ${child.pid})，日志 ${logfile}`);
       } catch (e) { console.log('[client] 拉起实时前向服务失败:', e.message); }
     })();
   } catch { /* 环境缺失——忽略，保持原行为 */ }
@@ -360,20 +392,31 @@ function maybeStartLocalCenter(server) {
     const req = http.get(`http://127.0.0.1:${port}/api/v1/health`, { timeout: 1500 }, res => { res.resume(); });
     req.on('error', () => {
       try {
-        const out = fs.openSync(path.join(repo, 'tempdata', 'center_auto.log'), 'a');
+        const logfile = checkWrite(path.join(app.getPath('logs'), 'center_auto.log'), 0, '本机中心日志');
+        const out = fs.openSync(logfile, 'a');
         const child = spawn(py, [entry], {
           cwd: repo,
           env: { ...process.env, AI2050_HOST: '127.0.0.1', AI2050_PORT: port },
           stdio: ['ignore', out, out],
         });
-        console.log(`[client] 本机中心未运行，已自动拉起 (pid ${child.pid})，日志 tempdata/center_auto.log`);
+        fs.closeSync(out);
+        console.log(`[client] 本机中心未运行，已自动拉起 (pid ${child.pid})，日志 ${logfile}`);
       } catch (e) { console.log('[client] 自动拉起本机中心失败:', e.message); }
     });
   } catch { /* server 不是合法 URL——忽略，保持原行为 */ }
 }
 
 /* ── 生命周期 ─────────────────────────────────────────────── */
-if (!app.requestSingleInstanceLock()) {
+let storageError;
+try {
+  configureStorage();
+} catch (error) {
+  storageError = error;
+  notifyStorage(error);
+}
+if (storageError) {
+  app.exit(1);
+} else if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => {
@@ -389,12 +432,16 @@ if (!app.requestSingleInstanceLock()) {
     ensureLiveOnly();                 // 与所连中心无关：本机有权重就能跑实时分析
     buildMenu();
     createWindow(server);
-    nodeSup.start(server);
+    await nodeSup.start(server);
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow((readConfig() || {}).server || DEFAULT_SERVER);
       }
     });
+  }).catch(error => {
+    if (error instanceof StorageBlocked) notifyStorage(error);
+    else console.error(error);
+    app.quit();
   });
 
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
@@ -410,13 +457,22 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 ipcMain.handle('ai2050:get-server', () => (readConfig() || {}).server || DEFAULT_SERVER);
+ipcMain.handle('ai2050:cache-check', (_e, { bytes, interactive } = {}) => {
+  try {
+    checkWrite(app.getPath('sessionData'), bytes, '离线数据缓存');
+    return { ok: true };
+  } catch (error) {
+    if (interactive && error instanceof StorageBlocked) notifyStorage(error);
+    return { ok: false, error: String(error.message || error) };
+  }
+});
 
 /* ── 本机节点服务（贡献算力）：界面只经这几个 IPC 调用，令牌不离开主进程 ── */
 const runtimeDir = () => (readConfig() || {}).runtimeDir || path.join(app.getPath('userData'), 'runtime');
 const lockFile = [path.join(process.resourcesPath || '', 'node', 'runtime', 'requirements-win-cu130.lock'),
   path.join(__dirname, '..', '..', 'deploy', 'runtime', 'requirements-win-cu130.lock')].find(p => fs.existsSync(p));
 const nodeSup = new NodeSupervisor({
-  app, readConfig, writeConfig,
+  app, readConfig, writeConfig, onStorageBlocked: notifyStorage,
   runtimePython: () => (readRuntime(runtimeDir()) || {}).python || '',
   onChange: info => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('ai2050:node-info', info); },
 });
@@ -436,7 +492,7 @@ ipcMain.handle('ai2050:node-pick-python', async () => {
 
 /* ── 计算组件（Python + torch + transformers）：主进程安装，不需要系统里已有 Python ── */
 const runtime = new RuntimeInstaller({
-  dir: runtimeDir, lockFile,
+  dir: runtimeDir, lockFile, checkWrite, onStorageBlocked: notifyStorage,
   onChange: info => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('ai2050:runtime-info', info); },
 });
 ipcMain.handle('ai2050:runtime-info', () => runtime.info());
@@ -453,14 +509,26 @@ ipcMain.handle('ai2050:runtime-pick-dir', async () => {
     title: '选择计算组件的安装目录（约 6 GB，建议放在空间大的盘）', properties: ['openDirectory', 'createDirectory'],
   });
   if (!r.canceled && r.filePaths[0]) {
-    const dir = path.join(r.filePaths[0], 'ai2050-runtime');
-    writeConfig({ ...(readConfig() || {}), runtimeDir: dir });
+    try {
+      const dir = checkWrite(path.join(r.filePaths[0], 'ai2050-runtime'), 0, '计算组件');
+      writeConfig({ ...(readConfig() || {}), runtimeDir: dir });
+    } catch (error) {
+      if (!(error instanceof StorageBlocked)) throw error;
+      notifyStorage(error);
+    }
   }
   return runtime.info();
 });
 ipcMain.handle('ai2050:node-pick-models-dir', async () => {
   const r = await dialog.showOpenDialog(mainWindow, { title: '选择模型下载目录（每个模型 1–30 GB）', properties: ['openDirectory', 'createDirectory'] });
-  return r.canceled || !r.filePaths[0] ? '' : r.filePaths[0];
+  if (r.canceled || !r.filePaths[0]) return '';
+  try {
+    return checkWrite(r.filePaths[0], 0, '模型下载');
+  } catch (error) {
+    if (!(error instanceof StorageBlocked)) throw error;
+    notifyStorage(error);
+    return '';
+  }
 });
 
 /* ── AI 助手（ai_assist.v1）：模型配置与 API Key 只在主进程；页面只发问题与上下文，Key 不进页面 ── */

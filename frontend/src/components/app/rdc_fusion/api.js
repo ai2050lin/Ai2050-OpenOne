@@ -16,7 +16,7 @@ const ONLINE_PATHS = new Set(['/api/platform/config']);
 const RESEARCH_INDEX = '/api/traces/research-space';
 const isResearchArtifact = path => /^\/api\/research-library\/artifacts\/[0-9a-f]{64}$/.test(path);
 const PUBLISHED_METADATA = new Set([RESEARCH_INDEX, '/api/research/mainline', '/api/research-library/workpackages', '/api/research-library/fragments']);
-const isPublishedResearch = path => typeof path === 'string' && (PUBLISHED_METADATA.has(path.split('?')[0]) || path.startsWith('/api/research/mlp-tail') || isResearchArtifact(path));
+const isPublishedResearch = path => typeof path === 'string' && (PUBLISHED_METADATA.has(path.split('?')[0]) || path.startsWith('/api/research/mlp-tail') || path.startsWith('/api/research/qwen14-mlp') || path.startsWith('/api/research/native-mlp') || isResearchArtifact(path));
 
 /* 离线客户端：从本机数据包取一条；没有时抛出带 pack（应下载的附加包 id）的错误。 */
 async function offlineJson(path) {

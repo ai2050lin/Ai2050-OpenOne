@@ -30,11 +30,11 @@ function TailDose({rows}){
     <table className="v6-table"><thead><tr><th>倍数 / 条件</th><th>有效文档</th><th>全词表KL</th><th>预测损失变化</th><th>首词变化</th></tr></thead><tbody>{rows.map(r=><tr key={`${r.factor}:${r.condition}`}><td>{r.factor} / {r.condition==='native_unit'?'原生':'对照'}</td><td>{r.n}/96</td><td>{num(r.mean_KL)}</td><td>{num(r.mean_nll_change)}</td><td>{r.top1_changes}</td></tr>)}</tbody></table></>;
 }
 
-export function TailScene({blocks=BLOCKS,layers,metric,block,unit,relation,allEdges,onPick}){
+export function TailScene({blocks=BLOCKS,layers,metric,block,unit,relation,allEdges,onPick,colorRelations=true,width=9728,modelName='Qwen3-4B'}){
   const ref=useRef(null),hits=useRef([]);
   const [view, setView] = useState({ yaw: -.48, pitch: 0, zoom: 1 });
   const { yaw, pitch, panX = 0, panY = 0, zoom } = view;
-  const count=blocks.length*9728;
+  const count=blocks.length*width;
   const height=blocks.length>4?840:590;
   const vectors=useMemo(()=>Object.fromEntries(blocks.map(b=>[b,layers[b]?.arrays?.[metric]||EMPTY])),[blocks,layers,metric]);
   useEffect(()=>{
@@ -42,27 +42,28 @@ export function TailScene({blocks=BLOCKS,layers,metric,block,unit,relation,allEd
     ctx.clearRect(0,0,900,height);hits.current=[];
     const mid=(blocks[0]+blocks.at(-1))/2;
     const spacing=(height-185)/(blocks.length-1);
-    const point=(b,u)=>{const x=(u%128-63.5)/64,z=(Math.floor(u/128)-37.5)/60;
+    const rows=Math.ceil(width/128);
+    const point=(b,u)=>{const x=(u%128-63.5)/64,z=(Math.floor(u/128)-(rows-1)/2)/(rows*.8);
       return [450+panX+zoom*185*(x*Math.cos(yaw)-z*Math.sin(yaw)), (height-55)/2+panY+pitchedScreenY(spacing*(b-mid),zoom*185*(x*Math.sin(yaw)+z*Math.cos(yaw)),pitch,1,35/185)];};
     const selected=point(block,unit),values=relation?.values;
     const destination=relation?.direction==='incoming'?relation.source:relation?.target;
     let edges=0;
-    if(values?.length===9728&&blocks.includes(destination)){
+    if(values?.length===width&&blocks.includes(destination)){
       const max=Math.max(1e-12,...values.map(Math.abs));
       values.forEach((v,i)=>{if(!allEdges&&Math.abs(v)<max*.2)return;const end=point(destination,i);ctx.beginPath();ctx.moveTo(...selected);ctx.lineTo(...end);ctx.strokeStyle=color(v,max,.13);ctx.stroke();edges++;});
     }
     for(const b of blocks){
-      const array=values?.length===9728&&b===destination?values:vectors[b];
+      const array=colorRelations&&values?.length===width&&b===destination?values:vectors[b];
       const max=Math.max(1e-12,...array.map(Math.abs));
-      for(let i=0;i<9728;i++){
+      for(let i=0;i<width;i++){
         const [x,y]=point(b,i);ctx.fillStyle=color(array[i],max);ctx.fillRect(x-1.1,y-1.1,2.2,2.2);hits.current.push({x,y,b,u:i});
       }
-      ctx.fillStyle='#334155';ctx.font='13px sans-serif';ctx.fillText(`B${b} · 第${b+1}层 · 9,728单元`,50,point(b,0)[1]-16);
+      ctx.fillStyle='#334155';ctx.font='13px sans-serif';ctx.fillText(`B${b} · 第${b+1}层 · ${width.toLocaleString('en-US')}单元`,50,point(b,0)[1]-16);
     }
     ctx.strokeStyle='#111827';ctx.lineWidth=2;ctx.strokeRect(selected[0]-4,selected[1]-4,8,8);ctx.lineWidth=1;
-    ctx.fillStyle='#475569';ctx.font='12px sans-serif';ctx.fillText(`全部${count.toLocaleString('en-US')}单元 · 原生编号 · 当前B${block}/U${unit} · 绘制${edges}/9,728条关系`,35,height-38);
+    ctx.fillStyle='#475569';ctx.font='12px sans-serif';ctx.fillText(`全部${count.toLocaleString('en-US')}单元 · 原生编号 · 当前B${block}/U${unit} · 绘制${edges}/${width.toLocaleString('en-US')}条关系`,35,height-38);
     ctx.fillText('蓝正橙负。板内位置按原生单元编号排布。连线含义见证据类型。',35,height-15);
-  },[blocks,count,height,vectors,block,unit,relation,allEdges,yaw,pitch,panX,panY,zoom]);
+  },[blocks,count,height,vectors,block,unit,relation,allEdges,colorRelations,yaw,pitch,panX,panY,zoom,width]);
   const pointer = useScenePointer({
     onPan: (dx, dy, canvas) => setView(v => panFixedCanvas(v, dx, dy, canvas)),
     onRotate: (dx, dy) => setView(v => ({ ...v, yaw: v.yaw + dx / 180, pitch: Math.max(-1, Math.min(1, v.pitch + dy / 180)) })),
@@ -73,19 +74,19 @@ export function TailScene({blocks=BLOCKS,layers,metric,block,unit,relation,allEd
   });
   const zoomBy = delta => setView(v => ({ ...v, zoom: Math.max(0.65, Math.min(1.5, v.zoom + delta)) }));
   useSceneWheel(ref, delta => zoomBy(delta < 0 ? 0.1 : -0.1));
-  return <><canvas ref={ref} width="900" height={height} style={{width:'100%',maxWidth:1050,touchAction:'none',cursor:'grab'}} aria-label={`Qwen3-4B B${blocks[0]}–B${blocks.at(-1)}全部${count}个MLP单元及分类型关联3D`}
+  return <><canvas ref={ref} width="900" height={height} style={{width:'100%',maxWidth:1050,touchAction:'none',cursor:'grab'}} aria-label={`${modelName} B${blocks[0]}–B${blocks.at(-1)}全部${count}个MLP单元及分类型关联3D`}
     title={SCENE_MOUSE_HINT} {...pointer} />
     <div className="v6-toolbar"><button className="fw-tbtn" onClick={()=>zoomBy(0.1)}>放大</button><button className="fw-tbtn" onClick={()=>zoomBy(-0.1)}>缩小</button><button className="fw-tbtn" onClick={()=>setView({ yaw: -.48, pitch: 0, zoom: 1 })}>重置视角</button></div></>;
 }
 
-export default function MlpTailAtlas(){
+export default function MlpTailAtlas({hideScene=false}){
   const report=useApi(BASE);
   if(report.error)return <Empty>{report.error}；尾层研究未接通，不使用演示数据。部署后可读取全部单元。</Empty>;
   if(!report.data)return <p className="v8-note">读取真实 MLP 图谱…</p>;
-  return <TailAtlasContent key={report.data.run_id} data={report.data}/>;
+  return <TailAtlasContent key={report.data.run_id} data={report.data} hideScene={hideScene}/>;
 }
 
-function TailAtlasContent({data}){
+function TailAtlasContent({data,hideScene=false}){
   const blocks=data.blocks||BLOCKS,first=blocks[0],last=blocks.at(-1);
   const [block,setBlock]=useState(()=>initialNumber('tail_block',first,first,last)),[unit,setUnit]=useState(()=>initialNumber('tail_unit',2663,0,9727)),[metric,setMetric]=useState('G_mean'),[kind,setKind]=useState('rho-holdout'),[direction,setDirection]=useState('outgoing'),[allEdges,setAllEdges]=useState(false);
   const [split,setSplit]=useState('holdout'),[field,setField]=useState('G'),[pole,setPole]=useState('positive');
@@ -114,7 +115,7 @@ function TailAtlasContent({data}){
       <label>关系 <select aria-label="尾层关系证据类型" value={kind} onChange={e=>setKind(e.target.value)}>{[['rho-discovery','发现集共同响应'],['rho-confirm','确认集共同响应'],['rho-holdout','留出集共同响应'],['weight-gate','写出→gate权重对齐'],['weight-up','写出→value权重对齐'],['causal','已测原模型有限干预']].map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>
       <label><input type="checkbox" checked={allEdges} onChange={e=>setAllEdges(e.target.checked)}/> 绘制全部关系</label></div>
     {kind==='causal'&&<div className="v6-toolbar"><label>已测源单元 <select aria-label="已测干预源单元" value={`${block}:${unit}`} onChange={e=>{const [b,u]=e.target.value.split(':').map(Number);pick(b,u);setDirection('outgoing')}}><option value={`${block}:${unit}`}>当前 B{block}/U{unit}</option>{[...new Map(data.path.summaries.map(r=>[`${r.source}:${r.unit}`,r])).values()].filter(r=>r.source!==block||r.unit!==unit).map(r=><option key={`${r.source}:${r.unit}`} value={`${r.source}:${r.unit}`}>B{r.source}/U{r.unit}</option>)}</select></label><label>写出倍数 <select aria-label="干预写出倍数" value={factor} onChange={e=>setFactor(Number(e.target.value))}>{[0,.5,1.5,2].map(f=><option key={f}>{f}</option>)}</select></label><p className="v8-note">有限干预从源单元向下一层查询；B35没有下一层MLP。</p></div>}
-    {layerError?<Empty>部分层数据读取失败。{layerError}</Empty>:blocks.every(b=>layers[b])?<TailScene blocks={blocks} layers={layers} metric={metric} block={block} unit={unit} relation={relation.data} allEdges={allEdges} onPick={pick}/>:<p className="v8-note">正在读取 {blocks.filter(b=>layers[b]).length} / {blocks.length} 层原生数据…</p>}
+    {!hideScene&&(layerError?<Empty>部分层数据读取失败。{layerError}</Empty>:blocks.every(b=>layers[b])?<TailScene blocks={blocks} layers={layers} metric={metric} block={block} unit={unit} relation={relation.data} allEdges={allEdges} onPick={pick}/>:<p className="v8-note">正在读取 {blocks.filter(b=>layers[b]).length} / {blocks.length} 层原生数据…</p>)}
     <MlpConditionCard block={block} unit={unit} snapshot={data.model_snapshot}/>
     <details><summary>原关键词线索（保留历史，不作为单元名称）</summary><p>{layer?.candidate_labels?.[unit]||'读取候选语境线索…'}</p></details>
     <p className="v8-note">{relation.error||relation.data?.scope||'读取关系…'} 候选关键词与当前 token 特征需要进一步验证，不作为单义性或因果解释。</p>

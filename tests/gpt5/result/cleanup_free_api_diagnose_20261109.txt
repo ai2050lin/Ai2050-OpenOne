@@ -1,0 +1,34 @@
+FREE-SPACE API / HARD-LINK / VSS DIAGNOSE  2026-11-10 00:03:20
+
+[1] GetDiskFreeSpaceExW D: rc=1
+    free bytes available to caller = 33.38 GB   <-- what shutil.disk_usage reports
+    total bytes                    = 731.39 GB
+    total free bytes (real)        = 33.38 GB
+    DIFF (quota / reserved)        = 0 B
+    shutil.disk_usage free         = 33.38 GB
+
+[2] fsutil volume diskfree D:
+    总可用字节数                :  35,836,837,888 ( 33.4 GB)
+    总字节数                     : 785,322,602,496 (731.4 GB)
+    总配额可用字节数          :  35,836,837,888 ( 33.4 GB)
+    不可用池字节数          :               0 (  0.0 KB)
+    配额不可用池字节数    :               0 (  0.0 KB)
+    已用字节数                      : 749,481,570,304 (698.0 GB)
+    总保留字节数            :       4,194,304 (  4.0 MB)
+    卷存储保留字节数   :               0 (  0.0 KB)
+    可用提交字节数       :               0 (  0.0 KB)
+    池可用字节数            :               0 (  0.0 KB)
+
+[3] hard-link check on remaining bank files
+    files=215  st_nlink distribution={2: 211, 1: 4}
+    distinct (dev,ino)=215  duplicated=0
+
+[4] VSS shadow copies on D:
+    vssadmin 1.1 - 卷影复制服务管理命令行工具
+    (C) 版权所有 2001-2013 Microsoft Corp.
+    找不到满足查询的项目。
+
+[5] recycle bin size
+    1.33 GB / 132 files
+
+=== END (READ-ONLY) ===

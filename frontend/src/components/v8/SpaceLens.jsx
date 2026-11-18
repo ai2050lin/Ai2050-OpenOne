@@ -18,18 +18,17 @@ import LangPage from './LangPage.jsx';
 import LangAtlas from './LangAtlas.jsx';
 import LivePane from './MechanismTraceExplorer.jsx';
 import ResearchSpace from './ResearchSpace.jsx';
+import SpatialResearchLibrary from './SpatialResearchLibrary.jsx';
 import NeuronPane from './NeuronPane.jsx';
 import ParameterExplorer from './ParameterExplorer.jsx';
-import ModelStructure from './ModelStructure.jsx';
 import Tower from './Tower.jsx';
 import { OVERLAYS, READOUT_LABEL, defaultModel, fmtP, hsLabel, pickItem, pickPiece, readState, shortModel, towerValues, writeState } from './v8Util.js';
 import './v8.css';
 import LanguageFrame from './LanguageFrame.jsx';
-import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
-import AssocSpace from './AssocSpace.jsx';
 import AssocWorkbench from './AssocWorkbench.jsx';
+import ResearchDisclosure from './ResearchDisclosure.jsx';
+import { AssocIntro, EncodingLadder } from './SpaceGuides.jsx';
 import { BasisCompare, RelationBoards } from './ClientGuide.jsx';
-import { PageHead, PageTabs, PillTools } from './CoreKit.jsx';
 
 const ResponseExplorer = lazy(() => import('../app/rdc_fusion/ResponseExplorer.jsx'));
 const AtlasView = lazy(() => import('../app/rdc_fusion/AtlasView.jsx'));
@@ -71,65 +70,35 @@ function curveHs(row, n) {
   return { values, marks, peak: row.peak?.layer ?? null };
 }
 
-/* 关联机制的四种模式（Phase 336）：Phase 346 起是工作台里的“分析视角”插件（AssocWorkbench.MODE_PLUGINS）。路由不变，旧链接照常打开对应模式。 */
-function assocModeOf(view, graphMode) {
-  if (view === 'live' || view === 'response') return view;
-  return view === 'graph' && ['langmeasure', 'relations'].includes(graphMode) ? graphMode : null;
-}
-/* 关联机制工作台（Phase 346）：3D 模型结构为核心，原来的四种模式变成“分析视角”插件，面板里仍是原来的页面 */
-function AssocHub({ mode, onMode, contextBar, children }) {
-  return <AssocWorkbench mode={mode} onMode={onMode} contextBar={contextBar}>{children}</AssocWorkbench>;
-}
-
-/* LLM 编码图谱：结构与参数、全部研发成果 */
-const ENC_MODES = [
-  ['structure', '结构与参数', '词嵌入、36 层的注意力头和 MLP 单元；点一层看它的 Head 与 MLP，再看真实参数与证据'],
-  ['internal', '全部研发成果', '全部研究对象的 3D 总图，按证据来源回查'],
-];
-function EncHub({ mode, onMode, children }) {
-  return <div className="v8-route as-page" aria-label="LLM 编码图谱">
-    <PageHead title="LLM 编码图谱" sub="模型里有什么：词嵌入、注意力头和 MLP 单元，以及它们各自的证据。" />
-    <PageTabs label="LLM 编码图谱视图" items={ENC_MODES} value={mode} onChange={onMode} />
-    {children}
-  </div>;
-}
-
+/* All legacy internal routes share one mounted workbench; the external language map remains separate. */
 export default function SpaceLens(props) {
-  const assocMode = assocModeOf(props.view, props.graphMode);
-  if (assocMode && !props.assocInner) {
-    const onMode = id => (id === 'live' || id === 'response' ? props.setView?.(id) : props.onGraphMode?.(id));
-    return <AssocHub mode={assocMode} onMode={onMode} contextBar={props.contextBar}><SpaceLens {...props} assocInner /></AssocHub>;
+  const associated = ['live', 'response'].includes(props.view) || props.view === 'graph' && ['langmeasure', 'relations'].includes(props.graphMode);
+  const browsing = props.view === 'parameters' || props.view === 'graph' && (!props.graphMode || ['structure', 'internal'].includes(props.graphMode));
+  if (associated || browsing) {
+    const mode = ['live', 'response'].includes(props.view) ? props.view : associated ? props.graphMode : null;
+    const onMode = id => ['live', 'response'].includes(id) ? props.setView?.(id) : props.onGraphMode?.(id);
+    return <AssocWorkbench workspaceMode={browsing ? 'browse' : 'analysis'} mode={mode} onMode={onMode}
+      modelKey={props.model} onModel={props.onModel} onGraphMode={props.onGraphMode} routeView={props.view} paramTab={props.paramTab}
+      contextBar={props.contextBar} archiveView={props.view === 'graph' && props.graphMode === 'internal'} renderArchive={options=><SpatialResearchLibrary {...options}/>}
+      methodItems={[
+          { id: 'ladder', label: '证据阶梯', render: () => <EncodingLadder open/> },
+          { id: 'basis', label: '特征基底对比', render: () => <BasisCompare/> },
+          { id: 'modes', label: '运行方式说明', render: () => <AssocIntro/> },
+          ...[['map','语言目录映射'],['fidelity','保真看板'],['bench','方法基准'],['public','公开基准']].map(([id,label])=>({id,label,render:()=> <RelationBoards only={id}/>})),
+        ]}
+      historyContent={<>
+          <p className="v8-note">以下保留模板汇总的独立模型与统计口径，不叠加到上方原生单元。</p>
+          <Suspense fallback={<Empty>读取模板响应…</Empty>}><ResponseExplorer initialTm={props.tm||undefined} initialBucket={props.model} strictBucket onContext={({tm})=>props.setTm?.(tm)}/></Suspense>
+          <HistoricalPanel kind={browsing?'activation':'fidelity'}/>
+      </>}>
+      {['langmeasure', 'relations'].includes(mode) ? <SpaceDetailLens {...props} analysisOnly/> : null}
+    </AssocWorkbench>;
   }
-  const encMode = props.view === 'parameters' || (props.view === 'graph' && (!props.graphMode || ['structure', 'internal'].includes(props.graphMode)))
-    ? (props.view === 'graph' && props.graphMode === 'internal' ? 'internal' : 'structure') : null;
-  if (encMode && !props.assocInner) {
-    return <EncHub mode={encMode} onMode={id => props.onGraphMode?.(id)}><SpaceLens {...props} assocInner /></EncHub>;
-  }
-  if (props.view !== 'graph' || !props.graphMode || props.graphMode === 'structure') {
-    /* 编码图谱（结构、参数）先给证据阶梯；关联机制（运行、对照）先说明三种运行方式的边界 */
-    const structure = <ModelStructure modelKey={props.model} onModel={props.onModel} view={props.view} paramTab={props.paramTab}
-      onGraphMode={props.onGraphMode} tm={props.tm} onTm={props.setTm} compact
-      historical={<HistoricalPanel kind={props.view==='response'?'fidelity':'activation'}/>}/>;
-    /* 关联机制 · 运行与路径：首屏只有 3D 空间，运行一段文字等功能收进操作台（Phase 332） */
-    if (props.view === 'live') return <AssocSpace model={props.model} bare>{structure}</AssocSpace>;
-    /* 其余结构页与响应对照：首屏只有核心模块（3D 层塔 / 最小对照），说明与看板收进按钮（Phase 333） */
-    const tools = props.view === 'response' ? [
-      { id: 'modes', label: '三种运行的区别', render: () => <AssocIntro/> },
-      { id: 'map', label: '语言目录映射', render: () => <RelationBoards only="map"/> },
-      { id: 'fidelity', label: '保真看板', render: () => <RelationBoards only="fidelity"/> },
-      { id: 'bench', label: '方法基准', render: () => <RelationBoards only="bench"/> },
-      { id: 'public', label: '公开基准', render: () => <RelationBoards only="public"/> },
-    ] : [
-      { id: 'ladder', label: '证据阶梯', render: () => <EncodingLadder open/> },
-      { id: 'basis', label: '特征基底对比', render: () => <BasisCompare/> },
-    ];
-    return <>{structure}<PillTools label="更多内容" items={tools}/></>;
-  }
-  return <SpaceDetailLens {...props} />;
+  return <SpaceDetailLens {...props}/>;
 }
 
-function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
-  /* language = 语言图谱（只有外部能力框架）；langmeasure = 关联机制里的语言项实测（原语言图谱页：层塔、读出、神经元、数据集实测） */
+function SpaceDetailLens({ analysisOnly = false, view: routeView, graphMode='language', paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
+  /* language = 语言图谱（只有外部能力框架）；langmeasure = 模型探索里的语言项实测（原语言图谱页：层塔、读出、神经元、数据集实测） */
   const view=routeView==='graph'?({language:'langframe',langmeasure:'lang',internal:'research',relations:'relations'}[graphMode]||'langframe'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
   /* 图层切换已由工作台的三张图和视图条承担，这里不再重复一排图层按钮 */
   const modeBar=routeView==='graph'?null:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;
@@ -279,7 +248,7 @@ function SpaceDetailLens({ view: routeView, graphMode='language', paramTab='weig
   }
   const syncTag = respRow && cfg.selected != null && view === 'response' ? `${respRow.readout}@L${cfg.selected}` : undefined;
 
-  const showTower = view === 'neuron' || view === 'lang' || view === 'response';   // 原生运行页自带按真实快照绘制的3D结构
+  const showTower = !analysisOnly && (view === 'neuron' || view === 'lang' || view === 'response');   // 原生运行页自带按真实快照绘制的3D结构
 
   /* 布局：需要层结构的 tab 一律左右分栏（塔在左，内容在右）。神经元页右栏常驻，
      不再有「只有塔」的单列态——单列时右边是空白，而块细节本来就是这一页要看的东西。 */

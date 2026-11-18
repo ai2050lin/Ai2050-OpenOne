@@ -2,11 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Local Client (Electron + Backend)",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\scripts\\start_visualization.ps1\" -Mode client -LocalBackend"
+    },
+    {
       "name": "Client (Electron)",
       "type": "node-terminal",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ${workspaceFolder}/scripts/start_visualization.ps1 -Mode client"
+      "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\scripts\\start_visualization.ps1\" -Mode client"
     },
     {
       "name": "Backend",

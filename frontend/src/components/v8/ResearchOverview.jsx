@@ -309,7 +309,7 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
     <CapabilityMatrix onOpenClaim={() => onGo('process', 'plan')} />
     <PillTools label="总览的更多内容" items={[
       { id: 'case', label: '一个决策点案例', render: () => <div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
-        <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开关联机制</button></div> },
+        <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开模型探索</button></div> },
       { id: 'scores', label: `四组成绩 · ${scored} / ${SCORES.length}`, render: () => <ScoreBoard bare/> },
       { id: 'findings', label: `最近的发现 · ${FINDINGS.length}`, render: () => <LatestFindings onGo={onGo} bare/> },
       { id: 'next', label: '下一步', render: () => <NextStep onGo={onGo}/> },

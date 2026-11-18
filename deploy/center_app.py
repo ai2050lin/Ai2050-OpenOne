@@ -97,6 +97,14 @@ def create_app():
         from server.research_space_service import router as research_space_router
         app.include_router(research_space_router, prefix='/api/traces')
     app.include_router(library_router)
+    from deploy.mainline_state_service import router as mainline_state_router
+    app.include_router(mainline_state_router)
+    from server.mlp_tail_service import router as mlp_tail_router
+    app.include_router(mlp_tail_router)
+    from server.qwen14_mlp_service import router as qwen14_mlp_router
+    app.include_router(qwen14_mlp_router)
+    from server.native_mlp_service import router as native_mlp_router
+    app.include_router(native_mlp_router)
     app.include_router(parameter_router)
     app.add_api_route('/api/rules/overview', rule_overview, methods=['GET'])
     from deploy.node_control import router as node_control_router

@@ -39,7 +39,7 @@ export function AssocIntro() {
     ['对照', '只改一个因素，分钟级', '能比较因素的作用，仍是未登记观察'],
     ['正式', '冻结决策点加修补', '进入研究记录，按预注册判据判定'],
   ];
-  return <section className="v8-card cg-section" aria-label="关联机制的运行方式">
+  return <section className="v8-card cg-section" aria-label="模型探索的运行方式">
     <h3>一段文字怎样决定下一个词</h3>
     <p className="v8-note">“竞争”需要对照：单次前向只能看到读数，比较因素要有对照文本，判断因果要有修补。下面三种运行方式分开记录。</p>
     <div className="cg-grid3">{modes.map(([name, cost, use]) => <div key={name}><strong>{name}</strong><small className="v8-note"> · {cost}</small><p className="v8-note">{use}</p></div>)}</div>

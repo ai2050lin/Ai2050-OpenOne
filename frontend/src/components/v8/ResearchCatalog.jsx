@@ -1,4 +1,3 @@
-import { CatalogSummary } from './ClientGuide.jsx';
 import { useState } from 'react';
 import { useApi } from '../app/rdc_fusion/api.js';
 import { CatalogItemDetails } from '../app/rdc_fusion/CatalogPanel.jsx';
@@ -6,9 +5,10 @@ import { STATUS_META } from '../app/rdc_fusion/catalogUtil.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
 import { ExtraPackPrompt } from '../open/DataBar.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
+import ResearchPanels from './ResearchPanels.jsx';
 import { fragmentHref } from './researchFragmentUtil.js';
 import { LockboxTable, PTile, PowerWizard } from './MainlineProgress.jsx';
-import { PageHead, PillTools } from './CoreKit.jsx';
+import { PageHead } from './CoreKit.jsx';
 import { useCoverage } from './coverage.js';
 import { PAIRS, SPLITS } from './data/mainline.js';
 
@@ -135,21 +135,14 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
     points: <p className="v8-note">决策点库的目标数量在 H1 按功效确定，现在没有分母，所以不显示百分比。</p>,
   }[stage];
 
-  /* 首屏只有一个核心模块：材料流向的四个环；其余收进按钮（Phase 333） */
   return <section className="v8-rnd" aria-label="材料与数据">
-    <PageHead title="材料与数据" sub="主线材料准备到哪里。所有实验用到的句子、语料和模型，都能在下方查到来源。" />
-    <div className="mp-tiles">
-      <PTile title="语言目录" done={coverage.language} total={coverage.languageTotal} unit="项" on={stage === 'lang'} onClick={() => setStage(stage === 'lang' ? '' : 'lang')}/>
-      <PTile title="竞争对材料" done={pairsBuilt} total={PAIRS.length} unit="组" on={stage === 'pairs'} onClick={() => setStage(stage === 'pairs' ? '' : 'pairs')}/>
-      <PTile title="三个划分" done={splitsBuilt} total={SPLITS.length} unit="份" on={stage === 'splits'} onClick={() => setStage(stage === 'splits' ? '' : 'splits')}/>
-      <PTile title="决策点库" empty="未建" on={stage === 'points'} onClick={() => setStage(stage === 'points' ? '' : 'points')}/>
+    <PageHead title="材料与数据" sub="搜索数据集和模板，点开查看样本、版本与来源。" />
+    <div className="rnd-summary" aria-label="材料概况">
+      <div><small>{runFilter ? '关联数据集' : '数据集'}</small><b>{research.data ? datasetRows.length : '—'}</b></div>
+      <div><small>{runFilter ? '当前范围模板' : '测试模板'}</small><b>{runFilter ? '—' : catalog.data?.items?.length ?? '—'}</b></div>
+      <div><small>模型档案</small><b>{skeleton.data?.models?.length ?? '—'}</b></div>
     </div>
-    {stageDetail && <div className="mp-detail">{stageDetail}</div>}
-    <PillTools label="材料与数据的更多内容" initial={runFilter || template ? 'all' : ''} items={[
-      { id: 'power', label: '冻结向导（H1）', render: () => <PowerWizard/> },
-      { id: 'lockbox', label: '锁箱看管', render: () => <LockboxTable/> },
-      { id: 'all', label: '全部材料（搜索与来源）', render: () => <>
-        <CatalogSummary templates={catalog.data?.items?.length} models={skeleton.data?.models?.length} tokens="1,904 万"/>
+    <section className="v8-card v8-rnd-catalog-list" aria-label="材料检索">
         <div className="v8-rnd-search">
           <input type="search" aria-label="搜索材料" placeholder="搜索数据集或模板" value={query}
             onChange={event => { setQuery(event.target.value); setLimit(FIRST_PAGE); }}/>
@@ -179,10 +172,26 @@ export default function ResearchCatalog({ runFilter = '', template, onGo, onAuto
         {rows.length > limit && <button className="fw-tbtn" type="button" onClick={() => setLimit(limit + FIRST_PAGE)}>
           显示更多材料（还有 {rows.length - limit} 条）
         </button>}
-        {!runFilter && independentReviews.length > 0 && <ResearchDisclosure title={`独立评审批次（${independentReviews.length}）`}>
-          <p className="v8-note">评审批次保留各自的来源和评分口径。</p>
-          {independentReviews.map(review => <ReviewDetails key={review.id} review={review}/>)}
-        </ResearchDisclosure>}
+    </section>
+    <ResearchPanels label="材料研究工具" collapsible items={[
+      { id: 'readiness', label: '准备进度', render: () => <>
+        <div className="mp-tiles">
+          <PTile title="语言目录" done={coverage.language} total={coverage.languageTotal} unit="项" on={stage === 'lang'} onClick={() => setStage(stage === 'lang' ? '' : 'lang')}/>
+          <PTile title="竞争对材料" done={pairsBuilt} total={PAIRS.length} unit="组" on={stage === 'pairs'} onClick={() => setStage(stage === 'pairs' ? '' : 'pairs')}/>
+          <PTile title="三个划分" done={splitsBuilt} total={SPLITS.length} unit="份" on={stage === 'splits'} onClick={() => setStage(stage === 'splits' ? '' : 'splits')}/>
+          <PTile title="决策点库" empty="未建" on={stage === 'points'} onClick={() => setStage(stage === 'points' ? '' : 'points')}/>
+        </div>
+        {stageDetail && <div className="mp-detail">{stageDetail}</div>}
+      </> },
+      { id: 'freeze', label: '冻结与划分', render: () => <>
+        <p className="v8-note">先确定材料划分与样本量，再进入模板流水线冻结。这里的计算不写入冻结记录。</p>
+        <ResearchDisclosure title="样本量计算"><PowerWizard/></ResearchDisclosure>
+        <ResearchDisclosure title="锁箱状态"><LockboxTable/></ResearchDisclosure>
+        {onStudio && <button type="button" className="fw-tbtn" onClick={onStudio}>打开模板流水线</button>}
+      </> },
+      independentReviews.length > 0 && { id: 'reviews', label: '独立评审', render: () => <>
+        <p className="v8-note">评审批次保留各自的来源和评分口径。</p>
+        {independentReviews.map(review => <ReviewDetails key={review.id} review={review}/>)}
       </> },
     ]} />
   </section>;

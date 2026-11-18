@@ -1,5 +1,21 @@
 /* 关联机制工作台（Phase 346） */
 .aw { display: flex; flex-direction: column; gap: 10px; }
+.aw [hidden] { display: none !important; }
+.aw-workspace-mode { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.aw-workspace-mode > button { margin-left: auto; }
+.aw-mode-actions { margin-left: auto; display: flex; gap: 10px; }
+.aw-comparison { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.aw-comparison label { min-width: 0; }
+.aw-comparison select { max-width: min(420px,100%); }
+.aw-comparison p { flex-basis: 100%; }
+.aw-library { min-width: 0; }
+.aw-library select { max-width: 100%; }
+.aw-library-list { display: grid; gap: 5px; }
+.aw-library-list button { text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.aw-library-list small { display: block; color: #68748a; font-size: 11px; }
+.aw-object-host { padding: 12px; min-width: 0; }
+.aw-object-host .v8-spatial-detail { padding: 10px; margin: 0; }
+.aw-object-host .v8-json { max-height: 320px; max-width: 100%; overflow: auto; font-size: 11px; }
 .aw-models { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 4px 12px; border-bottom: 1px solid #e2e7ef; min-width: 0; }
 .aw-models > button { border: 1px solid #e2e7ef; background: #fff; border-radius: 8px; padding: 4px 8px; font: inherit; text-align: left; cursor: pointer; display: grid; grid-template-columns: auto auto; align-items: center; gap: 2px 6px; line-height: 1.25; min-width: 0; }
 .aw-models > button b { font-size: 13.5px; }
@@ -43,7 +59,7 @@
 /* 控制台 */
 .aw-cons { padding: 0 !important; display: flex; flex-direction: column; }
 .aw-chead { display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid #e2e7ef; }
-.aw-chead h3 { margin: 0; font-size: 15px; }
+.aw-chead h3 { margin: 0; font-size: 15px; white-space: nowrap; flex-shrink: 0; }
 .aw-cin { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #e2e7ef; align-items: start; }
 .aw-cin textarea { width: 100%; height: 58px; border: 1px solid #cbd5e2; border-radius: 8px; padding: 6px 8px; font: inherit; resize: vertical; }
 .aw-cin p { margin: 2px 0 0; }
@@ -56,6 +72,18 @@
 .aw-toks button.on { outline: 2px solid #d29a00; }
 .aw-body { display: grid; grid-template-columns: 320px minmax(0, 1fr); min-height: 360px; }
 .aw-right { min-width: 0; display: flex; flex-direction: column; }
+.aw-right { max-height: 680px; overflow: auto; }
+.aw-right > .aw-tabs { position: sticky; top: 0; z-index: 2; background: #fff; flex-shrink: 0; }
+.aw-context-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 7px 14px; border-bottom: 1px solid #e2e7ef; }
+.aw-context-tools label, .aw-panel-toolbar label { display: flex; align-items: center; gap: 6px; min-width: 0; color: #68748a; font-size: 12px; }
+.aw-context-tools select, .aw-panel-toolbar select { min-width: 0; max-width: 250px; border: 1px solid #cbd5e2; border-radius: 6px; padding: 2px 4px; background: #fff; color: #3e4b60; font: inherit; }
+.aw-context-tools input { width: 58px; border: 1px solid #cbd5e2; border-radius: 6px; padding: 2px 4px; font: inherit; }
+.aw-subtabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #e2e7ef; }
+.aw-subtabs button { border: 1px solid #cbd5e2; background: #fff; color: #3e4b60; border-radius: 6px; padding: 3px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+.aw-subtabs button[aria-selected='true'] { color: #183f77; background: #eef4fc; border-color: #8eabd0; }
+.aw-panel-toolbar { padding: 10px 12px; margin: 0; }
+.aw-method-content { padding: 12px; min-width: 0; }
+.aw-toks { max-height: 180px; overflow: auto; }
 .aw-tabs { display: flex; gap: 2px; padding: 6px 10px 0; border-bottom: 1px solid #e2e7ef; flex-wrap: wrap; }
 .aw-tabs button { border: 0; background: none; padding: 5px 10px; font: inherit; font-size: 12.5px; color: #68748a; border-bottom: 2px solid transparent; cursor: pointer; }
 .aw-tabs button[aria-selected='true'] { color: #183f77; border-color: #183f77; font-weight: 600; }
@@ -72,7 +100,6 @@
 .aw-ops { font-size: 12.5px; background: #fff; display: flex; flex-direction: column; min-width: 0; }
 .aw-ops.docked { border-right: 1px solid #e2e7ef; max-height: 640px; }
 .aw-ops.float { position: absolute; width: 290px; max-height: calc(100% - 140px); border: 1px solid #e2e7ef; border-radius: 12px; box-shadow: 0 10px 30px rgba(23, 32, 51, .16); z-index: 10; overflow: hidden; background: rgba(255, 255, 255, .97); }
-.aw-ops.min .aw-in, .aw-ops.min .aw-cfg { display: none; }
 .aw-bar { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #e2e7ef; background: #f8fafc; user-select: none; }
 .aw-ops.float .aw-bar { cursor: move; }
 .aw-bar b { flex: 1; }
@@ -82,6 +109,9 @@
 .aw-cfg h5 { margin: 6px 0 3px; font-size: 11.5px; color: #68748a; }
 .aw-cfg label { display: flex; gap: 6px; align-items: center; padding: 2px 0; cursor: pointer; }
 .aw-cfg label small { color: #68748a; font-size: 10.5px; margin-left: auto; }
+.aw-pending p { margin: 8px 0; }
+.aw-pending small { display: block; color: #68748a; }
+.aw-run-setting { display: flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 12px; }
 .aw-acts { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .aw-acts button { border: 1px solid #cbd5e2; background: #fff; border-radius: 6px; font: inherit; font-size: 11.5px; padding: 1px 8px; cursor: pointer; }
 .aw-in { padding: 10px 12px; overflow: auto; }
@@ -115,3 +145,15 @@
 .aw-toks.live button.on { background: #e3edf9; color: #183f77; font-weight: 600; outline: 2px solid #d29a00; }
 .aw-src { margin-top: 2px; }
 .aw-src button:disabled { color: #a0a9b8; cursor: not-allowed; }
+
+/* Functional plugins activate workspaces, separate from optional data overlays. */
+.aw-function-plugins { display:grid; gap:6px; margin-bottom:14px; }
+.aw-function-plugins button { display:grid; gap:4px; text-align:left; padding:9px 10px; border:1px solid #dfe5ec; border-radius:7px; background:#fff; color:inherit; font:inherit; cursor:pointer; }
+.aw-function-plugins button[aria-pressed=true] { border-color:#245ca8; background:#f4f8fd; color:#134584; }
+.aw-function-plugins small { font-size:11px; line-height:1.5; color:#68748a; }
+.aw-task-switch { padding:10px 14px; }
+.aw-task { padding:12px 14px; border-bottom:1px solid #dfe5ec; }
+.aw-task-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px 0; }
+.aw-task-row small { width:100%; }
+.aw-task-layers { display:flex; flex-wrap:wrap; gap:4px; }
+.aw-task-layers button { min-width:50px; }

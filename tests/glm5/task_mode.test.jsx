@@ -1,0 +1,20 @@
+import {it,expect,vi,afterEach} from 'vitest';
+import React,{act} from '../../frontend/node_modules/react/index.js';
+import {createRoot} from '../../frontend/node_modules/react-dom/client.js';
+import Task from '../../frontend/src/components/v8/ObservationTask.jsx';
+import {taskPair,compareTaskRuns} from '../../frontend/src/components/v8/observationTasks.js';
+const fixture=(hidden=[[1,0],[0,1]])=>({id:'synthetic-engineering-only',snapshot:'synthetic',tokens:['x'],hidden,top:[{text:'红',probability:.8}],readout:[0],elapsed:1});
+let root,host;
+afterEach(async()=>{if(root){await act(async()=>root.unmount());host.remove();root=null;}});
+it('generates long paired inputs with equal character counts without claiming token matching',()=>{for(const k of ['binding','negation','order']){const [a,b]=taskPair(k);expect(a.text.length).toBeGreaterThan(300);expect(a.text.length).toBe(b.text.length);expect(a.text).not.toBe(b.text);expect(taskPair(k,1)[0].text).not.toBe(a.text);}});
+it('finds planted change and identical negative control on all coordinates',()=>{const x=fixture(),same=compareTaskRuns(x,x),changed=compareTaskRuns(x,fixture([[1,0],[1,0]]));expect(same.layers.every(l=>l.relativeL2===0)).toBe(true);expect(changed.layers[1].relativeL2).toBeCloseTo(Math.sqrt(2));expect(changed.layers[1].cosine).toBe(0);});
+it('rejects incompatible snapshots, missing/nonfinite coordinates and labels position confounding',()=>{expect(compareTaskRuns(fixture(),{...fixture(),snapshot:'different'}).layers).toHaveLength(0);expect(compareTaskRuns(fixture(),fixture([[1],[1]])).layers).toHaveLength(0);expect(compareTaskRuns(fixture(),fixture([[1,NaN],[1,1]])).layers).toHaveLength(0);expect(compareTaskRuns(fixture(),{...fixture(),tokens:['x','y']}).reason).toContain('混杂');});
+it('does not execute on mount, preserves failure results, retries and locates a layer',async()=>{
+ globalThis.IS_REACT_ACT_ENVIRONMENT=true;host=document.createElement('div');document.body.append(host);root=createRoot(host);
+ const execute=vi.fn().mockResolvedValueOnce(fixture()).mockRejectedValueOnce(new Error('本机离线')).mockResolvedValueOnce(fixture([[1,0],[1,0]])),observe=vi.fn();
+ await act(async()=>root.render(<Task execute={execute} observe={observe} preview={()=>{}} busy={false}/>));expect(execute).not.toHaveBeenCalled();
+ const run=async i=>{await act(async()=>host.querySelectorAll('.aw-task-row')[i].querySelector('.primary').click());};
+ await run(0);await run(1);expect(host.textContent).toContain('1 / 2 已运行');expect(host.textContent).toContain('本机离线');await run(1);expect(host.textContent).toContain('2 / 2 已运行');
+ await act(async()=>host.querySelectorAll('.aw-task-layers button')[1].click());expect(observe).toHaveBeenCalledWith(expect.any(Object),expect.any(String),'B',1);
+});
+it('disables execution when model prerequisites are absent',async()=>{globalThis.IS_REACT_ACT_ENVIRONMENT=true;host=document.createElement('div');document.body.append(host);root=createRoot(host);await act(async()=>root.render(<Task disabled="请加载模型" execute={()=>{throw Error('must not run')}} preview={()=>{}}/>));expect([...host.querySelectorAll('.primary')].every(b=>b.disabled)).toBe(true);});

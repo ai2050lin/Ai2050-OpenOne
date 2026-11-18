@@ -128,7 +128,6 @@ function WorkbenchContent() {
   const csec = CFG_SECTIONS.some(s => s.id === st.csec) || ['platform','legacy'].includes(st.csec) ? st.csec : 'conn';
   // 旧空间入口在 readState / normalizeState 中归一为图谱图层或参数子视图。
   const view = SPATIAL_VIEWS.some(v => v.id === st.view) ? st.view : 'graph';
-  const researchGraph = view==='graph'&&st.gview!=='structure';
   const rtab = ROUTE_VIEWS.some(v => v.id === st.rtab) || st.rtab === 'neuron' ? st.rtab : 'overview';
   const stationGroup=['plan','catalog'].includes(station)?station:'execution';
   const dsOn = dsBound(lens, { view, gview:st.gview });
@@ -200,7 +199,7 @@ function WorkbenchContent() {
                 tools={stations.filter(s=>!['plan','execution','catalog'].includes(s.id))}/>}
               {lens === 'spatial' && <SpaceLens contextBar={view==='graph'&&['langmeasure','relations'].includes(st.gview) ? <Gctx ds={st.ds || ''} mdl={st.mdl || ''} dsBound={dsOn} onDs={v => set({ ds: v })} onMdl={v => set({ mdl: v })}
                   scope={view === 'graph' ? '当前图层的数据来源与被测模型；不同快照分别查看'
-                    : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）'} /> : null} key={`${revision}:${researchGraph?st.gview:'workbench'}`} view={view} graphMode={st.gview}
+                    : '本页只随模型变：读的是已载入权重，普查读自然语料（1,900 万 token）'} /> : null} key={`${revision}:spatial-workspace`} view={view} graphMode={st.gview}
                                                   onGraphMode={gview=>set({view:'graph',gview})} paramTab={st.ptab} onParamTab={ptab=>set({ptab})} setView={v => set({ view: v })} tm={st.tm} setTm={tm => set({ tm })}
                                                   model={st.mdl || ''} onModel={mdl=>set({mdl})} ds={st.ds || ''} onDs={v => set({ ds: v })}
                                                   localPack={<LocalPack />} />}

@@ -32,6 +32,11 @@ import urllib.request
 import uuid
 from pathlib import Path
 
+try:
+    from .storage_policy import StorageBlocked, check_write, checked_dir, process_env, storage_dir, stop_with_notice
+except ImportError:  # standalone client distribution
+    from storage_policy import StorageBlocked, check_write, checked_dir, process_env, storage_dir, stop_with_notice
+
 CHUNK_SIZE = 1_500_000  # 与中心 CHUNK_SIZE 一致（base64 前）
 
 
@@ -175,6 +180,7 @@ def execute_task(args, task: dict, work_root: Path) -> Path:
     if Path(task['task_id']).name!=task['task_id']:raise ValueError('invalid task id')
     if not tdir.is_relative_to(work_root) or tdir==work_root:raise ValueError('task directory outside workspace')
     if any(Path(n).name!=n or n in ('.','..') for n in task['files']):raise ValueError('unsafe bundle path')
+    check_write(tdir, sum(len(content.encode('utf-8')) for content in task['files'].values()), operation='节点任务')
     if task.get('job_kind')=='natural_register':
         files=task['files'];contract=json.loads(files['contract.json']);corpus=json.loads(files['corpus.json'])
         design={'tm_id':task['tm_id'],'version':task['version'],'corpus':corpus,
@@ -196,7 +202,11 @@ def execute_task(args, task: dict, work_root: Path) -> Path:
         ref_path.write_text(json.dumps(research_ref, ensure_ascii=False, sort_keys=True, indent=2),
                             encoding='utf-8')
     runner = tdir / 'bundle' / 'runner.py'
-    env = dict(os.environ)
+    env = process_env(tdir)
+    native = env.get('AI2050_NATIVE_DIR') or str(storage_dir('reusable', 'native_fields'))
+    if native.lower() not in ('off', '0', 'none'):
+        native = str(check_write(native, operation='节点原生场'))
+    env['AI2050_NATIVE_DIR'] = native
     if research_ref:
         env['AI2050_RESEARCH_WORK_UNIT_PATH'] = str(ref_path)
     if args.model_path:
@@ -211,11 +221,25 @@ def execute_task(args, task: dict, work_root: Path) -> Path:
     proc = _spawn([args.python, str(runner), '--out', str(tdir / 'outputs')], cwd=str(tdir), env=env,
                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
     try:
-        out, err = proc.communicate(timeout=args.run_timeout)
+        deadline = time.monotonic() + args.run_timeout
+        while True:
+            try:
+                out, err = proc.communicate(timeout=max(0, min(30, deadline - time.monotonic())))
+                break
+            except subprocess.TimeoutExpired:
+                if time.monotonic() >= deadline:
+                    raise
+                check_write(tdir, operation='节点任务继续写入')
+                if native.lower() not in ('off', '0', 'none'):
+                    check_write(native, operation='节点原生场继续写入')
     except subprocess.TimeoutExpired:
         proc.kill()
         out, err = proc.communicate()
         raise RuntimeError(f'runner timeout after {args.run_timeout:.0f}s')
+    except StorageBlocked:
+        proc.kill()
+        proc.communicate()
+        raise
     finally:
         RUNNING.discard(proc)
     log(f"runner exit={proc.returncode} {out.strip().splitlines()[-1] if out.strip() else ''}")
@@ -314,8 +338,7 @@ def cmd_run(args) -> None:
     creds = load_creds(Path(args.data_dir))
     if args.server:
         creds['server'] = args.server.rstrip('/')
-    work_root = Path(args.data_dir) / 'tasks'
-    work_root.mkdir(parents=True, exist_ok=True)
+    work_root = checked_dir(Path(args.data_dir) / 'tasks', operation='节点工作区')
     log(f"agent loop server={creds['server']} once={args.once} "
         f"model={'REAL:' + args.model_path if args.model_path else 'smoke'}")
     while True:
@@ -339,9 +362,14 @@ def cmd_download(args) -> None:
     st, bundle = http_json(base + f'/api/kits/{args.kit}/bundle', 'GET', None, timeout=60)
     if st != 200 or not bundle:
         raise RuntimeError(f'bundle fetch failed: HTTP {st}')
-    out = Path(args.out) / args.kit
-    (out / 'bundle').mkdir(parents=True, exist_ok=True)
     files = bundle.get('files') or {}
+    if Path(args.kit).name != args.kit or args.kit in ('.', '..'):
+        raise ValueError('invalid research kit id')
+    if any(Path(name).name != name or name in ('.', '..') for name in files):
+        raise ValueError('invalid research kit member')
+    out = check_write(Path(args.out) / args.kit, sum(len(value.encode('utf-8')) for value in files.values()),
+                      operation='研究包下载')
+    checked_dir(out / 'bundle', operation='研究包下载')
     for name, content in files.items():
         (out / 'bundle' / name).write_bytes(content.encode('utf-8'))  # 字节写入：禁 CRLF 翻译（保 design_sha 一致）
     (out / 'results_manifest.json').write_text(
@@ -402,7 +430,8 @@ SNAPSHOT_PATTERNS = ('*.safetensors', '*.bin', '*.pt', '*.gguf', 'config.json', 
 
 
 def _home() -> Path:
-    return Path(os.environ.get('AI2050_HOME', str(Path.home() / '.ai2050')))
+    default = storage_dir('client', 'node-state') if os.name == 'nt' else Path.home() / '.ai2050'
+    return Path(os.environ.get('AI2050_HOME') or default)
 
 
 def model_snapshot(model_path) -> dict:
@@ -429,22 +458,28 @@ def model_snapshot(model_path) -> dict:
                 cache[key] = h.hexdigest()
             files[p.name] = {'sha256': cache[key], 'size': st.st_size}
     try:
+        check_write(cache_p, operation='模型指纹缓存')
         cache_p.parent.mkdir(parents=True, exist_ok=True)
         cache_p.write_text(json.dumps(cache), encoding='utf-8')
-    except OSError:
+    except (OSError, StorageBlocked):
         pass
     total = hashlib.sha256(json.dumps(files, sort_keys=True).encode('utf-8')).hexdigest()
     return {'sha256': total, 'files': files, 'n_files': len(files)}
 
 
 def http_download(url: str, dest: Path, timeout: float = 120) -> None:
+    dest = check_write(dest, operation='节点数据下载')
     tmp = dest.with_suffix(dest.suffix + '.part')
-    with urllib.request.urlopen(url, timeout=timeout) as r, tmp.open('wb') as fh:
-        while True:
-            b = r.read(1 << 20)
-            if not b:
-                break
-            fh.write(b)
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        required = int(r.headers.get('Content-Length') or 0)
+        tmp = check_write(tmp, required, operation='节点数据下载暂存')
+        with tmp.open('wb') as fh:
+            while True:
+                b = r.read(1 << 20)
+                if not b:
+                    break
+                check_write(tmp, len(b), operation='继续下载节点数据')
+                fh.write(b)
     tmp.replace(dest)
 
 
@@ -533,12 +568,18 @@ def _model_rev(model_dir: str) -> str:
 def run_census_shard(server: str, token: str, work: Path, model_dir: str, device: str, mode: str, py: str,
                      snapshot: str = '', job_id: str = '') -> bool:
     """领取并执行一个普查分片；返回是否领到了分片。"""
+    work = check_write(work, operation='普查工作区')
     st, lease = http_json(server + '/api/census/claim', 'POST', {'model_snapshot': snapshot, 'mode': mode, 'job_id': job_id},
                           token=token, ok_204=True)
     if st == 204 or not lease:
         return False
     ABORT.clear()
     lid = lease['lease_id']
+    if not lid or Path(lid).name != lid or lid in ('.', '..'):
+        raise ValueError('invalid census lease id')
+    tdir = (work / lid).resolve()
+    if tdir.parent != work:
+        raise ValueError('census lease directory outside workspace')
     _emit(PROGRESS_HOOKS, {'stage': 'claimed', 'task': lid, 'job': lease['job_id'], 'shard': lease['shard']})
     layers = lease['spec']['layers']
     log(f"领取普查分片 {lease['job_id']} / {lease['shard']}（层 {layers[0]}–{layers[-1]}，"
@@ -552,18 +593,18 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
             except Exception as e:
                 log(f'续租失败：{e}')
     threading.Thread(target=hb, daemon=True).start()
-    tdir = work / lid
     try:
-        cache = work / 'cache'
-        cache.mkdir(parents=True, exist_ok=True)
-        tdir.mkdir(parents=True, exist_ok=True)
+        cache = checked_dir(work / 'cache', operation='普查任务缓存')
+        checked_dir(tdir, operation='普查任务')
         for f in lease['files']:
+            if Path(f['name']).name != f['name'] or not all(c in '0123456789abcdef' for c in f['sha256']) or len(f['sha256']) != 64:
+                raise ValueError('invalid census material path or digest')
             cp = cache / f['sha256']
             if not cp.is_file() or sha256_file(cp) != f['sha256']:
                 http_download(server + f['url'], cp)
             if sha256_file(cp) != f['sha256']:
                 raise RuntimeError(f"任务包文件 {f['name']} sha256 不符，拒绝执行")
-            (tdir / f['name']).write_bytes(cp.read_bytes())
+            check_write(tdir / f['name'], cp.stat().st_size, operation='普查材料').write_bytes(cp.read_bytes())
         job = json.loads((tdir / 'job.json').read_text(encoding='utf-8'))
         for n, h in (job.get('code') or {}).items():
             if sha256_file(tdir / n) != h:
@@ -573,20 +614,26 @@ def run_census_shard(server: str, token: str, work: Path, model_dir: str, device
                '--tokens', str(tdir / tokens), '--out', str(tdir / 'outputs'), '--device', device, '--mode', mode]
         if mode == 'real':
             cmd += ['--model', model_dir]
-        proc = _spawn(cmd, cwd=str(tdir), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+        proc = _spawn(cmd, cwd=str(tdir), env=process_env(tdir), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                       encoding='utf-8', errors='replace')
         tail = []
-        for line in proc.stdout:
-            line = line.rstrip()
-            tail = (tail + [line])[-20:]
-            if line.startswith('@@progress '):
-                p = json.loads(line[11:])
-                _emit(PROGRESS_HOOKS, {'job': lease['job_id'], 'shard': lease['shard'], **p})
-                _console(f"\r  进度 {p['done']}/{p['total']} 窗口 · {p['tokens']:,} token · {p['tok_per_s']:.0f} tok/s · "
-                         f"{p['seconds']:.0f}s   ", end='')
-        rc = proc.wait()
-        proc.stdout.close()
-        RUNNING.discard(proc)
+        try:
+            for line in proc.stdout:
+                line = line.rstrip()
+                tail = (tail + [line])[-20:]
+                if line.startswith('@@progress '):
+                    check_write(tdir, operation='普查继续写入')
+                    p = json.loads(line[11:])
+                    _emit(PROGRESS_HOOKS, {'job': lease['job_id'], 'shard': lease['shard'], **p})
+                    _console(f"\r  进度 {p['done']}/{p['total']} 窗口 · {p['tokens']:,} token · {p['tok_per_s']:.0f} tok/s · "
+                             f"{p['seconds']:.0f}s   ", end='')
+            rc = proc.wait()
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
+            proc.stdout.close()
+            RUNNING.discard(proc)
         if rc != 0:
             raise RuntimeError(f'runner 失败（退出码 {rc}）：' + ' | '.join(tail[-5:]))
         _console('')
@@ -728,7 +775,7 @@ def main() -> None:
             pass
     ap = argparse.ArgumentParser(description='AI2050 distributed node agent')
     ap.add_argument('--server', default=os.environ.get('AI2050_DIST_SERVER', 'http://127.0.0.1:5010'))
-    ap.add_argument('--data-dir', default=str(Path.home() / '.ai2050_agent'))
+    ap.add_argument('--data-dir', default=str(_home() / 'agent') if os.name == 'nt' else str(Path.home() / '.ai2050_agent'))
     sub = ap.add_subparsers(dest='cmd', required=True)
 
     rg = sub.add_parser('register', help='注册节点并保存凭据')
@@ -782,8 +829,12 @@ def main() -> None:
     sv.set_defaults(fn=node_service.run_from_args)
 
     args = ap.parse_args()
-    args.data_dir = str(Path(args.data_dir).resolve())  # 子进程 cwd 切换前先固定绝对路径
-    args.fn(args)
+    try:
+        if args.cmd in ('register', 'run', 'participate'):
+            args.data_dir = str(check_write(args.data_dir, operation='节点任务数据'))
+        args.fn(args)
+    except StorageBlocked as error:
+        stop_with_notice(error)
 
 
 if __name__ == '__main__':

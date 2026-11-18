@@ -34,6 +34,7 @@ from urllib.parse import parse_qs, quote, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import node_agent as A  # noqa: E402
+from storage_policy import StorageBlocked, check_write, checked_dir, stop_with_notice
 
 SCHEMA = 'node_service.v1'
 VERSION = '1'
@@ -258,9 +259,13 @@ def hf_file_list(endpoint: str, repo: str, revision: str, timeout: float = 60) -
     return out
 
 
-def download_file(url: str, dest: Path, *, size=None, sha256: str = '', on_bytes=None, cancel=None, timeout: float = 60) -> str:
+def download_file(url: str, dest: Path, *, size=None, sha256: str = '', on_bytes=None, cancel=None,
+                  timeout: float = 60, check_space=False) -> str:
     """断点续传下载到 dest（先写 dest.part）；返回文件 sha256。已知 sha256 时不一致则删除并报错。"""
     part = dest.with_name(dest.name + '.part')
+    if check_space:
+        check_write(dest, operation='模型下载')
+        check_write(part, operation='模型断点文件')
     have = part.stat().st_size if part.exists() else 0
     if size is not None and have > size:
         part.unlink()
@@ -287,6 +292,8 @@ def download_file(url: str, dest: Path, *, size=None, sha256: str = '', on_bytes
                     b = r.read(1 << 20)
                     if not b:
                         break
+                    if check_space:
+                        check_write(part, len(b), operation='模型下载')
                     fh.write(b)
                     h.update(b)
                     if on_bytes:
@@ -312,8 +319,13 @@ def seed_snapshot_cache(entries: list) -> None:
     for path, digest in entries:
         st = Path(path).stat()
         cache[f'{Path(path).resolve()}|{st.st_size}|{int(st.st_mtime)}'] = digest
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(cache), encoding='utf-8')
+    content = json.dumps(cache).encode('utf-8')
+    try:
+        check_write(p, len(content), operation='模型指纹缓存')
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(content)
+    except StorageBlocked:
+        pass
 
 
 def weight_gib(model_dir: str) -> float:
@@ -399,7 +411,9 @@ def probe_runtime(python: str) -> dict:
 
 def disk_free_gib(path: Path):
     try:
-        path.mkdir(parents=True, exist_ok=True)
+        path = path.resolve()
+        while not path.exists() and path != path.parent:
+            path = path.parent
         return round(shutil.disk_usage(str(path)).free / 2**30, 1)
     except OSError:
         return None
@@ -409,8 +423,7 @@ def disk_free_gib(path: Path):
 
 class NodeService:
     def __init__(self, home: Path, *, synthetic: bool = False, python: str = sys.executable, probes=None):
-        self.home = Path(home)
-        self.home.mkdir(parents=True, exist_ok=True)
+        self.home = checked_dir(home, operation='本机节点数据')
         self.synthetic = synthetic
         self.python = python
         self.probes = {'gpus': query_gpus, 'battery': on_battery, 'runtime': probe_runtime,
@@ -541,6 +554,7 @@ class NodeService:
                         'hf_revision': m.get('hf_revision') or '', 'dir': chk.get('dir', d), 'status': chk['status'],
                         'weight_gib': weight_gib(chk.get('dir') or d) if (chk.get('dir') or d) and chk['status'] != 'downloading' else None,
                         'min_vram_gib': m.get('min_vram_gib'), 'error': chk.get('error', ''),
+                        'storage_blocked': chk.get('storage_blocked'),
                         'progress': {k: chk.get(k) for k in ('done', 'total', 'file', 'started')} if chk['status'] == 'downloading' else None})
         return out
 
@@ -587,6 +601,8 @@ class NodeService:
             raise ValueError('中心没有给出这个模型的下载来源（hf_repo）')
         name = re.sub(r'[^\w.-]', '_', m.get('name') or snapshot[:16])
         target = self.models_root() / name
+        if name in ('.', '..'):
+            raise ValueError('模型目录名称无效')
         endpoint = self.cfg.get('hf_endpoint') or HF_ENDPOINTS[0]
         with self.lock:
             if snapshot in self.cancels or (self.checks.get(snapshot) or {}).get('status') == 'checking':
@@ -602,21 +618,25 @@ class NodeService:
         st = self.checks[snapshot]
         repo, rev = m['hf_repo'], m.get('hf_revision') or 'main'
         try:
+            check_write(target, operation='模型下载')
             files = hf_file_list(endpoint, repo, rev)
             if not files:
                 raise RuntimeError('仓库里没有文件')
-            target.mkdir(parents=True, exist_ok=True)
             todo = [f for f in files if not ((target / f['name']).is_file() and f['size'] is not None
                                              and (target / f['name']).stat().st_size == f['size'])]
             total = sum(f['size'] or 0 for f in files)
             done = total - sum(f['size'] or 0 for f in todo)
-            need = sum((f['size'] or 0) - ((target / (f['name'] + '.part')).stat().st_size
-                                           if (target / (f['name'] + '.part')).is_file() else 0) for f in todo)
+            need = 0
+            for f in todo:
+                part = target / (f['name'] + '.part')
+                already = part.stat().st_size if part.is_file() else 0
+                size = f['size'] or 0
+                need += size - (already if already <= size else 0)
             free = self.probes['disk'](target)
             floor = (self.cfg.get('limits') or {}).get('min_free_disk_gib', DEFAULT_LIMITS['min_free_disk_gib'])
             if free is not None and free - need / 2**30 < floor:
-                raise RuntimeError(f'磁盘空间不够：还需 {need / 2**30:.1f} GiB，{target.anchor or target} 剩余 {free:.1f} GiB'
-                                   f'（至少保留 {floor} GiB）。可以在「模型目录」换一个盘')
+                raise StorageBlocked('space', target.resolve(), need, f'磁盘空间不够，剩余 {free:.1f} GiB，至少保留 {floor} GiB')
+            target = checked_dir(target, need, operation='模型下载')
             with self.lock:
                 st.update(total=total, done=done)
             A.log(f'下载模型 {m.get("name") or repo}：{repo}@{rev[:12]} → {target}（{len(todo)}/{len(files)} 个文件，'
@@ -630,7 +650,8 @@ class NodeService:
                 with self.lock:
                     st['file'] = f['name']
                 url = f"{endpoint}/{quote(repo, safe='/')}/resolve/{quote(rev, safe='')}/{quote(f['name'])}"
-                digest = download_file(url, target / f['name'], size=f['size'], sha256=f['sha256'], on_bytes=on_bytes, cancel=cancel)
+                digest = download_file(url, target / f['name'], size=f['size'], sha256=f['sha256'],
+                                       on_bytes=on_bytes, cancel=cancel, check_space=True)
                 seeded.append((target / f['name'], digest))
             if seeded:
                 seed_snapshot_cache(seeded)
@@ -642,7 +663,8 @@ class NodeService:
             return
         except (RuntimeError, ValueError, OSError) as e:
             with self.lock:
-                self.checks[snapshot] = {'status': 'error', 'dir': str(target), 'error': str(e)[:300]}
+                self.checks[snapshot] = {'status': 'error', 'dir': str(target), 'error': str(e)[:300],
+                                         'storage_blocked': e.reason if isinstance(e, StorageBlocked) else None}
                 self.cancels.pop(snapshot, None)
             A.log(f'下载失败：{e}')
             return
@@ -1391,8 +1413,11 @@ def add_arguments(ap) -> None:
 
 
 def run_from_args(args) -> None:
-    serve(Path(args.home), args.port, synthetic=args.synthetic, python=args.python, allow_origins=args.allow_origin,
-          server_override=args.server_override)
+    try:
+        serve(Path(args.home), args.port, synthetic=args.synthetic, python=args.python, allow_origins=args.allow_origin,
+              server_override=args.server_override)
+    except StorageBlocked as error:
+        stop_with_notice(error)
 
 
 if __name__ == '__main__':

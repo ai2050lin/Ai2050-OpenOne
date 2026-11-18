@@ -170,7 +170,7 @@ class RuntimeInstaller {
   async install({ mirror = 'pypi' } = {}) {
     if (this.state === 'running') return this.info();
     const m = MIRRORS[mirror] || MIRRORS.pypi;
-    const dir = this.opts.dir();
+    let dir = this.opts.dir();
     Object.assign(this, { state: 'running', error: '', log: [], bytes: 0, step: '检查' });
     this.abort = new AbortController();
     this._emit();
@@ -180,7 +180,14 @@ class RuntimeInstaller {
       if (drv == null) throw new Error('没有检测到 NVIDIA 显卡驱动（nvidia-smi）');
       if (drv < MIN_DRIVER) throw new Error(`NVIDIA 驱动版本 ${drv} 太旧：CUDA 13.0 需要 ${MIN_DRIVER} 以上，请先更新驱动`);
       const free = (this.opts.free || freeGiB)(dir);
-      if (free != null && free < NEED_GIB) throw new Error(`${dir} 所在磁盘剩余 ${free} GiB，至少需要 ${NEED_GIB} GiB：请换一个目录`);
+      if (this.opts.checkWrite) {
+        dir = this.opts.checkWrite(dir, NEED_GIB * 2 ** 30, '计算组件安装');
+        for (const name of ['downloads', 'downloads/uv-extract', 'bin', 'cache', 'python', 'venv', 'runtime.json']) {
+          this.opts.checkWrite(path.join(dir, name), 0, '计算组件安装');
+        }
+      } else if (free != null && free < NEED_GIB) {
+        throw new Error(`${dir} 所在磁盘剩余 ${free} GiB，至少需要 ${NEED_GIB} GiB：请换一个目录`);
+      }
       const lock = this.opts.lockFile;
       if (!lock || !fs.existsSync(lock)) throw new Error('安装包缺少锁文件 requirements-win-cu130.lock');
 
@@ -192,6 +199,7 @@ class RuntimeInstaller {
         this._push(`> ${this.step}（${m.label}，${(UV.size / 2 ** 20).toFixed(1)} MB，按 sha256 核对）`);
         this._emit();
         const whl = path.join(dir, 'downloads', UV.file);
+        this.opts.checkWrite?.(whl, UV.size, '计算组件下载');
         await (this.opts.download || download)((this.opts.filesBase || m.files) + UV.path, whl, {
           sha256: UV.sha256, size: UV.size, signal: this.abort.signal, onBytes: n => { this.bytes = n; },
         });
@@ -206,6 +214,7 @@ class RuntimeInstaller {
         fs.copyFileSync(inner, uvExe);
         fs.rmSync(ex, { recursive: true, force: true });
       }
+      this.opts.checkWrite?.(dir, 0, '计算组件安装');
       await this._cmd(`安装 Python ${PYTHON_VERSION}`, uvExe, ['python', 'install', PYTHON_VERSION], env);
       const py = venvPython(dir);
       await this._cmd('创建虚拟环境', uvExe, ['venv', path.join(dir, 'venv'), '--python', PYTHON_VERSION,
@@ -221,11 +230,14 @@ class RuntimeInstaller {
       const rec = { id: RUNTIME_ID, python: py, python_version: PYTHON_VERSION, uv: UV.version, mirror, torch: probe.torch,
         cuda: probe.cuda, transformers: probe.transformers, lock_sha256: crypto.createHash('sha256').update(fs.readFileSync(lock)).digest('hex'),
         installed_at: new Date().toISOString() };
-      fs.writeFileSync(path.join(dir, 'runtime.json'), JSON.stringify(rec, null, 1));
+      const result = path.join(dir, 'runtime.json');
+      this.opts.checkWrite?.(result, 4096, '计算组件安装记录');
+      fs.writeFileSync(result, JSON.stringify(rec, null, 1));
       this._push(`✓ 计算组件可用：torch ${probe.torch} · CUDA ${probe.cuda} · transformers ${probe.transformers}`);
       this.state = 'done';
       this.step = '';
     } catch (e) {
+      if (e.reason) this.opts.onStorageBlocked?.(e);
       if (this.state !== 'cancelled') { this.state = 'failed'; this.error = e.message; }
       this._push(this.state === 'cancelled' ? '已取消（已下载的包留在缓存里，重装时复用）' : `✗ ${e.message}`);
     } finally {

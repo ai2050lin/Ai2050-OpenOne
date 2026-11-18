@@ -1,0 +1,115 @@
+D: DRIVE CLEANUP FINAL PLAN / READ-ONLY  2026-11-17 06:01:03
+root = D:\AI2050\Ai2050-OpenOne
+
+POLICY: keep scripts + test inputs + conclusion results + client-served data; clean intermediate big data.
+
+[0] DISK
+    C: free 69.71 / 200.01 GB
+    D: free 20.00 / 731.39 GB   <-- 11-13 cleanup ended at 151.08 GB; -131.08 GB in 4 days
+    131 GB rebound source: tests\glm5 143.76 GB new writes (8002 files), .git\objects 4.35 GB, research_library 1.83 GB
+
+[1] CRITICAL STRUCTURE CHANGE SINCE 11-10 (reversal)
+    result\<9 dirs> -> C:\.codex\visualizations\...\research-storage\<dir> -> D:\ai2050_native\visualization-research\<dir>
+    C: codex tree without junction following = 0 bytes / 11 junctions; WITH following = 73.37 GB / 20552 files
+    => D:\ai2050_native\visualization-research (73.37 GB) is now the ONLY entity source.
+    => 11-10 conclusion 'D: copy is redundant, safe to clean' is WRONG. MUST KEEP.
+    All 9 two-level junctions healthy; /api/research/qwen14-mlp reads 175 registered files from here.
+    Center server.ai2050.com = v1.0.29, no native-mlp/qwen14-mlp endpoints yet (local release is 1.0.36).
+    Local server.py env: AI2050_NATIVE_MLP_ROOT / AI2050_QWEN14_MLP_DIR / AI2050_DIST_DIR all empty
+       => falls back to LOCAL result dirs; those manifest-registered tensors are LIVE client data.
+    Center /api/traces/research-space = HTTP 200 kind=real 11 studies / 990 objects / 693 artifacts
+       (11-13 was 8/870/673 -> conclusions of new experiments ARE registered).
+
+[2] A-TIER (cleanable, de-duplicated, non-overlapping)
+    label                                                      clean    files      keep     r24   reclaim last
+    recursive_branch14_20261113_v6                          61.53 GB      670  41.23 MB       0  61.53 GB 2026-11-13 15:18
+    goodfire_middle_20261113_v2                             61.25 GB      408 629.25 MB       0  61.25 GB 2026-11-13 11:45
+    ENT-XF                                                  37.47 GB     1686   2.34 MB       0  37.47 GB 2026-11-06 00:26
+    source_formation_v1                                     37.42 GB      112  67.42 MB       0  37.42 GB 2026-11-10 09:27
+    qwen14_client_v2                                        24.27 GB      197 565.43 MB       0   6.74 GB 2026-11-13 09:32
+    source_binding_v1                                       20.86 GB       59  27.14 MB       0  20.86 GB 2026-11-10 06:47
+    _cross_model                                            14.76 GB       48 225.39 KB       0  14.76 GB 2026-11-02 08:27
+    visualization-research\qwen14_mlp_atlas_v1              13.67 GB        9  13.27 GB       0  13.67 GB 2026-11-09 15:06
+    GR-Q                                                    13.09 GB     4435   1.82 MB       0  13.09 GB 2026-11-13 18:53
+    branch_reuse14_20261113_v3                              10.55 GB     1126  25.40 MB       0   9.26 GB 2026-11-13 17:04
+    _transcoder                                             10.50 GB        6   5.97 KB       0  10.50 GB 2026-10-30 02:49
+    source_relay_v2                                          9.11 GB       31  50.41 MB       0   9.11 GB 2026-11-11 00:02
+    qwen14_mlp_b28_b39_v2                                    7.24 GB      119 198.75 MB       0   1.34 GB 2026-11-13 08:49
+    _A_stage_finish_20261113                                 6.66 GB       29    0.00 B       0   6.66 GB 2026-11-08 10:52
+    reusable                                                 4.60 GB        4   2.29 KB       0   4.60 GB 2026-11-10 02:02
+    video                                                    4.29 GB     1694   1.34 GB       0   4.29 GB 2026-11-11 03:44
+    _weights                                                 3.91 GB      116    0.00 B       0   3.91 GB 2026-10-16 21:36
+    source_relay_v1                                          3.68 GB       16  28.58 MB       0   3.68 GB 2026-11-10 22:42
+    recursive_branch14_20261113_v5                           3.30 GB      126  22.54 MB       0   3.30 GB 2026-11-13 13:36
+    GR-NEG                                                   3.16 GB     1677 820.27 KB       0   3.16 GB 2026-11-06 21:05
+    _mode_atlas                                              2.87 GB        2  840.00 B       0   2.87 GB 2026-11-01 17:05
+    KN-ISA                                                   2.48 GB     1093 585.13 KB       0   2.48 GB 2026-11-13 18:53
+    common_bench_b1_repair_v2                                2.37 GB       23  33.73 MB       0   2.37 GB 2026-11-10 03:47
+    b36_composition14_20261113_v3                            2.14 GB      349  45.66 MB       0   2.14 GB 2026-11-13 19:47
+    branch_reuse14_20261113_v2                               1.71 GB      165   9.35 MB       0 438.55 MB 2026-11-13 16:03
+    KN-ATTR                                                  1.04 GB      616 289.08 KB       0   1.04 GB 2026-10-16 18:56
+    distributed_data\datapack                              865.67 MB       16   4.37 KB       3 865.67 MB 2026-11-17 05:58
+    _fusion                                                766.25 MB       10  599.00 B       0 766.25 MB 2026-11-02 09:28
+    _assembly                                              636.66 MB       12    0.00 B       0 636.66 MB 2026-11-02 18:07
+    frontend\node_modules                                  616.94 MB      195 555.16 MB       3 616.94 MB 2026-11-17 05:27
+    branch_reuse14_20261113_v1                             447.93 MB       44   8.57 MB       0 447.93 MB 2026-11-13 15:49
+    b36_transition14_20261114_v1                           373.40 MB        5   5.62 MB       0 373.40 MB 2026-11-14 10:42
+    b36_composition14_20261113_v2                          281.60 MB       47  18.37 MB       0 281.60 MB 2026-11-13 18:21
+    own_state_explicit_20261115_v2                         251.94 MB       52   5.43 MB       0 251.94 MB 2026-11-15 02:10
+    _entity_atlas                                          132.07 MB        3 126.32 KB       0 132.07 MB 2026-11-01 11:10
+    GR-ROLE                                                117.71 MB      184  91.82 KB       0 117.71 MB 2026-11-06 21:05
+    goodfire_middle_20261113_v1                             59.18 MB       62  11.70 MB       0  59.18 MB 2026-11-13 11:44
+    b36_composition14_20261113_v1                           50.49 MB        7  22.98 MB       0  50.49 MB 2026-11-13 18:07
+    _checks                                                 25.58 MB      162  52.93 KB       0  25.58 MB 2026-10-16 09:56
+    _arbitration                                             3.02 MB        1  875.00 B       0   3.02 MB 2026-11-01 17:28
+    _weight_space                                            1.08 MB        3    0.00 B       0   1.08 MB 2026-11-02 21:47
+    mlp_condition_v2 (1 leftover file)                     976.73 KB        1  80.21 MB       0 976.73 KB 2026-11-09 02:10
+    recursive_branch14_20261113_v3                          36.63 KB        1  12.57 MB       0  36.63 KB 2026-11-13 13:13
+
+    A-tier clean total  = 368.46 GB / 15621 files
+    hardlink bytes      = 26.00 GB (deleting these links frees ~0)
+    EXPECTED REAL RECLAIM = 342.46 GB
+
+[3] B-TIER (needs your decision)
+    label                                                      clean    files     r24  basis
+    models\hf                                               75.98 GB       24       0  75.98 GB weights; ~31 GB hardlinks free ~0; re-downloadable but needed for repro
+    .git\lfs                                                  0.00 B        0       0  29.01 GB extension-less LFS objects; NEVER git lfs prune (11-06 dropped refs/codex/*)
+    .git\objects                                             4.25 GB        2    1341  5.41 GB; 1296 writes in 24h - active git operation
+    .venv\Lib                                                3.11 GB     6236       0  3.11 GB installed packages, rebuildable via uv but needed to run scripts now
+    video                                                    4.29 GB     1694       0  5.65 GB video frames/wav, idle since 11-11; confirm whether test material
+    _agent_home\node_service                                 9.68 GB      344       1  10.22 GB; 1 write in 24h
+    D:\pagefile.sys                                         33.98 GB        1       0  33.98 GB system pagefile - cannot delete, only resize/relocate
+    kv_* 24h-active dirs                                   248.42 GB     4641     374  kv_receipt_20261117_v1 / kv_state_20261116_v1 / kv_prefix_20261116_v1 ~227 MB, 24h write
+    mlp_tail_acceptance                                    903.13 MB        5       0  903 MB tensors but 8 .sha256 registrations + 2.84 GB json - integrity chain
+    D:\$RECYCLE.BIN                                        135.66 MB       12       0  1.33 GB / 132 historical items - clearing frees space but loses old trash
+    D:\Comfy-Desktop                                         3.80 GB     7245       0  5.48 GB non-project, idle since 10-14
+    B-tier total clean = 384.52 GB
+
+[4] C-TIER MUST KEEP
+    D:\ai2050_native\visualization-research              PRESENT  73.37 GB - ONLY entity source for 9 result junctions + C: codex junctions; client data
+    tests\glm5\result\client_visualization_assets        PRESENT  5.90 GB - /api/research-assets direct client payload
+    distributed_data\objects                             PRESENT  12.67 GB CAS evidence packs (length-prefixed JSON)
+    distributed_data\research_library                    PRESENT  4.20 GB, 6 writes in 24h - active
+    distributed_data\mechanism_traces                    PRESENT  1.15 GB index.sqlite3 - server/research_space_service.py online reader
+    D:\ai2050_native\_mainline\MA-H2                     PRESENT  7.18 GB - mainline_sample_service.py
+    D:\ai2050_native\_census                             PRESENT  2.18 GB - neuron_census_service.py / mech_pair_service.py
+    goodfire_middle_20261113_v2\qwen4+qwen14             PRESENT  30.20 GB / 498 manifest-registered files, SHA256-verified by native_mlp_service.py
+    qwen14_client_v2\native                              PRESENT  18.07 GB / 206 manifest-registered files, SHA256-verified by qwen14_mlp_service.py
+    research                                             PRESENT  6.29 GB conclusions
+    9 result junctions + 11 C: codex junctions           PRESENT  structural - never delete junction itself
+    all conclusion files                                 PRESENT  json/jsonl/md/log/csv/py/sha256 + result/execution/behavior.json
+
+[5] ACCURACY NOTES
+    - measured ALLOCATED bytes (GetCompressedFileSizeW), junctions skipped, sparse gap excluded
+    - nlink>=2 bytes deducted from expected reclaim; 11-09 proved hardlinks free nothing
+    - manifest-registered files explicitly PROTECTED in served dirs
+    - 24h-active dirs (kv_*, .git\objects, datapack, frontend\node_modules, client-cache) excluded from A
+    - safe-delete hook redirects deletions to Recycle Bin; must empty bin per batch to free space
+    - pipeline still writing (server.py x2, snapshot_worker x2, vite/esbuild); stop before deleting
+
+[6] OUTPUTS
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\d_drive_final_report_20261117.txt
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\d_drive_cleanup_plan_20261117.csv
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\d_drive_delete_manifest_20261117.csv
+
+===== END FINAL PLAN =====

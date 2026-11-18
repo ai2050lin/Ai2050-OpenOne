@@ -433,6 +433,8 @@ def build_kit(server: str, bind_code: str = '', user: str = '') -> bytes:
             z.writestr(info, data if isinstance(data, bytes) else data.encode('utf-8'))
         add('node_agent.py', agent)
         add('node_service.py', service)
+        add('storage_policy.py', (here / 'storage_policy.py').read_bytes())
+        add('storage_policy.json', (here / 'storage_policy.json').read_bytes())
         add('parameter_reader.py', (here / 'parameter_reader.py').read_bytes())
         for n, data in probe_files.items():
             add(n, data)

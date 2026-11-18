@@ -2,7 +2,7 @@
   "name": "ai2050-client",
   "productName": "AI2050 语言机制研究平台",
   "private": true,
-  "version": "1.0.13",
+  "version": "1.0.15",
   "description": "AI2050 语言机制研究平台客户端 — 图谱 / 模板 / 机制查询与可视化",
   "author": "AI2050 Research Platform",
   "main": "electron/main.js",
@@ -20,9 +20,9 @@
     "test:electron": "node --test electron/runtimeInstaller.test.js electron/aiAssistant.test.js",
     "preview": "vite preview",
     "desktop": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "npm run build && electron-builder --win --x64",
-    "dist:dir": "npm run build && electron-builder --dir",
+    "pack": "node ../scripts/build_desktop.cjs pack",
+    "dist": "node ../scripts/build_desktop.cjs dist",
+    "dist:dir": "node ../scripts/build_desktop.cjs dir",
     "test": "vitest run"
   },
   "//": "前端依赖全部列在 devDependencies：Electron 主进程只用 Node 内置模块（http/https/fs/path/child_process），运行期不需要 react/three 等——它们已由 vite 打进 dist/。这同时让 electron-builder 不把 300MB node_modules 打进 asar。",
@@ -79,6 +79,14 @@
       {
         "from": "../deploy/node_service.py",
         "to": "node/node_service.py"
+      },
+      {
+        "from": "../deploy/storage_policy.py",
+        "to": "node/storage_policy.py"
+      },
+      {
+        "from": "../deploy/storage_policy.json",
+        "to": "node/storage_policy.json"
       },
       {
         "from": "../shared/dist_protocol/goodfire_runner.py",

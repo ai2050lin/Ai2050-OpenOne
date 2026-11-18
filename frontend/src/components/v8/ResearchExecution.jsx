@@ -9,11 +9,12 @@ import ResearchDisclosure from './ResearchDisclosure.jsx';
 import ResearchInterventionReport from './ResearchInterventionReport.jsx';
 import ResearchParticipation from './ResearchParticipation.jsx';
 import ResearchBundleUpload from './ResearchBundleUpload.jsx';
+import ResearchPanels from './ResearchPanels.jsx';
 import { orderedStages } from './researchFragmentUtil.js';
 import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './ClientGuide.jsx';
 import ClaimDraft from './ClaimDraft.jsx';
 import { ClaimSummary, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
-import { PageHead, PillTools } from './CoreKit.jsx';
+import { PageHead } from './CoreKit.jsx';
 
 
 const STAGE = {
@@ -100,7 +101,7 @@ function PlanRow({ entry, focused, children = [], onGo }) {
       <ResearchInterventionReport sha={report} planSha={body.stages.native_mlp_plan?.plan_sha256}
         capabilityInputsSha={body.stages.client_acceptance?.capability_inputs_sha256} rawFallback/>
     </ResearchDisclosure>}
-    {datasetPlan?.plan_sha256 && <DatasetAtlasPlan sha={datasetPlan.plan_sha256} implementation={stageState(datasetPlan) === 'partial'}/>}
+    {datasetPlan?.plan_sha256 && <ResearchDisclosure title="数据与图谱方案"><DatasetAtlasPlan sha={datasetPlan.plan_sha256} implementation={stageState(datasetPlan) === 'partial'}/></ResearchDisclosure>}
     <ResearchDisclosure title="预注册与原始记录"><pre className="v8-artifact-json">{JSON.stringify(body.stages, null, 2)}</pre></ResearchDisclosure>
     {children.length > 0 && <ResearchDisclosure title={`前置校准与试跑（${children.length}）`}>
       {children.map(child => <PlanRow key={child.sha} entry={child} onGo={onGo}/>)}
@@ -176,49 +177,46 @@ function ResearchPlans({ onGo }) {
   const archiveLabel = linkedArchive && (RESEARCH_BRIEFS[focused.body.stages.registration_validated.report_sha256]?.label || focused.body.title || run);
   const archiveRows = linkedArchive ? [focused, ...archived.filter(entry => entry !== focused)] : archived;
   const jobs = currentWork(census.data, queue.data);
+  const [selectedJob, setSelectedJob] = useState('');
+  const job = jobs.find(item => item.id === selectedJob) || jobs.find(item => item.active > 0) || jobs[0];
   const row = entry => <PlanRow key={`${run}:${entry.sha}`} entry={entry} focused={entry === focused} onGo={onGo}
     children={all.filter(child => child !== focused && !ongoing.includes(child) && child.body.parent_run_id === entry.body.run_id)}/>;
 
-  /* 线上版结构（Phase 340）：研究进度（当前主张 + 阶段）与参与研发并排；其余收进折叠行 */
   return <section className="v8-rnd v8-rnd-current" aria-label="当前研发">
-    <PageHead title="当前研发" sub="主线走到哪里，现在能怎样参与。进度只表示执行到哪里，不表示结论成立。" />
+    <PageHead title="当前研发" sub="查看正在做的研究，选择适合你的参与方式。" />
     <div className="ck-plan">
-      <MainlineCard/>
-      <div className="v8-card"><ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
+      <section className="v8-card v8-rnd-progress" aria-label="研究进度">
+        <div className="rnd-current-heading"><h3>研究进度</h3><button type="button" className="v6-linkbtn" onClick={refreshJobs}>刷新</button></div>
+        <p className="rnd-current-copy">{ongoing[0]?.body.question || ongoing[0]?.body.title || CLAIMS[0]?.title || '语言编码机制研究'}</p>
+        {jobs.length > 1 && <label className="rnd-current-select">开放作业<select aria-label="选择研究作业" value={job.id} onChange={event => setSelectedJob(event.target.value)}>{jobs.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
+        {job ? <div className="v8-rnd-work">
+          <div className="v8-rnd-progress-title"><strong>{job.name}</strong><span className="v8-chip">{job.active > 0 ? '运行中' : job.queued > 0 ? '待领取' : '开放'}</span></div>
+          <div className="v8-rnd-task-count"><b>{job.done ?? '—'}<span> / {job.total ?? '—'}</span></b> {job.unit}已完成</div>
+          {job.total > 0 && <progress className="rnd-progress-bar" aria-label={`${job.name}已完成${job.unit}`} value={job.done} max={job.total}/>}
+          <small>{job.active ?? 0} 运行中{job.queued != null && ` · ${job.queued} 待领取`}</small>
+        </div> : <p className="v8-note">{census.loading || queue.loading ? '正在读取任务进度…' : census.error || queue.error ? '任务进度暂不可用，请刷新重试。' : '暂无开放任务；已有研究可在历史中查看。'}</p>}
+        {(census.local || queue.local) && <small>任务统计来自已下载的数据包。</small>}
+        {job && (census.error || queue.error) && <small>部分任务统计暂未更新。</small>}
+        <small>任务完成量表示执行进度，不能当作机制破解率。</small>
+        <button type="button" className="v6-linkbtn" onClick={() => onGo('execution')}>查看任务与审核</button>
+      </section>
+      <ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
         publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
-        onTaskChanged={refreshJobs}/></div>
+        onTaskChanged={refreshJobs}/>
     </div>
-    <PillTools label="当前研发的更多内容" initial={run ? 'packages' : ''} items={[
-      { id: 'claim', label: `主张、两个解释与否定条件 · ${CLAIMS[0].id}`, render: () => <ClaimSummary/> },
-      { id: 'jobs', label: `作业明细 · ${ongoing.length + jobs.length}`, render: () => <div className="v8-rnd-dashboard">
-        <section className="v8-rnd-progress" aria-label="研究进度">
-          {ongoing.map(({ body }) => <div className="v8-rnd-progress-title" key={body.run_id}>
-            <strong>{body.title || body.run_id}</strong><span className="v8-chip">执行中</span>
-          </div>)}
-          {jobs.map(job => <div className="v8-rnd-work" key={`${job.unit}:${job.id}`}>
-            <div className="v8-rnd-progress-title"><strong>{job.name}</strong>
-              <span className="v8-chip">{job.active > 0 ? '运行中' : job.queued > 0 ? '待领取' : '开放'}</span></div>
-            <div className="v8-rnd-task-count"><b>{job.done}<span> / {job.total ?? '—'}</span></b> {job.unit}已完成</div>
-            {job.total > 0 && <progress aria-label={`${job.name}已完成${job.unit}`} value={job.done} max={job.total}/>}
-            <small>{job.active} 运行中{job.queued != null && ` · ${job.queued} 待领取`}</small>
-          </div>)}
-          {!ongoing.length && !jobs.length && <p className="v8-note">{census.loading || queue.loading ? '正在读取作业…'
-            : census.error || queue.error ? '任务进度暂不可用' : '暂无进行中的研究或开放作业'}</p>}
-          {(census.local || queue.local) && <small>任务统计来自已下载的数据包</small>}
-          {jobs.length > 0 && (census.error || queue.error) && <small>部分任务统计暂未更新</small>}
-        </section>
-      </div> },
-      { id: 'slices', label: `本周期切片 · ${SLICES.filter(slice => slice.done).length} / ${SLICES.length}`, render: () =>
+    <ResearchPanels key={run || 'current'} label="当前研发详情" initial={run ? 'packages' : ''} collapsible items={[
+      { id: 'details', label: '研究详情', render: () => <>
+        <MainlineCard/>
+        <ResearchDisclosure title="主张、解释与否定条件"><ClaimSummary/></ResearchDisclosure>
+        <ResearchDisclosure title={`本周期切片 · ${SLICES.filter(slice => slice.done).length} / ${SLICES.length}`}>
         <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>切片</th><th>任务</th><th>产物</th><th>状态</th></tr></thead>
-          <tbody>{SLICES.map(slice => <tr key={slice.name}><td>{slice.name}</td><td>{slice.task}</td><td>{slice.output}</td><td>{slice.done ? '已完成' : '未开始'}</td></tr>)}</tbody></table></div> },
-      { id: 'draft', label: '写一张新的主张卡（草稿）', render: () => <ClaimDraft/> },
-      { id: 'thesis', label: '总体工作判断', render: () => <>
+          <tbody>{SLICES.map(slice => <tr key={slice.name}><td>{slice.name}</td><td>{slice.task}</td><td>{slice.output}</td><td>{slice.done ? '已完成' : '未开始'}</td></tr>)}</tbody></table></div></ResearchDisclosure>
+        <ResearchDisclosure title="总体工作判断">
         <p><b>主张：</b>语言、风格、逻辑和语法通过条件化读写规则共同决定下一个词。这是工作判断，不是结论。</p>
         <p className="v8-note"><b>如果否定：</b>规则在未见组合上超不过词身份、位置和 n-gram 基线，就换对象或换表示。</p>
+        </ResearchDisclosure>
       </> },
-      { id: 'ways', label: '不贡献算力也能参与', render: () => <ParticipationWays onGo={onGo}/> },
-      { id: 'gaps', label: '研究缺口与自动解释', render: () => <><ResearchGaps/><AutoExplainCard/></> },
-      { id: 'packages', label: `研究工作包 · ${all.length}`, render: () => <>
+      { id: 'packages', label: '历史与计划', render: () => <>
         {ongoing.length > 0 && <ResearchDisclosure title="进行中的研究详情"><div className="v8-rnd-list">{ongoing.map(row)}</div></ResearchDisclosure>}
         {archiveRows.length > 0 && <ResearchDisclosure key={run} title={archiveLabel ? `研究历史 · ${archiveLabel}` : `研究历史（${archiveRows.length}）`}>
           <div className="v8-rnd-list">{archiveRows.map(row)}</div>
@@ -227,6 +225,12 @@ function ResearchPlans({ onGo }) {
         {packages.error && <ResearchDisclosure title="研究历史"><SourceNotice source={packages} loading="读取研究…"/></ResearchDisclosure>}
         {packages.data && run && !focused && <p className="v8-note">当前资料中未找到链接指定的研究。</p>}
         {!packages.data && !packages.error && <p className="v8-note">读取研究…</p>}
+        {packages.data && !all.length && <Empty>尚无已登记的研究工作包。</Empty>}
+      </> },
+      { id: 'ways', label: '更多参与方式', render: () => <>
+        <ParticipationWays onGo={onGo}/>
+        <ResearchDisclosure title="提出新研究（草稿）"><ClaimDraft/></ResearchDisclosure>
+        <ResearchDisclosure title="研究缺口与自动解释"><ResearchGaps/><AutoExplainCard/></ResearchDisclosure>
       </> },
     ]} />
   </section>;
@@ -261,9 +265,10 @@ function TaskRow({ task, name, onGo }) {
   const ref = task.research_ref ?? {};
   return <ResearchDisclosure title={<span className="v8-rnd-row">
     <strong>{name || task.template_name || task.tm_id || task.task_id}</strong>
-    <span className="v8-chip">{TASK_STATE[task.status] ?? task.status}</span><small>{task.task_id}</small>
+    <span className="v8-chip">{TASK_STATE[task.status] ?? task.status}</span><small>{task.node_name || '未分配节点'}</small>
   </span>}>
     <dl className="v8-rnd-meta">
+      <div><dt>任务编号</dt><dd>{task.task_id}</dd></div>
       <div><dt>模板</dt><dd>{task.tm_id || '未登记'}</dd></div>
       <div><dt>节点</dt><dd>{task.node_name || '未分配'}</dd></div>
       <div><dt>分片</dt><dd>{task.shard || (ref.shard_id ?? ref.shard_index ?? '未登记')}</dd></div>
@@ -284,11 +289,14 @@ function TaskRow({ task, name, onGo }) {
 }
 
 function ResearchQueue({ onGo, tools }) {
-  const { RUNS, STAGES } = useMainline();
+  const { RUNS } = useMainline();
   const tasks = useApi('/api/tasks', { online: true });
   const catalog = useApi('/api/catalog');
   const censusJobsApi = useApi('/api/census/jobs', { online: true });
   const [gateSel, setGateSel] = useState('');
+  const [queueTab, setQueueTab] = useState('tasks');
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [limit, setLimit] = useState(6);
   const { run } = useResearchContext();
   const items = catalog.data?.items ?? [];
   const names = new Map(items.flatMap(item => [item.tm_id, item.pilot_tm_id].filter(Boolean).map(id => [id, item.name])));
@@ -320,15 +328,13 @@ function ResearchQueue({ onGo, tools }) {
   const byTemplate = new Map(failureGroups.map(item => [item.tm_id, item]));
   for (const audit of audits) byTemplate.set(audit.tm_id, { ...byTemplate.get(audit.tm_id), ...audit });
   const groups = [...byTemplate.values()];
-  const highlighted = new Set([
-    ...groups.filter(item => item.remaining).slice(0, 2),
-    ...groups.filter(item => item.audit_pending).slice(0, 2),
-  ]);
-  const otherGroups = groups.filter(item => !highlighted.has(item));
-  const pending = catalog.data ? `${audits.reduce((sum, item) => sum + item.audit_pending, 0)} 份待审`
-    : catalog.error ? '待审暂不可用' : '待审读取中';
-  const failures = tasks.data ? `${stats.failed ?? 0} 个失败` : '失败未接入';
-  const current = [...active, ...queued];
+  const pending = audits.reduce((sum, item) => sum + item.audit_pending, 0);
+  const filter = selectedFilter || (failed.length || groups.length ? 'attention' : active.length ? 'active' : queued.length ? 'queued' : 'history');
+  const filtered = { active, queued, attention: failed, history: completed }[filter];
+  const issueGroups = filter === 'attention' ? groups : [];
+  const selectFilter = value => { setSelectedFilter(value); setLimit(6); setQueueTab('tasks'); };
+  const visibleRows = [...filtered.slice(0, 2).map(task => ({ task })), ...issueGroups.map(issue => ({ issue })), ...filtered.slice(2).map(task => ({ task }))];
+  const refresh = () => { tasks.reload(); catalog.reload(); censusJobsApi.reload(); };
 
   const gates = [
     ['exec', '运行执行', RUNS.filter(r => r.executed).length, r => r.exec],
@@ -338,60 +344,42 @@ function ResearchQueue({ onGo, tools }) {
   ];
   const gate = gates.find(g => g[0] === gateSel);
   const censusJobs = (censusJobsApi.data?.jobs ?? []).filter(job => job.n_shards > 0);
-  const mainDone = STAGES.filter(stage => stage.done.length === stage.gates.length).length;
-
-  /* 首屏只有一个核心模块：四关条形图；点一关看是哪几次运行（Phase 333） */
   return <section className="v8-rnd" aria-label="实验与队列">
-    <PageHead title="实验与队列" sub="已完成的研究运行走到哪一关。四关分开算，软件校验通过不等于科学证据成立。" />
-    <div className="mp-tiles">{gates.map(([id, title, done]) =>
-      <PTile key={id} title={title} done={done} total={RUNS.length} unit="次运行" on={gateSel === id} onClick={() => setGateSel(gateSel === id ? '' : id)}/>)}</div>
-    {gate && <div className="mp-detail"><b>{gate[1]}</b>{RUNS.map(r => <p key={r.id} className="v8-note">{r.id}（Phase {r.phase} · {r.title}）：{gate[3](r)}</p>)}</div>}
-    <PillTools label="实验与队列的更多内容" initial={run ? 'tasks' : ''} items={[
-      { id: 'queue', label: '任务队列', render: () => <>
-        {censusJobs.map(job => <div className="mp-qrow" key={job.job_id}><span>{[job.model?.name, '神经元普查'].filter(Boolean).join(' · ')}</span>
-          <PBar done={job.counts?.done ?? 0} total={job.n_shards} label="普查分片完成"/><span>{job.counts?.done ?? 0} / {job.n_shards}</span></div>)}
-        {!censusJobs.length && <p className="v8-note">{censusJobsApi.loading ? '读取普查作业…' : '没有普查作业。'}</p>}
-        <div className="mp-qrow"><span>主线 H0–H7</span><PBar done={mainDone} total={STAGES.length} label="主线完成阶段"/><span>{mainDone} / {STAGES.length}</span></div>
-        <p className="v8-note">四关只统计已登记的研究运行：{RUNS.map(r => r.id).join('、')}。</p>
-      </> },
-      { id: 'runs', label: '逐项查看研究运行', render: () => <>
-        <div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>运行</th><th>执行进度</th><th>软件校验</th><th>科学证据</th><th>独立复算</th></tr></thead>
-          <tbody>{RUNS.map(r => <tr key={r.id}><td><b>{r.id}</b><small> Phase {r.phase}</small></td><td>{r.exec}</td><td>{r.check}</td><td>{r.evidenceText}</td><td>{r.replicaText}</td></tr>)}</tbody></table></div>
-        <p className="v8-note">证据晋级要写明谁、何时、依据哪次复算；目前登记的 {RUNS.length} 次运行都没有晋级记录。</p>
-      </> },
-      { id: 'tasks', label: '节点任务、待审与回执', render: () => <>
-        <dl className="v8-rnd-metrics">
-          <div><dt>运行中</dt><dd>{tasks.data ? stats.claimed ?? 0 : '—'}</dd></div>
-          <div><dt>排队</dt><dd>{tasks.data ? stats.queued ?? 0 : '—'}</dd></div>
-          <div><dt>需处理</dt><dd>{failures} · {pending}{stats.expired > 0 ? ` · ${stats.expired} 个租约过期` : ''}</dd></div>
-        </dl>
-        <div className="v8-rnd-caption">
-          {tasks.data?.server_time > 0 && <span>{tasks.local ? '数据包' : '队列'} · {dateTime(tasks.data.server_time)}</span>}
-          <button className="v6-linkbtn" type="button" onClick={() => { tasks.reload(); catalog.reload(); }}>刷新</button>
-        </div>
+    <PageHead title="实验与队列" sub="查看任务状态、待审结果和回执。点击任务查看执行详情。" />
+    <div className="rnd-counts" aria-label="模板任务概况">
+      {[['active','运行中',tasks.data ? stats.claimed ?? 0 : '—'],['queued','待领取',tasks.data ? stats.queued ?? 0 : '—'],['attention','异常任务',tasks.data ? (stats.failed ?? 0) + (stats.expired ?? 0) : '—'],['history','近期完成',tasks.data ? completed.length : '—']].map(([id,label,count]) => <button className="rnd-count" key={id} type="button" aria-pressed={filter === id && queueTab === 'tasks'} onClick={() => selectFilter(id)}><span>{label}</span><b>{count}</b></button>)}
+    </div>
+    <div className="v8-rnd-caption"><span>以上为模板任务；普查分片单独显示。</span><span>{catalog.data ? `${pending} 份结果待审` : catalog.error ? '待审数量暂不可用' : '正在读取待审数量…'}</span>{tasks.data?.server_time > 0 && <span>{tasks.local ? '数据包' : '队列更新'} · {dateTime(tasks.data.server_time)}</span>}</div>
+    <ResearchPanels key={run || 'queue'} label="实验查看方式" initial="tasks" value={queueTab} onChange={setQueueTab} items={[
+      { id: 'tasks', label: '任务与回执', render: () => <>
+        <div className="rnd-queue-filter"><label>查看 <select aria-label="任务状态筛选" value={filter} onChange={event => selectFilter(event.target.value)}><option value="attention">异常与待审</option><option value="active">运行中</option><option value="queued">待领取</option><option value="history">近期完成</option></select></label><button className="v6-linkbtn" type="button" onClick={refresh}>刷新队列</button></div>
         <SourceNotice source={tasks} loading="读取调度队列…"/>
         {catalog.error && <p className="v8-note">{catalog.error}</p>}
-        <ResearchBundleUpload/>
         {run && <ArchivedExperiment key={run} run={run} onGo={onGo}/>}
+        {censusJobs.length > 0 && <ResearchDisclosure title={`普查作业（${censusJobs.length}） · ${censusJobs.reduce((sum, job) => sum + (job.counts?.queued ?? 0), 0)} 分片待领取`}>
+          {censusJobs.map(job => <div className="mp-qrow" key={job.job_id}><span>{[job.model?.name, '神经元普查'].filter(Boolean).join(' · ')} · {job.counts?.queued ?? 0} 待领取</span><PBar done={job.counts?.done ?? 0} total={job.n_shards} label="普查分片完成"/><span>{job.counts?.done ?? 0} / {job.n_shards}</span></div>)}
+        </ResearchDisclosure>}
+        {censusJobsApi.error && <p className="v8-note">普查作业暂不可用：{censusJobsApi.error}</p>}
         <div className="v8-rnd-list" aria-label="当前任务">
-          {failed.slice(0, 2).map(row)}
-          {[...highlighted].map(issueRow)}
-          {current.slice(0, 3).map(row)}
+          {visibleRows.slice(0, limit).map(entry => entry.task ? row(entry.task) : issueRow(entry.issue))}
         </div>
-        {tasks.data && !current.length && <p className="v8-note">当前无运行或排队任务。</p>}
-        {tasks.data?.attention && (stats.failed ?? 0) + (stats.expired ?? 0) > failed.length && <p className="v8-note">
+        {tasks.data && !filtered.length && !issueGroups.length && <Empty>当前分类没有任务记录。</Empty>}
+        {filter === 'attention' && tasks.data?.attention && (stats.failed ?? 0) + (stats.expired ?? 0) > failed.length && <p className="v8-note">
           队列显示最近 {failed.length} 条待处理任务明细。
         </p>}
-        {(failed.length > 2 || otherGroups.length > 0 || current.length > 3) && <ResearchDisclosure title="更多任务与待审模板">
-          <div className="v8-rnd-list">{failed.slice(2).map(row)}{otherGroups.map(issueRow)}{current.slice(3).map(row)}</div>
-        </ResearchDisclosure>}
-        <ResearchDisclosure title="历史任务">
-          {completed.length ? <div className="v8-rnd-list">{completed.map(row)}</div> : <Empty>当前资料中没有已完成任务记录。</Empty>}
-        </ResearchDisclosure>
+        {visibleRows.length > limit && <button type="button" className="fw-tbtn" onClick={() => setLimit(n => n + 6)}>显示更多任务</button>}
+        {filter === 'history' && <p className="v8-note">显示接口返回的近期完成记录，全部完成数量为 {tasks.data ? stats.done ?? 0 : '—'}；未把近期列表当作历史总量。</p>}
       </> },
-      { id: 'ai', label: 'AI 研究循环', render: () => <AiLoopCard/> },
-      tools.length > 0 && { id: 'tools', label: '专业工具', render: () => <div className="v6-toolbar">{tools.map(tool => <button key={tool.id} type="button" className="fw-tbtn"
-        onClick={() => onGo(tool.id)}>{tool.label}</button>)}</div> },
+      { id: 'checks', label: '研究验收', render: () => <>
+        <p className="v8-note">执行、软件校验、科学证据和独立复算分别记账。以下只统计已登记的 {RUNS.length} 次研究运行。</p>
+        <div className="mp-tiles">{gates.map(([id,title,done]) => <PTile key={id} title={title} done={done} total={RUNS.length} unit="次运行" on={gateSel === id} onClick={() => setGateSel(gateSel === id ? '' : id)}/>)}</div>
+        {gate ? <div className="mp-detail"><b>{gate[1]}</b>{RUNS.map(r => <p key={r.id} className="v8-note">{r.id}（Phase {r.phase} · {r.title}）：{gate[3](r)}</p>)}</div> : <ResearchDisclosure title="逐项查看研究运行"><div className="v8-weight-scroll"><table className="v6-table"><thead><tr><th>运行</th><th>执行进度</th><th>软件校验</th><th>科学证据</th><th>独立复算</th></tr></thead><tbody>{RUNS.map(r => <tr key={r.id}><td>{r.id}</td><td>{r.exec}</td><td>{r.check}</td><td>{r.evidenceText}</td><td>{r.replicaText}</td></tr>)}</tbody></table></div></ResearchDisclosure>}
+      </> },
+      { id: 'tools', label: '研究工具', render: () => <>
+        {tools.length > 0 && <div className="v6-toolbar">{tools.map(tool => <button key={tool.id} type="button" className="fw-tbtn" onClick={() => onGo(tool.id)}>{tool.label}</button>)}</div>}
+        <ResearchDisclosure title="AI 研究循环"><AiLoopCard/></ResearchDisclosure>
+        <ResearchBundleUpload/>
+      </> },
     ]} />
   </section>;
 }

@@ -5,7 +5,9 @@ import { languageSections, relationCounts } from './ClientGuide.jsx';
 describe('三部分研究摘要', () => {
   it('按语言目录三类入口统计已测条目，总数不受测量集影响', () => {
     const sections = languageSections(new Set(['KN.ATTR', 'GR.Q', 'RS.NEG']));
-    expect(sections.map(section => section.total).reduce((sum, value) => sum + value, 0)).toBe(69);
+    const totals = sections.map(section => section.total);
+    expect(totals.reduce((sum, value) => sum + value, 0)).toBe(72);
+    expect(totals).toEqual(languageSections(new Set()).map(section => section.total));
     expect(sections.map(section => section.done)).toEqual([1, 1, 1]);
   });
 

@@ -8,7 +8,7 @@ export async function consumeResearchStream(stream,{id,onEntry=async()=>{},onHea
     if(footer)throw Error('附加包完成标记之后仍有数据');
     if(value.complete===true){if(value.version!==header.version||value.n_entries!==count)throw Error('附加包计数或版本不一致');footer=value;return}
     if(typeof value.path!=='string'||!value.path.startsWith('/api/')||!Object.hasOwn(value,'data'))throw Error('附加包条目无效');
-    await onEntry(value.path,value.data);count++;
+    await onEntry(value.path,value.data,text.length);count++;
   }
   try{
     while(true){const {done,value}=await reader.read();if(done)break;buffer+=value;

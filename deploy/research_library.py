@@ -21,6 +21,7 @@ from fastapi import APIRouter, Header, HTTPException, Query
 
 router = APIRouter(prefix='/api/research-library', tags=['research-library'])
 _lock = threading.RLock()
+PUBLISHED_SQL = 'NOT EXISTS (SELECT 1 FROM mainline_publications mp WHERE mp.sha=a.sha AND mp.published=0)'
 
 
 def canonical(doc):
@@ -44,9 +45,12 @@ class Library:
                 CREATE TABLE IF NOT EXISTS graph_objects(sha TEXT NOT NULL,id TEXT NOT NULL,
                     type TEXT NOT NULL,model TEXT NOT NULL,body TEXT NOT NULL,PRIMARY KEY(sha,id,type));
                 CREATE INDEX IF NOT EXISTS objects_model ON graph_objects(model,type);
+                CREATE INDEX IF NOT EXISTS objects_identity ON graph_objects(model,id,type,sha);
+                CREATE INDEX IF NOT EXISTS objects_run ON graph_objects(json_extract(body,'$.run_id'),model,id,type,sha);
                 CREATE TABLE IF NOT EXISTS file_cache(path TEXT PRIMARY KEY,stamp TEXT NOT NULL,sha TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS workpackage_revisions(sha TEXT PRIMARY KEY,run_id TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS mainline_publications(sha TEXT PRIMARY KEY,published INTEGER NOT NULL);
             ''')
 
     @contextmanager
@@ -197,11 +201,11 @@ class Library:
         return {'new_revisions':count,'errors':errors}
 
     def summary(self, model=''):
-        where=' WHERE model=?' if model else '';args=(model,) if model else ()
+        where=' WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0)' + (' AND model=?' if model else '');args=(model,) if model else ()
         with self.db() as db:
-            models=[dict(r) for r in db.execute('SELECT model,COUNT(*) AS artifacts FROM artifacts GROUP BY model')]
+            models=[dict(r) for r in db.execute('SELECT model,COUNT(*) AS artifacts FROM artifacts WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0) GROUP BY model')]
             recent=[dict(r) for r in db.execute('SELECT * FROM artifacts'+where+' ORDER BY created DESC LIMIT 100',args)]
-            counts={t:db.execute('SELECT COUNT(*) FROM graph_objects WHERE type=?'+(' AND model=?' if model else ''),(t,)+args).fetchone()[0] for t in ('feature','edge')}
+            counts={t:db.execute('SELECT COUNT(*) FROM graph_objects WHERE type=? AND sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0)'+(' AND model=?' if model else ''),(t,)+args).fetchone()[0] for t in ('feature','edge')}
             total=db.execute('SELECT COUNT(*) FROM artifacts'+where,args).fetchone()[0]
             status=db.execute("SELECT value FROM metadata WHERE key='sync'").fetchone()
         return {'schema':'research_library.v1','artifacts':total,'graph_revisions':counts,'models':models,'recent':recent,
@@ -210,20 +214,20 @@ class Library:
 
     def fingerprint(self):
         with self.db() as db:
-            rows=list(db.execute('SELECT sha FROM artifacts ORDER BY sha'))
+            rows=list(db.execute('SELECT sha FROM artifacts WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0) ORDER BY sha'))
             if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='blind_labels'").fetchone():
                 rows+=list(db.execute('SELECT sha FROM blind_labels ORDER BY sha'))
         return hashlib.sha256(''.join(r[0] for r in rows).encode()).hexdigest()[:20]
 
     def graph(self, model='', offset=0, limit=100):
         with self.db() as db:
-            rows=db.execute('SELECT * FROM graph_objects'+(' WHERE model=?' if model else '')+' ORDER BY sha,id LIMIT ? OFFSET ?',((model,) if model else ())+(limit,offset)).fetchall()
+            rows=db.execute('SELECT * FROM graph_objects WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0)'+(' AND model=?' if model else '')+' ORDER BY sha,id LIMIT ? OFFSET ?',((model,) if model else ())+(limit,offset)).fetchall()
         return {'objects':[{**dict(r),'body':json.loads(r['body'])} for r in rows],'offset':offset,'limit':limit}
 
     def artifacts(self,offset=0,limit=50):
         with self.db() as db:
-            rows=[dict(r) for r in db.execute('SELECT * FROM artifacts ORDER BY created DESC,sha LIMIT ? OFFSET ?',(limit,offset))]
-            total=db.execute('SELECT COUNT(*) FROM artifacts').fetchone()[0]
+            rows=[dict(r) for r in db.execute('SELECT * FROM artifacts WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0) ORDER BY created DESC,sha LIMIT ? OFFSET ?',(limit,offset))]
+            total=db.execute('SELECT COUNT(*) FROM artifacts WHERE sha NOT IN (SELECT sha FROM mainline_publications WHERE published=0)').fetchone()[0]
         return {'artifacts':rows,'offset':offset,'limit':limit,'total':total}
 
     def fragments(self,offset=0,limit=50):
@@ -235,14 +239,14 @@ class Library:
         with self.db() as db:
             base='''SELECT g.*,a.created,ROW_NUMBER() OVER
                 (PARTITION BY g.model,g.id ORDER BY a.created DESC,g.sha DESC) AS revision_rank
-                FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE g.type='feature' '''
+                FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE g.type='feature' AND ''' + PUBLISHED_SQL
             total=db.execute('SELECT COUNT(*) FROM ('+base+') WHERE revision_rank=1').fetchone()[0]
             rows=db.execute('SELECT * FROM ('+base+') WHERE revision_rank=1 ORDER BY created DESC,id LIMIT ? OFFSET ?',(limit,offset)).fetchall()
             features=[]
             for r in rows:
                 history=[{'sha':h['sha'],'level':json.loads(h['body'])['evidence']['level'],'created':h['created']}
                     for h in db.execute('''SELECT g.sha,g.body,a.created FROM graph_objects g JOIN artifacts a ON a.sha=g.sha
-                        WHERE g.type='feature' AND g.model=? AND g.id=? ORDER BY a.created DESC,g.sha DESC''',(r['model'],r['id']))]
+                        WHERE g.type='feature' AND g.model=? AND g.id=? AND ''' + PUBLISHED_SQL + ' ORDER BY a.created DESC,g.sha DESC',(r['model'],r['id']))]
                 features.append({'sha':r['sha'],'id':r['id'],'model_snapshot':r['model'],'body':json.loads(r['body']),'history':history})
         return {'schema':'research_fragments.v1','features':features,'total':total,'offset':offset,'limit':limit}
 
@@ -250,7 +254,7 @@ class Library:
         with self.db() as db:
             rows=db.execute('''SELECT * FROM (SELECT w.*,a.created,ROW_NUMBER() OVER
                 (PARTITION BY w.run_id ORDER BY a.created DESC,w.sha DESC) AS revision_rank
-                FROM workpackage_revisions w JOIN artifacts a ON a.sha=w.sha)
+                FROM workpackage_revisions w JOIN artifacts a ON a.sha=w.sha WHERE ''' + PUBLISHED_SQL + ''')
                 WHERE revision_rank=1 ORDER BY created DESC''').fetchall()
         return {'schema':'research_workpackages.v1','workpackages':[{'sha':r['sha'],'body':self.artifact(r['sha'])} for r in rows]}
 
@@ -351,12 +355,20 @@ def progress():
 
 @router.get('/fragments')
 def fragments(offset:int=Query(0,ge=0),limit:int=Query(50,ge=1,le=1000)):
-    return library().fragments(offset,limit)
+    return _mainline_read(lambda lib: lib.fragments(offset,limit))
 
 
 @router.get('/workpackages')
 def workpackages():
-    return library().workpackages()
+    return _mainline_read(lambda lib: lib.workpackages())
+
+
+def _mainline_read(read):
+    from shared.dist_protocol.mainline_state import MainlineStore
+    with _lock:
+        lib = library()
+        state = MainlineStore(lib).ensure()
+        return {**read(lib), 'mainline_revision': state['revision']}
 
 
 @router.get('/graph')

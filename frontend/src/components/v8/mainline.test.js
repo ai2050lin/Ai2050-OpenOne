@@ -5,21 +5,21 @@ import { normalizeState, spaceMode, spaceTab } from '../app/workbenchUtil.js';
 import { BASIS, EDGES, NODES } from './data/lang_graph_seed.js';
 import { CAPABILITIES, CAP_LEVELS, CLAIMS, CLAIM_LIFE, LIFECYCLE, STAGES, TESTS, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
 
-describe('空间三张图的路由', () => {
+describe('统一关联机制与外部语言图谱的路由', () => {
   const mode = input => { const st = normalizeState(input); return [spaceMode(st.view, st.gview), spaceTab(st.view, st.gview)]; };
   it('新入口落到对应的图和视图', () => {
     expect(mode({ lens: 'spatial', view: 'graph', gview: 'language' })).toEqual(['lang', 'language']);
-    expect(mode({ lens: 'spatial', view: 'graph', gview: 'structure' })).toEqual(['enc', 'structure']);
+    expect(mode({ lens: 'spatial', view: 'graph', gview: 'structure' })).toEqual(['assoc', 'structure']);
     expect(mode({ lens: 'spatial', view: 'live' })).toEqual(['assoc', 'live']);
     expect(mode({ lens: 'spatial', view: 'response' })).toEqual(['assoc', 'response']);
   });
-  it('旧链接仍能归到三张图之一', () => {
+  it('旧链接恢复到统一入口中的原有内容', () => {
     // 旧别名 view=lang 原本是语言项实测页，现归关联机制；语言图谱只剩外部框架
     expect(mode({ lens: 'spatial', view: 'lang' })).toEqual(['assoc', 'langmeasure']);
     expect(mode({ lens: 'spatial', view: 'graph', gview: 'langmeasure' })).toEqual(['assoc', 'langmeasure']);
     expect(mode({ lens: 'spatial', view: 'atlas' })).toEqual(['assoc', 'relations']);
-    expect(mode({ lens: 'spatial', view: 'neuron' })).toEqual(['enc', 'structure']);
-    expect(mode({ lens: 'spatial', view: 'research' })).toEqual(['enc', 'internal']);
+    expect(mode({ lens: 'spatial', view: 'neuron' })).toEqual(['assoc', 'structure']);
+    expect(mode({ lens: 'spatial', view: 'research' })).toEqual(['assoc', 'internal']);
   });
 });
 

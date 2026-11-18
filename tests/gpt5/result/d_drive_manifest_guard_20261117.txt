@@ -1,0 +1,41 @@
+A-TIER DELETE MANIFEST GUARD / READ-ONLY  2026-11-17
+total rows = 13110
+
+[1] A3-PACKS per-file (should be only root-level archives)
+  goodfire_middle_20261113_v2       267438 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\goodfire_middle_20261113_v2\integration-sources.zip
+  goodfire_middle_20261113_v2  22910014666 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\goodfire_middle_20261113_v2\qwen14-b18-b28-native.tar.gz
+  goodfire_middle_20261113_v2     28544650 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\goodfire_middle_20261113_v2\qwen14-b18-b28-research-upload.tar.gz
+  goodfire_middle_20261113_v2  10553005731 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\goodfire_middle_20261113_v2\qwen4-b18-b28-native.tar.gz
+  goodfire_middle_20261113_v2     16002850 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\goodfire_middle_20261113_v2\qwen4-b18-b28-research-upload.tar.gz
+  qwen14_client_v2             6730643253 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\qwen14_client_v2\ai2050-qwen14-b28-b39-delta.tar.gz
+  qwen14_client_v2               30917921 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\qwen14_client_v2\ai2050-qwen14-b28-b39-research-upload.tar.gz
+  qwen14_client_v2                 185921 B  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\qwen14_client_v2\integration-sources.zip
+  A3 count = 8 / 40269582430 bytes
+
+[2] manifest-registered files in served dirs
+  goodfire_middle_20261113_v2\qwen4                          registered=250  9.56 GB
+  goodfire_middle_20261113_v2\qwen14                         registered=248  20.64 GB
+  qwen14_client_v2\native                                    registered=206  18.07 GB
+  qwen14_mlp_atlas_v1                                        registered=175  13.27 GB
+  protected absolute paths = 883
+
+[3] GUARD: delete-manifest rows that hit protected files
+  VIOLATIONS = 0  (MUST be 0)
+
+[4] GUARD: rows under the 4 served dirs (exact absolute prefix)
+  rows = 0  (MUST be 0)
+
+[5] GUARD: rows under visualization-research (junction entity source)
+  rows = 0  (MUST be 0 - entity source must stay intact)
+
+[6] GUARD: rows that still exist & are conclusion files
+  conclusion-like rows = 0  (MUST be 0)
+
+[7] tier totals
+  A1-COLD-NEW               80.66 GB    2655 files
+  A2-COLD-SOURCE            80.68 GB     360 files
+  A3-PACKS                  37.50 GB       8 files
+  A4-NATIVE                 95.52 GB   10058 files
+  A5-ORPHAN                  6.66 GB      29 files
+
+===== END GUARD =====

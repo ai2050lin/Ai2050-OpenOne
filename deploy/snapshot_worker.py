@@ -302,7 +302,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description='AI2050 center snapshot worker')
     ap.add_argument('--once', action='store_true')
     ap.add_argument('--force', action='store_true')
+    ap.add_argument('--datapack-only', action='store_true', help='仅重建客户端主数据包，然后退出')
     a = ap.parse_args()
+    if a.datapack_only:
+        fp = fingerprint()
+        result = build_datapack(fp, Guard(fp), force=True)
+        if not isinstance(result, dict) or result.get('errors'):
+            if isinstance(result, dict):
+                for error in result.get('errors', []):
+                    print(f'[datapack] {error}', file=sys.stderr)
+            print('[datapack] 主包未完整生成。', file=sys.stderr, flush=True)
+            return 1
+        return 0
     try:                                               # 内存耗尽时系统先杀本进程，不杀网站进程（Linux）
         Path('/proc/self/oom_score_adj').write_text('1000')
     except OSError:

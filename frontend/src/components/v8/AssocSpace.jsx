@@ -1,5 +1,5 @@
 import { useMainline } from './data/mainlineState.js';
-/* 空间 · 关联机制 · 运行与路径（Phase 332 → 335）。
+/* 空间 · 模型探索 · 运行与路径（Phase 332 → 335）。
    上面：全部 37 层的 3D 空间与 HiddenState 信息流（案例 MA-H2 汇总；生成后叠加本次输入的逐层改写幅度）。
    下面：控制台——输入文字生成，选择模式（信息流、逐层读出、注意力头、因素、对照、方法比较）进行观察和分析。 */
 import { useMemo, useState } from 'react';
@@ -68,8 +68,8 @@ export default function AssocSpace({ model, children, bare = false }) {
     </>,
   };
 
-  return <div className="v8-route as-page" aria-label="关联机制">
-    {!bare && <PageHead title="关联机制 · 运行与路径" sub="上面是全部 37 层的 3D 空间和 HiddenState 信息流；下面的控制台可以输入文字生成，也可以切换模式观察和分析。" />}
+  return <div className="v8-route as-page" aria-label="模型探索">
+    {!bare && <PageHead title="模型探索 · 运行与路径" sub="上面是全部 37 层的 3D 空间和 HiddenState 信息流；下面的控制台可以输入文字生成，也可以切换模式观察和分析。" />}
     <AssocFlow3D data={FLOW_DATA} cur={cur} onCur={setCur} facOn={facOn} selHead={selHead} live={live} claim={claim.id}
       band={lifeNow?.band || null} toolbar={<div className="as-life">
         <div className="as-life-chips" role="group" aria-label="生命周期环节"><span className="v8-note">生命周期</span>
@@ -78,7 +78,7 @@ export default function AssocSpace({ model, children, bare = false }) {
         {lifeNow && <p className="v8-note"><b>{LIFECYCLE.find(([id]) => id === stage)[1]}</b>：{lifeNow.text}{lifeNow.band ? ` 高亮第 ${lifeNow.band[0]}–${lifeNow.band[1]} 层板。` : ' 没有观察依据，不标层段。'}层段来自本主张已有的观察，不是固定的模型分区。</p>}
       </div>} />
     <AssocConsole mode={mode} onMode={setMode} onLive={setLive} panels={panels} />
-    <PillTools label="关联机制的更多内容" items={[
+    <PillTools label="模型探索的更多内容" items={[
       { id: 'trace', label: '原生轨迹查看器（逐层、逐头、逐个 MLP 单元）', render: () => children },
       { id: 'modes', label: '三种运行方式的区别', render: () => <AssocIntro /> },
       { id: 'more', label: '更多工具：反常句草稿、跨族读出、归因演示', render: () => <>

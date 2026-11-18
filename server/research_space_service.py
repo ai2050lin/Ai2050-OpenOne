@@ -9,9 +9,10 @@ def library():
     return get()
 
 def bindings(run_id=None):
+    from deploy.research_library import PUBLISHED_SQL
     lib=library()
     with lib.db() as db:
-        rows=db.execute("SELECT sha FROM artifacts WHERE kind='space_binding' ORDER BY created DESC,sha DESC").fetchall()
+        rows=db.execute("SELECT a.sha FROM artifacts a WHERE kind='space_binding' AND " + PUBLISHED_SQL + " ORDER BY created DESC,sha DESC").fetchall()
     result=[];seen=set()
     for row in rows:
         d=lib.artifact(row['sha'])
@@ -25,12 +26,54 @@ def binding(run_id,model_snapshot=None):
     return matches[0] if matches else None
 
 @router.get('/research-space')
-def research_space():
+def research_space(object_offset:int=0,object_limit:int|None=1000,model:str='',run_id:str='',query:str='',level:str='',dataset:str='',objects_only:bool=False):
+    from deploy.research_library import _lock
+    from shared.dist_protocol.mainline_state import MainlineStore
+    with _lock:
+        state = MainlineStore(library()).ensure()
+        if object_offset<0 or object_limit is not None and not 1<=object_limit<=1000:
+            raise HTTPException(422,'Invalid graph page')
+        result = _research_space(object_offset,object_limit,model,run_id,query,level,dataset,objects_only)
+        result['mainline_revision'] = state['revision']
+        return result
+
+
+def _research_space(object_offset=0,object_limit=None,model='',run_id='',query='',level='',dataset='',objects_only=False):
+    from deploy.research_library import PUBLISHED_SQL
     lib=library()
     with lib.db() as db:
-        features=db.execute('''SELECT * FROM (SELECT g.*,a.created,ROW_NUMBER() OVER(PARTITION BY g.model,g.id,g.type ORDER BY a.created DESC,g.sha DESC) AS rn
-          FROM graph_objects g JOIN artifacts a ON a.sha=g.sha) WHERE rn=1 ORDER BY model,id''').fetchall()
-        artifacts=[dict(r) for r in db.execute('SELECT sha,source,model,kind,created,bytes FROM artifacts ORDER BY created DESC,sha DESC')]
+        # Seek newer revisions by native identity instead of ranking every body
+        # for every page. Filters still apply AFTER choosing the latest visible
+        # revision: changing a run/label must never resurrect an obsolete card.
+        latest=''' FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE '''+PUBLISHED_SQL+''' AND NOT EXISTS (
+          SELECT 1 FROM graph_objects newer JOIN artifacts na ON na.sha=newer.sha
+          WHERE newer.model=g.model AND newer.id=g.id AND newer.type=g.type
+            AND (na.created>a.created OR (na.created=a.created AND newer.sha>g.sha))
+            AND NOT EXISTS (SELECT 1 FROM mainline_publications np WHERE np.sha=na.sha AND np.published=0))'''
+        total_objects=None
+        if not objects_only:
+            total_objects=db.execute('''SELECT COUNT(*) FROM (SELECT g.model,g.id,g.type
+              FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE '''+PUBLISHED_SQL+'''
+              GROUP BY g.model,g.id,g.type)''').fetchone()[0]
+        clauses=[];args=[]
+        for condition,value in [("g.model=?",model),("json_extract(g.body,'$.run_id')=?",run_id),
+                                ("json_extract(g.body,'$.evidence.level')=?",level)]:
+            if value:clauses.append(condition);args.append(value)
+        if dataset:
+            clauses.append("COALESCE(json_extract(g.body,'$.scope.dataset'),json_extract(g.body,'$.dataset'),'unlabelled')=?");args.append(dataset)
+        if query:
+            clauses.append("instr(lower(g.id||' '||g.sha||' '||COALESCE(json_extract(g.body,'$.label'),'')),lower(?))>0");args.append(query)
+        where=' AND '+' AND '.join(clauses) if clauses else ''
+        filtered_total=db.execute('SELECT COUNT(*)'+latest+where,args).fetchone()[0] if clauses or total_objects is None else total_objects
+        paging=' LIMIT ? OFFSET ?' if object_limit is not None else ''
+        features=db.execute('SELECT g.*'+latest+where+' ORDER BY g.model,g.id,g.type'+paging,
+          args+([object_limit,object_offset] if object_limit is not None else [])).fetchall()
+        if objects_only:
+            return {'schema':'research_space_objects.v1','kind':'real',
+                'objects':[{'sha':r['sha'],'id':r['id'],'type':r['type'],'model_snapshot':r['model'],'body':json.loads(r['body'])} for r in features],
+                'objects_page':{'total':filtered_total,'offset':object_offset,'limit':object_limit,'filtered':True}}
+        object_models=[r[0] for r in db.execute('SELECT DISTINCT g.model FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE '+PUBLISHED_SQL)]
+        artifacts=[dict(r) for r in db.execute('SELECT a.sha,source,model,kind,created,bytes FROM artifacts a WHERE '+PUBLISHED_SQL+' ORDER BY created DESC,sha DESC')]
     studies=[];all_bindings=bindings()
     bindings_by_run={}
     for b in all_bindings:
@@ -61,11 +104,13 @@ def research_space():
         if snapshot not in models and isinstance(dims,dict) and all(type(dims.get(k)) is int and 0<dims[k]<=v for k,v in limits.items()):
             models[snapshot]={'snapshot':snapshot,**{k:dims[k] for k in limits},'dimension_binding_sha256':b['binding_sha256']}
     objects=[{'sha':r['sha'],'id':r['id'],'type':r['type'],'model_snapshot':r['model'],'body':json.loads(r['body'])} for r in features]
+    for snapshot in object_models:models.setdefault(snapshot,{'snapshot':snapshot,'localization':'no_native_dimensions'})
     for o in objects:
         if o['model_snapshot'] not in models:models[o['model_snapshot']]={'snapshot':o['model_snapshot'],'localization':'no_native_dimensions'}
     for study in studies:
         snapshot=study['model_snapshot']
         if snapshot:models.setdefault(snapshot,{'snapshot':snapshot,'localization':'no_native_dimensions'})
     return {'schema':'research_space_index.v1','kind':'real','fingerprint':lib.fingerprint(),'studies':studies,'objects':objects,'artifacts':artifacts,'models':list(models.values()),
-        'counts':{'studies':len(studies),'objects':len(objects),'artifacts':len(artifacts)},
+        'counts':{'studies':len(studies),'objects':total_objects,'artifacts':len(artifacts)},
+        'objects_page':{'total':filtered_total,'offset':object_offset,'limit':object_limit,'filtered':object_limit is not None},
         'interpretation':'Native indices locate observations. Unlocated reports remain on an explicitly schematic artifact rack. Layout distance is not model geometry; no evidence promotion.'}

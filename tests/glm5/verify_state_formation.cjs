@@ -1,0 +1,123 @@
+const {chromium}=require('C:/Users/Admin/.workbuddy/binaries/node/workspace/node_modules/playwright-core');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const out=fs.realpathSync(path.resolve(__dirname,'result/state_formation_v1'));
+const reg=JSON.parse(fs.readFileSync(path.join(out,'registration.json'),'utf8'));
+const result={time:new Date().toISOString(),checks:[],errors:[],gpuRequests:[]};
+const record=(name,detail)=>{result.checks.push({name,detail});console.log(JSON.stringify({name,detail}));};
+const pct=v=>`${(100*v).toFixed(2)}%`,num=v=>v.toPrecision(4);
+(async()=>{
+ const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--no-sandbox']});
+ let page;
+ try{
+  page=await browser.newPage({viewport:{width:1440,height:1100}});page.setDefaultTimeout(45000);
+  page.on('pageerror',error=>result.errors.push(error.message));
+  page.on('request',r=>{if(r.method()==='POST'&&/\/api\/live\/(load|run)/.test(r.url()))result.gpuRequests.push(r.url());});
+  const api='http://localhost:5001/api/research-library/artifacts/';
+  const response=await page.request.get(api+reg.report_sha256);assert.equal(response.status(),200);
+  const report=await response.json();assert.equal(report.model_snapshot,reg.model_snapshot);assert.equal(report.families.confirm,768);
+  const mirrored=await page.request.get('http://localhost:5032/api/research-library/artifacts/'+reg.report_sha256);assert.equal(mirrored.status(),200);
+  assert.deepEqual(await mirrored.json(),report);record('two_local_libraries_same_report',reg.report_sha256);
+  const graph=await (await page.request.get(api+reg.graph_sha256)).json();assert.equal(graph.feature_cards.length,5);
+  assert.ok(graph.feature_cards.every(c=>c.index.space==='residual'&&c.index.anchor_only&&c.scope.formal_promotion===false));
+  record('cards_are_vector_and_module_observations_not_single_neurons');
+  await page.goto(`http://localhost:5173/workbench?lens=process&station=execution&run=${reg.run_id}&snapshot=${reg.model_snapshot}`);
+  const archive=page.getByLabel('链接指定的实验',{exact:true});
+  await archive.getByText('Qwen3-4B · 新样本：条件中心、注意力与MLP作用',{exact:true}).waitFor();
+  await archive.getByText('研究报告与反例',{exact:true}).click();
+  const panel=page.getByLabel('新样本状态形成与作用报告',{exact:true});await panel.waitFor();
+  assert.equal(report.diagnostic_only,true);assert.equal(report.behavior.passed,false);
+  await panel.getByText('原确认流程已因行为门失败停止。',{exact:true}).waitFor();
+  assert.ok(report.effects.every(e=>!e.scope_use_supported&&!e.effect_prediction_supported));
+  record('failed_behavior_gate_and_nonconfirmatory_scope_are_explicit');
+  const primary=report.center_rows.find(r=>r.primary),table=panel.getByLabel('条件中心简单基线比较');
+  const centerKeys=['fixed','oracle_center','decoded_center','pooled','norm','wrong_center','permuted_labels'];
+  assert.equal(await table.locator('tbody tr').count(),7);
+  for(let i=0;i<7;i++)assert.equal(await table.locator('tbody tr').nth(i).locator('td').last().innerText(),pct(primary.accuracies[centerKeys[i]]));
+  assert.ok((await panel.innerText()).includes(primary.gain.frame_interval.map(pct).join(' 至 ')));
+  record('seven_real_center_baselines_and_cluster_interval');
+  await panel.screenshot({path:path.join(out,'client-centers.png')});
+  await panel.getByRole('button',{name:'注意力与MLP形成',exact:true}).click();
+  assert.equal(await panel.getByLabel('形成状态边界').locator('option').count(),74);
+  await panel.getByRole('img',{name:'逐模块状态可读出曲线',exact:true}).waitFor();
+  await panel.getByLabel('形成状态边界').selectOption('73');
+  await panel.getByText('这里经过最终RMSNorm；原始B35输出在前一个边界，已单独保存。',{exact:true}).waitFor();
+  await panel.getByLabel('形成状态边界').selectOption('68');
+  const stateMSE=Object.values(report.curves[68].state_prediction_mse),mseRows=panel.getByLabel('状态预测简单基线').locator('tbody tr');
+  for(let i=0;i<4;i++)assert.equal(await mseRows.nth(i).locator('td').last().innerText(),num(stateMSE[i]));
+  record('four_state_prediction_baselines_match_native_analysis');
+  await panel.screenshot({path:path.join(out,'client-formation.png')});
+  await panel.getByText('完整原生坐标与数值',{exact:true}).click();
+  for(const [kind,source,factor,k] of [['state',1,'language',0],['state',0,'color',1],['attention',0,'color_language',2],['mlp',0,'color',1]]){
+   await panel.getByLabel('形成坐标对象').selectOption(kind);
+   await panel.getByLabel('形成成分').selectOption(factor);
+   await panel.getByLabel('状态形成完整系数，全部2560维，未进行TopK截断',{exact:true}).waitFor();
+   if(kind==='state')await panel.getByLabel('形成坐标来源').selectOption(String(source));
+   const index=kind==='state'?68:33,digest=report.coordinate_artifacts[kind][index];
+   const native=await(await page.request.get(api+digest)).json(),bytes=Buffer.from(native.array.data,'base64');
+   assert.equal(native.array.shape.at(-1),2560);
+   for(const coordinate of [0,2359,2559]){
+    await panel.getByLabel('形成原生坐标',{exact:true}).fill(String(coordinate));
+    const expected=bytes.readFloatLE(((source*3+k)*2560+coordinate)*4).toPrecision(4);
+    await panel.getByText(`原生坐标 ${coordinate} = ${expected}`,{exact:true}).waitFor();
+   }
+  }
+  record('state_and_both_actual_module_writes_all_coordinates_numeric_identity');
+  await panel.screenshot({path:path.join(out,'client-native.png')});
+  await panel.getByLabel('形成坐标对象').selectOption('state');
+  const missing='**/api/research-library/artifacts/'+report.coordinate_artifacts.state['16'];
+  await page.route(missing,route=>route.fulfill({status:404,contentType:'application/json',body:JSON.stringify({detail:'验收：坐标产物缺失'})}));
+  await panel.getByLabel('形成状态边界').selectOption('16');await panel.getByText(/原生坐标读取失败/).waitFor();
+  await page.unroute(missing);await panel.getByLabel('形成状态边界').selectOption('17');
+  await panel.getByLabel('状态形成完整系数，全部2560维，未进行TopK截断',{exact:true}).waitFor();
+  await panel.getByLabel('形成状态边界').selectOption('16');
+  await panel.getByLabel('状态形成完整系数，全部2560维，未进行TopK截断',{exact:true}).waitFor();
+  record('missing_coordinate_artifact_and_recovery');
+  const mismatch='**/api/research-library/artifacts/'+report.coordinate_artifacts.state['18'];
+  const wrong=await(await page.request.get(api+report.coordinate_artifacts.state['18'])).json();wrong.model_snapshot='invalid-test-identity';
+  await page.route(mismatch,route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(wrong)}));
+  await panel.getByLabel('形成状态边界').selectOption('18');await panel.getByText('数据身份或形状不匹配，未显示坐标。',{exact:true}).waitFor();
+  await page.unroute(mismatch);await panel.getByLabel('形成状态边界').selectOption('19');
+  await panel.getByLabel('状态形成完整系数，全部2560维，未进行TopK截断',{exact:true}).waitFor();
+  record('mismatched_model_identity_not_displayed');
+  await panel.getByRole('button',{name:'作用与副作用',exact:true}).click();
+  for(const effect of report.effects){
+   await panel.getByLabel('形成作用候选').selectOption(effect.candidate);
+   await panel.getByLabel('形成作用方法').selectOption(effect.method);
+   if(effect.method==='ablation')await panel.getByLabel('形成作用剂量').selectOption(String(effect.dose));
+   const values=await panel.getByLabel('状态形成作用与对照').locator('tr').allTextContents();
+   assert.ok(values[0].includes(num(effect.mean_target_margin_loss)));
+   assert.ok(values[2].includes(effect.matched_excess.frame_interval.map(num).join(' 至 ')));
+   assert.ok(values[3].includes(num(effect.prediction_to_best_baseline)));
+   assert.ok(values[4].includes(`${effect.first_correct_to_wrong} / 768`));
+   for(const failure of effect.failures)assert.ok((await panel.innerText()).includes(failure));
+  }
+  record('all_ten_frozen_effects_controls_predictions_and_failures');
+  await panel.getByLabel('形成作用候选').selectOption('color-attention-B23');await panel.getByLabel('形成作用方法').selectOption('ablation');await panel.getByLabel('形成作用剂量').selectOption('1');
+  await panel.getByText('新旧记录冲突与原本答错样本',{exact:true}).click();
+  const subgroups=report.effect_error_diagnosis.filter(e=>e.candidate==='color-attention-B23'&&e.method==='ablation'&&e.dose===1);
+  const subgroupRows=panel.getByLabel('作用失败分组诊断').locator('tbody tr');assert.equal(await subgroupRows.count(),5);
+  for(let i=0;i<5;i++){const cells=await subgroupRows.nth(i).locator('td').allTextContents();assert.equal(cells[1],num(subgroups[i].mean_margin_loss));assert.equal(cells[3],String(subgroups[i].rescued));}
+  record('overlapping_error_strata_are_descriptive_and_numeric_values_match');
+  await panel.screenshot({path:path.join(out,'client-effects.png')});
+  await panel.getByRole('button',{name:'原始证据与失败',exact:true}).click();
+  await panel.locator('summary').filter({hasText:'中心修正反例'}).first().click();
+  await panel.locator('.v8-sample-text:visible').first().waitFor();
+  await panel.getByText(`全部${report.behavior_errors.length}条行为错误及原始输入`,{exact:true}).click();
+  await panel.locator('summary').filter({hasText:report.behavior_errors[0].sample.id}).click();
+  assert.ok((await panel.locator('.v8-sample-text:visible').allTextContents()).includes(report.behavior_errors[0].sample.prompt));
+  record('all_behavior_failures_preserved_with_original_prompts',report.behavior_errors.length);
+  const auditUrl=await panel.getByRole('link',{name:'原生数据与结论审计',exact:true}).getAttribute('href');
+  const audit=await(await page.request.get(new URL(auditUrl,page.url()).href)).json();
+  assert.equal(audit.passed,true);assert.equal(audit.formal_promotion,false);assert.equal(audit.verified_native_families,1024);
+  record('real_counterexamples_and_audit_link');
+  await panel.getByRole('button',{name:'注意力与MLP形成',exact:true}).click();
+  await page.setViewportSize({width:390,height:844});
+  assert.ok(await panel.locator('.hs-controls').evaluate(el=>el.scrollWidth<=el.clientWidth));
+  const scroll=panel.getByLabel('注意力与MLP形成曲线，可横向滚动',{exact:true});await scroll.focus();await scroll.press('ArrowRight');
+  await page.waitForFunction(()=>document.querySelector('.hs-curve-scroll')?.scrollLeft>0);
+  await panel.getByLabel('形成状态边界').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,'client-mobile.png')});
+  record('mobile_controls_fit_keyboard_chart_navigation');
+  assert.deepEqual(result.errors,[]);assert.deepEqual(result.gpuRequests,[]);result.passed=true;
+ }catch(error){result.failure=error.stack;console.error(error);process.exitCode=1;if(page)await page.screenshot({path:path.join(out,'client-failure.png')});}
+ finally{fs.writeFileSync(path.join(out,'client-acceptance.json'),JSON.stringify(result,null,2));await browser.close();}
+})();

@@ -1,0 +1,651 @@
+{
+ "schema": "result.v1",
+ "name": "phase383plus_review",
+ "provenance": {
+  "git_sha": "2d5ec1ee3e033acd8eec8e2e8eb2a1d10a053f51",
+  "git_dirty": true,
+  "model_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\qwen3-4b",
+  "model_revision": "sha8:8ba006f7",
+  "seed": 202611100391,
+  "tool": "phase383plus_review",
+  "created_at": "2026-11-10T02:56:10"
+ },
+ "payload": {
+  "schema": "phase383plus_review.v1",
+  "scope": "Retrospective audit of Phase 385 and 387-390; no model forward or new blind test",
+  "started_at": "2026-11-10T02:56:09.407074-06:00",
+  "model_snapshot_under_review": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+  "custody_checks": [
+   {
+    "owner": "B plan",
+    "target": "tests/glm5/common_bench_b1.py",
+    "expected": "5790d9008dd7cc67e72f4c0bfc83994797614f589f3aeeb35c934f55577c2332",
+    "actual": "5790d9008dd7cc67e72f4c0bfc83994797614f589f3aeeb35c934f55577c2332",
+    "matches": true
+   },
+   {
+    "owner": "C prereg",
+    "target": "tests/glm5/common_bench_b1_stage_c.py",
+    "expected": "a6b76cdf00ea466760c51af387e8c0b09999f550b298f18863f6c910e0dacad5",
+    "actual": "a6b76cdf00ea466760c51af387e8c0b09999f550b298f18863f6c910e0dacad5",
+    "matches": true
+   },
+   {
+    "owner": "C report",
+    "target": "tests/glm5/common_bench_b1_stage_c_eval.py",
+    "expected": "6e0661649c28ba1d67c3083559ab927013ecfff619248fd6a2e297c392295c2b",
+    "actual": "6e0661649c28ba1d67c3083559ab927013ecfff619248fd6a2e297c392295c2b",
+    "matches": true
+   },
+   {
+    "owner": "D prereg",
+    "target": "tests/glm5/common_bench_b1_stage_d.py",
+    "expected": "ab3125e93bd1e0314b1cb8a37957ec8b88692bcdc06227de490e8d83ce449670",
+    "actual": "ab3125e93bd1e0314b1cb8a37957ec8b88692bcdc06227de490e8d83ce449670",
+    "matches": true
+   },
+   {
+    "owner": "C prereg",
+    "target": "tests/glm5/result/common_bench_b1_v3/plan.json",
+    "expected": "5237647ebbad1aa7cff2b45721f2930e6413b2c257d518973defb6a313ffa29c",
+    "actual": "5237647ebbad1aa7cff2b45721f2930e6413b2c257d518973defb6a313ffa29c",
+    "matches": true
+   },
+   {
+    "owner": "C freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-prereg.json",
+    "expected": "a1266b15d89974a0d470b2ef83dc8f28e290778455acf49b0491df5873235361",
+    "actual": "a1266b15d89974a0d470b2ef83dc8f28e290778455acf49b0491df5873235361",
+    "matches": true
+   },
+   {
+    "owner": "C freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-estimators.npz",
+    "expected": "01b69a73b28e844c17904267a155496ac94feaad6b2ac68bfe8ebc1e5a5d76b8",
+    "actual": "01b69a73b28e844c17904267a155496ac94feaad6b2ac68bfe8ebc1e5a5d76b8",
+    "matches": true
+   },
+   {
+    "owner": "C confirm",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-frozen.json",
+    "expected": "4b15ca2989d19c960b99837ca89b76ee1b76d3108ae70b09c0fd7bedf2f3ac17",
+    "actual": "4b15ca2989d19c960b99837ca89b76ee1b76d3108ae70b09c0fd7bedf2f3ac17",
+    "matches": true
+   },
+   {
+    "owner": "C confirm",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-prereg.json",
+    "expected": "a1266b15d89974a0d470b2ef83dc8f28e290778455acf49b0491df5873235361",
+    "actual": "a1266b15d89974a0d470b2ef83dc8f28e290778455acf49b0491df5873235361",
+    "matches": true
+   },
+   {
+    "owner": "C confirm",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-native-confirm.json",
+    "expected": "9654b296e8cbc83ebdc92379e45f7c44fbcf1d1475c7af34a012fa52c564e919",
+    "actual": "9654b296e8cbc83ebdc92379e45f7c44fbcf1d1475c7af34a012fa52c564e919",
+    "matches": true
+   },
+   {
+    "owner": "C freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-native-discovery.json",
+    "expected": "a2b853269c008b41cd53610342f586e04a7fcf6d2881fcaddcd2e4b8c6ba1c4a",
+    "actual": "a2b853269c008b41cd53610342f586e04a7fcf6d2881fcaddcd2e4b8c6ba1c4a",
+    "matches": true
+   },
+   {
+    "owner": "D prereg",
+    "target": "tests/glm5/result/common_bench_b1_v3/stagec-frozen.json",
+    "expected": "4b15ca2989d19c960b99837ca89b76ee1b76d3108ae70b09c0fd7bedf2f3ac17",
+    "actual": "4b15ca2989d19c960b99837ca89b76ee1b76d3108ae70b09c0fd7bedf2f3ac17",
+    "matches": true
+   },
+   {
+    "owner": "D prereg",
+    "target": "tests/glm5/result/common_bench_b1_v3/plan.json",
+    "expected": "5237647ebbad1aa7cff2b45721f2930e6413b2c257d518973defb6a313ffa29c",
+    "actual": "5237647ebbad1aa7cff2b45721f2930e6413b2c257d518973defb6a313ffa29c",
+    "matches": true
+   },
+   {
+    "owner": "D freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/staged-prereg.json",
+    "expected": "c4310c5d10ee36721b2e56c9e9b35fc63d548e87d66b941aeb2e04c7ece2b00f",
+    "actual": "c4310c5d10ee36721b2e56c9e9b35fc63d548e87d66b941aeb2e04c7ece2b00f",
+    "matches": true
+   },
+   {
+    "owner": "D freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/staged-centres.npz",
+    "expected": "e05d0b8ba6fda7a6502bba73b2293e661dde9f7a7b168436758cf2895a33b5a2",
+    "actual": "e05d0b8ba6fda7a6502bba73b2293e661dde9f7a7b168436758cf2895a33b5a2",
+    "matches": true
+   },
+   {
+    "owner": "D freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/staged-pilot.json",
+    "expected": "f80fefd37b3aa9e326210444dc28177494231c85474d5893839aeddfbe120e57",
+    "actual": "f80fefd37b3aa9e326210444dc28177494231c85474d5893839aeddfbe120e57",
+    "matches": true
+   },
+   {
+    "owner": "D pilot",
+    "target": "tests/glm5/result/common_bench_b1_v3/staged-pilot-items.json",
+    "expected": "2b6a9e90eec55886058fc6388acdefca53f91b2791bc0c3fc6df5ce1d5113c5c",
+    "actual": "2b6a9e90eec55886058fc6388acdefca53f91b2791bc0c3fc6df5ce1d5113c5c",
+    "matches": true
+   },
+   {
+    "owner": "B material freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/discovery-materials.json",
+    "expected": "f05288599677210bfee82c08824ad1eea22daba798d710d86cc453dc582e7293",
+    "actual": "f05288599677210bfee82c08824ad1eea22daba798d710d86cc453dc582e7293",
+    "matches": true
+   },
+   {
+    "owner": "B material freeze",
+    "target": "tests/glm5/result/common_bench_b1_v3/confirm-materials.json",
+    "expected": "0c5de165359cbb168cd8ae9ebb09647326140aa05649319b2d86ba64c4d65ef0",
+    "actual": "0c5de165359cbb168cd8ae9ebb09647326140aa05649319b2d86ba64c4d65ef0",
+    "matches": true
+   }
+  ],
+  "all_checked_hashes_match": true,
+  "native_arrays": "Native manifest hashes checked; multi-GB arrays not reread in this audit",
+  "random_seed_audit": {
+   "items": 512,
+   "unique_ids": 512,
+   "unique_seed_suffixes": 10,
+   "counts": {
+    "762933861": 64,
+    "808286578": 192,
+    "808463737": 192,
+    "808464429": 10,
+    "825241645": 10,
+    "842018861": 10,
+    "858796077": 10,
+    "875573293": 10,
+    "892350509": 10,
+    "909127725": 4
+   },
+   "largest_two_fraction": 0.75,
+   "directed_colour_pairs_present": 20,
+   "note": "Modulo 2**32 of a little-endian 12-byte suffix retains only its first four bytes. Several family/condition IDs therefore reuse the RNG stream and Gaussian direction; this is not 512 independent random-direction draws. All 20 colour pairs are present."
+  },
+  "stagec_behavior_recount": {
+   "discovery": {
+    "items": 2560,
+    "families": 320,
+    "entities": 20,
+    "forced_accuracy_all": 0.996875,
+    "top1_accuracy_all": 0.97734375,
+    "top1_accuracy_after_screen": 0.97734375
+   },
+   "confirm": {
+    "items": 4000,
+    "families": 500,
+    "entities": 25,
+    "forced_accuracy_all": 0.97225,
+    "top1_accuracy_all": 0.9605,
+    "top1_accuracy_after_screen": 0.9668478260869565
+   }
+  },
+  "exposure": {
+   "prior_pilot_entities": 33,
+   "confirm_entities": 25,
+   "confirm_entities_seen_in_prior_pilots": 11,
+   "confirm_items_with_any_prior_pilot_entity": 2784,
+   "scope": "Earlier prompt-version behaviour exposure; does not imply current confirm activations were used to fit."
+  },
+  "stagec_verdicts_as_recorded": {
+   "P1_language_across_source": "supported",
+   "P2a_colour_across_language": "supported",
+   "P2b_colour_across_source": "supported",
+   "P3_unseen_combination": "not_supported"
+  },
+  "stagec_P3_as_recorded": {
+   "A1": {
+    "reserved_0__primary": {
+     "n": 177,
+     "accuracy": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    },
+    "reserved_0__all_items": {
+     "n": 196,
+     "accuracy": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    },
+    "reserved_0__confusions": {},
+    "reserved_1__primary": {
+     "n": 188,
+     "accuracy": 0.9787,
+     "ci95": [
+      0.9091,
+      1.0
+     ]
+    },
+    "reserved_1__all_items": {
+     "n": 200,
+     "accuracy": 0.97,
+     "ci95": [
+      0.8808,
+      1.0
+     ]
+    },
+    "reserved_1__confusions": {
+     "(-1, 1, 2)": 4
+    },
+    "seen_cells__primary": {
+     "n": 3239,
+     "accuracy": 0.9602,
+     "ci95": [
+      0.92,
+      0.9908
+     ]
+    }
+   },
+   "A2": {
+    "reserved_0__primary": {
+     "n": 177,
+     "accuracy": 0.661,
+     "ci95": [
+      0.5416,
+      0.7792
+     ]
+    },
+    "reserved_0__all_items": {
+     "n": 196,
+     "accuracy": 0.648,
+     "ci95": [
+      0.537,
+      0.7658
+     ]
+    },
+    "reserved_0__confusions": {
+     "(-1, -1, 2)": 60
+    },
+    "reserved_1__primary": {
+     "n": 188,
+     "accuracy": 0.4947,
+     "ci95": [
+      0.1402,
+      0.8877
+     ]
+    },
+    "reserved_1__all_items": {
+     "n": 200,
+     "accuracy": 0.495,
+     "ci95": [
+      0.1279,
+      0.8461
+     ]
+    },
+    "reserved_1__confusions": {
+     "(1, 1, 3)": 73,
+     "(-1, 1, 1)": 1,
+     "(-1, 1, 2)": 21
+    },
+    "seen_cells__primary": {
+     "n": 3239,
+     "accuracy": 0.9173,
+     "ci95": [
+      0.8593,
+      0.9679
+     ]
+    }
+   }
+  },
+  "staged_pilot_arms_as_recorded": {
+   "pooled@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.9883,
+     "ci95": [
+      0.9707,
+      1.0
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.9688,
+     "ci95": [
+      0.9363,
+      0.9915
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.0098,
+     "ci95": [
+      0.0,
+      0.0246
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "cross_language@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.9902,
+     "ci95": [
+      0.975,
+      1.0
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.9688,
+     "ci95": [
+      0.9355,
+      0.9933
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.0098,
+     "ci95": [
+      0.0,
+      0.0262
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "cross_source@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.8828,
+     "ci95": [
+      0.8286,
+      0.932
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.8574,
+     "ci95": [
+      0.8053,
+      0.9103
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.0723,
+     "ci95": [
+      0.0329,
+      0.1151
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 0.957,
+     "ci95": [
+      0.9244,
+      0.9875
+     ]
+    }
+   },
+   "random@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.0039,
+     "ci95": [
+      0.0,
+      0.0167
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.0039,
+     "ci95": [
+      0.0,
+      0.0163
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.9961,
+     "ci95": [
+      0.984,
+      1.0
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "wrong_donor@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.7559,
+     "ci95": [
+      0.648,
+      0.8587
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "direct_pooled@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.9277,
+     "ci95": [
+      0.865,
+      0.972
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.8867,
+     "ci95": [
+      0.8082,
+      0.9505
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.0645,
+     "ci95": [
+      0.0229,
+      0.1175
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "direct_cross_language@1.0": {
+    "success": {
+     "n": 512,
+     "rate": 0.9395,
+     "ci95": [
+      0.8889,
+      0.9803
+     ]
+    },
+    "top1_success": {
+     "n": 512,
+     "rate": 0.9062,
+     "ci95": [
+      0.8353,
+      0.9632
+     ]
+    },
+    "unchanged": {
+     "n": 512,
+     "rate": 0.0547,
+     "ci95": [
+      0.0174,
+      0.1072
+     ]
+    },
+    "language_kept": {
+     "n": 512,
+     "rate": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  "staged_lockbox_report_present": false,
+  "staged_lockbox_frame_report_present": false,
+  "source_review_findings": [
+   "P3 tests nearest-centroid classification, not a state reconstruction error or output-distribution fidelity.",
+   "P4 resets prev=nxt to the observed state at every layer; this is teacher-forced one-step prediction.",
+   "C fit/evaluation behavior gate omits the registered top1>=0.80 term; retrospective top1 rates recorded here.",
+   "D summarise screens entities and correct cases but run_split does not apply the full B gate before supported verdicts.",
+   "D run_split still emits supported D1-D3 fields when controls_valid is false, with only a descriptive-only note.",
+   "D final-boundary injection is a useful residual-skip/direct-readout control; binary success rates do not estimate a mediated-effect fraction.",
+   "D random arm matches planned vector norm but does not record the realized BF16 norm mismatch.",
+   "D wrong_donor excludes target colour by construction; zero target success is not a test of harmlessness.",
+   "No D no-op/restore metric, unrelated-task retention, or post-intervention free generation is recorded."
+  ],
+  "input_manifest": {
+   "tests\\glm5\\result\\common_bench_b1_v3\\plan.json": {
+    "sha256": "5237647ebbad1aa7cff2b45721f2930e6413b2c257d518973defb6a313ffa29c",
+    "bytes": 8995
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-prereg.json": {
+    "sha256": "a1266b15d89974a0d470b2ef83dc8f28e290778455acf49b0491df5873235361",
+    "bytes": 4747
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-frozen.json": {
+    "sha256": "4b15ca2989d19c960b99837ca89b76ee1b76d3108ae70b09c0fd7bedf2f3ac17",
+    "bytes": 12423
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-confirm-report.json": {
+    "sha256": "521c473d5bf1c7c491b3e7172a141218b3b0ffa9e3dba2ef9d5b07f2656a37bb",
+    "bytes": 30305
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\staged-prereg.json": {
+    "sha256": "c4310c5d10ee36721b2e56c9e9b35fc63d548e87d66b941aeb2e04c7ece2b00f",
+    "bytes": 4673
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\staged-frozen.json": {
+    "sha256": "f0c0db7196ee9145426020233f2ce032381c19e4456dbdbfa41904c87ce6904f",
+    "bytes": 469
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\staged-pilot.json": {
+    "sha256": "f80fefd37b3aa9e326210444dc28177494231c85474d5893839aeddfbe120e57",
+    "bytes": 35890
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\staged-pilot-items.json": {
+    "sha256": "2b6a9e90eec55886058fc6388acdefca53f91b2791bc0c3fc6df5ce1d5113c5c",
+    "bytes": 4551937
+   },
+   "tests\\glm5\\common_bench_b1.py": {
+    "sha256": "5790d9008dd7cc67e72f4c0bfc83994797614f589f3aeeb35c934f55577c2332",
+    "bytes": 29313
+   },
+   "tests\\glm5\\common_bench_b1_stage_c.py": {
+    "sha256": "a6b76cdf00ea466760c51af387e8c0b09999f550b298f18863f6c910e0dacad5",
+    "bytes": 24482
+   },
+   "tests\\glm5\\common_bench_b1_stage_c_eval.py": {
+    "sha256": "6e0661649c28ba1d67c3083559ab927013ecfff619248fd6a2e297c392295c2b",
+    "bytes": 11788
+   },
+   "tests\\glm5\\common_bench_b1_stage_d.py": {
+    "sha256": "ab3125e93bd1e0314b1cb8a37957ec8b88692bcdc06227de490e8d83ce449670",
+    "bytes": 21346
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-estimators.npz": {
+    "sha256": "01b69a73b28e844c17904267a155496ac94feaad6b2ac68bfe8ebc1e5a5d76b8",
+    "bytes": 16083514
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-native-confirm.json": {
+    "sha256": "9654b296e8cbc83ebdc92379e45f7c44fbcf1d1475c7af34a012fa52c564e919",
+    "bytes": 1172
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-native-discovery.json": {
+    "sha256": "a2b853269c008b41cd53610342f586e04a7fcf6d2881fcaddcd2e4b8c6ba1c4a",
+    "bytes": 1173
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\staged-centres.npz": {
+    "sha256": "e05d0b8ba6fda7a6502bba73b2293e661dde9f7a7b168436758cf2895a33b5a2",
+    "bytes": 771718
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\discovery-materials.json": {
+    "sha256": "f05288599677210bfee82c08824ad1eea22daba798d710d86cc453dc582e7293",
+    "bytes": 5493901
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-behaviour-discovery.json": {
+    "sha256": "3347b03bd27d03d5161f60358abbb81c6462fe2ae57f07c918e523150bcb67ba",
+    "bytes": 571176
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\confirm-materials.json": {
+    "sha256": "0c5de165359cbb168cd8ae9ebb09647326140aa05649319b2d86ba64c4d65ef0",
+    "bytes": 8635523
+   },
+   "tests\\glm5\\result\\common_bench_b1_v3\\stagec-behaviour-confirm.json": {
+    "sha256": "c109e76c1695f2deb2ae4d77150e928d67ec85d936f0bb709776b4ae402366c3",
+    "bytes": 883909
+   },
+   "tests\\glm5\\result\\common_bench_b1\\pilot-items.json": {
+    "sha256": "3c4b5cb91bfa0b28c1a157899c89f8580c8c64b51fc826085bc32de395ce8e05",
+    "bytes": 276130
+   },
+   "tests\\glm5\\result\\common_bench_b1_v2\\pilot-items.json": {
+    "sha256": "3db255cf4fbd037ecee01a09f67b1e4fb60cfefc4418b8711a801a6c94c8aa29",
+    "bytes": 273844
+   }
+  },
+  "audit_source_sha256": "7522a90b59c0a0237841f9f31e954ff7075332a48db17981b500e4ca0146a633",
+  "formal_evidence_promotion": 0
+ },
+ "sha8": "943025ab"
+}

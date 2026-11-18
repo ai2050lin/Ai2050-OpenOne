@@ -1,0 +1,73 @@
+D DRIVE FINAL ANALYSIS REPORT (READ-ONLY)  2026-11-10 01:39:21
+Policy: KEEP test scripts + materials + results (reproducible) + client/server
+        visible assets; DELETE intermediate big-data folders.
+
+[0] KEY STRUCTURAL FINDING
+    tests\glm5\result has 9 NTFS junctions -> C:\Users\Admin\.codex\visualizations
+    \2026\11\<uuid>\research-storage\<experiment>.  All 9 are healthy.
+    D:\ai2050_native\visualization-research is a byte-for-byte 1:1 mirror of
+    that C: store (73.36 GB vs 73.36 GB, identical per-experiment file counts).
+    => server endpoints resolve through C:, so the D: copy is redundant;
+    => but C: must NOT be cleaned, or all 9 client views break.
+    Upload protocol (deploy/README_RESEARCH_UPLOAD.md) ships small JSON research
+    bundles (e.g. ai2050-qwen14-research-upload.tar.gz, 20 MB) to the center;
+    build_client_deployment_data.py states no 85 GiB tensor copy is made.
+    => large local tensors are NOT client assets; conclusions live in JSON.
+    A1 note: the D: mirror contains 0.93 GB of conclusion json as well; those
+    are byte-identical to the C: copy (kept). If you prefer a strictly
+    json-preserving delete, clear only the 72.44 GB tensor portion on D:.
+
+[1] NON-OVERLAPPING CLEANUP PLAN
+    pri  category                    clean       keep    files    24h path
+    A1   MIRROR-REDUNDANT         73.37 GB    0.00 GB    20552  20477 ai2050_native\visualization-research
+    A1   CAS-ORPHAN-BLOBS         84.71 GB    0.00 GB      668      0 AI2050\Ai2050-OpenOne\distributed_data\research_native_blobs
+    A2   RESULT-P3-TENSORS        24.33 GB    0.02 GB      100      0 AI2050\Ai2050-OpenOne\tests\glm5\result\branch_style_joint_v
+    A2   RESULT-P3-TENSORS        14.76 GB    0.11 GB       73      0 AI2050\Ai2050-OpenOne\tests\glm5\result\mlp_tail_b28_b31_v1
+    A2   RESULT-P3-TENSORS        13.93 GB    0.13 GB       88      0 AI2050\Ai2050-OpenOne\tests\glm5\result\mlp_tail_goodfire_v1
+    A2   RESULT-P3-TENSORS         0.88 GB    2.84 GB     4421    540 AI2050\Ai2050-OpenOne\tests\glm5\result\mlp_tail_acceptance
+    A3   NATIVE-INTERMEDIATE      37.47 GB    0.00 GB     1730      0 ai2050_native\ENT-XF
+    A3   NATIVE-INTERMEDIATE      13.09 GB    0.00 GB     4559      8 ai2050_native\GR-Q
+    A3   NATIVE-INTERMEDIATE      14.76 GB    0.00 GB       56      0 ai2050_native\_cross_model
+    A3   NATIVE-INTERMEDIATE      10.50 GB    0.00 GB        8      0 ai2050_native\_transcoder
+    A3   NATIVE-INTERMEDIATE       2.87 GB    0.00 GB        4      0 ai2050_native\_mode_atlas
+    A3   NATIVE-INTERMEDIATE       3.91 GB    0.00 GB      116      0 ai2050_native\_weights
+    A3   NATIVE-INTERMEDIATE       2.48 GB    0.00 GB     1132     42 ai2050_native\KN-ISA
+    A4   BUILD-OLD                 9.48 GB    1.10 GB      229      5 AI2050\Ai2050-OpenOne\release
+    A4   CACHE-REBUILDABLE         1.19 GB    0.00 GB    41224     88 AI2050\Ai2050-OpenOne\frontend\node_modules
+    B1   MODEL-DUPLICATE          35.00 GB   41.10 GB      136      0 AI2050\Ai2050-OpenOne\models\hf
+    B2   NATIVE-RUNTIME            9.68 GB    0.54 GB     1381      2 ai2050_native\_agent_home\node_service
+    B3   MEDIA                     5.52 GB    0.00 GB    93173    497 AI2050\Ai2050-OpenOne\video
+    B4   GIT-LFS                  29.01 GB    0.00 GB      309      0 AI2050\Ai2050-OpenOne\.git\lfs
+    C    CLIENT-ASSET              0.00 GB    5.90 GB     2401      0 AI2050\Ai2050-OpenOne\tests\glm5\result\client_visualization
+    C    SERVER-DEP                0.00 GB    7.18 GB        9      0 ai2050_native\_mainline\MA-H2
+    C    SERVER-DEP                0.00 GB    2.18 GB      115      0 ai2050_native\_census
+    C    EVIDENCE-DB               0.00 GB    3.35 GB     6559    819 AI2050\Ai2050-OpenOne\distributed_data\research_library
+    C    EVIDENCE-DB               0.00 GB   12.67 GB      220      0 AI2050\Ai2050-OpenOne\distributed_data\objects
+    C    SYSTEM                    0.00 GB   33.98 GB        1      0 pagefile.sys
+
+    CSV: D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\d_drive_cleanup_plan_v2_20261110.csv
+
+[2] TOTALS (real freeable bytes; D: has no hard-link views left, nlink>=2 = 0)
+    A1 redundant mirror + orphan CAS blobs : 158.09 GB
+    A2 remaining P3 result tensors         : 53.90 GB
+    A3 other native intermediate tensors   : 85.08 GB
+    A4 old builds + rebuildable cache      : 10.66 GB
+    ------------------------------------------------
+    A total (clear intermediate)           : 307.73 GB
+    B total (needs your decision)          : 79.22 GB
+    C total (explicitly keep)              : 65.27 GB
+
+[3] EXECUTION PRECONDITIONS
+    1. C: research-storage is the live client data source - do NOT clean C:.
+       If C: must be freed, first re-point the 9 junctions to the D: copy.
+    2. safe-delete hook redirects deletes to D: recycle bin; the bin quota is
+       tiny. Use per-batch delete -> SHEmptyRecycleBin -> verify (proven 11-09).
+    3. Directory-level staging (os.rename into a temp dir, then rmtree) is
+       300-1000x faster than per-file delete under this hook.
+    4. Active writers in 24h: visualization-research 20477, research_library 819,
+       node_modules 88, video 497, KN-ISA 42. Stop pipelines before deleting.
+    5. Verify center registration of derived JSON evidence before dropping the
+       84.71 GB CAS blobs (curl https://server.ai2050.com/api/traces/research-space).
+    6. Never run 'git lfs prune' here (11-06 incident).
+
+=== END (READ-ONLY, no file was deleted, moved or renamed) ===

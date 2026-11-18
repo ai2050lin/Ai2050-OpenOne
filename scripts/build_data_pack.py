@@ -26,15 +26,19 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import os
 import subprocess
+import sys
 import tarfile
 import time
 from pathlib import Path
 from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'deploy'))
+from storage_policy import StorageBlocked, check_write, pack_target, staging_file, stop_with_notice
 
 # 必带：缺一个就不打包（宁可报错，也不出一个「少半份题库」的包）
 REQUIRED = [
@@ -65,7 +69,8 @@ LICENSES = {
 
 def _git(*args: str) -> str:
     try:
-        out = subprocess.run(['git', *args], cwd=str(ROOT), capture_output=True, text=True, timeout=20)
+        out = subprocess.run(['git', '-c', f'safe.directory={ROOT.as_posix()}', *args],
+                             cwd=str(ROOT), capture_output=True, text=True, timeout=20)
         return out.stdout.strip() if out.returncode == 0 else ''
     except Exception:
         return ''
@@ -210,9 +215,10 @@ def main() -> int:
     dirty = bool(_git('status', '--porcelain'))
     version = f'{date}-{commit}'
     name = f'ai2050-datasets-{version}'
-    out_dir = Path(args.out)
+    tar_path = pack_target(Path(args.out) / f'{name}.tar.gz', sum(p.stat().st_size for p in files), len(files))
+    out_dir = tar_path.parent
+    check_write(out_dir / f'{name}-APPLY.md', operation='数据包说明')
     out_dir.mkdir(parents=True, exist_ok=True)
-    tar_path = out_dir / f'{name}.tar.gz'
 
     manifest: Dict[str, Any] = {
         'schema': 'ai2050_data_pack.v1',
@@ -227,11 +233,10 @@ def main() -> int:
         'files': [],
     }
 
-    tmp_files: List[Path] = []
-    # 说明文件在打包时临时生成，直接写进临时目录再一起 tar
-    staging = out_dir / f'.{name}.staging'
-    staging.mkdir(parents=True, exist_ok=True)
-    (staging / 'APPLY.md').write_text(APPLY_MD, encoding='utf-8', newline='')
+    def add_bytes(tf, filename, data):
+        info = tarfile.TarInfo(f'{name}/{filename}')
+        info.size, info.mtime = len(data), int(time.time())
+        tf.addfile(info, io.BytesIO(data))
 
     def add(tf: tarfile.TarFile, src: Path, arc: str) -> None:
         info = tf.gettarinfo(str(src), arcname=f'{name}/{arc}')
@@ -242,19 +247,17 @@ def main() -> int:
             tf.addfile(info, fh)
 
     total = 0
-    with tarfile.open(tar_path, 'w:gz', compresslevel=6) as tf:
+    with staging_file(tar_path) as partial, tarfile.open(partial, 'w:gz', compresslevel=6) as tf:
         for src in files:
+            check_write(partial, src.stat().st_size, operation='继续打包题库')
             rel = src.relative_to(ROOT).as_posix()
             manifest['files'].append({'path': rel, 'bytes': src.stat().st_size, 'sha256': _sha256(src)})
             add(tf, src, rel)
             total += src.stat().st_size
-        add(tf, staging / 'APPLY.md', 'APPLY.md')
-        manifest['files'].append({'path': 'APPLY.md', 'bytes': (staging / 'APPLY.md').stat().st_size,
-                                  'sha256': _sha256(staging / 'APPLY.md')})
-        # MANIFEST 最后写：它要含上面全部条目的摘要。先写到磁盘再入包，便于用户单独核对。
-        man_path = staging / 'MANIFEST.json'
-        man_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding='utf-8', newline='')
-        add(tf, man_path, 'MANIFEST.json')
+        apply = APPLY_MD.encode('utf-8')
+        add_bytes(tf, 'APPLY.md', apply)
+        manifest['files'].append({'path': 'APPLY.md', 'bytes': len(apply), 'sha256': hashlib.sha256(apply).hexdigest()})
+        add_bytes(tf, 'MANIFEST.json', json.dumps(manifest, ensure_ascii=False, indent=1).encode('utf-8'))
 
     digest = _sha256(tar_path)
     # newline='' 关掉 Windows 的 \n → \r\n 转换：校验文件在 Linux 上要能被 `sha256sum -c` 直接读，
@@ -262,9 +265,6 @@ def main() -> int:
     (out_dir / f'{name}.tar.gz.sha256').write_text(f'{digest}  {name}.tar.gz\n', encoding='utf-8', newline='')
     # 同一份说明在包外也放一份：上传前先看怎么装、许可能不能满足，不用先解包
     (out_dir / f'{name}-APPLY.md').write_text(APPLY_MD, encoding='utf-8', newline='')
-    for p in staging.iterdir():
-        p.unlink()
-    staging.rmdir()
 
     size = tar_path.stat().st_size
     print(f'包：{tar_path}')
@@ -275,4 +275,7 @@ def main() -> int:
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except StorageBlocked as error:
+        stop_with_notice(error)

@@ -14,6 +14,8 @@ import { shortModel, workbenchHref } from './v8Util.js';
 import { useSpatialTrace } from './SpatialTrace.jsx';
 import UnitStates from './UnitStates.jsx';
 import MlpTailAtlas from './MlpTailAtlas.jsx';
+import Qwen14MlpAtlas from './Qwen14MlpAtlas.jsx';
+import NativeMlpAtlas from './NativeMlpAtlas.jsx';
 import MlpUnitNeighborhood, { collectMlpNeighbors, MLP_LINK_COLORS, useTailNeighborhood } from './MlpUnitNeighborhood.jsx';
 import { B35LayerResults, B35UnitFeatures, useB35Features, useB35Unit } from './B35RecursiveReport.jsx';
 import { AttributionGraph, BasisCompare, HeadFeature, HeadInternals, InfoFlowMap, LayerList, MinimalPairs, RelationBoards } from './ClientGuide.jsx';
@@ -26,8 +28,8 @@ const TYPE_LABELS = ['只认一个词', '认词也看上下文', '偶尔强激�
 const VIEW_TEXT = {
   graph: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
   parameters: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
-  live: ['关联机制 · 运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
-  response: ['关联机制 · 响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
+  live: ['模型探索 · 运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
+  response: ['模型探索 · 响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
 };
 const EMPTY = { layer: null, module: '', index: null, mode: '', coordinate: null };
 const KEYS = { layer: 'sblock', module: 'smodule', index: 'sindex', mode: 'smode', coordinate:'scoord' };
@@ -116,7 +118,9 @@ export function researchGraph(archive, snapshot, selected, nLayers, dims) {
   const features = new Map(objects.filter(item => item.type === 'feature').map(item => [item.id, item]));
   const cards = [...features.values()].filter(item => {
     const loc = focusLocation(item.body, nLayers, dims);
-    return loc?.layer === selected.layer && loc.module === selected.module && loc.index === selected.index;
+    const member = loc?.module === 'mlp' && Array.isArray(item.body.index?.units)
+      && item.body.index.units.includes(selected.index);
+    return loc?.layer === selected.layer && loc.module === selected.module && (loc.index === selected.index || member);
   });
   const ids = new Set(cards.map(item => item.id));
   const links = [], lines = [];
@@ -195,6 +199,7 @@ export function GraphCards({ graph, archive, snapshot }) {
       const params = new URLSearchParams({ lens: 'process', station: 'execution', run: body.run_id || '', snapshot });
       return <div key={item.id}>
         <b>{body.label || item.id}</b><p className="v8-note">{EVIDENCE_LABEL[evidence.level] || '已有登记'}{body.boundary && ` · ${body.boundary}`}</p>
+        {Array.isArray(body.index?.units) && <p className="v8-note">单元组：{body.index.units.map(u=>`U${u}`).join('、')}。组级结果不能当作每个成员单独有效的证据。</p>}
         {body.run_id && <a href={workbenchHref(params.toString())}>查看研究报告</a>}
         <ResearchDisclosure title="定位记录 JSON"><pre className="v8-artifact-json">{JSON.stringify(body, null, 2)}</pre></ResearchDisclosure>
         {/^[0-9a-f]{64}$/.test(evidence.artifact_sha256 || '') && <ResearchDisclosure title="原始证据 JSON">
@@ -267,10 +272,11 @@ function EmbeddingIndex({ total, index, coordinate, dimensions, values, maxAbs, 
   </div>;
 }
 
-export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical, compact = false }) {
+export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical, compact = false, detailOnly = false, workspaceSelection, onSelection, onSceneData, responseContent }) {
   const source = useApi('/api/model/skeleton', { pollWhilePending: true });
   const { snapshot, pmodel } = useResearchContext();
-  const [selection, setSelection] = useState(()=>readSelection(view,paramTab));
+  const [ownSelection, setSelection] = useState(()=>readSelection(view,paramTab));
+  const selection = workspaceSelection || ownSelection;
   const models = source.data?.models || [];
   const registered = selectModel(models, modelKey, snapshot);
   const localOnly = Boolean(pmodel && !snapshot && !modelKey);
@@ -280,18 +286,26 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const model = local ? {model:local.name,n_layers:local.config.num_hidden_layers,d_model:local.config.hidden_size,
     d_ff:local.config.intermediate_size,config:local.config} : registered;
   const boundSnapshot=snapshot||model?.model_snapshot||'';
+  const selectedStudyRun=new URLSearchParams(window.location.search).get('run')||'';
+  const q14Identity=boundSnapshot==='1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce';
+  const q14Run=['QWEN14-MLP-B28-B35-20261109-v1','QWEN14-GOODFIRE-B28-B39-20261113-v2'].includes(selectedStudyRun)?selectedStudyRun:'';
+  const q14Report=useApi(q14Identity?`/api/research/qwen14-mlp${q14Run?'?run='+encodeURIComponent(q14Run):''}`:null);
+  const q14Config=q14Report.data?.model_snapshot===boundSnapshot?q14Report.data.config:null;
+  const nativeModel=boundSnapshot==='6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'?'qwen4':q14Identity?'qwen14':null;
+  const nativeReport=useApi(nativeModel?`/api/research/native-mlp?model=${nativeModel}`:null);
+  const nativeConfig=nativeReport.data?.model_snapshot===boundSnapshot?nativeReport.data.config:null;
   const [legacy,setLegacy]=useState(()=>{
     const params=new URLSearchParams(window.location.search);
     return {tab:view==='live'?params.get('ttab'):'',template:view==='response'&&params.has('rlayer')&&params.has('tm'),
       head:/^\d+$/.test(params.get('thead')||'')?Number(params.get('thead')):null};
   });
-  const defaultPanel=['live','response'].includes(view)?'data':'feature';
+  const defaultPanel=detailOnly && view==='parameters' ? 'parameters' : ['live','response'].includes(view)?'data':'feature';
   const [structureView,setStructureView]=useState('3d');
   const [colorMode,setColorMode]=useState('type');
   const [showRelations,setShowRelations]=useState(true);
   const [panel,setPanel]=useState(()=>paramTab==='neurons'||legacy.tab==='evidence'?'evidence':defaultPanel);
   const [priorView,setPriorView]=useState(view);
-  if(priorView!==view){setPriorView(view);setPanel(defaultPanel);setLegacy({});}
+  if(priorView!==view){setPriorView(view);if(!detailOnly)setPanel(defaultPanel);setLegacy({});}
   const [embedding,setEmbedding]=useState(null),[archiveOverlay,setArchiveOverlay]=useState(null);
   const [featurePlot,setFeaturePlot]=useState('');
   const [narrow, setNarrow] = useState(() => window.innerWidth <= 720);
@@ -309,9 +323,9 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     : numbered(selection.layer) && selection.layer <= layers ? selection.layer : null;
   const arch = useApi(layer != null && model ? `/api/model/arch?model_key=${encodeURIComponent(model.model)}` : null, { online: true });
   let module = '';
-  if (layer === 0) module = 'embedding';
+  if (layer === 0) module = detailOnly && selection.module === 'hs' ? 'hs' : 'embedding';
   else if (layer > 0) {
-    if (['attn', 'mlp'].includes(selection.module)) module = selection.module;
+    if (['attn', 'mlp', ...(detailOnly ? ['hs'] : [])].includes(selection.module)) module = selection.module;
     else if (isStructureView && selection.index == null) module = 'mlp';
   }
   const candidates = needLocalDimensions ? (localModels.data?.models || []).filter(({ config }) =>
@@ -322,10 +336,15 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     (candidates.length === 1 ? candidates[0] : null);
   const needsVerification = candidate && !arch.data?.available;
   const localIdentity = useParameters(needsVerification ? `/api/parameters/identity?model=${encodeURIComponent(candidate.id)}` : null);
-  const localConfig = needsVerification && localIdentity.data?.sha256 === boundSnapshot ? candidate.config : null;
+  const localConfig = needsVerification && localIdentity.data?.sha256 === boundSnapshot ? candidate.config : nativeConfig||q14Config;
   const dims = useMemo(() => model ? modelDimensions(model, arch.data, localConfig) :
     { arch: null, heads: 0, units: 0, vocab: 0 }, [model, arch.data, localConfig]);
-  const n = module==='attn'?dims.heads:module==='mlp'?dims.units:0;
+  const n = module==='attn'?dims.heads:module==='mlp'?dims.units:module==='hs'?(model?.d_model||0):0;
+  const q14Selected=q14Identity&&q14Config&&module==='mlp'&&q14Report.data?.blocks?.includes(layer-1)&&(!selectedStudyRun||selectedStudyRun===q14Report.data.run_id);
+  const q14Layer=useApi(q14Selected?`/api/research/qwen14-mlp/layers/${layer-1}?run=${encodeURIComponent(q14Report.data.run_id)}`:null);
+  const nativeSelected=nativeConfig&&module==='mlp'&&nativeReport.data?.blocks?.includes(layer-1)&&(!selectedStudyRun||selectedStudyRun===nativeReport.data.run_id);
+  const nativeStudyOutsideRange=nativeConfig&&selectedStudyRun===nativeReport.data?.run_id&&module==='mlp'&&(layer<19||layer>29);
+  const nativeLayer=useApi(nativeSelected?`/api/research/native-mlp/layers/${layer-1}?run=${encodeURIComponent(nativeReport.data.run_id)}`:null);
   const vocab=dims.vocab;
   const index = module && numbered(selection.index) && selection.index < (module==='embedding'?vocab:n) ? selection.index : null;
   const coordinate=module==='embedding'&&numbered(selection.coordinate)&&selection.coordinate<model?.d_model?selection.coordinate:null;
@@ -343,10 +362,10 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
         setShowRelations(true);
       }
     }
-    setSelection(next);writeSelection(next);
+    if (onSelection) onSelection(next); else { setSelection(next);writeSelection(next); }
   };
   useEffect(()=>{
-    if(selection.layer!=null)writeSelection(selection);
+    if(!detailOnly&&selection.layer!=null)writeSelection(selection);
   },[]); // Copy the legacy selection before changing modes.
   const pickLayer = layer => change({ ...EMPTY, layer });
   const pickModule = (layer, module) => change({ ...EMPTY, layer, module });
@@ -374,7 +393,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     unit.data.layer === block && unit.data.unit === index ? unit.data : null;
   const mlpNeighborhood = isStructureView && module === 'mlp' && index != null;
   const tail = useTailNeighborhood({ snapshot: boundSnapshot, block, unit: index, width: n, enabled: mlpNeighborhood });
-  const isB35 = module==='mlp' && block===35 && n===9728 && Boolean(boundSnapshot);
+  const isB35 = module==='mlp' && block===35 && n===9728 && Boolean(boundSnapshot)&&selectedStudyRun!=='QWEN4-GOODFIRE-B18-B28-20261113-v2';
   const archive = useApi((index != null && model?.model_snapshot) || isB35 ? '/api/traces/research-space' : null);
   const b35 = useB35Features(archive.data,boundSnapshot,isB35 || (mlpNeighborhood && block === 34 && n === 9728));
   const b35Unit = useB35Unit(isB35 ? b35.data : null,index);
@@ -389,7 +408,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const activityValues=useMemo(()=>colorMode==='activity'&&layerColumns?.dens?layerColumns.dens.map(value=>Math.log10(1+1000*(value||0))):null,[colorMode,layerColumns]);
   const circuit = useCandidateCircuit(circuitQuery, model?.census_key);
   const paths = circuitQuery ? neighbors(circuit.data, model, block, index, dims.units) : null;
-  const target = index != null && module!=='embedding' ? toPoint(selected, dims) : null;
+  const target = index != null && ['mlp','attn'].includes(module) ? toPoint(selected, dims) : null;
   const showLinks = showRelations || mode;
   const edges = showLinks ? [...graph.lines] : [];
   const related = mlpNeighborhood ? collectMlpNeighbors({ block, layers, width: n, links: graph.links, paths,
@@ -428,13 +447,15 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const recursive = card?.explanations?.some(entry => String(entry.cause || '').includes('递归泛化'));
   const nativeValues=view==='graph'||view==='parameters'?
     (archiveOverlay?.model_snapshot===boundSnapshot&&archiveOverlay?.block===block&&module==='mlp'?archiveOverlay.values:
-      module==='embedding'&&embedding?.snapshot===boundSnapshot&&embedding?.index===index?embedding.values:null)
+      module==='embedding'&&embedding?.snapshot===boundSnapshot&&embedding?.index===index?embedding.values:
+      nativeSelected&&nativeLayer.data?.block===block?nativeLayer.data.arrays.A_std:
+      q14Selected&&q14Layer.data?.block===block?q14Layer.data.arrays.A_std:null)
     : trace.pointValues;
   const measuredPlot = isB35 && ['graph','parameters'].includes(view) ? b35.data?.plots?.[featurePlot] : null;
   const values = measuredPlot || activityValues || nativeValues;
   const pointValues=values&&values.length===(module==='embedding'?model?.d_model:n)?values:null;
   const headScale=pointValues&&module==='attn'?(trace.maxAbs||Math.max(1e-12,...pointValues.map(Math.abs))):1;
-  const weights = index!=null && <ParameterExplorer key={`${model?.model}:${layer}:${module}:${index}`} researchModel={model?.model}
+  const weights = index!=null && module!=='hs' && <ParameterExplorer key={`${model?.model}:${layer}:${module}:${index}`} researchModel={model?.model}
     snapshot={boundSnapshot} selection={selected} onEmbedding={module==='embedding'?setEmbedding:undefined}
     onCoordinate={i=>change({...selected,coordinate:i})}
     onSelectModel={id=>{setEmbedding(null);setArchiveOverlay(null);publishResearchContext({pmodel:id});}}
@@ -442,7 +463,82 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     onResponse={setArchiveOverlay}/>;
   const locateRelated = location => change({ ...location, mode });
   const showMlpFeatures = related && (panel === 'feature' || mode);
+  const detailGroup = mode ? 'feature' : ['data','parameters'].includes(panel) ? 'parameters' : ['evidence','history'].includes(panel) ? 'evidence' : 'feature';
   const hideScene = compact && view === 'response' && !sceneOpen && index == null;
+  useEffect(() => {
+    onSceneData?.({ model, snapshot: boundSnapshot, dims, layer, module, index, pointValues, typeColors,
+      legend: typeColors ? TYPE_LABELS.map((name, i) => ({ name, color: TYPE_COLORS[i] })) : null,
+      links: related ? [...related.upstream.slice(0, 3), ...related.downstream.slice(0, 3)].map(row => ({ o: 'mlp', l: row.location.layer, idx: row.location.index,
+        kind: row.evidence.every(e => e.kind === 'observation') ? 'observation' : 'registered' })) : graph.links.filter(row => row.location).map(row => ({
+          o: row.location.module === 'mlp' ? 'mlp' : 'heads', l: row.location.layer, idx: row.location.index, kind: 'registered' })),
+      keys: [model, dims, layer, module, index, pointValues, typeColors, archive.data, circuit.data, b35Unit.data, tail.observations],
+    });
+  });
+  const objectDetail = nativeSelected&&index!=null?<section className="v8-card v8-spatial-detail"><p className="v8-note">上方空间配色为长文本归档 A 的标准差，非单次运行激活。</p><NativeMlpAtlas doc={nativeReport.data} hideScene={detailOnly} selection={{block,unit:index}} onSelect={(b,u)=>change({...selected,layer:b+1,module:'mlp',index:u})}/></section>:
+    nativeStudyOutsideRange?<section className="v8-card v8-spatial-detail"><Empty>本轮仅采集 B18–B28；当前层没有本轮原生档案。查看其他层的历史结果，请在成果库切换研究版本。</Empty></section>:
+    q14Selected&&index!=null?<section className="v8-card v8-spatial-detail"><p className="v8-note">上方空间配色为长文本归档 A 的标准差，非单次运行激活。</p><Qwen14MlpAtlas doc={q14Report.data} hideScene={detailOnly} selection={{block,unit:index}} onSelect={(b,u)=>change({...selected,layer:b+1,module:'mlp',index:u})}/></section>:!hideScene&&(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
+      <h3>{index==null?'当前数据':module==='embedding'?`Token #${index}`:module==='hs'?`HiddenState L${layer} · 坐标 ${index}`:`B${block} · ${label(module,index)}`}</h3>
+      {index!=null&&<div className="v6-toolbar" role="group" aria-label="对象详情">
+        {(detailOnly ? [['feature','特征与关联'],['parameters','参数与响应'],['evidence','研究记录']] : [...((responseContent || ['live','response'].includes(view))?[['data','当前响应']]:[]),...(module==='embedding'?[]:[['feature','特征']]),...(module==='hs'?[]:[['parameters','真实参数']]),['evidence','研究证据'],['history','历史测试']]).map(([key,title])=>
+          <button type="button" className="fw-tbtn" key={key} aria-pressed={detailOnly?detailGroup===key:panel===key&&!mode} onClick={()=>{
+            setPanel(key); if(mode)change({...selected,mode:''});
+          }}>{title}</button>)}
+        {!detailOnly&&['attn','mlp'].includes(module)&&<button type="button" className="fw-tbtn" aria-pressed={Boolean(mode)}
+          onClick={()=>change({...selected,mode:mode?'':'relations'})}>关联模式</button>}
+      </div>}
+      {!mode && (panel==='data' || detailOnly&&panel==='parameters') && <div>{detailOnly&&<h4>当前响应</h4>}{responseContent}</div>}
+      {detailOnly&&detailGroup==='feature'&&['attn','mlp'].includes(module)&&<button type="button" className="v6-linkbtn" aria-pressed={Boolean(mode)} onClick={()=>change({...selected,mode:mode?'':'relations'})}>{mode?'返回特征摘要':'查看完整关联'}</button>}
+      {detailOnly&&detailGroup==='feature'&&module==='embedding'&&<p className="v8-note">这是模型词表中的固定参数行。选择坐标后在“参数与响应”中查询真实数值；词表行不直接等同于概念。</p>}
+      {!mode && panel==='feature' && module==='hs' && <p className="v8-note">这是原生残差流坐标。当前响应按输入与读出位置查看；暂无该坐标的语义映射，不能将同编号跨层响应当作因果链。</p>}
+      {showMlpFeatures && <MlpUnitNeighborhood model={model} snapshot={boundSnapshot} selected={selected} layers={layers}
+        card={card} unit={unit} graph={graph} tail={tail} neighbors={related} candidate={circuit} b35Index={b35.data} b35Unit={b35Unit} onLocate={locateRelated}/>}
+      {mode && (related ? <ResearchDisclosure title="完整关联记录">
+        <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths} recursive={recursive} onPick={locateRelated}/>
+        {isB35 && b35.data && <B35UnitFeatures row={b35Unit} index={b35.data} recursive
+          onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
+      </ResearchDisclosure> : <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths}
+        recursive={recursive} onPick={locateRelated}/>)}
+      {!mode && (panel==='data'||index==null) && (view==='live'||view==='response') && trace.detail}
+      {mode&&!related&&isB35&&b35.data&&<B35UnitFeatures row={b35Unit} index={b35.data} recursive
+        onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
+      {!mode&&index!=null&&(panel==='parameters'||(panel==='feature'&&module==='embedding'))&&(detailOnly ? <ResearchDisclosure key={`weights:${module}:${index}`} title="真实参数与完整矩阵" initiallyOpen={view==='parameters'||module==='embedding'}>{module==='hs'?<p className="v8-note">HiddenState 是运行状态。参数请定位到词嵌入、Head 或 MLP 单元。</p>:weights}</ResearchDisclosure> : weights)}
+      {!mode&&index!=null&&panel==='parameters'&&module==='attn'&&<HeadInternals snapshot={boundSnapshot} block={block} head={index}/>}
+      {!mode&&index!=null&&panel==='feature'&&module==='attn'&&<HeadFeature snapshot={boundSnapshot} block={block} head={index}/>}
+      {!mlpNeighborhood&&!mode&&index!=null&&panel==='feature'&&module==='mlp'&&(card?<NeuronUnitCardContent data={card}/>:<p className="v8-note">{unit.error||(unit.loading?'读取神经元卡片…':'暂无与当前快照匹配的神经元卡片。')}<ExtraPackPrompt pack={unit.missingPack}/></p>)}
+      {!mode&&index!=null&&panel==='evidence'&&<>
+        {isB35&&b35.data&&<><B35UnitFeatures row={b35Unit} index={b35.data}/>
+          <ResearchDisclosure title="本单元的递归泛化"><B35UnitFeatures row={b35Unit} index={b35.data} recursive
+            onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/></ResearchDisclosure></>}
+        {card ? <>
+          <p>{latest?.explanation || '已归档自然语料统计，解释仍待检验。'}</p>
+          {recursive&&<p className="v8-note">解释检验记录 · 递归泛化线索</p>}
+          <ul className="v8-overview-tags">{[['读出','read'],['控制','control'],['解释','explain']].map(([name,key])=>
+            <li key={key}>{name} · {card.evidence_axes?.[key] || '未登记'}</li>)}</ul>
+        </> : query&&!(isB35&&b35.data) ? <div className="v8-note">{unit.error || (unit.loading ? '读取单元检验…' : '暂无与当前快照匹配的单元卡。')}<ExtraPackPrompt pack={unit.missingPack}/></div> : null}
+        <GraphCards key={`${module}:${block}:${index}`} graph={graph} archive={archive} snapshot={boundSnapshot}/>
+        {detailOnly&&<ResearchDisclosure title="历史测试与完整单元档案">{card?<NeuronUnitCardContent data={card}/>:<p className="v8-note">暂无匹配的单元测试档案。</p>}{historical}</ResearchDisclosure>}
+      </>}
+      {!mode&&index!=null&&panel==='history'&&<>
+        {card ? <NeuronUnitCardContent data={card}/> : <p className="v8-note">该对象暂无匹配的单元测试档案。</p>}
+        <GraphCards key={`history:${module}:${block}:${index}`} graph={graph} archive={archive} snapshot={boundSnapshot}/>
+        {historical}
+      </>}
+      {!mode&&view==='response'&&<ResearchDisclosure title="模板响应汇总与历史对照" initiallyOpen={legacy.template}>
+        <p className="v8-note">模板模型桶和层级统计在此查看。汇总结果不叠加到单个原生对象。</p>
+        <Suspense fallback={<Empty>读取模板响应…</Empty>}><ResponseExplorer key={`template:${model?.model}`}
+          initialTm={tm||undefined} initialBucket={model?.model} strictBucket
+          syncLayer={layer!=null?`final@L${layer}`:undefined}
+          onLayer={tag=>{const match=/@L(\d+)$/.exec(tag);if(match&&Number(match[1])!==layer)pickLayer(Number(match[1]))}}
+          onContext={({tm:next})=>onTm?.(next)}/></Suspense>
+        {historical}
+      </ResearchDisclosure>}
+    </section>;
+  if (detailOnly) return <div className="aw-object-inspector" aria-label="统一对象详情">
+    {layer === 0 && module === 'embedding' && <EmbeddingIndex total={vocab} index={index} coordinate={coordinate} dimensions={model?.d_model || 0}
+      values={pointValues} onToken={pickIndex} onCoordinate={i => change({ ...selected, coordinate: i })}/>}
+    {objectDetail || <p className="v8-note">点击空间中的 Head、HiddenState 或 MLP 单元，查看它的参数、特征、证据与历史。</p>}
+    {source.error && <p className="v8-note">{source.error}</p>}
+  </div>;
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
       <div>{!compact && <h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2>}{!compact && <p>{VIEW_TEXT[view]?.[1]}</p>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
@@ -550,60 +646,10 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
             </section>}
           </div>}
     {linked.error&&index==null&&<Empty>{linked.error}<ExtraPackPrompt pack={linked.missingPack}/></Empty>}
-    {!hideScene&&(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
-      <h3>{index==null?'当前数据':module==='embedding'?`Token #${index}`:`B${block} · ${label(module,index)}`}</h3>
-      {index!=null&&<div className="v6-toolbar" role="group" aria-label="对象详情">
-        {[...(['live','response'].includes(view)?[['data','当前数据']]:[]),...(module==='embedding'?[]:[['feature','特征']]),['parameters','真实参数'],['evidence','研究证据'],['history','历史测试']].map(([key,title])=>
-          <button type="button" className="fw-tbtn" key={key} aria-pressed={panel===key&&!mode} onClick={()=>{
-            setPanel(key); if(mode)change({...selected,mode:''});
-          }}>{title}</button>)}
-        {module!=='embedding'&&<button type="button" className="fw-tbtn" aria-pressed={Boolean(mode)}
-          onClick={()=>change({...selected,mode:mode?'':'relations'})}>关联模式</button>}
-      </div>}
-      {showMlpFeatures && <MlpUnitNeighborhood model={model} snapshot={boundSnapshot} selected={selected} layers={layers}
-        card={card} unit={unit} graph={graph} tail={tail} neighbors={related} candidate={circuit} b35Index={b35.data} b35Unit={b35Unit} onLocate={locateRelated}/>}
-      {mode && (related ? <ResearchDisclosure title="完整关联记录">
-        <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths} recursive={recursive} onPick={locateRelated}/>
-        {isB35 && b35.data && <B35UnitFeatures row={b35Unit} index={b35.data} recursive
-          onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
-      </ResearchDisclosure> : <Relations graph={graph} archive={archive} candidate={circuit} query={circuitQuery} paths={paths}
-        recursive={recursive} onPick={locateRelated}/>)}
-      {!mode && (panel==='data'||index==null) && (view==='live'||view==='response') && trace.detail}
-      {mode&&!related&&isB35&&b35.data&&<B35UnitFeatures row={b35Unit} index={b35.data} recursive
-        onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/>}
-      {!mode&&index!=null&&(panel==='parameters'||(panel==='feature'&&module==='embedding'))&&weights}
-      {!mode&&index!=null&&panel==='parameters'&&module==='attn'&&<HeadInternals snapshot={boundSnapshot} block={block} head={index}/>}
-      {!mode&&index!=null&&panel==='feature'&&module==='attn'&&<HeadFeature snapshot={boundSnapshot} block={block} head={index}/>}
-      {!mlpNeighborhood&&!mode&&index!=null&&panel==='feature'&&module==='mlp'&&(card?<NeuronUnitCardContent data={card}/>:<p className="v8-note">{unit.error||(unit.loading?'读取神经元卡片…':'暂无与当前快照匹配的神经元卡片。')}<ExtraPackPrompt pack={unit.missingPack}/></p>)}
-      {!mode&&index!=null&&panel==='evidence'&&<>
-        {isB35&&b35.data&&<><B35UnitFeatures row={b35Unit} index={b35.data}/>
-          <ResearchDisclosure title="本单元的递归泛化"><B35UnitFeatures row={b35Unit} index={b35.data} recursive
-            onUpstream={u=>change({layer:35,module:'mlp',index:u,mode:'relations'})}/></ResearchDisclosure></>}
-        {card ? <>
-          <p>{latest?.explanation || '已归档自然语料统计，解释仍待检验。'}</p>
-          {recursive&&<p className="v8-note">解释检验记录 · 递归泛化线索</p>}
-          <ul className="v8-overview-tags">{[['读出','read'],['控制','control'],['解释','explain']].map(([name,key])=>
-            <li key={key}>{name} · {card.evidence_axes?.[key] || '未登记'}</li>)}</ul>
-        </> : query&&!(isB35&&b35.data) ? <div className="v8-note">{unit.error || (unit.loading ? '读取单元检验…' : '暂无与当前快照匹配的单元卡。')}<ExtraPackPrompt pack={unit.missingPack}/></div> : null}
-        <GraphCards key={`${module}:${block}:${index}`} graph={graph} archive={archive} snapshot={boundSnapshot}/>
-      </>}
-      {!mode&&index!=null&&panel==='history'&&<>
-        {card ? <NeuronUnitCardContent data={card}/> : <p className="v8-note">该对象暂无匹配的单元测试档案。</p>}
-        <GraphCards key={`history:${module}:${block}:${index}`} graph={graph} archive={archive} snapshot={boundSnapshot}/>
-        {historical}
-      </>}
-      {!mode&&view==='response'&&<ResearchDisclosure title="模板响应汇总与历史对照" initiallyOpen={legacy.template}>
-        <p className="v8-note">模板模型桶和层级统计在此查看。汇总结果不叠加到单个原生对象。</p>
-        <Suspense fallback={<Empty>读取模板响应…</Empty>}><ResponseExplorer key={`template:${model?.model}`}
-          initialTm={tm||undefined} initialBucket={model?.model} strictBucket
-          syncLayer={layer!=null?`final@L${layer}`:undefined}
-          onLayer={tag=>{const match=/@L(\d+)$/.exec(tag);if(match&&Number(match[1])!==layer)pickLayer(Number(match[1]))}}
-          onContext={({tm:next})=>onTm?.(next)}/></Suspense>
-        {historical}
-      </ResearchDisclosure>}
-    </section>}
+    {objectDetail}
     {!compact&&view==='response'&&<RelationBoards/>}
     {!compact&&['graph','parameters'].includes(view)&&<BasisCompare/>}
     {!compact&&boundSnapshot==='6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'&&<ResearchDisclosure title="尾层 MLP · 全量单元特性与上下游关联"><MlpTailAtlas/></ResearchDisclosure>}
+    {!compact&&boundSnapshot==='1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce'&&<ResearchDisclosure title="Qwen3-14B · 已采集层的全部单元特性"><Qwen14MlpAtlas/></ResearchDisclosure>}
   </section>;
 }

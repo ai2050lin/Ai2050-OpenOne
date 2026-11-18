@@ -9,6 +9,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     env: { VITE_API_BASE: 'http://localhost:5001' },
-    include: ['src/**/*.test.{js,jsx}'],
+    include: ['src/**/*.test.{js,jsx}', '../tests/glm5/qwen14*.frontend.test.{js,jsx}'],
   },
 });

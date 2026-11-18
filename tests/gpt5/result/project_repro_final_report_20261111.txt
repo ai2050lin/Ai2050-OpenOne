@@ -1,0 +1,110 @@
+PROJECT CLEANUP PLAN / REPRO-ONLY POLICY / READ-ONLY  2026-11-11 02:53:46
+root = D:\AI2050\Ai2050-OpenOne
+
+POLICY: keep scripts + test inputs + results (reproducible); clean intermediate big data.
+
+[0] CURRENT DISK
+    C: free 79.80 / 200.01 GB
+    D: free 36.74 / 731.39 GB   <-- tight; pipeline still writing
+    project allocated total (earlier full scan) = 394.85 GB / 444,201 files
+
+[1] TIER TOTALS (de-duplicated, no parent/child overlap)
+    tier                  items     clean GB      files     reclaim GB      KEEP GB
+    A1-COLD-TENSOR           15        54.35       1230          54.35         0.75
+    A2-CAS-BLOBS              1        84.41        668          84.41         0.00
+    A3-OLD-BUILD              8        10.31        150          10.31         0.04
+    A4-CACHE                  2         1.75        196           1.75         0.54
+    B1-ACTIVE-TENSOR          6        73.48        242          73.48         0.21
+    B2-SHA256                 1         0.88          5           0.88         2.84
+    B3-MODELS                 1        75.98         24          44.69         0.12
+    B4-GIT-LFS                1        29.01        309          29.01         0.00
+    B5-GIT-PACK               1         4.25          2           4.25         0.00
+    B6-VENV                   1         3.11       6236           3.11         0.33
+    B7-ACTIVE-MEDIA           2         5.30       1735           5.30         1.35
+    A-tier reclaim = 150.83 GB ; B-tier reclaim = 160.73 GB ; A+B = 311.56 GB
+
+[2] A-TIER DETAIL (explicitly cleanable under the stated policy)
+    label                                            clean GB    files    r24 keepMB last_write
+    distributed_data\research_native_blobs              84.41      668      0      0 2026-11-05 04:25
+    result\branch_style_joint_v1                        24.27       35      0     25 2026-11-08 11:35
+    result\mlp_tail_b28_b31_v1                          14.76       48      0    111 2026-11-08 23:32
+    result\mlp_tail_goodfire_v1                         13.93       56      0    137 2026-11-08 11:13
+    release\ai2050-mlp-tail-display-20261108-r2.ta       7.14        1      0      0 2026-11-08 11:16
+    mechanism_traces                                     1.15        1      0      0 2026-11-08 22:41
+    release\AI2050-release-20261108-client1.0.8-ce       0.99        1      0      0 2026-11-08 09:57
+    release\deployment-20261108                          0.99        3      0      0 2026-11-08 09:57
+    frontend\node_modules                                0.60      195      0    555 2026-11-09 23:44
+    result\mlp_condition_v2                              0.60      642      0     80 2026-11-09 02:10
+    release\desktop-1.0.9                                0.44       71      0     20 2026-11-08 11:10
+    release\desktop-1.0.10                               0.44       71      0     20 2026-11-08 11:16
+    result\mlp_b34_confirm_v3                            0.26       48      0     16 2026-11-08 22:51
+    result\mlp_condition_v1                              0.12      128      0     63 2026-11-09 01:07
+    release\desktop-1.0.11                               0.11        1      0      0 2026-11-08 23:19
+    release\desktop-1.0.12                               0.11        1      0      0 2026-11-08 23:42
+    release\desktop-1.0.8                                0.11        1      0      0 2026-11-08 09:43
+    result\live_traces                                   0.09      152      0      0 2026-11-08 07:48
+    result\mlp_b34_confirm_v1                            0.08       14      0     14 2026-11-08 22:34
+    result\mlp_b34_confirm_v2                            0.08       14      0     15 2026-11-08 22:38
+    result\mlp_b31_b32_authority_v2                      0.07       62      0     24 2026-11-09 00:26
+    result\mlp_tail_final_pack_acceptance                0.03        3      0    137 2026-11-08 11:19
+    result\mlp_tail_pack_acceptance                      0.03        3      0    137 2026-11-08 11:05
+    result\mlp_b31_b32_authority_v1                      0.02       14      0     13 2026-11-09 00:07
+    result\hiddenstate_components_v1                     0.01        3      0      2 2026-11-09 06:03
+    result\mlp_tail_relative_encoding_v1                 0.01        8      0      0 2026-11-09 00:24
+
+[3] B-TIER DETAIL (needs your decision)
+    label                                            clean GB    files    r24   reclaim GB last_write
+    models\hf                                           75.98       24      0        44.69 2026-10-09 08:37
+    result\source_formation_v1                          37.42      112    325        37.42 2026-11-10 09:27
+    .git\lfs                                            29.01      309      0        29.01 2026-10-07 14:15
+    result\source_binding_v1                            20.86       59    164        20.86 2026-11-10 06:47
+    result\source_relay_v2                               9.11       31    113         9.11 2026-11-11 00:02
+    video                                                4.46     1719    261         4.46 2026-11-11 02:53
+    .git\objects                                         4.25        2    695         4.25 2026-11-11 02:17
+    result\source_relay_v1                               3.68       16     54         3.68 2026-11-10 22:42
+    .venv\Lib                                            3.11     6236      0         3.11 2026-11-08 09:05
+    result\common_bench_b1_repair_v2                     2.37       23     80         2.37 2026-11-10 03:47
+    result\mlp_tail_acceptance                           0.88        5      0         0.88 2026-11-09 15:05
+    datapack                                             0.85       16      1         0.85 2026-11-11 02:53
+    result\source_binding_ablation_v1                    0.04        1      9         0.04 2026-11-10 17:32
+
+[4] MUST-KEEP (verified)
+    conclusions: .json 28.27 GB / 229,916 files ; .jsonl 3.81 GB ; .py 0.46 GB / 33,249 files
+    result.json / execution.json / behavior.json / .sha256 / .md / .log / .csv => KEEP ALL
+    all conclusions (json/jsonl/md/log/csv/py/sha256)    (structural / measured globally)
+    client_visualization_assets                          keep=    5.90 GB  files=   2401  last=2026-09-05 11:15
+    distributed_data\objects (CAS evidence packs)        keep=   12.67 GB  files=    220  last=2026-11-04 01:32
+    distributed_data\research_library                    keep=    2.17 GB  files=   6558  last=2026-11-11 02:53
+    research                                             keep=    6.15 GB  files=   4552  last=2026-11-11 00:31
+    tests\glm5_temp                                      keep=    2.90 GB  files=  10632  last=2026-11-10 01:30
+    9 junctions -> C: .codex visualizations              (structural / measured globally)
+    .git refs / config / HEAD                            (structural / measured globally)
+
+[4b] EXTENSION-LESS / SPECIAL POOLS (would be missed by extension rules)
+    .git\lfs (LFS objects)                                  29.01 GB  files=   309  r24=   0  last=2026-10-07 14:15
+    distributed_data\objects (evidence)                     12.67 GB  files=   220  r24=   0  last=2026-11-04 01:32
+    tests\dist_test_data (service data root)                 0.00 GB  files=   111  r24=   0  last=2026-10-31 02:38
+
+[5] CLIENT / SERVER RUNTIME DEPENDENCIES (do not break)
+    server/qwen14_mlp_service.py -> tests/glm5/result/qwen14_mlp_atlas_v1
+        = junction to C:\Users\Admin\.codex\visualizations\...\research-storage
+        reads 175 registered files with SHA256 verification; D: costs 0 bytes. KEEP junction.
+    server/research_asset_service.py -> client_visualization_assets (5.90 GB). KEEP.
+    server/mlp_tail_service.py, qwen14_mlp_service.py -> AI2050_DIST_DIR (external).
+    server/rdc_*_service.py -> tests/glm5/result/rdc_* (json evidence chains). KEEP json.
+    deploy/README_RESEARCH_UPLOAD.md: upload packs contain JSON evidence only;
+        build_client_deployment_data.py states no 85 GiB tensor copy is made.
+        => large local tensors are NOT client assets; conclusions live in JSON.
+
+[6] ACCURACY NOTES
+    - measured ALLOCATED bytes, not logical; sparse/prealloc gap 2.01 GB excluded
+    - 19 junctions skipped (9 -> C: client data, 3 -> D:\develop\model, 5 -> C:\AI2050-RDC-Archive, 2 internal)
+    - 31.29 GB of models\hf are hardlinks (nlink>=2); deleting them frees ~0
+    - 24h writes present: tests/glm5/result 919, .git/objects 695, video 422 => stop pipeline first
+
+[7] OUTPUTS
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\project_repro_cleanup_plan_20261111.csv
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\project_repro_bigfiles_20261111.csv
+    D:\AI2050\Ai2050-OpenOne\tests\gpt5\result\project_repro_final_report_20261111.txt
+
+===== END FINAL REPORT =====

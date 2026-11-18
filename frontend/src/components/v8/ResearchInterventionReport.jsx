@@ -21,8 +21,18 @@ import B35RecursiveReport from './B35RecursiveReport.jsx';
 import AttributePrefixTransferReport from './AttributePrefixTransferReport.jsx';
 import MainlineReport from './MainlineReport.jsx';
 import MlpTailAtlas from './MlpTailAtlas.jsx';
+import Qwen14MlpAtlas from './Qwen14MlpAtlas.jsx';
+import NativeMlpAtlas from './NativeMlpAtlas.jsx';
 import MlpB34ConfirmReport from './MlpB34ConfirmReport.jsx';
 import MlpConditionReport from './MlpConditionReport.jsx';
+import MlpPuzzleReport from './MlpPuzzleReport.jsx';
+import HiddenStateComponentsReport from './HiddenStateComponentsReport.jsx';
+import StateFormationReport from './StateFormationReport.jsx';
+import RecordSelectionReport from './RecordSelectionReport.jsx';
+import SourceOutputReport from './SourceOutputReport.jsx';
+import MlpTriggerReport from './MlpTriggerReport.jsx';
+import KvLengthReport from './KvLengthReport.jsx';
+import KvReceiptReport from './KvReceiptReport.jsx';
 
 const NI={noninferior:'通过非劣效门',inferior:'超过允许损失',inconclusive:'能力保持尚未证实',not_tested:'未测试'};
 const pct=x=>Number.isFinite(x)?`${(100*x).toFixed(2)}%`:'—';
@@ -51,15 +61,25 @@ function DoseCurve({curve,description}){
   </>;
 }
 
-export default function ResearchInterventionReport({sha,planSha,capabilityInputsSha,rawFallback=false}){
+export default function ResearchInterventionReport({sha,planSha,capabilityInputsSha,rawFallback=false,hideScene=false}){
   const report=useApi(sha?`/api/research-library/artifacts/${sha}`:null);
   const [tab,setTab]=useState('result'),[page,setPage]=useState(0);
   if(!sha)return null;
   if(report.error)return <Empty>{report.error}<ExtraPackPrompt pack={report.missingPack}/></Empty>;
   if(!report.data)return <Empty>读取研究闭环报告…</Empty>;
   const d=report.data;
-  if(d.schema==='mlp_conditional_report.v1')return <MlpConditionReport doc={d}/>;
-  if(d.schema==='mlp_tail_atlas_report.v1')return <MlpTailAtlas/>;
+  if(d.schema==='kv_length_report.v1')return <KvLengthReport doc={d}/>;
+  if(d.schema==='kv_receipt_report.v1')return <KvReceiptReport doc={d}/>;
+  if(['qwen14_mlp_atlas_report.v1','qwen14_mlp_atlas_report.v2'].includes(d.schema))return <Qwen14MlpAtlas doc={d}/>;
+  if(d.schema==='native_mlp_atlas_report.v1')return <NativeMlpAtlas doc={d}/>;
+  if(d.schema==='hiddenstate_components_report.v1')return <HiddenStateComponentsReport doc={d}/>;
+  if(d.schema==='state_formation_report.v1')return <StateFormationReport doc={d}/>;
+  if(d.schema==='record_selection_report.v1')return <RecordSelectionReport doc={d}/>;
+  if(d.schema==='source_output_report.v1')return <SourceOutputReport doc={d}/>;
+  if(d.schema==='mlp_trigger_report.v1')return <MlpTriggerReport doc={d} hideScene={hideScene}/>;
+  if(d.schema==='native_puzzle_report.v1')return <MlpPuzzleReport doc={d}/>;
+  if(d.schema==='mlp_conditional_report.v1')return <MlpConditionReport doc={d} hideScene={hideScene}/>;
+  if(d.schema==='mlp_tail_atlas_report.v1')return <MlpTailAtlas hideScene={hideScene}/>;
   if(['mlp_b34_confirm_report.v1','mlp_b31_authority_report.v1'].includes(d.schema))return <MlpB34ConfirmReport doc={d}/>;
   if(d.schema==='mainline_run_report.v1')return <MainlineReport doc={d}/>;
   if(d.schema==='research_native_function_report.v1')return <NativeFunctionReport doc={d}/>;

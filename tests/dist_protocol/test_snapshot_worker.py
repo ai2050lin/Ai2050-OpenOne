@@ -171,6 +171,10 @@ class SnapshotWorkerTests(unittest.TestCase):
         self.assertEqual(doc['version'], meta['version'])
         for key in ('/api/catalog', '/api/templates', '/api/platform/overview', '/api/platform/snapshot/catalog'):
             self.assertIn(key, doc['entries'])
+        from deploy.lang_map_service import item_ids, map_ep, words_ep
+        self.assertEqual(doc['entries']['/api/lang/map'], map_ep())
+        for item_id in item_ids():
+            self.assertEqual(doc['entries'][f'/api/lang/map/words/{item_id}'], words_ep(item_id))
         from server.rule_ledger_service import overview as rule_overview
         self.assertEqual(doc['entries']['/api/rules/overview'], rule_overview())
         self.assertFalse(doc['entries']['/api/platform/snapshot/catalog']['pending'])

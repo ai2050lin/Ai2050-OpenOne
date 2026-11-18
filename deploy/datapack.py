@@ -21,6 +21,10 @@ import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import parse_qsl, urlsplit
+try:
+    from .storage_policy import archive_budget, check_write, checked_dir
+except ImportError:
+    from storage_policy import archive_budget, check_write, checked_dir
 
 SCHEMA = 'datapack.v1'
 EXTRA_SCHEMA = 'datapack_extra.v1'
@@ -34,9 +38,7 @@ def canonical(path: str) -> str:
 
 
 def pack_dir(data_dir: Path) -> Path:
-    d = Path(data_dir) / 'datapack'
-    d.mkdir(parents=True, exist_ok=True)
-    return d
+    return Path(data_dir) / 'datapack'
 
 
 def extra_file(data_dir: Path, extra_id: str) -> Path:
@@ -57,12 +59,19 @@ def research_stamp(research_root: Path) -> str:
     return h.hexdigest()[:12]
 
 
+def lang_map_plan() -> List[Tuple[str, Callable[[], Any]]]:
+    from deploy import lang_map_service as LM
+
+    return [('/api/lang/map', LM.map_ep), *[
+        (f'/api/lang/map/words/{item_id}', lambda i=item_id: LM.words_ep(i)) for item_id in LM.item_ids()
+    ]]
+
+
 def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
     """主数据包的 (请求路径, 取值函数) 列表。函数直接调用各路由的实现，与在线接口返回完全一致。"""
     from deploy.research_library import overview as library_overview, graph as library_graph, progress as library_progress, artifacts as library_artifacts, workpackages as library_workpackages
     import census_service as CS
     import distributed_service as D
-    import lang_map_service as LM
     import platform_service as PS
     from server import neuron_census_service as NS
     from server.rule_ledger_service import overview as rule_overview
@@ -90,9 +99,7 @@ def entries_plan() -> List[Tuple[str, Callable[[], Any]]]:
         ('/api/neurons/space/index', NS.space_index),
     ]
     # 语言图谱结构（lang_map.v1，随版本发布的文件，体积小）：上三层与每个语言项的词层都进主数据包
-    plan.append(('/api/lang/map', LM.map_ep))
-    for item_id in LM.item_ids():
-        plan.append((f'/api/lang/map/words/{item_id}', (lambda i=item_id: LM.words_ep(i))))
+    plan.extend(lang_map_plan())
     for name in ('catalog', 'coverage', 'pipeline_overview', 'scoreboard', 'atlas'):
         plan.append((f'/api/platform/snapshot/{name}', (lambda n=name: PS.snapshot(n))))
     lang = PS._lang_atlas()                            # 语言谱图（体积小，进主数据包）：还没生成时不放条目，下一版数据包再补
@@ -150,8 +157,9 @@ def _legacy_detail(D, sha: str) -> Dict[str, Any]:
 
 def _write_gz(path: Path, doc: Dict[str, Any]) -> Tuple[int, int]:
     raw = json.dumps(doc, ensure_ascii=False, default=str, separators=(',', ':')).encode('utf-8')
+    path = check_write(path, operation='离线数据包')
+    tmp = check_write(path.with_suffix(path.suffix + '.tmp'), archive_budget(len(raw), 1), operation='离线数据包暂存')
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + '.tmp')
     with gzip.open(tmp, 'wb', compresslevel=6) as fh:
         fh.write(raw)
     tmp.replace(path)
@@ -159,6 +167,8 @@ def _write_gz(path: Path, doc: Dict[str, Any]) -> Tuple[int, int]:
 
 
 def build(data_dir: Path, version: str, log=print) -> Dict[str, Any]:
+    d = checked_dir(pack_dir(data_dir), operation='离线数据包')
+    meta_path = check_write(d / 'datapack.meta.json', operation='离线数据包索引')
     entries, errors = {}, []
     for path, fn in entries_plan():
         try:
@@ -167,11 +177,10 @@ def build(data_dir: Path, version: str, log=print) -> Dict[str, Any]:
             errors.append(f'{path}: {type(exc).__name__}: {exc}'[:200])
     created = time.time()
     doc = {'schema': SCHEMA, 'version': version, 'created_at': created, 'entries': entries, 'errors': errors}
-    d = pack_dir(data_dir)
     size, raw = _write_gz(d / 'datapack.json.gz', doc)
     meta = {'schema': SCHEMA, 'version': version, 'created_at': created, 'n_entries': len(entries),
             'bytes': size, 'raw_bytes': raw, 'errors': errors}
-    (d / 'datapack.meta.json').write_text(json.dumps(meta, ensure_ascii=False), encoding='utf-8')
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False), encoding='utf-8')
     log(f"[datapack] {len(entries)} 条，{size / 2**20:.1f} MB（解压 {raw / 2**20:.1f} MB）" + (f'，{len(errors)} 条失败' if errors else ''))
     return meta
 
@@ -195,9 +204,11 @@ def read_extras(data_dir: Path) -> Dict[str, Any]:
 
 
 def _write_extras(data_dir: Path, extras: Dict[str, Any]) -> None:
-    p = pack_dir(data_dir) / 'extras.json'
-    tmp = p.with_suffix('.tmp')
-    tmp.write_text(json.dumps(extras, ensure_ascii=False), encoding='utf-8')
+    content = json.dumps(extras, ensure_ascii=False).encode('utf-8')
+    p = check_write(pack_dir(data_dir) / 'extras.json', operation='附加包索引')
+    tmp = check_write(p.with_suffix('.tmp'), len(content), operation='附加包索引暂存')
+    p.parent.mkdir(parents=True, exist_ok=True)
+    tmp.write_bytes(content)
     tmp.replace(p)
 
 
@@ -249,12 +260,15 @@ def template_entries(tm_id: str) -> Tuple[Dict[str, Any], List[str]]:
 
 def _write_extra_gz(path: Path, head: Dict[str, Any], entries: Dict[str, Any]) -> Tuple[int, int]:
     """流式写附加包：逐条写入，RawFile 按块拷贝，不在内存里拼整份 JSON。"""
+    path = check_write(path, operation='离线附加包')
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + '.tmp')
+    tmp = check_write(path.with_suffix(path.suffix + '.tmp'), operation='离线附加包暂存')
     raw = 0
     with gzip.open(tmp, 'wb', compresslevel=6) as fh:
         def put(b: bytes):
             nonlocal raw
+            if raw // (64 * 2**20) != (raw + len(b)) // (64 * 2**20):
+                check_write(tmp, len(b), operation='继续写入离线附加包')
             fh.write(b)
             raw += len(b)
         put(json.dumps(head, ensure_ascii=False, default=str)[:-1].encode('utf-8') + b',"entries":{')
@@ -373,6 +387,7 @@ def build_extras(data_dir: Path, cards_version: str, force: bool = False, log=pr
                  guard=None) -> Dict[str, Any]:
     """按需重建附加包：模式族包的版本由 template_version 按该模式族的数据计算，单元卡包用 cards_version
     （研究文件与普查版本）；同版本的包跳过。guard（可选，后台子进程的崩溃记录）：skip(name) / start(name)。"""
+    check_write(pack_dir(data_dir), operation='离线附加包')
     extras = read_extras(data_dir)
     plan = extras_plan()
     keep = {e['id'] for e in plan}

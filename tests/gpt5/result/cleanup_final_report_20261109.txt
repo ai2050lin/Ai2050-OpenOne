@@ -1,0 +1,65 @@
+GLM5 RESULT CLEANUP - FINAL VERIFICATION  2026-11-10 00:56:05
+SCOPE (user confirmed): P1-junk + P2-cold only. P3-active, REVIEW, KEEP untouched.
+
+[1] EXECUTION STATE
+    done=True  batches=137  rounds=7  next_line=223534
+    deleted_files=216256  deleted_bytes=235.24 GB
+    recorded_freed=155.78 GB
+
+[2] MANIFEST RESIDUE (files listed for deletion that still exist)
+    P1-junk    still_present=      0 /      37   still_present_bytes=0 B / 699.14 MB
+    P2-cold    still_present=      0 /  222221   still_present_bytes=0 B / 241.40 GB
+    P3-active  still_present=   1274 /    1274   still_present_bytes=55.30 GB / 55.30 GB
+
+[3] CURRENT TREE (scan 6.2s)
+    total=72.20 GB  files=205948  dirs=11722
+    (baseline 23:17 was 314.28 GB / 428,200 files / 11,722 dirs)
+    by extension (top 18):
+      .npy             52.99 GB /     133 files
+      .json            15.81 GB /  199834 files
+      .npz              1.42 GB /    1099 files
+      .jsonl          820.83 MB /     856 files
+      .gz             771.34 MB /      12 files
+      .png            191.79 MB /     665 files
+      .sqlite3        140.71 MB /      20 files
+      .js              63.74 MB /     217 files
+      .py              14.05 MB /    1258 files
+      .md               8.50 MB /     122 files
+      .html             5.05 MB /     131 files
+      .css              4.74 MB /     100 files
+      .log              4.25 MB /     581 files
+      .jpg              2.93 MB /      38 files
+      .txt              2.47 MB /     772 files
+      .jsx            667.03 KB /      31 files
+      .tar            500.00 KB /       2 files
+      .sqlite3-wal    313.86 KB /       1 files
+
+[4] KEPT EVIDENCE COUNTS
+    .log                   581
+    .md                    122
+    .py                   1258
+    .sha256                 10
+    .txt                   772
+    behavior.json            3
+    execution.json         600
+    result.json           1138
+
+[5] DISK
+    D: total=731.39 GB used=541.84 GB free=189.55 GB (74.1% used)
+    C: free=10.23 GB
+    D recycle bin = 1.33 GB / 132 files
+    baseline at 23:17: D free=34.54 GB ; at cleanup start 23:36: D free=34.48 GB
+
+[6] STAGING / PROBE LEFTOVERS
+    PRESENT 0 B / 0 files  D:\AI2050\Ai2050-OpenOne\tests\gpt5_temp\_cleanup_stage_20261109
+    absent  D:\AI2050\Ai2050-OpenOne\tests\gpt5_temp\_hookprobe_20261109
+    PRESENT 0 B / 0 files  D:\AI2050\Ai2050-OpenOne\tests\gpt5_temp\_dirprobe_20261109
+    PRESENT 0 B / 0 files  D:\AI2050\Ai2050-OpenOne\tests\gpt5_temp\_dirprobe2_20261109
+
+[7] HARDLINK / BLOB NOTE
+    74.85 GB of the deleted set were hard links into
+    distributed_data\research_native_blobs (CAS store, deliberately NOT touched).
+    Deleting those links does not free space; the CAS store still holds the data.
+    Blobs whose result-side link was removed are now nlink=1 (orphan candidates).
+
+=== END FINAL VERIFICATION (READ-ONLY) ===

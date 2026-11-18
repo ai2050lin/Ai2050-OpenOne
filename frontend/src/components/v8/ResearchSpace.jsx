@@ -6,7 +6,7 @@ import ResearchInterventionReport from './ResearchInterventionReport.jsx';
 import {publishResearchContext} from '../app/researchContext.js';
 import {useMainline} from './data/mainlineState.js';
 const COLORS={hypothesis:'#94a3b8',observation:'#8b99aa',heldout:'#2d83c4',intervention:'#db7943',parameter_source:'#305a86',negative:'#9c6457'};
-const NATIVE_TAIL_ATLASES=new Set(['MLP-TAIL-GOODFIRE-20261108-v1','MLP-TAIL-B28-B35-ATLAS-v2']);
+const NATIVE_TAIL_ATLASES=new Set(['MLP-TAIL-GOODFIRE-20261108-v1','MLP-TAIL-B28-B35-ATLAS-v2','MLP-CONDITIONAL-PATHS-v2','QWEN14-MLP-B28-B35-20261109-v1','QWEN14-GOODFIRE-B28-B39-20261113-v2']);
 export function nativePoint(object,model){
   const c=object.body,i=c.index||{},l=c.layer;if(!model?.n_layers||!Number.isInteger(l)||l<0||l>=model.n_layers)return null;
   const y=-1.5+3*(l+1)/(model.n_layers+1);
