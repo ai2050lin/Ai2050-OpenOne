@@ -2,53 +2,82 @@
    没有本机后端时诚实显示不可用，不做模拟。实时观察是未登记观察，不产生研究结论。 */
 import { useEffect, useState } from 'react';
 
-import { API_BASE } from '../app/rdc_fusion/api.js';
+import { API_BASE, LOCAL_ANALYSIS_BASES } from '../../config.js';
 import { request } from './MechanismTraceExplorer.jsx';
 import { rewriteCurve } from './data/assocFlow.js';
 
-const CANDIDATES = () => [...new Set([API_BASE, 'http://127.0.0.1:5001', 'http://127.0.0.1:5002'])];
+const CANDIDATES = () => [...new Set([API_BASE, ...LOCAL_ANALYSIS_BASES])];
+const loopback = new Set(['localhost','127.0.0.1','[::1]']);
+function localBases() {
+  const origin=new URL(API_BASE||window.location.href,window.location.href);
+  const configured=loopback.has(origin.hostname)&&['http:','https:'].includes(origin.protocol)
+    ? [API_BASE||origin.origin] : [];
+  return [...new Set([...configured,...LOCAL_ANALYSIS_BASES])];
+}
+
+const acceptAll = () => true;
+const isLiveService = status => status?.schema === 'live_status.v1';
 
 /* 找一个能响应 probe 路径的后端：同源中心或本机节点。accept 判断响应是不是要找的服务 */
-export function useLocalBase(probe = '/api/live/status', accept = () => true) {
-  const [state, setState] = useState({ base: null, status: null, checked: false });
+export function useLocalBase(probe = '/api/live/status', accept = acceptAll, localOnly = false, retry = 0) {
+  const [state, setState] = useState({});
   useEffect(() => {
+    if(!probe)return;
     let dead = false;
     (async () => {
-      for (const b of CANDIDATES()) {
-        try { const s = await request(b, probe); if (accept(s)) { if (!dead) setState({ base: b, status: s, checked: true }); return; } } catch { /* 试下一个 */ }
+      let fallback=null;
+      for (const base of (localOnly?localBases():CANDIDATES())) {
+        if(dead)return;
+        try {
+          const status=await request(base,probe,{signal:AbortSignal.timeout(3000)});
+          if(!accept(status))continue;
+          const result={probe,retry,base,status,checked:true};
+          if(localOnly&&status.available===false){fallback??=result;continue;}
+          if(!dead)setState(result);
+          return;
+        } catch { /* 试下一个 */ }
       }
-      if (!dead) setState({ base: null, status: null, checked: true });
+      if (!dead) setState(fallback||{probe,retry,base:null,status:null,checked:true});
     })();
     return () => { dead = true; };
-  }, [probe]);   // eslint-disable-line react-hooks/exhaustive-deps
-  return state;
+  }, [probe,accept,localOnly,retry]);
+  return state.probe===probe&&state.retry===retry?state:{base:null,status:null,checked:false};
 }
-/* 实时前向服务：只认 live_status.v1（中心自己的 /api/live/status 是节点连接状态，不能运行模型） */
-export const useLiveBase = () => useLocalBase('/api/live/status', s => s?.schema === 'live_status.v1');
+/* 实时输入只交给本机采集服务。 */
+export function useLiveBase() {
+  const [attempt,setAttempt]=useState(0);
+  const service=useLocalBase('/api/live/status',isLiveService,true,attempt);
+  return {...service,reconnect:()=>setAttempt(previous=>previous+1)};
+}
 
 /* 本机模型的加载状态：idle / loading / ready / error / unavailable；加载中每 1.5 秒刷新 */
 export function useLiveModel(base) {
   const [st, setSt] = useState({ status: null, busy: false, msg: '' });
-  const refresh = async () => { if (!base) return null; try { const s = await request(base, '/api/live/status'); setSt(x => ({ ...x, status: s })); return s; } catch (e) { setSt(x => ({ ...x, msg: e.message })); return null; } };
+  const refresh = async () => { if (base==null) return null; try { const s = await request(base, '/api/live/status', {signal:AbortSignal.timeout(5000)}); setSt(x => ({ ...x, base, status: s })); return s; } catch (e) { setSt(x => ({ ...x, base, msg: e.message })); return null; } };
   useEffect(() => { refresh(); }, [base]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (st.status?.status !== 'loading') return undefined;
     const t = setInterval(refresh, 1500);
     return () => clearInterval(t);
   }, [st.status?.status]);   // eslint-disable-line react-hooks/exhaustive-deps
-  const act = async kind => {
+  const act = async (kind, snapshot) => {
     setSt(x => ({ ...x, busy: true, msg: '' }));
-    try { const r = await request(base, `/api/live/${kind}`, { method: 'POST' }); setSt(x => ({ ...x, msg: r.message || '' })); }
+    try { const r = await request(base, `/api/live/${kind}`, { method: 'POST',
+      ...(snapshot?{body:JSON.stringify({expected_snapshot:snapshot})}:{}),signal:AbortSignal.timeout(30000) }); setSt(x => ({ ...x, msg: r.message || '' })); }
     catch (e) { setSt(x => ({ ...x, msg: e.message })); }
     await refresh(); setSt(x => ({ ...x, busy: false }));
   };
-  return { ...st, load: () => act('load'), unload: () => act('unload'), refresh };
+  return { ...st, status:st.base===base?st.status:null, load: snapshot => act('load',snapshot), unload: () => act('unload'), refresh };
 }
 
-export async function runOnce(base, text, expectedSnapshot) {
-  const d = await request(base, '/api/live/run', { method: 'POST', body: JSON.stringify({ text, max_tokens: 1024 }) });
+export async function runOnce(base, text, expectedSnapshot, promptFormat='chat') {
+  const body = { text, max_tokens: 1024, expected_snapshot:expectedSnapshot, ...(promptFormat==='rendered'?{prompt_format:promptFormat}:{}) };
+  const d = await request(base, '/api/live/run', { method: 'POST', body: JSON.stringify(body) });
   if (expectedSnapshot && d.model_snapshot !== expectedSnapshot) {
     throw Error('采集轨迹与当前模型快照不一致。请选择与本机权重匹配的模型档案。');
+  }
+  if (promptFormat==='rendered' && (d.prompt!==text || d.provenance?.prompt_format!=='rendered')) {
+    throw Error('本机服务未保留归档原始输入。请更新本机实时采集服务后重试。');
   }
   const pos = d.readout_positions.at(-1);
   if (pos !== d.tokens.length - 1 || pos < 0) throw Error('轨迹缺少最终输入位置的读出。');

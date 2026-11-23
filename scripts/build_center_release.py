@@ -40,8 +40,13 @@ INCLUDE = [
     'ai2050_research_os/registry/campaigns.json', 'ai2050_research_os/registry/language_graph_targets.json',
     'deploy/requirements-center.txt', 'deploy/platform_config.example.json', 'deploy/README_DEPLOY.md', 'deploy/README_RESEARCH_UPLOAD.md',
     'deploy/research_pack_stream.py', 'deploy/research_ingest_bundle.py', 'deploy/mlp_tail_pack.py', 'deploy/qwen14_mlp_pack.py', 'deploy/README_MLP_TAIL.md',
+    'deploy/test_archive_service.py', 'deploy/test_archive_client.py', 'deploy/README_TEST_ARCHIVE.md',
+    'deploy/test_record_catalog.py', 'deploy/test_record_history.json', 'deploy/workspace_service.py', 'deploy/workspace_evidence.py',
+    'AGENTS.md',
+    'tests/glm5/run_routine_test.py',
     'server/__init__.py', 'server/neuron_census_service.py', 'server/rule_ledger_service.py', 'data/rules/ledger.json',
     'server/research_space_service.py', 'server/trace_catalog.py', 'server/mainline_sample_service.py', 'server/mlp_tail_service.py', 'server/qwen14_mlp_service.py', 'server/native_mlp_service.py',
+    'server/workspace_mlp_atlas.py',
     'data/lang_bench/meta.json', 'data/lang_bench/results.json',
     # 数据集清单靠这份摘要：题量、科目、三类分布、许可、源地址都在 by_dataset 里。
     # 题目正文不进包（见下面 QUESTIONS_ONLY 的说明）——中心没有正文也能回答「有哪些数据集、各多少题」。
@@ -50,7 +55,7 @@ INCLUDE = [
     'scripts/download_lang_bench_v3.py',
     'scripts/run_language_family.py', 'scripts/prepare_census_corpus.py', 'scripts/build_circuit_pack.py',
 ]
-INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'frontend/dist']
+INCLUDE_DIRS = ['shared/dist_protocol', 'research/interventions', 'research/neurons', 'deploy/workspace_data', 'frontend/dist']
 INCLUDE_OPTIONAL = ['data/lang_bench/results.v2.json']
 # 题库正文（questions.v3.jsonl，3.3 MB，14,893 题）默认不进发布包：
 #   ① 它不是中心的运行必需品——中心只用 meta.v3.json 的 by_dataset 回答数据集清单；
@@ -101,6 +106,7 @@ def write_archive(tar, members, name, manifest, version_bytes, partial=None):
         info.uname = info.gname = 'root'
         if relative == 'VERSION':
             info.size = len(version_bytes)
+            info.mtime = int(time.time())
             tar.addfile(info, io.BytesIO(version_bytes))
         else:
             with path.open('rb') as stream:

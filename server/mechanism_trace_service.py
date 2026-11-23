@@ -2,6 +2,7 @@
 from functools import lru_cache
 from pathlib import Path
 import json
+import os
 import numpy as np
 from fastapi import APIRouter,HTTPException,Query
 from shared.dist_protocol.mechanism_trace import TraceStore,unbits
@@ -24,7 +25,9 @@ _store=None
 
 def store():
     global _store
-    if _store is None:_store=TraceStore()
+    if _store is None:
+        live_root=os.environ.get('AI2050_LIVE_TRACE_DIR')
+        _store=TraceStore(index=Path(live_root)/'catalog',raw_root=live_root) if live_root else TraceStore()
     return _store
 
 
@@ -85,7 +88,8 @@ def manifest(trace_id:str):return checked(store().manifest,trace_id)[0]
 
 
 @router.get('/{trace_id}/field')
-def field(trace_id:str,block:int=Query(0,ge=0),position:int=Query(...,ge=0),boundary:str='mlp_activation'):
+def field(trace_id:str,block:int=Query(0,ge=0),position:int=Query(...,ge=0),boundary:str='mlp_activation',head:int | None=None):
+    if head is not None:return checked(store().head_vector,trace_id,block,position,boundary,head)
     if boundary in ['hidden_state','embedding']:return checked(hidden_at,trace_id,0 if boundary=='embedding' else block,position)
     return checked(store().field,trace_id,block,position,boundary)
 

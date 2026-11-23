@@ -58,6 +58,18 @@ function autoCenter() {
   }
 }
 
+function centerOwnedWorkspace() {
+  const archivedInputs = /(?:\/workspace_data\/|\/test_records\/(?:pilot|direction_questions)\.json|\/mainline_release\.json|\/research\/mainline\/H[02]\/|\/(?:archiveHeadInputs|firstRecordPathStatus|graphObservationExample|nativeObservation[^/]*|qwen3_4b_[^/]*|threeCueEvidence)\.json)(?:\?|$)/;
+  return {
+    name:'ai2050-center-owned-workspace',
+    apply:'build',
+    moduleParsed({ importedIds, dynamicallyImportedIds }) {
+      const embedded = [...importedIds,...dynamicallyImportedIds].find(id=>archivedInputs.test(id.replaceAll('\\','/')));
+      if (embedded) this.error(`研究数据应由中心发布，生产客户端引用了 ${embedded}`);
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   root: '.',
@@ -68,7 +80,7 @@ export default defineConfig({
        ③ Electron file:// 加载 dist → **必须相对**，绝对路径 /assets/... 会指到文件系统根 → 白屏
      改前 dist 实测生成 src="/assets/main-*.js"（绝对），Electron 下必然白屏。 */
   base: './',
-  plugins: [react(), autoCenter()],
+  plugins: [react(), autoCenter(), centerOwnedWorkspace()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

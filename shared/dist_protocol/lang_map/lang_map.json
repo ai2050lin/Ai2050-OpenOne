@@ -1,6 +1,6 @@
 {
  "schema": "lang_map.v1",
- "version": 2,
+ "version": 3,
  "status": [
   "已定义",
   "有例句",
@@ -83,6 +83,24 @@
         true,
         false,
         false
+       ],
+       "fn_words": []
+      },
+      {
+       "id": "KN.ENTITY_REF",
+       "name": "查询实体指称",
+       "example": "同一档案中有 A、B 两条记录，按问题指定的实体读取对应代码。",
+       "origin": "new",
+       "also": [],
+       "templates": [
+        "SOURCE-BINDING-20261110"
+       ],
+       "n_words": 0,
+       "flags": [
+        true,
+        true,
+        false,
+        true
        ],
        "fn_words": []
       }
@@ -355,13 +373,15 @@
        "example": "设定资料和现实知识不一致时，按问题指定的来源作答。",
        "origin": "catalog",
        "also": [],
-       "templates": [],
+       "templates": [
+        "SOURCE-BINDING-20261110"
+       ],
        "n_words": 0,
        "flags": [
         true,
         true,
         false,
-        false
+        true
        ],
        "fn_words": []
       }
@@ -1802,6 +1822,14 @@
  ],
  "dims": [
   {
+   "id": "VAR.SOURCE_ORDER",
+   "name": "信息源呈现顺序",
+   "example": "交换两份档案文本块的先后位置，保持各自记录与查询条件不变。",
+   "templates": [
+    "SOURCE-BINDING-20261110"
+   ]
+  },
+  {
    "id": "VAR.RULE_PRESENTATION",
    "name": "规则呈现方式",
    "example": "区分指令、参考描述与只列条目的材料条件；是否理解规则生效需另作行为检验。",
@@ -1944,7 +1972,9 @@
    "id": "VAR.PARAPHRASE",
    "name": "同义改写与意义保持",
    "example": "「会议推迟到周五」可改写为「会议改在周五举行」。",
-   "templates": []
+   "templates": [
+    "SOURCE-BINDING-20261110"
+   ]
   }
  ],
  "tree_compat": {
@@ -1953,6 +1983,8 @@
   "KN.ATTR": "SEM.ATTRIBUTE",
   "KN.PART": "SEM.PART",
   "KN.ORIGIN": "SEM.ORIGIN",
+  "KN.SOURCE": "SEM.SOURCE",
+  "KN.ENTITY_REF": "KN.ENTITY_REF",
   "RS.NEG": "LOG.NEG",
   "RS.COND": "LOG.COND",
   "RS.CAUSE": "LOG.CAUSE",
@@ -1965,20 +1997,22 @@
   "EXT.FRAME": "VAR.FRAME",
   "EXT.RULE_PRESENTATION": "VAR.RULE_PRESENTATION",
   "EXT.TECHNICAL_TITLE": "VAR.TECHNICAL_TITLE",
-  "EXT.RULE_WORDING": "VAR.RULE_WORDING"
+  "EXT.RULE_WORDING": "VAR.RULE_WORDING",
+  "EXT.SOURCE_ORDER": "VAR.SOURCE_ORDER",
+  "EXT.SOURCE_WORDING": "VAR.PARAPHRASE"
  },
  "stats": {
   "domains": 3,
   "subs": 20,
-  "items": 80,
-  "catalog_items": 72,
-  "new_items": 19,
-  "dims": 11,
+  "items": 81,
+  "catalog_items": 73,
+  "new_items": 20,
+  "dims": 12,
   "words": 477,
   "draft_words": 57
  },
  "sources": {
-  "catalog": "lang_catalog.json v4",
+  "catalog": "lang_catalog.json v5",
   "lexicons": [
    "EA-v2",
    "ENT-XF v2"

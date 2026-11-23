@@ -1,6 +1,6 @@
 {
  "schema": "lang_map.structure.v1",
- "version": 2,
+ "version": 3,
  "note": "语言图谱的人工结构（上三层）与虚词草稿。改这里后运行 python scripts/build_lang_map.py 重建 lang_map.json 与词层；结构是展示与研究组织方式，不是模型内部结构。",
  "domains": [
   {
@@ -20,6 +20,11 @@
       },
       {
        "catalog": "SEM.IDENTITY"
+      },
+      {
+       "id": "KN.ENTITY_REF",
+       "name": "查询实体指称",
+       "example": "同一档案中有 A、B 两条记录，按问题指定的实体读取对应代码。"
       }
      ]
     },
@@ -424,6 +429,7 @@
   }
  ],
  "dims": [
+  {"catalog": "VAR.SOURCE_ORDER"},
   {"catalog": "VAR.RULE_PRESENTATION"},
   {"catalog": "VAR.TECHNICAL_TITLE"},
   {"catalog": "VAR.RULE_WORDING"},
@@ -478,6 +484,8 @@
   "KN.ATTR": "SEM.ATTRIBUTE",
   "KN.PART": "SEM.PART",
   "KN.ORIGIN": "SEM.ORIGIN",
+  "KN.SOURCE": "SEM.SOURCE",
+  "KN.ENTITY_REF": "KN.ENTITY_REF",
   "RS.NEG": "LOG.NEG",
   "RS.COND": "LOG.COND",
   "RS.CAUSE": "LOG.CAUSE",
@@ -490,7 +498,9 @@
   "EXT.FRAME": "VAR.FRAME",
   "EXT.RULE_PRESENTATION": "VAR.RULE_PRESENTATION",
   "EXT.TECHNICAL_TITLE": "VAR.TECHNICAL_TITLE",
-  "EXT.RULE_WORDING": "VAR.RULE_WORDING"
+  "EXT.RULE_WORDING": "VAR.RULE_WORDING",
+  "EXT.SOURCE_ORDER": "VAR.SOURCE_ORDER",
+  "EXT.SOURCE_WORDING": "VAR.PARAPHRASE"
  },
  "extra_templates": {
   "RS.SCOPE": [

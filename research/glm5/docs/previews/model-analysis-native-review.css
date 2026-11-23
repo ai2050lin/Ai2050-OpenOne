@@ -1,0 +1,43 @@
+.heading a { text-decoration: none }
+.context { padding: 10px 16px; display: flex; gap: 8px 12px; flex-wrap: wrap; align-items: end; border-bottom: 1px solid var(--line); background: #fafdff }
+.context label, .inspector label, #measure-tools label { display: grid; gap: 3px }
+.context input,.context select,.inspector select,#measure-tools select { border-radius: 6px; border: 1px solid #c9d8e8; background: white; padding: 6px 8px }
+.context input { width: 170px; font-family: Consolas,monospace }
+.context select { max-width: 100% }
+.context #address-error { flex-basis: 100%; color: #8c3326; padding: 1px 0 }
+.scene { min-height: 262px }
+.inspector { padding: 13px 16px; gap: 8px }
+#structure-coverage { display: grid; gap: 3px; color: var(--muted); font-size: 12px }
+#structure-coverage strong { color: var(--ink) }
+.coverage { padding: 7px 8px; border-radius: 5px; background: var(--blue-soft); color: #27466b; font-size: 12px }
+.coverage.missing { background: var(--amber-soft); color: #694410 }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px }
+.actions a { text-decoration: none }
+.data-panel { padding: 12px 15px 17px }
+.data-panel h2 { font-size: 18px; margin-bottom: 5px }
+.data-panel>p { margin: 5px 0 9px }
+#measure-tools { display: flex; align-items: end; flex-wrap: wrap; gap: 7px 12px; margin-bottom: 9px }
+.reading-origin { color: var(--blue); font-size: 12px; padding: 3px 0 }
+.reading-origin summary { cursor: pointer }
+#origin-data { padding: 5px 7px; border-left: 2px solid var(--line); margin-top: 5px; color: var(--muted); overflow-wrap: anywhere }
+.head-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(69px,1fr)); gap: 4px; margin: 0 0 9px }
+.head-list button { border: 1px solid #c8d8e9; border-radius: 5px; padding: 5px 3px; font: 600 11px Consolas,monospace; background: #f4f8fd; display: grid; justify-items: center; gap: 3px }
+.head-list button[aria-pressed="true"] { color: var(--blue); border-color: #3b70c9; background: #eaf1ff }
+.head-list small { color: var(--muted-light); font-weight: 400; font-size: 10px }
+.records { display: grid; gap: 6px }
+.records article { padding: 8px 10px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 3px 7px; border: 1px solid var(--line); border-radius: 7px }
+.records article p { grid-column: 1; color: var(--muted); font-size: 12px }
+.records article button { grid-column: 2; grid-row: 1 / span 2; align-self: center }
+#native-field-host .native-field .nf-map canvas { height: clamp(195px,24vw,315px) }
+#native-field-host .native-field[data-kind=head] .nf-map canvas { height: clamp(95px,14vw,165px) }
+.full-screen .observation .scene { min-height: clamp(262px,33vh,440px) }
+#other-panel textarea { margin-top: 5px; width: min(660px,100%); min-height: 78px; display: block }
+@media(max-width:730px) {
+  .context { padding: 8px 10px; gap: 7px }
+  .context label { max-width: 100% }
+  .context input { width: 137px }
+  .scene { min-height: 246px }
+  .data-panel { padding: 9px 10px }
+  .heading a { white-space: normal; font-size: 11px; flex: 0 0 90px; text-align: center }
+}
+

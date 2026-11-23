@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_BASE, getJson } from '../app/rdc_fusion/api.js';
-import { bundledState, MainlineContext, readSnapshot, useMainline } from './data/mainlineState.js';
+import { emptyState, MainlineContext, readSnapshot, useMainline } from './data/mainlineState.js';
 
 export function MainlineProvider({ children }) {
-  const [current, setCurrent] = useState({ state: bundledState, revision: null, source: 'bundled', error: '' });
+  const [current, setCurrent] = useState({ state: emptyState, revision: null, source: 'unavailable', error: '' });
   const accepted = useRef(null), busy = useRef(false);
   const refresh = useCallback(async () => {
     if (busy.current) return;
@@ -25,7 +25,7 @@ export function MainlineProvider({ children }) {
       try { localStorage.setItem(key, JSON.stringify(envelope)); } catch { /* Private mode / quota. */ }
       setCurrent(old => old.revision === next.revision && old.source === 'server' && !old.error ? old : { ...next, source: 'server', error: '' });
     } catch (reason) {
-      setCurrent(old => ({ ...old, source: accepted.current ? 'cached' : 'bundled', error: reason.message }));
+      setCurrent(old => ({ ...old, source: accepted.current ? 'cached' : 'unavailable', error: reason.message }));
     } finally { busy.current = false; }
   }, []);
   useEffect(() => {
@@ -40,10 +40,10 @@ export function MainlineProvider({ children }) {
 
 export function MainlineStatus() {
   const { state, source, error, revision, refresh } = useMainline();
-  const label = source === 'server' ? '中心研究记录' : source === 'cached' ? '已校验缓存 · 中心暂不可达' : '客户端随包记录 · 尚未接通中心记录';
+  const label = source === 'server' ? '中心研究记录' : source === 'cached' ? '已校验缓存 · 中心暂不可达' : '尚未接通中心记录';
   return <div className="v8-note mainline-status" aria-label="研究记录同步" title={error || state.scientific_note}>
-    <span>{label} · v{state.sequence} · {state.active_branch.id}：{state.active_branch.summary}</span>
+    <span>{label}{state.sequence&&` · v${state.sequence} · ${state.active_branch.id}：${state.active_branch.summary}`}</span>
     <button type="button" className="v6-linkbtn" onClick={refresh}>同步研究记录</button>
-    <details><summary>版本与来源</summary><p>{state.updated_at} · {revision || '客户端随包版本'}<br />{state.scientific_note}{error && <><br />{error}</>}</p></details>
+    <details><summary>版本与来源</summary><p>{state.updated_at} {revision}<br />{state.scientific_note}{error && <><br />{error}</>}</p></details>
   </div>;
 }

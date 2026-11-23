@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模型分析 · 三模式重构效果稿 · AI2050</title>
+<style>
+:root{--ink:#162e46;--muted:#526a7d;--blue:#2056a8;--line:#d5e0e9;--pale:#f0f5fb;--teal:#176f67;--shell:#f2f5f8;
+--ui:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",sans-serif;--mono:Consolas,"SFMono-Regular",monospace;
+color:var(--ink);font:14px/1.55 var(--ui);background:var(--shell)}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #5088d8;outline-offset:2px}
+a{color:var(--blue)}[hidden]{display:none!important}h1,h2,h3,h4,p{margin:0}
+i[data-icon]{display:inline-grid;place-items:center;font-style:normal;flex:none}
+i[data-icon] svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+
+.rail{position:fixed;inset:0 auto 0 0;width:74px;background:#fff;border-right:1px solid var(--line);display:flex;align-items:center;flex-direction:column;z-index:3}
+.brand{background:#194879;color:#fff;font:700 24px/37px Georgia,serif;height:38px;width:38px;margin:15px auto 28px;text-align:center;border-radius:10px}
+.brand sup{font:700 11px var(--ui)}
+.rail nav{width:100%;display:grid;gap:6px}
+.rail a{display:grid;place-items:center;gap:3px;margin:0 6px;padding:10px 1px;color:#516779;font-size:12px;text-decoration:none;border-radius:8px}
+.rail a[aria-current]{background:#e9f1fd;color:var(--blue);font-weight:650}
+.rail a:hover{background:var(--pale)}
+.rail .settings{margin-top:auto!important;margin-bottom:10px!important}
+.global{margin-left:74px;background:#fff;border-bottom:1px solid var(--line);min-height:44px;padding:0 clamp(18px,3vw,48px);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}
+.global strong{color:#254b75;letter-spacing:.04em}.global b{font-weight:400;color:#9eadbc;margin:0 12px}
+.mark{display:flex;align-items:center;gap:7px}.mark i{width:7px;height:7px;border-radius:50%;background:#7995af;display:inline-block}
+
+#wb{margin-left:74px;padding:20px clamp(18px,3vw,48px) 40px;min-height:calc(100dvh - 44px)}
+#wb>*{max-width:1480px;margin-inline:auto}
+.title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.title h1{font-size:26px;letter-spacing:-.05em;font-weight:700}
+.sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #bdcddb;border-radius:6px;background:#fff;color:#294862;padding:6px 11px;font-size:13px}
+.pill:hover{background:#edf4fc}
+
+.modes{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.modes button{display:flex;align-items:center;gap:12px;border:0;border-right:1px solid var(--line);border-bottom:3px solid transparent;padding:12px 18px 9px;background:#fff;color:#566b7c;text-align:left}
+.modes button:last-child{border-right:0}
+.modes button[aria-pressed=true]{border-bottom-color:#2c64af;background:#eaf2fe;color:#194f93}
+.modes button:hover{background:#f1f6fb}
+.modes .obj{margin-left:auto;font:600 11px var(--mono);background:#eef3f8;border-radius:4px;padding:2px 6px;color:#3d5a73}
+.modes button[aria-pressed=true] .obj{background:#d4e5fb;color:#194f93}
+.modes strong{font-size:15px}.modes small{display:block;font-size:11px;color:var(--muted)}
+.modes button[aria-pressed=true] small{color:#3a6296}
+
+.space{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,28%);margin-block:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.scene{position:relative;min-width:0;background:#f6faff}
+.scene-head,.scene-foot{position:absolute;left:14px;right:14px;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
+.scene-head{top:9px}.scene-head h2{display:flex;gap:6px;align-items:center;font-size:13px;color:#385770}
+.scene-head>div,.scene-foot>div{display:flex;gap:5px;pointer-events:auto}
+.scene-foot{bottom:8px;font-size:11px;color:var(--muted)}
+.scene-foot>span{display:flex;align-items:center;gap:6px}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #bdcddb;border-radius:6px;background:#ffffffea;color:#294862;padding:5px 9px;font-size:12px;height:30px}
+.iconbtn:hover{background:#edf4fc}
+#canvas{display:block;width:100%;height:230px}
+.scene-foot button{width:25px;height:23px;line-height:18px;border:1px solid var(--line);border-radius:4px;background:#fff}
+.legend{display:flex;align-items:center;gap:6px}
+.legend .bar{width:90px;height:8px;border-radius:3px;border:1px solid #b9c7d4}
+
+.locator{border-left:1px solid var(--line);padding:15px 18px;display:grid;align-content:center;gap:5px}
+.loc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:3px}
+.loc-head span{font-size:12px;color:var(--muted)}
+.loc-head strong{font:700 17px var(--mono);color:var(--blue)}
+.locator label{font-size:12px;color:#42596d}
+.locator input,.locator select{border:1px solid #bccbd8;border-radius:5px;background:#fff;height:32px;padding:0 8px;width:100%;min-width:0}
+.locator textarea{border:1px solid #bccbd8;border-radius:5px;background:#fff;padding:7px 8px;width:100%;min-height:54px;resize:vertical;font:13px/1.5 var(--ui)}
+.row{display:flex;gap:5px}
+.go{background:#eaf1fa;color:#214f88;border:1px solid #b4cce5;border-radius:5px;white-space:nowrap;padding:0 12px;font-size:12px;height:32px}
+.hint{font-size:11px;color:var(--muted);min-height:15px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.chip{font:600 11px var(--mono);border:1px solid #b9cce0;background:#eef4fb;color:#2a5288;border-radius:20px;padding:3px 9px}
+.chip[aria-pressed=true]{background:#2056a8;color:#fff;border-color:#2056a8}
+.chip .x{margin-left:5px;opacity:.7}
+
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.toolbar .lbl{font-size:12px;color:var(--muted);margin-right:2px}
+.tool{border:1px solid #bccbd8;background:#f7fafd;color:#294862;border-radius:6px;padding:6px 11px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px}
+.tool[aria-pressed=true]{background:#2056a8;color:#fff;border-color:#2056a8}
+.tool:hover{background:#e7f0fa}.tool[aria-pressed=true]:hover{background:#1a4a92}
+.tool .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+.toolbar .sep{width:1px;height:22px;background:var(--line);margin:0 3px}
+.toolbar .spacer{margin-left:auto;font-size:11px;color:var(--muted)}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;min-width:0}
+.sec{padding:18px clamp(14px,2vw,24px)}
+.sec-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sec-title h2{font-size:18px}.sec-title small{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fbfdfe}
+.card h4{font-size:13.5px;margin-bottom:6px;color:#21486e}
+.card p{font-size:12.5px;color:#3c556b;line-height:1.6}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono)}
+
+/* neuron colormap grid */
+.ngrid{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin:8px 0}
+.ncell{aspect-ratio:1;border-radius:2px;cursor:pointer;position:relative}
+.ncell:hover{outline:2px solid #162e46;outline-offset:1px;z-index:2}
+.ncell.sel{outline:2.5px solid #162e46;outline-offset:1px}
+.cbar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-top:4px}
+.cbar .grad{flex:1;height:10px;border-radius:3px;border:1px solid #b9c7d4}
+.dist{display:flex;align-items:flex-end;gap:2px;height:70px;margin:6px 0}
+.dist b{flex:1;background:#7fa9d6;border-radius:1px 1px 0 0;min-height:2px}
+.dist b.neg{background:#d68a8a}
+
+/* recursion graph */
+.recur{display:flex;align-items:stretch;gap:0;margin:8px 0}
+.rcol{flex:1;display:flex;flex-direction:column;gap:6px}
+.rcol h5{font-size:11px;color:var(--muted);text-align:center;margin-bottom:2px;font-weight:600}
+.rnode{border:1px solid #b9cce0;background:#eef4fb;border-radius:6px;padding:6px 8px;font:600 11px var(--mono);color:#2a5288;text-align:center}
+.rnode.cur{background:#2056a8;color:#fff;border-color:#2056a8}
+.rnode small{display:block;font:400 10px var(--ui);opacity:.8}
+.rarr{align-self:center;color:#9fb4c8;font-size:18px;padding:0 4px}
+.traj{width:100%;height:120px;display:block;background:#fbfdfe;border:1px solid var(--line);border-radius:6px;margin-top:6px}
+
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{border-bottom:1px solid #e6edf3;padding:6px 9px;text-align:left}
+th{background:#f1f5f8;color:var(--muted);font-weight:600;font-size:11.5px}
+.pos{color:#a23428}.neg{color:#2056a8}
+.tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:20px;background:#eef3f8;color:#3d5a73;border:1px solid #d3e0ec}
+.tag.ok{background:#e6f4ec;color:#176f4a;border-color:#bfe0cd}
+.tag.no{background:#fbe9e7;color:#a23428;border-color:#eec9c4}
+.tag.wait{background:#fdf3e3;color:#8a5a16;border-color:#eed9b5}
+
+@media(max-width:900px){.grid2{grid-template-columns:1fr}.ngrid{grid-template-columns:repeat(16,1fr)}}
+@media(max-width:650px){
+.rail{display:none}.global,#wb{margin-left:0}.global{padding:0 12px}
+#wb{padding:12px 10px 24px}.title h1{font-size:22px}
+.modes button{flex-direction:column;gap:3px;padding:9px 4px 7px;text-align:center}
+.modes .obj{margin:0}.modes small{display:none}
+.space{grid-template-columns:1fr}.locator{border-left:0;border-top:1px solid var(--line)}
+#canvas{height:170px}.ngrid{grid-template-columns:repeat(12,1fr)}
+.recur{flex-direction:column}.rarr{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<aside class="rail" aria-label="研究工作台">
+  <div class="brand">A<sup>2</sup></div>
+  <nav>
+    <a href="#"><i data-icon="overview"></i>总览</a>
+    <a href="#" aria-current="page"><i data-icon="cube"></i>语言与模型</a>
+    <a href="#"><i data-icon="tests"></i>实验管理</a>
+  </nav>
+  <a class="settings" href="#"><i data-icon="settings"></i>设置</a>
+</aside>
+<header class="global"><span><strong>AI2050</strong><b>/</b>研究工作台<b>/</b>语言与模型</span><span class="mark"><i></i>三模式重构 · 静态效果稿</span></header>
+
+<main id="wb">
+  <div class="title"><h1>模型分析</h1><button class="pill" id="plan-btn"><i data-icon="plan"></i>研究计划</button></div>
+  <p class="sub">一屏一对象 · 一对象一工具条 · 视图不互相隐藏。本页为静态效果演示，数据为本地示例，不发外部请求。</p>
+
+  <nav class="modes" aria-label="探索模式">
+    <button data-mode="live" aria-pressed="false"><i data-icon="pulse"></i><span><strong>实时模式</strong><small>对象 = 一段输入 + 观察点</small></span><span class="obj" id="obj-live">输入驱动</span></button>
+    <button data-mode="archive" aria-pressed="false"><i data-icon="archive"></i><span><strong>测试记录</strong><small>对象 = 一次归档运行</small></span><span class="obj" id="obj-archive">运行驱动</span></button>
+    <button data-mode="features" aria-pressed="true"><i data-icon="feature"></i><span><strong>特征分析</strong><small>对象 = 一个 Head / MLP 单元</small></span><span class="obj" id="obj-features">对象驱动</span></button>
+  </nav>
+
+  <section class="space" aria-label="共享模型空间">
+    <div class="scene">
+      <div class="scene-head"><h2><i data-icon="cube"></i>模型空间 <span class="muted" id="scene-model">Qwen3-14B</span></h2>
+        <div><button class="iconbtn" id="colormode" title="切换着色口径">按层分位数</button><button class="iconbtn" id="fs"><i data-icon="expand"></i>全屏</button></div></div>
+      <canvas id="canvas" aria-label="模型分块与原生对象示意"></canvas>
+      <div class="scene-foot">
+        <span class="legend">神经元着色 <span class="bar" id="legendbar"></span><span id="legendtxt">负 ← 激活值 → 正</span></span>
+        <div><button id="zo" aria-label="缩小">−</button><button id="zr" aria-label="复位">⟲</button><button id="zi" aria-label="放大">＋</button></div>
+      </div>
+    </div>
+    <div class="locator" id="locator"><!-- 随模式渲染 --></div>
+  </section>
+
+  <div class="toolbar" id="toolbar" aria-label="统一观察工具条"><!-- 随模式渲染 --></div>
+
+  <section class="panel" id="panel"><!-- 随模式渲染 --></section>
+</main>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SYM={overview:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',cube:'m12 2 9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10',
+tests:'M9 3h6 M10 3v6L4 19q-1 2 2 2h12q3 0 2-2L14 9V3 M8 15h8',settings:'M3 5h18 M3 12h18 M3 19h18 M8 3v4 M16 10v4 M9 17v4',
+plan:'M7 4H4v17h16V4h-3 M8 2h8v4H8z M8 11h8 M8 15h6',archive:'M3 4h18v4H3z M5 8v12h14V8 M9 12h6',
+feature:'M4 17v-7 M9 21V3 M14 16V8 M19 18V5',pulse:'M2 13h5l3-9 4 16 3-10 2 3h3',expand:'M3 9V3h6 M15 3h6v6 M21 15v6h-6 M9 21H3v-6'};
+for(const el of document.querySelectorAll('i[data-icon]'))el.innerHTML='<svg viewBox="0 0 24 24"><path d="'+SYM[el.dataset.icon]+'"/></svg>';
+
+/* ============ 真实对象编号（沿用历史档案） ============ */
+const UNITS={
+ 'B26/H36':{model:'Qwen3-14B',kind:'Head',block:26,index:36,label:'注意力头 · 条件选行',
+   claim:'按姓名/印刷标签提问时通常看向目标记录。',level:'注意力观察',
+   read:'Q/K 选行预测未过原实验准入门；仅限该头注意力落点解释范围。'},
+ 'B28/H21':{model:'Qwen3-14B',kind:'Head',block:28,index:21,label:'注意力头 · 原模型阻断',
+   claim:'阻断该头相对随机头使正确优势再降 0.330。',level:'匹配对照干预 · 待审',
+   read:'总体均值不能替代单题预测；中心回执可核验，证据待审。'},
+ 'B36/U2429':{model:'Qwen3-14B',kind:'MLP',block:36,index:2429,label:'原生 FFN 神经元 · 位置轨迹',
+   claim:'数步读代码题中同一单元四处读数有正有负。',level:'单题激活观察',
+   read:'跨题功能、稳定性、对答案影响缺独立证据。'},
+ 'B30/U9517':{model:'Qwen3-4B',kind:'MLP',block:30,index:9517,label:'原生 FFN 神经元 · 门控投影',
+   claim:'含特定地区词的句子触发更高门控响应。',level:'语料与句对观察',
+   read:'读/写对齐分差超验收上限，主题解释仍是候选。'},
+ 'B28/U17216':{model:'Qwen3-14B',kind:'MLP',block:28,index:17216,label:'原生 FFN 神经元 · 单元组成员',
+   claim:'属 128 单元恢复组，组恢复增益 −0.151。',level:'已关联组干预',
+   read:'干预作用于整组；单元独立效应记录中无答案。'}
+};
+const OBJKEYS=Object.keys(UNITS);
+
+/* ============ 全局状态 ============ */
+const S={
+ mode:'features',
+ model:'Qwen3-14B',
+ colorMode:'quantile',      // quantile | raw
+ live:{input:'红杯在蓝盘旁，蓝杯在红盘旁。问：哪个杯子是红色的？',points:['B26/H36','B28/H21'],step:0},
+ archive:{runId:'run-t7dfn8_7',phase:'2997',filter:''},
+ feature:{unit:'B36/U2429',tool:'morph'},
+ tool:'native',
+ zoom:1
+};
+
+/* ============ 色标（数值→颜色） ============ */
+function lerp(a,b,t){return a+(b-a)*t}
+function diverging(t){ // t in [-1,1] 负蓝 零灰 正红
+ t=Math.max(-1,Math.min(1,t));
+ if(t<0){const k=-t;return `rgb(${lerp(238,160,k)|0},${lerp(240,70,k)|0},${lerp(245,80,k)|0})`}
+ const k=t;return `rgb(${lerp(238,190,k)|0},${lerp(240,90,k)|0},${lerp(245,90,k)|0})`}
+function sequential(t){t=Math.max(0,Math.min(1,t));return `rgb(${lerp(232,32,t)|0},${lerp(240,86,t)|0},${lerp(248,168,t)|0})`}
+function legendGradient(){
+ return S.colorMode==='raw'
+  ?'linear-gradient(90deg,rgb(160,70,80),rgb(238,240,245),rgb(190,90,90))'
+  :'linear-gradient(90deg,rgb(160,70,80),rgb(238,240,245),rgb(190,90,90))';
+}
+$('legendbar').style.background=legendGradient();
+
+/* 生成确定性伪随机激活值（演示） */
+function seeded(seed){let x=seed;return()=>{x=(x*1103515245+12345)&0x7fffffff;return x/0x7fffffff}}
+function unitActivations(unit){
+ const u=UNITS[unit];const rnd=seeded(u.block*1000+u.index);
+ const n=24*8;const v=[];for(let i=0;i<n;i++){const z=(rnd()*2-1);v.push(z*z*(rnd()<.5?-1:1)*3)}
+ return v;
+}
+
+/* ============ 3D 场景（层塔 + 观察点） ============ */
+const cv=$('canvas'),ctx=cv.getContext('2d');
+function drawScene(){
+ const w=cv.width=cv.clientWidth*devicePixelRatio,h=cv.height=cv.clientHeight*devicePixelRatio;
+ ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+ const W=cv.clientWidth,H=cv.clientHeight;ctx.clearRect(0,0,W,H);
+ const layers=40,cols=10,rows=4;
+ const cw=(W-80)/cols,ch=(H-70)/rows;
+ const hl=S.mode==='features'?UNITS[S.feature.unit].block:(S.mode==='live'?26:28);
+ for(let b=0;b<layers;b++){
+  const cx=40+(b%cols)*cw,cy=30+Math.floor(b/cols)*ch;
+  const on=b===hl;
+  ctx.fillStyle=on?'#2056a8':'#dfe8f2';ctx.strokeStyle=on?'#163e6e':'#b9c9da';
+  ctx.lineWidth=on?1.5:.6;
+  roundRect(cx,cy,cw-8,ch-10,4);ctx.fill();ctx.stroke();
+  ctx.fillStyle=on?'#fff':'#5a7186';ctx.font='9px '+getComputedStyle(document.body).getPropertyValue('--mono');
+  ctx.fillText('B'+b,cx+4,cy+12);
+  // 神经元着色（特征模式时按值）
+  if(S.mode==='features'&&on){
+   const act=unitActivations(S.feature.unit);
+   for(let k=0;k<12;k++){const t=act[k]/3;ctx.fillStyle=diverging(t);
+    ctx.fillRect(cx+3+(k%6)*((cw-14)/6),cy+16+Math.floor(k/6)*7,(cw-14)/6-1,5)}
+  }
+ }
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+addEventListener('resize',drawScene);
+
+/* ============ 定位器（随模式） ============ */
+function renderLocator(){
+ const L=$('locator');
+ if(S.mode==='live'){
+  L.innerHTML=`<div class="loc-head"><span>研究对象</span><strong>一段输入</strong></div>
+   <label>输入文本</label><textarea id="lv-input">${esc(S.live.input)}</textarea>
+   <label>观察点（可多个对比）</label>
+   <div class="chips" id="lv-chips"></div>
+   <div class="row"><input id="lv-add" placeholder="添加 B26/H36 或 U2429"><button class="go" id="lv-addbtn">添加</button></div>
+   <p class="hint">实时模式：对象是一段前向。观察点是附属，可挂多个。</p>`;
+  renderLiveChips();
+  $('lv-input').oninput=e=>S.live.input=e.target.value;
+  $('lv-addbtn').onclick=addLivePoint;
+ }else if(S.mode==='archive'){
+  L.innerHTML=`<div class="loc-head"><span>研究对象</span><strong>一次运行</strong></div>
+   <label>检索历史测试</label><input id="ar-q" placeholder="题干 / Phase / 对象编号 / 模型" value="${esc(S.archive.filter)}">
+   <label>模型</label><select id="ar-model"><option>Qwen3-14B</option><option>Qwen3-4B</option></select>
+   <p class="hint">测试记录：对象是一次归档运行。Head/MLP 是回查锚点，不是主角。</p>
+   <div class="chips"><span class="chip">Phase ${S.archive.phase}</span><span class="chip">${S.archive.runId}</span></div>`;
+  $('ar-q').oninput=e=>{S.archive.filter=e.target.value;renderArchiveList()};
+ }else{
+  L.innerHTML=`<div class="loc-head"><span>研究对象</span><strong id="cur-unit">${S.feature.unit}</strong></div>
+   <label>Head 或 MLP 单元</label>
+   <div class="row"><input id="ft-in" class="mono" placeholder="B26/H36 或 U2429" value="${S.feature.unit}"><button class="go" id="ft-go">定位</button></div>
+   <label>模型</label><select id="ft-model">${['Qwen3-14B','Qwen3-4B'].map(m=>`<option ${m===UNITS[S.feature.unit].model?'selected':''}>${m}</option>`).join('')}</select>
+   <p class="hint">特征分析：对象就是这个单元本身，是主角。</p>
+   <div class="chips">${OBJKEYS.map(k=>`<button class="chip" data-unit="${k}" aria-pressed="${k===S.feature.unit}">${k}</button>`).join('')}</div>`;
+  $('ft-go').onclick=()=>{const v=$('ft-in').value.trim().toUpperCase();if(UNITS[v]){S.feature.unit=v;S.model=UNITS[v].model;renderAll()}};
+  L.querySelectorAll('[data-unit]').forEach(b=>b.onclick=()=>{S.feature.unit=b.dataset.unit;S.model=UNITS[b.dataset.unit].model;renderAll()});
+  $('ft-model').onchange=e=>{const k=OBJKEYS.find(k=>UNITS[k].model===e.target.value);if(k){S.feature.unit=k;S.model=e.target.value;renderAll()}};
+ }
+}
+function renderLiveChips(){
+ $('lv-chips').innerHTML=S.live.points.map(p=>`<span class="chip" aria-pressed="true">${p}<span class="x" data-rm="${p}">✕</span></span>`).join('');
+ $('lv-chips').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.live.points=S.live.points.filter(p=>p!==b.dataset.rm);renderLiveChips();drawScene()});
+}
+function addLivePoint(){const v=$('lv-add').value.trim().toUpperCase();if(UNITS[v]&&!S.live.points.includes(v)){S.live.points.push(v);renderLiveChips();drawScene()}$('lv-add').value=''}
+
+/* ============ 统一工具条 ============ */
+const TOOLS={
+ live:[['native','原生读数',1],['hidden','HiddenState 层间几何',1],['logit','Logit Lens',1],['cka','CKA / RSA',1],['attn','注意力分布',1],['mlp','MLP 门控分解',1],['sae','SAE 字典',0]],
+ archive:[['native','逐题输出',1],['paired','配对差值',1],['arms','干预各臂',1],['attn','回查部件',0],['export','导出 JSONL',1]],
+ features:[['morph','激活形态 · 着色',1],['goodfire','Goodfire 特征卡',1],['recur','前后层递归泛化',1],['native','原生读数',1],['cka','CKA / RSA',1],['sae','SAE 字典',0],['cause','干预对照',1]]
+};
+function renderToolbar(){
+ const list=TOOLS[S.mode];
+ const cur=S.mode==='features'?S.feature.tool:S.tool;
+ $('toolbar').innerHTML='<span class="lbl">观察工具条</span>'+list.map(([id,name,on])=>
+  `<button class="tool" data-tool="${id}" aria-pressed="${id===cur}" ${on?'':'title="按需/有数据时可用"'}><span class="dot"></span>${name}</button>`).join('')+
+  '<span class="spacer">工具条 = 数学工具唯一入口，按对象×模式过滤</span>';
+ $('toolbar').querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
+  if(S.mode==='features')S.feature.tool=b.dataset.tool;else S.tool=b.dataset.tool;
+  renderToolbar();renderPanel();
+ });
+}
+
+/* ============ 工作区（随模式/工具） ============ */
+function renderPanel(){
+ if(S.mode==='live')renderLive();
+ else if(S.mode==='archive')renderArchive();
+ else renderFeatures();
+}
+
+/* ---- 实时模式 ---- */
+function renderLive(){
+ const t=S.tool;
+ let body='';
+ if(t==='native'||t==='mlp'){
+  body=`<div class="grid2">${S.live.points.map(p=>{
+   const u=UNITS[p];const act=unitActivations(p);
+   return `<div class="card"><h4>${p} · ${u.label}</h4>
+    <p class="muted">${u.kind==='Head'?'注意力/Q/K/V/O':'gate/up/down 门控分解'} · 生成步 ${S.live.step}</p>
+    <div class="dist">${act.slice(0,40).map(v=>`<b class="${v<0?'neg':''}" style="height:${Math.min(68,Math.abs(v)*22)}px"></b>`).join('')}</div>
+    <p>读数沿真实 BF16 位模式保存，按声明位置与生成步读出。</p></div>`}).join('')}</div>`;
+ }else if(t==='hidden'||t==='cka'){
+  body=`<div class="card"><h4>层间几何 · CKA / RSA</h4>
+   <p class="muted">同一输入的对齐位置，比较两层表示结构。</p>
+   <table><tr><th>层对</th><th>线性 CKA</th><th>RSA ρ</th></tr>
+   <tr><td>hs[12] ↔ hs[26]</td><td>0.812</td><td>0.744</td></tr>
+   <tr><td>hs[26] ↔ hs[36]</td><td>0.653</td><td>0.591</td></tr></table>
+   <p class="muted" style="margin-top:8px">距离采用 1 − 余弦；跨题复现仍待检验。</p></div>`;
+ }else if(t==='logit'){
+  body=`<div class="card"><h4>Logit Lens · 词表读出</h4><p>在选定层应用 unembedding，读下一 token 分布。</p>
+   <table><tr><th>层</th><th>首选 token</th><th>logP</th></tr>
+   <tr><td>B26</td><td class="mono">红</td><td>−0.42</td></tr>
+   <tr><td>B36</td><td class="mono">红</td><td>−0.18</td></tr></table></div>`;
+ }else if(t==='attn'){
+  body=`<div class="card"><h4>注意力分布 · ${S.live.points[0]||'B26/H36'}</h4>
+   <p class="muted">最后输入 token 对各来源的质量。</p>
+   <table><tr><th>来源</th><th>质量</th></tr>
+   <tr><td>第 1 行 · 红杯</td><td>43.9%</td></tr><tr><td>第 2 行 · 蓝盘</td><td>16.1%</td></tr>
+   <tr><td>其余 token</td><td>40.0%</td></tr></table></div>`;
+ }else{
+  body=`<div class="card"><h4>SAE 特征字典</h4><p class="muted">按需/有数据时可用。当前快照未绑定 SAE 字典，单独显示缺失。</p></div>`;
+ }
+ $('panel').innerHTML=`<div class="sec"><div class="sec-title"><h2>实时模式 · 一段输入的前向观察</h2><small>对象 = 输入 + ${S.live.points.length} 个观察点</small></div>
+  <div class="card" style="margin-bottom:14px"><h4>输入</h4><p>${esc(S.live.input)}</p></div>
+  ${body}</div>`;
+}
+
+/* ---- 测试记录 ---- */
+const RUNS=[
+ {id:'run-t7dfn8_7',phase:'2997',model:'Qwen3-14B',title:'B28/H21 物理首行头干预',n:'192 家族',effect:'−0.330',status:'wait'},
+ {id:'kv-orth',phase:'2951',model:'Qwen3-14B',title:'Sandra/Joseph 实发 State 来源竞争',n:'95 家族',effect:'−0.3331',status:'ok'},
+ {id:'color-reuse',phase:'3008',model:'Qwen3-14B',title:'颜色命名→同异复用',n:'324 题',effect:'未过门',status:'no'},
+ {id:'clt-role',phase:'3004',model:'Qwen3-14B',title:'旧行号/现名冲突',n:'128 家族',effect:'结案',status:'no'},
+];
+function renderArchiveList(){
+ const q=(S.archive.filter||'').toLowerCase();
+ const rows=RUNS.filter(r=>!q||[r.id,r.phase,r.title,r.model].join(' ').toLowerCase().includes(q));
+ const el=$('archive-list');if(!el)return;
+ el.innerHTML=rows.map(r=>`<tr><td><strong>Phase ${r.phase}</strong> ${esc(r.title)}<br><small class="muted mono">${r.id} · ${r.model}</small></td>
+  <td>${r.n}</td><td class="mono">${r.effect}</td>
+  <td><span class="tag ${r.status}">${{ok:'已核验',no:'未过门/结案',wait:'待审'}[r.status]}</span></td>
+  <td><button class="go" data-run="${r.id}">回查部件</button></td></tr>`).join('')||'<tr><td colspan=5 class="muted">无匹配</td></tr>';
+ el.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>{S.mode='features';S.feature.unit='B28/H21';S.feature.tool='cause';renderAll()});
+}
+function renderArchive(){
+ const t=S.tool;
+ $('panel').innerHTML=`<div class="sec"><div class="sec-title"><h2>测试记录 · 复核一次归档运行</h2><small>对象 = 运行 · 按题对错/干预方向着色</small></div>
+  <table><thead><tr><th>测试</th><th>规模</th><th>效应</th><th>状态</th><th></th></tr></thead><tbody id="archive-list"></tbody></table>
+  <p class="muted" style="margin-top:12px">点「回查部件」→ 切到特征分析并带锚点，查看该运行涉及的 Head/MLP。</p></div>`;
+ renderArchiveList();
+}
+
+/* ---- 特征分析（重点） ---- */
+function renderFeatures(){
+ const u=UNITS[S.feature.unit];const t=S.feature.tool;
+ let body='';
+ if(t==='morph'){
+  const act=unitActivations(S.feature.unit);
+  body=`<div class="grid2">
+   <div class="card"><h4>激活形态 · 神经元按值着色</h4>
+    <p class="muted">${S.feature.unit} 整层视野下的相对激活（演示）。点任意格定位。</p>
+    <div class="ngrid">${act.map((v,i)=>`<div class="ncell ${i===u.index?'sel':''}" style="background:${diverging(v/3)}" title="U${i}: ${v.toFixed(2)}"></div>`).join('')}</div>
+    <div class="cbar"><span>负</span><span class="grad" style="background:${legendGradient()}"></span><span>正</span>
+     <span class="muted">口径：${S.colorMode==='quantile'?'按层分位数':'原始值'}</span></div></div>
+   <div class="card"><h4>跨样本激活分布</h4>
+    <div class="dist">${act.slice(0,48).map(v=>`<b class="${v<0?'neg':''}" style="height:${Math.min(68,Math.abs(v)*22)}px"></b>`).join('')}</div>
+    <p>正端典型上下文：含目标语义词的高激活样本。负端：对照样本。原始值与标准化双视图可切。</p>
+    <p class="muted">色标范围、归一方式、是否跨题共用上限均标注，不以 TopK 定义主干。</p></div></div>`;
+ }else if(t==='goodfire'){
+  body=`<div class="grid2">
+   <div class="card"><h4>Goodfire 特征卡 · ${S.feature.unit}</h4>
+    <p><strong>${u.label}</strong></p><p>${u.claim}</p>
+    <table><tr><th>劈半余弦</th><td>0.915</td></tr>
+    <tr><th>读方向对齐 S8</th><td>0.406</td></tr>
+    <tr><th>写方向对齐 S8</th><td>0.073</td></tr>
+    <tr><th>正端词</th><td class="mono">香港 · 港澳 · 台湾</td></tr></table></div>
+   <div class="card"><h4>读/写在 unembedding 上的对齐</h4>
+    <p>读方向与写方向的分差超原验收上限 0.20，主题解释仍是候选。</p>
+    <p class="muted">证据等级：${u.level}。${u.read}</p>
+    <p class="muted">原生单元与 SAE 字典特征分别赋身份，不混称。</p></div></div>`;
+ }else if(t==='recur'){
+  body=recurView(u);
+ }else if(t==='native'){
+  const act=unitActivations(S.feature.unit);
+  body=`<div class="card"><h4>原生读数 · ${S.feature.unit}</h4>
+   <p class="muted">${u.kind==='Head'?'Q/K/V/O 与注意力质量':'gate 预激活 / up 投影 / 门控激活 / down 写入'}</p>
+   <table><tr><th>读出位置</th><th>值</th></tr>
+   ${['输入末尾','最后一步前','Value 前','Code 前'].map((p,i)=>`<tr><td>${p}</td><td class="mono ${act[i]<0?'neg':'pos'}">${act[i].toFixed(3)}</td></tr>`).join('')}</table></div>`;
+ }else if(t==='cka'){
+  body=`<div class="card"><h4>该单元跨层表示几何</h4>
+   <table><tr><th>比较</th><th>CKA</th><th>RSA ρ</th></tr>
+   <tr><td>${S.feature.unit} 上游 ↔ 本层</td><td>0.771</td><td>0.702</td></tr>
+   <tr><td>本层 ↔ 下游</td><td>0.688</td><td>0.615</td></tr></table></div>`;
+ }else if(t==='sae'){
+  body=`<div class="card"><h4>SAE 特征字典</h4><p class="muted">此快照未绑定 SAE 字典。原生单元与字典特征分别记录，缺失单独显示。</p></div>`;
+ }else if(t==='cause'){
+  body=`<div class="card"><h4>干预对照 · ${S.feature.unit}</h4>
+   <table><tr><th>臂</th><th>正确优势变化</th><th>说明</th></tr>
+   <tr><td>定向阻断</td><td class="mono pos">−0.330</td><td>相对同题随机头</td></tr>
+   <tr><td>随机对照</td><td class="mono">基线</td><td>剂量配平 &lt;5%</td></tr>
+   <tr><td>完整恢复</td><td class="mono">还原</td><td>同输入恢复输出</td></tr>
+   <tr><td>仅恢复该单元</td><td class="mono neg">未挽回</td><td>组级中介待检</td></tr></table>
+   <p class="muted" style="margin-top:8px">证据等级：${u.level}。组级恢复 ≠ 单单元因果效应。</p></div>`;
+ }
+ $('panel').innerHTML=`<div class="sec"><div class="sec-title"><h2>特征分析 · ${S.feature.unit}</h2><small>${u.model} · ${u.label}</small></div>
+  <div class="card" style="margin-bottom:14px;border-left:3px solid #2056a8"><p><strong>当前主张：</strong>${u.claim}</p>
+   <p class="muted">解释边界：${u.read}</p></div>
+  ${body}</div>`;
+}
+function recurView(u){
+ const up=S.mode==='features'?u.block:26;
+ const traj=Array.from({length:40},(_,l)=>{const base=Math.sin(l/6)*.5;return l===u.block?1.6:base*(.3+.7*Math.exp(-Math.abs(l-u.block)/8))});
+ const W=560,H=120,max=Math.max(...traj.map(Math.abs));
+ const pts=traj.map((v,l)=>`${20+l*(W-40)/39},${H/2-v/max*(H/2-14)}`).join(' ');
+ return `<div class="card"><h4>前后层递归泛化机制 · ${S.feature.unit}</h4>
+  <p class="muted">该单元在前后 layer 的响应如何被复用 / 差异化。</p>
+  <div class="recur">
+   <div class="rcol"><h5>上游写入者</h5>
+    <div class="rnode">B${u.block-2}/H${(u.index+3)%40}<small>注意力写入</small></div>
+    <div class="rnode">B${u.block-1}/U${(u.index+120)%5000}<small>MLP 写入</small></div></div>
+   <div class="rarr">→</div>
+   <div class="rcol"><h5>当前单元</h5><div class="rnode cur">${S.feature.unit}<small>${u.kind}</small></div></div>
+   <div class="rarr">→</div>
+   <div class="rcol"><h5>下游读取者</h5>
+    <div class="rnode">B${u.block+1}/H${(u.index+7)%40}<small>Q/K 读取</small></div>
+    <div class="rnode">B${u.block+3}/U${(u.index+80)%5000}<small>残差读取</small></div></div>
+  </div>
+  <h4 style="margin-top:14px">跨层激活轨迹叠加</h4>
+  <svg class="traj" viewBox="0 0 ${W} ${H}">
+   <line x1="20" y1="${H/2}" x2="${W-20}" y2="${H/2}" stroke="#c7d4e0" stroke-width="1"/>
+   <polyline points="${pts}" fill="none" stroke="#2056a8" stroke-width="2"/>
+   <circle cx="${20+u.block*(W-40)/39}" cy="${H/2-1.6/max*(H/2-14)}" r="4" fill="#a23428"/>
+   <text x="${20+u.block*(W-40)/39}" y="14" font-size="10" fill="#a23428" text-anchor="middle">B${u.block}</text>
+  </svg>
+  <p class="muted" style="margin-top:6px">连接图（上游→单元→下游）+ 跨层轨迹叠加，两者并呈。读/写分离假设的因果验证另需原模型干预。</p></div>`;
+}
+
+/* ============ 渲染总控 ============ */
+function renderAll(){
+ for(const m of ['live','archive','features'])$('obj-'+m).textContent={live:'输入驱动',archive:'运行驱动',features:'对象驱动'}[m];
+ document.querySelectorAll('.modes button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===S.mode)));
+ $('scene-model').textContent=S.mode==='features'?UNITS[S.feature.unit].model:S.model;
+ $('colormode').textContent=S.colorMode==='quantile'?'按层分位数':'原始值';
+ $('legendtxt').textContent=S.mode==='archive'?'对 / 错 / 干预方向':'负 ← 激活值 → 正';
+ renderLocator();renderToolbar();renderPanel();drawScene();
+}
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{S.mode=b.dataset.mode;if(S.mode==='features')S.feature.tool=S.feature.tool||'morph';else S.tool=TOOLS[S.mode][0][0];renderAll()});
+$('colormode').onclick=()=>{S.colorMode=S.colorMode==='quantile'?'raw':'quantile';$('legendbar').style.background=legendGradient();renderAll()};
+$('zi').onclick=()=>{S.zoom=Math.min(2,S.zoom*1.15);drawScene()};
+$('zo').onclick=()=>{S.zoom=Math.max(.5,S.zoom*.87);drawScene()};
+$('zr').onclick=()=>{S.zoom=1;drawScene()};
+$('fs').onclick=()=>{const w=$('wb');if(document.fullscreenElement)document.exitFullscreen();else w.requestFullscreen?.().catch(()=>{})};
+$('plan-btn').onclick=()=>alert('研究计划面板：研究问题 / 规律索引 / 待测任务（沿用既有 plan 模块，本效果稿不展开）。');
+
+renderAll();
+</script>
+</body>
+</html>

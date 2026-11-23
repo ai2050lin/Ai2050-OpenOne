@@ -98,7 +98,7 @@ export default function SpaceLens(props) {
 }
 
 function SpaceDetailLens({ analysisOnly = false, view: routeView, graphMode='language', paramTab='weights',onParamTab, setView, tm, setTm, localPack, model: gModel, onModel, ds = '', onDs }) {
-  /* language = 语言图谱（只有外部能力框架）；langmeasure = 模型探索里的语言项实测（原语言图谱页：层塔、读出、神经元、数据集实测） */
+  /* language = 语言图谱（只有外部能力框架）；langmeasure = 「模型分析」里的语言项实测（原语言图谱页：层塔、读出、神经元、数据集实测） */
   const view=routeView==='graph'?({language:'langframe',langmeasure:'lang',internal:'research',relations:'relations'}[graphMode]||'langframe'):routeView==='parameters'&&paramTab==='neurons'?'neuron':routeView;
   /* 图层切换已由工作台的三张图和视图条承担，这里不再重复一排图层按钮 */
   const modeBar=routeView==='graph'?null:routeView==='parameters'?<section className="v8-card wb-object-modes"><strong>结构与参数</strong><div className="v6-toolbar" role="group" aria-label="参数与原生特征">{[['weights','真实参数'],['neurons','原生单元与特征卡']].map(([id,label])=><button type="button" className={'fw-tbtn'+(paramTab===id?' primary':'')} aria-pressed={paramTab===id} key={id} onClick={()=>onParamTab?.(id)}>{label}</button>)}</div></section>:null;

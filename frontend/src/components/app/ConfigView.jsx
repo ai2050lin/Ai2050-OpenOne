@@ -72,7 +72,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
   const center = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '');
   const name = user ? (user.display_name || user.username) : '';
   const role = guest ? ['na', '访客'] : (user?.role === 'admin' ? ['pass', '管理员'] : ['na', '成员']);
-  const conn = cfg?.pending ? ['na', '读取中…'] : (cfg?.error ? ['fail', '连接失败'] : ['pass', '已连接']);
+  const conn = cfg?.error ? ['fail', '连接失败'] : d ? ['pass', '已连接'] : ['na', '正在连接…'];
   const errCount = useErrorCount();
   const sec = CFG_SECTIONS.some(s => s.id === section) || section === 'platform' ? section : 'conn';
 
@@ -82,7 +82,7 @@ export default function ConfigView({ cfg, onGo, section = 'conn', nodeStep }) {
       {sec === 'conn' && (
         <>
           {/* 首屏只有一行连接状态；连接详情与诊断收进按钮（Phase 333） */}
-          <CoreCard label="连接状态" hint="一切正常时只看这一行；连接失败时这里直接给原因">
+          <CoreCard label="连接状态">
             <div className="ck-status">
               <span className={`ck-dot ${conn[0] === 'pass' ? 'ok' : conn[0] === 'fail' ? 'bad' : 'wait'}`} aria-hidden="true" />
               <div>

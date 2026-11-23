@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI2050 · 模型分析</title>
+  <link rel="stylesheet" href="model-explorer-design.css">
+  <script defer src="model-explorer-data.js"></script>
+  <script defer src="model-explorer-scene.js"></script>
+  <script defer src="model-explorer-design.js"></script>
+</head>
+<body>
+  <aside class="rail" aria-label="研究工作台">
+    <div class="brand" aria-label="AI2050">A<span>2</span></div>
+    <nav>
+      <a href="client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i data-icon="dashboard"></i>总览</a>
+      <a class="current" href="#workspace" aria-current="page"><i data-icon="cube"></i>语言与模型</a>
+      <a href="client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=plan"><i data-icon="flask"></i>实验管理</a>
+    </nav>
+    <a class="settings" href="client-distributed-testing.html#?wb=1&amp;lens=config"><i data-icon="settings"></i>系统设置</a>
+  </aside>
+  <header class="global"><span><b>AI2050</b><span class="slash">/</span>研究工作台<span class="slash">/</span>语言与模型</span><span class="preview-mark"><i></i>本地静态预览</span></header>
+  <main id="workspace">
+    <div class="work-head"><h1>模型分析</h1><div id="modes" class="modes" role="group" aria-label="观察模式">
+      <button data-mode="live"><i data-icon="pulse"></i>实时模式</button>
+      <button data-mode="archive" aria-pressed="true"><i data-icon="archive"></i>测试记录</button>
+      <button data-mode="features"><i data-icon="feature"></i>特征分析</button>
+    </div></div>
+    <div id="archive-search-link" class="archive-search-link"><a href="model-records-design.html">查找历史测试 →</a></div>
+    <div class="stage">
+      <section class="locator" aria-labelledby="locator-title">
+        <h2 id="locator-title"><i data-icon="locate"></i>对象定位</h2>
+        <form id="search-form"><i data-icon="search"></i><input id="locator-input" aria-label="输入原生编号" autocomplete="off" placeholder="输入 B26/H36"><button title="定位对象" aria-label="定位对象">↵</button></form>
+        <p class="error" id="loc-error" role="status"></p>
+        <div class="group-label">有归档的对象</div>
+        <div class="objects" id="objects"></div>
+        <div class="selection"><span class="blue-dot"></span><span>当前选择</span><strong id="object-id"></strong></div>
+      </section>
+      <section class="viewport" aria-label="共享三维模型空间">
+        <div class="scene-tools"><div class="model-picker"><i data-icon="cube"></i><select id="model" aria-label="选择模型"><option>Qwen3-14B</option><option>Qwen3-4B</option></select></div>
+          <span id="dimension" class="dim"></span>
+          <div class="right-actions">
+            <button id="display" aria-label="显示插件" aria-expanded="false" aria-controls="display-tools"><i data-icon="sliders"></i><span>显示插件</span></button>
+            <button id="fullscreen" aria-label="全屏"><i data-icon="expand"></i><span>全屏</span></button>
+          </div>
+        </div>
+        <fieldset class="display-tools" id="display-tools" hidden><legend>显示插件</legend><label><input type="checkbox" id="grid" checked>空间网格</label><label><input type="checkbox" id="labels" checked>对象标注</label></fieldset>
+        <div class="scene-canvas"><canvas id="scene" aria-label="模型的分块与头位置示意，可通过左侧输入框定位"></canvas></div>
+        <div class="scene-foot"><span><i class="swatch"></i>结构示意 <i class="swatch active"></i>选中对象</span><div><button id="minus" aria-label="缩小视图">−</button><button id="reset" title="复位视角" aria-label="复位视角"><i data-icon="reset"></i></button><button id="plus" aria-label="放大视图">＋</button></div></div>
+      </section>
+    </div>
+    <section class="console" aria-label="对象工作区">
+      <div id="tabs" class="tabs" role="tablist" aria-label="控制台功能"></div>
+      <div id="analysis-panel" role="tabpanel">
+        <div class="plugins"><div class="group-label">分析插件</div><div id="plugin-list"></div></div>
+        <div id="analysis-body"></div>
+      </div>
+      <div id="task-panel" role="tabpanel" hidden></div>
+      <div id="record-detail" role="region" aria-label="历史测试详情" hidden></div>
+    </section>
+  </main>
+</body>
+</html>

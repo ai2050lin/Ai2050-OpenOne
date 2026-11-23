@@ -1,9 +1,10 @@
 export const ASSOC_VIEWS = { iso: [-0.26, 0.71, '斜视'], side: [0, 0.22, '侧视'], top: [-0.25, 1.2, '俯视'] };
+export const HEAD_CHANNEL_PLANE = { x0: -8, x1: 320, z0: 218, z1: 330, y: 35 };
 // Both rendering and hit testing use this affine projection; grid order stays native.
 export function assocProject(s, x, y, z) {
   const cy = Math.cos(s.yaw), sy = Math.sin(s.yaw), cp = Math.cos(s.pitch), sp = Math.sin(s.pitch);
   const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
-  const k = Math.min(s.W / 1060, s.H / 500) * s.zoom;
+  const k = Math.min(s.W / 1060, s.H / (s.expandedHead ? 600 : 500)) * s.zoom;
   return [s.W * 0.455 + (s.panX || 0) + x1 * k, s.H * 0.52 + (s.panY || 0) - (y * cp - z1 * sp) * k];
 }
 

@@ -12,6 +12,7 @@ import Tower, { towerIndexPosition } from './Tower.jsx';
 import { EVIDENCE_LABEL } from './researchFragmentUtil.js';
 import { shortModel, workbenchHref } from './v8Util.js';
 import { useSpatialTrace } from './SpatialTrace.jsx';
+import { useWorkspaceCatalog } from './nativeObservationArchive.js';
 import UnitStates from './UnitStates.jsx';
 import MlpTailAtlas from './MlpTailAtlas.jsx';
 import Qwen14MlpAtlas from './Qwen14MlpAtlas.jsx';
@@ -28,8 +29,8 @@ const TYPE_LABELS = ['只认一个词', '认词也看上下文', '偶尔强激�
 const VIEW_TEXT = {
   graph: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
   parameters: ['LLM 编码图谱 · 结构与参数', '在 3D 空间里看完整的模型：每一层、每个 Head、每个 MLP 神经元。点任何一个，查看它的特征和相关研究。'],
-  live: ['模型探索 · 运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
-  response: ['模型探索 · 响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
+  live: ['模型分析 · 运行与路径', '模型读一句话时，信息一层层流动。这里看流中有什么信息，以及一句话的计算路径。'],
+  response: ['模型分析 · 响应对照', '只改句子里的一处，看模型内部哪里跟着变。这是连接语言图谱和内部图谱的主要方法。'],
 };
 const EMPTY = { layer: null, module: '', index: null, mode: '', coordinate: null };
 const KEYS = { layer: 'sblock', module: 'smodule', index: 'sindex', mode: 'smode', coordinate:'scoord' };
@@ -85,7 +86,7 @@ function selectModel(models, modelKey, snapshot) {
 }
 
 function modelDimensions(model, architecture, localConfig) {
-  const arch = architecture?.available && architecture.model_key === model.model && architecture.n_layers === model.n_layers &&
+  const arch = architecture?.available && architecture.model_snapshot === model.model_snapshot && architecture.n_layers === model.n_layers &&
     (!model.d_model || architecture.d_model === model.d_model) && (!model.d_ff || architecture.d_ff === model.d_ff) ? architecture : null;
   const config = model.config || localConfig;
   return { arch, heads: count(model.n_heads ?? config?.num_attention_heads ?? arch?.n_heads),
@@ -272,8 +273,9 @@ function EmbeddingIndex({ total, index, coordinate, dimensions, values, maxAbs, 
   </div>;
 }
 
-export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical, compact = false, detailOnly = false, workspaceSelection, onSelection, onSceneData, responseContent }) {
-  const source = useApi('/api/model/skeleton', { pollWhilePending: true });
+export default function ModelStructure({ modelKey, onModel, view='graph', paramTab, onGraphMode, tm, onTm, historical, compact = false, detailOnly = false, workspaceSelection, onSelection, onSceneData, responseContent, mlpAtlasRun }) {
+  const workspace = useWorkspaceCatalog();
+  const source = {...workspace, data:workspace.catalog};
   const { snapshot, pmodel } = useResearchContext();
   const [ownSelection, setSelection] = useState(()=>readSelection(view,paramTab));
   const selection = workspaceSelection || ownSelection;
@@ -286,13 +288,14 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const model = local ? {model:local.name,n_layers:local.config.num_hidden_layers,d_model:local.config.hidden_size,
     d_ff:local.config.intermediate_size,config:local.config} : registered;
   const boundSnapshot=snapshot||model?.model_snapshot||'';
-  const selectedStudyRun=new URLSearchParams(window.location.search).get('run')||'';
-  const q14Identity=boundSnapshot==='1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce';
-  const q14Run=['QWEN14-MLP-B28-B35-20261109-v1','QWEN14-GOODFIRE-B28-B39-20261113-v2'].includes(selectedStudyRun)?selectedStudyRun:'';
+  const selectedStudyRun=mlpAtlasRun||new URLSearchParams(window.location.search).get('run')||'';
+  const q14Runs=model?.analysis?.qwenMlpRuns || [];
+  const q14Identity=q14Runs.length>0;
+  const q14Run=q14Runs.includes(selectedStudyRun)?selectedStudyRun:'';
   const q14Report=useApi(q14Identity?`/api/research/qwen14-mlp${q14Run?'?run='+encodeURIComponent(q14Run):''}`:null);
   const q14Config=q14Report.data?.model_snapshot===boundSnapshot?q14Report.data.config:null;
-  const nativeModel=boundSnapshot==='6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'?'qwen4':q14Identity?'qwen14':null;
-  const nativeReport=useApi(nativeModel?`/api/research/native-mlp?model=${nativeModel}`:null);
+  const nativeModel=model?.analysis?.nativeMlp;
+  const nativeReport=useApi(nativeModel?`/api/research/native-mlp?model=${encodeURIComponent(nativeModel)}`:null);
   const nativeConfig=nativeReport.data?.model_snapshot===boundSnapshot?nativeReport.data.config:null;
   const [legacy,setLegacy]=useState(()=>{
     const params=new URLSearchParams(window.location.search);
@@ -321,7 +324,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   const isStructureView = view === 'graph' || view === 'parameters';
   const layer = selection.layer === undefined && isStructureView && layers > 0 ? layers
     : numbered(selection.layer) && selection.layer <= layers ? selection.layer : null;
-  const arch = useApi(layer != null && model ? `/api/model/arch?model_key=${encodeURIComponent(model.model)}` : null, { online: true });
+  const arch = useApi(layer != null && model?.model_snapshot ? `/api/research/workspace/models/${encodeURIComponent(boundSnapshot)}/architecture` : null);
   let module = '';
   if (layer === 0) module = detailOnly && selection.module === 'hs' ? 'hs' : 'embedding';
   else if (layer > 0) {
@@ -341,10 +344,10 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     { arch: null, heads: 0, units: 0, vocab: 0 }, [model, arch.data, localConfig]);
   const n = module==='attn'?dims.heads:module==='mlp'?dims.units:module==='hs'?(model?.d_model||0):0;
   const q14Selected=q14Identity&&q14Config&&module==='mlp'&&q14Report.data?.blocks?.includes(layer-1)&&(!selectedStudyRun||selectedStudyRun===q14Report.data.run_id);
-  const q14Layer=useApi(q14Selected?`/api/research/qwen14-mlp/layers/${layer-1}?run=${encodeURIComponent(q14Report.data.run_id)}`:null);
+  const q14Layer=useApi(q14Selected&&!mlpAtlasRun?`/api/research/qwen14-mlp/layers/${layer-1}?run=${encodeURIComponent(q14Report.data.run_id)}`:null);
   const nativeSelected=nativeConfig&&module==='mlp'&&nativeReport.data?.blocks?.includes(layer-1)&&(!selectedStudyRun||selectedStudyRun===nativeReport.data.run_id);
-  const nativeStudyOutsideRange=nativeConfig&&selectedStudyRun===nativeReport.data?.run_id&&module==='mlp'&&(layer<19||layer>29);
-  const nativeLayer=useApi(nativeSelected?`/api/research/native-mlp/layers/${layer-1}?run=${encodeURIComponent(nativeReport.data.run_id)}`:null);
+  const nativeStudyOutsideRange=nativeConfig&&selectedStudyRun===nativeReport.data?.run_id&&module==='mlp'&&!nativeReport.data?.blocks?.includes(layer-1);
+  const nativeLayer=useApi(nativeSelected&&!mlpAtlasRun?`/api/research/native-mlp/layers/${layer-1}?run=${encodeURIComponent(nativeReport.data.run_id)}`:null);
   const vocab=dims.vocab;
   const index = module && numbered(selection.index) && selection.index < (module==='embedding'?vocab:n) ? selection.index : null;
   const coordinate=module==='embedding'&&numbered(selection.coordinate)&&selection.coordinate<model?.d_model?selection.coordinate:null;
@@ -474,9 +477,15 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
       keys: [model, dims, layer, module, index, pointValues, typeColors, archive.data, circuit.data, b35Unit.data, tail.observations],
     });
   });
-  const objectDetail = nativeSelected&&index!=null?<section className="v8-card v8-spatial-detail"><p className="v8-note">上方空间配色为长文本归档 A 的标准差，非单次运行激活。</p><NativeMlpAtlas doc={nativeReport.data} hideScene={detailOnly} selection={{block,unit:index}} onSelect={(b,u)=>change({...selected,layer:b+1,module:'mlp',index:u})}/></section>:
+  const nativeDetail = (study, Component) => {
+    const contents = <Component doc={study} hideScene={detailOnly} lockSelection={Boolean(mlpAtlasRun)}
+      selection={{block,unit:index}} onSelect={(b,u)=>change({...selected,layer:b+1,module:'mlp',index:u})}/>;
+    return mlpAtlasRun ? <ResearchDisclosure key={mlpAtlasRun} title="完整参数、跨层关联与验证记录">{contents}</ResearchDisclosure> :
+      <section className="v8-card v8-spatial-detail"><p className="v8-note">空间配色基于长文本归档 A 的标准差。</p>{contents}</section>;
+  };
+  const objectDetail = nativeSelected&&index!=null?nativeDetail(nativeReport.data,NativeMlpAtlas):
     nativeStudyOutsideRange?<section className="v8-card v8-spatial-detail"><Empty>本轮仅采集 B18–B28；当前层没有本轮原生档案。查看其他层的历史结果，请在成果库切换研究版本。</Empty></section>:
-    q14Selected&&index!=null?<section className="v8-card v8-spatial-detail"><p className="v8-note">上方空间配色为长文本归档 A 的标准差，非单次运行激活。</p><Qwen14MlpAtlas doc={q14Report.data} hideScene={detailOnly} selection={{block,unit:index}} onSelect={(b,u)=>change({...selected,layer:b+1,module:'mlp',index:u})}/></section>:!hideScene&&(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
+    q14Selected&&index!=null?nativeDetail(q14Report.data,Qwen14MlpAtlas):!hideScene&&(index!=null||view==='live'||view==='response')&&<section className="v8-card v8-spatial-detail" aria-label={index!=null?'选中索引':'当前数据'}>
       <h3>{index==null?'当前数据':module==='embedding'?`Token #${index}`:module==='hs'?`HiddenState L${layer} · 坐标 ${index}`:`B${block} · ${label(module,index)}`}</h3>
       {index!=null&&<div className="v6-toolbar" role="group" aria-label="对象详情">
         {(detailOnly ? [['feature','特征与关联'],['parameters','参数与响应'],['evidence','研究记录']] : [...((responseContent || ['live','response'].includes(view))?[['data','当前响应']]:[]),...(module==='embedding'?[]:[['feature','特征']]),...(module==='hs'?[]:[['parameters','真实参数']]),['evidence','研究证据'],['history','历史测试']]).map(([key,title])=>
@@ -542,8 +551,8 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
   return <section className="v8-route v8-structure-view" aria-label="模型结构浏览">
     <header className="v8-overview-heading">
       <div>{!compact && <h2>{VIEW_TEXT[view]?.[0] || '空间'}</h2>}{!compact && <p>{VIEW_TEXT[view]?.[1]}</p>}{model && <p className="v8-note wb-pro">{shortModel(model.model)}{model.precision ? ` · ${model.precision}` : ''} · {layers} 个 Transformer 层</p>}</div>
-      {models.length > 1 && <label className={isStructureView ? 'v8-structure-model-picker' : undefined}>模型 <select aria-label="结构模型" value={model?.model || ''} onChange={event => {
-        const next = models.find(row => row.model === event.target.value);
+      {models.length > 1 && <label className={isStructureView ? 'v8-structure-model-picker' : undefined}>模型 <select aria-label="结构模型" value={model?.model_snapshot || ''} onChange={event => {
+        const next = models.find(row => row.model_snapshot === event.target.value);
         if (!next) return;
         onModel?.(next.model);
         publishResearchContext({ snapshot: next.model_snapshot || '', run: '', trace: '', context_trace: '', pmodel: '' });
@@ -551,7 +560,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
         change(isStructureView ? { ...EMPTY, layer: undefined } : EMPTY);
       }}>
         {!model && <option value="">选择已有模型</option>}
-        {models.map(row => <option key={row.model} value={row.model}>{shortModel(row.model)}{row.precision ? ` · ${row.precision}` : ''}</option>)}
+        {models.map(row => <option key={row.model_snapshot} value={row.model_snapshot}>{shortModel(row.model)} · {row.model_snapshot.slice(0,12)}</option>)}
       </select></label>}
       <details className="v8-spatial-graph-menu wb-pro"><summary>研究图谱</summary><div className="v6-toolbar">
         {[['internal','全部研发成果'],['relations','共享关系与映射']].map(([key,label])=>
@@ -649,7 +658,7 @@ export default function ModelStructure({ modelKey, onModel, view='graph', paramT
     {objectDetail}
     {!compact&&view==='response'&&<RelationBoards/>}
     {!compact&&['graph','parameters'].includes(view)&&<BasisCompare/>}
-    {!compact&&boundSnapshot==='6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'&&<ResearchDisclosure title="尾层 MLP · 全量单元特性与上下游关联"><MlpTailAtlas/></ResearchDisclosure>}
-    {!compact&&boundSnapshot==='1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce'&&<ResearchDisclosure title="Qwen3-14B · 已采集层的全部单元特性"><Qwen14MlpAtlas/></ResearchDisclosure>}
+    {!compact&&model?.analysis?.mlpTail&&<ResearchDisclosure title="尾层 MLP · 全量单元特性与上下游关联"><MlpTailAtlas/></ResearchDisclosure>}
+    {!compact&&q14Config&&<ResearchDisclosure title={`${shortModel(model.model)} · 已采集层的全部单元特性`}><Qwen14MlpAtlas doc={q14Report.data}/></ResearchDisclosure>}
   </section>;
 }

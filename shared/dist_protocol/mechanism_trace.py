@@ -101,6 +101,45 @@ class TraceStore:
         d,_=self.manifest(identity)
         if type(block)is not int or not 0<=block<d['n_layers']:raise ValueError('block outside trace')
         with np.load(self.native_path(identity,f'block_{block:02d}.npz')) as z:return {k:z[k] for k in z.files}
+    def head_vector(self,identity,block,position,boundary,head):
+        """Slice one observed native head, preserving cache positions and GQA identity."""
+        d,_=self.manifest(identity)
+        heads,kv_heads,width=d['n_heads'],d['n_kv_heads'],d['head_dim']
+        if kv_heads<1 or width<1 or heads<1 or heads%kv_heads:raise ValueError('invalid recorded head dimensions')
+        if type(block) is not int or not 0<=block<d['n_layers']:raise ValueError('block outside trace')
+        if type(head) is not int or not 0<=head<heads:raise ValueError('query head outside trace')
+        if type(position) is not int or not 0<=position<d['n_tokens']:raise ValueError('position outside trace')
+        keys={'head_q':'q','head_k':'k','head_v':'v','head_z':'head_z'}
+        if boundary not in keys:raise ValueError('unsupported head field boundary')
+        group=head//(heads//kv_heads)
+        readouts=d['readout_positions']
+        with np.load(self.native_path(identity,f'block_{block:02d}.npz'), allow_pickle=False) as z:
+            key=keys[boundary]
+            if key not in z.files:raise KeyError('this trace did not capture '+boundary)
+            a=z[key]
+            if a.dtype!=np.uint16:raise ValueError('native head field is not BF16 bits')
+            if key=='head_z':
+                if position not in readouts:raise KeyError('head output not captured at this position')
+                if a.shape!=(len(readouts),heads,width):raise ValueError('head output shape differs from manifest')
+                bits=a[readouts.index(position),head]
+            else:
+                if not d['deep']:raise KeyError('Q/K/V require a deep trace')
+                count=heads if key=='q' else kv_heads
+                if a.ndim!=3 or a.shape[0]!=count or a.shape[2]!=width:raise ValueError('head field shape differs from manifest')
+                local_position=position
+                if a.shape[1]!=d['n_tokens']:
+                    # A cached forward records Q only for newly processed suffix tokens,
+                    # while its post-cache K and V contain the full prefix.
+                    offset=d['n_tokens']-a.shape[1]
+                    cached=bool(d.get('parent_trace_id') or d.get('generation_step'))
+                    if key!='q' or not cached or offset<=0 or not readouts or min(readouts)<offset:
+                        raise ValueError('native position axis cannot be aligned to this manifest')
+                    if position<offset:raise KeyError('historical query not recaptured in this cached forward')
+                    local_position-=offset
+                bits=a[head if key=='q' else group,local_position]
+        return {'schema':'mechanism_head_vector.v1','kind':'real','trace_id':identity,'model_snapshot':d['model_snapshot'],
+                'block':block,'head':head,'kv_group':group,'position':position,'boundary':boundary,
+                'shape':[width],'values':unbits(bits).tolist(),'source':'native_BF16_bits'}
     def field(self,identity,block,position,boundary):
         d,_=self.manifest(identity);z=self.block(identity,block)
         allowed={'mlp_gate':'gate','mlp_value':'value','mlp_activation':'activation','mlp_output':'mlp_output',

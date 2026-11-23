@@ -2,13 +2,18 @@
    正式主张卡要随预注册冻结（scripts/mainline_h*.py 的 prereg 步骤），草稿本身不算冻结。 */
 import { useState } from 'react';
 
-import prereg from '../../../../research/mainline/H0/MA-H0-v3.prereg.json';
+import { useWorkspaceResource } from './nativeObservationArchive.js';
 import './client_guide.css';
 
-const BASE = prereg.claim_card;
 const blank = () => ({ id: '', name: '', mechanism: '', behavior: '', later: '' });
 
 export default function ClaimDraft() {
+  const {data,error} = useWorkspaceResource('h0-prereg');
+  if (!data?.claim_card) return <p className="v8-note">{error||'等待中心主张卡。'}</p>;
+  return <DraftForm initial={data.claim_card}/>;
+}
+
+function DraftForm({initial:BASE}) {
   const [card, setCard] = useState(() => ({
     claim: BASE.claim, model: BASE.model, readout: BASE.readout,
     factors: { ...BASE.factors }, hypotheses: BASE.hypotheses.map(h => ({ ...h })), decisions: BASE.decisions.map(d => [...d]),

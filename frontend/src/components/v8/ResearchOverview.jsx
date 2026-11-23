@@ -14,6 +14,7 @@ import { ScoreBoard } from './SpaceGuides.jsx';
 
 import CapabilityMatrix from './CapabilityMatrix.jsx';
 import { Bar, PageHead, PillTools } from './CoreKit.jsx';
+import { useWorkspaceResource } from './nativeObservationArchive.js';
 
 const TOPICS = [['KN', '知识网络'], ['RS', '推理与功能'], ['GR', '语法体系']];
 const CARDS = [
@@ -179,10 +180,13 @@ function FrozenTemplates({ snapshot, onGo }) {
 }
 
 export default function ResearchOverview({ onGo, tree, skeletons = {}, model, dataset, open = '', renderLanguage, onOpenUnit }) {
-  const { CLAIMS, FINDINGS, SCORES, revision } = useMainline();
+  const testIndex = useWorkspaceResource('goodfire-records').data;
+  const firstRecord = useWorkspaceResource('first-record').data;
+  const { CLAIMS, SCORES, revision } = useMainline();
   const { snapshot, run } = useResearchContext();
   const packages = atMainlineRevision(useApi('/api/research-library/workpackages'), revision);
   const [topic, setTopic] = useState('');
+  const [more, setMore] = useState('');
   const modelList = Object.values(skeletons);
   const matched = snapshot ? modelList.filter(entry => entry.model_snapshot === snapshot) : [];
   const skeleton = snapshot ? matched.find(entry => entry.model === model) || (matched.length === 1 ? matched[0] : null) : skeletons[model];
@@ -288,9 +292,9 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
       <span className="v8-overview-action">{open === id ? '收起 ↑' : '查看详情 →'}</span>
     </button>;
   };
-  /* 线上版的结构（Phase 334）：页面标题 → 三张卡片 → 点开的详情 → 左对齐折叠行 */
+  const moreSections = [['findings', '研究发现'], ['validation', '验证进展'], ['archive', '研究资料']];
   return <div className="v8-route v8-overview">
-    <PageHead title="语言机制研究总览" sub="我们在破解什么：语言里的知识、推理和语法，在模型里怎样编码。分三部分：语言图谱、LLM 编码图谱，以及把两边对上的关联机制。"
+    <PageHead visible title="语言机制研究总览" sub="探索语言里的知识、推理和语法如何在模型中编码。"
       note={analysisModel ? `覆盖统计 · ${[shortModel(analysisModel), analysisModel.split('|')[2]].filter(Boolean).join(' · ')}` : '当前范围暂无可核对的统计模型。'}>
       <details className="v8-overview-scope wb-pro">
         <summary title={snapshot || undefined}>{snapshot ? `模型快照 ${snapshot.slice(0, 12)}` : '全部研究'}</summary>
@@ -303,18 +307,46 @@ export default function ResearchOverview({ onGo, tree, skeletons = {}, model, da
         </select></label>
       </details>
     </PageHead>
+    <section className="v8-card v8-overview-test-index" aria-label="测试记录概况">
+      <div className="wb-index-summary"><span>中心发布的历史记录</span><strong>{testIndex?.records?.length ?? '—'}<small> 条</small></strong></div>
+      <div className="wb-index-links">
+        <button type="button" className="fw-tbtn primary" onClick={()=>onGo('route',null,null,{rtab:'database',record:''})}>打开测试数据库</button>
+        {firstRecord?.archiveState==='server_verified'&&<button type="button" className="fw-tbtn"
+          onClick={()=>onGo('route',null,null,{rtab:'database',record:firstRecord.runId})}>查看首行头干预归档</button>}
+      </div>
+    </section>
     {packages.error && <p className="v8-note" role="status">工作包暂不可用。{packages.error}</p>}
     <div className="ck-cards">{['language', 'internal', 'relations'].map(card)}</div>
     {detail}
-    <CapabilityMatrix onOpenClaim={() => onGo('process', 'plan')} />
-    <PillTools label="总览的更多内容" items={[
-      { id: 'case', label: '一个决策点案例', render: () => <div className="cg-next"><p className="v8-note">一份资料、一个问题：模型在第几层开始按“资料”或“现实”取颜色，哪些注意力头在读资料。数据来自主线 H2 的 discovery 采集。</p>
-        <button type="button" className="fw-tbtn primary" onClick={() => onGo('spatial', 'live')}>打开模型探索</button></div> },
-      { id: 'scores', label: `四组成绩 · ${scored} / ${SCORES.length}`, render: () => <ScoreBoard bare/> },
-      { id: 'findings', label: `最近的发现 · ${FINDINGS.length}`, render: () => <LatestFindings onGo={onGo} bare/> },
-      { id: 'next', label: '下一步', render: () => <NextStep onGo={onGo}/> },
-      { id: 'plan', label: '阶段任务与历史分片', pro: true, render: () => <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} /> },
-      { id: 'archive', label: '研究归档与原始来源', pro: true, render: () => <ResearchLibrary compact /> },
-    ]} />
+    <div className="v8-overview-more">
+      <div className="v8-overview-more-links" role="group" aria-label="总览的更多内容">
+        {moreSections.map(([id, label]) => <button key={id} type="button" className="fw-tbtn"
+          aria-expanded={more === id} aria-controls="overview-more-panel"
+          onClick={() => setMore(more === id ? '' : id)}>{label}</button>)}
+      </div>
+      <section id="overview-more-panel" className="v8-card v8-overview-more-panel"
+        aria-label={moreSections.find(([id]) => id === more)?.[1]} hidden={!more}>
+        {more === 'findings' && <>
+          <LatestFindings onGo={onGo} bare />
+          <ResearchDisclosure title="一个决策点案例">
+            <div className="cg-next">
+              <p className="v8-note">模型在哪一层开始区分资料里的颜色和现实中的颜色？数据来自主线 H2 的发现集。</p>
+              <button type="button" className="fw-tbtn" onClick={() => onGo('spatial', 'live')}>打开模型分析</button>
+            </div>
+          </ResearchDisclosure>
+          <NextStep onGo={onGo} />
+        </>}
+        {more === 'validation' && <>
+          <ScoreBoard />
+          <ResearchDisclosure title="能力矩阵与证据状态">
+            <CapabilityMatrix onOpenClaim={() => onGo('process', 'plan')} />
+          </ResearchDisclosure>
+        </>}
+        {more === 'archive' && <PillTools label="研究资料来源" items={[
+          { id: 'plan', label: '阶段任务与历史分片', pro: true, render: () => <FrozenTemplates key={snapshot} snapshot={snapshot} onGo={onGo} /> },
+          { id: 'archive', label: '研究归档与原始来源', pro: true, render: () => <ResearchLibrary compact /> },
+        ]} />}
+      </section>
+    </div>
   </div>;
 }

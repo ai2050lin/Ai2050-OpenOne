@@ -1,0 +1,129 @@
+.free-window[hidden],
+.free-window .fw-controls,
+.free-window .fw-resize {
+  display: none;
+}
+
+:where(#free-workbench).fw-floating {
+  position: relative;
+}
+
+.fw-floating #free-windows {
+  position: absolute;
+  inset: var(--fw-top, 60px) 0 var(--fw-bottom, 0px);
+  z-index: var(--fw-stack, 8);
+  display: block;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.fw-floating #free-windows > .free-window {
+  position: absolute;
+  display: flex;
+  flex-flow: column nowrap;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: auto;
+  border: 1px solid var(--fw-border, #acbec9);
+  border-radius: 9px;
+  background: var(--fw-surface, #fff);
+  color: var(--fw-text, #203340);
+  box-shadow: 0 8px 28px #18334425, 0 1px 3px #18334419;
+}
+
+.fw-floating #free-windows > .free-window[hidden] { display: none; }
+.fw-floating #free-windows > .fw-front { border-color: var(--fw-accent, #397e85); }
+.fw-floating .free-window .window-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 3px 6px 3px 12px;
+  box-sizing: border-box;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  border-bottom: 1px solid var(--fw-border, #d4dfe4);
+  background: var(--fw-bar, #f3f7f8);
+}
+
+.fw-floating .free-window .window-bar:active { cursor: grabbing; }
+.fw-floating .free-window .window-bar h2 {
+  min-width: 0;
+  margin: 0 auto 0 0;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fw-floating .free-window .window-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.fw-floating .fw-controls { display: flex; gap: 1px; margin-left: auto; flex: none; }
+.fw-floating .fw-controls button, .fw-floating .free-window .fw-resize {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  height: 27px;
+  width: 27px;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.fw-floating .fw-controls button { cursor: pointer; }
+.fw-floating .fw-controls button:hover, .fw-floating .fw-controls button[aria-pressed="true"] {
+  background: var(--fw-selected, #dcebec);
+}
+.fw-floating .fw-controls button svg, .fw-floating .fw-resize svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.fw-floating .window-bar:focus-visible, .fw-floating .fw-controls button:focus-visible,
+.fw-floating .free-window .fw-resize:focus-visible {
+  outline: 2px solid var(--fw-accent, #397e85);
+  outline-offset: -2px;
+}
+.fw-floating .free-window .fw-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--fw-grip, #758a94);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.fw-floating .fw-collapsed .window-content,
+.fw-floating .free-window.fw-collapsed .fw-resize,
+.fw-floating .free-window.fw-maximized .fw-resize { display: none; }
+.fw-floating .free-window.fw-collapsed .window-bar { border-bottom: none; }
+.fw-floating .free-window.fw-maximized .window-bar { cursor: default; }
+@media (pointer: coarse) {
+  .fw-floating .fw-controls button { width: 34px; height: 34px; }
+  .fw-floating .free-window .fw-resize { width: 28px; height: 28px; }
+}

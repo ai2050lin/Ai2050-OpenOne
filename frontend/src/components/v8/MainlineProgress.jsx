@@ -75,6 +75,7 @@ export function MainlineCard({ ring = false, claim: suppliedClaim }) {
 export function ClaimSummary({ claim: suppliedClaim }) {
   const { CLAIMS } = useMainline();
   const claim = suppliedClaim || CLAIMS[0];
+  if (!claim) return <p className="v8-note">等待中心主张记录。</p>;
   return <div className="mp-claim-body">
     <p><b>{claim.id}</b> · {claim.source} · {claim.model}</p>
     <p>{claim.claim}</p>

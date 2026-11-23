@@ -1,12 +1,14 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { atMainlineRevision, bundledState, MainlineContext, readSnapshot } from './data/mainlineState.js';
+import { atMainlineRevision, MainlineContext, readSnapshot } from './data/mainlineState.js';
 import { LockboxTable, MainlineCard } from './MainlineProgress.jsx';
 import { TestsPanel } from './AssocConsole.jsx';
 import { MainlineStatus } from './MainlineProvider.jsx';
 import release from '../../../../shared/dist_protocol/mainline_release.json';
 import MainlineReport from './MainlineReport.jsx';
+
+const bundledState = release.state;
 
 async function envelope(state) {
   const record = JSON.stringify(state);
@@ -35,7 +37,7 @@ describe('中心研究状态与同一版本页面', () => {
     expect(html).toContain('未记录');
   });
   it('确认集开封、H3b负结果、尚未测量的独立预测分别显示', () => {
-    const html = renderToStaticMarkup(<><MainlineCard/><LockboxTable/><TestsPanel/></>);
+    const html = renderToStaticMarkup(<MainlineContext.Provider value={{...bundledState.view,state:bundledState}}><MainlineCard/><LockboxTable/><TestsPanel/></MainlineContext.Provider>);
     expect(html).toContain('已开封');
     expect(html).toContain('未达 0.6');
     expect(html).toContain('0.9885');
@@ -52,7 +54,7 @@ describe('中心研究状态与同一版本页面', () => {
     </MainlineContext.Provider>);
     for (const text of ['中心研究记录','中心新结果一起更新','中心新开封记录','中心新范围检验']) expect(html).toContain(text);
   });
-  it('断网时明确显示随包来源', () => {
+  it('无中心记录时明确显示空态', () => {
     expect(renderToStaticMarkup(<MainlineStatus/>)).toContain('尚未接通中心记录');
   });
   it('校验完整记录哈希和模型身份', async () => {

@@ -97,6 +97,11 @@ def create_app():
         from server.research_space_service import router as research_space_router
         app.include_router(research_space_router, prefix='/api/traces')
     app.include_router(library_router)
+    from deploy.test_archive_service import router as test_archive_router
+    app.include_router(test_archive_router)
+    from deploy.workspace_service import router as workspace_router, PRIVATE as private_workspace_router
+    app.include_router(workspace_router)
+    app.include_router(private_workspace_router)
     from deploy.mainline_state_service import router as mainline_state_router
     app.include_router(mainline_state_router)
     from server.mlp_tail_service import router as mlp_tail_router

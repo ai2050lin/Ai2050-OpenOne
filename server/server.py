@@ -309,9 +309,11 @@ app.include_router(rdc_binding_router)
 app.include_router(rdc_update_router)
 app.include_router(research_workspace_router)
 from deploy.research_library import router as research_library_router
+from deploy.workspace_service import router as workspace_catalog_router
 from deploy.lang_map_service import router as lang_map_router
 from deploy.parameter_service import router as parameter_browser_router
 app.include_router(research_library_router)
+app.include_router(workspace_catalog_router)
 app.include_router(lang_map_router)
 from deploy.mainline_state_service import router as mainline_state_router
 app.include_router(mainline_state_router)

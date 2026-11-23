@@ -11,7 +11,7 @@ export default function ObservationTask({ execute, observe, preview, disabled, b
   return <section className="aw-task" aria-label="自动文本任务">
     <div className="v6-toolbar"><label>任务 <select aria-label="观察任务类型" value={kind} disabled={busy||!!pending} onChange={e=>build(e.target.value,variant)}>{TASKS.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label><button type="button" className="fw-tbtn" disabled={busy||!!pending} onClick={()=>build(kind,variant+1)}>生成另一组文本</button><b>{Object.keys(results).length} / 2 已运行</b></div>
     <p>{TASKS.find(t=>t.id===kind).question}</p>
-    <p className="v8-note">探索任务 · 2 条长文本，逐条手动运行，每条最多 1024 输入 token。使用本机 Qwen3-4B、占用 GPU，并保存原生轨迹；超长输入由服务拒绝，不截断。这里只检验下一 token，不是完整回答或正式研究结论。</p>
+    <p className="v8-note">探索任务 · 逐条手动运行，每条最多 1024 输入 token。使用与中心所选快照一致的本机权重，占用 GPU，并保存原生轨迹。支持查看下一 token，超长输入会提示原因。</p>
     {disabled&&<p className="v8-note">{disabled}</p>}
     {rows.map(row=>{const result=results[row.id],top=result?.top?.[0];return <div className="aw-task-row" key={row.id}>
       <b>条件 {row.condition}</b><span>{row.text.length} 字符 · 目标颜色：{row.expected}</span>
@@ -24,6 +24,9 @@ export default function ObservationTask({ execute, observe, preview, disabled, b
     {comparison.layers.length>0&&<><h4>原生坐标逐层对照</h4><p className="v8-note">相对变化 = ‖B−A‖₂ / ‖A‖₂。点击某层，在3D查看条件 B；颜色深浅不表示因果重要性。L0 是词嵌入基线，末层已过最终归一化。</p>
       <div className="aw-task-layers">{comparison.layers.map(l=><button type="button" className="fw-tbtn" key={l.layer} disabled={busy||!!pending} title={`cos=${l.cosine??'未定义'}；相对变化=${l.relativeL2??'未定义'}`} onClick={()=>observe(b,rows[1].text,rows[1].condition,l.layer)}>L{l.layer}<br/>{l.relativeL2?.toFixed(3)??'—'}</button>)}</div>
       <ResearchDisclosure title="全部层数值与分析口径"><table className="v6-table"><thead><tr><th>层</th><th>余弦相似度</th><th>相对 L2</th></tr></thead><tbody>{comparison.layers.map(l=><tr key={l.layer}><td>{l.layer}</td><td>{l.cosine?.toFixed(6)??'未定义'}</td><td>{l.relativeL2?.toFixed(6)??'未定义'}</td></tr>)}</tbody></table><p>全部原生坐标参与计算，没有用 Top-K 定义结构。仅两条探索输入，无独立留出、统计检验或因果干预；不能据此定位语义神经元。任务汇总仅保留在当前页面会话。</p></ResearchDisclosure></>}
-    <ResearchDisclosure title="输入、轨迹与原始分析记录"><pre className="v8-artifact-json">{JSON.stringify({schema:'observation_task.v1',kind,variant,scope:'unregistered_exploration',rows:rows.map(r=>({...r,trace:results[r.id]?.id,snapshot:results[r.id]?.snapshot,readout:results[r.id]?.readout,top:results[r.id]?.top})),analysis:comparison},null,2)}</pre></ResearchDisclosure>
+    <section aria-labelledby="aw-task-raw-title">
+      <h4 id="aw-task-raw-title">输入、轨迹与原始分析记录</h4>
+      <pre className="v8-artifact-json">{JSON.stringify({schema:'observation_task.v1',kind,variant,scope:'unregistered_exploration',rows:rows.map(r=>({...r,trace:results[r.id]?.id,snapshot:results[r.id]?.snapshot,readout:results[r.id]?.readout,top:results[r.id]?.top})),analysis:comparison},null,2)}</pre>
+    </section>
   </section>;
 }

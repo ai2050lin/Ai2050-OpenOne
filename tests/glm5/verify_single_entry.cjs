@@ -11,7 +11,7 @@ try{
  await page.goto(`${base}/workbench?lens=spatial`);
  await page.waitForFunction(()=>document.querySelector('.aw-canvas canvas')?.getAttribute('aria-label')?.includes('36 层'));
  assert.equal(await page.getByRole('button',{name:'LLM 编码图谱',exact:true}).count(),0);
- assert.equal(await page.getByRole('button',{name:'模型探索',exact:true}).count(),1);
+ assert.equal(await page.getByRole('button',{name:'模型分析',exact:true}).count(),1);
  assert.equal(await page.getByRole('button',{name:'语言图谱',exact:true}).count(),1);
  const observation=page.getByRole('group',{name:'观察方式',exact:true});
  assert.equal(await observation.getByRole('button',{name:'结构与档案',exact:true}).getAttribute('aria-pressed'),'true');

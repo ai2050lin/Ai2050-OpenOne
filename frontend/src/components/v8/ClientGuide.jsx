@@ -2,7 +2,7 @@ import { useMainline } from './data/mainlineState.js';
 /* 研究工作台 · 三部分研究框架的共用内容。
    语言图谱、LLM 内部图谱、两图谱关联贯穿各页；这里放页面共用的白话摘要、归因图和保真看板。
    约束：研究数字来自接口或登记过的记录；归因图是未预注册的界面演示，不计入研究证据；没有跑过的实验写“未测”。 */
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useApi } from '../app/rdc_fusion/api.js';
 import { Empty } from '../app/rdc_fusion/ui.jsx';
@@ -11,7 +11,16 @@ import { shortModel } from './v8Util.js';
 
 import './client_guide.css';
 
-export const DEMO_SNAPSHOT = '6be1034f0b55a6df';
+import { useWorkspaceCatalog, useWorkspaceResource } from './nativeObservationArchive.js';
+
+function useModelResource(kind, snapshot) {
+  const {catalog, error} = useWorkspaceCatalog();
+  const descriptor = catalog?.resources.find(entry=>entry.kind===kind && entry.snapshot===snapshot);
+  const model = catalog?.models.find(entry=>entry.model_snapshot===snapshot);
+  const result = useWorkspaceResource(descriptor?.id);
+  return {...result, registered:Boolean(descriptor), model, error:result.error||error};
+}
+
 export const EVIDENCE = {
   observation: ['obs', '看到过'], heldout: ['held', '新材料也成立'], intervention: ['int', '改动后输出变了'],
   negative: ['neg', '未成立'], parameter_source: ['read', '权重可算'],
@@ -109,16 +118,18 @@ export function CatalogSummary({ templates, models, tokens }) {
 const FLOW_ROWS = [['语言（中/英）', 'ENT-XF', 'lang'], ['语法', 'GR-Q', 'mood'], ['知识', 'KN-ISA', 'category'], ['上下文逻辑', 'ENT-XF', 'polarity'], ['任务线索', 'ENT-XF', 'task']];
 
 export function InfoFlowMap({ model }) {
+  const [selectedLayer,setLayer] = useState(0);
   const overlay = useApi(model ? `/api/space/overlay?model_key=${encodeURIComponent(model)}` : null);
-  const [layer, setLayer] = useState(13);
+  const maxLayer = Math.max(0,...(overlay.data?.route_T||[]).flatMap(item=>item.layers||[]));
+  const layer = Math.min(selectedLayer,maxLayer);
   const rows = useMemo(() => FLOW_ROWS.map(([name, family, factor]) => {
     const row = (overlay.data?.route_T || []).find(item => item.family_id === family && item.factor === factor);
     if (!row?.sep?.some(value => value != null)) return { name, values: null };
-    const values = Array.from({ length: 37 }, () => null);
-    row.layers.forEach((hs, index) => { if (hs <= 36) values[hs] = row.sep[index]; });
+    const values = Array.from({ length: maxLayer+1 }, () => null);
+    row.layers.forEach((hs, index) => { values[hs] = row.sep[index]; });
     const max = Math.max(...values.slice(1).filter(value => value != null));
     return { name, values, max, peak: values.indexOf(max) };
-  }), [overlay.data]);
+  }), [overlay.data,maxLayer]);
   const strong = rows.filter(row => row.values?.[layer] != null && row.values[layer] / row.max >= .7).map(row => row.name);
   return <section className="v8-card cg-section" aria-label="HiddenState 流中的信息">
     <div className="cg-flow"><div><b>词嵌入</b><small>词 → 数字</small></div><span aria-hidden="true">→</span><div><b>HiddenState 流</b><small>多种信息叠在同一条流里</small></div><span aria-hidden="true">→</span><div><b>输出</b><small>下一个词</small></div></div>
@@ -129,8 +140,8 @@ export function InfoFlowMap({ model }) {
       <div className="cg-cells">{row.values ? row.values.map((value, index) => <i key={index} title={value == null ? `第 ${index} 层：无数据` : `第 ${index} 层：${value}`}
         className={index === layer ? 'on' : ''} style={{ background: value == null ? '#eef1f5' : `rgba(24,79,149,${(.06 + .94 * Math.min(1, value / row.max)).toFixed(2)})` }}/>) : <span className="v8-note">当前模型暂无这一行数据</span>}</div>
       <small>{row.values ? `最清楚：第 ${row.peak} 层` : ''}</small></div>)}
-      <div className="cg-heat-row"><strong>风格</strong><span className="v8-note">第 3 层起全程可读，中后层只能“打开”不能“关闭”（Phase 275）。逐层曲线待接入。</span></div></div>}
-    <label>移动到某一层：{layer === 0 ? '词嵌入（第 0 层）' : `第 ${layer} 层`}<input type="range" min="0" max="36" value={layer} onChange={event => setLayer(Number(event.target.value))}/></label>
+      </div>}
+    <label>移动到某一层：{layer === 0 ? '词嵌入（第 0 层）' : `第 ${layer} 层`}<input type="range" min="0" max={maxLayer} value={layer} onChange={event => setLayer(Number(event.target.value))}/></label>
     <p>{strong.length ? `这一层较清楚：${strong.join('、')}` : '这一层没有信息接近各自的最高值'}</p>
     <p className="v8-note">第 0 层就能分开语言，多半来自词本身，不算模型计算出来的。能读出也不等于模型实际使用了它。</p>
   </section>;
@@ -141,31 +152,25 @@ const W = 760, H = 470;
 const nodeName = node => `第 ${node.l} 块 · ${node.k === 'm' ? '神经元' : 'Head'} ${node.i}`;
 
 export function AttributionGraph({ snapshot, onOpen }) {
-  const [data, setData] = useState(null), [error, setError] = useState('');
+  const {data, error, registered, model} = useModelResource('attribution',snapshot);
   const [graphIndex, setGraphIndex] = useState(0), [selected, setSelected] = useState(0);
-  const matches = (snapshot || '').startsWith(DEMO_SNAPSHOT);
-  useEffect(() => {
-    if (!matches) return undefined;
-    let live = true;
-    import('./data/qwen3_4b_attr_demo.json').then(file => { if (live) setData(file.default); }).catch(reason => { if (live) setError(reason.message); });
-    return () => { live = false; };
-  }, [matches]);
-  const graph = data?.graphs[graphIndex];
+  const graph = data?.graphs?.[graphIndex];
+  const lastBlock = Math.max(1,(model?.n_layers||1)-1);
   const layout = useMemo(() => {
     if (!graph) return null;
-    const last = Math.max(1, graph.tokens.length - 1), x = position => 70 + position * (W - 150) / last, y = layer => 415 - layer / 35 * 365;
+    const last = Math.max(1, graph.tokens.length - 1), x = position => 70 + position * (W - 150) / last, y = layer => 415 - layer / lastBlock * 365;
     const seen = {}, maxNode = Math.max(...graph.nodes.map(node => Math.abs(node.s)));
     const points = graph.nodes.map(node => {
       const key = `${node.p}:${Math.floor(node.l / 3)}`, order = seen[key] = (seen[key] || 0) + 1;
       return [x(node.p) + (order % 2 ? 1 : -1) * Math.floor(order / 2) * 18, y(node.l)];
     });
     return { x, points, maxNode, maxEdge: Math.max(.0001, ...graph.edges.map(edge => Math.abs(edge[2]))) };
-  }, [graph]);
-  if (!matches) return <section className="v8-card cg-section"><h3>这句话的归因图</h3><p className="v8-note">演示数据只对应 Qwen3-4B 快照 {DEMO_SNAPSHOT}。切换到这个模型后可以查看。</p></section>;
+  }, [graph,lastBlock]);
+  if (!registered) return <section className="v8-card cg-section"><h3>这句话的归因图</h3><p className="v8-note">{error||"当前快照暂无中心归因示例。"}</p></section>;
   const node = graph?.nodes[Math.min(selected, graph.nodes.length - 1)];
   const percent = value => `${(100 * value).toFixed(1)}%`;
   return <section className="v8-card cg-section" aria-label="单句归因图"><h3>这句话的归因图</h3>
-    <p className="v8-note">模型为什么说出这个词？下面三句用本机 Qwen3-4B 实算，是未预注册的界面演示，不计入研究证据。</p>
+    <p className="v8-note">模型为什么说出这个词？下面的示例来自中心公开档案，是未预注册的界面演示，不计入研究证据。</p>
     <div className="v6-toolbar">{['知识网络', '推理与功能', '语法体系'].map((label, index) => <button type="button" className="fw-tbtn" key={label} aria-pressed={graphIndex === index} onClick={() => { setGraphIndex(index); setSelected(0); }}>{label}</button>)}</div>
     {error && <Empty>{error}</Empty>}
     {!graph && !error && <p className="v8-note">读取归因数据…</p>}
@@ -266,24 +271,12 @@ export function LayerList({ tower, onPick }) {
     })}</div></section>;
 }
 
-function useDataFile(enabled, load) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    if (!enabled) return undefined;
-    let live = true;
-    load().then(file => { if (live) setData(file.default); }).catch(() => {});
-    return () => { live = false; };
-  }, [enabled, load]);
-  return data;
-}
-const loadHeadInfo = () => import('./data/qwen3_4b_head_info.json');
-const loadHeadWeights = () => import('./data/qwen3_4b_head_weights.json');
-
 export function HeadFeature({ snapshot, block, head }) {
-  const matches = (snapshot || '').startsWith(DEMO_SNAPSHOT), info = useDataFile(matches, loadHeadInfo);
-  if (!matches) return <p className="v8-note">Head 读写数据目前只有 Qwen3-4B。</p>;
+  const {data:info, registered, error} = useModelResource('head-info',snapshot);
+  if (!registered || error) return <p className="v8-note">{error||'当前快照暂无中心 Head 读写档案。'}</p>;
   if (!info) return <p className="v8-note">读取 Head 数据…</p>;
-  const out = info.ov[`${block}:${head}`];
+  const out = info.ov?.[`${block}:${head}`];
+  if (!out) return <p className="v8-note">中心档案未覆盖这个 Head。</p>;
   return <div className="cg-grid2"><div><h4>它主要写出什么</h4><p className="v8-note">O 矩阵最强方向投到词表的两端，只是直接通路近似。</p>
     <strong>一端</strong><div className="cg-tokens">{out[1].map((token, index) => <code key={index}>{token}</code>)}</div>
     <strong>另一端</strong><div className="cg-tokens">{out[2].map((token, index) => <code key={index}>{token}</code>)}</div></div>
@@ -301,18 +294,22 @@ function decode(text) {
 }
 
 export function HeadInternals({ snapshot, block, head }) {
-  const matches = (snapshot || '').startsWith(DEMO_SNAPSHOT), weights = useDataFile(matches, loadHeadWeights);
+  const {data:weights, registered, model, error} = useModelResource('head-weights',snapshot);
   const [cell, setCell] = useState(null);
-  if (!matches) return null;
+  if (!registered) return null;
+  if (error) return <p className="v8-note">{error}</p>;
   if (!weights) return <p className="v8-note">读取 Head 权重数据…</p>;
-  const group = Math.floor(head / 4), layer = weights.L[block];
-  const parts = [['q', 'Q 查询：它想找什么', '这个 Head 独有', head], ['k', 'K 键：内容怎样被找到', `第 ${group} 组，4 个 Head 共用`, group], ['v', 'V 值：找到后带走什么', `第 ${group} 组，4 个 Head 共用`, group], ['o', 'O 输出：写回信息流', '这个 Head 独有', head]];
+  const width = model?.head_dim, headsPerGroup = model?.n_heads/model?.n_kv_heads;
+  const layer = weights.L[block];
+  if (!layer || !width || !Number.isInteger(headsPerGroup)) return <p className="v8-note">当前对象缺少可核验的权重维度。</p>;
+  const group = Math.floor(head / headsPerGroup);
+  const parts = [['q', 'Q 查询：它想找什么', '这个 Head 独有', head], ['k', 'K 键：内容怎样被找到', `第 ${group} 组，${headsPerGroup} 个 Head 共用`, group], ['v', 'V 值：找到后带走什么', `第 ${group} 组，${headsPerGroup} 个 Head 共用`, group], ['o', 'O 输出：写回信息流', '这个 Head 独有', head]];
   return <section className="cg-section" aria-label="Head 内部全部维度"><h4>Head 内部的全部维度</h4>
-    <p className="v8-note">Q、K、V、O 各 128 维，共 512 个。颜色越深，这一维的权重向量越长。这是固定参数强度，不是运行时激活；单个维度不等于一个概念。</p>
+    <p className="v8-note">Q、K、V、O 各 {width} 维，共 {4*width} 个。颜色越深，这一维的权重向量越长。这是固定参数强度，不是运行时激活；单个维度不等于一个概念。</p>
     <div className="cg-head-grid">{parts.map(([key, title, note, offset]) => {
       const values = decode(layer[key]), [low, high] = layer.s[key];
-      return <div key={key}><strong>{title}</strong><small>{note}</small><div className="cg-dims">{Array.from({ length: 128 }, (_, dim) => {
-        const value = values[offset * 128 + dim], depth = Math.max(0, Math.min(1, (value - low) / Math.max(1, high - low))), label = `${key.toUpperCase()} 第 ${dim} 维：${(value / 1000).toFixed(3)}`;
+      return <div key={key}><strong>{title}</strong><small>{note}</small><div className="cg-dims">{Array.from({ length: width }, (_, dim) => {
+        const value = values[offset * width + dim], depth = Math.max(0, Math.min(1, (value - low) / Math.max(1, high - low))), label = `${key.toUpperCase()} 第 ${dim} 维：${(value / 1000).toFixed(3)}`;
         return <button type="button" key={dim} title={label} aria-label={label} className={cell?.key === key && cell.dim === dim ? 'on' : ''}
           style={{ background: `rgba(24,79,149,${(.04 + .96 * depth).toFixed(3)})` }} onClick={() => setCell({ key, dim, value: value / 1000 })}/>;
       })}</div><div className="cg-scale"><small>浅 {(low / 1000).toFixed(2)}</small><small>深 {(high / 1000).toFixed(2)}</small></div></div>;

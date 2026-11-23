@@ -39,6 +39,12 @@ def get_native_parameter(model: str = "qwen4", case: int = 0, j: int = 0, k: int
     return query(model, case, j, k, checkpoint, token)
 
 
+@router.get("/native-parameter/models")
+def get_native_parameter_models():
+    from .native_parameter_query import models
+    return {'schema':'native_parameter_models.v1','models':models()}
+
+
 @router.get("/health")
 async def research_asset_health():
     root = research_asset_root()

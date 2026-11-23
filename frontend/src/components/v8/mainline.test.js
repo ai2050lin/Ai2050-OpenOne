@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 import { normalizeState, spaceMode, spaceTab } from '../app/workbenchUtil.js';
 import { BASIS, EDGES, NODES } from './data/lang_graph_seed.js';
-import { CAPABILITIES, CAP_LEVELS, CLAIMS, CLAIM_LIFE, LIFECYCLE, STAGES, TESTS, achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
+import { achievedPower, nRequired, pct, stageProgress } from './data/mainline.js';
+import release from '../../../../shared/dist_protocol/mainline_release.json';
+const { CAPABILITIES, CAP_LEVELS, CLAIMS, CLAIM_LIFE, LIFECYCLE, STAGES, TESTS } = release.state.view;
 
 describe('统一关联机制与外部语言图谱的路由', () => {
   const mode = input => { const st = normalizeState(input); return [spaceMode(st.view, st.gview), spaceTab(st.view, st.gview)]; };
@@ -25,7 +27,7 @@ describe('统一关联机制与外部语言图谱的路由', () => {
 
 describe('主线进度', () => {
   it('没有登记完成的阶段时总进度为 0，下一步是 H0', () => {
-    const progress = stageProgress();
+    const progress = stageProgress(STAGES);
     expect(progress.total).toBe(8);
     expect(progress.done).toBe(STAGES.filter(s => s.done.length === s.gates.length).length);
     expect(stageProgress(STAGES.map(s => ({ ...s, done: [] }))).next.id).toBe('H0');

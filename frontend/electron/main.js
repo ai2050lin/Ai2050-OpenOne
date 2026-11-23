@@ -16,6 +16,8 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const { createHash } = require('node:crypto');
+const { fileURLToPath } = require('node:url');
 const { NodeSupervisor } = require('./nodeSupervisor');
 const { RuntimeInstaller, readRuntime } = require('./runtimeInstaller');
 const { AiAssistant } = require('./aiAssistant');
@@ -283,7 +285,9 @@ function buildMenu() {
                           : custom + '\n\n界面会显示「未接入」空态，请检查地址或网络。'),
             });
             nodeSup.stop().then(() => nodeSup.start(custom));
-            if (mainWindow) mainWindow.reload();
+            const previous = mainWindow;
+            createWindow(custom);
+            if (previous && !previous.isDestroyed()) previous.close();
           },
         },
         { type: 'separator' },
@@ -322,8 +326,8 @@ function buildMenu() {
                 '客户端版本：' + app.getVersion() + '\n' +
                 '服务器：' + (cfg.server || '未配置') + '\n' +
                 '连通性：' + (cfg.verified ? '已验证' : '未验证或失败') + '\n\n' +
-                '全部实验数据来自服务器端，客户端不内置数据。\n' +
-                '连接不可用时面板显示「未接入」空态，不伪造结果。',
+                '模型和已发布归档由所连中心提供。断网时可查看上次同步的公开资料。\n' +
+                '没有匹配的读数时，面板会说明缺测原因。',
             });
           },
         },
@@ -350,7 +354,7 @@ function ensureLiveOnly() {
         let body = '';
         res.on('data', c => { body += c; });
         res.on('end', () => {
-          try { const d = JSON.parse(body); resolve(d.status === 'ready' || d.status === 'loading'); }
+          try { const d = JSON.parse(body); resolve(d.schema === 'live_status.v1'); }
           catch { resolve(false); }
         });
       });
@@ -457,6 +461,73 @@ if (storageError) {
 }
 
 ipcMain.handle('ai2050:get-server', () => (readConfig() || {}).server || DEFAULT_SERVER);
+const firstRecordRoot = path.resolve(__dirname, '..', '..');
+const firstRecordOutput = path.join(firstRecordRoot, 'tests', 'glm5', 'result', 'clt_first_record_path_v1');
+const firstRecordPython = path.join(firstRecordRoot, '.venv', 'Scripts', 'python.exe');
+const firstRecordEntry = path.join(firstRecordRoot, 'tests', 'glm5', 'clt_first_record_desktop.py');
+let firstRecordChild = null;
+
+function firstRecordAccess(event) {
+  if (!mainWindow || event.sender !== mainWindow.webContents || !event.senderFrame || event.senderFrame.parent) {
+    throw new Error('只能从研究客户端的主窗口运行首行实验。');
+  }
+  const source = new URL(event.senderFrame.url);
+  const devOrigin = /^http:\/\/(localhost|127\.0\.0\.1):\d+\/?$/.test(process.env.AI2050_CLIENT_DEV_URL || '')
+    ? new URL(process.env.AI2050_CLIENT_DEV_URL).origin : '';
+  const localPage = ['localhost', '127.0.0.1'].includes(source.hostname)
+    && source.protocol === 'http:' && source.origin === devOrigin
+    && ['/', '/workbench', '/atlas'].includes(source.pathname);
+  if (app.isPackaged || !localPage || !fs.existsSync(firstRecordPython) || !fs.existsSync(firstRecordEntry)) {
+    return '首行实验需要打开含冻结材料和 Python 环境的本机项目客户端。';
+  }
+  if ((readConfig() || {}).server !== DEFAULT_SERVER) {
+    return '请先将研究客户端连接到正式中心。';
+  }
+  return '';
+}
+
+ipcMain.handle('ai2050:first-record-archive-status', event => {
+  const unavailable = firstRecordAccess(event);
+  if (unavailable) return { stage: 'unavailable', message: unavailable };
+  const marker = path.join(firstRecordOutput, 'desktop-archive.json');
+  let status = { stage: 'ready' };
+  try {
+    if (fs.statSync(marker).size <= 32768) status = JSON.parse(fs.readFileSync(marker, 'utf8'));
+  } catch (err) {
+    if (err.code !== 'ENOENT') return { stage: 'failed', message: '本机归档状态读取失败。' };
+  }
+  return { ...status, working: firstRecordChild !== null };
+});
+
+ipcMain.handle('ai2050:first-record-archive-start', (event, session) => {
+  const unavailable = firstRecordAccess(event);
+  if (unavailable) return { accepted: false, message: unavailable };
+  if (firstRecordChild) return { accepted: false, message: '首行实验正在运行。' };
+  if (typeof session !== 'string' || !/^[-A-Za-z0-9_.~+/=]{16,4096}$/.test(session)) {
+    return { accepted: false, message: '请使用正式中心管理员账户登录。' };
+  }
+  let log;
+  try {
+    checkedDir(firstRecordOutput, 12 * 2 ** 30, '首行实验预算');
+    log = fs.openSync(checkWrite(path.join(firstRecordOutput, 'desktop-workflow.log'), 2 ** 20, '首行归档日志'), 'a');
+    const child = spawn(firstRecordPython, ['-B', '-X', 'utf8', '-u', firstRecordEntry], {
+      cwd: firstRecordRoot, windowsHide: true, stdio: ['pipe', log, log],
+    });
+    firstRecordChild = child;
+    const clear = () => { if (firstRecordChild === child) firstRecordChild = null; };
+    child.once('error', clear);
+    child.once('exit', clear);
+    // This is the only handoff of the existing bearer to the fixed worker.
+    child.stdin.on('error', () => {});
+    child.stdin.end(session + '\n', 'ascii');
+    return { accepted: true };
+  } catch (error) {
+    return { accepted: false, message: error instanceof StorageBlocked ? error.message : '无法启动本机正式归档流程。' };
+  } finally {
+    if (log !== undefined) fs.closeSync(log);
+  }
+});
+
 ipcMain.handle('ai2050:cache-check', (_e, { bytes, interactive } = {}) => {
   try {
     checkWrite(app.getPath('sessionData'), bytes, '离线数据缓存');
@@ -464,6 +535,36 @@ ipcMain.handle('ai2050:cache-check', (_e, { bytes, interactive } = {}) => {
   } catch (error) {
     if (interactive && error instanceof StorageBlocked) notifyStorage(error);
     return { ok: false, error: String(error.message || error) };
+  }
+});
+
+ipcMain.handle('ai2050:save-case-results', async (event, { bytes, sha } = {}) => {
+  if (!mainWindow || event.sender !== mainWindow.webContents || !event.senderFrame || event.senderFrame.parent) {
+    throw new Error('请从客户端的测试详情保存逐题结果。');
+  }
+  const source = new URL(event.senderFrame.url);
+  const localApp = source.protocol === 'file:' &&
+    fileURLToPath(source) === path.join(__dirname, '..', 'dist', 'index.html');
+  const dev = process.env.AI2050_CLIENT_DEV_URL || '';
+  const localDev = /^http:\/\/(127\.0\.0\.1|localhost):\d+\/?$/.test(dev) && source.origin === new URL(dev).origin;
+  if (!localApp && !localDev) throw new Error('当前页面无法保存项目文件。');
+  if (!(bytes instanceof ArrayBuffer) || !/^[a-f0-9]{64}$/.test(sha || '')) throw new Error('产物身份无效。');
+  const buffer = Buffer.from(bytes);
+  if (createHash('sha256').update(buffer).digest('hex') !== sha) throw new Error('产物哈希不一致。');
+  try {
+    const dir = checkedDir(storageDir('client', 'case-results'), buffer.length, '逐题归档保存');
+    const selected = await dialog.showSaveDialog(mainWindow, {
+      title:'保存已核验的逐题结果', defaultPath:path.join(dir,sha.slice(0,12)+'-case_results.jsonl'),
+      filters:[{name:'逐题结果',extensions:['jsonl']}],
+    });
+    if (selected.canceled || !selected.filePath) return false;
+    const target = checkWrite(selected.filePath, buffer.length, '逐题归档保存');
+    await fs.promises.writeFile(target, buffer, {flag:'wx'});
+    return true;
+  } catch (error) {
+    if (error instanceof StorageBlocked) notifyStorage(error);
+    if (error.code === 'EEXIST') throw new Error('该文件已存在。请选择新文件名。');
+    throw error;
   }
 });
 

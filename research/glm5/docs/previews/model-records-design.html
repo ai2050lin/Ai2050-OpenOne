@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>历史测试检索 · AI2050 模型分析</title>
+  <link rel="stylesheet" href="model-explorer-design.css">
+  <link rel="stylesheet" href="model-records-design.css">
+  <script defer src="model-records-data.js"></script>
+  <script defer src="model-explorer-scene.js"></script>
+  <script defer src="model-records-design.js"></script>
+</head>
+<body>
+  <aside class="rail" aria-label="研究工作台">
+    <div class="brand" aria-label="AI2050">A<span>2</span></div>
+    <nav>
+      <a href="client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i data-icon="overview"></i>总览</a>
+      <a class="current" aria-current="page" href="model-records-design.html"><i data-icon="cube"></i>语言与模型</a>
+      <a href="client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=plan"><i data-icon="flask"></i>实验管理</a>
+    </nav>
+    <a class="settings" href="client-distributed-testing.html#?wb=1&amp;lens=config"><i data-icon="settings"></i>系统设置</a>
+  </aside>
+  <header class="global"><span><b>AI2050</b><span class="slash">/</span>研究工作台<span class="slash">/</span>语言与模型</span><span class="preview-mark"><i></i>离线静态预览</span></header>
+  <main id="workspace">
+    <header class="work-head"><h1>模型分析</h1><nav class="modes" aria-label="观察模式">
+      <a href="model-explorer-design.html?mode=live"><i data-icon="pulse"></i>实时模式</a>
+      <a href="model-records-design.html" aria-current="page"><i data-icon="archive"></i>测试记录</a>
+      <a href="model-explorer-design.html?mode=features"><i data-icon="feature"></i>特征分析</a>
+    </nav></header>
+    <section id="search-view" class="surface" aria-labelledby="search-title">
+      <header class="search-head"><div class="section-icon"><i data-icon="archive"></i></div><div><h2 id="search-title">查找历史测试</h2><p>按题目或原生对象查找记录，打开后可在 3D 中查看对应位置。</p></div></header>
+      <form id="filters" role="search" aria-label="筛选历史测试">
+        <label class="question">测试题目<span class="input-wrap"><i data-icon="search"></i><input type="search" id="question-filter" placeholder="题目关键词、Phase 或样本编号" autocomplete="off"></span></label>
+        <label>模型<select id="model-filter"><option value="">全部模型</option></select></label>
+        <label>对象类型<select id="kind-filter"><option value="">全部类型</option><option value="Head">Head 注意力头</option><option value="MLP">MLP 神经元</option></select></label>
+        <label>原生编号<input id="object-filter" class="mono" placeholder="B26/H36 或 U2429" autocomplete="off" spellcheck="false"></label>
+      </form>
+      <div class="list-toolbar"><strong id="result-count" aria-live="polite"></strong><div><label class="receipt"><input type="checkbox" id="receipt-filter">仅有中心回执</label><button id="clear-filters" type="button">清除筛选</button></div></div>
+      <div class="table-head ledger-grid" aria-hidden="true"><span>测试题目</span><span>模型</span><span>关联对象</span><span>记录层级</span><span></span></div>
+      <div id="record-list" role="group" aria-label="历史测试搜索结果"></div>
+      <div id="zero-results" hidden><i data-icon="search"></i><h3>没有匹配的历史测试</h3><p>可删除部分关键词或放宽模型和对象条件。</p><button class="secondary" id="zero-clear">显示全部记录</button></div>
+      <footer class="list-foot"><span><i data-icon="database"></i>本地归档摘录</span><span>收录范围与中心回执可在每条记录中核对</span></footer>
+    </section>
+    <section id="record-view" class="surface" aria-label="历史测试的结果与模型定位" hidden>
+      <div class="detail-nav"><button id="back-to-list" class="back">← 返回搜索结果</button><span id="record-number"></span></div>
+      <header class="detail-head"><p id="record-meta"></p><h2 id="record-title" tabindex="-1"></h2></header>
+      <section id="inspection" class="inspection" aria-label="原生对象定位">
+        <div class="inspect-bar"><div><i data-icon="cube"></i><b id="model-name"></b><span id="scene-dims"></span></div><button id="full" class="quiet" aria-label="全屏"><i data-icon="expand"></i><span>全屏</span></button></div>
+        <div id="scene"><canvas aria-label="模型结构示意"></canvas></div>
+        <div class="inspect-foot"><label id="object-picker-wrap">记录关联对象 <select id="object-picker" aria-label="记录关联对象"></select></label><span id="scene-position" aria-live="polite"></span><div class="zoom"><button type="button" id="zoom-out" aria-label="缩小">−</button><button type="button" id="reset-view" aria-label="重置视角">⟲</button><button type="button" id="zoom-in" aria-label="放大">＋</button></div></div>
+      </section>
+      <p id="no-location" class="no-location" hidden></p>
+      <section class="result-body" aria-label="测试结果">
+        <div class="result-main"><h3>测试结果</h3><p id="record-result"></p><dl id="metrics"></dl></div>
+        <div class="result-source"><h3>题目与来源</h3><p id="record-question"></p><details><summary>核对原始记录</summary><dl id="provenance"></dl></details></div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

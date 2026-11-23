@@ -10,7 +10,7 @@ import { fragmentHref } from './researchFragmentUtil.js';
 import { LockboxTable, PTile, PowerWizard } from './MainlineProgress.jsx';
 import { PageHead } from './CoreKit.jsx';
 import { useCoverage } from './coverage.js';
-import { PAIRS, SPLITS } from './data/mainline.js';
+import { useMainline } from './data/mainlineState.js';
 
 const STATUS = { supported_in_scope: '范围内支持', not_supported: '未支持', inconclusive: '尚未确定', not_measured: '未测' };
 const METRIC = {
@@ -90,6 +90,7 @@ function DatasetDetails({ entry, archive, onGo }) {
 }
 
 export default function ResearchCatalog({ runFilter = '', template, onGo, onAutotest, onStudio }) {
+  const {PAIRS,SPLITS} = useMainline();
   const catalog = useApi(runFilter ? null : '/api/catalog');
   const research = useApi('/api/research-library/catalog');
   const skeleton = useApi('/api/model/skeleton');

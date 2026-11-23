@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { API_CONFIG } from '../../config/api';
 import NativePathParameterInspector from './NativePathParameterInspector';
 import NativePrecisionParameterInspector from './NativePrecisionParameterInspector';
@@ -22,19 +22,33 @@ const labels = {
 };
 
 export default function NativeParameterInspector() {
-  const [selection, setSelection] = useState({ model: 'qwen4', case: '0', j: '0', k: '0', checkpoint: '', token: '' });
+  const [selection, setSelection] = useState({ model: '', case: '0', j: '0', k: '0', checkpoint: '', token: '' });
+  const [catalog, setCatalog] = useState({models:[],error:''});
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [wide, setWide] = useState(false);
   const requestId = useRef(0);
+  const endpoint = `${API_CONFIG.main.replace(/\/$/, '')}/api/research-assets/native-parameter`;
+  const selectedModel = catalog.models.find(row=>row.id===selection.model) || catalog.models[0];
+  useEffect(()=>{
+    const controller = new AbortController();
+    fetch(endpoint+'/models',{signal:controller.signal,cache:'no-store'}).then(async response=>{
+      if (!response.ok) throw Error('中心暂未开放此参数目录。');
+      const result = await response.json();
+      if (result.schema!=='native_parameter_models.v1') throw Error('中心参数目录格式不兼容。');
+      setCatalog({models:result.models,error:''});
+    }).catch(reason=>{if(!controller.signal.aborted)setCatalog({models:[],error:reason.message});});
+    return ()=>controller.abort();
+  },[endpoint]);
   async function inspect(event) {
     event.preventDefault();
+    if (!selectedModel) return;
     const id = ++requestId.current;
     setBusy(true); setError(''); setData(null);
     try {
-      const query = new URLSearchParams(Object.fromEntries(Object.entries(selection).filter(([, value]) => value !== '')));
-      const response = await fetch(`${API_CONFIG.main.replace(/\/$/, '')}/api/research-assets/native-parameter?${query}`);
+      const query = new URLSearchParams(Object.fromEntries(Object.entries({...selection,model:selectedModel.id}).filter(([, value]) => value !== '')));
+      const response = await fetch(`${endpoint}?${query}`);
       const payload = await response.json();
       if (!response.ok) throw new Error(typeof payload.detail === 'string' ? payload.detail : '坐标查询失败');
       if (id === requestId.current) setData(payload);
@@ -48,14 +62,15 @@ export default function NativeParameterInspector() {
       <button type="button" aria-label="原生查询宽屏" aria-pressed={wide} onClick={() => setWide(!wide)} style={{ marginTop: 8 }}>{wide ? '还原紧凑查询视图' : '展开宽屏查询视图'}</button>
       <p>按原始编号查询全部坐标与最终 MLP 参数，无 Top-K 筛选。数据只读，不加载模型。</p>
       <form onSubmit={inspect} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <label>模型 <select aria-label="原生参数模型" value={selection.model} onChange={(e) => setSelection({ ...selection, model: e.target.value })}>
-          <option value="qwen4">Qwen3-4B</option><option value="qwen14">Qwen3-14B</option><option value="glm4">GLM4</option><option value="ds7">DS7B</option>
+        <label>归档 <select aria-label="原生参数模型" value={selectedModel?.id||''} disabled={!selectedModel||busy} onChange={(e) => {setData(null);setSelection({ ...selection, model: e.target.value });}}>
+          {!selectedModel&&<option value="">暂无可读取的参数归档</option>}
+          {catalog.models.map(row=><option key={row.id} value={row.id}>{row.name} · {row.model_snapshot?.slice(0,12)||row.run}</option>)}
         </select></label>
         {['case', 'j', 'k'].map((key) => <label key={key}>{key} <input aria-label={`原生参数 ${key}`} type="number" min="0" step="1" required value={selection[key]} onChange={(e) => setSelection({ ...selection, [key]: e.target.value })} style={{ width: 66 }} /></label>)}
         {['checkpoint', 'token'].map((key) => <label key={key}>{key}（可选） <input aria-label={`全token ${key}`} type="number" min="0" step="1" value={selection[key]} onChange={(e) => setSelection({ ...selection, [key]: e.target.value })} style={{ width: 66 }} /></label>)}
-        <button type="submit" disabled={busy}>{busy ? '读取中…' : '查询'}</button>
+        <button type="submit" disabled={busy||!selectedModel}>{busy ? '读取中…' : '查询'}</button>
       </form>
-      {error && <p role="alert" style={{ color: '#ffb5ab' }}>{error}</p>}
+      {(error||catalog.error) && <p role="alert" style={{ color: '#ffb5ab' }}>{error||catalog.error}</p>}
       {data && <>
         <p>{data.case_id} · layer {data.layer} · j={data.coordinate_j}, k={data.neuron_k}</p>
         <p>可选范围：case 0–{data.counts.cases - 1}；j 0–{data.counts.coordinates - 1}；k 0–{data.counts.neurons - 1}</p>

@@ -6,6 +6,7 @@ import ResearchDisclosure from './ResearchDisclosure.jsx';
 import ResearchInterventionReport from './ResearchInterventionReport.jsx';
 import {EVIDENCE_COLORS,EVIDENCE_NAMES,researchLocation} from './researchLocation.js';
 import {useMainline} from './data/mainlineState.js';
+import {databaseHref} from './testDatabaseLocation.js';
 
 const datasetOf=o=>o.body?.scope?.dataset||o.body?.dataset||o.dataset||'';
 const titleOf=o=>o.title||o.body?.label||o.body?.relation||o.source||o.id||o.run_id;
@@ -22,13 +23,13 @@ export default function SpatialResearchLibrary({onLocate,onOverlay}) {
   const objectCurrent=Boolean(objectApi.data&&objectApi.data.mainline_revision===api.data?.mainline_revision);
   const data=useMemo(()=>api.data?{...api.data,objects:objectCurrent?objectApi.data.objects:[],objects_page:objectCurrent?objectApi.data.objects_page:null}:null,[api.data,objectApi.data,objectCurrent]);
   const linkedObject=data?.objects.find(o=>o.id===entry.feature&&(!snapshot||o.model_snapshot===snapshot));
-  const linkedArtifact=data?.artifacts.find(a=>a.sha===entry.artifact);
+  const linkedArtifact=data?.artifacts?.find(a=>a.sha===entry.artifact);
   const chosen=selection===undefined?(linkedObject||linkedArtifact||null):selection;
   const {reload:reloadIndex}=api,{reload:reloadObjects}=objectApi;
   const reload=useCallback(()=>{reloadIndex();reloadObjects();},[reloadIndex,reloadObjects]);useEffect(()=>{reload();},[revision,reload]);
   const models=data?.models;
   const model=models?.find(m=>m.snapshot===snapshot);
-  const ready=Boolean(data&&(!revision||data.mainline_revision===revision));
+  const ready=Boolean(data?.counts&&(!revision||data.mainline_revision===revision));
   const select=useCallback(row=>{setChosen(row);setMessage('');},[]);
   const objects=useMemo(()=>!ready?[]:data.objects.filter(o=>(!snapshot||o.model_snapshot===snapshot)&&(!run||o.body.run_id===run)&&(!level||o.body.evidence?.level===level)&&(!dataset||(datasetOf(o)||'unlabelled')===dataset)&&(!query||[titleOf(o),o.id,o.sha].join(' ').toLowerCase().includes(query.toLowerCase()))),[data,ready,snapshot,run,level,dataset,query]);
   const points=useMemo(()=>objects.flatMap(o=>{const location=researchLocation(o,model);return location?[{...location,id:o.id,sha:o.sha,level:o.body.evidence?.level,label:titleOf(o)}]:[];}),[objects,model]);
@@ -67,6 +68,7 @@ export default function SpatialResearchLibrary({onLocate,onOverlay}) {
     {!rows.length&&!(pagedObjects&&(objectApi.loading||objectApi.error))&&<Empty>当前筛选没有匹配成果；可清除筛选查看未定位和历史记录。</Empty>}
     <div className="v6-toolbar"><button className="fw-tbtn" disabled={!page} onClick={()=>setPage(p=>p-1)}>上一页</button><span>{page+1} / {Math.max(1,Math.ceil(rowCount/12))}</span><button className="fw-tbtn" disabled={(page+1)*12>=rowCount} onClick={()=>setPage(p=>p+1)}>下一页</button></div>
     {chosen&&<section className="v8-card" aria-label="选中成果"><h4>{titleOf(chosen)}</h4>{location?<button className="fw-tbtn primary" onClick={()=>setMessage(onLocate?.({snapshot:target.model_snapshot,run:target.body.run_id,trace:target.body.scope?.trace_id,location})||'已定位到上方空间，可在对象详情查看参数和研究记录。')}>定位到当前空间</button>:<p className="v8-note">此项没有可直接定位的原生单元；报告和原始记录完整保留。</p>}{message&&<p role="status">{message}</p>}
+      {(study?.run_id||chosen.body?.run_id)&&<a className="fw-tbtn" href={databaseHref(study?.run_id||chosen.body.run_id)}>在测试数据库中查看此运行</a>}
       {study?.traces?.map(t=><p key={t.trace_id}><a href={`?lens=spatial&view=live&snapshot=${study.model_snapshot||''}&trace=${t.trace_id}&tblock=${t.layer||0}&tunit=${t.unit||0}&thead=${t.head||0}`}>打开轨迹 {t.sample_id||t.trace_id.slice(0,12)}</a></p>)}
       {sha&&<ResearchDisclosure key={sha} title="完整报告与原始证据"><ResearchInterventionReport sha={sha} rawFallback hideScene planSha={study?.stages?.native_mlp_plan?.plan_sha256} capabilityInputsSha={study?.stages?.client_acceptance?.capability_inputs_sha256}/><a href={`${API_BASE}/api/research-library/artifacts/${sha}`} target="_blank" rel="noreferrer">打开原始产物</a></ResearchDisclosure>}
       <ResearchDisclosure key={`metadata:${chosen.sha||chosen.study_key}`} title="版本、来源与定位记录"><pre className="v8-artifact-json">{JSON.stringify(chosen,null,2)}</pre></ResearchDisclosure>

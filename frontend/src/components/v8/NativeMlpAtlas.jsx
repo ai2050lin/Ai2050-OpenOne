@@ -24,13 +24,13 @@ function Dose({rows}){
   <table className="v6-table"><thead><tr><th>剂量 / 条件</th><th>匹配/总数</th><th>全部样本KL</th><th>全部样本首词变化</th></tr></thead><tbody>{rows.map(r=><tr key={r.id}><td>{r.dose} / {r.condition==='native'?'原生列':'等范数'}</td><td>{r.n_matched}/{r.n_total}</td><td>{fmt(r.mean_kl_all)}</td><td>{r.argmax_changes_all}</td></tr>)}</tbody></table></>;
 }
 
-export default function NativeMlpAtlas({doc,hideScene=false,selection,onSelect}){
+export default function NativeMlpAtlas({doc,hideScene=false,selection,onSelect,lockSelection=false}){
   if(!doc)return <Empty>尚无已审计的原生神经元档案。</Empty>;
   if(doc.schema!=='native_mlp_atlas_report.v1'||!doc.run_id||!doc.model_snapshot||!Number.isInteger(doc.width)||!doc.config?.hidden_size)return <Empty>研究报告身份或模型维度缺失，无法读取原生档案。</Empty>;
-  return <Atlas key={doc.run_id} data={doc} hideScene={hideScene} selection={selection} onSelect={onSelect}/>;
+  return <Atlas key={doc.run_id} data={doc} hideScene={hideScene} selection={selection} onSelect={onSelect} lockSelection={lockSelection}/>;
 }
 
-function Atlas({data,hideScene,selection,onSelect}){
+function Atlas({data,hideScene,selection,onSelect,lockSelection}){
   const blocks=data.blocks||BLOCKS;
   const first=blocks[0],last=blocks[blocks.length-1],width=data.width,dim=data.config.hidden_size;
   const url=path=>apiUrl(path,data);
@@ -67,11 +67,11 @@ function Atlas({data,hideScene,selection,onSelect}){
     <h3>{data.model_name} · B{first}–B{last} 神经元档案</h3>
     <p className="v8-note">{(blocks.length*width).toLocaleString()} 个原生单元 · BF16 · {data.documents?.toLocaleString()} 篇 1,024-token 长文本。模型共{data.config.num_hidden_layers}层，这里是零基 B{first}–B{last}。全量观察不等于全部语义已经破解。</p>
     {data.regimes&&<details><summary>11层覆盖与研究汇总</summary><p className="v8-note">下表双负份额先对每个单元计算，再在层内取均值。G/V/A候选是三个字段的筛查计数，不能相加称为已破解神经元。</p><table className="v6-table"><thead><tr><th>层</th><th>双负 |A| 份额</th><th>SiLU负导数比例</th><th>响应候选 G / V / A</th></tr></thead><tbody>{data.regimes.map(r=>{const c=data.prediction?.layers?.find(x=>x.block===r.block)?.counts;return <tr key={r.block}><td>B{r.block}</td><td>{fmt(r.holdout_DN_mass_mean)}</td><td>{fmt(r.holdout_negative_silu_derivative_mean)}</td><td>{c?`${c.G} / ${c.V} / ${c.A}`:'未检验'}</td></tr>})}</tbody></table><p>已做有限写入干预：{data.total_intervention_units}个单元；正式语义确认：0。响应预测和单父递推的结果与反例保留在验证视图。</p></details>}
-    <div className="v6-toolbar">
+    {!lockSelection&&<div className="v6-toolbar">
       <label>层 <select aria-label="原生研究层" value={block} onChange={e=>pick(Number(e.target.value),unit)}>{blocks.map(x=><option key={x} value={x}>B{x}（第{x+1}层）</option>)}</select></label>
       <label>单元 <input aria-label="原生单元" type="number" min="0" max={width-1} value={unit} onChange={e=>pick(block,Math.max(0,Math.min(width-1,Number(e.target.value)||0)))}/></label>
       <label>着色 <select aria-label="原生着色特性" value={metric} onChange={e=>setMetric(e.target.value)}>{[['A_std','实际乘积变化'],['A_mean','实际乘积均值'],['G_std','gate变化'],['V_std','value变化'],['sign_0','正gate × 正value'],['sign_3','负gate × 负value'],...(data.regimes?[['double_negative_mass','双负绝对激活份额'],['negative_silu_derivative','SiLU负导数区间']]:[])].map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>
-    </div>
+    </div>}
     {!hideScene&&(layerError?<Empty>层数据缺失：{layerError}</Empty>:blocks.every(x=>layers[x])?<TailScene blocks={blocks} width={width} modelName={data.model_name} layers={layers} metric={metric} block={block} unit={unit} relation={tab==='relations'?relation.data:null} allEdges={allEdges} onPick={pick}/>:<p>读取 {blocks.filter(x=>layers[x]).length}/{blocks.length} 层完整阵列…</p>)}
     <p className="v8-note">蓝为正、橙为负；按原生编号排列。每层色标按当前数组最大绝对值缩放，不能据颜色深浅直接比较不同层。</p>
     <div className="v6-toolbar" role="tablist" aria-label="原生单元研究视图">{[['response','响应与语境'],['parameters','完整参数'],['relations','上下游关联'],['evidence','验证与反例']].map(([key,label])=><button key={key} className="fw-tbtn" role="tab" aria-selected={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</div>

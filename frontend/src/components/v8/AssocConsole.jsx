@@ -20,7 +20,7 @@ const EXAMPLE_B = '资料：香蕉是蓝色的。\n问：在现实世界里，�
 export function TestsPanel() {
   const { CLAIMS, TESTS, METHOD_RESULTS } = useMainline();
   return <>
-    <p className="ac-k">三类检验 · 主张 {CLAIMS[0].id}</p>
+    <p className="ac-k">三类检验{CLAIMS[0]&&` · 主张 ${CLAIMS[0].id}`}</p>
     <div className="v8-weight-scroll"><table className="v6-table">
       <thead><tr><th>检验</th><th>项目</th><th>结果</th></tr></thead>
       <tbody>{TESTS.flatMap(test => test.rows.map(([name, value], i) => <tr key={`${test.id}:${name}`}>

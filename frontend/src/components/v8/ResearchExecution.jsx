@@ -15,6 +15,8 @@ import { AiLoopCard, AutoExplainCard, ParticipationWays, ResearchGaps } from './
 import ClaimDraft from './ClaimDraft.jsx';
 import { ClaimSummary, MainlineCard, PBar, PTile } from './MainlineProgress.jsx';
 import { PageHead } from './CoreKit.jsx';
+import { workbenchHref } from './v8Util.js';
+import { databaseHref } from './testDatabaseLocation.js';
 
 
 const STAGE = {
@@ -182,9 +184,12 @@ function ResearchPlans({ onGo }) {
   const row = entry => <PlanRow key={`${run}:${entry.sha}`} entry={entry} focused={entry === focused} onGo={onGo}
     children={all.filter(child => child !== focused && !ongoing.includes(child) && child.body.parent_run_id === entry.body.run_id)}/>;
 
-  return <section className="v8-rnd v8-rnd-current" aria-label="当前研发">
-    <PageHead title="当前研发" sub="查看正在做的研究，选择适合你的参与方式。" />
+  return <section className="v8-rnd v8-rnd-current" aria-label="实验管理">
+    <PageHead visible title="实验管理" sub="参与分布式测试，查看任务进度和中心回执。" />
     <div className="ck-plan">
+      <ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
+        publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
+        onTaskChanged={refreshJobs}/>
       <section className="v8-card v8-rnd-progress" aria-label="研究进度">
         <div className="rnd-current-heading"><h3>研究进度</h3><button type="button" className="v6-linkbtn" onClick={refreshJobs}>刷新</button></div>
         <p className="rnd-current-copy">{ongoing[0]?.body.question || ongoing[0]?.body.title || CLAIMS[0]?.title || '语言编码机制研究'}</p>
@@ -197,12 +202,14 @@ function ResearchPlans({ onGo }) {
         </div> : <p className="v8-note">{census.loading || queue.loading ? '正在读取任务进度…' : census.error || queue.error ? '任务进度暂不可用，请刷新重试。' : '暂无开放任务；已有研究可在历史中查看。'}</p>}
         {(census.local || queue.local) && <small>任务统计来自已下载的数据包。</small>}
         {job && (census.error || queue.error) && <small>部分任务统计暂未更新。</small>}
-        <small>任务完成量表示执行进度，不能当作机制破解率。</small>
+        <small>统计范围 · 任务执行进度</small>
         <button type="button" className="v6-linkbtn" onClick={() => onGo('execution')}>查看任务与审核</button>
       </section>
-      <ResearchParticipation onGo={onGo} publicWork={jobs.find(job => job.queued > 0)?.name}
-        publicSnapshot={census.local || queue.local} publicLoaded={Boolean(census.data && queue.data)}
-        onTaskChanged={refreshJobs}/>
+    </div>
+    <div className="v6-toolbar">
+      <a className="fw-tbtn" href={workbenchHref('lens=spatial&view=research')}>在「分析研究」中查看测试数据</a>
+      <button type="button" className="fw-tbtn" onClick={()=>onGo('catalog',null,null,{run:'',mrun:'',tm:''})}>系统测试方案与材料</button>
+      <button type="button" className="fw-tbtn" onClick={() => onGo('route', null, null, { rtab: 'database', record: '', run: '' })}>查看测试数据库</button>
     </div>
     <ResearchPanels key={run || 'current'} label="当前研发详情" initial={run ? 'packages' : ''} collapsible items={[
       { id: 'details', label: '研究详情', render: () => <>
@@ -255,7 +262,7 @@ function ArchivedExperiment({ run, onGo }) {
       </ResearchDisclosure> : <p className="v8-note">此运行尚无已登记报告。</p>}
       <div className="v6-toolbar">
         <button type="button" className="fw-tbtn" onClick={() => onGo('plan')}>返回当前研发</button>
-        <button type="button" className="fw-tbtn" onClick={() => onGo('route', null, null, { rtab: 'rules' })}>查看成果与证据</button>
+        <a className="fw-tbtn" href={databaseHref(run)}>在测试数据库中查看此运行</a>
       </div>
     </>}
   </section>;
@@ -345,7 +352,7 @@ function ResearchQueue({ onGo, tools }) {
   const gate = gates.find(g => g[0] === gateSel);
   const censusJobs = (censusJobsApi.data?.jobs ?? []).filter(job => job.n_shards > 0);
   return <section className="v8-rnd" aria-label="实验与队列">
-    <PageHead title="实验与队列" sub="查看任务状态、待审结果和回执。点击任务查看执行详情。" />
+    <PageHead visible title="实验与队列" sub="查看任务状态、待审结果和回执。" />
     <div className="rnd-counts" aria-label="模板任务概况">
       {[['active','运行中',tasks.data ? stats.claimed ?? 0 : '—'],['queued','待领取',tasks.data ? stats.queued ?? 0 : '—'],['attention','异常任务',tasks.data ? (stats.failed ?? 0) + (stats.expired ?? 0) : '—'],['history','近期完成',tasks.data ? completed.length : '—']].map(([id,label,count]) => <button className="rnd-count" key={id} type="button" aria-pressed={filter === id && queueTab === 'tasks'} onClick={() => selectFilter(id)}><span>{label}</span><b>{count}</b></button>)}
     </div>

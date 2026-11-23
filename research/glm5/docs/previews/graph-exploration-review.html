@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>图谱探索 · AI2050 界面评审</title>
+<style>
+:root{color-scheme:light;--page:#f5f7fa;--ink:#192f45;--muted:#50677b;--line:#d6e2eb;--accent:#205b86;--pale:#eaf3fb;--white:#fff;font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);font-size:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--page)}h1,h2,h3,p,dl,dd{margin:0}button,select,input,textarea{font:inherit;color:inherit}button,select,input,textarea{border:1px solid var(--line);border-radius:6px;background:white;padding:7px 10px}button{cursor:pointer}button:hover:not(:disabled){background:#f2f7fb}button:disabled{opacity:.62;cursor:default}textarea{resize:vertical;width:100%}a,.link{color:var(--accent)}:focus-visible{outline:2px solid #236fa7;outline-offset:2px}[hidden]{display:none!important}
+.top{height:55px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 22px;background:white;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:650}.mark{display:grid;place-items:center;background:#1f5795;color:white;width:24px;height:24px;border-radius:6px;font-size:10px}.preview{color:var(--muted);font-size:12px}
+.frame{display:grid;grid-template-columns:68px minmax(0,1fr);min-height:calc(100dvh - 55px)}.rail{background:white;border-right:1px solid var(--line);padding:12px 5px;display:flex;flex-direction:column;gap:5px}.rail a{min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--muted);font-size:11px;border-radius:7px;white-space:nowrap}.rail i{font-style:normal;font-size:16px;line-height:1}.rail a[aria-current]{border:1px solid #bdd4e5;background:var(--pale);color:var(--accent);font-weight:650}
+.view-tabs{display:flex;gap:5px;background:white;border-bottom:1px solid var(--line);padding:8px clamp(12px,3vw,40px)}
+[role=tab]{white-space:nowrap;border-color:transparent;background:transparent;color:var(--muted)}
+[role=tab][aria-selected=true]{background:var(--pale);border-color:#bcd4e8;color:#1a547e;font-weight:650}
+main{max-width:1472px;margin:auto;padding:18px clamp(12px,3vw,38px) 36px;min-width:0}.page-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}.page-head h1{font-size:clamp(23px,2.35vw,31px);line-height:1.25;letter-spacing:-.025em}.page-head p{margin-top:5px;color:var(--muted);font-size:13px}
+.card{background:white;border:1px solid var(--line);border-radius:10px;min-width:0}.scene{overflow:hidden}.scene-header,.scene-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 15px}.scene-header h2,.console-title h2{font-size:16px}.scene-header .jump{font-size:12px}.scene-stage{position:relative;background:linear-gradient(#f9fbfd,#eef4f9);border-block:1px solid #e1ebf3}.scene-canvas{width:100%;height:clamp(198px,27vh,290px);display:block;cursor:pointer}.scene-foot{color:var(--muted);font-size:12px;flex-wrap:wrap}.legend{display:flex;align-items:center;gap:9px 14px;flex-wrap:wrap}.legend span{white-space:nowrap}.chip{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.console{display:grid;gap:11px;margin-top:13px}.console-title{display:flex;align-items:center;gap:10px}.context{padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:9px;display:grid;gap:9px}.context-fields{display:grid;grid-template-columns:minmax(132px,1.2fr) minmax(75px,.6fr) minmax(118px,1fr) minmax(65px,.6fr);gap:8px 13px}.context-fields label,.field{display:grid;gap:4px;color:var(--muted);font-size:12px;min-width:0}.context-fields :is(input,select),.field :is(input,select,textarea){color:var(--ink);width:100%;min-width:0}.context-note{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.console-body{display:grid;grid-template-columns:192px minmax(0,1fr);gap:13px;align-items:start}.plugin{padding:11px;background:#fbfdff}.plugin-head{display:flex;align-items:center;justify-content:space-between;gap:5px}.plugin-head h3{font-size:14px}.plugin-head button{font-size:11px;padding:4px 6px}.plugin-group{display:grid;gap:4px;margin-top:10px}.plugin-group p{font-size:11px;color:var(--muted);margin-bottom:3px}.plugin-group button{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:6px 8px;border-color:transparent;background:white;font-size:12px}.plugin-group button[aria-pressed=true]{background:var(--pale);border-color:#bdd4e6;color:var(--accent);font-weight:650}.plugin-group button::after{content:"";width:4px;height:4px;border:solid #54768c;border-width:1px 1px 0 0;transform:rotate(45deg);margin-right:2px}
+.task-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);padding:7px 9px;flex-wrap:wrap}.task-tabs button{font-size:13px;padding:6px 9px}.task-panel{padding:13px 16px;overflow-wrap:anywhere}.task-panel h3{font-size:17px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px;line-height:1.55}.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,138px),1fr));gap:7px 14px;margin:10px 0}.facts div{padding:8px 0;border-top:1px solid #e3ebf2;min-width:0}.facts dt{font-size:12px;color:var(--muted)}.facts dd{margin-top:4px;font-size:13px;overflow-wrap:anywhere}.actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:9px 0}.primary{background:var(--accent);border-color:var(--accent);color:white}.primary:hover:not(:disabled){background:#19496e}.actions button,.actions a{font-size:12px}.actions a{padding:5px 2px}
+details{margin-top:8px;border-top:1px solid #e3ebf2;padding-top:8px;font-size:12px;color:var(--muted)}summary{cursor:pointer}details pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.result{margin-top:10px;padding:10px 12px;background:#f3f8fc;border:1px solid #dce9f3;border-radius:7px}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bars{display:grid;gap:4px;margin-top:6px}.bar{display:grid;grid-template-columns:32px minmax(0,1fr) 38px;gap:5px;align-items:center;font-size:11px}.bar progress{width:100%;accent-color:#4f83ae;height:8px}.bar strong{text-align:right}
+.lang-grid{display:grid;grid-template-columns:minmax(190px,.70fr) minmax(0,1.65fr);gap:12px}.lang-tree,.lang-info{padding:15px}.lang-tree [role=tablist]{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:12px}.lang-tree [role=tab]{font-size:12px;padding:5px 7px}.lang-terms{display:grid;gap:5px}.lang-terms button{text-align:left}.lang-terms button[aria-pressed=true]{background:var(--pale);border-color:#bdd4e6}.id{font-family:ui-monospace,Consolas,monospace;color:var(--muted);font-size:12px}.lang-info h2{font-size:22px;margin:5px 0 10px}
+dialog{margin:auto;width:min(440px,92vw);padding:16px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:white}dialog::backdrop{background:#233f5870}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.dialog-head h2{font-size:17px}dialog label{display:flex;align-items:center;gap:6px;margin:8px 0}
+@media(max-width:760px){.top{padding:0 9px}.view-tabs{padding-inline:9px}main{padding-top:12px}.scene-header,.scene-foot{padding:8px 9px}.context-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.console-body{grid-template-columns:1fr}.plugin-group{display:flex;gap:4px;flex-wrap:wrap}.plugin-group p{flex-basis:100%}.plugin-group button{border-color:var(--line);gap:6px}.task-panel,.lang-tree,.lang-info{padding:10px}.task-tabs button{font-size:12px;padding:6px 7px}.lang-grid,.pair{grid-template-columns:1fr}}
+@media(max-width:380px){.frame{grid-template-columns:58px minmax(0,1fr)}.rail{padding-inline:3px}.rail a{font-size:10px}.scene-foot .legend{gap:5px 7px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><span class="mark" aria-hidden="true">A2</span><span>研究工作台</span></div><span class="preview">图谱探索静态评审</span></header>
+<div class="frame">
+  <nav class="rail" aria-label="工作台">
+    <a href="./client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i aria-hidden="true">▣</i>总览</a>
+    <a href="#model" aria-current="page" id="rail-model"><i aria-hidden="true">◎</i>图谱探索</a>
+    <a href="./client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=execution"><i aria-hidden="true">▤</i>实验管理</a>
+    <a href="./client-distributed-testing.html#?wb=1&amp;lens=config"><i aria-hidden="true">⚙</i>系统设置</a>
+  </nav>
+  <div>
+    <div class="view-tabs" role="tablist" aria-label="图谱探索视图">
+      <button type="button" role="tab" id="tab-model" aria-controls="model-panel" aria-selected="true">模型探索</button>
+      <button type="button" role="tab" id="tab-language" aria-controls="language-panel" aria-selected="false" tabindex="-1">语言图谱</button>
+    </div>
+    <main>
+      <section id="model-panel" role="tabpanel" aria-labelledby="tab-model">
+        <header class="page-head"><div><h1>模型探索</h1><p>选择一个部件，在同一上下文中查看结构、运行与证据。</p></div></header>
+        <section class="card scene" aria-labelledby="scene-title">
+          <header class="scene-header"><h2 id="scene-title">模型结构</h2><button class="jump" id="focus-object">精确定位 ↓</button></header>
+          <div class="scene-stage"><canvas class="scene-canvas" id="scene" aria-hidden="true"></canvas></div>
+          <footer class="scene-foot"><div class="legend"><span><i class="chip" style="background:#8aabd5"></i>Attention</span><span><i class="chip" style="background:#9bc7b6"></i>MLP</span><span><i class="chip" style="background:#c1b3d9"></i>HiddenState</span></div><span>结构示意 · 点击层板可切换</span></footer>
+        </section>
+        <section class="console" aria-labelledby="console-title">
+          <header class="console-title"><h2 id="console-title">控制台</h2></header>
+          <div class="context">
+            <div class="context-fields">
+              <label>模型<select id="model"><option>Qwen3-14B</option><option>Qwen3-4B</option></select></label>
+              <label>层（含嵌入层）<input id="layer" type="number" min="0" max="40" step="1" value="27"></label>
+              <label>部件<select id="part"><option value="head">注意力头</option><option value="mlp">MLP 单元</option><option value="hs">HiddenState 坐标</option></select></label>
+              <label>原生索引<input id="index" type="number" min="0" max="39" step="1" value="36"></label>
+            </div>
+            <p class="context-note" id="context-status" aria-live="polite"></p>
+          </div>
+          <div class="console-body">
+            <aside class="card plugin" aria-labelledby="plugin-title">
+              <div class="plugin-head"><h3 id="plugin-title">插件系统</h3><button id="manage">管理插件</button></div>
+              <div class="plugin-group" id="functions"></div>
+              <div class="plugin-group" id="analysis"></div>
+            </aside>
+            <section class="card" aria-label="工作区">
+              <div class="task-tabs" role="tablist" aria-label="控制台任务" id="task-tabs">
+                <button type="button" role="tab" data-task="object">对象详情</button>
+                <button type="button" role="tab" data-task="run">运行与对照</button>
+                <button type="button" role="tab" data-task="plugin">插件分析</button>
+                <button type="button" role="tab" data-task="research">成果与方法</button>
+              </div>
+              <div class="task-panel" role="tabpanel" id="task-panel" tabindex="0"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+      <section id="language-panel" role="tabpanel" aria-labelledby="tab-language" hidden>
+        <header class="page-head"><div><h1>语言图谱</h1><p>按语言现象找条目、看例句，再查相关测试。</p></div></header>
+        <div class="lang-grid">
+          <aside class="card lang-tree" aria-label="语言目录"><div role="tablist" aria-label="语言分类" id="domain-tabs"></div><label class="field">筛选语言条目<input id="lang-search" type="search" placeholder="名称或条目编号"></label><div class="lang-terms actions" id="lang-terms"></div></aside>
+          <article class="card lang-info" id="lang-info" aria-live="polite"></article>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<dialog id="plugin-dialog" aria-labelledby="manage-title">
+  <div class="dialog-head"><h2 id="manage-title">管理分析插件</h2><button id="close-manager">关闭</button></div>
+  <div id="installed"></div>
+  <details><summary>其他已接入工具</summary><label><input id="add-tests" type="checkbox"> 三类检验</label><p class="muted">查看已归档的检验报告。</p></details>
+</dialog>
+<script>
+const $=id=>document.getElementById(id);
+const models={
+  'Qwen3-14B':{layers:40,head:40,mlp:17408,hs:5120,snapshot:'1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce'},
+  'Qwen3-4B':{layers:36,head:32,mlp:9728,hs:2560,snapshot:'6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad'}
+};
+const labels={head:'注意力头',mlp:'MLP 单元',hs:'HiddenState 坐标'};
+const prefix={head:'H',mlp:'U',hs:'坐标 '};
+const functions={structure:'结构与档案',replay:'运行响应',pairs:'条件对照'};
+const plugins={hs:'HiddenState',mlp:'MLP',head:'Head',lens:'Logit Lens',tests:'三类检验'};
+const labelsByRule=['按姓名','按印刷标签','按物理首行'];
+// Phase 2983, clt_b26_three_cues_v3, confirmation family 0. Arrays index record identity.
+const original=[
+  {id:'confirm-000-00',output:'wood',gold:0,mass:[.40520933,.04257776,.04523783,.13418025,.10341178]},
+  {id:'confirm-000-01',output:'lion',gold:1,mass:[.08311543,.37414223,.03470675,.05200485,.06246334]},
+  {id:'confirm-000-02',output:'silver',gold:3,mass:[.09131672,.05560481,.34138101,.10375173,.03861831]}
+];
+const order=[3,0,1,2,4],codes=['wood','lion','glass','silver','fire'];
+const directions={
+  '知识网络':[
+    ['KN.ENTITY_REF','查询实体指称','在同一份档案里，根据题目提到的名字找到正确的人。','同一份档案有甲、乙两条记录。题目指定乙，读取乙的代码。',2983],
+    ['SEM.ATTRIBUTE','属性','区分实体与它具有的颜色、形状等属性。','按资料里的说明，查出物体的颜色。',322]
+  ],
+  '推理功能':[['RS.RECORD','记录与选源','根据题目规定的取值规则决定使用哪条记录。','用同一张表分别按姓名、印刷标签或首行提问。',2983]],
+  '语法规则':[['SYN.MOOD','句子语气','区分疑问与陈述。','「我知道他会来」与「我想知道他会不会来」。',null]]
+};
+const state={view:'model',model:'Qwen3-14B',layer:27,part:'head',index:36,task:'object',fn:'structure',plugin:'head',active:new Set(['hs','mlp','head','lens']),samples:'archive',sample:0,replay:null,text:'',report:'library',domain:'知识网络',term:'KN.ENTITY_REF'};
+const esc=s=>String(s).replace(/[&<>"']/g,a=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[a]));
+const model=()=>models[state.model];
+const grounded=()=>state.model==='Qwen3-14B'&&state.layer===27&&state.part==='head'&&state.index===36;
+const firstRecord=()=>state.model==='Qwen3-14B'&&state.layer===29&&state.part==='head'&&state.index===21;
+const object=()=>state.layer===0?'嵌入层 · 坐标 '+state.index:'B'+(state.layer-1)+' / '+prefix[state.part]+state.index;
+const archiveUrl=phase=>'./client-distributed-testing.html#?wb=1&lens=route&rtab=database&dbStudy='+phase;
+const archiveLink=(phase,text)=>'<a href="'+archiveUrl(phase)+'">'+text+'</a>';
+const details=pairs=>'<dl class="facts">'+pairs.map(([name,value])=>'<div><dt>'+name+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>';
+const fix=()=>'<button data-action="locate">定位 B26 / H36</button>';
+
+function context(){
+  if(state.layer===0)state.part='hs';
+  state.index=Math.min(model()[state.part]-1,state.index);
+  $('model').value=state.model;$('layer').value=state.layer;$('layer').max=model().layers;$('part').value=state.part;
+  for(const opt of $('part').options)opt.disabled=state.layer===0&&opt.value!=='hs';
+  $('index').value=state.index;$('index').max=model()[state.part]-1;
+  $('context-status').textContent=object()+' · '+labels[state.part]+' · '+(state.layer===0?'hs[0]':'hs['+state.layer+']（B'+(state.layer-1)+' 输出）')+' · 快照 '+model().snapshot.slice(0,12);
+}
+function scene(){
+  const canvas=$('scene'),w=canvas.clientWidth,h=canvas.clientHeight;
+  if(!w||!h)return;
+  const dpr=Math.min(window.devicePixelRatio,2),ctx=canvas.getContext('2d'),n=model().layers;
+  canvas.width=w*dpr;canvas.height=h*dpr;ctx.scale(dpr,dpr);
+  const x=w*.22,y=h-28,rise=(h-65)/n,a=Math.min(w*.09,78),b=Math.min(25,w*.045),f=w<550?11:13;
+  function tile(px,py,width,depth,fill,stroke){
+    ctx.beginPath();ctx.moveTo(px-width,py);ctx.lineTo(px+width,py);ctx.lineTo(px+width+depth,py-depth*.72);ctx.lineTo(px-width+depth,py-depth*.72);ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.stroke();
+  }
+  function word(value,px,py,color='#23435d',weight=500){ctx.fillStyle=color;ctx.font=weight+' '+f+'px "Microsoft YaHei", sans-serif';ctx.fillText(value,px,py);}
+  for(let i=0;i<=n;i++){
+    const py=y-i*rise;
+    tile(x,py,a,b,i===state.layer?'#92b5d7':i===0?'#dce5ef':'#f8fbfe',i===state.layer?'#326998':'#b8c9d9');
+  }
+  const py=y-state.layer*rise, cx=w*.66,cy=h*.52, size=Math.min(w*.125,113);
+  ctx.beginPath();ctx.setLineDash([3,4]);ctx.moveTo(x+a+b+3,py-4);ctx.lineTo(cx-size-5,cy-6);ctx.strokeStyle='#799ab8';ctx.stroke();ctx.setLineDash([]);
+  const modules=state.layer?[['HiddenState','#e1d9ed','hs'],['Attention','#c8daed','head'],['MLP','#cfe5dc','mlp']]:[['Embedding','#e1d9ed','hs']];
+  modules.forEach(([name,color,kind],i)=>{
+    const iy=cy+(i-(modules.length-1)/2)*29;
+    if(kind===state.part){ctx.lineWidth=2;tile(cx,iy,size,b,color,'#2b6b9b');ctx.lineWidth=1;}
+    else tile(cx,iy,size,b,color,'#b3c7d9');
+    word(name,cx-size+6,iy-4,'#214660',kind===state.part?650:500);
+  });
+  word('模型 · '+n+' 层',Math.max(8,x-a),19);
+  word(state.layer?'第 '+state.layer+' 层 · B'+(state.layer-1):'Embedding · hs[0]',Math.max(8,cx-size),28,'#1d4a70',650);
+  word(object(),Math.max(8,cx-size),h-20);
+  canvas.onclick=event=>{
+    const box=canvas.getBoundingClientRect();
+    if(event.clientX-box.left>(x+a+b+9))return;
+    const v=Math.max(0,Math.min(n,Math.round((y-(event.clientY-box.top))/rise)));
+    state.layer=v;state.replay=null;render();
+  };
+}
+function pressGroup(id,title,items,current,attribute){
+  $(id).innerHTML='<p>'+title+'</p>'+Object.entries(items).map(([key,label])=>'<button type="button" data-'+attribute+'="'+key+'" aria-pressed="'+(key===current)+'">'+label+'</button>').join('');
+}
+function barChart(c){
+  return '<div class="bars">'+order.map((identity,i)=>{
+    const value=c.mass[identity];
+    return '<div class="bar"><span>第 '+(i+1)+' 行</span><progress max="1" value="'+value+'" aria-label="第 '+(i+1)+' 行注意力质量"></progress><strong>'+Math.round(value*100)+'%</strong></div>';
+  }).join('')+'</div>';
+}
+function replayCase(c,i,chart){
+  const selected=c.mass.indexOf(Math.max(...c.mass));
+  return '<section class="result"><strong>'+labelsByRule[i]+'</strong><p class="muted">'+c.id+' · 目标第 '+(order.indexOf(c.gold)+1)+' 行</p>'
+    +details([['该头最高注意力','第 '+(order.indexOf(selected)+1)+' 行'],['模型实际输出',esc(c.output)],['目标答案',codes[c.gold]]])
+    +(chart?barChart(c)+'<p class="muted">五条记录以外的注意力质量 '+Math.round((1-c.mass.reduce((sum,value)=>sum+value,0))*100)+'%。</p>':'')+'</section>';
+}
+function runPanel(){
+  if(state.fn==='pairs'){
+    return '<h3>条件对照</h3><p class="muted">同一确认家族与记录顺序，改变取值规则。头的最高注意力和模型输出分别显示。</p>'
+      +(grounded()?'<div class="pair">'+replayCase(original[0],0,false)+replayCase(original[2],2,false)+'</div><div class="actions">'+archiveLink(2983,'查看 Phase 2983 的全部条件 →')+'</div>'
+        :'<p class="result">此对象在静态稿中没有配对读数。</p><div class="actions">'+fix()+'</div>');
+  }
+  const selector='<label class="field">数据来源<select id="run-source"><option value="archive">归档样本</option><option value="manual">自由输入</option></select></label>';
+  if(state.samples==='manual')return '<h3>运行响应</h3>'+selector+'<label class="field">输入文本<textarea rows="2" id="manual-text" placeholder="输入要观察的文本">'+esc(state.text)+'</textarea></label><div class="actions"><button disabled>执行模型</button><span class="muted">静态评审只回放已有样本。</span></div>';
+  return '<h3>运行响应</h3>'+selector
+    +(grounded()?'<div class="actions"><label>样本 <select id="sample" aria-label="归档样本">'+original.map((c,i)=>'<option value="'+i+'"'+(i===state.sample?' selected':'')+'>'+labelsByRule[i]+' · '+c.id+'</option>').join('')+'</select></label><button class="primary" data-action="replay">回放样本</button></div>'
+      +(state.replay===null?'<p class="muted">选择样本后回放，可查看这个头在最后输入 token 的注意力分布。</p>'
+        :replayCase(original[state.replay],state.replay,true)+'<div class="actions">'+archiveLink(2983,'查看来源记录 →')+'</div>')
+      :'<p class="result">此对象在静态稿中没有归档响应。</p><div class="actions">'+fix()+'</div>');
+}
+function objectPanel(){
+  const title='<h3>'+object()+'</h3>';
+  const dims=details([['层与块',state.layer?'第 '+state.layer+' 层 · B'+(state.layer-1):'嵌入层'],['本层索引范围','0 – '+(model()[state.part]-1).toLocaleString()],['快照',model().snapshot.slice(0,12)]]);
+  const find=grounded()?'<div class="actions"><button class="primary" data-action="archive">查看相关测试</button></div>':firstRecord()?'<div class="actions">'+archiveLink(2997,'查看首行头干预归档 →')+'</div>':'<p class="muted">此位置暂无内置研究记录。</p>';
+  return title+dims+find+'<details><summary>参数与来源</summary><p>完整模型快照 <code>'+model().snapshot+'</code></p><p>原生参数和激活由正式客户端按模型与采集身份读取。</p></details>';
+}
+function pluginPanel(){
+  if(!state.plugin)return '<h3>插件分析</h3><p class="muted">通过「管理插件」选择要查看的工具。</p>';
+  const title='<h3>'+plugins[state.plugin]+'</h3><p class="muted">当前对象 · '+object()+'</p>';
+  if(state.plugin==='head'&&grounded())return title+'<p class="result">本稿含一个冻结家族的末位置注意力读数。</p><div class="actions"><button class="primary" data-action="run">打开样本回放</button></div>';
+  if(state.plugin==='tests')return title+'<div class="actions">'+archiveLink(2997,'查看已有原生机制检验 →')+'</div>';
+  return title+'<p class="result">此静态稿未载入所需的原生张量。</p><details><summary>数据需求</summary><p>正式客户端按快照、样本、token 和层读取对应数据。</p></details>';
+}
+function researchPanel(){
+  const types={library:'成果库',records:'测试记录',methods:'方法与基准',history:'历史对照'};
+  const chooser='<label class="field">研究内容<select id="report">'+Object.entries(types).map(([key,label])=>'<option value="'+key+'"'+(key===state.report?' selected':'')+'>'+label+'</option>').join('')+'</select></label>';
+  const body={
+    library:grounded()?'<div class="result"><strong>五条记录，三种取值规则</strong><p class="muted">Phase 2983 · 自然前向选源观察 · B26 / H36</p><div class="actions">'+archiveLink(2983,'在测试数据库查看 →')+'</div></div>':
+      firstRecord()?'<div class="result"><strong>首行头写入与 128 个 FFN 单元</strong><p class="muted">Phase 2997 · 匹配干预与恢复 · B28 / H21</p><div class="actions">'+archiveLink(2997,'在测试数据库查看 →')+'</div></div>':'<p class="result">此对象暂无内置证据。可按模型、部件在测试数据库继续检索。</p>',
+    records:'<div class="result">从研究编号回查材料、判据和逐题结果。<div class="actions">'+archiveLink(2983,'打开三线索选源记录 →')+'</div></div>',
+    methods:'<p class="result">观察注意力分布与验证头的因果作用分别登记。前者读取已有样本，后者查阅阻断、匹配对照和恢复报告。</p>',
+    history:'<div class="result"><strong>在新姓名家族上复核三种规则</strong><p class="muted">Phase 2990 · 新家族复核</p><div class="actions">'+archiveLink(2990,'打开复核记录 →')+'</div></div>'
+  };
+  return '<h3>成果与方法</h3>'+chooser+body[state.report];
+}
+function render(){
+  context();
+  pressGroup('functions','常驻功能',functions,state.fn,'fn');
+  pressGroup('analysis','分析插件',Object.fromEntries(Object.entries(plugins).filter(([id])=>state.active.has(id))),state.task==='plugin'?state.plugin:'','plugin');
+  document.querySelectorAll('[data-task]').forEach(button=>{
+    const active=button.dataset.task===state.task;
+    button.id='task-'+button.dataset.task;button.setAttribute('aria-controls','task-panel');
+    button.setAttribute('aria-selected',active);button.tabIndex=active?0:-1;
+  });
+  $('task-panel').setAttribute('aria-labelledby','task-'+state.task);
+  $('task-panel').innerHTML=({object:objectPanel,run:runPanel,plugin:pluginPanel,research:researchPanel})[state.task]();
+  if($('run-source'))$('run-source').value=state.samples;
+  scene();
+}
+function showView(view){
+  state.view=view;
+  for(const id of ['model','language']){
+    const selected=view===id;
+    $(id+'-panel').hidden=!selected;const tab=$('tab-'+id);tab.setAttribute('aria-selected',selected);tab.tabIndex=selected?0:-1;
+  }
+  if(view==='model')scene();else renderLanguage();
+}
+function renderLanguage(){
+  $('domain-tabs').innerHTML=Object.keys(directions).map((domain,i)=>'<button role="tab" type="button" id="domain-'+i+'" data-domain="'+domain+'" aria-controls="lang-terms" aria-selected="'+(state.domain===domain)+'" tabindex="'+(state.domain===domain?0:-1)+'">'+domain+'</button>').join('');
+  $('lang-terms').setAttribute('role','tabpanel');
+  $('lang-terms').setAttribute('aria-labelledby',$('domain-tabs').querySelector('[aria-selected="true"]').id);
+  const q=$('lang-search').value.trim().toLowerCase();
+  const entries=directions[state.domain].filter(row=>row.slice(0,2).some(s=>s.toLowerCase().includes(q)));
+  const selected=entries.find(([id])=>id===state.term)||entries[0];
+  $('lang-terms').innerHTML=entries.map(([id,title])=>'<button data-term="'+id+'" aria-pressed="'+(id===selected[0])+'">'+title+'</button>').join('');
+  $('lang-info').innerHTML=selected?'<span class="id">'+selected[0]+'</span><h2>'+selected[1]+'</h2><p class="muted">'+selected[2]+'</p><div class="result"><strong>例句</strong><p class="muted">'+selected[3]+'</p></div>'
+    +'<div class="actions">'+(selected[4]?archiveLink(selected[4],'查看相关测试 →'):'<span class="muted">本稿未收录此条目的测试链接。</span>')+'</div>'
+    :'<h2>没有匹配条目</h2><p class="muted">可以修改搜索词，或切换语言分类。</p>';
+}
+function activateTask(task){
+  state.task=task;
+  if(task==='object')state.fn='structure';
+  if(task==='run'&&state.fn==='structure')state.fn='replay';
+  render();
+}
+function updateNumber(input,key,max){
+  const value=Number(input.value);
+  state[key]=input.value!==''&&Number.isFinite(value)?Math.max(0,Math.min(max,Math.trunc(value))):state[key];
+  state.replay=null;render();
+}
+$('model').onchange=event=>{state.model=event.target.value;state.layer=Math.min(state.layer,model().layers);state.replay=null;render();};
+$('layer').onchange=()=>updateNumber($('layer'),'layer',model().layers);
+$('part').onchange=event=>{state.part=event.target.value;state.index=0;state.replay=null;render();};
+$('index').onchange=()=>updateNumber($('index'),'index',model()[state.part]-1);
+$('focus-object').onclick=()=>$('layer').focus();
+$('tab-model').onclick=()=>showView('model');
+$('tab-language').onclick=()=>showView('language');
+$('rail-model').onclick=event=>{event.preventDefault();showView('model');};
+$('lang-search').oninput=renderLanguage;
+$('manage').onclick=()=>{
+  $('installed').innerHTML=Object.entries(plugins).filter(([id])=>id!=='tests').map(([id,name])=>'<label><input type="checkbox" data-toggle="'+id+'"'+(state.active.has(id)?' checked':'')+'> '+name+'</label>').join('');
+  $('add-tests').checked=state.active.has('tests');$('plugin-dialog').showModal();
+};
+$('close-manager').onclick=()=>$('plugin-dialog').close();
+function setPlugin(id,checked){
+  if(checked)state.active.add(id);else state.active.delete(id);
+  if(!state.active.has(state.plugin))state.plugin=[...state.active][0]||'';
+  render();
+}
+$('plugin-dialog').onchange=event=>setPlugin(event.target.dataset.toggle||'tests',event.target.checked);
+document.addEventListener('change',event=>{
+  const {id,value}=event.target;
+  if(id==='run-source'){state.samples=value;state.replay=null;render();}
+  if(id==='sample'){state.sample=Number(value);state.replay=null;render();}
+  if(id==='report'){state.report=value;render();}
+});
+document.addEventListener('input',event=>{if(event.target.id==='manual-text')state.text=event.target.value;});
+document.addEventListener('click',event=>{
+  const button=event.target.closest('button');if(!button)return;
+  const {task,fn,plugin,action,domain,term}=button.dataset;
+  if(task)activateTask(task);
+  if(fn){state.fn=fn;state.task=fn==='structure'?'object':'run';render();$('task-panel').focus();}
+  if(plugin){state.plugin=plugin;state.task='plugin';render();$('task-panel').focus();}
+  if(action==='locate'){Object.assign(state,{model:'Qwen3-14B',layer:27,part:'head',index:36,replay:null});render();}
+  if(action==='replay'){state.replay=state.sample;render();}
+  if(action==='run'){state.fn='replay';state.samples='archive';activateTask('run');}
+  if(action==='archive'){state.report='library';activateTask('research');}
+  if(domain){state.domain=domain;$('lang-search').value='';renderLanguage();$('domain-tabs').querySelector('[aria-selected="true"]').focus();}
+  if(term){state.term=term;renderLanguage();$('lang-terms').querySelector('[aria-pressed="true"]').focus();}
+});
+document.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)||event.target.getAttribute('role')!=='tab')return;
+  const tabs=[...event.target.parentElement.querySelectorAll('[role="tab"]')],i=tabs.indexOf(event.target);
+  const target=tabs[({Home:0,End:tabs.length-1,ArrowLeft:(i-1+tabs.length)%tabs.length,ArrowRight:(i+1)%tabs.length})[event.key]];
+  event.preventDefault();target.click();
+  if(target.isConnected)target.focus();
+});
+new ResizeObserver(scene).observe($('scene').parentElement);
+render();
+</script>
+</body>
+</html>

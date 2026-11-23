@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>模型分析 · 编码机制研究工作台</title>
+  <link rel="stylesheet" href="encoding-workbench.css">
+  <link rel="stylesheet" href="../../../../frontend/src/components/v8/nativeFieldInspector.css">
+  <link rel="stylesheet" href="encoding-workbench-tools.css">
+  <script defer src="model-records-data.js"></script>
+  <script defer src="model-explorer-data.js"></script>
+  <script defer src="explorer-system-field.js"></script>
+  <script defer src="model-explorer-scene.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/data/nativeHeadChannels.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/attentionPatternStats.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/representationGeometry.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/nativeFieldInspector.js"></script>
+  <script defer src="encoding-workbench-data.js"></script>
+  <script defer src="encoding-workbench-tools.js"></script>
+  <script defer src="encoding-workbench-chinese.js"></script>
+  <script defer src="encoding-workbench.js"></script>
+</head>
+<body>
+<aside class="rail" aria-label="研究工作台">
+  <div class="brand" aria-label="AI2050">A<span>2</span></div>
+  <nav>
+    <a href="client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i data-icon="overview"></i>总览</a>
+    <a href="#analysis" aria-current="page"><i data-icon="layers"></i>语言与模型</a>
+    <a href="client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=plan"><i data-icon="experiments"></i>实验管理</a>
+  </nav>
+  <a class="settings" href="client-distributed-testing.html#?wb=1&amp;lens=config"><i data-icon="settings"></i>设置</a>
+</aside>
+<header class="crumb"><span><b>AI2050</b><em>/</em><a href="encoding-workbench.html">返回自由观察</a><em>/</em>研究案例</span><span>离线设计预览</span></header>
+<main id="analysis">
+  <div class="shell-head"><h1>模型分析</h1><nav class="modes" aria-label="数据模式">
+    <button data-mode="live">实时模式</button><button data-mode="archive">测试记录</button><button data-mode="features">特征分析</button>
+  </nav></div>
+  <div class="surface">
+    <header class="question">
+      <div><label for="question">研究问题</label><select id="question">
+        <option value="head">注意力最强的那一行，能预测模型的答案吗？</option>
+        <option value="ffn">同一个 FFN 单元，在解题的哪些位置改变响应？</option>
+        <option value="zh">换一组中文句子，两个单元的响应相同吗？</option>
+      </select></div>
+      <button class="secondary" id="material"><i data-icon="file"></i>查看原题与来源</button>
+    </header>
+    <div class="scope">
+      <span class="model-label"><i data-icon="layers"></i><b id="model-name"></b><small id="phase"></small></span>
+      <label><b class="letter a" id="a-tag">A</b><span class="visually-hidden" id="a-label">观察 A</span><select id="select-a"></select></label>
+      <label><b class="letter b" id="b-tag">B</b><span class="visually-hidden" id="b-label">对照 B</span><select id="select-b"></select></label>
+      <span class="scope-hint" id="scope-hint"></span>
+    </div>
+    <section id="live-box" class="live-box" hidden aria-label="实时输入">
+      <label for="live-input">当前输入</label><textarea id="live-input" rows="2" placeholder="输入你要观察的文本"></textarea>
+      <div><span id="live-status"></span><button id="replay">回放已采集材料</button></div>
+    </section>
+    <div class="paired-view">
+      <section class="spatial" aria-label="模型结构定位">
+        <div class="section-head"><h2><i data-icon="layers"></i>结构定位</h2><div class="actions">
+          <button id="display" class="icon-btn" aria-label="显示插件" title="显示插件" aria-expanded="false"><i data-icon="sliders"></i></button>
+          <button id="screen" class="icon-btn" aria-label="全屏观察" title="全屏观察"><i data-icon="screen"></i></button>
+        </div></div>
+        <fieldset id="display-panel" hidden><legend>显示插件</legend><label><input id="grid" type="checkbox" checked>空间网格</label><label><input id="labels" type="checkbox" checked>原生编号</label><button id="reset-camera">复位视角</button></fieldset>
+        <canvas id="scene-canvas" aria-label="可旋转的模型结构，可用下方编号定位同一对象"></canvas>
+        <div class="locator"><form id="coordinate"><label for="locate">原生对象</label><input id="locate" autocomplete="off" spellcheck="false" required><button type="submit">定位</button></form>
+          <button id="native" class="text-btn">查看全场 ›</button></div>
+        <p class="locator-status" id="locator-status" role="status" hidden></p>
+      </section>
+      <section class="measurement" aria-label="对照读数">
+        <div class="section-head"><h2 id="measure-title">来源行注意力</h2><label class="view-select">视角<select id="angle"></select></label></div>
+        <div id="measure-figure" aria-live="polite"></div>
+        <div class="metric-controls" id="metric-controls" hidden><label for="metric-index" id="metric-label"></label><input id="metric-index" type="number" min="0" step="1"></div>
+      </section>
+    </div>
+    <section class="console" aria-label="分析控制台">
+      <nav class="task-tabs" aria-label="分析任务">
+        <button data-tab="object">对象详情</button><button data-tab="contrast">运行与对照</button><button data-tab="tools">插件分析</button><button data-tab="evidence">成果与方法</button>
+      </nav>
+      <div id="work-panel"></div>
+    </section>
+  </div>
+  <dialog id="material-dialog" aria-labelledby="material-title">
+    <header><h2 id="material-title">原题与来源</h2><button id="close-material" aria-label="关闭原题">×</button></header>
+    <div id="material-body"></div>
+    <p class="related"><a href="model-records-design.html" target="_blank" rel="noopener">按模型、题目或原生对象检索更多历史测试 ↗</a></p>
+  </dialog>
+</main>
+</body></html>

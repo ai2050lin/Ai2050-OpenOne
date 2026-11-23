@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>模型分析 · 原生全量观察方案</title>
+  <link rel="stylesheet" href="model-analysis-history-review.css">
+  <link rel="stylesheet" href="../../../../frontend/src/components/v8/nativeFieldInspector.css">
+  <link rel="stylesheet" href="model-analysis-native-review.css">
+  <script defer src="model-explorer-scene.js"></script>
+  <script defer src="model-records-data.js"></script>
+  <script defer src="model-explorer-data.js"></script>
+  <script defer src="explorer-system-field.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/data/nativeHeadChannels.js"></script>
+  <script defer src="encoding-workbench-data.js"></script>
+  <script defer src="free-model-data.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/nativeFieldInspector.js"></script>
+  <script defer src="model-analysis-native-b23.js"></script>
+  <script defer src="model-analysis-native-review.js"></script>
+</head>
+<body>
+  <aside class="rail" aria-label="研究工作台">
+    <a class="brand" href="#main" aria-label="AI2050 模型分析"><b>A</b><sub>2</sub></a>
+    <div class="rail-line"></div>
+    <span class="rail-current" aria-current="page"><span class="rail-cube" aria-hidden="true">◇</span>语言与模型</span>
+  </aside>
+  <header class="topbar"><div>研究工作台 <span aria-hidden="true">/</span> 语言与模型 <span aria-hidden="true">/</span> <strong>模型分析</strong></div>
+    <span class="preview-status">静态评审 · 实测归档</span>
+  </header>
+  <main class="page" id="main">
+    <header class="heading"><div><h1>模型分析</h1><p>手动定位任意原生部件，也可从一条测试回到同一部件的原始读数。</p></div>
+      <a class="button" href="model-analysis-history-review.html">查看历史核对稿 ↗</a>
+    </header>
+    <section id="workspace" aria-label="原生模型工作区">
+      <div class="workspace-top">
+        <nav id="modes" class="mode-switch" aria-label="工作模式">
+          <button data-mode="live" aria-pressed="false">实时模式</button>
+          <button data-mode="records" aria-pressed="false">测试记录</button>
+          <button data-mode="features" aria-pressed="true">特征分析</button>
+        </nav>
+        <div class="model-bar"><button id="fullscreen" class="button compact" aria-pressed="false">⛶ 全屏观察</button></div>
+      </div>
+      <form class="context" id="context" aria-label="模型与原生地址">
+        <label>模型快照<select id="model" aria-label="模型快照"></select></label>
+        <label>数据来源<select id="source" aria-label="数据来源"></select></label>
+        <label id="site-label">观察位置<select id="site" aria-label="观察位置"></select></label>
+        <label>原生地址<input id="address" autocomplete="off" required spellcheck="false" value="B35/H31/D127" placeholder="B35/H31/D127"></label>
+        <button class="button primary">定位</button>
+        <p id="address-error" role="alert" hidden></p>
+      </form>
+      <div class="observation">
+        <section class="scene" aria-label="原生结构">
+          <canvas id="native-scene" aria-label="模型结构与选中位置"></canvas>
+          <div class="scene-label"><b id="scene-address"></b><span id="scene-context"></span></div>
+          <div class="scene-tools"><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-in" aria-label="放大">+</button><button id="zoom-reset" aria-label="复位视角">↺</button></div>
+        </section>
+        <aside class="inspector" aria-label="定位及覆盖">
+          <h2 id="overview-title">模型覆盖</h2>
+          <div id="structure-coverage"></div>
+          <p id="response-coverage" class="coverage"></p>
+          <label>跳到块<select id="block"></select></label>
+          <div class="segments" aria-label="部件类型">
+            <button data-kind="head">Head</button>
+            <button data-kind="ffn">MLP</button>
+            <button data-kind="hidden">HiddenState</button>
+          </div>
+          <div class="actions"><button id="jump" class="button compact">查看原值 ↓</button>
+            <a id="parameter-link" class="button compact" href="encoding-workbench.html">参数工作台 ↗</a></div>
+        </aside>
+      </div>
+      <div class="console">
+        <nav id="console-tabs" class="console-tabs" aria-label="分析工具">
+          <button data-tab="object">对象详情</button><button data-tab="run">运行与对照</button>
+          <button data-tab="plugin">插件分析</button><button data-tab="record">成果与方法</button>
+        </nav>
+        <section id="plugin-panel" class="data-panel" aria-label="全部原生读数">
+          <div id="measure-tools">
+            <label id="measure-label">数值字段<select id="measure" aria-label="数值字段"></select></label>
+            <button id="all-heads" class="button compact" aria-expanded="false" aria-controls="head-list">本层全部 Head</button>
+            <details id="origin" class="reading-origin"><summary>数据身份与出处</summary><div id="origin-data"></div></details>
+          </div>
+          <p id="head-legend" class="caption" hidden>本层各头的 Z 通道 RMS。色深对应本层相对幅度，点击查看所选头的原值。</p>
+          <div id="head-list" class="head-list" hidden></div>
+          <p id="source-index" class="caption" hidden></p>
+          <div id="native-field-host"></div>
+        </section>
+        <section id="other-panel" class="data-panel" aria-label="选中工作项" hidden></section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

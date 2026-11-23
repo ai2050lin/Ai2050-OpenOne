@@ -343,12 +343,12 @@ def circuit_source(data_dir: Path, model_key: str) -> Path:
 
 
 def research_entries():
-    """All immutable research versions; stream raw objects without loading the entire archive."""
-    from deploy.research_library import library
+    """Stream the immutable, publicly visible research versions into the pack."""
+    from deploy.research_library import library, PUBLISHED_SQL
     lib=library();entries={}
     with lib.db() as db:
-        shas=[r[0] for r in db.execute('SELECT sha FROM artifacts ORDER BY sha')]
-        count=db.execute('SELECT COUNT(*) FROM graph_objects').fetchone()[0]
+        shas=[r[0] for r in db.execute('SELECT a.sha FROM artifacts a WHERE '+PUBLISHED_SQL+' ORDER BY a.sha')]
+        count=db.execute('SELECT COUNT(*) FROM graph_objects g JOIN artifacts a ON a.sha=g.sha WHERE '+PUBLISHED_SQL).fetchone()[0]
     for sha in shas:
         entries[f'/api/research-library/artifacts/{sha}']=RawFile(lib.root/'objects'/sha[:2]/(sha+'.json'))
     for offset in range(0,len(shas)+50,50):
@@ -362,7 +362,7 @@ def research_entries():
     entries['/api/research-library/catalog']=Registry(lib).catalog()
     from server.research_space_service import research_space
     entries['/api/traces/research-space']=research_space()
-    return entries,['完整产物历史与显式图谱；归档和证据声明不代表自动验证。']
+    return entries,['已公开的产物历史与显式图谱；归档和证据声明不代表自动验证。']
 
 
 def extras_plan() -> List[Dict[str, Any]]:
@@ -370,7 +370,7 @@ def extras_plan() -> List[Dict[str, Any]]:
     import distributed_service as D
     from server import neuron_census_service as NS
     from shared.dist_protocol import pipeline as P
-    out = [{'id':'research-library','kind':'research-library','label':'持续研究库 · 产物与图谱全版本'}]
+    out = [{'id':'research-library','kind':'research-library','label':'持续研究库 · 已公开产物与图谱'}]
     for t, corpus in P.templates_v3(D._db()):
         if P.is_v3(corpus):
             out.append({'id': f"tm:{t['tm_id']}", 'kind': 'template', 'tm_id': t['tm_id'],

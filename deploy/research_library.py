@@ -378,7 +378,13 @@ def graph(model: str='',offset:int=Query(0,ge=0),limit:int=Query(100,ge=1,le=100
 
 @router.get('/artifacts/{sha}')
 def artifact(sha:str):
-    try:return library().artifact(sha)
+    try:
+        lib = library()
+        with lib.db() as db:
+            visible = db.execute('SELECT a.sha FROM artifacts a WHERE a.sha=? AND '+PUBLISHED_SQL,(sha,)).fetchone()
+        if visible is None:
+            raise FileNotFoundError('Artifact not published')
+        return lib.artifact(sha)
     except (ValueError,FileNotFoundError) as exc:raise HTTPException(404,str(exc)) from exc
 
 

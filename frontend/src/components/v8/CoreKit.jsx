@@ -32,13 +32,17 @@ export function GateBar({ name, n, d, color = '#183f77', onClick }) {
   return onClick ? <button type="button" className="ck-gate" onClick={onClick}>{body}</button> : <div className="ck-gate">{body}</div>;
 }
 
-/* 页面标题与说明：页面上不显示，登记给右上角“?”窗口（Phase 337 补充二）。屏幕阅读器仍可读到标题；children（如范围选择）照常显示在右侧 */
-export function PageHead({ title, sub, note, children, id }) {
+/* 工作台入口可显示页头。其他面板沿用紧凑标题与上下文帮助。 */
+export function PageHead({ title, sub, note, children, id, visible = false }) {
   useEffect(() => {
     const info = { title, sub, note };
     setPageInfo(info);
     return () => clearPageInfo(info);
   }, [title, sub, note]);
+  if (visible) return <header className="wb-page-heading">
+    <div><h1 id={id}>{title}</h1>{sub && <p>{sub}</p>}</div>
+    {children && <div className="wb-page-tools">{children}</div>}
+  </header>;
   return <>
     <h2 id={id} className="ck-sr">{title}</h2>
     {children && <div className="ck-head-tools">{children}</div>}

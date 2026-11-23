@@ -17,6 +17,8 @@ import RuleLedgerPage from './RuleLedgerPage.jsx';
 import ResearchOverview from './ResearchOverview.jsx';
 import ResearchLibrary from './ResearchLibrary.jsx';
 import ResearchDisclosure from './ResearchDisclosure.jsx';
+import TestRecords from './TestRecords.jsx';
+import { PageHead } from './CoreKit.jsx';
 import { LEVELS, GRADE_COLOR, READOUT_LABEL, TYPE_COLOR, defaultModel, itemLevel, levelMeta, shortModel } from './v8Util.js';
 import './v8.css';
 
@@ -515,8 +517,8 @@ function LanguageGraphView({ onOpenMeasurement, coverage }) {
 
 /* 覆盖模型与题库选择仍由工作台地址栏 mdl / ds 持久化。 */
 export default function RouteLens({ tab = 'overview', openPane = '', model: gModel, ds = '', onGoSpace, onGo }) {
-  const treeApi = useApi(tab === 'rules' ? null : '/api/lang/tree');
-  const skApi = useApi(tab === 'rules' ? null : '/api/model/skeleton');
+  const treeApi = useApi(tab === 'database' ? null : '/api/lang/tree');
+  const skApi = useApi(tab === 'database' ? null : '/api/model/skeleton');
   const tree = treeApi.data && !treeApi.data.pending ? treeApi.data : null;
   const skeletons = useMemo(() => Object.fromEntries((skApi.data?.models || []).map(s => [s.model, s])), [skApi.data]);
   const model = gModel || defaultModel(tree, skeletons);
@@ -543,11 +545,13 @@ export default function RouteLens({ tab = 'overview', openPane = '', model: gMod
   return (
     <div className="v8-route">
       {tab === 'neuron' && <Card title="神经元逆向分析进展" sub={`${shortModel(model)} · 自然语料普查与解释检验`}>{neuron(model)}</Card>}
-      {tab === 'rules' && (
-        <RuleLedgerPage>
-          <ResearchLibrary />
-        </RuleLedgerPage>
-      )}
+      {tab === 'database' && <>
+        <PageHead visible title="测试数据库" sub="查找测试记录，核对结果、反例和归档来源。" />
+        <TestRecords model={gModel ? shortModel(gModel) : ''} sharedLocation/>
+        <ResearchDisclosure title="规则、查重与公开成果">
+          <RuleLedgerPage><ResearchLibrary /></RuleLedgerPage>
+        </ResearchDisclosure>
+      </>}
     </div>
   );
 }

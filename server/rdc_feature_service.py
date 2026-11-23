@@ -1,5 +1,6 @@
 """Read-only, bounded slices of real RDC artifacts. No endpoint loads a model or starts jobs."""
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 import numpy as np
@@ -13,6 +14,25 @@ CONTINUITY=ROOT/'tests/glm5/result/rdc_continuity_campaign_20260909'
 CONDITIONAL=ROOT/'tests/glm5/result/rdc_conditional_campaign_20260910'
 NEW_RUNS=('i_factorial','k_long','m_order','o_generalization','aligned_qwen4','aligned_qwen14','aligned_glm4')
 RUNS=('s0','s1','s2pilot','a_native','b_relations','c_generation','e_confirmation','g_generation','scale_qwen14','scale_glm4')+NEW_RUNS
+RUN_LABELS = {
+    'i_factorial': 'I/J · 4096因子组合 / 全单元条件预测',
+    'k_long': 'K · 八类长生成 / 全词表预测',
+    'aligned_qwen4': 'L · Qwen4 首内容对齐',
+    'aligned_qwen14': 'L · Qwen14 首内容对齐',
+    'aligned_glm4': 'L · GLM4 首内容对齐',
+    'm_order': 'M/N · 输出顺序 / 历史KV条件预测',
+    'o_generalization': 'O · 新材料 / 冻结注意力预测推广',
+    'e_confirmation': 'E · 独立材料 / 同形核查 / 固定读尺',
+    'g_generation': 'G · 当前 next-token 与生成阶段',
+    'scale_qwen14': 'H · Qwen3-14B 非量化全场',
+    'scale_glm4': 'H · GLM4 非量化全场',
+    'a_native': 'A · 真实MLP单元与标量参数',
+    'b_relations': 'B · 关系 / 角色 / 语法四格',
+    'c_generation': 'C · 自回归与原生输出',
+    's1': 'S1 · Qwen3-4B 真实语言',
+    's2pilot': 'S2试运行 · 冻结读取器独立确认',
+    's0': 'S0 · 已知结构校准',
+}
 router=APIRouter(prefix='/api/rdc',tags=['rdc-features'])
 FIGURES={
  'i_interactions':('i_factorial','i_factorial/figures/all_coordinate_interactions.png','i_factorial/features/interactions.npz','i_factorial/figures/display_contract.json','八族全部坐标的支持×提问交互（观察对比）'),
@@ -83,6 +103,33 @@ def arrays(path):
 def decode(a):
     if a.dtype==np.uint16:return (a.astype(np.uint32)<<16).view(np.float32)
     return a.astype(np.float64)
+
+def run_layout(run):
+    if run=='s0':
+        return {'kind':'synthetic'}
+    root = folder(run)
+    protocol = read(root/'protocol.json') or read(root/'native_protocol.json', {})
+    runtime = read(root/'runtime.json', {})
+    aliases = {'qwen3-4b':'qwen3-4b','qwen4':'qwen3-4b','qwen3-14b':'Qwen3-14B','qwen14':'Qwen3-14B',
+               'glm4-9b-chat-hf':'glm4-9b-chat-hf','glm4':'glm4-9b-chat-hf'}
+    names = set()
+    for value in (protocol.get('model'),protocol.get('model_path'),protocol.get('execution'),runtime.get('model'),runtime.get('model_path')):
+        names.update(aliases[token] for token in re.findall(r'[a-z0-9]+(?:-[a-z0-9]+)*',str(value).lower()) if token in aliases)
+    name = next(iter(names)) if len(names)==1 else None
+    config = read(ROOT/'models/hf'/name/'config.json', {}) if name else {}
+    return {'kind':'archived_real','model_name':name or None,
+            'd_model':config.get('hidden_size'),'d_ff':config.get('intermediate_size'),
+            'n_layers':config.get('num_hidden_layers'),'head_dim':config.get('head_dim'),
+            'parameter_model':name if config else None,
+            'structure_source':'local model configuration named by run protocol' if config else None}
+
+
+@router.get('/runs/catalog')
+def run_catalog():
+    return {'schema':'rdc_run_catalog.v1','runs':[
+        {'id':key,'label':label,**run_layout(key)} for key,label in RUN_LABELS.items()
+    ]}
+
 
 @router.get('/runs')
 def runs():

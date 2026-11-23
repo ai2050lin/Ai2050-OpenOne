@@ -2,7 +2,7 @@
    只是 discovery 上的候选观察：逐层读出是近似，注意力去向不等于计算使用，确认要到 H4 的路径干预。 */
 import { useState } from 'react';
 
-import report from '../../../../research/mainline/H2/report.json';
+import { useWorkspaceResource } from './nativeObservationArchive.js';
 import './client_guide.css';
 
 const DOC = '#2a78d6', REAL = '#eb6834';
@@ -45,6 +45,8 @@ export function LineChart({ series, label, yLabel, band, height = 210 }) {
 }
 
 export default function H2Results() {
+  const {data:report,error} = useWorkspaceResource('h2-report');
+  if (!report) return <p className="v8-note">{error||'等待中心的 MA-H2 报告。'}</p>;
   const lens = report.lens;
   const att = report.attention;
   const factors = Object.keys(FACTOR_LABEL);

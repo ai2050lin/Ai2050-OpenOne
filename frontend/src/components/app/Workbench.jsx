@@ -28,6 +28,7 @@ import {ExtraPackPrompt} from '../open/DataBar.jsx';
 import './rdc_fusion/rdc_fusion.css';
 import './rdc_fusion/rdc_fusion_v6.css';
 import './workbench.css';
+import './workbench-layout.css';
 import ResearchExecution from '../v8/ResearchExecution.jsx';
 import ResearchCatalog from '../v8/ResearchCatalog.jsx';
 
@@ -86,11 +87,21 @@ function LensIcon({ id }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{p}</svg>;
 }
 
-function SubNav({ items, value, onChange, label, onHelp, extra }) {
+function SubNav({ items, value, onChange, label, onHelp, extra, tabs = false }) {
   return (
-    <nav className="wb-subnav" aria-label={label}>
-      {items.map(it => (
-        <button key={it.id} type="button" className={value === it.id ? 'on' : ''} onClick={() => onChange(it.id)} title={it.desc || it.label}>
+    <nav className="wb-subnav" aria-label={label} role={tabs ? 'tablist' : undefined}>
+      {items.map((it,index) => (
+        <button key={it.id} type="button" className={value === it.id ? 'on' : ''} onClick={() => onChange(it.id)} title={it.desc || it.label}
+          role={tabs ? 'tab' : undefined} aria-selected={tabs ? value === it.id : undefined}
+          id={tabs ? 'wb-tab-'+it.id : undefined} tabIndex={tabs ? (value === it.id ? 0 : -1) : undefined}
+          aria-controls={tabs ? 'wb-panel-'+it.id : undefined}
+          onKeyDown={tabs ? event => {
+            const target = ({Home:0,End:items.length-1,ArrowRight:(index+1)%items.length,ArrowLeft:(index+items.length-1)%items.length})[event.key];
+            if (!Number.isInteger(target)) return;
+            event.preventDefault();
+            event.currentTarget.parentElement.children[target].focus();
+            onChange(items[target].id);
+          } : undefined}>
           {it.label}
         </button>
       ))}
@@ -143,7 +154,7 @@ function WorkbenchContent() {
     writeState(normalized,{push:true,...context});
     setSt(normalized);
   };
-  const go = (a, b, c, {run,snapshot,...extra}={}) => commit(resolveGo(latestState.current,a,b,c,extra),{run,snapshot});
+  const go = (a, b, c, {run,snapshot,record,...extra}={}) => commit(resolveGo(latestState.current,a,b,c,extra),{run,snapshot,record});
   const set = patch => commit({...latestState.current,...patch});
   /* 进展 → 空间：先把空间内部状态（语言项、块等）写进地址栏，空间挂载时读取 */
   const goSpace = (v, patch = {}, model = st.mdl) => {
@@ -152,12 +163,11 @@ function WorkbenchContent() {
   };
 
   return (
-    <div className="fw-root wb-root">
+    <div className="fw-root wb-root" data-lens={lens}>
       <header className="wb-top">
         <a className="wb-brand" href={window.location.protocol === 'file:' ? window.location.pathname : '/'}><span className="op-logo" aria-hidden="true">A2</span><span><b>研究工作台</b><small>返回首页</small></span></a>
-        <span className="wb-lens-title" title={lenses.find(l => l.id === lens)?.desc}>{lensLabel}</span>
         <div className="wb-top-right">
-          <button type="button" className="fw-tbtn" onClick={()=>set({lens:'config',csec:'node'})}>贡献算力</button>
+          <button type="button" className="fw-tbtn" onClick={()=>go('plan',null,null,{run:''})}>贡献算力</button>
           <button type="button" className="fw-tbtn" onClick={()=>set({importing:true})}>数据与同步</button>
           {cfg.data?.sandbox_synthetic && <span className="op-sandbox">合成·沙盒</span>}
           <span className="wb-center wb-pro" title="当前连接的中心服务">{API_BASE || window.location.origin}</span>
@@ -172,7 +182,10 @@ function WorkbenchContent() {
             <Fragment key={l.id}>
               {l.id === 'config' && <div className="fw-rdiv" />}
               {l.id === 'local' && <div className="fw-rdiv" />}
-              <button type="button" className={'fw-rbtn' + (lens === l.id ? ' on' : '')} onClick={() => set(l.id === 'process' && lens !== 'process' ? { lens: 'process', station: 'plan' } : { lens: l.id })}
+              <button type="button" className={'fw-rbtn' + (lens === l.id ? ' on' : '')} onClick={() => {
+                if(l.id==='process')go('plan',null,null,{run:''});
+                else set(l.id==='route'?{lens:'route',rtab:'overview',opane:''}:{lens:l.id});
+              }}
                       title={`${l.label}：${l.desc}`} aria-current={lens === l.id ? 'page' : undefined}>
                 <LensIcon id={l.id} />{l.label}
               </button>
@@ -180,19 +193,22 @@ function WorkbenchContent() {
           ))}
         </nav>
         <div className="wb-body">
-          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab==='neuron'?'overview':rtab} onChange={v => set({ rtab: v, opane: '' })} label="进展视图" onHelp={() => setHelpOpen(true)} />}
+          {lens === 'route' && <SubNav items={ROUTE_VIEWS} value={rtab==='neuron'?'overview':rtab} onChange={v => set({ rtab: v, opane: '' })} label="总览视图" tabs />}
           {lens === 'spatial' && <SubNav items={SPATIAL_MODES} value={smode}
-            onChange={v => set(SPACE_TARGET[v])} label="空间图谱" onHelp={() => setHelpOpen(true)}
+            onChange={v => set(SPACE_TARGET[v])} label="分析研究导航" onHelp={() => setHelpOpen(true)}
             extra={<button type="button" className="v6-linkbtn wb-copy-link" onClick={copyLink}>{copied ? '链接已复制' : '复制当前链接'}</button>} />}
-          {lens === 'process' && <SubNav items={stations.filter(s=>['plan','catalog','execution'].includes(s.id))} value={stationGroup}
-            onChange={s => set({ station: s, mrun: '', ...(s === 'catalog' ? { tm: '' } : {}) })} label="研发工位" onHelp={() => setHelpOpen(true)} />}
+          {lens==='process' && station!=='plan' && <nav className="wb-subnav" aria-label="实验管理导航">
+            <button type="button" onClick={()=>go('plan',null,null,{run:''})}>← 返回实验管理</button>
+            <button type="button" className="wb-help-btn" onClick={()=>setHelpOpen(true)} aria-label="本页功能与原理说明">?</button>
+          </nav>}
           {/* 配置的分段与其它界面用同一条子导航：连接 / 账号与节点 / 模型与 AI / 平台 */}
           {lens === 'config' && <SubNav items={CFG_SECTIONS} value={csec} onChange={v => set({ csec: v })} label="配置分段" onHelp={() => setHelpOpen(true)} />}
           {/* 图谱覆盖在摘要旁选模型，在数据集实测里选题库；空间继续使用全局维度条。 */}
           {!(lens==='process'&&station==='plan') && (context.run || context.trace || context.context_trace || (context.snapshot && (lens !== 'route' || !['overview','lang'].includes(rtab)))) && <div className="wb-research-context wb-pro" aria-label="当前研究上下文"><span>研究：{context.run||'未绑定实验'}</span>{context.snapshot&&<span title={context.snapshot}>来源快照 {context.snapshot.slice(0,16)} · 页面内核验</span>}{(context.trace||context.context_trace)&&view!=='live'&&<button type="button" className="v6-linkbtn" onClick={()=>set({lens:'spatial',view:'live'})}>回到来源样本</button>}</div>}
-          <main className="wb-main">
+          <main className="wb-main" aria-label={lensLabel}>
+            <div className="wb-content">
             <MainlineStatus/>
-            {lens==='config'&&CFG_SECTIONS.some(s=>s.id===csec)&&<PageHead title={CFG_SECTIONS.find(s=>s.id===csec).label} sub={CFG_SECTIONS.find(s=>s.id===csec).desc} />}
+            {lens==='config'&&<PageHead visible title={CFG_SECTIONS.find(s=>s.id===csec)?.label || (csec==='platform'?'平台信息':'高级工具')} />}
             {lens==='process'&&stationGroup==='execution'&&station!=='execution'&&<button className="fw-tbtn" type="button" onClick={()=>go('execution')}>返回实验与队列</button>}
             <Suspense fallback={<Empty>加载中…</Empty>}>
               {lens==='process'&&['plan','execution'].includes(station)&&<ResearchExecution plan={station==='plan'} onGo={go}
@@ -210,11 +226,17 @@ function WorkbenchContent() {
               {lens === 'process' && station === 'pipeline' && <TemplatePipeline step={pstep} onStep={v => set({ pstep: v })} onGo={go} canAudit={isAdmin} />}
               {lens === 'process' && station === 'census' && <CensusPanel />}
               {lens === 'process' && station === 'autotest' && <AutoTestPanel onGo={go} onStation={s => go(s)} />}
-              {lens === 'route' && <RouteLens tab={rtab} openPane={st.opane} model={st.mdl || ''} ds={st.ds || ''} onGoSpace={goSpace} onGo={go} />}
+              {lens === 'route' && ROUTE_VIEWS.map(({id}) => {
+                const active=id===(rtab==='neuron'?'overview':rtab);
+                return <div key={id} id={'wb-panel-'+id} role="tabpanel" aria-labelledby={'wb-tab-'+id} hidden={!active} tabIndex={0}>
+                  {active&&<RouteLens key={revision} tab={rtab} openPane={st.opane} model={st.mdl || ''} ds={st.ds || ''} onGoSpace={goSpace} onGo={go}/>}
+                </div>;
+              })}
               {lens === 'config' && csec!=='legacy' && <ConfigView cfg={cfg} onGo={go} section={csec} nodeStep={st.cstep} />}
               {lens==='config'&&<details className="v8-card v8-overview-fold"><summary>高级与兼容工具</summary><div className="v6-toolbar"><button className="fw-tbtn" onClick={()=>set({csec:'platform'})}>平台信息</button>{localTools&&<button className="fw-tbtn" onClick={()=>set({csec:'legacy'})}>旧版兼容与教学工具</button>}</div></details>}
               {lens === 'config' && csec==='legacy' && (localTools?<><section className="v8-card"><h2>旧版兼容与教学工具</h2><p className="v8-note">此处保留历史实测与显式教学演示；演示不进入研究统计。正式前向请进入运行与路径。</p><button className="fw-tbtn" onClick={()=>go('spatial','live')}>打开真实运行与路径</button></section><LensSpatial on onGo={go}/></>:<Empty>旧版工具只在本机中心开放；正式研究使用空间中的图谱、参数和运行页面。</Empty>)}
             </Suspense>
+            </div>
           </main>
           {/* 「问 AI」侧栏：只在桌面客户端（Key 在主进程）；网页版不显示 */}
           {DESKTOP && <Suspense fallback={null}><AiChatDrawer onSettings={() => set({ lens: 'config', csec: 'model' })} /></Suspense>}

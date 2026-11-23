@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 
+from functools import lru_cache
 import io
 import json
 import os
@@ -166,11 +167,9 @@ def census_open_jobs() -> list:
         return []
 
 
-@router.get('/config')
-def config(request: Request) -> dict:
-    from shared.dist_protocol import accounts as A
-    cfg = _config_file()
-    jobs = census_open_jobs()
+def participation_models(cfg=None, jobs=None):
+    cfg = _config_file() if cfg is None else cfg
+    jobs = census_open_jobs() if jobs is None else jobs
     models, seen = [], set()
     listed = [m for m in (cfg.get('models') or []) if len(str(m.get('snapshot_sha256') or '')) == 64]
     for m in (listed or DEFAULT_MODELS) + [j['model'] for j in jobs]:   # 参与所需模型：配置文件登记（缺省 DEFAULT_MODELS）+ 开放的普查作业
@@ -178,6 +177,14 @@ def config(request: Request) -> dict:
         if len(snap) == 64 and all(ch in '0123456789abcdef' for ch in snap) and snap not in seen:   # 占位值不下发
             seen.add(m['snapshot_sha256'])
             models.append({k: m.get(k) for k in ('name', 'hf_repo', 'hf_revision', 'snapshot_sha256', 'min_vram_gib')})
+    return models
+
+
+@router.get('/config')
+def config(request: Request) -> dict:
+    from shared.dist_protocol import accounts as A
+    cfg = _config_file()
+    jobs = census_open_jobs()
     return {
         'schema': 'platform_config.v1', 'version': PLATFORM_VERSION,
         'title': cfg.get('title', 'AI2050 · 开源 LLM 逆向研究平台'),
@@ -189,7 +196,7 @@ def config(request: Request) -> dict:
         'repo_url': cfg.get('repo_url', 'https://github.com/ai2050lin/Ai2050-OpenOne'),
         'license': {'code': 'Apache-2.0', 'data': 'CC BY 4.0'},
         'census_jobs': jobs,
-        'models': models,
+        'models': participation_models(cfg, jobs),
         'sandbox_synthetic': os.environ.get('AI2050_DIST_ALLOW_SYNTHETIC') == '1',
         'datapack': _datapack_meta(),                    # 客户端离线数据包的版本与大小；客户端据此提示「有新数据」
         'local_tools': os.environ.get('AI2050_LOCAL_TOOLS') == '1',   # 本机中心：工作台显示自动测试与模型资产
@@ -539,10 +546,37 @@ def model_skeleton_ep(model_key: str = '') -> dict:
         return _lang_pending()
     sk = doc['data']['skeletons']
     if not model_key:
-        return {'schema': 'model_skeletons.v1', 'pending': False, 'models': [sk[m] for m in sorted(sk)]}
+        return {'schema': 'model_skeletons.v1', 'pending': False,
+                'models': [_complete_verified_skeleton(sk[m]) for m in sorted(sk)]}
     if model_key not in sk:
         raise HTTPException(404, f'没有模型 {model_key} 的骨架')
-    return {**sk[model_key], 'pending': False}
+    return {**_complete_verified_skeleton(sk[model_key]), 'pending': False}
+
+
+@lru_cache(maxsize=1)
+def _verified_model_layouts() -> dict:
+    path = _REPO / 'shared/dist_protocol/verified_model_layouts.json'
+    return json.loads(path.read_bytes())
+
+
+def _complete_verified_skeleton(skeleton: dict) -> dict:
+    """Fill missing dimensions for the exact weight snapshot from its verified model config."""
+    verified = _verified_model_layouts().get(skeleton.get('model_snapshot'))
+    if not verified:
+        return skeleton
+    config = verified['config']
+    dimensions = {
+        'n_layers': config['num_hidden_layers'], 'd_model': config['hidden_size'],
+        'd_ff': config['intermediate_size'], 'n_heads': config['num_attention_heads'],
+        'n_kv_heads': config['num_key_value_heads'], 'head_dim': config['head_dim'],
+    }
+    recorded = skeleton.get('config') or {}
+    if any(skeleton.get(key) not in (None, value) for key, value in dimensions.items()) or any(
+        recorded.get(key) not in (None, value) for key, value in config.items()
+    ):
+        return skeleton
+    return {**skeleton, **dimensions, 'config': config | {k: v for k, v in recorded.items() if v is not None},
+            'structure_source': {'kind': 'verified_snapshot_config', 'config_sha256': verified['config_sha256']}}
 
 
 # ---------------- 模型结构参数：词嵌入 / 注意力 / MLP 的形状与参数量 ----------------
@@ -634,10 +668,14 @@ def model_arch_ep(model_key: str) -> dict:
     sk = (doc.get('data') or {}).get('skeletons', {}).get(model_key)
     if sk is None:
         raise HTTPException(404, f'没有模型 {model_key} 的骨架')
+    sk = _complete_verified_skeleton(sk)
     model_id = sk.get('model_id') or str(model_key).split('|')[0]
-    cfg, src = _hf_config(model_id)
-    if not cfg:
-        cfg, src = (sk.get('config') or {}), 'lang_atlas skeletons[].config'
+    if sk.get('structure_source', {}).get('kind') == 'verified_snapshot_config':
+        cfg, src = sk['config'], 'verified_model_layouts.json · ' + sk['structure_source']['config_sha256']
+    else:
+        cfg, src = _hf_config(model_id)
+        if not cfg:
+            cfg, src = (sk.get('config') or {}), 'lang_atlas skeletons[].config'
     arch = _arch_from_config(cfg or {}, sk.get('n_layers'))
     if arch is None:
         return {'schema': 'model_arch.v1', 'pending': False, 'available': False, 'model_key': model_key, 'model_id': model_id,

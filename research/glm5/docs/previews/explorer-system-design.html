@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>模型分析 · AI2050 研究工作台</title>
+  <link rel="stylesheet" href="explorer-system-design.css">
+  <link rel="stylesheet" href="explorer-system-live.css"><link rel="stylesheet" href="explorer-system-features.css">
+  <link rel="stylesheet" href="../../../../frontend/src/components/v8/nativeFieldInspector.css">
+  <script defer src="model-records-data.js"></script><script defer src="model-explorer-data.js"></script>
+  <script defer src="explorer-system-field.js"></script><script defer src="model-explorer-scene.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/representationGeometry.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/attentionPatternStats.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/sparseDictionaryArchive.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/data/nativeHeadChannels.js"></script>
+  <script defer src="../../../../frontend/src/components/v8/nativeFieldInspector.js"></script>
+  <script defer src="explorer-system-native.js"></script>
+  <script defer src="explorer-system-plugins.js"></script>
+  <script defer src="explorer-system-live.js"></script><script defer src="explorer-system-features.js"></script>
+  <script defer src="explorer-system-archive.js"></script><script defer src="explorer-system-laws.js"></script><script defer src="explorer-system-plan.js"></script>
+  <script defer src="explorer-system-design.js"></script>
+</head><body>
+  <aside class="sys-rail" aria-label="研究工作台"><div class="sys-brand" aria-label="AI2050">A<sup>2</sup></div>
+    <nav><a href="client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i data-icon="overview"></i>总览</a>
+    <a href="#workbench" aria-current="page"><i data-icon="cube"></i>语言与模型</a>
+    <a href="client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=plan"><i data-icon="tests"></i>实验管理</a></nav>
+    <a class="sys-settings" href="client-distributed-testing.html#?wb=1&amp;lens=config"><i data-icon="settings"></i>设置</a>
+  </aside>
+  <header class="sys-global"><span><strong>AI2050</strong><b>/</b>研究工作台<b>/</b>语言与模型</span><span class="sys-preview"><i></i>离线设计预览</span></header>
+  <main id="workbench">
+    <header class="sys-title"><h1>模型分析</h1><button id="plan-open" class="sys-button"><i data-icon="plan"></i>研究计划 <small id="plan-count" hidden></small></button></header>
+    <div class="sys-exploration-nav"><nav class="sys-modes" aria-label="探索模式">
+      <button id="mode-live" data-mode="live"><i data-icon="pulse"></i><span><strong>实时模式</strong><small>观察一段输入</small></span></button>
+      <button id="mode-archive" data-mode="archive"><i data-icon="archive"></i><span><strong>测试记录</strong><small>复核一次测试</small></span></button>
+      <button id="mode-features" data-mode="features"><i data-icon="feature"></i><span><strong>特征分析</strong><small>研究一个对象</small></span></button>
+    </nav>
+    <nav id="full-views" class="sys-full-views" aria-label="全屏视图" hidden>
+      <button type="button" id="full-workspace" aria-pressed="true">3D 与控制台</button>
+      <button type="button" id="full-units" aria-pressed="false">原生单元</button>
+    </nav></div>
+    <section class="sys-space" aria-label="共享模型空间">
+      <div class="sys-scene"><div class="sys-scene-head"><h2><i data-icon="cube"></i>模型空间</h2>
+        <div><button id="native-open" class="sys-button" type="button" title="全屏查看 Head 通道或整层 FFN">原生单元</button><button id="display-open" class="sys-icon" aria-label="显示插件" title="显示插件" aria-expanded="false"><i data-icon="settings"></i></button>
+        <button id="fullscreen" aria-label="全屏" class="sys-icon" title="全屏"><i data-icon="expand"></i></button></div></div>
+        <fieldset id="display-options" hidden><legend>显示插件</legend><label><input id="grid" type="checkbox" checked>空间网格</label><label><input id="labels" type="checkbox" checked>原生编号</label></fieldset>
+        <canvas id="model-canvas" aria-label="模型分块与原生对象"></canvas>
+        <div class="sys-scene-foot"><span><i></i>原生结构位置</span><div><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-reset" aria-label="复位视角">⟲</button><button id="zoom-in" aria-label="放大">＋</button></div></div>
+      </div>
+      <div class="sys-locator"><div class="sys-object-heading"><span>当前对象</span><strong id="current-object"></strong></div>
+        <label for="model-select">模型</label><select id="model-select"><option>Qwen3-14B</option><option>Qwen3-4B</option></select>
+        <label for="coord-input">Head 或 FFN 神经元</label><form id="coord-form"><input id="coord-input" spellcheck="false" placeholder="B26/H36 或 B36/U2429" autocomplete="off" required><button id="locate-btn">定位</button></form>
+        <p id="coord-info" role="status"></p>
+      </div>
+    </section>
+    <section id="full-native" class="sys-native-panel" aria-label="全屏原生场" hidden>
+      <div class="sys-native-bar">
+        <h2 id="native-title">原生单元</h2>
+        <label>测量量<select id="native-measure"></select></label>
+        <label>读出位置<select id="native-site"></select></label>
+        <details class="sys-native-examples"><summary>已采集样例</summary><div>
+          <button type="button" id="native-sample-head">B26/H36 · Head 输出</button>
+          <button type="button" id="native-sample-ffn">B36 · FFN 激活</button>
+        </div></details>
+      </div>
+      <div id="native-host"></div>
+      <p id="native-unlinked" hidden>这条历史记录未关联模型内的对象。可回到控制台查看整模型结果，或显式打开一份已采集样例。</p>
+    </section>
+    <section id="console" aria-label="当前模式工作区"><div id="live-panel" hidden></div><div id="archive-panel" hidden></div><div id="features-panel" hidden></div></section>
+    <dialog id="plan-dialog" aria-labelledby="plan-title"><header class="sys-dialog-head"><h2 id="plan-title">研究计划</h2><button id="plan-close" aria-label="关闭研究计划" class="sys-icon">×</button></header>
+      <nav class="sys-plan-tabs" aria-label="研究计划视图"><button id="plan-questions">研究问题</button><button id="plan-laws">规律索引</button><button id="plan-drafts">待测任务</button></nav>
+      <div id="plan-content"></div></dialog>
+  </main>
+</body></html>

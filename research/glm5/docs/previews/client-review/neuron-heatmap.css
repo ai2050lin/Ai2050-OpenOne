@@ -1,0 +1,44 @@
+.neuron-heatmap {
+  box-sizing: border-box;
+  min-width: 0;
+  color: #20334c;
+  font: inherit;
+}
+.neuron-heatmap *, .neuron-heatmap *::before, .neuron-heatmap *::after { box-sizing: border-box; }
+.nhm-heading, .nhm-meta, .nhm-selection, .nhm-readout, .nhm-selection form, .nhm-legend {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.nhm-heading, .nhm-meta, .nhm-selection { justify-content: space-between; }
+.neuron-heatmap .nhm-heading { margin: 0 0 8px; padding: 0; border: 0; background: none; }
+.neuron-heatmap .nhm-heading h3 { margin: 0; padding: 0; color: #1b3049; font-size: 16px; font-weight: 650; }
+.nhm-heading > span, .nhm-meta, .nhm-help { color: #526479; font-size: 12px; line-height: 1.5; }
+.nhm-meta { gap: 4px 10px; margin: 0 0 6px; }
+.nhm-plot { position: relative; margin: 0; border: 1px solid #b6c5d1; background: #e2e8ec; }
+.neuron-heatmap .nhm-raster {
+  display: block; width: 100%; height: clamp(130px, 18vh, 205px); padding: 0; margin: 0;
+  border: 0; border-radius: 0; image-rendering: pixelated; cursor: crosshair;
+}
+.nhm-raster:focus-visible { outline: 2px solid #1f5fbf; outline-offset: 2px; }
+.nhm-cursor {
+  position: absolute; width: 11px; height: 11px; transform: translate(-50%, -50%); pointer-events: none;
+  border: 2px solid #10263b; border-radius: 50%; box-shadow: 0 0 0 1px white, inset 0 0 0 1px white;
+}
+.nhm-legend { gap: 4px; min-height: 26px; color: #44576d; font-size: 11px; font-variant-numeric: tabular-nums; }
+.nhm-legend i { width: min(44px, 9%); height: 7px; border: 1px solid #c9d3dc; }
+.nhm-legend i:first-of-type { background: linear-gradient(90deg,#d4622b,#e39973 50%,#fff); }
+.nhm-legend i:last-of-type { background: linear-gradient(90deg,#fff,#6b95d5 50%,#1f5fbf); }
+.nhm-legend small { margin-left: 8px; font-size: inherit; }
+.nhm-selection { gap: 5px 10px; padding-top: 4px; align-items: baseline; }
+.nhm-selection form, .nhm-readout { margin: 0; gap: 6px; color: #435970; font-size: 12px; }
+.neuron-heatmap .nhm-index {
+  width: 84px; min-width: 0; max-width: 100%; height: 28px; padding: 2px 5px; border: 1px solid #b9c7d4;
+  border-radius: 4px; background: #fff; color: #20334c; font: inherit; font-variant-numeric: tabular-nums;
+}
+.neuron-heatmap .nhm-selection button {
+  width: auto; min-height: 28px; padding: 2px 9px; border: 1px solid #b9c7d4;
+  border-radius: 4px; background: #f4f8fb; color: #28496a; font: inherit; cursor: pointer;
+}
+.nhm-value { color: #143351; font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+.nhm-help { margin: 7px 0 0; }
+.nhm-empty { padding: 15px; border: 1px dashed #bdcad5; border-radius: 4px; background: #f6f9fb; font-size: 13px; }
+.nhm-empty p { margin: 4px 0; color: #526479; }

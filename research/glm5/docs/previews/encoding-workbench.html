@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模型分析 · AI2050 研究工作台</title>
+<link rel="stylesheet" href="free-model.css">
+<link rel="stylesheet" href="../../../../frontend/src/components/v8/nativeFieldInspector.css">
+<link rel="stylesheet" href="free-model-tools.css"><link rel="stylesheet" href="free-model-windows.css">
+<script defer src="model-records-data.js"></script><script defer src="model-explorer-data.js"></script>
+<script defer src="explorer-system-field.js"></script><script defer src="model-explorer-scene.js"></script>
+<script defer src="../../../../frontend/src/components/v8/data/nativeHeadChannels.js"></script>
+<script defer src="../../../../frontend/src/components/v8/attentionPatternStats.js"></script>
+<script defer src="../../../../frontend/src/components/v8/representationGeometry.js"></script>
+<script defer src="../../../../frontend/src/components/v8/nativeFieldInspector.js"></script>
+<script defer src="encoding-workbench-data.js"></script>
+<script defer src="free-model-data.js"></script><script defer src="free-model-tools.js"></script>
+<script defer src="free-model-windows.js"></script><script defer src="free-model.js"></script>
+</head>
+<body>
+<aside class="rail" aria-label="项目导航"><a class="brand" href="client-distributed-testing.html" aria-label="AI2050 总览">A<span>2</span></a>
+<nav><a href="client-distributed-testing.html#?wb=1&amp;lens=route&amp;rtab=overview"><i data-ico="overview"></i>总览</a>
+<a class="selected" href="#free-workbench" aria-current="page"><i data-ico="layers"></i>语言与模型</a>
+<a href="client-distributed-testing.html#?wb=1&amp;lens=process&amp;station=plan"><i data-ico="flask"></i>实验管理</a></nav>
+<a class="settings" href="client-distributed-testing.html#?wb=1&amp;lens=config"><i data-ico="sliders"></i>设置</a></aside>
+<header class="crumb"><span>研究工作台 <em>/</em> 语言与模型 <em>/</em> <b>模型分析</b></span><span class="offline"><i></i>离线预览</span></header>
+<div class="page">
+<header class="title-line"><div><h1>模型分析</h1><p>选择原生对象，追踪它在语言材料中的响应。</p></div><a href="encoding-cases.html" class="case-link"><i data-ico="book"></i>研究案例<i data-ico="arrow"></i></a></header>
+<main id="free-workbench">
+<header class="desk-toolbar">
+<button type="button" class="palette-grip" aria-label="移动模型工具栏，支持方向键" title="拖动工具栏或用方向键移动">⠿</button>
+<label class="model-control"><i data-ico="layers"></i><span class="sr">模型快照</span><select id="model-select"></select></label>
+<span class="model-info" id="model-info"></span><span class="toolbar-spacer"></span>
+<button id="view-screen" class="screen-btn" type="button"><i data-ico="screen"></i><span>全屏观察</span></button>
+</header>
+<section id="stage" aria-label="模型结构观察区">
+<canvas id="space-canvas" aria-label="模型结构图"></canvas>
+<div class="stage-tag"><b class="point"></b><span id="selection-name"></span></div>
+<div class="camera" aria-label="视角"><button id="zoom-out" title="缩小" aria-label="缩小">−</button><button id="zoom-in" title="放大" aria-label="放大">+</button><button id="camera-reset" title="复位视角" aria-label="复位视角"><i data-ico="reset"></i></button><button data-open-window="display" title="显示设置" aria-label="显示设置"><i data-ico="sliders"></i></button></div>
+</section>
+<nav class="tool-dock" aria-label="分析窗口">
+<button type="button" class="palette-grip" aria-label="移动窗口工具栏，支持方向键" title="拖动工具栏或用方向键移动">⠿</button>
+<button data-open-window="locator"><i data-ico="target"></i><span>对象定位</span></button>
+<button data-open-window="readout"><i data-ico="wave"></i><span>激活读数</span></button>
+<button data-open-window="parameters"><i data-ico="matrix"></i><span>模型参数</span></button>
+<button data-open-window="tools"><i data-ico="math"></i><span>数学工具</span></button>
+<button data-open-window="evidence"><i data-ico="book"></i><span>材料与来源</span></button>
+<button id="layout-reset" title="复位浮窗位置" aria-label="复位浮窗位置"><i data-ico="reset"></i></button>
+</nav>
+<div id="free-windows">
+<section class="free-window" data-window="locator">
+<header class="window-bar"><h2>对象定位</h2></header>
+<div class="window-content locator-columns">
+<div class="locate-controls">
+<form id="jump-form"><label for="address">跳至原生地址</label><div class="input-button"><input id="address" autocomplete="off" spellcheck="false" required aria-describedby="address-help"><button class="primary">定位<i data-ico="arrow"></i></button></div><small id="address-help">如 B26/H36、B0/U0、hs[0]/D0 或张量全名</small></form>
+<div class="controls-group"><label>对象类型<select id="loc-kind"><option value="head">注意力头 · Head</option><option value="ffn">前馈单元 · FFN</option><option value="hidden">残差坐标 · HiddenState</option></select></label><label><span id="block-label">模型块</span><input id="loc-block" type="number" min="0" step="1"></label><label><span id="index-label">Head 编号</span><input id="loc-index" type="number" min="0" step="1"></label></div>
+<div id="loc-note" class="notice" role="status"></div>
+</div>
+<div class="object-details"><div class="object-title"><i data-ico="target"></i><h3 id="object-title"></h3></div><p id="object-description"></p><div class="related" id="related"></div>
+<button class="text-btn" id="channel-view">展开头内通道</button>
+<button class="text-btn" data-open-window="readout">观察激活读数 <i data-ico="arrow"></i></button></div>
+</div></section>
+<section class="free-window" data-window="readout" hidden><header class="window-bar"><h2>激活读数</h2></header><div class="window-content"><div id="readout-host"></div></div></section>
+<section class="free-window" data-window="parameters" hidden><header class="window-bar"><h2>模型参数</h2></header><div class="window-content">
+<div class="parameter-layout"><div><label for="tensor-filter">查找张量</label><input id="tensor-filter" type="search" placeholder="按完整名称或片段检索" autocomplete="off" spellcheck="false">
+<label for="tensor-select">原生张量 <small id="tensor-count"></small></label><select id="tensor-select"></select><div id="tensor-info" class="native-meta"></div>
+<form id="weight-form"><div class="controls-group"><label>起始行<input id="weight-row" type="number" min="0" step="1" required></label><label>起始列<input id="weight-col" type="number" min="0" step="1" required></label><button class="primary">读取</button></div></form>
+<div class="related"><button id="analyze-weight">分析当前切片 <i data-ico="arrow"></i></button><button data-open-window="evidence">接入本机数据</button></div></div>
+<div class="weights"><p id="weight-message" role="status"></p><div class="table-scroll"><table id="weight-table" aria-label="按原生行列显示的权重"></table></div>
+<div class="weight-paging" aria-label="按行列翻页"><button id="rows-prev">↑ 上 8 行</button><button id="rows-next">↓ 下 8 行</button><button id="cols-prev">← 左 8 列</button><button id="cols-next">右 8 列 →</button></div></div></div>
+</div></section>
+<section class="free-window" data-window="tools" hidden><header class="window-bar"><h2>数学工具</h2></header><div class="window-content"><div id="tools-host"></div></div></section>
+<section class="free-window" data-window="display" hidden><header class="window-bar"><h2>空间显示</h2></header><div class="window-content display-options">
+<label><input id="show-grid" type="checkbox" checked> 显示空间网格</label><label><input id="show-labels" type="checkbox" checked> 显示原生编号</label>
+<label>Head 结构视图 <select id="head-detail"><option value="heads">本块全部查询头</option><option value="channels">所选 Head 的全部通道</option></select></label>
+<p>拖动旋转，滚轮缩放。点击左侧模型块切换层，点击右侧对象定位。激活强度的热力图可在「激活读数」查看。</p><button data-open-window="locator">返回对象定位</button></div></section>
+<section class="free-window" data-window="evidence" hidden><header class="window-bar"><h2>材料与来源</h2></header><div class="window-content">
+<div class="sources-grid"><section><h3>归档材料</h3><p id="source-summary"></p><div class="snapshot" id="snapshot"></div><div id="source-fields"></div><a href="model-records-design.html" class="text-btn">检索历史测试 <i data-ico="arrow"></i></a></section>
+<section><h3>本机权重</h3><p>选择当前模型的原始 SafeTensors 分片，可按行列读取其中任意参数。文件只在本页读取。</p><label class="file-btn">选择权重分片<input type="file" id="weight-files" multiple accept=".safetensors"></label><button id="clear-files" hidden>移除文件</button><p id="weight-load-note" role="status"></p></section>
+<section><h3>本机激活向量</h3><p>载入其他题目保存的向量，按快照、读出位置和对象定位，再调用数学工具。</p><label class="file-btn">导入激活 JSON<input type="file" id="experiment-field" accept=".json,application/json"></label><button id="field-example" class="text-btn">下载当前对象的格式模板</button><div id="field-source-control" hidden><label>正在分析的数据 <select id="source-switch"><option value="import">本机导入</option><option value="archive">随稿归档</option></select></label></div><button id="clear-field" hidden>移除导入向量</button><p id="field-load-note" role="status"></p></section></div>
+</div></section>
+</div>
+</main></div>
+</body></html>

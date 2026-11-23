@@ -1,0 +1,422 @@
+{
+  "schema": "workspace_publication.v1",
+  "models": [
+    {
+      "model": "Qwen3-14B",
+      "model_snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "config": {
+        "architectures": [
+          "Qwen3ForCausalLM"
+        ],
+        "attention_bias": false,
+        "attention_dropout": 0.0,
+        "bos_token_id": 151643,
+        "eos_token_id": 151645,
+        "head_dim": 128,
+        "hidden_act": "silu",
+        "hidden_size": 5120,
+        "initializer_range": 0.02,
+        "intermediate_size": 17408,
+        "max_position_embeddings": 40960,
+        "max_window_layers": 40,
+        "model_type": "qwen3",
+        "num_attention_heads": 40,
+        "num_hidden_layers": 40,
+        "num_key_value_heads": 8,
+        "rms_norm_eps": 1e-06,
+        "rope_scaling": null,
+        "rope_theta": 1000000,
+        "sliding_window": null,
+        "tie_word_embeddings": false,
+        "torch_dtype": "bfloat16",
+        "transformers_version": "4.51.0",
+        "use_cache": true,
+        "use_sliding_window": false,
+        "vocab_size": 151936
+      },
+      "config_sha256": "e73c3664ca09b10a673fef0c22e8a6b456201d49bd4713c9691f775720e8857a",
+      "tokenizer_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "n_layers": 40,
+      "n_heads": 40,
+      "n_kv_heads": 8,
+      "head_dim": 128,
+      "d_model": 5120,
+      "d_ff": 17408,
+      "analysis": {
+        "parameterModel": "qwen14",
+        "nativeMlp": "qwen14",
+        "qwenMlpRuns": [
+          "QWEN14-MLP-B28-B35-20261109-v1",
+          "QWEN14-GOODFIRE-B28-B39-20261113-v2"
+        ]
+      }
+    },
+    {
+      "model": "Qwen3-4B",
+      "model_snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "config": {
+        "architectures": [
+          "Qwen3ForCausalLM"
+        ],
+        "attention_bias": false,
+        "attention_dropout": 0.0,
+        "bos_token_id": 151643,
+        "eos_token_id": 151645,
+        "head_dim": 128,
+        "hidden_act": "silu",
+        "hidden_size": 2560,
+        "initializer_range": 0.02,
+        "intermediate_size": 9728,
+        "max_position_embeddings": 40960,
+        "max_window_layers": 36,
+        "model_type": "qwen3",
+        "num_attention_heads": 32,
+        "num_hidden_layers": 36,
+        "num_key_value_heads": 8,
+        "rms_norm_eps": 1e-06,
+        "rope_scaling": null,
+        "rope_theta": 1000000,
+        "sliding_window": null,
+        "tie_word_embeddings": true,
+        "torch_dtype": "bfloat16",
+        "transformers_version": "4.51.0",
+        "use_cache": true,
+        "use_sliding_window": false,
+        "vocab_size": 151936
+      },
+      "config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+      "tokenizer_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "n_layers": 36,
+      "n_heads": 32,
+      "n_kv_heads": 8,
+      "head_dim": 128,
+      "d_model": 2560,
+      "d_ff": 9728,
+      "analysis": {
+        "parameterModel": "qwen4",
+        "nativeMlp": "qwen4",
+        "mlpTail": true
+      }
+    },
+    {
+      "model": "GLM-4-9B",
+      "model_snapshot": "64baf4f7e4fb31aeb689b7cb8a63b2484be0aa1ca5ed7108f3c21f83c5879b3f",
+      "config": {
+        "architectures": [
+          "GlmForCausalLM"
+        ],
+        "attention_bias": true,
+        "attention_dropout": 0.0,
+        "eos_token_id": [
+          151329,
+          151336,
+          151338
+        ],
+        "head_dim": 128,
+        "hidden_act": "silu",
+        "hidden_size": 4096,
+        "initializer_range": 0.02,
+        "intermediate_size": 13696,
+        "max_position_embeddings": 131072,
+        "model_type": "glm",
+        "num_attention_heads": 32,
+        "num_hidden_layers": 40,
+        "num_key_value_heads": 2,
+        "pad_token_id": 151329,
+        "rms_norm_eps": 1.5625e-07,
+        "rope_theta": 10000.0,
+        "tie_word_embeddings": false,
+        "torch_dtype": "bfloat16",
+        "transformers_version": "4.46.0.dev0",
+        "use_cache": true,
+        "vocab_size": 151552
+      },
+      "config_sha256": "8ec64bc0dff4835a800b9eceb059e2b8263f783c898812175aa1ccdda074f596",
+      "tokenizer_sha256": "8a7269d6daa6328de533def0082ff9d3a825bb89036cbcc665c324f941f67fbf",
+      "n_layers": 40,
+      "n_heads": 32,
+      "n_kv_heads": 2,
+      "head_dim": 128,
+      "d_model": 4096,
+      "d_ff": 13696,
+      "analysis": {
+        "parameterModel": "glm4"
+      }
+    }
+  ],
+  "archives": [
+    {
+      "id": "qwen4",
+      "title": "Qwen3-4B · 全层实测轨迹",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "run": "LIVE-NATIVE-OBSERVATION",
+      "coverage": "输入末尾 · B0–B35 的全部 Head 和 MLP",
+      "visibility": "public",
+      "location": {
+        "layer": 1,
+        "module": "attn",
+        "index": 0
+      },
+      "shortcuts": [
+        {
+          "layer": 1,
+          "module": "attn",
+          "index": 0
+        },
+        {
+          "layer": 27,
+          "module": "attn",
+          "index": 14
+        },
+        {
+          "layer": 27,
+          "module": "mlp",
+          "index": 0
+        },
+        {
+          "layer": 36,
+          "module": "mlp",
+          "index": 9727
+        }
+      ],
+      "nativeCoverage": [
+        {
+          "firstBlock": 0,
+          "lastBlock": 35,
+          "module": "attn",
+          "firstIndex": 0,
+          "lastIndex": 31
+        },
+        {
+          "firstBlock": 0,
+          "lastBlock": 35,
+          "module": "mlp",
+          "firstIndex": 0,
+          "lastIndex": 9727
+        }
+      ],
+      "file": "qwen4.json"
+    },
+    {
+      "id": "head",
+      "title": "Qwen3-14B · B26/H36 选源测试",
+      "snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "run": "clt_b26_three_cues_v3",
+      "coverage": "三个归档条件 · B26/H36 的 Z",
+      "visibility": "public",
+      "location": {
+        "layer": 27,
+        "module": "attn",
+        "index": 36
+      },
+      "shortcuts": [
+        {
+          "layer": 27,
+          "module": "attn",
+          "index": 36
+        }
+      ],
+      "nativeCoverage": [
+        {
+          "firstBlock": 26,
+          "lastBlock": 26,
+          "module": "attn",
+          "firstIndex": 36,
+          "lastIndex": 36
+        }
+      ],
+      "file": "head.json",
+      "presentation": "selection"
+    },
+    {
+      "id": "b23",
+      "title": "Qwen3-14B · B23 语料观察",
+      "snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "run": "QWEN14-GOODFIRE-B18-B28-20261113-v2",
+      "coverage": "两个独立文档读出 · B23 的 MLP 激活",
+      "visibility": "public",
+      "location": {
+        "layer": 24,
+        "module": "mlp",
+        "index": 7708
+      },
+      "shortcuts": [
+        {
+          "layer": 24,
+          "module": "mlp",
+          "index": 7708
+        }
+      ],
+      "nativeCoverage": [
+        {
+          "firstBlock": 23,
+          "lastBlock": 23,
+          "module": "mlp",
+          "firstIndex": 0,
+          "lastIndex": 17407
+        }
+      ],
+      "file": "b23.json"
+    },
+    {
+      "id": "b26",
+      "title": "Qwen3-14B · B26 本机原题复跑",
+      "snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "run": "record-a641dea2-e60b-4262-bd38-6d3aba1bd868",
+      "coverage": "token 0、95、190 · B26 的 40 个 Head 输出和 17,408 个 MLP 激活",
+      "visibility": "private",
+      "location": {
+        "layer": 27,
+        "module": "attn",
+        "index": 0
+      },
+      "shortcuts": [
+        {
+          "layer": 27,
+          "module": "attn",
+          "index": 0
+        },
+        {
+          "layer": 27,
+          "module": "attn",
+          "index": 39
+        },
+        {
+          "layer": 27,
+          "module": "mlp",
+          "index": 17407
+        }
+      ],
+      "nativeCoverage": [
+        {
+          "firstBlock": 26,
+          "lastBlock": 26,
+          "module": "attn",
+          "firstIndex": 0,
+          "lastIndex": 39
+        },
+        {
+          "firstBlock": 26,
+          "lastBlock": 26,
+          "module": "mlp",
+          "firstIndex": 0,
+          "lastIndex": 17407
+        }
+      ],
+      "artifact": "native-0000.npz",
+      "source_block": 26,
+      "caseId": "confirm-000-02",
+      "trace": "6dbb2cc748e1f474a4b455b013b2378eed95ad6841d706aba4bb4b6de5fd121f"
+    },
+    {
+      "id": "b36",
+      "title": "Qwen3-14B · B36 受控对照",
+      "snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "run": "B36-TRANSITION14-20261114-v1",
+      "coverage": "同一输入的四个读出 · B36 的 MLP 激活",
+      "visibility": "public",
+      "location": {
+        "layer": 37,
+        "module": "mlp",
+        "index": 2429
+      },
+      "shortcuts": [
+        {
+          "layer": 37,
+          "module": "mlp",
+          "index": 2429
+        },
+        {
+          "layer": 37,
+          "module": "mlp",
+          "index": 3929
+        }
+      ],
+      "nativeCoverage": [
+        {
+          "firstBlock": 36,
+          "lastBlock": 36,
+          "module": "mlp",
+          "firstIndex": 0,
+          "lastIndex": 17407
+        }
+      ],
+      "file": "b36.json",
+      "presentation": "path-example"
+    }
+  ],
+  "resources": [
+    {
+      "id": "selection-cases",
+      "file": "selection-cases.json",
+      "visibility": "public"
+    },
+    {
+      "id": "path-example",
+      "file": "path-example.json",
+      "visibility": "public",
+      "snapshot": "1e970d119494affd09689ec3dd25aa30587dfcbb16d873b40fb917016fe2a2ce",
+      "kind": "path-example"
+    },
+    {
+      "id": "first-record",
+      "file": "first-record.json",
+      "visibility": "public"
+    },
+    {
+      "id": "dictionary",
+      "file": "dictionary.json",
+      "visibility": "public",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "kind": "dictionary"
+    },
+    {
+      "id": "attribution",
+      "file": "attribution.json",
+      "visibility": "public",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "kind": "attribution"
+    },
+    {
+      "id": "head-info",
+      "file": "head-info.json",
+      "visibility": "public",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "kind": "head-info"
+    },
+    {
+      "id": "head-weights",
+      "file": "head-weights.json",
+      "visibility": "public",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad",
+      "kind": "head-weights"
+    },
+    {
+      "id": "direction-questions",
+      "file": "direction-questions.json",
+      "visibility": "public",
+      "kind": "direction-questions"
+    },
+    {
+      "id": "h2-report",
+      "file": "h2-report.json",
+      "visibility": "public",
+      "kind": "h2-report",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+    },
+    {
+      "id": "h2-heads",
+      "file": "h2-heads.json",
+      "visibility": "public",
+      "kind": "h2-heads",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+    },
+    {
+      "id": "h0-prereg",
+      "file": "h0-prereg.json",
+      "visibility": "public",
+      "kind": "h0-prereg",
+      "snapshot": "6be1034f0b55a6dfc9383b4f155a736433d822a21f3ab6178012c2c2e14739ad"
+    }
+  ]
+}

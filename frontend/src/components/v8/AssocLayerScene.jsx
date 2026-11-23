@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { panScene, useScenePointer } from '../scenePointer.js';
 
-import { ASSOC_VIEWS, assocHit, assocProject } from './assocLayerGeometry.js';
+import { ASSOC_VIEWS, HEAD_CHANNEL_PLANE, assocHit, assocProject } from './assocLayerGeometry.js';
 import { EVIDENCE_COLORS } from './researchLocation.js';
 
 const ZONES = {
@@ -10,7 +10,7 @@ const ZONES = {
   mlp: { x0: -8, x1: 491, z0: 31, z1: 203 },
 };
 
-export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, marks, links = [], onPick, overlays, live, archive }) {
+export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, marks, links = [], onPick, overlays, live, archive, headChannels }) {
   const cv = useRef(null), st = useRef({ yaw: ASSOC_VIEWS[view][0], pitch: ASSOC_VIEWS[view][1], view, zoom: 1, hits: [], linkHits: [], W: 0, H: 0, dpr: 1 });
   const [tick, setTick] = useState(0), [tip, setTip] = useState(null);
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
   useEffect(() => {
     const ctx = cv.current.getContext('2d'), s = st.current;
     if (s.view !== view) { s.view = view; s.yaw = ASSOC_VIEWS[view][0]; s.pitch = ASSOC_VIEWS[view][1]; }
+    s.expandedHead = Boolean(headChannels);
     if (!s.W) return;
     ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0); ctx.clearRect(0, 0, s.W, s.H); s.hits = []; s.linkHits = []; s.archiveHits=[];
     const fontScale = Math.max(0.68, Math.min(1, s.W / 760));
@@ -79,7 +80,7 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
       quad(h, null, '#9cadc4'); s.hits.push(h);
       const p = proj(h.x0, 20, h.z0); label(o.name, [p[0], p[1] - 10]);
     }
-    if (s.W > 640) label(layer ? `第 ${layer} 层 · 块 B${layer - 1} 的内部` : '输入词嵌入 · 全部坐标', proj(0, 20, -220), '#183f77', 14);
+    if (s.W > 640 && s.H > 500) label(layer ? `第 ${layer} 层 · 块 B${layer - 1} 的内部` : '输入词嵌入 · 全部坐标', proj(0, 20, -220), '#183f77', 14);
     overlays?.({ ctx, proj, LY, llm, alpha });
     if (live?.curve) {
       const mx = Math.max(...live.curve.slice(1)) || 1;
@@ -96,17 +97,24 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
       const counts=new Map();
       for(const entry of archive.points){
         counts.set(entry.layer,(counts.get(entry.layer)||0)+1);
-        if(entry.layer!==layer)continue;
+        if(entry.layerOnly||entry.layer!==layer)continue;
         const id=entry.module==='attn'?'heads':entry.module==='hs'?'hs':entry.module;
         const p=point({id,idx:entry.index});if(!p)continue;
         ctx.fillStyle=EVIDENCE_COLORS[entry.level]||EVIDENCE_COLORS.observation;ctx.beginPath();ctx.arc(...p,2,0,Math.PI*2);ctx.fill();
         s.archiveHits.push({x:p[0],y:p[1],entry,h:{o:id,l:entry.layer,idx:entry.index}});
       }
       for(const [l,n] of counts){const p=proj(llm.x+110,LY(l),45.5);label(String(n),[p[0]+4,p[1]+3],'#305a86',10);}
-      label(`成果分布 · ${archive.points.length} 张原生定位卡`,[14,82],'#305a86',11);
+      label(archive.label || `成果分布 · ${archive.points.length} 张原生定位卡`,[14,82],'#305a86',11);
     }
-    for (const m of marks) { const p = point(m); if (!p) continue; ctx.strokeStyle = '#a33e43'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(...p, 6, 0, 7); ctx.stroke(); }
-    const origin = marks[0] && point(marks[0]);
+    for (const m of marks) {
+      const p = point(m);
+      if (!p) continue;
+      ctx.strokeStyle = m.feature ? '#b87916' : '#a33e43';
+      ctx.lineWidth = m.feature ? 1.4 : 2;
+      ctx.beginPath(); ctx.arc(...p, m.feature ? 2.8 : 6, 0, 7); ctx.stroke();
+    }
+    const selected = marks.find(mark=>!mark.feature);
+    const origin = selected && point(selected);
     if (origin) {
       // Endpoints are layer anchors with explicit native IDs, not a geometric neuron embedding.
       let lastLabelY = -Infinity;
@@ -122,9 +130,40 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
         s.linkHits.push({ x, y: y - 9, w: w + 6, h: 14, link });
       });
     }
+    if (headChannels) {
+      const {head, grid, count, selected, texture} = headChannels;
+      const h = {...HEAD_CHANNEL_PLANE, l:layer, o:{id:'headChannels',grid,count}};
+      const anchor = point({id:'heads',idx:head});
+      const corner = proj(h.x0,h.y,h.z0);
+      if (anchor) {
+        ctx.beginPath(); ctx.moveTo(...anchor); ctx.lineTo(...corner);
+        ctx.strokeStyle = '#54789a'; ctx.lineWidth = 1;
+        ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+      }
+      quad(h,'#e4eaf1','#9cadc4');
+      if (texture) drawTex(texture,h);
+      const [cols,rows] = grid, dx = (h.x1-h.x0)/cols, dz = (h.z1-h.z0)/rows;
+      ctx.beginPath(); ctx.strokeStyle = '#7288a777'; ctx.lineWidth = .5;
+      for (let col=1;col<cols;col++) {
+        const x = h.x0+col*dx;
+        ctx.moveTo(...proj(x,h.y,h.z0)); ctx.lineTo(...proj(x,h.y,h.z1));
+      }
+      for (let row=1;row<rows;row++) {
+        const z = h.z0+row*dz;
+        ctx.moveTo(...proj(h.x0,h.y,z)); ctx.lineTo(...proj(h.x1,h.y,z));
+      }
+      ctx.stroke();
+      const x0=h.x0+(selected%cols)*dx, z0=h.z0+Math.floor(selected/cols)*dz;
+      quad({...h,x0,x1:x0+dx,z0,z1:z0+dz},null,'#142e49',1.8);
+      label(`B${layer-1}/H${head} · ${count} 个 Z 通道`,[corner[0],corner[1]-7],'#183f77',11);
+      s.hits.push(h);
+    }
   });
   const pickAt = e => {
     const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = st.current;
+    const expanded = s.hits.at(-1);
+    const channel = expanded?.o.id==='headChannels' && assocHit(expanded,proj,x,y);
+    if (channel) return {h:channel,x,y};
     const link = [...s.linkHits].reverse().find(h => x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h);
     if (link) return { h: link.link, x, y };
     const entry=s.archiveHits?.find(hit=>Math.hypot(hit.x-x,hit.y-y)<3);
@@ -139,7 +178,8 @@ export default function AssocLayerScene({ dims, objs, layer, view, tex: TX, mark
     onPick: e => { const { h, x, y, entry } = pickAt(e); if(entry)archive?.onPick?.(entry);onPick(h, x, y); },
   });
   return <div className="aw-canvas">
-    <canvas ref={cv} data-tick={tick} data-archive-count={archive?.points.length||0} aria-label={`LLM 全部 ${NL - 1} 层；当前第 ${layer} 层的 Head、HiddenState 与 MLP 原生单元；可用精确定位选择`} {...pointer}/>
+    <canvas ref={cv} data-tick={tick} data-archive-count={archive?.points.length||0} data-head-channels={headChannels?.count||0}
+      aria-label={`LLM 全部 ${NL - 1} 层；当前第 ${layer} 层的 Head、HiddenState 与 MLP 原生单元${headChannels?`；H${headChannels.head} 已展开 ${headChannels.count} 个通道`:''}；可用精确定位选择`} {...pointer}/>
     {tip && <div className="aw-tip" style={{ left: tip.left, top: tip.top }}>{dims.describe(tip.h)}</div>}
   </div>;
 }

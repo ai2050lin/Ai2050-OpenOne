@@ -22,6 +22,7 @@ assert.deepEqual(pkg.dependencies || {}, {});
 const frontendDist = process.env.AI2050_DESKTOP_FRONTEND_DIST || path.join(frontend, 'dist');
 const output = process.env.AI2050_DESKTOP_BUILD_DIR || path.join(frontend, 'dist-installer', pkg.version);
 const unpacked = path.join(output, 'win-unpacked');
+const unpackedOnly = process.argv.includes('--unpacked');
 const resources = pkg.build.extraResources.map(item => ({ ...item, from: path.resolve(frontend, item.from) }));
 const { build: buildConfig, devDependencies, ...runtime } = pkg;
 if (!process.argv.includes('--verify-only')) {
@@ -43,7 +44,7 @@ if (!process.argv.includes('--verify-only')) {
         extraResources: resources,
         win: { ...buildConfig.win, signAndEditExecutable: false },
       },
-      targets: Platform.WINDOWS.createTarget(['nsis'], Arch.x64),
+      targets: Platform.WINDOWS.createTarget([unpackedOnly ? 'dir' : 'nsis'], Arch.x64),
       publish: 'never',
     });
   } finally {
@@ -88,14 +89,18 @@ try {
 } finally {
   await exe.close();
 }
-const setup = path.join(output, `AI2050-Setup-${pkg.version}-x64.exe`);
-const setupHash = await sha256(setup);
-const blockMap = setup + '.blockmap';
-await fs.writeFile(path.join(output, 'SHA256SUMS.txt'),
-  `${setupHash}  ${path.basename(setup)}\n${await sha256(blockMap)}  ${path.basename(blockMap)}\n`);
+let installer;
+if (!unpackedOnly) {
+  const setup = path.join(output, `AI2050-Setup-${pkg.version}-x64.exe`);
+  const setupHash = await sha256(setup);
+  const blockMap = setup + '.blockmap';
+  await fs.writeFile(path.join(output, 'SHA256SUMS.txt'),
+    `${setupHash}  ${path.basename(setup)}\n${await sha256(blockMap)}  ${path.basename(blockMap)}\n`);
+  installer = { setup, sha256: setupHash, bytes: (await fs.stat(setup)).size };
+}
 const report = {
   schema: 'package_integrity.v1', kind: 'engineering', passed: true, version: pkg.version,
-  target: 'win-x64', setup, sha256: setupHash, bytes: (await fs.stat(setup)).size,
+  target: 'win-x64', ...installer,
   archive_sha256: await sha256(archive), verified_files: verifiedFiles, verified_resources: resources.length,
   signed: false, created_at: new Date().toISOString(),
 };

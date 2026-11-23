@@ -1,6 +1,6 @@
 {
   "schema": "lang_tree.v1",
-  "version": 3,
+  "version": 4,
   "note": "语言树是展示层的组织方式，不是模型内部结构的事实；交叉项只存一次（主类型 + also_in）。planned=true 的语言项还没有模式族，图谱显示为「未研究」。",
   "types": [
     {"id": "KN", "name": "知识网络", "desc": "实体、类别、属性与关系的表征和读出"},
@@ -12,6 +12,8 @@
     {"id": "KN.taxonomy", "type": "KN", "name": "分类关系"},
     {"id": "KN.attribute", "type": "KN", "name": "属性"},
     {"id": "KN.relation", "type": "KN", "name": "实体关系"},
+    {"id": "KN.source", "type": "KN", "name": "信息来源"},
+    {"id": "KN.reference", "type": "KN", "name": "实体指称"},
     {"id": "RS.truth", "type": "RS", "name": "真值与否定"},
     {"id": "RS.inference", "type": "RS", "name": "条件与因果"},
     {"id": "RS.task", "type": "RS", "name": "任务功能"},
@@ -27,6 +29,8 @@
     {"id": "KN.ATTR", "category": "KN.attribute", "name": "属性绑定", "desc": "实体的颜色、味道、温度等属性", "languages": ["zh"]},
     {"id": "KN.PART", "category": "KN.relation", "name": "部分—整体", "desc": "「轮子是汽车的一部分」", "languages": [], "planned": true},
     {"id": "KN.ORIGIN", "category": "KN.relation", "name": "来源与产地", "desc": "「葡萄酒由葡萄酿成」", "languages": [], "planned": true},
+    {"id": "KN.SOURCE", "category": "KN.source", "name": "信息源选择", "desc": "在多份已给出的档案中按问题指定的来源读取信息；不表示来源真假或可信度，不是产地关系，也不代表模型内部独立模块", "languages": ["en"], "also_in": ["RS"]},
+    {"id": "KN.ENTITY_REF", "category": "KN.reference", "name": "查询实体指称", "desc": "问题指定同一组记录中的哪个实体，区分实体身份与来源内的属性绑定；不是实体语义类别或施事/受事角色", "languages": ["en"], "also_in": ["RS"]},
     {"id": "RS.NEG", "category": "RS.truth", "name": "否定与真值", "desc": "否定词改变命题真值的判断", "languages": ["zh", "en"], "also_in": ["GR"]},
     {"id": "RS.COND", "category": "RS.inference", "name": "条件推理", "desc": "「如果……那么……」的推断", "languages": [], "planned": true},
     {"id": "RS.CAUSE", "category": "RS.inference", "name": "因果关系", "desc": "原因与结果的识别", "languages": [], "planned": true},
@@ -37,6 +41,8 @@
     {"id": "GR.CONSTR", "category": "GR.construction", "name": "主动 / 把字 / 被字", "desc": "同一事件的不同句式", "languages": ["zh"]},
     {"id": "EXT.LANG", "category": "EXT.language", "name": "语种识别", "desc": "输入是中文还是英文", "languages": ["zh", "en"]},
     {"id": "EXT.FRAME", "category": "EXT.surface", "name": "提问表述变体", "desc": "同一分类任务的不同提示框架；材料控制标签，不代表疑问/陈述或模型内部独立模块", "languages": ["en"]},
+    {"id": "EXT.SOURCE_ORDER", "category": "EXT.surface", "name": "信息源呈现顺序", "desc": "档案块在提示中先后位置的交换，保留来源内记录及问题指定的来源和实体；属于位置控制，不等同于语法语序或事件时间顺序", "languages": ["en"]},
+    {"id": "EXT.SOURCE_WORDING", "category": "EXT.surface", "name": "来源查询表述变体", "desc": "同一档案记录与来源查询的等义表述框架；按模板标注，不代表不同句类或已证明相同的内部算法", "languages": ["en"]},
     {"id": "EXT.RULE_PRESENTATION", "category": "EXT.surface", "name": "规则呈现方式", "desc": "指令、参考或被引用的描述、无关系清单等外部材料条件；规则是否生效的理解另需行为检验，不是神经元语义标签", "languages": ["en"]},
     {"id": "EXT.TECHNICAL_TITLE", "category": "EXT.surface", "name": "无关技术词标题", "desc": "材料标题是否包含技术词；标题明确不构成操作指令，不等于正文的语义关系或模型内部主题模块", "languages": ["en"]},
     {"id": "EXT.RULE_WORDING", "category": "EXT.surface", "name": "关系描述句式", "desc": "同一配对或次序变换关系的不同句式框架；按材料生成规则标注，未声称内部实现相同", "languages": ["en"]}
@@ -49,6 +55,7 @@
     "KN-ISA": {"category": "KN.ISA", "frame": "GR.Q"},
     "KN-LOOP": {"category": "KN.CAT", "frame": "EXT.FRAME"},
     "ENT-XF": {"cat": "KN.CAT", "lang": "EXT.LANG", "polarity": "RS.NEG", "task": "RS.TASK"},
+    "SOURCE-BINDING-20261110": {"source": "KN.SOURCE", "entity": "KN.ENTITY_REF", "order": "EXT.SOURCE_ORDER", "paraphrase": "EXT.SOURCE_WORDING"},
     "RG14-structure-mathematics-20261113": {"role": "EXT.RULE_PRESENTATION", "lexical": "EXT.TECHNICAL_TITLE", "wording": "EXT.RULE_WORDING"},
     "RG14-structure-mathematics-20261113-v2": {"role": "EXT.RULE_PRESENTATION", "lexical": "EXT.TECHNICAL_TITLE", "wording": "EXT.RULE_WORDING"},
     "RG14-structure-mathematics-20261113-v3": {"role": "EXT.RULE_PRESENTATION", "lexical": "EXT.TECHNICAL_TITLE", "wording": "EXT.RULE_WORDING"},
@@ -75,6 +82,7 @@
     "RG14-procedure-logistics-20261113-v3": {"role": "EXT.RULE_PRESENTATION", "lexical": "EXT.TECHNICAL_TITLE", "wording": "EXT.RULE_WORDING"}
   },
   "family_languages": {
+    "SOURCE-BINDING-20261110": ["en"],
     "GR-Q": ["zh"], "GR-NEG": ["zh"], "GR-ROLE": ["zh"], "KN-ATTR": ["zh"], "KN-ISA": ["zh"], "KN-LOOP": ["en"], "ENT-XF": ["zh", "en"],
     "RG14-structure-mathematics-20261113": ["en"],
     "RG14-structure-mathematics-20261113-v2": ["en"],

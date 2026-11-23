@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import { languageSections, relationCounts } from './ClientGuide.jsx';
+import catalog from '../../../../shared/dist_protocol/lang_catalog.json';
 
 describe('三部分研究摘要', () => {
   it('按语言目录三类入口统计已测条目，总数不受测量集影响', () => {
     const sections = languageSections(new Set(['KN.ATTR', 'GR.Q', 'RS.NEG']));
     const totals = sections.map(section => section.total);
-    expect(totals.reduce((sum, value) => sum + value, 0)).toBe(72);
+    const catalogCount=catalog.domains.flatMap(domain=>domain.groups.flatMap(group=>group.items)).length;
+    expect(totals.reduce((sum, value) => sum + value, 0)).toBe(catalogCount);
     expect(totals).toEqual(languageSections(new Set()).map(section => section.total));
     expect(sections.map(section => section.done)).toEqual([1, 1, 1]);
   });

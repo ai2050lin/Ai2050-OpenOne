@@ -1,0 +1,152 @@
+.ow-graph {
+  --ow-line: #dce5ee;
+  --ow-ink: #1c334b;
+  --ow-muted: #536c84;
+  --ow-blue: #1b5688;
+  --ow-float-width: min(430px, calc(100vw - 16px));
+  color: var(--ow-ink);
+  margin: 0 auto;
+  max-width: 1460px;
+}
+.ow-graph > .aw-space { background: linear-gradient(#fff, #f2f6fa); border-color: var(--ow-line); }
+.ow-graph .ow-stage-nav { position: relative; z-index: 3; background: #fff; }
+.ow-graph .ow-mode-bar { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--ow-line); }
+.ow-graph .ow-mode-bar > div { display: flex; flex-wrap: wrap; min-width: 0; gap: 4px; }
+.ow-graph .ow-mode-bar button {
+  padding: 6px 12px; border: 1px solid transparent; border-radius: 6px; background: transparent;
+  color: var(--ow-muted); font: inherit; font-size: 13px; cursor: pointer;
+}
+.ow-graph .ow-mode-bar button:hover { background: #f4f8fc; }
+.ow-graph .ow-mode-bar button[aria-pressed=true] { color: var(--ow-blue); background: #e8f2fb; border-color: #c0d6e9; font-weight: 650; }
+.ow-graph .ow-mode-source { color: var(--ow-muted); font-size: 11px; white-space: nowrap; }
+.ow-graph .ow-scene-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 8px 12px; border-bottom: 1px solid var(--ow-line); background: #fff;
+  position: relative; z-index: 2;
+}
+.ow-graph .ow-model { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ow-muted); }
+.ow-graph .ow-scene-bar :is(select, button) {
+  min-height: 30px; padding: 3px 8px; border: 1px solid #cddce9;
+  border-radius: 6px; background: #fff; color: var(--ow-ink); font: inherit; font-size: 12px;
+}
+.ow-graph .ow-scene-bar select { cursor: pointer; }
+.ow-graph .ow-model select { font-size: 13px; font-weight: 650; }
+.ow-graph .ow-object { min-width: 0; overflow-wrap: anywhere; font-weight: 650; font-size: 13px; padding: 0 5px; }
+.ow-graph .ow-view { margin-left: auto; }
+.ow-graph .ow-scene-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.ow-graph .ow-scene-bar button:hover,
+.ow-graph .ow-scene-bar button[aria-expanded=true] { background: #edf5fd; border-color: #a8c5de; }
+.ow-graph .aw-canvas { position: relative; min-height: 0; }
+.ow-graph .aw-canvas canvas { height: clamp(260px, 36dvh, 410px); }
+.ow-graph .aw-space.max { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.ow-graph .aw-space.max .aw-canvas canvas { height: 100%; }
+.ow-graph .aw-legend { position: relative; inset: auto; padding: 4px 12px 9px; pointer-events: none; color: var(--ow-muted); }
+.ow-graph .aw-locator { top: 94px; }
+.ow-graph .ow-stage-nav .ow-display { top: calc(100% + 4px); }
+.ow-graph .ow-display label:has(input[type=checkbox]) { display: flex; gap: 8px; align-items: center; }
+.ow-graph .ow-display input[type=checkbox] { width: auto; }
+.ow-graph .aw-pop { translate: 0 42px; max-height: calc(100% - 144px); }
+
+.ow-graph .aw-cons { padding: 0; margin-top: 10px; border-color: var(--ow-line); overflow: hidden; }
+.ow-graph .aw-body { display: block; min-height: 0; padding: 0; }
+.ow-graph .aw-right { max-height: none; min-height: 0; min-width: 0; border: 0; overflow: visible; padding: 0; }
+.ow-graph .ow-console-nav { background: #fff; }
+.ow-graph .aw-tabs { padding: 6px 11px; gap: 4px; border-bottom: 1px solid var(--ow-line); }
+.ow-graph .aw-tabs button { color: var(--ow-muted); padding: 7px 10px; font-size: 13px; }
+.ow-graph .aw-tabs button[aria-selected=true] { color: var(--ow-blue); background: #e8f2fb; border-color: #c0d6e9; }
+.ow-graph .ow-tool-row, .ow-graph .ow-plugin-options {
+  padding: 6px 11px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px;
+  border-bottom: 1px solid var(--ow-line); background: #f8fafc;
+}
+.ow-graph .ow-tool-row > span, .ow-graph .ow-plugin-options { color: var(--ow-muted); font-size: 12px; }
+.ow-graph .ow-tool-row > span { margin-right: 4px; }
+.ow-graph .ow-tool-row button[aria-pressed=true] { background: #e1effa; border-color: #a1c3df; color: var(--ow-blue); font-weight: 650; }
+.ow-graph .ow-plugin-manager { margin-left: auto; }
+.ow-graph .ow-plugin-options { gap: 8px 12px; background: #fff; }
+.ow-graph .ow-plugin-options label { display: inline-flex; align-items: center; gap: 4px; }
+.ow-graph [id^=console-panel-] { padding: 12px; min-width: 0; }
+.ow-graph .ow-section-head,
+.ow-graph .ow-head > header {
+  display: flex; align-items: start; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.ow-graph .ow-section-head h3, .ow-graph .ow-head h3 { margin: 0; font-size: 16px; }
+.ow-graph .ow-section-head p, .ow-graph .ow-head header p { margin: 4px 0 0; font-size: 12px; color: var(--ow-muted); }
+.ow-graph .ow-object-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+.ow-graph .ow-run-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.ow-graph .ow-run-nav .aw-subtabs { border: 0; padding: 0; }
+.ow-graph #console-panel-run > details { margin: 0 0 12px; }
+.ow-graph .aw-foot { display: none; }
+.ow-graph .dp-atlas { margin: 8px 0 0; max-width: none; padding: 12px; }
+.ow-graph .dp-atlas.dp-strip { min-height: 0; }
+.ow-graph .ow-database { margin: 6px 0; }
+.ow-graph .ow-head-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(230px, 1fr); gap: 12px; }
+.ow-graph .ow-head label { display: grid; gap: 4px; color: var(--ow-muted); font-size: 12px; }
+.ow-graph .ow-head select { max-width: 100%; border: 1px solid #cad9e7; border-radius: 5px; padding: 4px; font: inherit; }
+.ow-graph .ow-masses, .ow-graph .ow-head-source {
+  border: 1px solid var(--ow-line); background: #f6f9fc; border-radius: 8px; padding: 10px 12px;
+}
+.ow-graph .ow-masses > div { display: grid; grid-template-columns: 41px minmax(0, 1fr) 43px; align-items: center; gap: 6px; padding: 3px 0; font-size: 12px; }
+.ow-graph .ow-masses progress { width: 100%; accent-color: #3779ad; height: 8px; }
+.ow-graph .ow-masses b { text-align: right; font-variant-numeric: tabular-nums; }
+.ow-graph .ow-masses p { color: var(--ow-muted); font-size: 11px; margin: 6px 0 0; }
+.ow-graph .ow-head-source dl { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 0 0 12px; }
+.ow-graph .ow-head-source dt { font-size: 11px; color: var(--ow-muted); }
+.ow-graph .ow-head-source dd { margin: 3px 0 0; font-weight: 650; }
+.ow-graph .ow-mode-panel > p { color: var(--ow-muted); margin: 8px 0; }
+.ow-graph .ow-step-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 10px; }
+.ow-graph .ow-step-list button[aria-pressed=true] { color: var(--ow-blue); border-color: #a6c7e0; background: #e8f2fb; font-weight: 650; }
+.ow-graph :is(.ow-run-sample,.ow-feature-entry,.ow-feature-results) {
+  margin: 9px 0; padding: 10px 12px; border: 1px solid var(--ow-line); border-radius: 8px; background: #f6f9fc;
+}
+.ow-graph .ow-run-sample dl, .ow-graph .ow-feature-results { display: flex; flex-wrap: wrap; gap: 9px 22px; }
+.ow-graph .ow-run-sample dt, .ow-graph .ow-feature-results dt { color: var(--ow-muted); font-size: 11px; }
+.ow-graph .ow-run-sample dd, .ow-graph .ow-feature-results dd { margin: 3px 0 0; font-weight: 650; }
+.ow-graph .ow-feature-entry { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 7px; }
+.ow-graph .ow-feature-entry h4 { margin: 0; }
+.ow-graph .ow-feature-entry p { margin: 4px 0 0; color: var(--ow-muted); font-size: 12px; }
+.ow-graph .ow-inline-value { margin: 8px 0 2px; color: var(--ow-ink); }
+.ow-graph .ow-inline-value output { font-weight: 650; margin-left: 6px; font-variant-numeric: tabular-nums; }
+.ow-graph .ow-provenance { margin-top: 8px; border-top: 1px solid var(--ow-line); padding-top: 7px; }
+.ow-graph .ow-provenance summary { color: var(--ow-blue); cursor: pointer; }
+.ow-graph .ow-provenance dd, .ow-graph .ow-feature-id { margin-left: 0; overflow-wrap: anywhere; }
+.ow-graph .ow-provenance pre { white-space: pre-wrap; }
+.ow-graph .ow-draft-input { display: grid; gap: 4px; margin: 8px 0; }
+.ow-graph .ow-draft-input textarea { width: 100%; resize: vertical; }
+.ow-graph .ow-value-table { width: min(100%, 460px); border-collapse: collapse; font-size: 12px; }
+.ow-graph .ow-value-table :is(th,td) { text-align: left; border-bottom: 1px solid var(--ow-line); padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.ow-graph .ow-value-table [data-active=true] { background: #e8f2fb; }
+
+.ow-graph .ow-float {
+  position: fixed; z-index: 65; width: var(--ow-float-width); max-height: min(70dvh, calc(100dvh - 76px));
+  display: flex; flex-direction: column; box-sizing: border-box; margin: 0; border-radius: 10px;
+  box-shadow: 0 10px 36px #17203335; background: #fff;
+}
+.ow-graph .ow-grip {
+  display: flex; justify-content: space-between; align-items: center; padding: 6px 11px; background: #f4f7fa;
+  cursor: move; touch-action: none; user-select: none; border-bottom: 1px solid var(--ow-line);
+}
+.ow-graph .ow-grip span { color: var(--ow-muted); font-size: 11px; }
+.ow-graph .ow-layer-step { display: flex; align-items: center; gap: 8px; padding: 3px 11px; color: var(--ow-muted); font-size: 11px; border-bottom: 1px solid var(--ow-line); }
+.ow-graph .ow-layer-step input { width: min(170px,65%); }
+.ow-graph .ow-float .aw-body { display: flex; flex-direction: column; min-height: 0; }
+.ow-graph .ow-float .aw-right { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.ow-graph .ow-float .ow-console-nav { position: sticky; z-index: 1; top: 0; }
+.ow-graph .ow-float .ow-head-grid { grid-template-columns: 1fr; }
+.ow-graph:has(>.aw-space.max .aw-locator) .ow-float { visibility: hidden; }
+
+@media(max-width: 720px) {
+  .ow-graph .ow-mode-bar { padding: 5px 7px; gap: 4px; }
+  .ow-graph .ow-mode-bar button { padding: 5px 6px; font-size: 12px; }
+  .ow-graph .ow-mode-source { display: none; }
+  .ow-graph .ow-scene-bar { gap: 5px; padding: 6px 8px; }
+  .ow-graph .ow-scene-bar :is(select, button) { padding-inline: 5px; min-height: 28px; }
+  .ow-graph .ow-view { margin-left: 0; }
+  .ow-graph .ow-scene-actions { flex: 1 0 auto; justify-content: flex-end; }
+  .ow-graph .aw-locator { top: 112px; }
+  .ow-graph .aw-tabs, .ow-graph .ow-tool-row { padding-inline: 6px; }
+  .ow-graph .aw-tabs button { font-size: 12px; padding: 5px 6px; }
+  .ow-graph .ow-plugin-manager { margin-left: 0; }
+  .ow-graph .ow-head-grid { grid-template-columns: 1fr; }
+  .ow-graph .ow-float { max-height: min(53dvh, calc(100dvh - 76px)); }
+}

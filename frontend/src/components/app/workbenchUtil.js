@@ -6,16 +6,16 @@
 /* 一级界面：前三个是研究对象（进展 / 空间）与实验生产（研发），同属一组、排在左轨分隔线之上；
    分隔线之下是本机形态相关的界面（配置、本机工具）。 */
 export const LENSES = [
-  { id: 'route', label: '进展', desc: '图谱进展、研究覆盖与验证证据' },          // id 沿用 route，旧链接 ?lens=route 照常可用
-  { id: 'spatial', label: '空间', desc: '模型探索与外部语言图谱' },
-  { id: 'process', label: '研发', desc: '整体研究路线、任务与数据、执行与审计' },
-  { id: 'config', label: '配置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
+  { id: 'route', label: '总览', desc: '研究进展与测试数据库' },
+  { id: 'spatial', label: '分析研究', desc: '查看语言图谱，观察模型内部的结构与运行' },
+  { id: 'process', label: '实验管理', desc: '整体研究路线、任务与数据、执行与审计' },
+  { id: 'config', label: '系统设置', desc: '当前连接的中心与运行形态、账号、被测模型与平台信息' },
 ];
 
 /* 进展视图：与空间/研发同一层级的子导航（?rtab=），默认 overview */
 export const ROUTE_VIEWS = [
   { id: 'overview', label: '总览', desc: '外部语言、内部模型与关联验证的研究摘要' },
-  { id: 'rules', label: '成果与证据', desc: '查重、负面规则、有效规则与原始证据' },
+  { id: 'database', label: '测试数据库', desc: '测试记录、原始证据与查重' },
 ];
 
 /* 空间四个稳定页面：图谱图层、静态参数、真实运行、多样本对照；各自采用对应结构视图。 */
@@ -28,7 +28,7 @@ export const SPATIAL_VIEWS = [
 ];
 /* 两个产品入口；原 view/gview 保留为统一工作台的观察方式及旧链接。 */
 export const SPATIAL_MODES = [
-  { id: 'assoc', label: '模型探索', desc: '模型结构、真实参数、运行响应、条件对照与研究档案' },
+  { id: 'assoc', label: '模型分析', desc: '查看模型各层的结构、参数和运行时的响应，对照历史测试' },
   { id: 'lang', label: '语言图谱', desc: '外部能力框架：知识网络、推理功能、语法规则的语言项与关系，不含模型信息' },
 ];
 export const SPACE_TARGET = { lang: { view: 'graph', gview: 'language' }, enc: { view: 'graph', gview: 'structure' }, assoc: { view: 'graph', gview: 'structure' } };
@@ -53,7 +53,7 @@ export function spaceTab(view, gview) {
 export const GRAPH_LAYERS = [
   {id:'structure',label:'模型结构'}, {id:'language',label:'外部语言模式'}, {id:'langmeasure',label:'语言项实测'}, {id:'internal',label:'全部研发成果'}, {id:'relations',label:'共享关系与映射'},
 ];
-/* 语言图谱只放外部能力框架（gview=language）；语言项在模型上的读出、层塔、数据集实测属于模型探索（gview=langmeasure）。
+/* 语言图谱只放外部能力框架（gview=language）；语言项在模型上的读出、层塔、数据集实测属于「模型分析」（gview=langmeasure）。
    旧别名 ?view=lang 原本指语言项实测页，归到 langmeasure。 */
 
 /* 研发工位：网页只能浏览；执行测试（神经元测试）与管理都在桌面客户端。
@@ -119,6 +119,7 @@ export function normalizeState(input) {
   if(!SPATIAL_VIEWS.some(v=>v.id===st.view))st.view='graph';
   if(!GRAPH_LAYERS.some(v=>v.id===st.gview))st.gview='structure';
   if(st.lens==='route'&&st.rtab==='lang') { st.rtab='overview'; st.opane='language'; }
+  if(st.lens==='route'&&st.rtab==='rules')st.rtab='database';
   if(st.lens!=='route'||st.rtab!=='overview'||!['language','internal','relations'].includes(st.opane)) st.opane='';
   if(st.lens!=='config'||st.csec!=='node'||!['service','runtime','account','device','models','resources'].includes(st.cstep)) st.cstep='';
   return st;
@@ -127,11 +128,12 @@ export function readState() {
   try {
     const q=new URLSearchParams(window.location.search),input={};
     for(const k of ['lens','view','gview','ptab','station','pstep','csec','cstep','rtab','opane','tm','ds','mdl','mrun'])if(q.has(k))input[k]=q.get(k);
+    if(input.lens==='route'&&!q.has('rtab')&&['db','dbStudy','record'].some(key=>q.has(key)))input.rtab='database';
     input.importing=q.get('data')==='import';
     return normalizeState(input);
   }catch{return normalizeState({});}
 }
-export function writeState(input,{push=false,run,snapshot}={}) {
+export function writeState(input,{push=false,run,snapshot,record}={}) {
   try {
     const st=normalizeState(input),url=new URL(window.location.href),q=url.searchParams;
     for(const k of ['lens','view','gview','ptab','station','rtab','opane','tm','pstep','csec','cstep','obj','atlasTab','atlasSel','ds','mdl','data','mrun'])q.delete(k);
@@ -145,10 +147,14 @@ export function writeState(input,{push=false,run,snapshot}={}) {
     if(st.lens==='process'&&st.station==='catalog'&&st.mrun)q.set('mrun',st.mrun);
     if(st.lens==='config'&&st.csec!=='conn')q.set('csec',st.csec);
     if(st.cstep)q.set('cstep',st.cstep);
-    if(st.lens==='route'&&st.rtab!=='overview')q.set('rtab',st.rtab);
+    if(st.lens==='route')q.set('rtab',st.rtab);
     if(st.opane)q.set('opane',st.opane);
     for(const k of ['tm','ds','mdl'])if(st[k])q.set(k,st[k]);
     if(st.importing)q.set('data','import');
+    if(record!==undefined){
+      q.delete('dbStudy');
+      if(record)q.set('record',record);else q.delete('record');
+    }
     const changingRun=run!==undefined&&run!==(q.get('run')||'');
     const changingSnapshot=snapshot&&q.has('snapshot')&&snapshot!==q.get('snapshot');
     if(changingRun){
@@ -163,7 +169,8 @@ export function writeState(input,{push=false,run,snapshot}={}) {
       if(trace)q.set('trace',trace);q.delete('context_trace');
     }else{if(trace)q.set('context_trace',trace);q.delete('trace');}
     if(st.lens!=='spatial')for(const k of ['pmodel','pblock','pkind','phead','punit','prow','pcol','artifact','feature',
-      'tblock','thead','tunit','ttab','sblock','smodule','sindex','smode','scoord','strace','straceb','spos','sposb','sposrun','spanel'])q.delete(k);
+      'tblock','thead','tunit','ttab','sblock','smodule','sindex','smode','scoord','strace','straceb','spos','sposb','sposrun','spanel',
+      'observeMode','observeTab','observePlugin','observeFullscreen','headCase'])q.delete(k);
     if(url.href!==window.location.href)window.history[push?'pushState':'replaceState'](null,'',url);
     window.dispatchEvent(new Event('research-context'));
   }catch{/* Read-only address bars keep component state. */}

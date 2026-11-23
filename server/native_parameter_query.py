@@ -18,6 +18,21 @@ def metadata(model):
     return (json.loads((root/'material/cases.json').read_text(encoding='utf-8')),
             json.loads((root/'protocol/model.json').read_text(encoding='utf-8')))
 
+
+def models():
+    found = []
+    for identity, source in SOURCES.items():
+        if not (RESULT/source/'field/final_down_weights.float32.npy').is_file():
+            continue
+        try:
+            cases, info = metadata(identity)
+        except (OSError, ValueError):
+            continue
+        found.append({'id':identity,'name':info.get('model_id') or info.get('model') or identity,
+                      'model_snapshot':info.get('model_snapshot'),'run':source,'cases':len(cases),
+                      'd_model':info['hidden_size'],'d_ff':info['intermediate_size'],'n_layers':info['layers']})
+    return found
+
 def query(model,case,j,k,checkpoint=None,token=None):
     if model not in SOURCES:raise HTTPException(status_code=400,detail='unknown model')
     root=RESULT/SOURCES[model]

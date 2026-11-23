@@ -42,6 +42,11 @@ contextBridge.exposeInMainWorld('ai2050Desktop', {
   server: config.apiBase,
   getServer: () => ipcRenderer.invoke('ai2050:get-server'),
   checkCache: (bytes, interactive) => ipcRenderer.invoke('ai2050:cache-check', { bytes, interactive }),
+  saveCaseResults: (bytes, sha) => ipcRenderer.invoke('ai2050:save-case-results', { bytes, sha }),
+  firstRecordArchive: {
+    status: () => ipcRenderer.invoke('ai2050:first-record-archive-status'),
+    start: session => ipcRenderer.invoke('ai2050:first-record-archive-start', session),
+  },
   /* 本机节点服务（贡献算力）：主进程只转发白名单内的接口，本机令牌不进页面 */
   node: {
     info: () => ipcRenderer.invoke('ai2050:node-info'),

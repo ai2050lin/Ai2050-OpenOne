@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图谱探索 · 插件与功能结构修改评审 · AI2050</title>
+<style>
+/* 复用真实客户端的类名与视觉变量，不改页面风格，仅演示插件与功能结构 */
+:root{--fw-text:#16202c;--fw-text-2:#42566a;--fw-text-3:#6a7d8e;--fw-border:#d6e1ea;--fw-border-strong:#bccfdf;
+--fw-blue:#1b5987;--fw-blue-d:#13456b;--fw-pale:#f4f8fb;--ow-line:#dfe7ee;--accent:#1b5987;
+font-family:Inter,"Segoe UI","Microsoft YaHei UI",sans-serif;color:var(--fw-text);background:#eef2f6;line-height:1.5}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #3279ae;outline-offset:2px}
+[hidden]{display:none!important}h1,h2,h3,h4,p{margin:0}
+.page{max-width:1200px;margin:0 auto;padding:22px 18px 48px}
+.page h1{font-size:23px;margin-bottom:4px}.page .lead{color:var(--fw-text-3);font-size:13px;margin-bottom:18px}
+.fw-tbtn{border:1px solid var(--fw-border-strong);background:#fff;color:#254b6c;border-radius:6px;padding:5px 11px;font-size:12.5px}
+.fw-tbtn:hover{background:#edf4fa}.fw-tbtn[aria-pressed=true]{background:var(--fw-blue);color:#fff;border-color:var(--fw-blue)}
+.fw-primary{background:var(--fw-blue);color:#fff;border-color:var(--fw-blue)}
+
+.note{background:#fff;border:1px solid var(--fw-border);border-left:3px solid var(--fw-blue);border-radius:8px;padding:12px 16px;font-size:13px;color:#2c4a63;margin-bottom:18px}
+.note b{color:var(--fw-blue-d)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.col-card{background:#fff;border:1px solid var(--fw-border);border-radius:10px;overflow:hidden}
+.col-card>header{padding:12px 18px;border-bottom:1px solid var(--fw-border);font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+.col-card.cur>header{background:#fbf0ee;color:#9d3932}
+.col-card.new>header{background:#eef5ee;color:#176f4a}
+.col-card .body{padding:14px 18px}
+
+.ow-mode-panel{background:#fff;border:1px solid var(--ow-line);border-radius:10px;padding:16px 20px;min-width:0}
+.ow-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.ow-section-head h3{font-size:16px}.ow-section-head p{font-size:12px;color:var(--fw-text-3);margin-top:2px}
+.ow-step-list{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.ow-value-table{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0}
+.ow-value-table th,.ow-value-table td{border-bottom:1px solid #e6edf3;padding:6px 10px;text-align:left}
+.ow-value-table th{background:#f1f5f8;color:var(--fw-text-3);font-weight:600;font-size:11.5px}
+.ow-feature-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ow-line);margin-bottom:8px}
+.ow-feature-entry h4{font-size:14px}.ow-feature-entry p{font-size:12px;color:var(--fw-text-3)}
+.ow-feature-results{display:grid;gap:6px;margin:10px 0}
+.ow-feature-results dt{font-size:12px;color:var(--fw-text-3)}
+.ow-feature-results dd{margin:0 0 6px;font-size:13px}
+.ow-provenance{margin-top:10px;font-size:12px;color:var(--fw-text-3)}
+.ow-provenance summary{cursor:pointer;color:var(--fw-blue)}
+.v8-note{font-size:12px;color:var(--fw-text-3);line-height:1.6}
+
+/* 插件清单（功能结构演示） */
+.pl-group{margin-bottom:12px}
+.pl-group>h4{font-size:12px;color:var(--fw-text-3);font-weight:600;margin-bottom:6px;text-transform:none}
+.pl-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px dashed #e6edf3;font-size:12.5px}
+.pl-item:last-child{border-bottom:0}
+.pl-item .nm{font-weight:600;min-width:120px}
+.pl-item .ds{color:var(--fw-text-2);flex:1;line-height:1.45}
+.pl-item .add{color:#176f4a;font-weight:700}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap}
+.tag.on{background:#e7f2fa;color:#175a87}
+.tag.new{background:#e6f4ec;color:#176f4a}
+.tag.off{background:#f1f3f5;color:#7a8894}
+
+/* 神经元着色形态网格（功能实景演示） */
+.morph{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ngrid{display:grid;grid-template-columns:repeat(20,1fr);gap:2px;margin:8px 0}
+.ncell{aspect-ratio:1;border-radius:2px;cursor:pointer}
+.ncell:hover{outline:2px solid #16202c;outline-offset:1px}
+.ncell.sel{outline:2.5px solid #16202c;outline-offset:1px}
+.cbar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--fw-text-3);margin-top:4px}
+.cbar .grad{flex:1;height:9px;border-radius:3px;border:1px solid #b9c7d4;background:linear-gradient(90deg,#d4622b,#fff,#1f5fbf)}
+.dist{display:flex;align-items:flex-end;gap:2px;height:64px;margin:6px 0}
+.dist b{flex:1;background:#1f5fbf;border-radius:1px 1px 0 0;min-height:2px}
+.dist b.neg{background:#d4622b}
+
+/* 递归泛化 */
+.recur{display:flex;align-items:stretch;gap:0;margin:10px 0}
+.rcol{flex:1;display:flex;flex-direction:column;gap:6px}
+.rcol h5{font-size:11px;color:var(--fw-text-3);text-align:center;margin:0 0 3px;font-weight:600}
+.rnode{border:1px solid var(--fw-border-strong);background:var(--fw-pale);border-radius:6px;padding:6px 8px;font:600 11px Consolas,monospace;color:#2a5288;text-align:center}
+.rnode.cur{background:var(--fw-blue);color:#fff;border-color:var(--fw-blue)}
+.rnode small{display:block;font:400 10px Inter,sans-serif;opacity:.8}
+.rarr{align-self:center;color:#9fb4c8;font-size:18px;padding:0 4px}
+.traj{width:100%;height:110px;display:block;background:#fbfdfe;border:1px solid var(--ow-line);border-radius:6px;margin-top:6px}
+
+.divider{height:1px;background:var(--fw-border);margin:22px 0}
+.sec-h{font-size:18px;margin-bottom:10px}
+.pos{color:#9d3932}.neg{color:#175a87}
+@media(max-width:820px){.compare,.morph{grid-template-columns:1fr}.ngrid{grid-template-columns:repeat(14,1fr)}}
+@media(max-width:560px){.recur{flex-direction:column}.rarr{transform:rotate(90deg)}.ngrid{grid-template-columns:repeat(10,1fr)}}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>图谱探索 · 插件与功能结构修改评审</h1>
+  <p class="lead">只改「插件与功能」部分，保留 <code>client-distributed-testing.html</code> 现有页面风格与布局。下面对比当前与修改后的插件组织，并实景演示特征分析新增的三个功能。</p>
+
+  <div class="note">
+    <b>修改边界：</b>不动 3D 场景、不动四个控制台页签框架、不动配色与卡片样式。改动集中在 <code>AssocWorkbench.jsx</code> 的插件清单（<code>PLUGINS</code>/<code>MODE_TABS</code>/<code>ANALYSIS_TOOL_IDS</code>）与 <code>GraphWorkspaceEvidence.jsx</code> 的 <code>NeuronExample</code>（特征分析工作区）。本页为独立静态演示，零外部请求。
+  </div>
+
+  <h2 class="sec-h">一、特征分析（features）插件结构对比</h2>
+  <div class="compare">
+    <div class="col-card cur">
+      <header>当前：类型切换 + 静态表</header>
+      <div class="body">
+        <div class="pl-group"><h4>特征分析工作区（NeuronExample）</h4>
+          <div class="pl-item"><span class="nm">原生神经元</span><span class="ds">采集位置 × 激活值静态表</span><span class="tag on">on</span></div>
+          <div class="pl-item"><span class="nm">原生单元组</span><span class="ds">组屏蔽对照 + 编号列表</span><span class="tag on">on</span></div>
+          <div class="pl-item"><span class="nm">稀疏字典特征</span><span class="ds">未接入，仅提示</span><span class="tag off">空</span></div>
+        </div>
+        <p class="v8-note">问题：神经元着色形态、Goodfire 特征卡、前后层递归泛化<strong>都没有</strong>；Goodfire 内容散在 mlp 插件里，特征分析只剩静态表。</p>
+      </div>
+    </div>
+    <div class="col-card new">
+      <header>修改后：形态 / Goodfire / 递归泛化 三功能</header>
+      <div class="body">
+        <div class="pl-group"><h4>特征分析工作区（NeuronExample 重做）</h4>
+          <div class="pl-item"><span class="nm">激活形态</span><span class="ds">整层神经元按值着色网格 + 跨样本分布</span><span class="tag new">新增</span></div>
+          <div class="pl-item"><span class="nm">Goodfire 特征卡</span><span class="ds">典型上下文 / 读写方向对齐 / 劈半余弦</span><span class="tag new">新增</span></div>
+          <div class="pl-item"><span class="nm">前后层递归泛化</span><span class="ds">上游写入者→单元→下游读取者 + 跨层轨迹</span><span class="tag new">新增</span></div>
+          <div class="pl-item"><span class="nm">原生神经元 / 单元组</span><span class="ds">保留原有静态表与组对照</span><span class="tag on">保留</span></div>
+          <div class="pl-item"><span class="nm">稀疏字典特征</span><span class="ds">按需，未接入时显式标缺</span><span class="tag off">按需</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec-h">二、特征分析新功能实景演示</h2>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="ft-tabs">
+    <button class="fw-tbtn" data-f="morph" aria-pressed="true">激活形态 · 着色</button>
+    <button class="fw-tbtn" data-f="goodfire" aria-pressed="false">Goodfire 特征卡</button>
+    <button class="fw-tbtn" data-f="recur" aria-pressed="false">前后层递归泛化</button>
+  </div>
+
+  <section class="ow-mode-panel" id="demo"></section>
+
+  <div class="divider"></div>
+
+  <h2 class="sec-h">三、三模式插件归属（按对象 × 模式过滤）</h2>
+  <div class="note" style="border-left-color:#176f4a">
+    核心修正：<b>每个模式只显示与自己研究对象匹配的插件</b>。实时=一段输入，测试记录=一次运行，特征分析=一个单元。下表即 <code>AssocWorkbench.jsx</code> 里插件按模式的归属方案。
+  </div>
+  <table class="ow-value-table" style="background:#fff;border:1px solid var(--fw-border);border-radius:8px">
+    <thead><tr><th>插件 / 功能</th><th>实时(输入)</th><th>测试记录(运行)</th><th>特征分析(单元)</th></tr></thead>
+    <tbody id="matrix"></tbody>
+  </table>
+  <p class="v8-note" style="margin-top:8px">● 默认　○ 按需　— 不适用。<code>ANALYSIS_TOOL_IDS</code> 当前为 <code>attnviz/geometry/sae</code>，需补 <code>morph/goodfire/recur</code> 三个特征分析工具。</p>
+
+  <div class="divider"></div>
+  <h2 class="sec-h">四、源码改动点（确认后落地，非本次执行）</h2>
+  <div class="col-card"><div class="body" style="font-size:13px;line-height:1.7">
+    <p><b>1. <code>AssocWorkbench.jsx · PLUGINS</code></b>：在「观察」组新增 <code>{id:'morph',name:'激活形态',tag:'on'}</code>、<code>{id:'goodfire',name:'Goodfire 特征',tag:'on'}</code>、<code>{id:'recur',name:'递归泛化',tag:'on'}</code>。</p>
+    <p><b>2. <code>AssocWorkbench.jsx · ANALYSIS_TOOL_IDS</code></b>：由 <code>['attnviz','geometry','sae']</code> 扩为含 <code>'morph','goodfire','recur'</code>。</p>
+    <p><b>3. <code>AssocWorkbench.jsx</code></b>：新增「插件按 observeMode 过滤」逻辑（当前所有模式共享 <code>AVAILABLE</code>，不过滤）。</p>
+    <p><b>4. <code>GraphWorkspaceEvidence.jsx · NeuronExample</code></b>：把 <code>types</code> 从 <code>[unit,group,sae]</code> 扩为 <code>[morph,goodfire,recur,unit,group,sae]</code>，新增三个功能面板（本页第二节即其静态样貌）。</p>
+    <p><b>5.</b> 配色沿用现有 <code>divc/seqc</code> 着色函数，不新增配色体系，不改页面风格。</p>
+  </div></div>
+
+  <p class="v8-note" style="margin-top:18px">确认本页的插件与功能结构后，我再按第四节改动点修改真实客户端源码并做工程验收。</p>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* 真实对象（沿用历史档案编号） */
+const UNIT={model:'Qwen3-14B',block:36,index:2429,label:'原生 FFN 神经元 · 位置轨迹',
+ claim:'数步读代码题中同一单元四处读数有正有负。',
+ read:'跨题功能、稳定性、对答案影响缺独立证据。'};
+function seeded(s){let x=s;return()=>{x=(x*1103515245+12345)&0x7fffffff;return x/0x7fffffff}}
+const rnd=seeded(UNIT.block*1000+UNIT.index);
+const act=Array.from({length:20*7},()=>{const z=rnd()*2-1;return z*z*(rnd()<.5?-1:1)*3});
+function divc(v,m){const t=Math.max(-1,Math.min(1,v/(m||1))),e=Math.abs(t)**0.6,c=t>=0?[31,95,191]:[212,98,43];
+ return `rgb(${255+(c[0]-255)*e|0},${255+(c[1]-255)*e|0},${255+(c[2]-255)*e|0})`}
+const am=Math.max(...act.map(Math.abs))||1;
+
+let F='morph';
+function render(){
+ document.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===F)));
+ if(F==='morph'){
+  $('demo').innerHTML=`<div class="ow-section-head"><div><h3>激活形态 · 神经元按值着色</h3><p>B${UNIT.block}/U${UNIT.index} · ${UNIT.model} · 整层视野</p></div>
+   <button class="fw-tbtn" id="cm">按层分位数</button></div>
+   <div class="morph">
+    <div><h4 style="font-size:13px;margin-bottom:4px">整层神经元着色网格（点格定位）</h4>
+     <div class="ngrid">${act.map((v,i)=>`<div class="ncell ${i===UNIT.index?'sel':''}" style="background:${divc(v,am)}" title="U${i}: ${v.toFixed(2)}"></div>`).join('')}</div>
+     <div class="cbar"><span>负</span><span class="grad"></span><span>正</span></div></div>
+    <div><h4 style="font-size:13px;margin-bottom:4px">跨样本激活分布</h4>
+     <div class="dist">${act.slice(0,40).map(v=>`<b class="${v<0?'neg':''}" style="height:${Math.min(62,Math.abs(v)/am*62)}px"></b>`).join('')}</div>
+     <p class="v8-note">正端=高激活典型上下文，负端=对照。原始值 / 按层分位数双视图可切，色标范围与归一方式标注，不以 TopK 定义主干。</p></div>
+   </div>`;
+  $('cm').onclick=()=>{$('cm').textContent=$('cm').textContent==='按层分位数'?'原始值':'按层分位数'};
+ }else if(F==='goodfire'){
+  $('demo').innerHTML=`<div class="ow-section-head"><div><h3>Goodfire 特征卡 · B${UNIT.block}/U${UNIT.index}</h3><p>${UNIT.label}</p></div><span class="tag on">候选</span></div>
+   <div class="morph">
+    <div><p style="font-size:13px;margin-bottom:8px"><strong>当前主张：</strong>${UNIT.claim}</p>
+     <table class="ow-value-table"><tbody>
+      <tr><th>劈半余弦</th><td>0.915</td></tr>
+      <tr><th>读方向对齐 S8</th><td>0.406</td></tr>
+      <tr><th>写方向对齐 S8</th><td>0.073</td></tr>
+      <tr><th>正端词</th><td style="font-family:Consolas,monospace">香港 · 港澳 · 台湾</td></tr>
+      <tr><th>门控响应差(A−B)</th><td class="pos">+0.333</td></tr>
+     </tbody></table></div>
+    <div><h4 style="font-size:13px;margin-bottom:4px">读/写在 unembedding 上的对齐</h4>
+     <p class="v8-note">读方向与写方向分差超原验收上限 0.20，主题解释仍是候选。原生单元与 SAE 字典特征分别赋身份，不混称。</p>
+     <p class="v8-note" style="margin-top:8px"><strong>解释边界：</strong>${UNIT.read}</p>
+     <details class="ow-provenance"><summary>证据来源与快照</summary><p>Goodfire 风格单元分析 · S1/S6/S8/S9 · 模型快照 1e970d11…</p></details></div>
+   </div>`;
+ }else{
+  const b=UNIT.block;
+  const traj=Array.from({length:40},(_,l)=>l===b?1.6:Math.sin(l/6)*.5*(.3+.7*Math.exp(-Math.abs(l-b)/8)));
+  const W=560,H=110,mx=Math.max(...traj.map(Math.abs));
+  const pts=traj.map((v,l)=>`${20+l*(W-40)/39},${H/2-v/mx*(H/2-14)}`).join(' ');
+  $('demo').innerHTML=`<div class="ow-section-head"><div><h3>前后层递归泛化机制 · B${b}/U${UNIT.index}</h3><p>该单元在前后 layer 的响应如何被复用 / 差异化</p></div></div>
+   <div class="recur">
+    <div class="rcol"><h5>上游写入者</h5>
+     <div class="rnode">B${b-2}/H${(UNIT.index+3)%40}<small>注意力写入</small></div>
+     <div class="rnode">B${b-1}/U${(UNIT.index+120)%5000}<small>MLP 写入</small></div></div>
+    <div class="rarr">→</div>
+    <div class="rcol"><h5>当前单元</h5><div class="rnode cur">B${b}/U${UNIT.index}<small>MLP</small></div></div>
+    <div class="rarr">→</div>
+    <div class="rcol"><h5>下游读取者</h5>
+     <div class="rnode">B${b+1}/H${(UNIT.index+7)%40}<small>Q/K 读取</small></div>
+     <div class="rnode">B${b+3}/U${(UNIT.index+80)%5000}<small>残差读取</small></div></div>
+   </div>
+   <h4 style="font-size:13px;margin:12px 0 4px">跨层激活轨迹叠加</h4>
+   <svg class="traj" viewBox="0 0 ${W} ${H}">
+    <line x1="20" y1="${H/2}" x2="${W-20}" y2="${H/2}" stroke="#c7d4e0" stroke-width="1"/>
+    <polyline points="${pts}" fill="none" stroke="#1b5987" stroke-width="2"/>
+    <circle cx="${20+b*(W-40)/39}" cy="${H/2-1.6/mx*(H/2-14)}" r="4" fill="#9d3932"/>
+    <text x="${20+b*(W-40)/39}" y="13" font-size="10" fill="#9d3932" text-anchor="middle">B${b}</text>
+   </svg>
+   <p class="v8-note" style="margin-top:6px">连接图 + 跨层轨迹并呈。读/写分离假设的因果验证另需原模型干预，本视图仅作结构观察。</p>`;
+ }
+}
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{F=b.dataset.f;render()});
+
+/* 三模式插件归属矩阵 */
+const MATRIX=[
+ ['HiddenState (hs)','●','—','●'],
+ ['MLP 神经元 (mlp)','●','○','●'],
+ ['注意力头 (heads)','●','○','●'],
+ ['Logit Lens (lens)','●','—','○'],
+ ['表征几何 CKA/RSA (geometry)','●','—','●'],
+ ['注意力分布 (attnviz)','●','○','●'],
+ ['激活形态 · 着色 (morph)','○','—','●'],
+ ['Goodfire 特征 (goodfire)','—','—','●'],
+ ['前后层递归泛化 (recur)','○','—','●'],
+ ['SAE 特征字典 (sae)','○','—','●'],
+ ['干预对照 (tests)','—','●','●'],
+];
+$('matrix').innerHTML=MATRIX.map(([n,...cells])=>`<tr><td>${esc(n)}</td>${cells.map(c=>`<td style="text-align:center">${c}</td>`).join('')}</tr>`).join('');
+render();
+</script>
+</body>
+</html>

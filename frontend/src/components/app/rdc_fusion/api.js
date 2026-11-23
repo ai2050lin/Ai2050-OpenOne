@@ -5,7 +5,7 @@
    纪律：读取失败只返回 error，组件显示「未接入」空态，不回退演示数据。 */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
-import { getExtraEntry, getLocal, getOnDemand, isOnDemand, packHint, packInfo, putOnDemand, storeTick, subscribe } from './dataStore.js';
+import { forgetWorkspaceCache, getExtraEntry, getLocal, getOnDemand, getWorkspaceCache, isOnDemand, packHint, packInfo, putOnDemand, putWorkspaceCache, storeTick, subscribe } from './dataStore.js';
 
 import { ADMIN_LIVE, API_BASE, DESKTOP, OFFLINE_CLIENT, REMOTE_CENTER, WEB_URL } from '../../../config.js';
 
@@ -17,6 +17,7 @@ const RESEARCH_INDEX = '/api/traces/research-space';
 const isResearchArtifact = path => /^\/api\/research-library\/artifacts\/[0-9a-f]{64}$/.test(path);
 const PUBLISHED_METADATA = new Set([RESEARCH_INDEX, '/api/research/mainline', '/api/research-library/workpackages', '/api/research-library/fragments']);
 const isPublishedResearch = path => typeof path === 'string' && (PUBLISHED_METADATA.has(path.split('?')[0]) || path.startsWith('/api/research/mlp-tail') || path.startsWith('/api/research/qwen14-mlp') || path.startsWith('/api/research/native-mlp') || isResearchArtifact(path));
+const publishedWorkspace = path => /^\/api\/research\/workspace\/(?:catalog$|evidence(?:\?|$)|archives\/|resources\/|models\/)/.test(path || '');
 
 /* 离线客户端：从本机数据包取一条；没有时抛出带 pack（应下载的附加包 id）的错误。 */
 async function offlineJson(path) {
@@ -50,16 +51,13 @@ function withTimeout(signal, timeoutMs) {
 }
 
 export async function getJson(path, { signal, online = false, timeoutMs, networkOnly = false } = {}) {
+  if (publishedWorkspace(path)) return (await getWorkspace(path, signal)).data;
   if (networkOnly && isPublishedResearch(path)) return fetchJson(path, { signal, timeoutMs });
   if (OFFLINE_CLIENT && isPublishedResearch(path)) {
-    if (isResearchArtifact(path)) {
-      const cached = getLocal(path) ?? await getExtraEntry(path);
-      if (cached !== undefined) return cached;
-    }
     try {
       return await fetchJson(path, { signal, timeoutMs: timeoutMs ?? 12000 });
     } catch (reason) {
-      if (signal?.aborted || reason?.name === 'AbortError') throw reason;
+      if (signal?.aborted || reason?.name === 'AbortError' || reason.status && reason.status<500) throw reason;
       return offlineJson(path).catch(missing => {
         reason.pack = missing.pack;
         throw reason;
@@ -76,6 +74,25 @@ export async function getJson(path, { signal, online = false, timeoutMs, network
   return fetchJson(path, { signal, timeoutMs });
 }
 
+async function getWorkspace(path,signal) {
+  try {
+    const data = await fetchJson(path,{signal,timeoutMs:12000});
+    if (!data || Object.keys(data).length===0) throw new Error('中心未提供此研究资料。');
+    // Only explicit public endpoints use this cache. Large assets are fetched on demand.
+    putWorkspaceCache(path,data).catch(()=>{});
+    return {data};
+  } catch (error) {
+    if(signal?.aborted)throw error;
+    if(error.status && error.status<500){
+      await forgetWorkspaceCache(path);
+      throw error;
+    }
+    const cached = await getWorkspaceCache(path);
+    if(cached!==undefined)return {data:cached,local:true};
+    throw error;
+  }
+}
+
 async function fetchJson(path, { signal, timeoutMs } = {}) {
   let response;
   try {
@@ -86,7 +103,11 @@ async function fetchJson(path, { signal, timeoutMs } = {}) {
     throw new Error('中心服务暂时无法连接，请稍后重试');
   }
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(detailText(body.detail) || `HTTP ${response.status}`);
+  if (!response.ok) {
+    const error = new Error(detailText(body.detail) || `HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
   return body;
 }
 
@@ -132,8 +153,9 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
   const [state, setState] = useState({ key: null, data: null, error: '', pack: null });
   const [nonce, setNonce] = useState(0);
   const live = online && ADMIN_LIVE;                     // 管理工位的实时读取
-  const useLocal = !live && !isPublishedResearch(path) && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
-  const needFetch = Boolean(path) && (live || ready || isPublishedResearch(path)) && !useLocal;
+  const workspace = publishedWorkspace(path);
+  const useLocal = !live && !workspace && !isPublishedResearch(path) && (nonce === 0 || OFFLINE_CLIENT) && local !== undefined;
+  const needFetch = Boolean(path) && (live || ready || workspace || isPublishedResearch(path)) && !useLocal;
   const extrasKey = OFFLINE_CLIENT && path && !ONLINE_PATHS.has(path.split('?')[0])
     ? JSON.stringify(packInfo().extras) : '';                // 附加包下载后重读（站点配置不受影响）
   useEffect(() => {
@@ -141,17 +163,17 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     const controller = new AbortController();
     let retry = null;
     let dead = false;
-    const run = () => getJson(path, { signal: controller.signal, online: live })
-      .then(data => {
+    const run = () => (workspace ? getWorkspace(path,controller.signal) : getJson(path, { signal: controller.signal, online: live }).then(data=>({data})))
+      .then(({data,local:cached}) => {
         if (dead) return;
-        setState({ key: path, data, error: '', pack: null });
+        setState({ key: path, data, error: '', pack: null, local:cached });
         if (!OFFLINE_CLIENT && isOnDemand(path)) putOnDemand(path, data);
         // 服务端后台计算中（data.pending）：15 秒后自动复查，直到出结果
         if (pollWhilePending && data?.pending) retry = window.setTimeout(run, 15000);
       })
       .catch(reason => {
         if (reason?.name === 'AbortError' || dead) return;
-        setState(previous => ({ key: path, data: previous.key === path ? previous.data : null, error: String(reason.message || reason),
+        setState(previous => ({ key: path, data: !workspace && previous.key === path ? previous.data : null, error: String(reason.message || reason),
                                 pack: reason?.pack || null }));
       });
     if (!OFFLINE_CLIENT && isOnDemand(path) && nonce === 0) {
@@ -164,7 +186,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
       run();
     }
     return () => { dead = true; controller.abort(); if (retry) window.clearTimeout(retry); };
-  }, [path, nonce, pollWhilePending, needFetch, extrasKey, live]);
+  }, [path, nonce, pollWhilePending, needFetch, extrasKey, live, workspace]);
   const reload = useCallback(() => setNonce(value => value + 1), []);
   if (useLocal) return { data: local, error: '', loading: false, pending: false, reload, local: true, missingPack: null };
   const current = state.key === path;
@@ -175,7 +197,7 @@ export function useApi(path, { pollWhilePending = false, online = false } = {}) 
     loading,
     pending: loading,          // ConfigView 等按 pending 判"读取中"：与 loading 同源，加载中不再假显"已连接"
     reload,
-    local: false,
+    local: current && Boolean(state.local),
     missingPack: current ? state.pack : null,
   };
 }
@@ -192,8 +214,9 @@ export function useSnapshot(name) {
 /* 账号会话（accounts.v1）：登录后令牌存在 localStorage，再次打开客户端直接进入主界面；退出登录即清除。
    令牌只随 /api/auth/* 请求以 Authorization 头发送（普通读取不带，避免每个 GET 都触发预检）；
    管理员账号的会话同时可作为写操作的管理令牌。 */
-const SESSION_KEY = 'ai2050-session';
-const USER_KEY = 'ai2050-user';
+const SESSION_CENTER = API_BASE || globalThis.location?.origin || 'local';
+const SESSION_KEY = `ai2050-session:${SESSION_CENTER}`;
+const USER_KEY = `ai2050-user:${SESSION_CENTER}`;
 const LAST_USER_KEY = 'ai2050-last-username';
 
 function store(op, key, value) {
@@ -219,14 +242,14 @@ export function setSession(token, user) {
 export function clearSession() { store('del', SESSION_KEY); store('del', USER_KEY); }
 
 /* /api/auth/* 调用：自动带会话令牌 */
-export async function authJson(path, { method = 'GET', body, rawBody, timeoutMs, redirect } = {}) {
+export async function authJson(path, { method = 'GET', body, rawBody, timeoutMs, redirect, signal } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   const token = getSession();
   if (token) headers.Authorization = `Bearer ${token}`;
   let response;
   try {
     response = await fetch(`${API_BASE}${path}`, { method, headers, cache: 'no-store', redirect,
-      signal: withTimeout(undefined, timeoutMs), body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)) });
+      signal: withTimeout(signal, timeoutMs), body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)) });
   } catch (reason) {
     if (reason?.name === 'TimeoutError') throw new Error(`操作超时（${Math.round((timeoutMs ?? REQUEST_TIMEOUT_MS) / 1000)} 秒无响应），请稍后重试`);
     const error = new Error('中心服务暂时无法连接，请稍后重试');

@@ -74,7 +74,7 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(path.read_bytes(), b'old archive')
             self.assertEqual(list(Path(raw).iterdir()), [path])
 
-    def test_daily_run_retains_only_the_replay_record(self):
+    def test_daily_run_refuses_unregistered_execution(self):
         with tempfile.TemporaryDirectory(dir=TEMP) as raw:
             root = Path(raw)
             # The replay wrapper intentionally only accepts scripts in tests/glm5.
@@ -84,19 +84,10 @@ class StorageTests(unittest.TestCase):
                                    '--script', __file__, '--questions', str(questions), '--peak-gib', '.01',
                                    '--seed', '19', '--', '--fixture'],
                                   env={**os.environ, 'AI2050_STORAGE_ROOT': raw, 'PYTHONUTF8': '1'},
-                                  capture_output=True, text=True, encoding='utf-8', check=True)
-            record = Path(proc.stdout.splitlines()[-1].split(' · ', 1)[1]).parent
-            try:
-                review = json.loads((record / 'review.json').read_text(encoding='utf-8'))
-                self.assertEqual(review['conclusion'], {'observed': 5})
-                self.assertEqual(review['seed'], 19)
-                self.assertEqual({f.name for f in record.iterdir()}, {'test.py', 'questions.json', 'review.json'})
-                self.assertFalse(Path(review['scratch']).exists())
-            finally:
-                self.assertEqual(record.parent.resolve(), (ROOT / 'tests/glm5/result/routine').resolve())
-                for name in ('test.py', 'questions.json', 'review.json'):
-                    (record / name).unlink(missing_ok=True)
-                record.rmdir()
+                                  capture_output=True, text=True, encoding='utf-8')
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn('--archive-plan', proc.stderr)
+            self.assertFalse((root / 'scratch').exists())
 
 
 if __name__ == '__main__':

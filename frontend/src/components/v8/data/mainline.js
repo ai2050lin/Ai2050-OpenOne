@@ -1,14 +1,10 @@
-/* Immutable release fallback. Live pages read the shared server snapshot. */
-import release from '../../../../../shared/dist_protocol/mainline_release.json';
-export const { BENCH, CAPABILITIES, CAP_LEVELS, CLAIMS, CLAIM_LIFE, FINDINGS, LIFECYCLE, LOCKBOXES, PAIRS, RUNS, SCORES, SLICES, SPLITS, STAGES, TESTS, METHOD_RESULTS } = release.state.view;
-
 export const pct = (done, total) => {
   if (!Number.isFinite(done) || !Number.isFinite(total) || total <= 0) return null;
   const value = 100 * done / total;
   return value === 0 || value === 100 ? value.toFixed(0) : value < 1 ? value.toFixed(2) : value.toFixed(0);
 };
 
-export function stageProgress(stages = STAGES) {
+export function stageProgress(stages = []) {
   const doneStages = stages.filter(stage => stage.done.length === stage.gates.length).length;
   const next = stages.find(stage => stage.done.length < stage.gates.length) || null;
   return { done: doneStages, total: stages.length, next };

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>模型分析 · 研究历史回查评审</title>
+  <link rel="stylesheet" href="model-analysis-history-review.css">
+  <script defer src="model-explorer-scene.js"></script>
+  <script defer src="model-analysis-history-review-data.js"></script>
+  <script defer src="model-analysis-history-review.js"></script>
+</head>
+<body>
+  <aside class="rail" aria-label="研究工作台">
+    <a class="brand" href="#main" aria-label="AI2050 模型分析"><b>A</b><sub>2</sub></a>
+    <div class="rail-line"></div>
+    <span class="rail-current" aria-current="page"><span class="rail-cube" aria-hidden="true">◇</span>语言与模型</span>
+  </aside>
+  <header class="topbar">
+    <div>研究工作台 <span aria-hidden="true">/</span> 语言与模型 <span aria-hidden="true">/</span> <strong>模型分析</strong></div>
+    <span class="preview-status">静态评审 · 已有研究摘录</span>
+  </header>
+  <main id="main" class="page">
+    <header class="heading">
+      <div>
+        <h1>模型分析</h1>
+        <p>观察模型怎样计算，沿原生对象回查已经验证过的问题。</p>
+      </div>
+      <button id="open-review" class="button primary">核对复测方案 <span aria-hidden="true">↗</span></button>
+    </header>
+
+    <section id="workspace" aria-label="模型分析工作区">
+      <div class="workspace-top">
+        <nav id="modes" class="mode-switch" aria-label="观察模式">
+          <button data-mode="live" aria-pressed="false">实时模式</button>
+          <button data-mode="history" aria-pressed="true">测试记录</button>
+          <button data-mode="features" aria-pressed="false">特征分析</button>
+        </nav>
+        <div class="model-bar">
+          <b>Qwen3-14B</b><span>BF16</span>
+          <button id="fullscreen" class="button compact" aria-pressed="false">⛶ 全屏</button>
+        </div>
+      </div>
+
+      <div class="observation">
+        <section class="scene" aria-label="原生结构与定位">
+          <canvas id="structure" aria-label="模型 3D 结构"></canvas>
+          <div class="scene-label"><b id="scene-address">B26/H36</b><span id="scene-context"></span></div>
+          <div class="scene-tools" aria-label="相机控制">
+            <button data-camera="out" aria-label="缩小">−</button>
+            <button data-camera="in" aria-label="放大">+</button>
+            <button data-camera="reset" aria-label="复位视角">↺</button>
+          </div>
+          <div class="scene-footer">
+            <label>原生对象
+              <select id="object">
+                <option value="head">B26/H36 · 注意力头</option>
+                <option value="unit">B23/U7708 · MLP 神经元</option>
+              </select>
+            </label>
+            <span>拖动旋转 · 结构视图</span>
+          </div>
+        </section>
+        <aside id="inspector" class="inspector" aria-label="当前对象读数"></aside>
+      </div>
+
+      <div class="console">
+        <nav id="console-tabs" class="console-tabs" aria-label="分析工具">
+          <button data-tab="object" aria-pressed="false">对象详情</button>
+          <button data-tab="run" aria-pressed="false">运行与对照</button>
+          <button data-tab="plugin" aria-pressed="false">插件分析</button>
+          <button data-tab="history" aria-pressed="true">成果与方法</button>
+        </nav>
+        <section id="history-panel" aria-label="研究历史">
+          <header class="panel-heading">
+            <div><h2>相关测试记录</h2><p id="history-scope"></p></div>
+            <div class="filters">
+              <label class="search-field">搜索<input id="search" type="search" placeholder="Phase、对象、关键词"></label>
+              <label>状态<select id="filter">
+                <option value="all">全部状态</option>
+                <option value="positive">有局部证据</option>
+                <option value="negative">反例 / 未过门</option>
+                <option value="closed">已结案</option>
+              </select></label>
+            </div>
+          </header>
+          <div class="history-body">
+            <div class="record-column">
+              <div class="record-meta"><output id="match-count" aria-live="polite"></output>
+                <label><input id="linked-only" type="checkbox" checked>与当前对象相关</label></div>
+              <div id="history-list" class="history-list"></div>
+            </div>
+            <article id="record-detail" class="record-detail" aria-label="所选实验详情"></article>
+          </div>
+        </section>
+        <section id="tool-panel" class="tool-panel" aria-label="选中分析工具" hidden></section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="case-dialog" aria-labelledby="case-title"></dialog>
+  <dialog id="review-dialog" aria-labelledby="review-title"></dialog>
+</body>
+</html>

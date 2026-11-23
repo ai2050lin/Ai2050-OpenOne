@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { panScene, useScenePointer } from '../scenePointer.js';
 
-import report from '../../../../research/mainline/H2/report.json';
+import { useWorkspaceResource } from './nativeObservationArchive.js';
 import { LineChart } from './H2Results.jsx';
-import { BENCH } from './data/mainline.js';
+import { useMainline } from './data/mainlineState.js';
 import './client_guide.css';
 
 const FACTORS = [['scope', '范围', '#2a78d6'], ['draft', '草稿', '#eb6834'], ['form', '记录形式', '#1baf7a'], ['pos', '目标位置', '#c98a00'], ['k', '记录数', '#7050a0']];
@@ -13,7 +13,7 @@ const POS = [['qname', '问题中的目标名'], ['ans', '答案位置'], ['tcol
 const L = 37;
 
 /* 第 0 层就能分开（AUC ≥ 0.9）的位置 × 因素是词身份混淆，不画 */
-const confounded = (f, p) => (report.effects[f][p].auc[0] ?? 0) >= 0.9;
+const confounded = (report, f, p) => (report.effects[f][p].auc[0] ?? 0) >= 0.9;
 
 function project(v, x, y, z, W, H, s) {
   const cy = Math.cos(v.yaw), sy = Math.sin(v.yaw), cp = Math.cos(v.pitch), sp = Math.sin(v.pitch);
@@ -22,6 +22,7 @@ function project(v, x, y, z, W, H, s) {
 }
 
 export function FlowRibbons() {
+  const {data:report,error} = useWorkspaceResource('h2-report');
   const [pos, setPos] = useState('qname');
   const [layer, setLayer] = useState(36);
   const [view, setView] = useState({ yaw: -0.5, pitch: 0.18 });
@@ -32,7 +33,7 @@ export function FlowRibbons() {
     return () => clearInterval(t);
   }, [playing]);
   const W = 640, H = 470, S = 172;
-  const shown = FACTORS.filter(([f]) => !confounded(f, pos));
+  const shown = !error && report ? FACTORS.filter(([f]) => !confounded(report, f, pos)) : [];
   const max = Math.max(1e-6, ...shown.flatMap(([f]) => report.effects[f][pos].std_rms));
   const lanes = shown.map((_, i) => -0.8 + (1.6 * i) / Math.max(1, shown.length - 1));
   const Y = l => -1 + (2 * l) / (L - 1);
@@ -58,6 +59,7 @@ export function FlowRibbons() {
     },
     onRotate: (dx, dy) => rotate(dx * 0.008, dy * 0.006),
   });
+  if (!report) return <p className="v8-note">{error||'等待中心逐层观测。'}</p>;
   return <section className="v8-card cg-section" aria-label="HiddenState 流">
     <h3>HiddenState 流：各因素在每一层能区分多少 <span className="mp-tag ok">真实数据 · MA-H2</span></h3>
     <p className="v8-note">线宽 = 该因素两个水平在这一层的标准化差异（各坐标差值除以组内标准差的均方根），读出位置可切换。宽说明读得出，不说明被使用；线的位置和走向是布局，不代表模型几何。</p>
@@ -77,7 +79,7 @@ export function FlowRibbons() {
       <aside className="lg3-side">
         <h4>第 {layer} 层 · {POS.find(p => p[0] === pos)[1]}</h4>
         {FACTORS.map(([f, name, color]) => {
-          const off = confounded(f, pos), v = report.effects[f][pos].std_rms[layer], auc = report.effects[f][pos].auc[layer];
+          const off = confounded(report, f, pos), v = report.effects[f][pos].std_rms[layer], auc = report.effects[f][pos].auc[layer];
           return <div className="h2-bar" key={f}><span>{name}</span>
             {off ? <small className="v8-note">词身份混淆，不画</small> : <span className="mp-bar"><i style={{ width: `${Math.min(100, 100 * v / max)}%`, background: color }}/></span>}
             <small className="v8-note">{off ? '' : `${v.toFixed(3)}${auc != null ? ` · AUC ${auc.toFixed(2)}` : ''}`}</small></div>;
@@ -109,9 +111,12 @@ const CARDS = {
 };
 
 export function AlgorithmPanel() {
+  const {data:report,error} = useWorkspaceResource('h2-report');
+  const {BENCH} = useMainline();
   const [tab, setTab] = useState('pair');
   const [card, setCard] = useState('scope');
   const c = CARDS[card];
+  if (!report) return <p className="v8-note">{error||'等待中心方法资料。'}</p>;
   return <section className="v8-card cg-section" aria-label="算法分析">
     <h3>算法分析</h3>
     <p className="v8-note">同一个决策点，不同算法回答不同的问题，结果性质也不同。下表是主线现在实际用到的方法。</p>
@@ -140,8 +145,8 @@ export function AlgorithmPanel() {
     {tab === 'life' && <div className="v8-weight-scroll"><table className="v6-table">
       <thead><tr><th>因素</th><th>种子（第 0 层）</th><th>汇集</th><th>载体</th><th>接续</th><th>读出（首个可读出层）</th></tr></thead>
       <tbody>{FACTORS.map(([f, name]) => {
-        const best = POS.map(([p, label]) => [label, report.effects[f][p].first_readable, confounded(f, p)]).filter(x => x[1] != null && !x[2]).sort((a, b) => a[1] - b[1])[0];
-        const seed = POS.some(([p]) => confounded(f, p));
+        const best = POS.map(([p, label]) => [label, report.effects[f][p].first_readable, confounded(report, f, p)]).filter(x => x[1] != null && !x[2]).sort((a, b) => a[1] - b[1])[0];
+        const seed = POS.some(([p]) => confounded(report, f, p));
         return <tr key={f}><td>{name}</td><td>{seed ? '部分位置第 0 层已可分（词身份）' : '第 0 层不可分'}</td>
           <td>未测</td><td>H3 进行中</td><td>未测</td><td>{best ? `${best[0]}，第 ${best[1]} 层` : '—'}</td></tr>;
       })}</tbody></table>

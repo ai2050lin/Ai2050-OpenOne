@@ -61,6 +61,8 @@ const API_BASE_RAW = isDesktop()
 
 export const API_BASE = stripTrailingSlash(API_BASE_RAW);
 
+export const LOCAL_ANALYSIS_BASES = ['http://127.0.0.1:5001', 'http://127.0.0.1:5002'];
+
 /** 分析服务；缺省与中心服务同源（CentOS 部署只跑一个进程）。 */
 export const ANALYSIS_API_BASE = stripTrailingSlash(
   readRuntime('analysisApiBase') || import.meta.env.VITE_ANALYSIS_API_BASE || API_BASE

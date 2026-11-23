@@ -1,7 +1,6 @@
 /* 研究工作台 · 空间 · 实时分析：输入一段文本，在本机中心上跑一次真实前向传播，
    逐层步进观察每个注意力头与 MLP 单元的响应和参数（「下一步」从嵌入层走到输出头）。
-   数据来自 /api/live/*（live_trace.v1 / live_block.v1），模型权重从本机加载（AI2050_LIVE_MODEL_DIR，
-   与自然语料普查同款 Qwen3-4B：36 块 × 32 头 × d_ff 9728）。
+   数据来自 /api/live/*（live_trace.v1 / live_block.v1），模型权重由 AI2050_LIVE_MODEL_DIR 指定。
    本机没有权重、或处于只读网页模式时显示诚实空态，不做任何模拟。
    神经元语义与普查打通：块的 MLP 前列单元会标出普查「已解释 / 模板选择性」标记（/api/neurons/layer）。 */
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -189,12 +188,12 @@ export function LegacyLivePane({ census, trace, setTrace, step, setStep }) {
     return (
       <Empty>
         {st === 'unreachable' && (<>实时分析不可用：当前中心（{API_BASE || '同源 ' + window.location.origin}）与本机 5001/5002 都连不上。
-          实时分析要跑一次真实前向——需要本机模型权重（AI2050_LIVE_MODEL_DIR，缺省 D:/develop/model/Qwen/Qwen3-4B）；
+          实时分析需要本机权重。请将 AI2050_LIVE_MODEL_DIR 指向模型目录。
           桌面客户端启动时会自动拉起本机轻量前向服务（5002）。
           {status.retrying ? '每 5 秒自动重试中…' : ''}</>)}
         {st === 'incompatible' && `实时分析不可用：${status.reason}。`}
         {(st === 'unavailable' || st === 'error')
-          && `实时分析不可用：${status.reason || status.error || '前向服务没有响应'}。需要本机模型权重（AI2050_LIVE_MODEL_DIR，缺省 D:/develop/model/Qwen/Qwen3-4B）。`}
+          && `实时分析不可用：${status.reason || status.error || '前向服务没有响应'}。请检查 AI2050_LIVE_MODEL_DIR 指向的本机权重。`}
         <div style={{ marginTop: 8 }}>
           <button type="button" className="lv-run" onClick={() => setProbeTick(t => t + 1)}>重试</button>
         </div>

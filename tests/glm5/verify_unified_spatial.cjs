@@ -20,7 +20,7 @@ function ok(name, detail) { report.checks.push({ name, detail }); console.log(JS
   await inspector.getByRole('button', { name: '真实参数', exact: true }).click();
   await inspector.locator('.v8-weight-scroll td').first().waitFor();
   ok('parameter_inspector_open', (await inspector.innerText()).slice(0, 1700));
-  await page.getByRole('button', { name: '模型探索', exact: true }).click();
+  await page.getByRole('button', { name: '模型分析', exact: true }).click();
   await page.locator('.aw-cin').getByText(/现在显示的是冻结样本 #0/).waitFor();
   await inspector.getByRole('heading', { name: 'B34 · U2663', exact: true }).waitFor();
   assert.equal(await page.locator('.aw-canvas canvas').getAttribute('data-mounted-proof'), 'same-instance');
@@ -31,7 +31,7 @@ function ok(name, detail) { report.checks.push({ name, detail }); console.log(JS
   assert.equal(await inspector.locator('details').filter({hasText:'完整响应数组与来源'}).getAttribute('open'), null); ok('raw_data_collapsed');
   await page.screenshot({ path: path.join(output, 'analysis.png'), fullPage: true });
   await page.getByRole('button', { name: 'LLM 编码图谱', exact: true }).click();
-  await page.getByRole('button', { name: '模型探索', exact: true }).click();
+  await page.getByRole('button', { name: '模型分析', exact: true }).click();
   assert.equal(await page.locator('.aw-cin textarea').inputValue(), '保留这段尚未运行的长文本输入。');
   ok('unsent_input_preserved_without_running_gpu');
   await page.getByRole('tab', { name: '运行与路径', exact: true }).click();
@@ -51,7 +51,7 @@ function ok(name, detail) { report.checks.push({ name, detail }); console.log(JS
   ok('archive_roundtrip_preserves_selection');
   await page.locator('.aw-models > button').filter({ hasText: 'glm4-9b' }).click();
   await page.waitForFunction(() => document.querySelector('.aw-canvas canvas')?.getAttribute('aria-label')?.includes('40 层'));
-  await page.getByRole('button', { name: '模型探索', exact: true }).click();
+  await page.getByRole('button', { name: '模型分析', exact: true }).click();
   await page.locator('.aw-cin').getByText(/当前运行与所选模型快照不匹配/).waitFor();
   ok('other_model_structure_and_no_cross_snapshot_activation');
   await page.goto(`http://127.0.0.1:5173/workbench?lens=spatial&view=parameters&pkind=embedding&prow=100&pcol=7&snapshot=${snap}`);
@@ -75,7 +75,7 @@ function ok(name, detail) { report.checks.push({ name, detail }); console.log(JS
   assert.equal(raw.values[9031], field.values[9031]); assert.equal(raw.values.length,9728);
   ok('old_trace_token_and_mlp_value_match_native_field',{value:raw.values[9031],count:raw.values.length});
   await page.getByRole('button',{name:'LLM 编码图谱',exact:true}).click();
-  await page.getByRole('button',{name:'模型探索',exact:true}).click();
+  await page.getByRole('button',{name:'模型分析',exact:true}).click();
   await page.locator('.aw-cin').getByText(/正在回放归档轨迹.*token 1023/).waitFor(); ok('trace_preserved_across_modes');
   await page.screenshot({path:path.join(output,'trace-replay.png'),fullPage:true});
   await page.getByRole('tab',{name:'响应对照',exact:true}).count().then(async count=>{

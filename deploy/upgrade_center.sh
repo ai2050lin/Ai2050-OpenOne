@@ -3,6 +3,7 @@
 #
 #     sudo bash upgrade_center.sh                     # 自动选同目录下版本号最高的 ai2050-center-*.tar.gz
 #     sudo bash upgrade_center.sh ai2050-center-1.0.14.tar.gz
+#     bash upgrade_center.sh --check ai2050-center-1.0.14.tar.gz  # 仅核对文件
 #
 # 依次：核对 sha256 → 从 systemd 读出当前程序目录、数据目录与端口 → 备份数据库 → 部署新版本 → 重启 →
 # 等 /api/health 报告新版本。任何一步失败都自动回退到旧版本（程序与 systemd 配置；数据库没有被替换）。
@@ -12,7 +13,7 @@
 #   固定目录  WorkingDirectory=/opt/ai2050/app（install_center.sh 的布局）：旧程序先复制为 app.bak-<旧版本>，再同步新程序
 #
 # 环境变量：SERVICE（缺省 ai2050-center）、BACKUP_DIR（缺省 /root/ai2050-backups）、HEALTH_TIMEOUT（秒，缺省 90）。
-set -euo pipefail
+set -Eeuo pipefail
 
 SERVICE=${SERVICE:-ai2050-center}
 BACKUP_DIR=${BACKUP_DIR:-/root/ai2050-backups}
@@ -25,12 +26,11 @@ ok()   { printf '  \033[32m✓\033[0m %s\n' "$*"; }
 warn() { printf '  \033[33m!\033[0m %s\n' "$*"; }
 die()  { printf '\n\033[31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
-[ "$(id -u)" = 0 ] || die "请用 root 运行：sudo bash $0"
-command -v systemctl >/dev/null || die "需要 systemd"
-command -v curl >/dev/null || die "需要 curl"
-
 # ---------- 1. 发布包 ----------
 step "发布包"
+CHECK_ONLY=false
+if [ "${1:-}" = --check ]; then CHECK_ONLY=true; shift; fi
+[ $# -le 1 ] || die "用法：bash $0 [--check] [发布包.tar.gz]"
 if [ $# -ge 1 ]; then
   PKG=$(readlink -f "$1")
 else
@@ -41,14 +41,22 @@ fi
 NAME=$(basename "$PKG" .tar.gz)
 NEW_VER=${NAME#ai2050-center-}
 [[ "$NEW_VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "文件名应为 ai2050-center-<x.y.z>.tar.gz：$PKG"
-if [ -f "$PKG.sha256" ]; then
-  want=$(awk '{print $1}' "$PKG.sha256")
-  got=$(sha256sum "$PKG" | awk '{print $1}')
-  [ "$want" = "$got" ] || die "sha256 不一致：发布包可能没传完整（期望 ${want:0:16}…，实际 ${got:0:16}…）"
-  ok "$NAME（sha256 已核对）"
-else
-  warn "$NAME（没有 .sha256 文件，跳过核对）"
-fi
+[ -f "$PKG.sha256" ] || die "缺少 $PKG.sha256，请与发布包一起上传"
+want=$(awk 'NR==1 {print $1}' "$PKG.sha256")
+got=$(sha256sum "$PKG" | awk '{print $1}')
+[[ "$want" =~ ^[0-9a-f]{64}$ && "$want" = "$got" ]] || die "sha256 不一致，请重新核对发布包和校验文件"
+members=$(tar -tzf "$PKG") || die "无法读取发布包目录"
+for required in VERSION RELEASE_MANIFEST.json deploy/center_app.py frontend/dist/index.html; do
+  grep -Fxq "$NAME/$required" <<<"$members" || die "发布包缺少 $required"
+done
+PKG_VER=$(tar -xOzf "$PKG" "$NAME/VERSION" | tr -d '[:space:]')
+[ "$PKG_VER" = "$NEW_VER" ] || die "包内 VERSION 与文件名的版本不同"
+ok "$NAME（SHA-256、目录和版本已核对）"
+if [ "$CHECK_ONLY" = true ]; then exit 0; fi
+
+[ "$(id -u)" = 0 ] || die "请用 root 运行：sudo bash $0"
+command -v systemctl >/dev/null || die "需要 systemd"
+command -v curl >/dev/null || die "需要 curl"
 
 # ---------- 2. 当前部署 ----------
 step "当前部署（systemd: $SERVICE）"
@@ -92,8 +100,9 @@ if [[ "$(basename "$OLD_DIR")" =~ ^ai2050-center-[0-9]+\.[0-9]+\.[0-9]+$ ]]; the
   [ ! -e "$NEW_DIR" ] || die "$NEW_DIR 已存在：确认后删除或改名再运行"
 else
   NEW_DIR="$OLD_DIR"
+  PROGRAM_BAK="$OLD_DIR.bak-$OLD_VER-$TS"
 fi
-ok "布局：$([ $LAYOUT = versioned ] && echo "版本目录 → $NEW_DIR" || echo "固定目录（原地同步，旧程序备份为 $OLD_DIR.bak-$OLD_VER）")"
+ok "布局：$([ $LAYOUT = versioned ] && echo "版本目录 → $NEW_DIR" || echo "固定目录（原地同步，旧程序备份为 $PROGRAM_BAK）")"
 
 # ---------- 3. 备份 ----------
 step "备份"
@@ -110,6 +119,20 @@ dst.close(); src.close()
 EOF
   ok "数据库 → $DB_BAK（$(du -h "$DB_BAK" | cut -f1)，完整性已检查）"
 fi
+for ARCHIVE_DB in research_library/library.sqlite3 research_library/test_archive/archive.sqlite3; do
+  if [ -f "$DATA_DIR/$ARCHIVE_DB" ]; then
+    ARCHIVE_BAK="$BACKUP_DIR/$(echo "$ARCHIVE_DB" | tr '/' '_')-$OLD_VER-$TS.sqlite3"
+    "$PY" - "$DATA_DIR/$ARCHIVE_DB" "$ARCHIVE_BAK" <<'EOF'
+import sqlite3, sys
+src = sqlite3.connect(sys.argv[1], timeout=60)
+dst = sqlite3.connect(sys.argv[2])
+src.backup(dst)
+assert dst.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
+dst.close(); src.close()
+EOF
+    ok "研究档案数据库 → $ARCHIVE_BAK（完整性已检查；对象文件保留在原数据目录）"
+  fi
+done
 UNIT_FILES=("$UNIT")
 for f in /etc/systemd/system/"$SERVICE".service.d/*.conf; do [ -f "$f" ] && UNIT_FILES+=("$f"); done
 UNIT_BAK="$BACKUP_DIR/systemd-$OLD_VER-$TS"
@@ -128,17 +151,18 @@ PKG_VER=$(tr -d '[:space:]' < "$SRC/VERSION" 2>/dev/null || true)      # 容忍 
 [ "$PKG_VER" = "$NEW_VER" ] || die "发布包里的 VERSION 是 '$PKG_VER'，与文件名的 $NEW_VER 不符"
 
 rollback() {
+  trap - ERR
   printf '\n\033[31m✗ %s，回退到 %s\033[0m\n' "$1" "$OLD_VER" >&2
   for f in "${UNIT_FILES[@]}"; do cp -p "$UNIT_BAK/$(echo "$f" | tr '/' '_')" "$f"; done
-  if [ $LAYOUT = fixed ] && [ -d "$OLD_DIR.bak-$OLD_VER" ]; then
-    rsync -a --delete "$OLD_DIR.bak-$OLD_VER/" "$OLD_DIR/"
+  if [ $LAYOUT = fixed ] && [ -d "$PROGRAM_BAK" ]; then
+    rsync -a --checksum --delete "$PROGRAM_BAK/" "$OLD_DIR/"
   fi
   systemctl daemon-reload
   systemctl restart "$SERVICE" || true
   sleep 3
   echo "--- 新版本启动日志（最后 40 行）---" >&2
   journalctl -u "$SERVICE" -n 40 --no-pager >&2 || true
-  if curl -fsS -m 5 "$HEALTH" >/dev/null 2>&1; then
+  if curl -fsS -m 5 "$HEALTH" 2>/dev/null | "$PY" -c 'import json,sys; sys.exit(json.load(sys.stdin).get("version") != sys.argv[1])' "$OLD_VER"; then
     echo "已回退，服务正常（$OLD_VER）。新版本目录与备份保留，便于排查。" >&2
   else
     echo "回退后服务仍未响应：systemctl status $SERVICE；数据库备份在 ${DB_BAK:-（无）}" >&2
@@ -163,18 +187,23 @@ if [ $LAYOUT = versioned ]; then
     cp -p "$f" "$NEW_DIR/data/lang_bench/"
     ok "题库正文随版本目录带过去：$(basename "$f")"
   done
+  trap 'rollback "切换服务配置时执行失败（行 $LINENO）"' ERR
   for f in "${UNIT_FILES[@]}"; do sed -i "s#$OLD_DIR_RAW#$NEW_DIR_RAW#g" "$f"; done
   grep -q "$NEW_DIR_RAW" "${UNIT_FILES[@]}" || rollback "systemd 配置里没找到 $OLD_DIR_RAW，无法改指新目录"
   ok "程序 → $NEW_DIR；systemd 已改指新目录"
 else
   command -v rsync >/dev/null || die "需要 rsync"
-  rm -rf "$OLD_DIR.bak-$OLD_VER"
-  cp -a "$OLD_DIR" "$OLD_DIR.bak-$OLD_VER"
+  [ ! -e "$PROGRAM_BAK" ] || die "旧程序备份路径已存在：$PROGRAM_BAK"
+  cp -a "$OLD_DIR" "$PROGRAM_BAK"
+  trap 'rollback "同步程序时执行失败（行 $LINENO）"' ERR
   # --delete 会删掉包里没有的文件，所以显式排除题库正文：它可能被单独放在服务器上，
   # 属于数据而不是程序，升级不该动它。
-  rsync -a --delete --exclude '__pycache__' --exclude 'data/lang_bench/questions*.jsonl' "$SRC/" "$OLD_DIR/"
+  # VERSION is generated when packaging. Two releases may carry different bytes
+  # with identical sizes and mtimes, which rsync's default quick check skips.
+  rsync -a --checksum --delete --exclude '__pycache__' --exclude 'data/lang_bench/questions*.jsonl' "$SRC/" "$OLD_DIR/"
+  cmp -s "$SRC/VERSION" "$OLD_DIR/VERSION" || rollback "固定目录中的 VERSION 与发布包不一致"
   chown -R "$SVC_USER:$SVC_GROUP" "$OLD_DIR"
-  ok "程序已同步到 $OLD_DIR（旧程序 → $OLD_DIR.bak-$OLD_VER；题库正文保留）"
+  ok "程序已同步到 $OLD_DIR（旧程序 → $PROGRAM_BAK；题库正文保留）"
 fi
 
 # ---------- 5. 重启与检查 ----------
@@ -193,6 +222,7 @@ done
 grep -q "\"version\": *\"$NEW_VER\"" <<<"$body" || rollback "health 报告的版本不是 $NEW_VER：$body"
 grep -q '"data_dir_in_release": *false' <<<"$body" || warn "health 报告 data_dir_in_release 不是 false：$body"
 ok "$HEALTH → $NEW_VER"
+trap - ERR
 
 step "完成：$OLD_VER → $NEW_VER"
 echo "  数据库备份：${DB_BAK:-（无）}"
@@ -201,6 +231,6 @@ if [ $LAYOUT = versioned ]; then
   echo "  旧版本目录保留：$OLD_DIR"
   echo "  回退：把 $UNIT_BAK 里的配置复制回 ${UNIT_FILES[*]}，再 systemctl daemon-reload && systemctl restart $SERVICE"
 else
-  echo "  旧程序备份：$OLD_DIR.bak-$OLD_VER"
-  echo "  回退：rsync -a --delete $OLD_DIR.bak-$OLD_VER/ $OLD_DIR/ && systemctl restart $SERVICE"
+  echo "  旧程序备份：$PROGRAM_BAK"
+  echo "  回退：rsync -a --checksum --delete $PROGRAM_BAK/ $OLD_DIR/ && systemctl restart $SERVICE"
 fi

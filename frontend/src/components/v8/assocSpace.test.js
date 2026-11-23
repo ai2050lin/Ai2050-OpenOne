@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { FLOW_DATA, rankHeads, rewriteCurve } from './data/assocFlow.js';
+import { buildH2Flow, rankHeads, rewriteCurve } from './data/assocFlow.js';
+import report from '../../../../deploy/workspace_data/h2-report.json';
+import heads from '../../../../deploy/workspace_data/h2-heads.json';
+
+const FLOW_DATA = buildH2Flow(report,heads);
 
 describe('关联机制 3D 流数据（MA-H2）', () => {
   it('词嵌入 + 36 层，36 块 × 32 头', () => {
@@ -14,9 +18,9 @@ describe('关联机制 3D 流数据（MA-H2）', () => {
     FLOW_DATA.factors.forEach(f => expect(f[3][0]).toBeLessThan(0.01));
   });
   it('头排名按资料减现实，与 H2 报告的前几名一致', () => {
-    const top = rankHeads().map(x => `L${x.l}H${x.h}`);
+    const top = rankHeads(FLOW_DATA).map(x => `L${x.l}H${x.h}`);
     expect(top.slice(0, 5)).toEqual(expect.arrayContaining(['L29H11', 'L23H4', 'L28H0']));
-    const d = rankHeads().map(x => x.d - x.r);
+    const d = rankHeads(FLOW_DATA).map(x => x.d - x.r);
     expect([...d].sort((a, b) => b - a)).toEqual(d);
   });
 });

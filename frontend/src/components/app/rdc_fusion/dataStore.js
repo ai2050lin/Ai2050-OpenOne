@@ -6,7 +6,8 @@
    浏览器禁用 IndexedDB 时退化为只在内存里保存（关闭页面即失效）。 */
 
 import {consumeResearchStream} from './researchStream.js';
-const DB_NAME = 'ai2050-data';
+import {API_BASE} from '../../../config.js';
+const DB_NAME = `ai2050-data:${API_BASE || globalThis.location?.origin || 'local'}`;
 const STORE = 'kv';
 const ON_DEMAND = [/^\/api\/agg\/[^/]+\/v2$/, /^\/api\/analysis\/[^/]+$/];
 
@@ -160,6 +161,19 @@ export async function getExtraEntry(path) {
   const id = packHint(path);
   if (!id || !state.extras[id]) return undefined;
   return idb('get', `${state.extras[id].key_prefix||'x|'}${canonical(path)}`);
+}
+
+export function getWorkspaceCache(path) {
+  return idb('get', `workspace|${canonical(path)}`);
+}
+
+export async function putWorkspaceCache(path, data) {
+  if (!await checkCache(JSON.stringify(data).length, false)) return;
+  await idb('put', `workspace|${canonical(path)}`, data);
+}
+
+export function forgetWorkspaceCache(path) {
+  return idb('delete',`workspace|${canonical(path)}`);
 }
 
 export function isOnDemand(path) {
